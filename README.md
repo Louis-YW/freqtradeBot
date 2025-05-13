@@ -48,8 +48,8 @@ Some script files might contain absolute paths specific to my machine (e.g., /Us
 
 
 
+# Full Workflow (Reproducible Pipeline)
 
-Full Workflow (Reproducible Pipeline)
 To fully replicate the full pipeline from raw data to model training and strategy execution:
 
 1. Scrape Forum Data
