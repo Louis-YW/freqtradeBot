@@ -1,0 +1,149 @@
+{
+  "id": "topic_5427745",
+  "title": "JohnyD1",
+  "author": "JohnyD1",
+  "created_time": "December 10, 2022, 03:38:03 PMLast edit: December 11, 2022, 09:19:01 PM by mprep",
+  "content": "How can I create a HD multisig (HD seeds 3/5) with hardened derivation and use passphrase with the seed  (bip39?) Using offline: Ubuntu 22.04 , bitcoincore 22.0 and ian colemanResuming 5 HD seeds with passphrase 3/5 multisig  Do I use addmultisigaddress using bitcoin-cli?Anyone can take me through the steps?And after can I simply use bitcoin core full node import descriptors to and create watch-only address to create psbts to sign at other offline devices?Seedhammer has 3/5 multisig which I what I want to create[moderator's note: consecutive posts merged]",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5427745",
+  "comments": [
+    {
+      "author": "hosemary",
+      "created_time": "December 10, 2022, 04:18:00 PM",
+      "body": "You can create a multi-signature address using createmultisig command, but you can't have a seed phrase. Bitcoin core doesn't support seed phrase at all. For creating a multi-signature address, you can use the following command. Code:createmultisig M \"[\\\"Publickey1\\\",\\\"PublicKey2\\\",....................,\\\"PublicKeyN\\\"]\"This creates a M of N multi-signature address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JohnyD1",
+      "created_time": "December 10, 2022, 04:34:55 PMLast edit: December 11, 2022, 09:19:18 PM by mprep",
+      "body": "So if I have 5 seeds I need to keep creating multisigs from the derivation of those 5 seeds following the derivation path (child pukeys) to keep creating multisigs I one day wish to spend? This seems like a heavy convoluted process using only bitcoin core also error proneSo practically if I have 3 devices Device 1 - full node Device 2 - offline laptop 1 (lp1)  Device 3 - offline laptop 2 (lp2)5 seeds with passphrase  2 at lp 1, one at lp2, 2 offline, all xpubs in lp1 and lp2 (this won't work?)I can't simply keep 2 xpriv in lp1 plus 1 xpriv in lp 2 plus 2 xpriv offline (I plan on having 1 or 2 backup for every: seed + 2xpubs)So instead of putting all 5 xpubs in full node to keep generating new multisig addresses using bitcoinqt .I would have to create: 20 multisig addresses for example, by creating the first 20 addresses per seed then using bitcoin cli to individually create the multisig for each of those addresses so I could then add those addresses to bitcoinqt so I could create psbts and watchonly wallet?And transfer to lp1 sign transfer to lp2 sign and then back to full node to send?So can't have multisigs from 5 seeds? Using bitcoinqt I mean you're not supposed to reuse addresses but this makes it too complicated So from what I understand if people want to use multisig they can't not reuse address?Isn't the descriptor for that? So the descriptor works for one address only?[moderator's note: consecutive posts merged]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 10, 2022, 08:17:53 PM",
+      "body": "Quote from: JohnyD1 on December 10, 2022, 04:57:04 PM5 seeds with passphrase  2 at lp 1, one at lp2, 2 offline, all xpubs in lp1 and lp2 (this won't work?)This will work minus the seeds and passphrases, since Bitcoin Core does not support these. But as I said on your other thread, there really is very little point creating a higher order multi-sig when multiple keys are stored on the same device. 3-of-5 with 2 keys on one device is no more secure than 2-of-3 with 1 key on each device.Quote from: JohnyD1 on December 10, 2022, 04:57:04 PMI can't simply keep 2 xpriv in lp1 plus 1 xpriv in lp 2 plus 2 xpriv offline (I plan on having 1 or 2 backup for every: seed + 2xpubs)As long as you also keep the xpubs from all the other cosigners, sure.Quote from: JohnyD1 on December 10, 2022, 04:57:04 PMSo instead of putting all 5 xpubs in full node to keep generating new multisig addresses using bitcoinqt .I would have to create: 20 multisig addresses for example, by creating the first 20 addresses per seed then using bitcoin cli to individually create the multisig for each of those addresses so I could then add those addresses to bitcoinqt so I could create psbts and watchonly wallet?Why would you manually create every single address when you can just import all 5 xpubs?Quote from: JohnyD1 on December 10, 2022, 04:57:04 PMAnd transfer to lp1 sign transfer to lp2 sign and then back to full node to send?Yes.Quote from: JohnyD1 on December 10, 2022, 04:57:04 PMSo can't have multisigs from 5 seeds?From seed phrases? Not with Core, but yes with a decent BIP39 wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JohnyD1",
+      "created_time": "December 10, 2022, 08:56:05 PM",
+      "body": "Thank you I will follow the explanation on the other post if you care to explain to me, from what I understand the descriptors is to keep creating addresses for the multisigs yes?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "December 11, 2022, 01:27:46 PMLast edit: December 11, 2022, 03:01:28 PM by nc50lc",
+      "body": "Quote from: JohnyD1 on December 10, 2022, 03:38:03 PMHow can I create a HD multisig (HD seeds 3/5) with hardened derivation and use passphrase with the seed  (bip39?) Using offline: Ubuntu 22.04 , bitcoincore 22.0 and ian colemanThe steps to \"workaround\" using iancoleman's BIP39 tool and Bitcoin Core will be long and technical, but it's possible.On the other hand, it's fairly easy in Electrum's GUI.Here are the steps if you really want to continue:In BIP39 tool:Type your mnemonic seed and BIP39 passphrase, select the correct coin.Scroll-down, go to \"BIP32\" Tab, select \"Custom derivation path\" in the client drop-down menu.Type the correct derivation path up to the \"script_type\" level of your wallet which has the standard BIP48 path of m/48'/0'/0'/1' for P2SH-P2WSH MultiSig;refer to BIP48 and BIP45 for the derivation path of other script types (BIP48 link & BIP45 link) and/or your wallet's derivation path to the extended master keys.After that, take note of the \"BIP32 Extended Private Key\" and \"BIP32 Extended Public Key\" below.Repeat all steps for other cosigner's keys.In Bitcoin Core:For example, I want a to restore an HD 2-of-2 Nested SegWit MultiSig (P2SH-P2WSH) [RegTest]:[1] Create 2 blank Cosigners wallets with \"Blank Wallet\" and \"Descriptor\" checkboxes ticked.[2] Create 1 Watching-only wallet with \"Disable Private Keys\", Blank Wallet\" and \"Descriptor\" checkboxes ticked.This is for unsigned raw transaction creation in the GUI since you've mentioned it in your other thread and you wont be able to create unsigned transacting using the Cosigner wallets (as of v24.0.0).[3] Now the hard part, create the descriptors based from the extended keys that you have.Sample Cosigner 1's Extended keystprv8j6Rs3aMoX1iGB9RVgYViW1JDyBrqNF2ZXEc5h8qYdMeJeP8RAZ2JyEBENC69RW8E7KnRS9TcdY ytCSwnBmHf5cDtM35UdphibSWFaVvunutpubDFnU1TcbwthP9eBDPLD67ufQnzhnzhRw8pqPNDB8xuA398du3ZNcVTr3QXNfDfGWLC2sB9PBqcb ycszg9P795mm1u56ksDbvs59JyDjPCSnSample Cosigner 2's Extended keystprv8iRCdgDxePisb7TXVSVQ4qceiphq9aXUNzabLsYSNz6PnWkhKAX3t5PcM134tZXkAX6jTxHDujq GDAyEzEdDoRztK3LA6srFcvwMJtMDzLctpubDF7En6GCnmQYUaVKP69zUFGmHrDmJuiNxJBNdPajoFtnd11TwZLe4a1UX8Pvkf2u6fU5EMjyr65 xyuDvq3TumNA8LwU8PtWRaicdzZ6EF2dThe \"sh(wsh\" multiSig descriptors from those extended keys will be (the keys' arrangement should be the same to your previous wallet):Cosigner 1 (Cosigner1's xprv, Cosigner2's xpub)sh(wsh(multi(2,tprv8j6Rs3aMoX1iGB9RVgYViW1JDyBrqNF2ZXEc5h8qYdMeJeP8RAZ2JyEBENC69RW8E7KnRS9TcdYytCSwnBmHf5cDtM35UdphibSWFaVvunu/0/*,tpubDF7En6GCnmQYUaVKP69zUFGmHrDmJuiNxJBNdPajoFtnd11TwZLe4a1UX8Pvkf2u6fU5EMjyr65xyuDvq3TumNA8LwU8PtWRaicdzZ6EF2d/0/*)))Cosigner 2 (Cosigner1's xpub, Cosigner2's xprv)sh(wsh(multi(2,tpubDFnU1TcbwthP9eBDPLD67ufQnzhnzhRw8pqPNDB8xuA398du3ZNcVTr3QXNfDfGWLC2sB9PBqcbycszg9P795mm1u56ksDbvs59JyDjPCSn/0/*,tprv8iRCdgDxePisb7TXVSVQ4qceiphq9aXUNzabLsYSNz6PnWkhKAX3t5PcM134tZXkAX6jTxHDujqGDAyEzEdDoRztK3LA6srFcvwMJtMDzLc/0/*)))For the Watching-only wallet (Cosigner1's xpub, Cosigner2's xpub)sh(wsh(multi(2,tpubDFnU1TcbwthP9eBDPLD67ufQnzhnzhRw8pqPNDB8xuA398du3ZNcVTr3QXNfDfGWLC2sB9PBqcbycszg9P795mm1u56ksDbvs59JyDjPCSn/0/*,tpubDF7En6GCnmQYUaVKP69zUFGmHrDmJuiNxJBNdPajoFtnd11TwZLe4a1UX8Pvkf2u6fU5EMjyr65xyuDvq3TumNA8LwU8PtWRaicdzZ6EF2d/0/*)))You'll also need descriptors for the change addresses which are basically the sameexcept for the trailing \"/0\" path after the master keys; for the change, it should be \"/1\"For reference, read this document about descriptors: https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md#examples[4] Get the descriptors' checksums from the command \"getdescriptorinfo\".From the example, the checksums are: \"3scferc6\", \"augnfj7d\" and \"de92usr9\" respectively.[5] Import the descriptors to the correct wallet using the command \"importdescriptors\":Put the checksum after a \"#\" next to the descriptor.Wallet 1 (Cosigner 1):importdescriptors \"[{\\\"desc\\\": \\\"sh(wsh(multi(2,tprv8j6Rs3aMoX1iGB9RVgYViW1JDyBrqNF2ZXEc5h8qYdMeJeP8RAZ2JyEBENC69RW8E7KnRS9TcdYytCSwnBmHf5cDtM35UdphibSWFaVvunu/0/*,tpubDF7En6GCnmQYUaVKP69zUFGmHrDmJuiNxJBNdPajoFtnd11TwZLe4a1UX8Pvkf2u6fU5EMjyr65xyuDvq3TumNA8LwU8PtWRaicdzZ6EF2d/0/*)))#3scferc6\\\",\\\"timestamp\\\": \\\"now\\\",\\\"active\\\": true,\\\"watching-only\\\": false,\\\"internal\\\": false,\\\"range\\\": [0,999]}]\"Wallet 2 (Cosigner 2):importdescriptors \"[{\\\"desc\\\": \\\"sh(wsh(multi(2,tpubDFnU1TcbwthP9eBDPLD67ufQnzhnzhRw8pqPNDB8xuA398du3ZNcVTr3QXNfDfGWLC2sB9PBqcbycszg9P795mm1u56ksDbvs59JyDjPCSn/0/*,tprv8iRCdgDxePisb7TXVSVQ4qceiphq9aXUNzabLsYSNz6PnWkhKAX3t5PcM134tZXkAX6jTxHDujqGDAyEzEdDoRztK3LA6srFcvwMJtMDzLc/0/*)))#augnfj7d\\\",\\\"timestamp\\\": \\\"now\\\",\\\"active\\\": true,\\\"watching-only\\\": false,\\\"internal\\\": false,\\\"range\\\": [0,999]}]\"Wallet 3 (Watching-only wallet)importdescriptors \"[{\\\"desc\\\": \\\"sh(wsh(multi(2,tpubDFnU1TcbwthP9eBDPLD67ufQnzhnzhRw8pqPNDB8xuA398du3ZNcVTr3QXNfDfGWLC2sB9PBqcbycszg9P795mm1u56ksDbvs59JyDjPCSn/0/*,tpubDF7En6GCnmQYUaVKP69zUFGmHrDmJuiNxJBNdPajoFtnd11TwZLe4a1UX8Pvkf2u6fU5EMjyr65xyuDvq3TumNA8LwU8PtWRaicdzZ6EF2d/0/*)))#de92usr9\\\",\\\"timestamp\\\": \\\"now\\\",\\\"active\\\": true,\\\"watching-only\\\": true,\\\"internal\\\": false,\\\"range\\\": [0,999]}]\"Import the descriptors for change as well, aside from the previous \"/1\" difference in the descriptor, those should be set as \"\\\"internal\\\": true,\" in the command as well.Without it, you'll have to manually set change addresses in every transaction that needs change.[6] Now, try to request a \"Base58 (P2SH-SegWit)\" address in the \"Receive\" tab to see if the Cosigners have matching address.To spend, create an unsigned transaction using the watching-only wallet, then the usual: export the txn to the cosigners to sign it one at a time, fully sign it to broadcast.Take note that this is more of a workaround and an \"official\" feature may be implemented in the future.And the derivation path differs per wallet, my example is based from BIP48.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JohnyD1",
+      "created_time": "December 11, 2022, 07:42:22 PMLast edit: December 11, 2022, 09:18:17 PM by mprep",
+      "body": "nc50lc much love to you, I did it, thank you for explaining it to me, really made my day to go about trying this and actually getting it to work.The derivation path for external being m/48'/0'/0'/1'/0 (plus/* to getdescriptorinfo and importdescriptors)And internal being m/48'/0'/0'/1'/1 (plus/* to getdescriptorinfo and importdescriptors)Right?Again thank you, feels nice to actually do it.The one thing I dont understand is if i have more cosigners, because cosigner1 did xpriv,xpub Cosigner2 did xpub,xprivIf i have 4 cosigners or 5Id do:cosigner1: xpriv,xpub,xpub,xpub,xpubCosigner2: xpub,xpriv,xpub,xpub,xpubCosigner3: xpub,xpub,xpriv,xpub,xpubCosigner4: xpub,xpub,xpub,xpriv,xpubCosginer5: xpub,xpub,xpub,xpub,xprivGuess this would be it?Quote from: JohnyD1 on December 11, 2022, 07:42:22 PMnc50lc much love to you, I did it, thank you for explaining it to me, really made my day to go about trying this and actually getting it to work.The derivation path for external being m/48'/0'/0'/1'/0 (plus/* to getdescriptorinfo and importdescriptors)And internal being m/48'/0'/0'/1'/1 (plus/* to getdescriptorinfo and importdescriptors)Right?Again thank you, feels nice to actually do it.You'll also need descriptors for the change addresses which are basically the sameexcept for the trailing \"/0\" path after the master keys; for the change, it should be \"/1\"So above i should have used:m/48'/0'/0'/1'/0' m/48'/0'/0'/1'/0'/* = externalm/48'/0'/0'/1'/1'/* = internal[moderator's note: consecutive posts merged]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 11, 2022, 08:49:07 PM",
+      "body": "Quote from: JohnyD1 on December 11, 2022, 07:57:24 PMIf i have 4 cosigners or 5That's correct. Each cosigner needs their own xprv, and the xpub of every other cosigner.Bear in mind that when you make your back ups, backing up just the xprv is insufficient and you must back up the other xpubs as well. If your wallet is 3-of-5, for example, you cannot recover it with just 3 xprvs - you also need the other 2 xpubs.Quote from: JohnyD1 on December 11, 2022, 08:11:42 PMSo above i should have used:m/48'/0'/0'/1'/0' m/48'/0'/0'/1'/0'/* = externalm/48'/0'/0'/1'/1'/* = internalThe change level is not hardened. Provided you are using nested segwit, then:m/48'/0'/0'/1'/0/0 will be your first external address.m/48'/0'/0'/1'/0/1 will be your second external address.m/48'/0'/0'/1'/1/0 will be your first change address.m/48'/0'/0'/1'/1/1 will be your second change address.And so on.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JohnyD1",
+      "created_time": "December 11, 2022, 10:34:29 PMLast edit: December 11, 2022, 11:05:15 PM by JohnyD1",
+      "body": "Quote from: o_e_l_e_o on December 11, 2022, 08:49:07 PMQuote from: JohnyD1 on December 11, 2022, 07:57:24 PMIf i have 4 cosigners or 5That's correct. Each cosigner needs their own xprv, and the xpub of every other cosigner.Bear in mind that when you make your back ups, backing up just the xprv is insufficient and you must back up the other xpubs as well. If your wallet is 3-of-5, for example, you cannot recover it with just 3 xprvs - you also need the other 2 xpubs.Quote from: JohnyD1 on December 11, 2022, 08:11:42 PMSo above i should have used:m/48'/0'/0'/1'/0' m/48'/0'/0'/1'/0'/* = externalm/48'/0'/0'/1'/1'/* = internalThe change level is not hardened. Provided you are using nested segwit, then:m/48'/0'/0'/1'/0/0 will be your first external address.m/48'/0'/0'/1'/0/1 will be your second external address.m/48'/0'/0'/1'/1/0 will be your first change address.m/48'/0'/0'/1'/1/1 will be your second change address.And so on.So I did it correctly by not hardening the one before the /*  ? I guess so.Thanks for the clarifications,  you guys helped me a ton.Could you also please give your way of doing this using only core since you dislike Ian coleman because of java script. Would really appreciate it.I guess create blank wallet , create address, dumpprivkey, repeat process for number of signers, then createmultisig using these xpubs? Do the watchonly, and get laptop 1 with wallet with 2 xpriv get laptop2 with 1 xpriv , backup seperatedly every xpriv + derivation path + (anything else?) each with 2 xpubs and their order if they are 1/2/3/4/5 Xpriv 1 with xpub 2 and 3 Xpriv 2 with xpub 3 and 4Xpriv 3 with xpub 4 and 5Xpriv 4 with xpub 5 and 1Xpriv 5 with xpub 1 and 2",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "December 12, 2022, 03:37:35 AM",
+      "body": "Quote from: JohnyD1 on December 11, 2022, 07:42:22 PMQuoteYou'll also need descriptors for the change addresses which are basically the sameexcept for the trailing \"/0\" path after the master keys; for the change, it should be \"/1\"So above i should have used:m/48'/0'/0'/1'/0' m/48'/0'/0'/1'/0'/* = externalm/48'/0'/0'/1'/1'/* = internalIn that part, I'm talking about the \"/0/*\" in the descriptor.So for my example Cosigner1's change descriptor, it should be:sh(wsh(multi(2,tprv8j6Rs3aMoX1iGB9RVgYViW1JDyBrqNF2ZXEc5h8qYdMeJeP8RAZ2JyEBENC69RW8E7KnRS9TcdYytCSwnBmHf5cDtM35UdphibSWFaVvunu/1/*,tpubDF7En6GCnmQYUaVKP69zUFGmHrDmJuiNxJBNdPajoFtnd11TwZLe4a1UX8Pvkf2u6fU5EMjyr65xyuDvq3TumNA8LwU8PtWRaicdzZ6EF2d/1/*)))Since I'm using BIP48 as an example, the extended keys that I have are already at the \"script_type\" level,which is the \"1'\" in m/48'/0'/0'/1', the next level in the descriptor should be the \"change\" or \"chain\" level.You wont have to change the m/48'/0'/0'/1' path in BIP39 tool if you're going to use the standard path.Quote from: JohnyD1 on December 11, 2022, 10:34:29 PMCould you also please give your way of doing this using only core since you dislike Ian coleman because of java script. Would really appreciate it.I guess create blank wallet , create address, dumpprivkey, repeat process for number of signers, then createmultisig using these xpubs? Do the watchonly, and get laptop 1 with wallet with 2 xpriv get laptop2 with 1 xpriv , backup seperatedly every xpriv + derivation path + (anything else?) each with 2 xpubs and their order if they are 1/2/3/4/5 createmultisig or addmultisig do not accept xprv and xpub keys, those commands are for single MultiSig address generation.It's doable but you'll have to use addmultisig for each set of prv/pub keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 12, 2022, 11:57:52 AM",
+      "body": "Quote from: JohnyD1 on December 11, 2022, 10:34:29 PMCould you also please give your way of doing this using only core since you dislike Ian coleman because of java script. Would really appreciate it.I wouldn't. I would use Electrum as I mentioned in another thread. It's a far more straightforward process, does not involve doing a bunch of workarounds which only serve to increase the chances you lock yourself our of your coins, and does not require importing individual addresses rather than just an entire HD wallet.Quote from: JohnyD1 on December 11, 2022, 10:34:29 PMXpriv 1 with xpub 2 and 3 Xpriv 2 with xpub 3 and 4Xpriv 3 with xpub 4 and 5Xpriv 4 with xpub 5 and 1Xpriv 5 with xpub 1 and 2This is a sufficient way to back up a 3-of-5 multi-sig, since the recovery of any 3 shares gives you 3 xprvs and the 2 missing xpubs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JohnyD1",
+      "created_time": "December 12, 2022, 12:22:25 PMLast edit: December 12, 2022, 04:48:13 PM by mprep",
+      "body": "Quote from: nc50lc on December 12, 2022, 03:37:35 AMIn that part, I'm talking about the \"/0/*\" in the descriptor.So for my example Cosigner1's change descriptor, it should be:sh(wsh(multi(2,tprv8j6Rs3aMoX1iGB9RVgYViW1JDyBrqNF2ZXEc5h8qYdMeJeP8RAZ2JyEBENC69RW8E7KnRS9TcdYytCSwnBmHf5cDtM35UdphibSWFaVvunu/1/*,tpubDF7En6GCnmQYUaVKP69zUFGmHrDmJuiNxJBNdPajoFtnd11TwZLe4a1UX8Pvkf2u6fU5EMjyr65xyuDvq3TumNA8LwU8PtWRaicdzZ6EF2d/1/*)))Since I'm using BIP48 as an example, the extended keys that I have are already at the \"script_type\" level,which is the \"1'\" in m/48'/0'/0'/1', the next level in the descriptor should be the \"change\" or \"chain\" level.You wont have to change the m/48'/0'/0'/1' path in BIP39 tool if you're going to use the standard path.[/quote]What i mean is after m/48'/0'/0'/1'/  I can't harden the path correct? So it has to be for external m/48'/0'/0'/1'/0Andm/48'/0'/0'/1'/1 for internal without 'I used electrum as you suggested o_e_l_e_o it is simpler and works fine, but i did notice electrum derivation path is m/1'Does this mean it is less secure than bip48? But seems like no hard derivation is used since the standard wallet is m/0 it is also an spv and not a full node, could i use the textfile (it creates to broadcast transaction) to send it through full node (bitcoin core 22.0), also can i use electrums watchonly in bitcoincore instead of electrum and use electrum to sign (psbt) only? Guess not?Ian coleman does use 15+1 words instead of 12+1 (extended word)...Is there no option to ian coleman to create a bip48 while using python3 i guess, since you are ok with electrum (which uses python3 python-cryptographylib right?) you would be ok would something like ian coleman that comes/uses out of python3 right o_e_l_e_o?[moderator's note: consecutive posts merged]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 12, 2022, 04:12:03 PM",
+      "body": "Quote from: JohnyD1 on December 12, 2022, 03:58:25 PMDoes this mean it is less secure than bip48?No. The derivation path makes no real difference to security, especially since both used a hardened derivation at the account level.Quote from: JohnyD1 on December 12, 2022, 03:58:25 PMit is also an spv and not a full nodeI would set up an Electrum server linked to my own full node on my online computer. Then you can set up a watch only HD multi-sig Electrum wallet which is pointed exclusively at your own server. And then you can use airgapped Electrum wallets on your two airgapped laptops. You can then broadcast Electrum transactions via your own server via your own full node.Quote from: JohnyD1 on December 12, 2022, 03:58:25 PMIan coleman does use 15+1 words instead of 12+1 (extended word)...There is a drop down box on Ian Coleman which allows you to customize the number of words.Quote from: JohnyD1 on December 12, 2022, 03:58:25 PMyou would be ok would something like ian coleman that comes/uses out of python3 right o_e_l_e_o?You can certainly do much worse than Ian Coleman, but personally I would still prefer to use reputable wallet software such as Core or Electrum to generate my entropy over a website.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JohnyD1",
+      "created_time": "December 12, 2022, 04:40:39 PM",
+      "body": "Ah so I would get a full node with bitcoin core plus electrum and simply point my electrum to my node (can they run on same device?), nice idea.Ok I'm probably sticking with this.The thing that annoys me is ubuntu 22.04 uses fuselib3 and it requires to install fuselib2. I'm going to make a guide for my friends and me amd everyone i onboard to bitcoin using strictly ubuntu + bitcoin core + electrum (now) and airgapped devices. Since it is easier to use electrum, i hope core can easily create multisigs sh(multi(x in future then i can drop electrum 😆.I mean there is a ton of laptops in secondary market 🤣.Thanks for all the help once again.Also removing WAN and bluetooth from the laptops (physically).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 12, 2022, 08:17:45 PM",
+      "body": "Quote from: JohnyD1 on December 12, 2022, 04:40:39 PMcan they run on same device?Absolutely. There are various different pieces of software you can choose from, each with its own pros and cons:https://github.com/spesmilo/electrumxhttps://github.com/romanz/electrshttps://github.com/chris-belcher/electrum-personal-serverQuote from: JohnyD1 on December 12, 2022, 04:40:39 PMI'm going to make a guide for my friends and meIf your friends trust you, they can always connect to your Electrum server rather than having to spin up their own.Quote from: JohnyD1 on December 12, 2022, 04:40:39 PMAlso removing WAN and bluetooth from the laptops (physically).Good plan. The best airgapped devices are ones which physically can never connect to the internet again, not simply ones which could connect but hopefully don't.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JohnyD1",
+      "created_time": "December 13, 2022, 04:19:57 PMLast edit: December 13, 2022, 11:22:42 PM by Mr. Big",
+      "body": "How can i create a bip 48 using bip 39 15 words plus one without ian coleman with m/48'/0'/0'/1'/0 and get the m/48'/0'/0'/1'/1  (a entropy safe oss) electrum is nice but i also want to have a wallet using nc50lc workaround so I can use bitcoin core. I'll make a script to smooth out the process using text file editor, any oss to generate seeds like ian coleman but safer (entropy) no javascript and tested.Quote from: JohnyD1 on December 13, 2022, 04:19:57 PMHow can i create a bip 48 using bip 39 15 words plus one without ian coleman with m/48'/0'/0'/1'/0 and get the m/48'/0'/0'/1'/1  (a entropy safe oss) electrum is nice but i also want to have a wallet using nc50lc workaround so I can use bitcoin core. I'll make a script to smooth out the process using text file editor, any oss to generate seeds like ian coleman but safer (entropy) no javascript and tested.Hmmm actually it's a bip 32 with custom derivation path of m/48.... right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "December 14, 2022, 11:28:33 AM",
+      "body": "Quote from: o_e_l_e_o on December 12, 2022, 08:17:45 PMQuote from: JohnyD1 on December 12, 2022, 04:40:39 PMcan they run on same device?Absolutely. There are various different pieces of software you can choose from, each with its own pros and cons:https://github.com/spesmilo/electrumxhttps://github.com/romanz/electrshttps://github.com/chris-belcher/electrum-personal-serverQuote from: JohnyD1 on December 12, 2022, 04:40:39 PMI'm going to make a guide for my friends and meIf your friends trust you, they can always connect to your Electrum server rather than having to spin up their own.I have to say electrum perosnal server (EPS) has major limitation and definitely bad choice if OP's friend decide connect to OP's Electrum server. EPS require you to add xpub/address manually on configuration file and each time you add new xpub/address, EPS have to send rescan request to Bitcoin Core which take some time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 14, 2022, 11:42:35 AM",
+      "body": "Quote from: ETFbitcoin on December 14, 2022, 11:28:33 AMEPS require you to add xpub/address manually on configuration file and each time you add new xpub/address, EPS have to send rescan request to Bitcoin Core which take some time.Absolutely, but the beneficial trade off for that limitation is it also the lightest of the three options which has the lowest demand on hardware, so that will be something for OP consider. If OP will simply be setting up a solitary multi-sig HD wallet, then it is quick and straightforward to import his xpubs to EPS, scan once, and then be good to go. And you can of course choose to only scan from a set height, so if it is a newly created wallet you do not need to rescan at all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

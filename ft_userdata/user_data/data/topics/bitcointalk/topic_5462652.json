@@ -1,0 +1,165 @@
+{
+  "id": "topic_5462652",
+  "title": "cygan",
+  "author": "cygan",
+  "created_time": "August 09, 2023, 01:55:24 PMLast edit: August 09, 2023, 05:01:42 PM by cygan",
+  "content": "Bitcoin wallets created with the so-called Libbitcoin explorer are very insecure due to a cryptographically poorly implemented random number generator and should be cleared as soon as possible. the Libbitcoin explorer, more commonly known by its abbreviation 'bx', is a handy tool for the command line, with all sorts of functions for Bitcoin key and wallet management. among them is the ability to use the 'bx' seed command to create a supposedly secure new wallet with 12 or 24 recovery words.Libbitcoin explorer is best known for its prominent mention in the technical Bitcoin book 'Mastering Bitcoin' written by author Andreas M. Antonopoulos. an entire article is dedicated to how the tool works and how to use it.David A. Harding, who is busy writing the revised and third edition of this book, sent the following tweet about it today:https://twitter.com/hrdng/status/1689022029142560771under the following link you can find more information about the vulnerability: https://milksad.info/",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5462652",
+  "comments": [
+    {
+      "author": "Yamane_Keto",
+      "created_time": "August 09, 2023, 02:32:33 PM",
+      "body": "This looks very interesting, restricts the entropy from 128/256 bits to 32 bits.I wouldn't be surprised if this was the reason for hacking some closed source wallets like Atomic Wallet, and I wouldn't be surprised if they were using deterministic random number generators.I think we have enough reasons to stop using closed source wallets because we don't know exactly what updates they make and whether they check entropy is really random or they rely on outdated libraries for PRNG.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 09, 2023, 09:56:26 PM",
+      "body": "You should never have used any closed source wallet-- but being open source is not enough.In this case the rng was replaced with an obviously broken toy and no one noticed because the project has no reviewers.Some extra relevant links:https://github.com/libbitcoin/libbitcoin-system/pull/559The pull request adding the vulnerability, the lack of review or collaboration is worth noticing. The prior code was already dubious in that AFAIK std::random_device library doesn't promise that the randomness is suitable for cryptography. I believe on common systems where this code was run the old code was not likely to be exploitable, but I wouldn't bet my money on it.https://twitter.com/evoskuil/status/1688657656620167169Developer commentary on this issue. I can't figure out what \"long-documented intended usage\" a seed command that mandates 128-bits of output but never has more than 32-bits of entropy would have.https://archive.is/A7Jn6The documentation the tweet references. I don't know how the 'Pseudorandom seeding' warning there would be distinguishable from warnings against CSPRNGs in favor of dice rolls or whatever, perhaps this is an example of the harm that chicken-little crying about CSPRNGS causes. Nor can I figure out for whose convenience this function would serve except attackers. In any case, this is the only place I found any kind of warning and the warning postdates the mastering bitcoin usage (as well as the change that made the command unconditionally unsafe).https://archive.is/HDe8hCurrent libbitcoin-explorer instructions telling users to use the seed command to generate private keys.https://archive.is/fhm5J#selection-12915.2-12915.10Current libbitcoin-explorer instructions telling users to use the seed command to generate BIP39 seeds (also private keys).https://archive.is/PWLKJCurrent libbitcoin-explorer documentation on randomness noting that bx seed is the ONLY source of randomness available to users in the package, and that all other commands that need randomness require the user to provide it. It also notes that 'bx seed' will not function if less than 128-bits are requested.The private key and bip39 seed usage (above) sure appears to be the \"intended usage\" in their documentation, but the \"bx seed\" function as currently implemented (since 2016) is unambiguously not fit for those purpose.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "August 09, 2023, 11:07:05 PM",
+      "body": "Are there any educational articles on the security of wallets/ tools and anything related to private keys on this forum?For ordinary users, well they don't know how to review the code if the code is available.One other thing is educating people to never use closed source tools to generate private keys.Also, what are the most secure and properly reviewed tools good for cryptography use? They all should be listed and updated somewhere like in a book or a site, wait this bx was in a book which everyone kept using as a reference for newbies. What an irony!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 10, 2023, 06:20:40 AM",
+      "body": "Any chance that somebody can create a stopgap version of libbitcoin explorer with a secure random number generator, just so that book authors and other website portals have an alternate version of 'bx' to point to instead?(although if we do go that route I fear the situation will be similar to that of chrome extensions such as The Great Suspender and Tab Auto Refresh who sold out to malicious buyers and now there's 5 clones of them in the Chrome Web Store, each of which may or may not also be malicious.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "August 10, 2023, 07:00:47 AM",
+      "body": "Quote from: digaran on August 09, 2023, 11:07:05 PMOne other thing is educating people to never use closed source tools to generate private keys. I don't know much about Libbitcoin or under what license the code was released, but I was under the impression that we are talking about a publicly verifiable library of tools for the Bitcoin blockchain. Was the code not publicly available for scrutiny?The source says the first thefts started occurring in May 2023, but how long was the software available in that form before someone found out how to exploit it?What crypto wallets use this library?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 10, 2023, 07:54:40 AMLast edit: August 10, 2023, 09:40:47 AM by NotATether",
+      "body": "Quote from: Pmalek on August 10, 2023, 07:00:47 AMQuote from: digaran on August 09, 2023, 11:07:05 PMOne other thing is educating people to never use closed source tools to generate private keys. I don't know much about Libbitcoin or under what license the code was released, but I was under the impression that we are talking about a publicly verifiable library of tools for the Bitcoin blockchain. Was the code not publicly available for scrutiny?The source says the first thefts started occurring in May 2023, but how long was the software available in that form before someone found out how to exploit it?What crypto wallets use this library?As we speak, I am looking at the codebase of bx and it has an AGPL v3+ license, so yes it is open-source:Code:/** * Copyright (c) 2011-2022 libbitcoin developers (see AUTHORS) * * This file is part of libbitcoin. * * This program is free software: you can redistribute it and/or modify * it under the terms of the GNU Affero General Public License as published by * the Free Software Foundation, either version 3 of the License, or * (at your option) any later version. * * This program is distributed in the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the * GNU Affero General Public License for more details. * * You should have received a copy of the GNU Affero General Public License * along with this program.  If not, see <http://www.gnu.org/licenses/>. */EDIT: I give up. The build system used by libbitcoin-explorer is extremely convoluted, requires a C++20 compiler, at least Boost 1.76 (this is later than what Ubuntu 22.04 has), and works via a script \"install.sh\", instead of normal CMake or Automake, and trying to circumvent all these limitations by using containers has so far lead to all kinds of build configuration errors.It looks like \"bx seed\" was really intended to be NOT SECURE AT ALL, so why the hell didn't they make an announcement about that when they made the change?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 10, 2023, 10:33:33 AM",
+      "body": "Quote from: ETFbitcoin on August 10, 2023, 10:26:49 AMI already know libbitcoin has some problem/limitation, but i would never expect it used weak entropy.Quote from: NotATether on August 10, 2023, 07:54:40 AMEDIT: I give up. The build system used by libbitcoin-explorer is extremely convoluted, requires a C++20 compiler, at least Boost 1.76 (this is later than what Ubuntu 22.04 has), and works via a script \"install.sh\", instead of normal CMake or Automake, and trying to circumvent all these limitations by using containers has so far lead to all kinds of build configuration errors.IMO it's good thing you give up early. Based on my short experience, libbitcoin is one of least friendly full node implementation where i also had difficulty to compile[1] and also prone to corruption[2].[1] https://bitcointalk.org/index.php?topic=5329445.msg56770963#msg56770963[2] https://bitcointalk.org/index.php?topic=5329445.msg56832879#msg56832879Regarding your second link: It's been years and still version4 (what master branch points to) is still unfinished and hence non-functional. Obelisk has also been discontinued apparently in order to develop libbitcoin-server, and 80% of the libbitcoin repositories are all broken with the message: \"Please use version 3 branch instead\". Last commit to most of these repos was on May 9.So yeah, it seems more and more like vaporware with every passing day.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "August 10, 2023, 10:58:36 AM",
+      "body": "Quote from: NotATether on August 10, 2023, 07:54:40 AMAs we speak, I am looking at the codebase of bx and it has an AGPL v3+ license, so yes it is open-source Do we know of any security experts or companies that have reviewed that open-source code and given it thumbs up as being safe with strong-enough entropy generation? It's too bad that Andreas recommended or talked about this Bitcoin library in his Mastering Bitcoin book. I wonder how long it was out there before someone realized how it can be exploited...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 10, 2023, 11:12:23 AM",
+      "body": "Quote from: Pmalek on August 10, 2023, 10:58:36 AMQuote from: NotATether on August 10, 2023, 07:54:40 AMAs we speak, I am looking at the codebase of bx and it has an AGPL v3+ license, so yes it is open-source Do we know of any security experts or companies that have reviewed that open-source code and given it thumbs up as being safe with strong-enough entropy generation? It's too bad that Andreas recommended or talked about this Bitcoin library in his Mastering Bitcoin book. I wonder how long it was out there before someone realized how it can be exploited...  Regarding the second part, the bx seed instructions and appendix in the book was a pull request by a libbitcoin developer in 2015.At the time, it did not use a pseudorandom generator. But about a year later, they changed it, which unfortunately was soon after the book was published.Nobody has audited libbitcoin explorer for security weaknesses previously as far as I know.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "August 10, 2023, 12:16:01 PM",
+      "body": "Quote from: NotATether on August 10, 2023, 11:12:23 AMRegarding the second part, the bx seed instructions and appendix in the book was a pull request by a libbitcoin developer in 2015.At the time, it did not use a pseudorandom generator. But about a year later, they changed it, which unfortunately was soon after the book was published.Nobody has audited libbitcoin explorer for security weaknesses previously as far as I know. So, would it be fair to say that the vulnerability where you could generate a seed using weak and not random enough entropy was there from 2016 at earliest? I am asking because according to the report, the first misuses are believed to have been recorded in May 2023. If it was there for such a long time before someone figured out what they could do with it, it's quite positive that they figured out what was wrong. Additionally, it's share luck that someone didn't understand how to abuse it earlier or they did but no one knew about it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 10, 2023, 12:19:13 PM",
+      "body": "Quote from: Pmalek on August 10, 2023, 12:16:01 PMQuote from: NotATether on August 10, 2023, 11:12:23 AMRegarding the second part, the bx seed instructions and appendix in the book was a pull request by a libbitcoin developer in 2015.At the time, it did not use a pseudorandom generator. But about a year later, they changed it, which unfortunately was soon after the book was published.Nobody has audited libbitcoin explorer for security weaknesses previously as far as I know. So, would it be fair to say that the vulnerability where you could generate a seed using weak and not random enough entropy was there from 2016 at earliest? I am asking because according to the report, the first misuses are believed to have been recorded in May 2023. If it was there for such a long time before someone figured out what they could do with it, it's quite positive that they figured out what was wrong. Additionally, it's share luck that someone didn't understand how to abuse it earlier or they did but no one knew about it.Certainly! With reservations though, because depending on the operating system, there is a chance that even older versions of bx seed are using unsafe random number generators (this is because previously it was using std::random_device which in turn uses the OS random number generator).Apparently, nobody figured out that this new code could be exploited until a few months ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "August 10, 2023, 12:23:17 PM",
+      "body": "Quote from: digaran on August 09, 2023, 11:07:05 PMAre there any educational articles on the security of wallets/ tools and anything related to private keys on this forum?For ordinary users, well they don't know how to review the code if the code is available.You can start with this topic https://bitcointalk.org/index.php?topic=5316005.0 It explains well the concept of the private key and the entropy behind it, there are some videos in YouTube but they go into the details without giving a background.Quote from: Pmalek on August 10, 2023, 07:00:47 AMWhat crypto wallets use this library?at some time https://openbazaar.org and Cody Wilson & @genjix DarkWallet (no longer working now) was using it.I don't know if there is any new wallet uses this library, but I wouldn't be surprised if one of the closed source wallets used it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Artemis3",
+      "created_time": "August 10, 2023, 01:33:30 PM",
+      "body": "So, the Milk Sad announcement is nice and all, but which projects have this libbitcoin dependency? Leaving closed wallets aside, shouldn't there be a list of affected programs so that people can take measures? I imagine a security patch and recompile would be needed too.The question is related to the title of this thread: Wallets (seed words) created with libbitcoin (which wallets?)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "August 10, 2023, 02:18:33 PM",
+      "body": "Quote from: Artemis3 on August 10, 2023, 01:33:30 PMThe question is related to the title of this thread: Wallets (seed words) created with libbitcoin (which wallets?)You will find the list with a wiki link https://en.bitcoin.it/wiki/LibbitcoinQuoteProjects Using LibbitcoinAirbitzBitprimCancoinChip-ChapDarkleaksDarkwalletDarkmarketMastering_BitcoinMetaverseOpenBazaarTeechanMost of these projects are dead or have been renamed, for example Airbitz has been renamed to EdgeApp and you will find Libbitcoin https://github.com/EdgeApp/libbitcoin-client otherwise popular wallets do not use Libbitcoin",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fillippone",
+      "created_time": "August 10, 2023, 08:55:24 PM",
+      "body": "This is an interesting theory:The images are the following:     Translation: Libbitcoin was under active development until the first evidence of the exploit being used. The thesis here is that Eric Voskuil was either involved in the exploit or at least well aware of this since the very first use of it. Is that a reasonable hypothesis that he has planted this bug years in advance, only to sabotage his work, reputation and legacy for a highly uncertain payoff?).Maybe the bug itself caused him to rage quit: Also, similar conspiracy theories have surfaced on Reddit: Mass hacking of over 1000 bitcoin accounts...QuoteIn addition, the fact that this withdrawal affected more than 1200 addresses within one transaction (!) led me to the assumption that this was some kind of a planned event, which may be the result of a vulnerability in some library, or even a bakcdoor that was used by an attacker to carry out this theft.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 10, 2023, 10:21:10 PMLast edit: August 10, 2023, 10:32:37 PM by gmaxwell",
+      "body": "Quote from: NotATether on August 10, 2023, 06:20:40 AMAny chance that somebody can create a stopgap version of libbitcoin explorer with a secure random number generator, just so that book authors and other website portals have an alternate version of 'bx' to point to instead?I would be careful about assuming this was the only flaw.Quote from: fillippone on August 10, 2023, 08:55:24 PMMaybe the bug itself caused him to rage quit: it's hard to square that with the current position that there isn't even a bug and that it's working as designed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kryptowerk",
+      "created_time": "August 11, 2023, 01:00:49 AM",
+      "body": "I am not familiar with this tool, so maybe ththis is a stupid question: Do we know if the Libbitcoin explorer wallet (seed) generation method was utilized by any mobile or desktop wallets?Or is this just a tool you use similar to a paper-wallet generator and cannot be included as part of code for a wallet project?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 11, 2023, 03:32:23 AM",
+      "body": "Quote from: Kryptowerk on August 11, 2023, 01:00:49 AMOr is this just a tool you use similar to a paper-wallet generatorYes.Quoteand cannot be included as part of code for a wallet project?Cannot is a little strong, but it would be slightly surprising.  OTOH, it would be less surprising than the original error in libbitcoin explorer itself.I could imagine some web service wallet thing using it on the backend but it would be an odd choice... or managing to copy the vulnerable code into other software though there was nothing subtle about it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 11, 2023, 04:29:20 AM",
+      "body": "Quote from: fillippone on August 10, 2023, 08:55:24 PMTranslation: Libbitcoin was under active development until the first evidence of the exploit being used. The thesis here is that Eric Voskuil was either involved in the exploit or at least well aware of this since the very first use of it. Is that a reasonable hypothesis that he has planted this bug years in advance, only to sabotage his work, reputation and legacy for a highly uncertain payoff?).Maybe the bug itself caused him to rage quit: As John Wick would say, \"Everything has a price.\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "id": "topic_5459080",
+  "title": "simpic",
+  "author": "simpic",
+  "created_time": "July 08, 2023, 04:42:21 PM",
+  "content": "Hello, I have added the following parameters to bitcoin.conf:Code:txindex=1rest=1There are requested by a third part application to run a blockchain explorer.Now in the Bitcoin Core file there are a lot of \"ThreadRPCServer incorrect password attempt from 127.0.0.1<port>\" errors, where port is different each time the error occurs.What does it mean?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459080",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 08, 2023, 04:51:30 PM",
+      "body": "There is only one likely reason this happens. You have given incorrect authentication credentials to the blockchain explorer software, so Bitcoin Core continuously returns that someone attempted to connect incorrectly. Check if you have written the correct password, or if you're using a cookie file, check if that is configurable by the blockchain explorer software.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 08, 2023, 04:52:02 PM",
+      "body": "What exactly the 3rd part application?Are you trying to run a blockchain explorer?The error seems related to RPC since you don't added some flags under bitcoin.conf to run RPC. Copy this setup below and paste it to the bitcoin.confCode:server=1daemon=1rpcuser=<username>rpcpassword=<password>",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "July 08, 2023, 05:11:27 PM",
+      "body": "Quote from: BitMaxz on July 08, 2023, 04:52:02 PMWhat exactly the 3rd part application?Are you trying to run a blockchain explorer?The error seems related to RPC since you don't added some flags under bitcoin.conf to run RPC. Copy this setup below and paste it to the bitcoin.confCode:server=1daemon=1rpcuser=<username>rpcpassword=<password>The application is FBBE.Seems RPC auth was not requested... or in your opinion was implied by author?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 08, 2023, 05:45:45 PM",
+      "body": "Quote from: simpic on July 08, 2023, 05:11:27 PMThe application is FBBE.Seems RPC auth was not requested... or in your opinion was implied by author?I never heard of this FBBE and I tried to check the GitHub page and codes I can't seems to find where you can edit RPC configuration unlike other Block explorer out there that has .env file where you can configure RPCuser/password.Why not use another explorer like BTC RPC Explorer? There is a guide here that you can follow.- https://bitcointalk.org/index.php?topic=5368219.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "July 10, 2023, 09:05:16 PM",
+      "body": "Quote from: BitMaxz on July 08, 2023, 05:45:45 PMQuote from: simpic on July 08, 2023, 05:11:27 PMThe application is FBBE.Seems RPC auth was not requested... or in your opinion was implied by author?I never heard of this FBBE and I tried to check the GitHub page and codes I can't seems to find where you can edit RPC configuration unlike other Block explorer out there that has .env file where you can configure RPCuser/password.Why not use another explorer like BTC RPC Explorer? There is a guide here that you can follow.- https://bitcointalk.org/index.php?topic=5368219.0It worked, without setting any RPC login details.Anyway, what about my main question?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 10, 2023, 11:05:04 PM",
+      "body": "Quote from: simpic on July 10, 2023, 09:05:16 PMIt worked, without setting any RPC login details.Anyway, what about my main question?I don't know what's the cause of why it isn't working on FBBE without an RPC login but based on the error it requires RPC credentials.If the BTC RPC explorer worked then why not use that instead of FBBE?Or I think bring your issue directly to their issue page below the developer might be able to help you- https://github.com/RCasatta/fbbe/issues",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "July 11, 2023, 08:05:26 AM",
+      "body": "Quote from: BitMaxz on July 10, 2023, 11:05:04 PMQuote from: simpic on July 10, 2023, 09:05:16 PMIt worked, without setting any RPC login details.Anyway, what about my main question?I don't know what's the cause of why it isn't working on FBBE without an RPC login but based on the error it requires RPC credentials.If the BTC RPC explorer worked then why not use that instead of FBBE?Or I think bring your issue directly to their issue page below the developer might be able to help you- https://github.com/RCasatta/fbbe/issuesEhm... I said I solved, FBBE works without settings any RPC login details.Anyway, there are no longer those error messages in the log    So, nevermind... and thank you for your support",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 11, 2023, 10:44:38 AM",
+      "body": "Quote from: simpic on July 08, 2023, 05:11:27 PMThe application is FBBE.Seems RPC auth was not requested... or in your opinion was implied by author?When you want to use the Bitcoin Core API in third party applications, you must do it by exposing RPC credentials, so in this case, the username and password. This is true for JSON-RPC, though I suspect it also applies to the REST API as well as I have not seen a different set of credentials for it.If you don't specify -rpcuser and -rpcpassword, it defaults to a \"cookie-based authentication\" where the username is \"cookie\" and the password is randomly generated at launch and saved to a file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xenoky",
+      "created_time": "July 11, 2023, 02:36:19 PM",
+      "body": "Hi, I am the main FBBE developerI can confirm FBBE works without RPC authentication, only via unauthenticated REST as a design choice.I am not sure why you were seeing those log messages about authentication attempts but they should not be related to FBBE (or there is a bug I am not yet aware)> though I suspect it also applies to the REST API as well as I have not seen a different set of credentials for it.The point of the REST interface is exactly that you don't need authentication, as clearly stated in the title of the official doc https://github.com/bitcoin/bitcoin/blob/e253568da8dc3693ad99aee260276233245e3d77/doc/REST-interface.mdThe REST interface provides only data about the blockchain and the mempool, it cannot interact with the wallet, this is why could be used without authentication",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "July 11, 2023, 02:48:15 PM",
+      "body": "Quote from: xenoky on July 11, 2023, 02:36:19 PMHi, I am the main FBBE developerI can confirm FBBE works without RPC authentication, only via unauthenticated REST as a design choice.I am not sure why you were seeing those log messages about authentication attempts but they should not be related to FBBE (or there is a bug I am not yet aware)> though I suspect it also applies to the REST API as well as I have not seen a different set of credentials for it.The point of the REST interface is exactly that you don't need authentication, as clearly stated in the title of the official doc https://github.com/bitcoin/bitcoin/blob/e253568da8dc3693ad99aee260276233245e3d77/doc/REST-interface.mdThe REST interface provides only data about the blockchain and the mempool, it cannot interact with the wallet, this is why could be used without authenticationGlad to highlight your work with my topic It was not my intention to link FBBE with those errors... but I got them just after adding the settings requested by FBBE (txindex and rest), before running FBBE for the first time.Anyway - coming back to the topic - it is weird that now I have no longer those errors in Bitcoin Core log... and can't figure out why I got them",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "July 12, 2023, 08:22:11 AM",
+      "body": "Have you read the previous messages?I have no clients that connect to Bitcoin Core via RPC.I have no rpcuser and no rpcpassword in my bitcoin.conf file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xenoky",
+      "created_time": "July 13, 2023, 12:00:05 PM",
+      "body": "QuoteI got curious, so i dig Bitcoin Core repository and found out both REST and RPC use same port[1]. It implies Bitcoin Core can't use both at same time.This is incorrect, you can use both RPC and REST at the same time.For example:Code:$ curl -s http://localhost:8332/rest/mempool/info.json | jq{  \"loaded\": true,  \"size\": 112484,  \"bytes\": 54413157,  \"usage\": 277410432,  \"total_fee\": 1.66517559,  \"maxmempool\": 300000000,  \"mempoolminfee\": 1e-05,  \"minrelaytxfee\": 9.99e-06,  \"incrementalrelayfee\": 1e-05,  \"unbroadcastcount\": 0,  \"fullrbf\": false}$ bitcoin-cli getmempoolinfo{  \"loaded\": true,  \"size\": 112519,  \"bytes\": 54420837,  \"usage\": 277461216,  \"total_fee\": 1.66604331,  \"maxmempool\": 300000000,  \"mempoolminfee\": 0.00001000,  \"minrelaytxfee\": 0.00000999,  \"incrementalrelayfee\": 0.00001000,  \"unbroadcastcount\": 0,  \"fullrbf\": false}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

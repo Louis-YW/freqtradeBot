@@ -1,0 +1,45 @@
+{
+  "id": "topic_5440310",
+  "title": "Kostelooscoin",
+  "author": "Kostelooscoin",
+  "created_time": "February 18, 2023, 12:16:29 PMLast edit: February 18, 2023, 02:08:23 PM by Kostelooscoin",
+  "content": "hi here my code : Code:import timeimport randomelements = []def fib(n):    while len(elements) < 10000:        priv = random.randint(10000, 20000)        if priv not in elements:            elements.append(priv)start = time.time()fib(1)end = time.time()elapsed = end - start           print(f'Temps d\\'exécution : {elapsed:.2}s')result : Code:exécution : 5.4sIs it possible to do this while keeping the same execution time ? Code:import timeimport randomelements = []elements2 = []def fib(n):    while len(elements) < 10000:        priv = random.randint(10000, 20000)        priv2 = random.randint(20000, 30000)        if priv not in elements:            elements.append(priv)        if priv2 not in elements2:            elements.append(priv2)start = time.time()fib(1)end = time.time()elapsed = end - startprint(f'Temps d\\'exécution : {elapsed:.2}s')Code:exécution : 12.26syet elements have 10000 entries as at the beginning",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440310",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "February 18, 2023, 03:59:55 PMLast edit: February 18, 2023, 04:10:43 PM by n0nce",
+      "body": "Executing your code 20,000 times will obviously take longer than running it 10,000 times.You may speed it up by using a set [1], which will save you those lengthy duplicate checks.Something like:Code:elements = set()elements2 = set()while len(elements) < 10000:    elements.add(random.randint(10000, 20000))    elements2.add(random.randint(20000, 30000))It is a lot quicker. Your and my code in comparison:Code:>> python3 test.pyTime foo: 9.392797946929932s, time bar: 0.1551358699798584sFull code:Code:import time, randomelements = [] elements2 = [] myset0 = set()myset1 = set()def foo():  while len(elements) < 10000:    priv = random.randint(10000, 20000)    priv2 = random.randint(20000, 30000)    if priv not in elements:      elements.append(priv)    if priv2 not in elements2:      elements2.append(priv2)def bar():  while len(myset0) < 10000:    myset0.add(random.randint(10000, 20000))    myset1.add(random.randint(20000, 30000))start0 = time.time()foo()end0 = time.time()start1 = time.time()bar()end1 = time.time()print(f\"Time foo: {end0-start0}s, time bar: {end1-start1}s\")Since you provided no context though, I assume the order of numbers is more important than the numbers themselves? Because your code generates... all of them... and there are obviously easier ways to do that. Sets unfortunately don't have an order and will be output in ascending order, from my testing.[1] https://www.w3schools.com/python/python_sets.asp",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "February 19, 2023, 03:46:50 AM",
+      "body": "If I understand your code correctly the end result in your \"elements\" is a shuffled array containing all numbers between x and y (like 10k and 20k). So why not just create an array of the numbers between x and y sequentially (10000,10001, 10002,...) then shuffle that array?Right now your code also has two bottlenecks slowing it down. First is repeated usage of RNG to generate all numbers between x and y and the fact that it may encounter collisions so to generate 10 items for example you may repeat the process 12 times.You don't have to touch the list itself either, you can create an array of \"shuffle indexes\" to act as a map which you can reuse too. That \"map\" can be generated once at the start.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "February 19, 2023, 09:20:09 PM",
+      "body": "Quote from: pooya87 on February 19, 2023, 03:46:50 AMIf I understand your code correctly the end result in your \"elements\" is a shuffled array containing all numbers between x and y (like 10k and 20k). So why not just create an array of the numbers between x and y sequentially (10000,10001, 10002,...) then shuffle that array?Nailed it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "July 02, 2023, 10:04:48 AM",
+      "body": "That's some goofy looking code, OP. (Why is the function called fib when there's nothing Fibonacci-esque going on? What is that unused n parameter supposed to be for? Why are you checking if something is present in elements2, but only ever appending things to elements? etc.)There's an off-by-one error in the loop count (that is, if you meant for every integer, between, and including, 10000 and 20000 to be in the elements list, then you should be waiting for its length to be 10001, rather than 10000; as it stands now, elements will always end up without one random integer from that range). Alternatively, if you did actually only want elements to have 10000 entries, then you should be picking your random numbers like this: random.randint(10000, 19999).If all you meant to accomplish was to produce a shuffled list of every integer in range(10000, 20000), then it's much faster (~750x on my machine, compared to your script), and much clearer, to just do the following:Code:import randomelements = [x for x in range(10000, 20000)]random.shuffle(elements)Your second script is harder to make sense of (because you're testing the contents of elements2 without ever actually appending anything to it: elements2 is empty when the script starts, and is still empty by the time the script ends). If I fix that problem, your script still doesn't make much sense, because then the loop termination logic (which only considers elements) will often leave elements2 with either too few, or (one) too many entries.Because you seemed surprised that your second script took longer to execute than your first, I can only assume that what you were trying to do was to run a 10000-iteration loop that left elements with 5000 random integers from range(10000, 20000) and elements2 with 5000 random integers from range(20000, 30000). If that's what you were aiming at, then this should do the trick:Code:import randomelements = random.sample(range(10000, 20000), k=5000)elements2 = random.sample(range(20000, 30000), k=5000)(I know I'm bumping an old topic; I'm catching up on unread stuff.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

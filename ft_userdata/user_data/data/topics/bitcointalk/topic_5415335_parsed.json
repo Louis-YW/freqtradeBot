@@ -1,0 +1,165 @@
+{
+  "id": "topic_5415335",
+  "title": "nullama",
+  "author": "nullama",
+  "created_time": "September 29, 2022, 10:31:36 AM",
+  "content": "If you need some testnet bitcoins, you can easily get them by solo mining. Some other guides I've found in the web are outdated, so I made this one to work with the latest software/hardware.You'll need:Latest version of Bitcoin Core(v23.0 at the time of writing)Special build of cgminer that allows solo mining, available from https://github.com/cmmodtools/cgminer with a small update from this guide.Ideally an ASIC miner. You can use any miner that works with cgminer, even the USB miner from GekkoScience, the Compac F:To make things simple, for this guide I am going to assume you have two computers, one running a Compac F miner and another one running Bitcoin core. It shouldn't matter if you're running both on the same computer or if you have a different miner.Step 1: Install and run Bitcoin CoreWe're going to use the folder ~/bitcoin_testnet to save everything so that it's easy to remove once you're done and to keep things simple. You can of course use a different path if you want.Inside ~/bitcoin_testnet create a folder called data:Code:mkdir -p ~/bitcoin_testnet/dataDownload the Bitcoin Core for your platform into ~/bitcoin_testnet/ and extract it there.Now let's prepare the configuration file. Create a text file named bitcoin_testnet.conf in ~/bitcoin_testnet/ and put these content in it:Code:testnet=1txindex=1server=1[test]rpcport=5000rpcallowip=YOUR_MINER_IPrpcuser=YOUR_RPC_USERrpcpassword=YOUR_RPC_PASSWORDrpcbind=0.0.0.0The thing that you need to understand here is that you're setting up the Bitcoin node to run in testnet, and you're defining an RPC port(5000 in this case, can be anything), user and password, and whitelisting a specific IP to connect to your node(YOUR_MINER_IP). You'll need these details and your Bitcoin node IP later when connecting from cgminer.You can now start running your Bitcoin node by doing the following(make sure to change user to your actual user:Code:/home/user/bitcoin_testnet/bitcoin-23.0/bin/bitcoind -conf=/home/user/bitcoin_testnet/bitcoin_testnet.conf -datadir=/home/user/bitcoin_testnet/dataIf you want, you can keep this running in the background with screen:Code:screen -dm -S bitcoin_testnet /home/user/bitcoin_testnet/bitcoin-23.0/bin/bitcoind -conf=/home/user/bitcoin_testnet/bitcoin_testnet.conf -datadir=/home/user/bitcoin_testnet/dataYou can then see what's happening with:Code:screen -r bitcoin_testnetTo detach the screen, simply press Ctrl-A and then Ctrl-D. You'll be back in the console, and the command will continue running in the background.Step 2: Install and run cgminerWe're going to use an updated repo of cgminer, this one has the latest changes from kano so that we can use the Compac F, plus some fixes that allow solo mining. Of course you might want to change the options to match your environment or miner.Code:cd ~/bitcoin_testnet/git clone https://github.com/cmmodtools/cgminercd cgminer./autogen.shCFLAGS=\"-O2 -Wall -march=native -fcommon\" ./configure --enable-geckomakeNow, in theory we should be ready, but we need one extra change. Open the file cgminer.c with your favorite text editor and change this line:Code:if (opt_btc_address[0] != '1') {To this:Code:if (opt_btc_address[0] != '1' && opt_btc_address[0] != 'm' && opt_btc_address[0] != 'n'  ) {Basically we need to also consider the first symbol of the testnet address, which is either n or m. OK, now run make again:Code:makeAnd now cgminer is compiled and ready. Let's create the configuration file:Create a text file named ~/bitcoin_testnet/cgminer_testnet.conf with these contents:Code:{\"pools\" : [        {                \"url\" : \"http://YOUR_BITCOIN_CORE_IP:5000\",                \"user\" : \"YOUR_RPC_USER\",                \"pass\" : \"YOUR_RPC_PASSWORD\"        }],\"btc-address\": \"YOUR_TESTNET_BTC_ADDRESS\",\"gekko-compacf-freq\" : \"400\",\"gekko-compacf-detect\" : true,\"gekko-start-freq\" : \"300\",\"gekko-mine2\" : true,\"gekko-tune2\" : \"60\",\"suggest-diff\" : \"442\",\"failover-only\" : true,}If you don't have a testnet btc address yet, note that Bitcoin Core now doesn't generate a wallet by default any more so you will need to create one. You can read about it in createwallet. Then you should be able to getnewaddress. Make sure to use the legacy format as that's what cgminer is expecting. You address should start with n or m.Alternatively, you can simply use the GUI. To open the GUI, first stop the bitcoind process (Ctrl-C) and then run bitcoin-qt instead. There you'll be able to easily create wallets and generate addresses by clicking around.And now you can simply run cgminer like this:Code:sudo /home/user/bitcoin_testnet/cgminer/cgminer -c /home/user/bitcoin_testnet/mine_testnet.confYou can of course also run it in the background with screen, or run this at startup, etc. It will depend on your particular setup. If you're on a pi for example, you could create a bash shell executable (~/start_mining.sh) with that code and then simply add this to /etc/rc.local:Code:su - pi -c \"screen -dm -S cgminer ~/start_mining.sh\"That's just one example, you can choose to run it however you prefer.There it is, it should now say:Code:Solo mining to valid address: YOUR_TESTNET_BTC_ADDRESSIf you leave it overnight you should hit a few blocks with the Compac F USB miner.Happy testnet solo mining!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415335",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "September 29, 2022, 11:30:07 AM",
+      "body": "A few blocks overnight? That means the testnet difficulty is extremely low. Exactly what was the testnet difficulty when you wrote this guide?I'm sure this will help a bunch of people who are setting up testnet bitcoin mining farms.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "September 29, 2022, 11:41:42 AM",
+      "body": "Quote from: NotATether on September 29, 2022, 11:30:07 AMA few blocks overnight? That means the testnet difficulty is extremely low. Exactly what was the testnet difficulty when you wrote this guide?I'm sure this will help a bunch of people who are setting up testnet bitcoin mining farms.The difficulty was in the millions:Code:Network diff set to 76.6MBut apparently testnet3 resets diff to 1 at some blocks, as those are the ones I hit:Code:Accepted Diff 1/1 GSF 0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d3bt3",
+      "created_time": "September 29, 2022, 11:46:15 AM",
+      "body": "Nicely detailed guide!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "September 29, 2022, 12:21:44 PM",
+      "body": "Thanks for writing this guide. Although people who currently don't have ASIC better use Signet or Regtest, unless they also want to try their luck with solo mining on Bitcoin mainnet.Quote from: nullama on September 29, 2022, 11:41:42 AM--snip--But apparently testnet3 resets diff to 1 at some blocks, as those are the ones I hit:Code:Accepted Diff 1/1 GSF 0Not at some blocks, but after 20 minutes since last block mined. That might be why you mine more block than @NotATether expected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 29, 2022, 04:39:52 PM",
+      "body": "Quote from: ETFbitcoin on September 29, 2022, 12:21:44 PMQuote from: nullama on September 29, 2022, 11:41:42 AM--snip--But apparently testnet3 resets diff to 1 at some blocks, as those are the ones I hit:Code:Accepted Diff 1/1 GSF 0Not at some blocks, but after 20 minutes since last block mined. That might be why you mine more block than @NotATether expected.That's great to know! I wasn't aware of this rule. Will spin a Compac F up to mine some testnet BTC, then.. I've never hit a solo block, so this should be a pretty cool experience.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "September 29, 2022, 11:40:24 PM",
+      "body": "Quote from: n0nce on September 29, 2022, 04:39:52 PM~snip~That's great to know! I wasn't aware of this rule. Will spin a Compac F up to mine some testnet BTC, then.. I've never hit a solo block, so this should be a pretty cool experience.That was the motivation for me to do this in the first place  A couple of things you might want to do:Keep the log of your first block:Code:sudo /home/user/bitcoin_testnet/cgminer/cgminer -c /home/user/bitcoin_testnet/mine_testnet.conf 2>> /home/user/bitcoin_testnet/my_first_block_log.txtAnd you can of course write something into the coinbase of the block you found, just add this option to the config file:Code:--btc-sig <arg>     Set signature to add to coinbase when solo mining (optional)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "September 30, 2022, 04:17:17 PM",
+      "body": "Quote from: ETFbitcoin on September 30, 2022, 09:02:46 AMQuote from: nullama on September 29, 2022, 11:40:24 PMAnd you can of course write something into the coinbase of the block you found, just add this option to the config file:Code:--btc-sig <arg>     Set signature to add to coinbase when solo mining (optional)Do you know format of <arg> (such as HEX or plain text) or have example of working <arg>? I tried using search feature, but GitHub doesn't enable such feature on forked repository.It's a simple text argument, the same as the btc-address argument you have to give in the config file. Just add another line with that.Just try it out, that's the whole point of the testnet",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "October 04, 2022, 05:47:25 AM",
+      "body": "Quote from: ETFbitcoin on October 01, 2022, 12:56:35 PM~snip~I'd do it if i have SHA-256 ASIC or testnet difficulty is low enough where i can try it with CPU or GPU . That's also why i sometimes use Signet network to try/test something.I just posted a new guide that doesn't require an ASIC. It only uses the CPU and/or the GPU of a normal computer, so you should be able to test it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "December 17, 2022, 01:55:53 PMLast edit: January 05, 2024, 02:14:09 PM by n0nce",
+      "body": "A few recommendations and fixes:(1) Just add datadir=/home/user/bitcoin_testnet/data to the conf file, as well. Then you won't have to specify it through CLI anymore.Quote from: nullama on September 29, 2022, 10:31:36 AMNow let's prepare the configuration file. Create a text file named bitcoin_testnet.conf in ~/bitcoin_testnet/ and put these content in it:Code:testnet=1txindex=1server=1[test]rpcport=5000rpcallowip=YOUR_MINER_IPrpcuser=YOUR_RPC_USERrpcpassword=YOUR_RPC_PASSWORDrpcbind=0.0.0.0(2) There is a typo here. It should be --enable-gekko; otherwise it will compile just fine, but without Gekko support and you won't even notice. Quote from: nullama on September 29, 2022, 10:31:36 AMCode:cd ~/bitcoin_testnet/git clone https://github.com/cmmodtools/cgminercd cgminer./autogen.shCFLAGS=\"-O2 -Wall -march=native -fcommon\" ./configure --enable-geckomake(3) Cgminer complains about the comma at the end of the last line (\"failover-only\" : true,); it has to be removed to work. Quote from: nullama on September 29, 2022, 10:31:36 AMCode:{\"pools\" : [        {                \"url\" : \"http://YOUR_BITCOIN_CORE_IP:5000\",                \"user\" : \"YOUR_RPC_USER\",                \"pass\" : \"YOUR_RPC_PASSWORD\"        }],\"btc-address\": \"YOUR_TESTNET_BTC_ADDRESS\",\"gekko-compacf-freq\" : \"400\",\"gekko-compacf-detect\" : true,\"gekko-start-freq\" : \"300\",\"gekko-mine2\" : true,\"gekko-tune2\" : \"60\",\"suggest-diff\" : \"442\",\"failover-only\" : true,}(4) For anyone unsure how to do this:Code:$ ./bitcoin-24.0.1/bin/bitcoin-cli -conf=/home/user/bitcoin_testnet/bitcoin_testnet.conf getnewaddress mining legacyQuote from: nullama on September 29, 2022, 10:31:36 AMThen you should be able to getnewaddress. Make sure to use the legacy format as that's what cgminer is expecting. You address should start with n or m.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "December 18, 2022, 07:10:46 PMLast edit: February 02, 2023, 07:06:29 PM by n0nce",
+      "body": "Nullama, your guide worked great (besides the few points I raised)! Amazing; I hadn't expected to mine multiple blocks per day.In fact, I managed to grab almost 30 blocks in 24h.  Sitting at roughly 0.9tBTC right now.Even consecutive blocks a few times... I must have very good network latency or something.  Only a single Compac F hashing at just under 300GH/s.It was an awesome experience to solo-mine again (and hit blocks!) and I'll definitely do it again if I need testnet coins and / or for validating a miner / miner driver software.PS: Check last 24h of blocks for hidden message!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinSoloMiner",
+      "created_time": "December 18, 2022, 11:17:53 PM",
+      "body": "What needs to be changed for this to work on main net? Remove testnet=1 ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "December 19, 2022, 10:17:08 AM",
+      "body": "Quote from: ETFbitcoin on December 19, 2022, 09:50:00 AMQuote from: n0nce on December 18, 2022, 07:10:46 PMIn fact, I managed to grab almost 30 blocks in 24h.  Sitting at roughly 0.9tBTC right now.Even consecutive blocks a few times... I must have very good network latency or something.  Only a single Compac F hashing at just under 300GH/s.The result is much better compared with when i mined with GPU. It looks like getting tBTC isn't that hard for those who already own ASIC.Interesting; I would have expected a CPU / GPU setup to work fine, too then. At difficulty 1, you need a fast network latency in my opinion, but also a block candidate immediately. In case the ASIC is 100x faster, that could play a bigger role than what I anticipated.Again; I got consecutive blocks a few times, so I guess that a couple hundred GH suffice for consistent blocks rewards.Quote from: ETFbitcoin on December 19, 2022, 09:50:00 AMQuote from: n0nce on December 18, 2022, 07:10:46 PMPS: Check last 24h of blocks for hidden message! Using blockchair help[1], did you send message \"cgminer42\b\u0001\u0011 solo on Compac F\"?Yes  It is also displayed by mempool.space.Oddly enough; someone just sent me ‎0.00017893 tBTC, which was no coinbase transaction. Typo? Never happened on mainnet to me, in all these years. I mined:Block 2411861, Block 2411862 and Block 2411863 in a row.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "December 20, 2022, 12:31:53 AM",
+      "body": "Glad to see people now solo mining testnet bitcoins with this guide",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "January 27, 2023, 04:23:21 PM",
+      "body": "Quote from: n0nce on December 18, 2022, 07:10:46 PMIn fact, I managed to grab almost 30 blocks in 24h.  Sitting at roughly 0.9tBTC right now.Even consecutive blocks a few times... I must have very good network latency or something.  Only a single Compac F hashing at just under 300GH/s.That's 50,000 times faster than my CPU mining! Would you be interested to try? I still have a synced testnet blockchain running, and could give you access. At low difficulty, I wonder if I made a mistake for not getting anything in days.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "January 28, 2023, 06:16:38 PM",
+      "body": "Quote from: ETFbitcoin on January 28, 2023, 09:42:12 AMHow old/slow is your CPU? My old GPU manage to mine 4 blocks within 4 days, although 2 of them become stale block.It's a quad core Xeon E3-1270 V2 @ 3.50GHz. That's why I'm wondering if I did something wrong somewhere.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 29, 2023, 12:24:09 PM",
+      "body": "Stale has less to do with mining and more to do with propagation. If you have all the cores screaming running the SHA did you have enough CPU power left over to do the rest and get it out to the world. It's not a lot of computing power, but if you don't have any to spare it could cause issues. The other half of stale is networking. How many nodes is your node talking to? If there is a lag there and more nodes see the other block then you loose. Also, it could be other miners deliberately causing reorgs. I don't see the point on testnet, but if I have enough power I can just ignore some blocks figuring I will get 2 or 3 while the rest of the network gets 1. That would just be a waste, but I can see people messing around to see if they can do it.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "January 29, 2023, 08:37:58 PM",
+      "body": "Quote from: nullama on December 20, 2022, 12:31:53 AMGlad to see people now solo mining testnet bitcoins with this guide  You found my messages! Nice!  I've got to plant some more (on a new address) then.. Quote from: LoyceMobile on January 27, 2023, 04:23:21 PMQuote from: n0nce on December 18, 2022, 07:10:46 PMIn fact, I managed to grab almost 30 blocks in 24h.  Sitting at roughly 0.9tBTC right now.Even consecutive blocks a few times... I must have very good network latency or something.  Only a single Compac F hashing at just under 300GH/s.That's 50,000 times faster than my CPU mining! Would you be interested to try? I still have a synced testnet blockchain running, and could give you access. At low difficulty, I wonder if I made a mistake for not getting anything in days.Sure, let's do it. Sorry, only just revisited this thread again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "January 30, 2023, 03:28:24 AM",
+      "body": "Quote from: DaveF on January 29, 2023, 12:24:09 PMIf you have all the cores screaming running the SHA did you have enough CPU power left over to do the rest and get it out to the world.Usually in parallel programming (multi-thread) when one thread finds the answer it breaks out of it and sends a \"signal\" to other threads to break too. Which means after finding the new block at least part of CPU has to be freed to be used for the broadcasting process.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 30, 2023, 09:25:14 AM",
+      "body": "Quote from: ETFbitcoin on January 29, 2023, 12:12:29 PMIf you use bitcoind or CLI environment, did you check whether you actually mine block but become stale?As far as I could see, I never mined a block.QuoteDid you follow this guide (which is meant for ASIC) or other one (which use bfgminer)?I followed Solo mine testnet bitcoins with bfgminer, Bitcoin Core, and a CPU (but somehow ended up posting in this thread).Quote from: DaveF on January 29, 2023, 12:24:09 PMIf you have all the cores screaming running the SHA did you have enough CPU power left over to do the rest and get it out to the world.I assume that's not a problem, Linux multitasking should be able to handle this. And I used nice for the miner.QuoteThe other half of stale is networking. How many nodes is your node talking to? If there is a lag there and more nodes see the other block then you loose.If that would be the problem, I would have expected to see orphaned blocks, right?Quote from: n0nce on January 29, 2023, 08:37:58 PMSure, let's do it. Sorry, only just revisited this thread again.Thanks! I'll PM you the details (and let's switch back to the correct thread).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

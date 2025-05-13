@@ -1,0 +1,165 @@
+{
+  "id": "topic_5447475",
+  "title": "Bitcoiner2023",
+  "author": "Bitcoiner2023",
+  "created_time": "April 04, 2023, 12:03:47 AM",
+  "content": "Hey friends,I have a beginner question about Reproducibility.How can I check if a Firmeware from a HWW or a .exe files from a Desktop Wallet matches the code on GitHub ?I know how to verify the signature, but how can I be sure that the .exe or a Firmware I download from the homepage is the same one that is public on github ?Best regards",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5447475",
+  "comments": [
+    {
+      "author": "Welsh",
+      "created_time": "April 04, 2023, 01:46:07 AMLast edit: April 04, 2023, 01:59:05 AM by Welsh",
+      "body": "You need to verify the checksum, do note this doesn't prove anything other than the checksum is the same. This could have been altered by a malicious attacker. How you do it, differs depending on the checksum. For sha256 via the terminal on Linux you can use: Code:sha256sum <filename> However, you should also verify via verifying their signature via gpg. Basically, you find their public signing key, import it into your keyring, and then you can try to verify the file. If it matches, it'll tell you that's a good signature. I'd recommend looking at the documentation of gpg.Unfortunately, not every hardware wallet or software provide this. However, that probably gives you a reason to avoid them in the first place Here's Trezor's documentation for their desktop application: https://trezor.io/learn/a/download-verify-trezor-suite-appHowever, for any signatures being verified via gpg you'll be using: Code:gpg --import AndCode:gpg --verify The fingerprint is only as good as the computer you are verifying it on. If your computer could've been compromised, then you can't verify that it's real. Also, you should probably look at deploying a web of trust, and finding the fingerprint on websites other than the main Trezor site. Since, if the Trezor site was compromised when you got the fingerprint from there, you could be tricked into thinking it's genuine. If you're really serious about your security, verifying on two different computers could help with the concern that one of the machines is compromised. Verifying on a offline computer can also be a decent way. As long as you can be sure that you've got the right signing key, and your machine isn't feeding you the wrong information via being compromised. You should be alright, to go ahead, and install the software. People's threat levels will differ. You can go really deep into verifying, establishing a web of trust, and mitigating various attacks. For most people, importing, and verifying is enough.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "April 04, 2023, 02:10:19 PM",
+      "body": "The rule of thumb with software authenticity is: you should verify signatures whose public keys have been published on multiple places. There's absolutely no difference between using a non-verified software downloaded from Github, and a verified software whose binaries and public key(s) were published together. If Github is compromised, then public keys can also be compromised.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 05, 2023, 02:11:57 PM",
+      "body": "Ideally, you would want to download the code and then build the binary yourself from scratch. This is only possible with a very small handful of wallets: https://walletscrutiny.com/If you trust that the .tar/.dmg/.exe/whatever does indeed match the published code, then you should simply verify what you download either via matching hashes or signatures from the developers, as Welsh has said.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Bitcoiner2023",
+      "created_time": "April 06, 2023, 01:49:35 PM",
+      "body": "Quote from: Welsh on April 04, 2023, 01:46:07 AMYou need to verify the checksum, do note this doesn't prove anything other than the checksum is the same. This could have been altered by a malicious attacker. How you do it, differs depending on the checksum. For sha256 via the terminal on Linux you can use: Code:sha256sum <filename> Quote from: o_e_l_e_o on April 05, 2023, 02:11:57 PMIdeally, you would want to download the code and then build the binary yourself from scratch. This is only possible with a very small handful of wallets: https://walletscrutiny.com/If you trust that the .tar/.dmg/.exe/whatever does indeed match the published code, then you should simply verify what you download either via matching hashes or signatures from the developers, as Welsh has said.Thanks for the answer,How exactly does hashing work?I know the command via the terminal, but where can I find the hash on the Github to verify that it match ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "April 06, 2023, 02:14:34 PMLast edit: April 06, 2023, 03:12:28 PM by BlackHatCoiner",
+      "body": "Quote from: o_e_l_e_o on April 05, 2023, 02:11:57 PMIdeally, you would want to download the code and then build the binary yourself from scratch.Why is this ideal? It takes more time and provides no further benefits, unless you want to study the source code. Quote from: Bitcoiner2023 on April 06, 2023, 01:49:35 PMI know the command via the terminal, but where can I find the hash on the Github to verify that it match ?As far as I'm concerned, you don't have to verify the firmware (and there's no official guide for doing it either), because the bootloader does it for you each time you update your firmware:Quote from: https://trezor.io/learn/a/security-safety-in-trezorThe bootloader is a simple program designed to install, update, and check the firmware loaded on the Trezor device. The bootloader checks the integrity and signatures of the firmware and runs it if everything is OK. This examination occurs every time you power the device. If the bootloader detects an unofficial firmware, it displays a noticeable warning on the device screen.In other words, bootloader is programmed to check that the firmware isn't compromised. How you confirm that the bootloader isn't compromised is a question for another day.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 06, 2023, 03:14:40 PM",
+      "body": "Quote from: Bitcoiner2023 on April 06, 2023, 01:49:35 PMHow exactly does hashing work?I know the command via the terminal, but where can I find the hash on the Github to verify that it match ?You are dependent on the developer releasing the hash that they themselves have generated from the source code they have. You then calculate the hash from the code you have downloaded and check that it matches the hash provided by the developer. If the developer has not provided a hash, then you have nothing to check against so you cannot use this method.Quote from: BlackHatCoiner on April 06, 2023, 02:14:34 PMWhy is this ideal? It takes more time and provides no further benefits, unless you want to study the source code.Because by skipping this step you are trusting that the pre-compiled software you are downloading matches the code you are looking at on GitHub. There is no guarantee this is true.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "April 06, 2023, 03:23:00 PM",
+      "body": "Quote from: o_e_l_e_o on April 06, 2023, 03:14:40 PMBecause by skipping this step you are trusting that the pre-compiled software you are downloading matches the code you are looking at on GitHub.This is why you should verify the signature, using public keys uploaded on Github (or preferably on some other place). But if you do that, then compiling the software is just unnecessary. Verification of software authenticity is irrelevant to binaries and source code. What you want is to verify that the resources are approved by the developer. Compiling the source code without verifying it's the actual source code is, incidentally, neither enough.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 06, 2023, 04:27:31 PM",
+      "body": "Quote from: BlackHatCoiner on April 06, 2023, 03:23:00 PMBut if you do that, then compiling the software is just unnecessary.No, it isn't. Verifying against signatures is obviously something that everyone should do, and it does protect against many types of attack. However, it does nothing to protect you against either the developer sneaking in code which is not on GitHub in order to scam all their users at once, or from someone having stolen the developer's key and using it to sign a malicious version. The only way to be absolutely sure of the software you are running is to examine the code yourself and then build it from scratch yourself. This is obviously outside the skill set of 99% of users, but calling it unnecessary is wrong.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "April 06, 2023, 05:01:37 PM",
+      "body": "Quote from: o_e_l_e_o on April 06, 2023, 04:27:31 PMHowever, it does nothing to protect you against either the developer sneaking in code which is not on GitHub in order to scam all their users at onceAbsolutely, that's why I said unless you want to study the source code. Unless you belong to that 1% which will take the time to study code, test and read documentation, then it's unnecessary. Quote from: o_e_l_e_o on April 06, 2023, 04:27:31 PMor from someone having stolen the developer's key and using it to sign a malicious version.Signatures are usually uploaded on Github, so there's no point in stealing the developer's key for that purpose. Unless of course you compromise their account, which makes software compiling unnecessary again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "April 06, 2023, 05:35:10 PM",
+      "body": "Quote from: o_e_l_e_o on April 05, 2023, 02:11:57 PMIdeally, you would want to download the code and then build the binary yourself from scratch. This is only possible with a very small handful of wallets: https://walletscrutiny.com/If you trust that the .tar/.dmg/.exe/whatever does indeed match the published code, then you should simply verify what you download either via matching hashes or signatures from the developers, as Welsh has said.Unfortunately I don't think it's possible to build the source code for hardware wallet firmware.Because if you could, and then flash it on to the physical hardware, you'd be able to probably determine that the hardware wallet is not bugged.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "epsi1on",
+      "created_time": "April 06, 2023, 08:16:23 PM",
+      "body": "Quote from: Bitcoiner2023 on April 04, 2023, 12:03:47 AMHow can I check if a Firmeware from a HWW or a .exe files from a Desktop Wallet matches the code on GitHub ?In short, there is no way.if you have a source code and have a binary file, (as far as i understand) then there is no way to ensure the code and binary are matched, unless you compile it yourself.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Bitcoiner2023",
+      "created_time": "April 07, 2023, 09:57:26 PM",
+      "body": "Quote from: o_e_l_e_o on April 06, 2023, 03:14:40 PMQuote from: Bitcoiner2023 on April 06, 2023, 01:49:35 PMHow exactly does hashing work?I know the command via the terminal, but where can I find the hash on the Github to verify that it match ?You are dependent on the developer releasing the hash that they themselves have generated from the source code they have. You then calculate the hash from the code you have downloaded and check that it matches the hash provided by the developer. If the developer has not provided a hash, then you have nothing to check against so you cannot use this method.Quote from: BlackHatCoiner on April 06, 2023, 02:14:34 PMWhy is this ideal? It takes more time and provides no further benefits, unless you want to study the source code.Because by skipping this step you are trusting that the pre-compiled software you are downloading matches the code you are looking at on GitHub. There is no guarantee this is true.Quote from: Welsh on April 04, 2023, 01:46:07 AMYou need to verify the checksum, do note this doesn't prove anything other than the checksum is the same. This could have been altered by a malicious attacker. How you do it, differs depending on the checksum. For sha256 via the terminal on Linux you can use: Code:sha256sum <filename> However, you should also verify via verifying their signature via gpg. Basically, you find their public signing key, import it into your keyring, and then you can try to verify the file. If it matches, it'll tell you that's a good signature. I'd recommend looking at the documentation of gpg.Unfortunately, not every hardware wallet or software provide this. However, that probably gives you a reason to avoid them in the first place Here's Trezor's documentation for their desktop application: https://trezor.io/learn/a/download-verify-trezor-suite-appHowever, for any signatures being verified via gpg you'll be using: Code:gpg --import AndCode:gpg --verify The fingerprint is only as good as the computer you are verifying it on. If your computer could've been compromised, then you can't verify that it's real. Also, you should probably look at deploying a web of trust, and finding the fingerprint on websites other than the main Trezor site. Since, if the Trezor site was compromised when you got the fingerprint from there, you could be tricked into thinking it's genuine. If you're really serious about your security, verifying on two different computers could help with the concern that one of the machines is compromised. Verifying on a offline computer can also be a decent way. As long as you can be sure that you've got the right signing key, and your machine isn't feeding you the wrong information via being compromised. You should be alright, to go ahead, and install the software. People's threat levels will differ. You can go really deep into verifying, establishing a web of trust, and mitigating various attacks. For most people, importing, and verifying is enough. Quote from: BlackHatCoiner on April 04, 2023, 02:10:19 PMThe rule of thumb with software authenticity is: you should verify signatures whose public keys have been published on multiple places. There's absolutely no difference between using a non-verified software downloaded from Github, and a verified software whose binaries and public key(s) were published together. If Github is compromised, then public keys can also be compromised. Thank you for your helpful replies.Best regardsQuote from: epsi1on on April 06, 2023, 08:16:23 PMQuote from: Bitcoiner2023 on April 04, 2023, 12:03:47 AMHow can I check if a Firmeware from a HWW or a .exe files from a Desktop Wallet matches the code on GitHub ?In short, there is no way.if you have a source code and have a binary file, (as far as i understand) then there is no way to ensure the code and binary are matched, unless you compile it yourself.This is how I understood it:Always check PGP, so you can be sure that the file that was downloaded also comes from the provider.If you trust the provider you can compare the file that was downloaded with the hash to make sure the code hasn't been changed.If the hash is not provided by the provider, then this method is not applicable.If the provider does not provide the hash or you do not trust the providerThen there is only one method, compile it yourself",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 08, 2023, 07:42:13 AM",
+      "body": "Quote from: BlackHatCoiner on April 06, 2023, 05:01:37 PMAbsolutely, that's why I said unless you want to study the source code. Unless you belong to that 1% which will take the time to study code, test and read documentation, then it's unnecessary.Again, it isn't. If you build the binary yourself from the publicly viewable code, then even if you don't read the code yourself you have some additional protection from having the eyes of the community on the code.Quote from: BlackHatCoiner on April 06, 2023, 05:01:37 PMSignatures are usually uploaded on Github, so there's no point in stealing the developer's key for that purpose. Unless of course you compromise their account, which makes software compiling unnecessary again.I would assume that if someone's PGP key is compromised, then their entire system is probably compromised and so stealing their login for GitHub would be trivial.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "April 08, 2023, 08:51:48 AM",
+      "body": "Agree with o_e_l_e_o, verifying (signed) hashes only really tells you that the executable hasn't been tampered with, but tells you nothing about the correspondence between the binary and the source code that produced it. The only way to have any real confidence that there's nothing evil hiding inside (ignoring \"trusting trust\" attacks) is to build it yourself from source. Even without the skills to examine the code yourself you'll still benefit from other people having looked at it. I get that compiling code is well outside most people's comfort zone, but calling the process \"unnecessary\" is not good advice, IMO.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "April 08, 2023, 09:19:26 AM",
+      "body": "Quote from: o_e_l_e_o on April 08, 2023, 07:42:13 AMAgain, it isn't. If you build the binary yourself from the publicly viewable code, then even if you don't read the code yourself you have some additional protection from having the eyes of the community on the code.This is correct, indeed I hadn't thought of. Any changes you make on the repository are viewable from the entire community, using commitments. You can't make a change without committing a message. However, wouldn't you also have \"the eyes of the community\" with a valid signature of tempered software? Unless you downloaded the binaries from some unknown, compromised site (and not Github itself), then you should expect the majority of community members (if not all) to have installed the binaries and verified the developer's intention beforehand.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 08, 2023, 09:27:23 AM",
+      "body": "Quote from: BlackHatCoiner on April 08, 2023, 09:19:26 AMHowever, wouldn't you also have \"the eyes of the community\" with a valid signature of tempered software? Unless you downloaded the binaries from some unknown, compromised site (and not Github itself), then you should expect the majority of community members (if not all) to have installed the binaries and verified the developer's intention beforehand.I suspect very few people (if any at all) will be downloading the binaries and then decompiling them to check they match the published code. If someone is able to do all this, then the likelihood is they will just download and check the code and compile the binary themselves. It would also be entirely possible for the developer to hide some code which does nothing for several weeks or months before it activates, so as to fool the community in to thinking the software is clean and maximize how many people will download it.It is also possible to obfuscate the code so that if someone does decompile the binary it is near impossible to interpret.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 08, 2023, 10:41:24 AM",
+      "body": "I haven't checked this myself so far. To my knowledge Shiftcrypto's BitBox02 hardware wallet has open-source firmware and they publish reproducible builds of their firmware (maybe their BitBox App, too). As far as I understand it's documented how to reproduce the firmware from the Github and you can compare the published firmware and verify it's the same, i.e. the firmware's code is exactly what's visible as code on the Github.Reproducible app builds should provide the same verification ability for programs or .exe (if you're stuck in the Windows world). You need the exact tool chain and recipe to build the app from the published sources (usually on Github) and if the build is reproducible you should get an app which has the same hash as the published app. Then you know that the source code reflects exactly your app's binary.When there's no recipe for a reproducible build, you're usually out of luck to verify that the source code represents exactly the firmware or app binary.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "April 08, 2023, 11:30:09 AMLast edit: April 08, 2023, 01:43:19 PM by BlackHatCoiner",
+      "body": "Quote from: o_e_l_e_o on April 08, 2023, 09:27:23 AMI suspect very few people (if any at all) will be downloading the binaries and then decompiling them to check they match the published code.No, this is not what I meant. Obviously, nobody is going to reverse engineer the binaries, especially if trust has been built. What I'm arguing is that if the developer publishes tampered software with a valid signature, the community can build it and compare the signed hashes. If he has indeed altered the software, then it will be trivial to notice the difference between the compiled binaries and the pre-compiled; they will give different hashes.The protection you have from the \"eyes of the community\" goes for the entire repository, not just for the source code. And now that I'm thinking about it, I feel more confident knowing that the community has checked the pre-binaries are identical with the compiled, rather than their coding skills, because the former is much easier to check.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "April 08, 2023, 01:39:38 PM",
+      "body": "Quote from: BlackHatCoiner on April 08, 2023, 11:30:09 AMThe protection you have from the \"eyes of the community\" goes for the entire repository, not just for the source code. And now that I'm thinking about it, I feel more confident knowing that the community has checked the pre-binaries are identical with the compiled, rather than their coding skills, because the former is much easier to check. I get your logic, which by my reckoning amounts to you asking: \"If you can rely on the community to examine the source code, then why can't you rely on the community to verify that the hash of the executable corresponds to the source code?\".Reproducible builds are the exception, and not the rule. To have any hope of getting a byte-for-byte identical build, whoever built the reference executable would have to share more details than they typically do. In a C/C++ project (for example) it wouldn't be enough to just match the compiler flags and specific version, you'd also have to match the exact configuration of the reference compiler (i.e. there are differences between Debian's GCC and Fedora's GCC). Even after that, there'll normally be something remaining that will spoil reproducibility (e.g. the linker embedding a timestamp, or a slightly different version of some dependency, or some data structure inside one of the build tools being sensitive to completion order during a parallel build, etc.)But yeah, if the project in question has managed to make their builds reproducible, then I agree that you can probably count on someone in the community having checked that the signed hashes correspond to the source code. Combine that with the community keeping an eye on the source code itself, and there's not much room left for shenanigans. Of course, someone has to actually do these things, and if everyone is relying on everyone else, then, well, you get the point...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

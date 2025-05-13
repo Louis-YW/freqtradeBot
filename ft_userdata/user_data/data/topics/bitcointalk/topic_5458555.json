@@ -1,0 +1,165 @@
+{
+  "id": "topic_5458555",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "July 04, 2023, 10:54:36 AM",
+  "content": "So this post had ideas jumping to my head:Quote from: o_e_l_e_o on July 04, 2023, 09:20:59 AMQuote from: NotATether on July 04, 2023, 08:35:02 AMThe timelock can only be cancelled if when you are broadcasting the timelocked transaction (that is RBF-enabled!), you broadcast another transaction without the timelock and place a higher transaction fee on it.The timelocked transaction cannot be broadcast until after the timelock has expired. You can invalidate it with a transaction paying a lower fee prior to this, since the rest of the network know nothing about the timelocked transaction. The original transaction also does not need to be RBF enabled, since again, the network knows nothing about it.As we all know very well, Bitcoin Layer 1 can send one-time payments, but recurring subscription payments are a bit of a thorn in the eye, because the Bitcoin protocol doesn't provide us with primitives for solving all of these things.However, we do have locktime, so let's see how a Bitcoin wallet can emulate the recurring payments feature:1. First, the wallet should come with a daemon or background program whose only function is to store signed transactions and attempt to broadcast them. That will free users from the necessity from leaving their wallet open 24/7.2. When a service wants you to pay bitcoins, we currently have the bitcoin: URI, which encodes fields such as address, amount, and expiration date. New fields can be created: quantity= which dictates the number of payments, and interval= to describe the payment interval in days.     These fields can just be directly created and used immediately, since there is empirical evidence that shows that just deploying the stuff yourself (disappointingly) gets adoption much faster than trying to formalize it first (ZeroSync, Ark, Bitcoin transaction relay over Nostr, etc).3. The wallet ensures that the UTXO set available in the wallet is enough to cover the fixed BTC costs over the specified time frame, and then signs a transaction for each payment, each one containing a UTXO from the previous transaction AND a locktime of the current block height plus (2016 - 100)*(interval/14) to prevent them from being spent all at once. This particular locktime also ensures that transactions can be broadcasted several hours before payday.4. These transactions are then sent to the background program to be broadcasted in due time.5. If you make a new transaction somewhere else using one of the UTXOs that are being used, the currently timelocked transactions are discarded and you have the option of lowering the recurring payment quantity, for any of your recurring payments (or even discarding them all together), in order to accommodate the new transaction, while a new set of recurring timelocked payments are created with the new time constraints and UTXO set.So, I guess that really does it. Now let's see how long it takes for a wallet to pick up on this idea, as the infrastructure for handling this can easily be created server-side....",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5458555",
+  "comments": [
+    {
+      "author": "un_rank",
+      "created_time": "July 04, 2023, 11:11:28 AM",
+      "body": "How will changes in fees be accounted for if it is done automatically?At the time of creating the transaction the feerate averagely accepted by miners could be very different to the one at the time of broadcast. I will not want to overpay by a wide margin to accommodate for changes in the mempool and I will not want to underpay and not have my transaction added to any block.- Jay -",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 04, 2023, 11:16:42 AM",
+      "body": "Quote from: un_rank on July 04, 2023, 11:11:28 AMHow will changes in fees be accounted for if it is done automatically?At the time of creating the transaction the feerate averagely accepted by miners could be very different to the one at the time of broadcast. I will not want to overpay by a wide margin to accommodate for changes in the mempool and I will not want to underpay and not have my transaction added to any block.- Jay -Since the transactions for future payments are timelocked but cannot be broadcasted yet, it is trivial to change the fee: just periodically recreate the recurring transaction chain every week or so, and the wallet software should be intelligent enough to get the current fee estimates for that day, for example from an Electrum server or even possibly from Blockchain.info or Blockchair.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 04, 2023, 11:31:17 AMLast edit: July 04, 2023, 11:47:33 AM by BlackHatCoiner",
+      "body": "Quote from: NotATether on July 04, 2023, 10:54:36 AM3. The wallet ensures that the UTXO set available in the wallet is enough to cover the fixed BTC costs over the specified time frameI believe this implies that the \"subscription coins\" cannot be transferred until the final subscription payment has been made.So why not consider opening a lightning channel to avoid the complications of on-chain fees? Gather UTXOs (subscription coins) and use them to open a channel with the payee. The only downside is that the payee needs to have a lightning node running. You're anyway going to periodically connect to your wallet to change the fee, so you could do the same to check for penalties.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 04, 2023, 11:40:32 AM",
+      "body": "Quote from: BlackHatCoiner on July 04, 2023, 11:31:17 AMQuote from: NotATether on July 04, 2023, 10:54:36 AM3. The wallet ensures that the UTXO set available in the wallet is enough to cover the fixed BTC costs over the specified time frameI believe this implies that the \"subscription coins\" cannot be transferred until the final subscription payment has been made.So why not consider opening a lightning channel to avoid the complications of on-chain fees? Gather UTXOs (subscription coins) and use them to open a channel with the payee. The only downside is that the payee needs to have a lightning node running. You're anyway going to periodically connect to your wallet to change the fee. It's a loose model that is dictated by software, so it's possible to transport this model to lightning network too, although I don't know how you would \"cache\" LN payments so that they can be sent on a future date, but maybe it's more simple than in Layer 1.But actually, in any case, you can transfer \"subscription coins\" to any other transaction since they haven't been broadcasted yet, and the subscription that you may have now is the one you had already paid for previously.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "July 04, 2023, 11:51:48 AM",
+      "body": "Using the credit card theory, the merchant sends a request to their processor with the CC info and gets their money.Now, obviously we cant do that here. But,Create a 2 of 3 multisig wallet.You, the sender keep 2 of them, the merchant gets 1.Since you have 2 of the 3 you can move the coins anytime.Once a month, or whenever the merchant generates a transaction that you have to sign with your part of the multisig.Some app would have to get that request and verify that it's correct and then sign & broadcast but that is fairly trivial I would think.I'm sure I am missing something, but I'm working on almost no sleep at the moment.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 04, 2023, 11:52:45 AM",
+      "body": "Quote from: NotATether on July 04, 2023, 11:40:32 AMalthough I don't know how you would \"cache\" LN payments so that they can be sent on a future date, but maybe it's more simple than in Layer 1.In CoinCorner, they have implemented it for their customers: Recurring Lightning payments. It's basically a LNURL functionality as far as I can tell. It must have been already implemented in Layer 1 as well. Quote from: DaveF on July 04, 2023, 11:51:48 AMYou, the sender keep 2 of them, the merchant gets 1.Since you have 2 of the 3 you can move the coins anytime.So what does this grant to the merchant anyway? You get to always decide where the coins go.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 04, 2023, 03:04:45 PM",
+      "body": "Quote from: NotATether on July 04, 2023, 10:54:36 AMThe wallet ensures that the UTXO set available in the wallet is enough to cover the fixed BTC costs over the specified time frame, and then signs a transaction for each payment, each one containing a UTXO from the previous transaction AND a locktime of the current block height plus (2016 - 100)*(interval/14) to prevent them from being spent all at once.You can specify the nLockTime in Unix time rather than block height, which is an easier calculation and avoids issues with compounding variability in the average block time over a period of weeks or months.Quote from: NotATether on July 04, 2023, 11:16:42 AMjust periodically recreate the recurring transaction chain every week or so, and the wallet software should be intelligent enough to get the current fee estimates for that dayForgive me if I've misunderstood, but if you need your wallet to recreate the transaction chain on a weekly basis to get the most appropriate fee, then why do you need timelocks at all? Why not just have your wallet create a single transaction each week with an appropriate fee?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "July 04, 2023, 03:22:29 PM",
+      "body": "QuoteHow will changes in fees be accounted for if it is done automatically?I guess it will end up in the same way as on-chain fees for LN transactions.Also, it is possible to always use the minimal fee, and make it open for modifications, by using RBF, CPFP, or by allowing more coins through sighashes other than SIGHASH_ALL. The only problem with sighashes is that it cannot be chained, so you cannot say for example \"compute txid based on those sighashes\", we don't have things like SIGHASH_PREVOUT_ANYONECANPAY, that would mean \"please apply SIGHASH_ANYONECANPAY to the previous transaction, in the context of computing signatures\".QuoteI will not want to overpayThen use no fee or even negative fee, and combine it with proper sighashes. The classical example is when your recipient sends you any transaction with negative fee, signed with SIGHASH_SINGLE|SIGHASH_ANYONECANPAY, and then you can attach any coins, and set your fees on-the-fly.Because technically, your recipient could start with some dust amount, and provide you a chain of transactions, signed with SIGHASH_SINGLE|SIGHASH_ANYONECANPAY, each with negative fee, and each with incrementally growing amount of coins on recipient's address. Then, you could take this chain, and attach any coins in the right time, and the proper fees. The only problem is that adding any inputs or outputs will break the chain of signatures, because you have nothing like SIGHASH_PREVOUT_SOMETHING that could allow you to decide, how to compute txid that is used in signatures.Maybe we should even have something like SIGHASH_PREVOUT_CHAIN, that would automatically detect, which sighashes were used, and could compute txid, based only on things that were signed.Quoteand I will not want to underpayThis case is easier, because you can just add more coins in any way mentioned above. Lowering the fee of signed and shared transaction is much harder.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 05, 2023, 08:49:28 AM",
+      "body": "Quote from: o_e_l_e_o on July 04, 2023, 03:04:45 PMif you need your wallet to recreate the transaction chain on a weekly basis to get the most appropriate fee, then why do you need timelocks at all? Why not just have your wallet create a single transaction each week with an appropriate fee?I was thinking the same thing. If you need to adjust a wallet anyway, it can just as well automate the payments. That would require a part of your funds to be accessible without entering a password.With some scripting, you can already setup automated payments in Bitcoin Core (that's what many Bitcoin services do). But I wouldn't set it up months ahead.Usually, recurring payments are for a certain amount in dollars, so a pre-determined Bitcoin amount won't work. Long-term, when Bitcoin goes up or down a lot, you'll end up paying a small fortune or nothing for your weekly magazine subscription.The guy who put $15k in Bitcoin in a 125 year timelock got me thinking: this would be the first time you can distribute wealth to your descendant far down the line, without trusting third parties. Of course, this requires you to be wealthy enough in the first place, but if you are, how cool would it be to leave a legacy of 1BTC becoming available every 10 years for the next 1000 years? If Bitcoin gets big, it will be your family's fortune guarded by generations.I'm now curious how this would work in countries with a wealth tax. Would you still pay annual tax on money you can't access for decades?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 05, 2023, 10:57:08 AM",
+      "body": "The only way around it at the moment would be for every transaction in the chain of timelocked transactions to include an output to an address controlled by the recipient who could use that output to perform a CPFP to speed up the timelocked transactions. You can't use RBF or adding additional inputs via a specific SIGHASH since doing so changes your TXID and therefore invalidates the rest of the chain. But by doing this all you are really doing is moving the requirement to make a transaction from yourself to the recipient, who is unlikely to be best pleased about having to do this every week for every customer paying them regularly.Quote from: LoyceV on July 05, 2023, 08:49:28 AMThe guy who put $15k in Bitcoin in a 125 year timelock got me thinking: this would be the first time you can distribute wealth to your descendant far down the line, without trusting third parties.The biggest issue here (aside from not being able to access your money if you need it) is if a private key is leaked or compromised, you cannot move the funds to safety. You simply have to wait until the timelock expires and hope that your transaction beats the transaction belonging to the attacker. It also involves backing up and passing on both your private key and your redeem script, which is obviously more complex and more prone to error than a seed phrase.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 05, 2023, 01:23:28 PM",
+      "body": "Quote from: o_e_l_e_o on July 05, 2023, 10:57:08 AMThe biggest issue here (aside from not being able to access your money if you need it) is if a private key is leaked or compromised, you cannot move the funds to safety. You simply have to wait until the timelock expires and hope that your transaction beats the transaction belonging to the attacker. It also involves backing up and passing on both your private key and your redeem script, which is obviously more complex and more prone to error than a seed phrase.Let's say it was hypothetical. I wasn't going to do it (and I lack the 100 Bitcoin needed for it), but if you'd do something like this, it shouldn't be for your entire fortune. As a billionaire it wouldn't hurt to make a name for yourself for the coming 1000 years by investing a couple million bucks now. You can opt to use more smaller amounts further in the future, so more decendents can each get a small part from their parents. Each parent down the line then has to distribute a pile of paperwork to their children, who do the same to theirs.It's also an interesting way to temporarily reduce the number of Bitcoins in circulation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 06, 2023, 06:19:37 AM",
+      "body": "Quote from: o_e_l_e_o on July 04, 2023, 03:04:45 PMQuote from: NotATether on July 04, 2023, 10:54:36 AMThe wallet ensures that the UTXO set available in the wallet is enough to cover the fixed BTC costs over the specified time frame, and then signs a transaction for each payment, each one containing a UTXO from the previous transaction AND a locktime of the current block height plus (2016 - 100)*(interval/14) to prevent them from being spent all at once.You can specify the nLockTime in Unix time rather than block height, which is an easier calculation and avoids issues with compounding variability in the average block time over a period of weeks or months.That would actually be much better for this design, but how does that work? I'm curious to know what the minimum and maximum values of an epoch-based timelock are. Surely it can't be the standard 1900-2038 range because of the block height dual-representation.Quote from: o_e_l_e_o on July 04, 2023, 03:04:45 PMQuote from: NotATether on July 04, 2023, 11:16:42 AMjust periodically recreate the recurring transaction chain every week or so, and the wallet software should be intelligent enough to get the current fee estimates for that dayForgive me if I've misunderstood, but if you need your wallet to recreate the transaction chain on a weekly basis to get the most appropriate fee, then why do you need timelocks at all? Why not just have your wallet create a single transaction each week with an appropriate fee?This is not really a requirement since it was just an answer to BlackHatCoiner's wondering how this is supposed to work with USD values - I thought of this scheme with BTC values in mind (1BTC = 1BTC).To be clear:The only reason I chose to use timelocks in this scheme in the first place is to prevent the funds from being accidentally broadcasted early. But I guess that will also prevent you from spending them at all until that period, which is not so helpful - unless your subscription model is like Shutterstock's where 1 year advance payment works by making 12 mandatory monthly payments, which is actually a use case where Bitcoin works better than Big Banks right now (as a customer can make a chargeback at any time).Perhaps a better solution would be time-based encryption, where the signed transactions are encrypted by the wallet using an AES private key which is published to the wallet after a certain date. Such a private key would have to be stored in the operating system's secure store, and probably gated behind your OS user account password.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 06, 2023, 08:57:23 AM",
+      "body": "Quote from: NotATether on July 06, 2023, 06:19:37 AMI'm curious to know what the minimum and maximum values of an epoch-based timelock are.The range is from 0 to 0xFFFFFFFF, with the cut off point being 500,000,000.Anything under 500,000,000 is interpreted as a block height. At 10 minutes per block, block 500,000,000 will arrive somewhere around the year 11,514.Anything greater or equal than 500,000,000 is interpreted as Unix time. 500,000,000 is 00:53:20 on November 5th, 1985. The maximum nLockTime of 4,294,967,295 (0xFFFFFFFF) is 06:28:15 on February 7th, 2106.Here's the relevant part of the code: https://github.com/bitcoin/bitcoin/blob/bc4f6b13feb29146b7e10e86f93dc7f6fb6937f2/src/script/script.h#L41-L49Quote from: NotATether on July 06, 2023, 06:19:37 AMBut I guess that will also prevent you from spending them at all until that period, which is not so helpfulThat's not the case with timelocked transactions. If I create and sign a transaction sending you some money which is timelocked for a year, I can invalidate it at any time by spending one of the inputs in a different transaction. Even if I share the timelocked transaction with you, there is nothing you can do to stop me invalidating it since if you try to broadcast it before the timelock it will simply be rejected. The network will know nothing about it and so will happily accept any competing transaction regardless of fee rate, RBF, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "July 06, 2023, 02:47:33 PM",
+      "body": "QuoteSurely it can't be the standard 1900-2038 range because of the block height dual-representation.Believe it or not, but the upper limit is 2038. If you try to set for example 2040 as your system time, then your node will crash: https://bitcointalk.org/index.php?topic=5365359.msg58166985#msg58166985QuoteThe maximum nLockTime of 4,294,967,295 (0xFFFFFFFF) is 06:28:15 on February 7th, 2106.Yes, but in the source code, it is casted between signed and unsigned, so only using values lower or equal than 0x7fffffff are safe. Other values may be correct in the future, but the current version will crash, if you try to start your client with the local time greater or equal to 0x80000000. So yes, technically you can set your locktime to 0xbadc0ded, but practically, there is no guarantee that after 2038, this will be correctly enforced, after a hard-fork to fix 2038 year problem (it will require hard-fork by definition, because the current version cannot handle it, so it is backward-incompatible).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tread93",
+      "created_time": "July 07, 2023, 03:02:44 AM",
+      "body": "Quote from: NotATether on July 04, 2023, 10:54:36 AMSo this post had ideas jumping to my head:Quote from: o_e_l_e_o on July 04, 2023, 09:20:59 AMQuote from: NotATether on July 04, 2023, 08:35:02 AMThe timelock can only be cancelled if when you are broadcasting the timelocked transaction (that is RBF-enabled!), you broadcast another transaction without the timelock and place a higher transaction fee on it.The timelocked transaction cannot be broadcast until after the timelock has expired. You can invalidate it with a transaction paying a lower fee prior to this, since the rest of the network know nothing about the timelocked transaction. The original transaction also does not need to be RBF enabled, since again, the network knows nothing about it.As we all know very well, Bitcoin Layer 1 can send one-time payments, but recurring subscription payments are a bit of a thorn in the eye, because the Bitcoin protocol doesn't provide us with primitives for solving all of these things.However, we do have locktime, so let's see how a Bitcoin wallet can emulate the recurring payments feature:1. First, the wallet should come with a daemon or background program whose only function is to store signed transactions and attempt to broadcast them. That will free users from the necessity from leaving their wallet open 24/7.2. When a service wants you to pay bitcoins, we currently have the bitcoin: URI, which encodes fields such as address, amount, and expiration date. New fields can be created: quantity= which dictates the number of payments, and interval= to describe the payment interval in days.     These fields can just be directly created and used immediately, since there is empirical evidence that shows that just deploying the stuff yourself (disappointingly) gets adoption much faster than trying to formalize it first (ZeroSync, Ark, Bitcoin transaction relay over Nostr, etc).3. The wallet ensures that the UTXO set available in the wallet is enough to cover the fixed BTC costs over the specified time frame, and then signs a transaction for each payment, each one containing a UTXO from the previous transaction AND a locktime of the current block height plus (2016 - 100)*(interval/14) to prevent them from being spent all at once. This particular locktime also ensures that transactions can be broadcasted several hours before payday.4. These transactions are then sent to the background program to be broadcasted in due time.5. If you make a new transaction somewhere else using one of the UTXOs that are being used, the currently timelocked transactions are discarded and you have the option of lowering the recurring payment quantity, for any of your recurring payments (or even discarding them all together), in order to accommodate the new transaction, while a new set of recurring timelocked payments are created with the new time constraints and UTXO set.So, I guess that really does it. Now let's see how long it takes for a wallet to pick up on this idea, as the infrastructure for handling this can easily be created server-side....This is great! How do you figure out the appropriate amount of BTC to cover transaction fees accurately over a specified period of time? Also, is there a limit to how many payment intervals that you can put with this time lock mechanism?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 07, 2023, 07:48:18 AM",
+      "body": "Quote from: tread93 on July 07, 2023, 03:02:44 AMHow do you figure out the appropriate amount of BTC to cover transaction fees accurately over a specified period of time?You can't predict that. One solution could be to create multiple timelocked transactions, and later pick the one that fits best.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flexystar",
+      "created_time": "July 07, 2023, 04:01:51 PM",
+      "body": "Quote from: NotATether on July 04, 2023, 11:16:42 AMQuote from: un_rank on July 04, 2023, 11:11:28 AMHow will changes in fees be accounted for if it is done automatically?At the time of creating the transaction the feerate averagely accepted by miners could be very different to the one at the time of broadcast. I will not want to overpay by a wide margin to accommodate for changes in the mempool and I will not want to underpay and not have my transaction added to any block.- Jay -Since the transactions for future payments are timelocked but cannot be broadcasted yet, it is trivial to change the fee: just periodically recreate the recurring transaction chain every week or so, and the wallet software should be intelligent enough to get the current fee estimates for that day, for example from an Electrum server or even possibly from Blockchain.info or Blockchair.First when I read the OP I was excited enough to see where it goes but after noticing the foreseen problems like fees and everything it seems to be hectic to implement in the real world. Jay has got point actually. Whenever you will be broadcast based on the \"block\" in which your transaction shall be included can give us timelock transaction but nobody thought about the bumped fees. If I am supposed to do the manual override of the transaction every week or so, then it's pointless to have future subscription because I would simply broadcast the transaction on the day my subscription is due, manually. Instead there should be auto debit of the fees. Like when we broadcast the transaction it will include the fees along with it. Instead of that, a code should be written which will just withdraw the fees automatically from the \"subwallet\" or some other ways and then broadcast it automatically. If there is not enough balance at the time of broadcasting, it would simply cancel it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 08, 2023, 08:53:10 AM",
+      "body": "Quote from: Flexystar on July 07, 2023, 04:01:51 PMInstead there should be auto debit of the fees. Like when we broadcast the transaction it will include the fees along with it. Instead of that, a code should be written which will just withdraw the fees automatically from the \"subwallet\" or some other ways and then broadcast it automatically.The problem with this is that as soon as you change the fee, you change the TXID. And as soon as you change the TXID, any child transactions will no longer be valid. This means you cannot create a chain of timelocked transactions, since as soon as the fee changes on one, all the other ones being held to a future date will no longer be valid.As I mentioned above, the only way around this at present is to include an additional output to the transaction which can then be used to perform a CPFP. But the additional time and cost involved in doing this negates any benefits gained from creating a chain of timelocked transactions in the first place.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 08, 2023, 09:28:31 AM",
+      "body": "Quote from: o_e_l_e_o on July 08, 2023, 08:53:10 AMThe problem with this is that as soon as you change the fee, you change the TXID. And as soon as you change the TXID, any child transactions will no longer be valid. This means you cannot create a chain of timelocked transactions, since as soon as the fee changes on one, all the other ones being held to a future date will no longer be valid.Easy fix: use different inputs  Now that I think about it: you can just as well send small funded private keys on a monthly schedule to pay for your subscription.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

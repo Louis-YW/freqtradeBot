@@ -1,0 +1,165 @@
+{
+  "id": "topic_5402580",
+  "title": "nullama",
+  "author": "nullama",
+  "created_time": "June 14, 2022, 01:37:57 PM",
+  "content": "After seeing lightning wallets like Blixt, Breez, Phoenix, and others, which basically run a full lightning node on the phone(LND for example), and use a Bitcoin light client(Neutrino for example), I started to wonder if it would be possible to have a similar setup for a light Bitcoin checkout.Something like BTCPayServer is great, but it requires to have a Bitcoin node. Yes, you can prune it, but I'm wondering if there is any alternative checkout that uses a Bitcoin light client instead, and ideally has a lightning node on top of it, so that lightning payments can be received as well as on-chain payments.I'm not sure if there's any technical impediment to do this, or if there's any huge drawback other than having to trust other Bitcoin nodes in the network. I think it would be ideal for small amounts on simple websites for example.Of course you could already do this manually, just using any of these lightning wallets, I'm just wondering if there's anything more dedicated that you could setup on any website for example and it would create the checkout, invoices, etc, for you, without requiring to have a Bitcoin node.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5402580",
+  "comments": [
+    {
+      "author": "mocacinno",
+      "created_time": "June 14, 2022, 01:56:23 PM",
+      "body": "You *can* actually run electrum as a daemon and incorporate it in your webshophttps://electrum.readthedocs.io/en/latest/merchant.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 14, 2022, 02:37:15 PM",
+      "body": "You can also use something like this: https://www.npmjs.com/package/bitcore-libPersonally I would do something like mocacinno suggested, but there are other ways too.Also, the amounts you would be getting should change your approach.Many small payments you might be better off using a BTCPay server. There are places out there that will host them for free or very little money.A few large payments, then you may want to actually go for a full node and just deal with the cost and issues because it is for larger amounts of money.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 14, 2022, 10:03:44 PM",
+      "body": "Quote from: nullama on June 14, 2022, 01:37:57 PMSomething like BTCPayServer is great, but it requires to have a Bitcoin node. Yes, you can prune it, but I'm wondering if there is any alternative checkout that uses a Bitcoin light client instead, and ideally has a lightning node on top of it, so that lightning payments can be received as well as on-chain payments.There is also lightweight alternative for BTCPayServer that is called CypherpunkPay.It is also open source, Lightning is supported, it's easier to set up and it can work just fine even with cheap $5 VPS, that is not so easy to do with older brother BTCPayServer.Running a full node is encouraged but not required by CypherpunkPay.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "June 14, 2022, 11:09:34 PM",
+      "body": "Quote from: dkbit98 on June 14, 2022, 10:03:44 PMQuote from: nullama on June 14, 2022, 01:37:57 PMSomething like BTCPayServer is great, but it requires to have a Bitcoin node. Yes, you can prune it, but I'm wondering if there is any alternative checkout that uses a Bitcoin light client instead, and ideally has a lightning node on top of it, so that lightning payments can be received as well as on-chain payments.There is also lightweight alternative for BTCPayServer that is called CypherpunkPay.It is also open source, Lightning is supported, it's easier to set up and it can work just fine even with cheap $5 VPS, that is not so easy to do with older brother BTCPayServer.Running a full node is encouraged but not required by CypherpunkPay.Yeah, I remember that one from an older thread.How can they work without a node but BTCPayServer can't?, are they using a light node fallback?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 14, 2022, 11:36:48 PM",
+      "body": "Quote from: nullama on June 14, 2022, 11:09:34 PMQuote from: dkbit98 on June 14, 2022, 10:03:44 PMQuote from: nullama on June 14, 2022, 01:37:57 PMSomething like BTCPayServer is great, but it requires to have a Bitcoin node. Yes, you can prune it, but I'm wondering if there is any alternative checkout that uses a Bitcoin light client instead, and ideally has a lightning node on top of it, so that lightning payments can be received as well as on-chain payments.There is also lightweight alternative for BTCPayServer that is called CypherpunkPay.It is also open source, Lightning is supported, it's easier to set up and it can work just fine even with cheap $5 VPS, that is not so easy to do with older brother BTCPayServer.Running a full node is encouraged but not required by CypherpunkPay.Yeah, I remember that one from an older thread.How can they work without a node but BTCPayServer can't?, are they using a light node fallback?They pull from block explorers: QuoteFor each charge (invoice) CypherpunkPay picks two random block explorers to cross-check the payment arrival against. New Tor circuit (and so IP address) is used for each charge. User agent and headers are consistent with the Tor Browser. From the block explorer perspective it is not evident if this is CypherpunkPay or anyone else asking. It is even less clear which specific business the transaction belongs to (unless the amount itself is globally unique to your business, but then even running the full node would not help as Bitcoin blockchain itself is plain text).In theory you give up a bit of security with that, and if the API calls / HTML changes you would have to update CypherpunkPay to get to the new locations / data.But, it is a quick and simple way to take BTC payments. YMMV if doing it that way works for you, since you are at that point relying on external services. That you are not paying for (not a big deal) but can change forcing you to update.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 15, 2022, 04:57:38 AM",
+      "body": "Quote from: mocacinno on June 14, 2022, 01:56:23 PMYou *can* actually run electrum as a daemon and incorporate it in your webshophttps://electrum.readthedocs.io/en/latest/merchant.htmlElectrum's daemon is a bare-bones payment processor though, you can configure it to send QR codes and addresses to a webpage, but it doesn't track the payments to each user (so there's no refund functionality), and also you have to set up the TLS certificate yourself and put it inside the daemon so it's an error-prone process - you can't use things like Certbot, and browsers will make obnoxious warnings if you attmpt to fill in a self-signed cert.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 15, 2022, 11:09:43 AM",
+      "body": "Quote from: NotATether on June 15, 2022, 04:57:38 AMQuote from: mocacinno on June 14, 2022, 01:56:23 PMYou *can* actually run electrum as a daemon and incorporate it in your webshophttps://electrum.readthedocs.io/en/latest/merchant.htmlElectrum's daemon is a bare-bones payment processor though, you can configure it to send QR codes and addresses to a webpage, but it doesn't track the payments to each user (so there's no refund functionality), and also you have to set up the TLS certificate yourself and put it inside the daemon so it's an error-prone process - you can't use things like Certbot, and browsers will make obnoxious warnings if you attmpt to fill in a self-signed cert.You should never be running it on the server talking to the public. For security everything should be sitting in private IP space and then you run something to talk back to it.NGINX as a reverse proxy is usually my choice. https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/ This also takes care of the SSL requests with certbot or whatever else you are doing.Just a bit more security. Not just for BTC put all websites in general.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "June 15, 2022, 11:46:34 AM",
+      "body": "@NotATether : i agree with DaveF but also wanted to add that if you want to setup something like btcpayserver manually (which i did), it's also quite a bit of configuration and it'll also take a while before you get things running smoothly...I guess setting up a merchant system is always a bit complex, it's usually not for an enduser I know you can run btcpayserver inside a container (witch btcpayserver authors actually recommend), but i don't like to run financial services without knowing exactly how they work, and exactly how they were set up Also, i just wanted to add my own nginx snipplet on how i setup nginx as a reverse proxy for my private electrum serverCode:root@node:~# cat /etc/nginx/nginx.confload_module /usr/lib/nginx/modules/ngx_stream_module.so;user www-data;worker_processes auto;pid /run/nginx.pid;error_log /var/log/nginx/electrum_error.log;events {    worker_connections  1024;}stream {       upstream electrs {                server 127.0.0.1:50001;        }                log_format upstream_time '[$time_local] [$connection] $remote_addr:$remote_port => $server_addr:$server_port bytes in/out $bytes_received/$bytes_sent [$status]';        server {                access_log /var/log/nginx/electrum_access.log upstream_time;                listen 50002 ssl;                proxy_pass electrs;                ssl_certificate /etc/letsencrypt/live/electrum.mocacinno.com/fullchain.pem;                ssl_certificate_key /etc/letsencrypt/live/electrum.mocacinno.com/privkey.pem;                ssl_session_cache shared:SSL:1m;                ssl_session_timeout 4h;                ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;                ssl_prefer_server_ciphers on;                include blockips.conf;        }}root@node:~#",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "June 15, 2022, 11:56:06 AM",
+      "body": "If you only care about non-custodial part, you can use 3rd party service such as Mycelium Gear[1] and Coinbase Commerce[2] where you give your master public key to them.[1] https://gear.mycelium.com/[2] https://commerce.coinbase.com/Quote from: DaveF on June 14, 2022, 11:36:48 PMQuote from: nullama on June 14, 2022, 11:09:34 PMHow can they work without a node but BTCPayServer can't?, are they using a light node fallback?They pull from block explorers: QuoteFor each charge (invoice) CypherpunkPay picks two random block explorers to cross-check the payment arrival against. New Tor circuit (and so IP address) is used for each charge. User agent and headers are consistent with the Tor Browser. From the block explorer perspective it is not evident if this is CypherpunkPay or anyone else asking. It is even less clear which specific business the transaction belongs to (unless the amount itself is globally unique to your business, but then even running the full node would not help as Bitcoin blockchain itself is plain text).IMO it's weird choice since SPV protocol (such as Electum protocol and BIP 157/158) exist.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "June 15, 2022, 04:25:30 PM",
+      "body": "Quote from: ETFbitcoin on June 15, 2022, 11:56:06 AMIf you only care about non-custodial part, you can use 3rd party service such as Mycelium Gear[1] and Coinbase Commerce[2] where you give your master public key to them.[1] https://gear.mycelium.com/[2] https://commerce.coinbase.com/I have never heard of Mycelium Gear before. It looks very promising, as it's non-custodial, open source, has plugins for websites, and you can even get it for free for up to 0.1BTC a month. Really interesting. The only downside I can see about it is that it doesn't seem to support lightning.Coinbase Commerce seems to have lightning, and it's just 1% fee. Not too bad really. I always assumed it was custodial only.Thanks for the options, they look really easy to use. Will have a look at them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 16, 2022, 12:03:11 AM",
+      "body": "Quote from: ETFbitcoin on June 15, 2022, 11:56:06 AMIf you only care about non-custodial part, you can use 3rd party service such as Mycelium Gear[1] and Coinbase Commerce[2] where you give your master public key to them.[1] https://gear.mycelium.com/[2] https://commerce.coinbase.com/Quote from: DaveF on June 14, 2022, 11:36:48 PMQuote from: nullama on June 14, 2022, 11:09:34 PMHow can they work without a node but BTCPayServer can't?, are they using a light node fallback?They pull from block explorers: QuoteFor each charge (invoice) CypherpunkPay picks two random block explorers to cross-check the payment arrival against. New Tor circuit (and so IP address) is used for each charge. User agent and headers are consistent with the Tor Browser. From the block explorer perspective it is not evident if this is CypherpunkPay or anyone else asking. It is even less clear which specific business the transaction belongs to (unless the amount itself is globally unique to your business, but then even running the full node would not help as Bitcoin blockchain itself is plain text).IMO it's weird choice since SPV protocol (such as Electum protocol and BIP 157/158) exist.True; I expected it to basically be BTCPayServer with neutrino backend or something similar.Which is what I'd probably do to get the functionality requested in the original post. Since that's exactly what those apps do.By the way; Core Lightning has this open issue [Planning for SPV backend#3858], but it doesn't seem like it went anywhere since 2020.I also found an interesting post about this online:Quote from: https://www.reddit.com/r/Bitcoin/comments/ro9g0x/lightweight_nodes_with_clightning/hpx9kst/You can run c-lightining with a large variety of Bitcoin backend plugins to integrate it into your existing infrastructure.I'm not aware of an existing plugin for neutrino, but it'd be relatively simple to build one. I myself have used the following backends:bcli: the default backend plugin that c-lightining ships with. It talks to either a local or remote bitcoind, and may work with pruned nodes too, as long as the sync height doesn't drop below the pruned height.bcli + spruned: lightweight proxy that sits in front of a pruned bitcoind, pretending to be a full bitcoind node, fetching pruned blocks on demand from peerstrustedcoin: a plugin that just fetches the necessary information on public blockexplorers. This is likely the most lightweight option, but comes with some level of trust towards the explorer operators.btc-rpc-proxy + bcli: another proxy like spruned, that will fetch missing blocks on demand.Btcli4j: another plugin that is backed by a combination of pruned nodes and explorers.So there's quite a few options, depending on your own preferences you might trust explorers enough so that you done have to run a Bitcoin node at all giving you a very lightweight experience. Pruned bitcoind + on demand fetching of blocks is a middle ground and full bitcoind node involves the least trust.Neutrino fwiw is not a good fit for LN: it is lightweight because it fetches only blocks that are interesting to the node. A block is interesting to the node if a) one of it's transactions is included, or b) some channel in the network was opened or closed. If you verify channel opens and closes pretty much every block will be interesting to you, and you'll download every block, making the neutrino negotiation useless overhead. If you don't verify opens and closes you're basically trusting others to be honest or verify them on your behalf.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "June 16, 2022, 11:55:15 AM",
+      "body": "Quote from: nullama on June 15, 2022, 04:25:30 PMCoinbase Commerce seems to have lightning, and it's just 1% fee. Not too bad really. I always assumed it was custodial only.Their service changed some time ago with little publication, so it's not surprising you only know the old custodial version.Quote from: nullama on June 15, 2022, 04:25:30 PMThanks for the options, they look really easy to use. Will have a look at them.Don't forget to look about they handle underpay, overpay or refunds request. I didn't find much about those on their documentation.Quote from: n0nce on June 16, 2022, 12:03:11 AMQuote from: ETFbitcoin on June 15, 2022, 11:56:06 AMQuote from: DaveF on June 14, 2022, 11:36:48 PMThey pull from block explorers: --snip--IMO it's weird choice since SPV protocol (such as Electum protocol and BIP 157/158) exist.True; I expected it to basically be BTCPayServer with neutrino backend or something similar.Which is what I'd probably do to get the functionality requested in the original post. Since that's exactly what those apps do.I just checked their release page[1] and found out initial release was only about 4 months. The project only have 3 contributor, so it's not very surprising they don't implement Neutrino or Electrum protocol.[1] https://github.com/CypherpunkPay/CypherpunkPay/releases",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "coinableS",
+      "created_time": "June 20, 2022, 04:11:53 AM",
+      "body": "I built NoNodePay for this exact purpose a few years back, no lightning though. This is a simple shopping cart that creates keypool to give each buyer a unique address to pay to, as well as an admin dashboard to track orders, add new products etc. Lots of room for improvement but the basics are there.https://github.com/coinables/NoNodePayHere's a video demo and a walkthrough of how to set it up on just about any server, even free shared servers: https://www.youtube.com/watch?v=jBUnOFxe24s",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "death_wish",
+      "created_time": "June 20, 2022, 05:28:37 AM",
+      "body": "Quote from: coinableS on June 20, 2022, 04:11:53 AMI built NoNodePay for this exact purpose a few years back, no lightning though. This is a simple shopping cart that creates keypool to give each buyer a unique address to pay to, as well as an admin dashboard to track orders, add new products etc. Lots of room for improvement but the basics are there.https://github.com/coinables/NoNodePayHere's a video demo and a walkthrough of how to set it up on just about any server, even free shared servers: https://www.youtube.com/watch?v=jBUnOFxe24sAny plans to add BIP 32 standard HD wallet support?  That’s a basic safety feature; BIP 32 was developed after it was discovered that, in the nitty-gritty real world, keypools are a money-destroying misfeature.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 20, 2022, 12:35:30 PM",
+      "body": "Quote from: coinableS on June 20, 2022, 04:11:53 AMI built NoNodePay for this exact purpose a few years back, no lightning though. This is a simple shopping cart that creates keypool to give each buyer a unique address to pay to, as well as an admin dashboard to track orders, add new products etc. Lots of room for improvement but the basics are there.Is your NoNodePay project supporting bc1 bech32 address type?I don't see many code updates in last few years (except maybe readme file and decimals length) so I think you should update it for new address types, and adding Lightning support would be very cool if possible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 20, 2022, 01:12:30 PM",
+      "body": "Quote from: ETFbitcoin on June 20, 2022, 11:45:32 AMQuote from: coinableS on June 20, 2022, 04:11:53 AMI built NoNodePay for this exact purpose a few years back, no lightning though. This is a simple shopping cart that creates keypool to give each buyer a unique address to pay to, as well as an admin dashboard to track orders, add new products etc. Lots of room for improvement but the basics are there.https://github.com/coinables/NoNodePayHere's a video demo and a walkthrough of how to set it up on just about any server, even free shared servers: https://www.youtube.com/watch?v=jBUnOFxe24sJust wondering, which blockchain explorer API do you use? I expect such service change their API after some time, so your software could break in future.It uses Blockchain.info, as seen in the code. Not only will this break if they change their API or shut it down, it also makes you completely reliant on this API being benevolent (from the inside) as well as not being hacked. For example, someone might find a flaw in the TLS certificate, MITM your connection to the API and serve you wrong information, such as showing them having paid, while they have not. Your software would then provide them the (physical or digital) item they supposedly purchased, while not actually having received the BTC.If someone were to use such a software, I'd make sure it at least queries multiple block explorers and checks them to give identical results. In any other case, it should send you a big red alert that something massively suspicious is going on.Quote from: dkbit98 on June 20, 2022, 12:35:30 PMQuote from: coinableS on June 20, 2022, 04:11:53 AMI built NoNodePay for this exact purpose a few years back, no lightning though. This is a simple shopping cart that creates keypool to give each buyer a unique address to pay to, as well as an admin dashboard to track orders, add new products etc. Lots of room for improvement but the basics are there.Is your NoNodePay project supporting bc1 bech32 address type?I don't see many code updates in last few years (except maybe readme file and decimals length) so I think you should update it for new address types, and adding Lightning support would be very cool if possible.I think just using CypherpunkPay makes more sense: it uses two block explorers and has Lightning already built-in; and is generally much more up-to-date. Last commit 20 days ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "death_wish",
+      "created_time": "June 21, 2022, 12:10:25 AM",
+      "body": "I assumed that that was a new project.  I didn’t want to be too hard on someone who is excited about his new project.  He said there was “lots of room for improvement”, so I assumed that it was being improved.  I took that post within its four corners—only pointed out the obvious about keypools; HD wallet support is a basic MVP feature, a safety feature.  My bad.A pile of unmaintained PHP code (srsly) that uses keypools, and is exclusively reliant on Blockchain(dot)(whatever)?  Mark Karpelès did better than this.But its author has spare dev cycles to make videos promoting it on Youtube.Quote from: coinableS on June 20, 2022, 04:11:53 AMI built NoNodePay for this exact purpose a few years back, no lightning though. This is a simple shopping cart that creates keypool to give each buyer a unique address to pay to, as well as an admin dashboard to track orders, add new products etc. Lots of room for improvement but the basics are there.https://github.com/coinables/NoNodePayHere's a video demo and a walkthrough of how to set it up on just about any server, even free shared servers: https://www.youtube.com/watch?v=jBUnOFxe24sPlease, no.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "edgycorner",
+      "created_time": "June 21, 2022, 07:37:36 PM",
+      "body": "Generate addresses from xpub(ypub for segwit), you can find many trusted open source libraries to do so.Ask for confirmation from your customers when they send the payment(\"I have paid\" button).Keep a track of confirmed payments with explorer APIs. Blockchain.com offers WebSocket where you can subscribe to an address, make sure to subscribe to only confirmed payments.  Unsubscribe to old addresses to be under their API usage limit.This method is noncustodial and free. A solid option for small shops",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "edgycorner",
+      "created_time": "June 22, 2022, 06:56:22 PM",
+      "body": "Quote from: ETFbitcoin on June 22, 2022, 12:18:39 PMMost service don't ask for such confirmation, since it's not good for user experience. But if you're going to do it anyway, make sure they MUST click \"I have paid\" buttonYes, if a shop won't be expecting many customers then they can skip the \"I have paid\" part. It's more of a nuisance, and will only reduce like 15~20% of API usage. A newb-friendly woo-commerce plugin can be made with this solution and might give that push to new entrepreneurs to accept Bitcoin as a payment method(even if they have zero technical knowledge about bitcoin itself). Given how they will be paying zero fees on it, compared to 3~5% fees on fiat payments.The same can be done with Ethereum and ethscan for API.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

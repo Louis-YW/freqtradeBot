@@ -1,0 +1,37 @@
+{
+  "id": "topic_5419734",
+  "title": "dougEfish",
+  "author": "dougEfish",
+  "created_time": "November 07, 2022, 12:27:08 PM",
+  "content": "Bitcoin nodes calculate  signature operations for transactions and limit to amount of operations. Currently, max is 80,000 https://github.com/bitcoin/bitcoin/blob/24.x/src/consensus/consensus.h#L16-L17. Presumably, this is to prevent DoS type of attacks . If nodes spend all their time checking sigs, they won't keep up. Function WitnessSigOps https://github.com/bitcoin/bitcoin/blob/24.x/src/script/interpreter.cpp#L2072-L2087 simply checks the size of SegWit v0 data and returns a cost of 1. (See WITNESS_V0_KEYHASH_SIZE https://github.com/bitcoin/bitcoin/blob/24.x/src/script/interpreter.h#L226 )Is it possible to construct a tx such that bitcoin nodes believe total signature operation costs is low, but in actuality nodes end up wasting CPU cycles and fail to catch up with the tip?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5419734",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "November 07, 2022, 05:08:02 PM",
+      "body": "Quote from: dougEfish on November 07, 2022, 12:27:08 PMFunction WitnessSigOps simply checks the size of SegWit v0 data and returns a cost of 1. Technically it is returning 1 for P2WPKH outputs (since they are only performing a single SigOp) and if it is P2WSH it counts the SigOps inside the redeem script.QuoteIs it possible to construct a tx such that bitcoin nodes believe total signature operation costs is low, but in actuality nodes end up wasting CPU cycles and fail to catch up with the tip?I don't know if it would prevent the node from catching up but there are ways to slow down verification of a transaction. For example the legacy transactions suffer from Quadratic Sighash problem which is when you have a transaction with many legacy inputs and have to compute SHA256d hash of a big different data for each sighash. This is fixed with SegWit but not removed since legacy transactions are still valid.Read this blog post and others found there: https://bitslog.com/2017/01/08/a-bitcoin-transaction-that-takes-5-hours-to-verify/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 07, 2022, 06:47:08 PMLast edit: November 07, 2022, 10:09:50 PM by BlackHatCoiner",
+      "body": "Quote from: dougEfish on November 07, 2022, 12:27:08 PMIs it possible to construct a tx such that bitcoin nodes believe total signature operation costs is low, but in actuality nodes end up wasting CPU cycles and fail to catch up with the tip?Software doesn't think or believe. What you're asking is: is it possible to construct a transaction that has an operation cost unexpectedly higher than it should? Right?Quote from: pooya87 on November 07, 2022, 05:08:02 PMRead this blog post and others found there: https://bitslog.com/2017/01/08/a-bitcoin-transaction-that-takes-5-hours-to-verify/Very interesting. There is a thread about the transaction that takes 3 minutes to validate by Sergio_Demian_Lerner (according to his hardware's specs at that time) here: https://bitcointalk.org/index.php?topic=140078.0. Following the old, non-segwit-upgraded rules, a 1MB transaction can hold 10,000 signatures, given that transaction inputs require at least 100 bytes to hold a signature. Provided that validation of a signature takes about 2 milliseconds, our transaction would require 20 seconds to validate. I presume the way the network defenses this attack is by charging extraordinarily high for 1MB transactions?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 08, 2022, 04:31:05 AM",
+      "body": "Quote from: BlackHatCoiner on November 07, 2022, 06:47:08 PMI presume the way the network defenses this attack is by charging extraordinarily high for 1MB transactions?There are many improvements in the code to improve efficiency like optimizing SHA256 itself to prevent effects of such attacks but generally speaking a lot of these things are prevented by standard rules which would prevent propagation of such transactions in first place. So the only way is for a miner to broadcast a valid block containing such transactions which is a very costly attack which would only slow down validation of that single block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

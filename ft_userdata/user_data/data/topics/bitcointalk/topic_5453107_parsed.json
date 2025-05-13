@@ -1,0 +1,61 @@
+{
+  "id": "topic_5453107",
+  "title": "cygan",
+  "author": "cygan",
+  "created_time": "May 17, 2023, 03:41:33 PM",
+  "content": "with this thread, i would like to open a general discussion and a certain reference place dedicated to the topic of Bitcoin dust. in some cases, the Bitcoin protocol generates small satoshis value when users send and receive some Bitcoin transactions. some of these amounts have such a low value that issuing them requires more fees than they are worth.however, the blockchain has limited space. therefore, transactions of small value take up as much space as large transactions. therefore, many small sats amounts can cause performance problems throughout the system.originally Bitcoin dust (an amount of 546 satoshis) was not necessarily a problem for crypto users. however, that changed when fees increased and transactions with smaller values became more expensive. as a result, some developers are urging Bitcoin users to get rid of 'dust' as soon as the costs drop.some reference links:https://thebitcoinmanual.com/articles/what-bitcoin-dust/https://www.reddit.com/r/Bitcoin/comments/2unzen/what_is_bitcoins_dust_limit_precisely/https://cointelegraph.com/explained/what-is-a-crypto-dusting-attack-and-how-do-you-avoid-itwith the following 4 slides, exactly this 'dust' topic is visually explained and should hopefully help you to understand the whole thing a bit better",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5453107",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "May 17, 2023, 03:54:07 PM",
+      "body": "With the dust attacks it's kind of, at least for me, an interesting loop. I have a few addresses that I put into 'cold' storage back in 2018. They now have a lot of 0.000005xx dustings in them.Dozens of addresses with a lot of dust. So, even if BTC doubles they are worth $0.30 each. Is it worth the time and effort and TX fees and everything else to pull the addresses out of cold storage and generate new addresses and move the coins? For me no, they will just stay there. Obviously YMMV. But, if I do need to move some of that old BTC do I move the dust too or just leave it there. At this point if I am moving the coins it's going to be in bulk to an exchange to sell since I am in NY it's probably all going to be KYCd 100% anyway and taxed accordingly anyway unless I go for a F2F thing. But if I am moving these coins something has gone to shit anyway so I probably will not be able to or even want to hide the funds. So does it matter?Which does bring up the point, does it even matter for most people? Are there more like me or less like me?-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "May 17, 2023, 04:31:44 PM",
+      "body": "Quote from: DaveF on May 17, 2023, 03:54:07 PMWhich does bring up the point, does it even matter for most people? Are there more like me or less like me?There are people who don't want anyone to know what they have, how much they have and for them, it matters.Quote from: cygan on May 17, 2023, 03:41:33 PMoriginally Bitcoin dust (an amount of 546 satoshis) was not necessarily a problem for crypto users. however, that changed when fees increased and transactions with smaller values became more expensive. as a result, some developers are urging Bitcoin users to get rid of 'dust' as soon as the costs drop.The current situation of high transaction fees is not going to stay for longer time. We will be back to low transaction fees very soon. On the other hand, when you have a wallet that have coin control feature, you can easily exclude the dust inputs.I don't see dust bitcoin can create any problem for someone who have at least coin control knowledge. One does not need to be a bitcoin geek for that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "May 17, 2023, 06:16:55 PM",
+      "body": "Quote from: cygan on May 17, 2023, 03:41:33 PMoriginally Bitcoin dust (an amount of 546 satoshis) was not necessarily a problem for crypto users. Note that the 546 satoshi is the dust limit for legacy outputs. If the output is segwit, the dust limit would be 294 satoshi for that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "May 18, 2023, 07:51:48 AM",
+      "body": "Quote from: hosseinimr93 on May 17, 2023, 06:16:55 PMQuote from: cygan on May 17, 2023, 03:41:33 PMoriginally Bitcoin dust (an amount of 546 satoshis) was not necessarily a problem for crypto users. Note that the 546 satoshi is the dust limit for legacy outputs. If the output is segwit, the dust limit would be 294 satoshi for that. okay, i didn't know that now.is this then perhaps also different with taproot or how does the 'dust' behave with the p2tr (bc1p...) addresses?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "May 18, 2023, 08:29:01 AM",
+      "body": "Quote from: cygan on May 18, 2023, 07:51:48 AMis this then perhaps also different with taproot or how does the 'dust' behave with the p2tr (bc1p...) addresses?Yes, that's different. The 294 satoshi is the dust limit for segwit version 0. The dust limit for segwit version 1 (taproot) is 330 satoshi.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 18, 2023, 12:35:21 PM",
+      "body": "If you are interested to know why these are the limits, you can read the relevant code starting here: https://github.com/bitcoin/bitcoin/blob/e9262ea32a6e1d364fb7974844fadc36f931f8c6/src/policy/policy.cpp#L26The dust limit is 3000 sat/kvB, or 3 sats/vbyte, of the minimum amount of data required to spend that type of output.For a legacy P2PKH transaction, then an input is 148 bytes, and an output is 34 bytes, giving (148+34)*3 = 546 sats.For a segwit v0 P2WPKH transaction, then an input is 67 bytes and an output is 31 bytes, giving (67+31)*3 = 294 sats.*For any script hash or taproot outputs, however, then the size of the input is not known in advance, since the locking script is not revealed until after the transaction is made. So instead we use the size of a standard input, and the size of the specific output.So for a taproot P2TR transaction, then an input is assumed to be 67 bytes and an output is 43 bytes, giving (67+43)*3 = 330 sats.*This should actually be 297 sats in reality, but a rounding error means that 67.75 is rounded down to 67 instead of up to 68.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

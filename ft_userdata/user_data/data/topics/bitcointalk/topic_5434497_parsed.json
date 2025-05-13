@@ -1,0 +1,53 @@
+{
+  "id": "topic_5434497",
+  "title": "stan_srednyak",
+  "author": "stan_srednyak",
+  "created_time": "January 12, 2023, 05:31:22 PM",
+  "content": "The most ugly piece of code in go-ethereum code base , IMHO, is the following https://github.com/ethereum/go-ethereum/blob/master/core/vm/evm.goOf course , it is there for a reason. Virtual machines guarantee that the code is executed the same on all computers, no matter the system, and that it is executed deterministically. I am trying to understand if it is possible to get rid of virtual machines. The answer would definitely be yes, if we can guarantee deterministic execution. Nondeterministic execution seems to be hard for existing consensus mechanisms. I looked at Ethereum, Avalanche, Solana. Do you know any consensus mechanism that would allow nondeterministic execution? ( to clarify, the state after consensus must be the same across nodes, it is only nondeterministic how it is chosen.) Note that  although Avalanche consensus does terminate even in nondeterministic situation,  practically it does  not seem to usable because one can pollute the system with multiple nondeterministic transactions, which would make consensus time unreasonably large.I am trying to understand if it is possible to isolate a process from sources of nondeterminism.There are typical sources 1. /dev/urandom 2. time We should include system variables here, but lets suppose we fix the system. One more source could be system files. Lets say we use chroot to jail the process. This should be done carefully: naive use does not exclude /dev/urandom , and as a result e.g. RSA key generation has access to randomness. But lets assume that we dealt with this issue.Also, the stack can be a source of randomness. In some languages, it is possible to get info about the stack. But lets say, we blocked these possibilities.What else is there?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5434497",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "January 12, 2023, 05:47:28 PM",
+      "body": "Quote from: stan_srednyak on January 12, 2023, 05:31:22 PMAlso, the stack can be a source of randomness. In some languages, it is possible to get info about the stack. But lets say, we blocked these possibilities.What else is there?If you want to be particularly creative, you can malloc a bunch of memory, and then use the uninitialized memory as entropy for whatever you're need it for. It is probably not going to be a high-quality randomness source, but it's not casually predictable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "January 12, 2023, 08:19:11 PM",
+      "body": "Quote from: stan_srednyak on January 12, 2023, 05:31:22 PMWhat else is there?Another rather popular random seed is system uptime (as opposed to current date/time).If you insist, I guess that you can even try to start up the mic, record some noise and add that too to the randomness. Just of course, the recording level has to be big enough to catch anything and there's a chance the OS may tell the user what you're doing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AverageGlabella",
+      "created_time": "January 12, 2023, 08:34:05 PM",
+      "body": "What are you trying to accomplish? There are a number of ways of generating randomness but they all are categorized into 4 methods.Hardware Random Number Generators (HRNG), Operating System Random Number Generators (OSRNG), Quantum Random Number Generators (QRNGs) and  Cryptographic Pseudorandom Number Generators (CPRNG). Hardware are things like what hardware wallets use to generate entropy. OSRNG could use mouse input, mic, CPU temp or various other things that can be accessed on the operating system level. The average person probably is not going to have access to quantum random number generators so there is no reason to consider that. Without knowing exactly what you plan on implementing it would be hard to recommend any method above.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitDane",
+      "created_time": "January 12, 2023, 09:45:31 PM",
+      "body": "Interesting reply from openai:  I do not know if this helps but I will put its input anyway.Other potential sources of non-determinism include:Inputs from external devices, such as sensors or cameras,Network interactions, such as incoming network traffic or responses from other systems,Hardware-level events, such as interrupts or disk access,Concurrent or parallel execution of code,Use of external libraries or APIs, which may have their own sources of non-determinism.To isolate a process from these sources of non-determinism, you may need to use techniques such as:Sandboxing the process to limit its access to external resources,Replacing external libraries or APIs with deterministic alternatives,Using deterministic replay to test the process with known inputs,Controlling the environment in which the process runs, such as by running it on a dedicated machine or in a virtualized environment.Keep in mind that completely eliminating all sources of non-determinism may be difficult or impossible, and the more sources of non-determinism that are eliminated, the more complex and ]resource-intensive the process may become.source: https://chat.openai.com/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stan_srednyak",
+      "created_time": "January 13, 2023, 05:02:52 PM",
+      "body": "To summarize answers so far: to get nondeterministic behavior- use malloc and the unallocated memory- use external devices Concerning the second point, our goal is not to get a lot of good randomness, but rather guarantee deterministic execution.To reiterate, the question :  is it possible to get rid of virtual machines ,and still have deterministic execution of programs?In other words, is it possible to have chaincode written in some native language?For definiteness, lets fix it to be Golang ( things are quite different in c).The question is ,really, what remains of the language once we block all of the nondeterminism sources.First, some functionality have to be restricted. We cannot allow the code to use some packages including syscall, runtime ,  part of the os , simply because we cannot let users have access to this, because they will try to crush the system on the node, or damage it in some way. Second, we need to limit nondeterminism. So we block time, crypto key generation, and jail the process using chroot. Note that Golang has no analogy of malloc , so the user code cannot use unallocated memory as a source of nondeterminism. Golang allows to examine stack using runtime, but we already blocked this.It seems there is nothing else that could lead to nondeterministic behavior. Is there anything else?Is it worth the effort of writing a blockchain where execution relies on a native language (e.g. Golang) with the features restricted as above , to make it \"safe\" and deterministic?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

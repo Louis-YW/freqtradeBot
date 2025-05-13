@@ -1,0 +1,165 @@
+{
+  "id": "topic_5454120",
+  "title": "achow101",
+  "author": "achow101",
+  "created_time": "May 26, 2023, 03:12:19 PMLast edit: May 29, 2023, 03:59:24 PM by achow101",
+  "content": "25.0 Release NotesBitcoin Core version 25.0 is now available from:https://bitcoincore.org/bin/bitcoin-core-25.0/This release includes new features, various bug fixes and performanceimprovements, as well as updated translations.Please report bugs using the issue tracker at GitHub:https://github.com/bitcoin/bitcoin/issuesTo receive security and update notifications, please subscribe to:https://bitcoincore.org/en/list/announcements/join/How to UpgradeIf you are running an older version, shut it down. Wait until it has completelyshut down (which might take a few minutes in some cases), then run theinstaller (on Windows) or just copy over /Applications/Bitcoin-Qt (on macOS)or bitcoind/bitcoin-qt (on Linux).Upgrading directly from a version of Bitcoin Core that has reached its EOL ispossible, but it might take some time if the data directory needs to be migrated. Oldwallet versions of Bitcoin Core are generally supported.CompatibilityBitcoin Core is supported and extensively tested on operating systemsusing the Linux kernel, macOS 10.15+, and Windows 7 and newer.  BitcoinCore should also work on most other Unix-like systems but is not asfrequently tested on them.  It is not recommended to use Bitcoin Core onunsupported systems.Notable changesP2P and network changesTransactions of non-witness size 65 bytes and above are now allowed by mempooland relay policy. This is to better reflect the actual afforded protectionsagainst CVE-2017-12842 and open up additional use-cases of smaller transaction sizes. (#26265)New RPCsThe scanblocks RPC returns the relevant blockhashes from a set of descriptors byscanning all blockfilters in the given range. It can be used in combination withthe getblockheader and rescanblockchain RPCs to achieve fast wallet rescans. Notethat this functionality can only be used if a compact block filter index(-blockfilterindex=1) has been constructed by the node. (#23549)Updated RPCsAll JSON-RPC methods accept a new namedparameter called args that cancontain positional parameter values. This is a convenience to allow someparameter values to be passed by name without having to name every value. Thepython test framework and bitcoin-cli tool both take advantage of this, sofor example:bitcoin-cli -named createwallet wallet_name=mywallet load_on_startup=1Can now be shortened to:bitcoin-cli -named createwallet mywallet load_on_startup=1The verifychain RPC will now return false if the checks didn't fail,but couldn't be completed at the desired depth and level. This could be dueto missing data while pruning, due to an insufficient dbcache or due tothe node being shutdown before the call could finish. (#25574)sendrawtransaction has a new, optional argument, maxburnamount with a default value of 0.Any transaction containing an unspendable output with a value greater than maxburnamount willnot be submitted. At present, the outputs deemed unspendable are those with scripts that beginwith an OP_RETURN code (known as 'datacarriers'), scripts that exceed the maximum script size,and scripts that contain invalid opcodes.The testmempoolaccept RPC now returns 2 additional results within the \"fees\" result:\"effective-feerate\" is the feerate including fees and sizes of transactions validated together ifpackage validation was used, and also includes any modified fees from prioritisetransaction. The\"effective-includes\" result lists the wtxids of transactions whose modified fees and sizes were usedin the effective-feerate (#26646).decodescript may now infer a Miniscript descriptor under P2WSH context if it is not lackinginformation. (#27037)finalizepsbt is now able to finalize a transaction with inputs spending Miniscript-compatibleP2WSH scripts. (#24149)Changes to wallet related RPCs can be found in the Wallet section below.Build SystemThe --enable-upnp-default and --enable-natpmp-default optionshave been removed. If you want to use port mapping, you canconfigure it using a .conf file, or by passing the relevantoptions at runtime. (#26896)Updated settingsIf the -checkblocks or -checklevel options are explicitly provided by theuser, but the verification checks cannot be completed due to an insufficientdbcache, Bitcoin Core will now return an error at startup. (#25574)Ports specified in -port and -rpcport options are now validated at startup.Values that previously worked and were considered valid can now result in errors. (#22087)Setting -blocksonly will now reduce the maximum mempool memoryto 5MB (users may still use -maxmempool to override). Previously,the default 300MB would be used, leading to unexpected memory usagefor users running with -blocksonly expecting it to eliminatemempool memory usage.As unused mempool memory is shared with dbcache, this also reducesthe dbcache size for users running with -blocksonly, potentiallyimpacting performance.Setting -maxconnections=0 will now disable -dnsseedand -listen (users may still set them to override).Changes to GUI or wallet related settings can be found in the GUI or Wallet section below.New settingsThe shutdownnotify option is used to specify a command to execute synchronouslybefore Bitcoin Core has begun its shutdown sequence. (#23395)WalletThe minconf option, which allows a user to specify the minimum numberof confirmations a UTXO being spent has, and the maxconf option,which allows specifying the maximum number of confirmations, have beenadded to the following RPCs in #25375:fundrawtransactionsendwalletcreatefundedpsbtsendallAdded a new next_index field in the response in listdescriptors tohave the same format as importdescriptors (#26194)RPC listunspent now has a new argument include_immature_coinbaseto include coinbase UTXOs that don't meet the minimum spendabilitydepth requirement (which before were silently skipped). (#25730)Rescans for descriptor wallets are now significantly faster if compactblock filters (BIP158) are available. Since those are not constructedby default, the configuration option \"-blockfilterindex=1\" has to beprovided to take advantage of the optimization. This improves theperformance of the RPC calls rescanblockchain, importdescriptorsand restorewallet. (#25957)RPC unloadwallet now fails if a rescan is in progress. (#26618)Wallet passphrases may now contain null characters.Prior to this change, only characters up to the firstnull character were recognized and accepted. (#27068)Address Purposes strings are now restricted to the currently known values of \"send\",\"receive\", and \"refund\". Wallets that have unrecognized purpose strings will haveloading warnings, and the listlabels RPC will raise an error if an unrecognized purposeis requested. (#27217)In the createwallet, loadwallet, unloadwallet, and restorewallet RPCs, the\"warning\" string field is deprecated in favor of a \"warnings\" field thatreturns a JSON array of strings to better handle multiple warning messages andfor consistency with other wallet RPCs. The \"warning\" field will be fullyremoved from these RPCs in v26. It can be temporarily re-enabled during thedeprecation period by launching bitcoind with the configuration option-deprecatedrpc=walletwarningfield. (#27279)Descriptor wallets can now spend coins sent to P2WSH Miniscript descriptors. (#24149)GUI changesThe \"Mask values\" is a persistent option now. (gui#701)The \"Mask values\" option affects the \"Transaction\" view now, in addition to the\"Overview\" one. (gui#708)RESTA new /rest/deploymentinfo endpoint has been added for fetching variousstate info regarding deployments of consensus changes. (#25412)Binary verificationThe binary verification script has been updated. In previous releases itwould verify that the binaries had been signed with a single \"release key\".In this release and moving forward it will verify that the binaries aresigned by a threshold of trusted keys. For more details andexamples, see:https://github.com/bitcoin/bitcoin/blob/master/contrib/verify-binaries/README.md(#27358)Low-level changesRPCThe JSON-RPC server now rejects requests where a parameter is specified multipletimes with the same name, instead of silently overwriting earlier parameter valueswith later ones. (#26628)RPC listsinceblock now accepts an optional label argumentto fetch incoming transactions having the specified label. (#25934)Previously setban, addpeeraddress, walletcreatefundedpsbt, methodsallowed non-boolean and non-null values to be passed as boolean parameters.Any string, number, array, or object value that was passed would be treatedas false. After this change, passing any value except true, false, ornull now triggers a JSON value is not of expected type error. (#26213)CreditsThanks to everyone who directly contributed to this release:0xb10c721217.xyz@RandyMcMillanamadeuszpawlikAmiti UttarwarAndrew ChowAndrew TothAnthony TownsAntoine PoinsotAurèle OulèsBen WoosleyBitcoin HodlerbrunoergBushstarCarl DongChris GeihslerCory FieldsDavid GumbergdergoeggeDhruv MehtaDimitris TsapakidisdougEfishDouglas ChimentoekzyisElichai TurkelEthan HeilmanFabian JahrFractalEncryptfurszyGleb NaumenkoglozowGreg SandersHennadii StepanovhernanmarinoishaanamismaelsadeeqJames O'Beirnejdjkelly@gmail.comJeff RuaneJeffrey CzyzJeremy RubinJesse BartonJoão BarbosaJoaoAJMatosJohn MoffettJon AtackJonas SchnellijonatackJoshua KellyjosibakeJuan Pablo CivilekdmukaiklementtanKolby MLkouloumosKristaps KaupelaanwjLarry RuaneLeonardo AraujoLeonardo LazzaroLuke DashjrMacroFakeMarcoFalkeMartin Leitner-AnkerlMartin ZumsandeMatt WhitlockMatthew ZipkinMichael FordMiles LiumruddyMurray Nesbittmuxatoromahspablomartin4btcPastaPieter WuillePttnRandall NaarRiahiamirrezaroconnor-blockstreamRussell O'ConnorRyan OfskyS3RKSebastian FalbesonerSeibart NedorsinetekSjors ProvoostSkuli DulfariSomberNightStacie Waleykostickies-vstratospherSuhas DaftuarSuriyaa SundararubanTheCharlatanVasil DimovVasil Stoyanovvirtuw0xltwillcl-arkyancyYusuf Sahin HAMZAAs well as to everyone that helped with translations onTransifex.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454120",
+  "comments": [
+    {
+      "author": "darkv0rt3x",
+      "created_time": "May 26, 2023, 10:02:36 PM",
+      "body": "Shouldn't it also have a \"How to upgrade\" for Linux OS?? I don't know why only Windows users are worth of the \"How to\".... Anyway, thanks for the great job of the dev community in keep things running!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "May 27, 2023, 06:14:56 PM",
+      "body": "Quote from: darkv0rt3x on May 26, 2023, 10:02:36 PMShouldn't it also have a \"How to upgrade\" for Linux OS?? I don't know why only Windows users are worth of the \"How to\".... Miss this part?Quote from: achow101 on May 26, 2023, 03:12:19 PMor just copy over /Applications/Bitcoin-Qt (on macOS)or bitcoind/bitcoin-qt (on Linux).I think many linux users also use package managers which will handle this automatically.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 28, 2023, 06:13:56 AM",
+      "body": "Does the mempoolrbf config switch share the same default value as in 24.0?Quote from: achow101 on May 27, 2023, 06:14:56 PMQuote from: darkv0rt3x on May 26, 2023, 10:02:36 PMShouldn't it also have a \"How to upgrade\" for Linux OS?? I don't know why only Windows users are worth of the \"How to\".... Miss this part?Quote from: achow101 on May 26, 2023, 03:12:19 PMor just copy over /Applications/Bitcoin-Qt (on macOS)or bitcoind/bitcoin-qt (on Linux).I think many linux users also use package managers which will handle this automatically.Personally I just upgrade by coping the tarball extraction over /usr/local. It's always been a hassle-free experience. Although, I don't see Bitcoin Core in the Ubuntu repositories. (I am not sure about Debian or Arch though.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "May 28, 2023, 05:07:16 PM",
+      "body": "Quote from: achow101 on May 27, 2023, 06:14:56 PMQuote from: darkv0rt3x on May 26, 2023, 10:02:36 PMShouldn't it also have a \"How to upgrade\" for Linux OS?? I don't know why only Windows users are worth of the \"How to\".... Miss this part?Quote from: achow101 on May 26, 2023, 03:12:19 PMor just copy over /Applications/Bitcoin-Qt (on macOS)or bitcoind/bitcoin-qt (on Linux).I think many linux users also use package managers which will handle this automatically.Is that enough to hanle all binaries? Only by copying bitcoind? What about bicoin-cli and all other binaires?I was expecting to see some instructions for installing from scratch. Like cloning repository, or at least downloading source code, installing dependencies, and minimal commands to compile, make and install binaries!What I see in the docs (./docs/INSTALL.md) is mostly for Ubuntu specific distro.I cannot find either any reference to any package related to bitcoin in my Debian package managerCode:psysc0rpi0n@rockpro64:~$ apt-cache search bitcoindpsysc0rpi0n@rockpro64:~$ apt-cache search bitcoinbruteforce-wallet - try to find the password of an encrypted wallet filepython3-btchip - Python library to communicate with BTChip dongle (Python 3)electrum - Easy to use Bitcoin clientpython3-electrum - Easy to use Bitcoin client - Python modulegolang-github-btcsuite-btcd-btcec-dev - Go library for Elliptic curve cryptographylibbase58-0 - library for Bitcoin's base58 encodinglibbase58-dev - library for Bitcoin's base58 encoding -- development fileslibencode-base58-perl - module to shorten numbers using a base58 conversionlibsecp256k1-0 - library for EC operations on curve secp256k1libsecp256k1-dev - library for EC operations on curve secp256k1 - development headerslitecoin-qt - peer-to-peer network based digital currency - Qt GUIlitecoind - peer-to-peer network based digital currency - daemonbase58 - base58 encode/decode: command-line interfacepython3-base58 - base58 encode/decode for Pythonpython3-bip32utils - Python implementation of Bitcoin hierarchical deterministic walletpython3-bitcoinlib - Python module with an easy interface to the Bitcoin protocolpython3-mnemonic - Implementation of Bitcoin BIP-0039 (Python 3)python3-stdnum - Python module to handle standardized numbers and codes (Python3 version)python3-trezor - library for communicating with TREZOR Bitcoin HW wallet (Python 3)trezor - utilities for communicating with TREZOR Bitcoin HW walletpsysc0rpi0n@rockpro64:~$",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "roksana.hee",
+      "created_time": "May 31, 2023, 07:03:34 PM",
+      "body": "Quote from: achow101 on May 26, 2023, 03:12:19 PM25.0 Release NotesBitcoin Core version 25.0 is now available from:https://bitcoincore.org/bin/bitcoin-core-25.0/This release includes new features, various bug fixes and performanceimprovements, as well as updated translations.Please report bugs using the issue tracker at GitHub:https://github.com/bitcoin/bitcoin/issuesTo receive security and update notifications, please subscribe to:https://bitcoincore.org/en/list/announcements/join/How to UpgradeIf you are running an older version, shut it down. Wait until it has completelyshut down (which might take a few minutes in some cases), then run theinstaller (on Windows) or just copy over /Applications/Bitcoin-Qt (on macOS)or bitcoind/bitcoin-qt (on Linux).Upgrading directly from a version of Bitcoin Core that has reached its EOL ispossible, but it might take some time if the data directory needs to be migrated. Oldwallet versions of Bitcoin Core are generally supported.CompatibilityBitcoin Core is supported and extensively tested on operating systemsusing the Linux kernel, macOS 10.15+, and Windows 7 and newer.  BitcoinCore should also work on most other Unix-like systems but is not asfrequently tested on them.  It is not recommended to use Bitcoin Core onunsupported systems.Thank you for your helpful post. I hope it helps our local people to get the benefit of it. I want to convert your post to my local language. Also, I'll publish your remarkable helpful post on our local community board named Bengali. You can see the post by clicking the above link.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 10, 2023, 07:12:15 PM",
+      "body": "Quote from: achow101 on May 26, 2023, 03:12:19 PM...New RPCsThe scanblocks RPC returns the relevant blockhashes from a set of descriptors byscanning all blockfilters in the given range. It can be used in combination withthe getblockheader and rescanblockchain RPCs to achieve fast wallet rescans. Notethat this functionality can only be used if a compact block filter index(-blockfilterindex=1) has been constructed by the node. (#23549)...Wallet...Rescans for descriptor wallets are now significantly faster if compactblock filters (BIP158) are available. Since those are not constructedby default, the configuration option \"-blockfilterindex=1\" has to beprovided to take advantage of the optimization. This improves theperformance of the RPC calls rescanblockchain, importdescriptorsand restorewallet. (#25957)...I have assembled a watch-only wallet of more than 21000 combo(PubKey) descriptors and before v25.0 it took literally ages to rescan over the whole blockchain. Now with v25.0 I saw a significant speed-up. I wish I had this version quite some months ago. I ran a part of this wallet's rescan on a low energy consuming Raspberry Pi which isn't known for its computing power, so I was aware that it can take a while. But I didn't anticipate that with prior versions of Core it would take months for the rescan!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Good_Doctor",
+      "created_time": "June 12, 2023, 07:38:42 AM",
+      "body": "CompatibilityBitcoin Core is supported and extensively tested on operating systemsusing the Linux kernel, macOS 10.15+, and Windows 7 and newer.  BitcoinCore should also work on most other Unix-like systems but is not asfrequently tested on them.  It is not recommended to use Bitcoin Core onunsupported systems.Notable changesFrom the above the unsupported system can also be some Unix-like systems right? Or shouldn't a list of unsupported systems be given for clarity?Updated RPCsAll JSON-RPC methods accept a new namedparameter called args that cancontain positional parameter values. This is a convenience to allow someparameter values to be passed by name without having to name every value. Thepython test framework and bitcoin-cli tool both take advantage of this, sofor example:bitcoin-cli -named createwallet wallet_name=mywallet load_on_startup=1Can now be shortened to:bitcoin-cli -named createwallet mywallet load_on_startup=1The verifychain RPC will now return false if the checks didn't fail,but couldn't be completed at the desired depth and level. This could be dueto missing data while pruning, due to an insufficient dbcache or due tothe node being shutdown before the call could finish. (#25574)sendrawtransaction has a new, optional argument, maxburnamount with a default value of 0.Any transaction containing an unspendable output with a value greater than maxburnamount willnot be submitted. At present, the outputs deemed unspendable are those with scripts that beginwith an OP_RETURN code (known as 'datacarriers'), scripts that exceed the maximum script size,and scripts that contain invalid opcodes.The testmempoolaccept RPC now returns 2 additional results within the \"fees\" result:\"effective-feerate\" is the feerate including fees and sizes of transactions validated together ifpackage validation was used, and also includes any modified fees from prioritisetransaction. The\"effective-includes\" result lists the wtxids of transactions whose modified fees and sizes were usedin the effective-feerate (#26646).decodescript may now infer a Miniscript descriptor under P2WSH context if it is not lackinginformation. (#27037)finalizepsbt is now able to finalize a transaction with inputs spending Miniscript-compatibleP2WSH scripts. (#24149)Changes to wallet related RPCs can be found in the Wallet section below.Build SystemWalletThe minconf option, which allows a user to specify the minimum numberof confirmations a UTXO being spent has, and the maxconf option,which allows specifying the maximum number of confirmations, have beenadded to the following RPCs in #25375:fundrawtransactionsendwalletcreatefundedpsbtsendallAdded a new next_index field in the response in listdescriptors tohave the same format as importdescriptors (#26194)RPC listunspent now has a new argument include_immature_coinbaseto include coinbase UTXOs that don't meet the minimum spendabilitydepth requirement (which before were silently skipped). (#25730)Rescans for descriptor wallets are now significantly faster if compactblock filters (BIP158) are available. Since those are not constructedby default, the configuration option \"-blockfilterindex=1\" has to beprovided to take advantage of the optimization. This improves theperformance of the RPC calls rescanblockchain, importdescriptorsand restorewallet. (#25957)RPC unloadwallet now fails if a rescan is in progress. (#26618)Wallet passphrases may now contain null characters.Prior to this change, only characters up to the firstnull character were recognized and accepted. (#27068)Address Purposes strings are now restricted to the currently known values of \"send\",\"receive\", and \"refund\". Wallets that have unrecognized purpose strings will haveloading warnings, and the listlabels RPC will raise an error if an unrecognized purposeis requested. (#27217)In the createwallet, loadwallet, unloadwallet, and restorewallet RPCs, the\"warning\" string field is deprecated in favor of a \"warnings\" field thatreturns a JSON array of strings to better handle multiple warning messages andfor consistency with other wallet RPCs. The \"warning\" field will be fullyremoved from these RPCs in v26. It can be temporarily re-enabled during thedeprecation period by launching bitcoind with the configuration option-deprecatedrpc=walletwarningfield. (#27279)Descriptor wallets can now spend coins sent to P2WSH Miniscript descriptors. (#24149)A row stating whether or not it's wallet is a custodial or non-custodial wallet would have been more expository.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 12, 2023, 03:03:13 PM",
+      "body": "Quote from: Good_Doctor on June 12, 2023, 07:38:42 AMA row stating whether or not it's wallet is a custodial or non-custodial wallet would have been more expository.The wallet is a non-custodial, as it has always been. It's not as if this is going to change between releases - there's no reason to restate the existing features for every single release. This isn't a new product announcement - it's a new version announcement.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "oppiet30",
+      "created_time": "August 01, 2023, 04:37:39 PM",
+      "body": "I was always checking on bitcoin.org for the current release. Now I know to come here for current releases.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 16, 2023, 01:16:40 PM",
+      "body": "Quote from: oppiet30 on August 01, 2023, 04:37:39 PMI was always checking on bitcoin.org for the current release. Now I know to come here for current releases.bitcoin.org is a simple mirror of the bitcoin core releases that sometimes updates with a delay. Topics like this on this forum are also announcements that can also be delayed.The direct link to check for updates on bitcoin core project are bitcoincore.org website (the first link in OP) or the https://github.com/bitcoin/bitcoin repository that contains the source code.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kirilldead",
+      "created_time": "August 28, 2023, 07:08:15 PMLast edit: September 09, 2023, 11:34:59 AM by hilariousandco",
+      "body": "is there support for the latest version of kali linux now?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "August 28, 2023, 11:48:00 PM",
+      "body": "Quote from: kirilldead on August 28, 2023, 07:08:15 PMis there support for the latest version of kali linux now?Bitcoin Core does not publish official releases for any particular linux distros. The published linux binaries should work on any linux distro so long as the CPU architecture is supported.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 31, 2023, 10:49:36 AM",
+      "body": "Quote from: achow101 on August 28, 2023, 11:48:00 PMQuote from: kirilldead on August 28, 2023, 07:08:15 PMis there support for the latest version of kali linux now?Bitcoin Core does not publish official releases for any particular linux distros. The published linux binaries should work on any linux distro so long as the CPU architecture is supported.I'm curious though, what is the minimum supported glibc for these binaries (i.e. which one is it built against) and do you have any plans to change that?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "decryptit",
+      "created_time": "September 30, 2023, 03:44:32 PM",
+      "body": "Hey guys. I switched Bitcoin Core to running on testnet. I have a couple of questions on that. I want to start solo mining tBTC. Can I prune the data when running on testnet? Or do I need the full blockchain db? Also, how do I configure the rpc server? In the Setting Options on the wallet UI, I clicked on Open Configuration FIle, but nothing happens. Do I need to create another configuration file for it via CLI? Or do I add the rpc server info to the bitcoin.conf? Thank you in advance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 01, 2023, 06:23:29 AM",
+      "body": "Quote from: decryptit on September 30, 2023, 03:44:32 PMHey guys. I switched Bitcoin Core to running on testnet. I have a couple of questions on that. I want to start solo mining tBTC. Can I prune the data when running on testnet? Or do I need the full blockchain db?Yes, it is like mainnet. You don't need to store the whole blockchain, all you need is the chainstate (ie. the UTXO database) so you can prune the chain. But you still need to download and verify all blocks to build the chainstate before you can discard the old ones in the process called pruning.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "October 01, 2023, 01:32:19 PMLast edit: October 01, 2023, 01:50:37 PM by Cricktor",
+      "body": "Quote from: decryptit on September 30, 2023, 03:44:32 PMIn the Setting Options on the wallet UI, I clicked on Open Configuration FIle, but nothing happens. Do I need to create another configuration file for it via CLI? Or do I add the rpc server info to the bitcoin.conf?Why nothing opened after you clicked in the GUI is not obvious to me, but it depends on too many not provided details.In the bitcoin.conf file you can have sections specific to Mainnet and Testnet, e.g.Code:# Options only for mainnet[main]...# Options only for testnet[test]#dbcache=2000#blocksonly=1maxuploadtarget=0# Indexestxindex=1blockfilterindex=1coinstatsindex=1# Network#listen=1listenonion=1proxy=127.0.0.1:9050bind=127.0.0.1onlynet=onion# Connections#rpcuser=...#rpcpassword=...port=18333rpcport=18332rpcbind=127.0.0.1rpcallowip=127.0.0.1# Options only for Regtest[regtest]# Options only for Signet[signet]This way you can keep the configuration all in one file and location and the appropriate options are read with whatever net you fire up your bitcoind or GUI.I would recommend to use the Bitcoin Core Config Generator by Jameson Lopp: https://jlopp.github.io/bitcoin-core-config-generator/Github sources: https://github.com/jlopp/bitcoin-core-config-generator",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "decryptit",
+      "created_time": "October 02, 2023, 02:27:13 AM",
+      "body": "Thanks guys. I was able to configure the bitcoin.conf to testnet and now the Bitcoin Core is running on testnet with the green logo. I did insert some rpc info like user/pw ports etc. I opened those ports. Does anyone have any info on how to set up a testnet pool to connect your miner to it? Thanks for your response. I also found another option to run a bitcoin full node via bitnodes. They have a one line command that you can run on your VPS or something. I just haven't figured out how to configure that one to testnet. I kept getting errors on it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "October 03, 2023, 09:56:58 AM",
+      "body": "Quote from: decryptit on October 02, 2023, 02:27:13 AM...Your questions are turning more and more offtopic to this thread. I suggest you hop over to nullama's guide to solo mine Testnet bitcoins and see what you can get from his guide for your own purpose.There might also be more guides on the mining Testnet coins topic in this forum. You probably should invest some time to use the forum's search or use https://ninjastic.space/ to search the forum. It's not rocket science to figure out some search keywords that give you helpful hits.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "decryptit",
+      "created_time": "October 03, 2023, 05:32:44 PM",
+      "body": "Quote from: Cricktor on October 03, 2023, 09:56:58 AMQuote from: decryptit on October 02, 2023, 02:27:13 AM...Your questions are turning more and more offtopic to this thread. I suggest you hop over to nullama's guide to solo mine Testnet bitcoins and see what you can get from his guide for your own purpose.There might also be more guides on the mining Testnet coins topic in this forum. You probably should invest some time to use the forum's search or use https://ninjastic.space/ to search the forum. It's not rocket science to figure out some search keywords that give you helpful hits.Thank you for your response. And of course, it's not rocket science. But if it was easy to find, I would've found it. There's a difference between finding some out of date information that put you in the kinda right direction vs. actually finding the answer to your problem. In reality, there are not that many people in the world who mine mainnet bitcoin. So finding people who mine testnet bitcoin is even smaller than a needle in a haystack. I understand the the discussion is getting off topic. Ending it here. Thanks again for your reponse.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

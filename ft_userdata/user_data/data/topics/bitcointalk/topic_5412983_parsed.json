@@ -1,0 +1,165 @@
+{
+  "id": "topic_5412983",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "September 09, 2022, 11:28:35 AMLast edit: September 13, 2022, 05:58:36 AM by PowerGlove",
+  "content": "A while back a suggestion was made (probably not for the first time) that appending \"(OP)\" to the topic starter's name would make it much easier to identify subsequent posts made by them.The initial response was lukewarm, but by the time the topic died down, there were a good number of members (TheUltraElite, LoyceV, isaac_clarke22, KingsDen, sheenshane, Stalker22, vapourminer, Pmalek, dkbit98, The Pharmacist, Smartvirus, Mr.right85) that agreed it was a fine idea and that they would find it useful.Thankfully, the current forum software is a modified version of SMF, which is both open-source and run by nice people that still offer old archived versions of their releases for download.So, I thought I'd figure out how to implement this suggestion in SMF 1.1.19 and try my luck getting theymos to accept the patch.I've implemented this change in 5 different styles (with 5 different patches) so theymos can choose the most appropriate one.Style AThis one signifies the OP by appending \"(OP)\" (in bold) to their name:Code:--- /var/www/baseline/Themes/default/Display.template.php 2010-10-22 01:38:35.000000000 +0000+++ /var/www/modified/Themes/default/Display.template.php 2022-09-10 03:27:48.000000000 +0000@@ -261,13 +261,13 @@    // Show information about the poster of this message.   echo '     <table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\" style=\"table-layout: fixed;\">      <tr>       <td valign=\"top\" width=\"16%\" rowspan=\"2\" style=\"overflow: hidden;\">-       <b>', $message['member']['link'], '</b>+       <b>', $message['member']['link'], !$message['member']['is_guest'] && $message['member']['is_topic_starter'] ? ' <span title=\"This member is the topic starter\" style=\"cursor: help;\">(OP)</span>' : '', '</b>        <div class=\"smalltext\">';    // Show the member's custom title, if they have one.   if (isset($message['member']['title']) && $message['member']['title'] != '')    echo '         ', $message['member']['title'], '<br />';Style BThis one signifies the OP by appending \"(OP)\" (not in bold) to their name:Code:--- /var/www/baseline/Themes/default/Display.template.php 2010-10-22 01:38:35.000000000 +0000+++ /var/www/modified/Themes/default/Display.template.php 2022-09-10 03:31:02.000000000 +0000@@ -261,13 +261,13 @@    // Show information about the poster of this message.   echo '     <table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\" style=\"table-layout: fixed;\">      <tr>       <td valign=\"top\" width=\"16%\" rowspan=\"2\" style=\"overflow: hidden;\">-       <b>', $message['member']['link'], '</b>+       <b>', $message['member']['link'], '</b>', !$message['member']['is_guest'] && $message['member']['is_topic_starter'] ? ' <span title=\"This member is the topic starter\" style=\"cursor: help;\">(OP)</span>' : '', '        <div class=\"smalltext\">';    // Show the member's custom title, if they have one.   if (isset($message['member']['title']) && $message['member']['title'] != '')    echo '         ', $message['member']['title'], '<br />';Style CThis one signifies the OP by adding a small \"OP\" underneath their name:Code:--- /var/www/baseline/Themes/default/Display.template.php 2010-10-22 01:38:35.000000000 +0000+++ /var/www/modified/Themes/default/Display.template.php 2022-09-10 03:39:50.000000000 +0000@@ -264,12 +264,17 @@     <table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\" style=\"table-layout: fixed;\">      <tr>       <td valign=\"top\" width=\"16%\" rowspan=\"2\" style=\"overflow: hidden;\">        <b>', $message['member']['link'], '</b>        <div class=\"smalltext\">'; +  // Show the text \"OP\" (with an explanation tooltip), if this member is the topic starter.+  if (!$message['member']['is_guest'] && $message['member']['is_topic_starter'])+   echo '+        ', '<span title=\"This member is the topic starter\" style=\"cursor: help;\">OP</span>', '<br />';+   // Show the member's custom title, if they have one.   if (isset($message['member']['title']) && $message['member']['title'] != '')    echo '         ', $message['member']['title'], '<br />';    // Show the member's primary group (like 'Administrator') if they have one.Style DThis one signifies the OP by putting their name in italics:Code:--- /var/www/baseline/Themes/default/Display.template.php 2010-10-22 01:38:35.000000000 +0000+++ /var/www/modified/Themes/default/Display.template.php 2022-09-10 03:41:49.000000000 +0000@@ -261,13 +261,13 @@    // Show information about the poster of this message.   echo '     <table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\" style=\"table-layout: fixed;\">      <tr>       <td valign=\"top\" width=\"16%\" rowspan=\"2\" style=\"overflow: hidden;\">-       <b>', $message['member']['link'], '</b>+       <b>', !$message['member']['is_guest'] && $message['member']['is_topic_starter'] ? '<i>' . $message['member']['link'] . '</i>' : $message['member']['link'], '</b>        <div class=\"smalltext\">';    // Show the member's custom title, if they have one.   if (isset($message['member']['title']) && $message['member']['title'] != '')    echo '         ', $message['member']['title'], '<br />';Style EThis one signifies the OP by underlining their name:Code:--- /var/www/baseline/Themes/default/Display.template.php 2010-10-22 01:38:35.000000000 +0000+++ /var/www/modified/Themes/default/Display.template.php 2022-09-10 03:43:11.000000000 +0000@@ -261,13 +261,13 @@    // Show information about the poster of this message.   echo '     <table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\" style=\"table-layout: fixed;\">      <tr>       <td valign=\"top\" width=\"16%\" rowspan=\"2\" style=\"overflow: hidden;\">-       <b>', $message['member']['link'], '</b>+       <b>', !$message['member']['is_guest'] && $message['member']['is_topic_starter'] ? '<u>' . $message['member']['link'] . '</u>' : $message['member']['link'], '</b>        <div class=\"smalltext\">';    // Show the member's custom title, if they have one.   if (isset($message['member']['title']) && $message['member']['title'] != '')    echo '         ', $message['member']['title'], '<br />';Closing thoughtsI think my favorite is style B. It's the most obvious and I prefer the \"(OP)\" when it's not in bold. I also like style C because the small \"OP\" underneath the name somehow seems in keeping with the Bitcointalk \"style\" (although it does consume vertical space). Style D is subtle and non-intrusive, which I like. I like styles A & E the least.I experimented with different background colors and tried a few linear gradients as a way to make the OP's posts stand out, but I decided against anything too heavy-handed because I kind of love the forum just the way it is!I've carefully tested these patches, but I'm pretty sure they won't cleanly apply to the modified version of SMF that this forum runs on. Luckily, they're tiny and easy to understand, so massaging them into place should be very straightforward.Okay, that's all for now, I hope theymos accepts one of these patches! Update (2022/9/10)Based on a suggestion from dkbit98, I've updated the patches above (A, B & C) to include a tooltip (explanation text) when you hover over the \"OP\" letters (see below for an example).I've also added a new style which uses this tooltip together with an icon (as suggested by KingsDen). Right now, the icon is Unicode character \"✍\" (U+270D: Writing Hand).Obviously, theymos is free to decide on a different icon and reword the tooltip, but I think this style is my new favorite! Style FThis one signifies the OP by adding a little icon next to their name:Code:--- /var/www/baseline/Themes/default/Display.template.php 2010-10-22 01:38:35.000000000 +0000+++ /var/www/modified/Themes/default/Display.template.php 2022-09-10 03:58:47.000000000 +0000@@ -261,13 +261,13 @@    // Show information about the poster of this message.   echo '     <table width=\"100%\" cellpadding=\"5\" cellspacing=\"0\" style=\"table-layout: fixed;\">      <tr>       <td valign=\"top\" width=\"16%\" rowspan=\"2\" style=\"overflow: hidden;\">-       <b>', $message['member']['link'], '</b>+       <b>', $message['member']['link'], '</b>', !$message['member']['is_guest'] && $message['member']['is_topic_starter'] ? ' <span title=\"This member is the topic starter\" style=\"cursor: help;\">&#x270d</span>' : '', '        <div class=\"smalltext\">';    // Show the member's custom title, if they have one.   if (isset($message['member']['title']) && $message['member']['title'] != '')    echo '         ', $message['member']['title'], '<br />';Update (2022/9/13)One of these patches (style B) was accepted by theymos! I'm humbled at being allowed to contribute to the forum in my own small way and very appreciative of the kind words that people have left in this thread.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412983",
+  "comments": [
+    {
+      "author": "Welsh",
+      "created_time": "September 09, 2022, 11:35:24 AM",
+      "body": "Yeah, this has been suggested a few times. However, I appreciate the pro activeness of getting it implemented. Anyway, I actually don't like any of the suggestions, and the reason being is nothing against you, but I bloody hate abbreviations without it being previously made clear what that abbreviation stands for. I might be on my own with that opinion, but it does annoy me, especially in technical discussions, which I understand this isn't. I'd much rather thread starter, original topic starter or thread creator underneath their name or something, because I can guarantee it, not everyone will know what \"OP\" stands for. Anyone that has been using forum software for a long time, probably will, and sure they could ask if in doubt, but that increases the chances of them asking in that thread, and therefore going off topic or opening a new thread which will likely happen a few dozen times every year. So, while I like the idea I think it needs to be clear what it means, but also not abbreviated. I do appreciate that the suggestions I've made are rather long winded, and therefore isn't as clean. Maybe, a key system could be implemented at the top of each thread, explaining what it means, and then have the abbreviation. Again though, likely to cause issues. Same goes for the bolding or underlining, it's not self explanatory.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "September 09, 2022, 12:43:17 PM",
+      "body": "@Welsh: Yeah, I appreciate your point of view. I actually did try a small \"Topic Starter\" underneath the name, but it kind of ends up looking (to me anyway) like an award or something. Like you're \"Legendary\", \"Staff\" and a \"Topic Starter\" Maybe if it was both underneath the name and in italics, or in square brackets, it would look right?These patches are pretty simple to hand edit (patching patches?), so if others agree with you, then adjustments should be straightforward.My thinking behind the last two (name in italics, and name underlined) is that they are non-intrusive and language-neutral, and for a feature that the forum has lived without for so long, something super subtle actually kind of works (the people that want this will know/learn/ask what to look for and the people that don't will barely notice anything has changed). I still prefer something a little more obvious, but I can see the appeal.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Welsh",
+      "created_time": "September 09, 2022, 12:52:14 PM",
+      "body": "Quote from: PowerGlove on September 09, 2022, 12:43:17 PMMy thinking behind the last two (name in italics, and name underlined) is that they are non-intrusive and language-neutralGood point, hadn't even thought about that. Very good point. However, I still think a key would be needed, and that would be an issue with implementing for local sections, since not everyone here speaks English perfectly. I feel like implementing it would require some explanation, and having that somewhere on the page like a key system would be the best option. I don't know how you get around local section specific implementations then though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "September 09, 2022, 12:53:59 PM",
+      "body": "Quote from: PowerGlove on September 09, 2022, 11:28:35 AM...I like Style C best with OP written below username.Quote from: Welsh on September 09, 2022, 11:35:24 AMI'd much rather thread starter, original topic starter or thread creator underneath their name or something, because I can guarantee it, not everyone will know what \"OP\" stands for. Perhaps adding simple popup window when you hover over username (or OP letters) could solve this.Something like that exist in BPIP extension, so when you hover over any added icon you will see short explanation, and by default it works the same for username profile like this:Code:View the profile off ...or for profile icon:Code:View ProfileIt's the same for contact details and any information added in profile, like email or personal message.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Rizzrack",
+      "created_time": "September 09, 2022, 01:25:41 PM",
+      "body": "On epochtalk it does show (OP) under the username. Main point is the functionality. UI/UX is a different animal altogether Quote from: dkbit98 on September 09, 2022, 12:53:59 PMPerhaps adding simple popup window when you hover over username (or OP letters) could solve this.Adding a tooltip to the \"(OP)\" text string is a good fix, though it would be useless on a mobile/tablet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mk4",
+      "created_time": "September 09, 2022, 02:53:23 PM",
+      "body": "I'd go with either A or B.C ended up looking like a rank or sort of featured text.D and E: the name being italicized or underlined being equivalent to being the OP might not be obvious enough for a non-native Bitcointalk user.Quote from: Rizzrack on September 09, 2022, 01:25:41 PMOn epochtalk it does show (OP) under the username. Main point is the functionality. UI/UX is a different animal altogether Ah, Epochtalk. We'll probably get the software ready a few years before the sun dies.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "KingsDen",
+      "created_time": "September 09, 2022, 08:26:27 PM",
+      "body": "Nice to see that the idea isn't abandoned by you if you actually were the one that created the first thread. I remember contributing to it. The idea is decent to tracking the option of the OP at every point of the interaction or discussion. I have seen 5 patches you sampled, I would have gone with the first sample but considering what Welsh said, the abbreviation could cause confusion and you would be shocked by the amount of thread to be opened asking the meaning of \"OP\" and it would continue even when you answer 100 times.I'll suggest it goes with an icon instead.  The author icon 👤 with same color as the user-text color, this will give a perfect blend and occupy less space and almost self explanatory. The author icon is like a user icon with or without a crossed pen or a book icon. Powerglove, if you can release a patch with an icon, who knows it can fit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "UserU",
+      "created_time": "September 10, 2022, 06:11:02 AM",
+      "body": "@PowerGlove, option A is a solid choice with square brackets.[OP]Quote from: Rizzrack on September 09, 2022, 01:25:41 PMAdding a tooltip to the \"(OP)\" text string is a good fix, though it would be useless on a mobile/tablet.Some software do display the tooltip when the user taps on the tag or icon.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "September 10, 2022, 06:49:37 AM",
+      "body": "I've updated the initial post with support for tooltips and added a new style that uses an icon instead of the letters \"OP\". Thanks everyone for their ideas and feedback!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "September 10, 2022, 07:29:16 AM",
+      "body": "I like styles A and B the most. Anyone who knows what OP means, won't have any problems grasping the meaning from the first two suggestions. I am not a fan of Style C. It just seems weird to add one more line in the profile design just to accommodate two letters. Styles D in italics or E with underlining don't mean anything and if one of those were to be implemented, we would have new people asking the same questions over and over again. Why are some usernames on the forum in italics or underlined and others aren't? Style F with the explanation text is also not bad, but the explanation text can also be added to A and B on the word OP. Those who don't know what OP means could just hover over the text and see the context.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "September 10, 2022, 07:36:11 AM",
+      "body": "Quote from: Pmalek on September 10, 2022, 07:29:16 AMStyle F with the explanation text is also not bad, but the explanation text can also be added to A and B on the word OP. Those who don't know what OP means could just hover over the text and see the context. Yup, maybe I didn't draw enough attention to it, but that's already part of the update (I \"backported\" the tooltip from style F into styles A, B & C).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 10, 2022, 08:43:31 AMLast edit: September 10, 2022, 08:59:48 AM by LoyceV",
+      "body": "Can you show a sample of what the actual page would look like? Or just the HTML around the username. I'm curious if this would break my (many) scripts that get amongst others the username from that location in the page.Quote from: PowerGlove on September 09, 2022, 11:28:35 AMStyle BThis one signifies the OP by appending \"(OP)\" (not in bold) to their name:I choose this one. I guess with long usernames, it ends up like Style C (but with brackets). Unless I switch to full screen, which I barely do.Or just make OP's name red.Quote from: PowerGlove on September 09, 2022, 11:28:35 AMStyle FThis one signifies the OP by adding a little icon next to their name:This looks even better",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hd49728",
+      "created_time": "September 10, 2022, 11:22:08 AM",
+      "body": "You made a good userscript with 5 styles to choose and from suggestion, I think you will add more styles in future. I have different thinking. Is the script actually meaningful for people really engage in a discussion (in one topic)?Because if they actually read and join that discussion, they must at least read the opening post and do know who is the author (OP). For people who don't care about that, they will not care about the OP text from the script.Welcome to List of Bitcointalk.org Userscripts",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 10, 2022, 11:56:52 AM",
+      "body": "Quote from: hd49728 on September 10, 2022, 11:22:08 AMYou made a good userscriptNo he didn't. It's a forum patch, only Admin can apply this. A userscript could probably do this too, but I'm not sure if it would be able to get OP from the first page if you're reading the second page.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "September 10, 2022, 02:07:55 PM",
+      "body": "Quote from: PowerGlove on September 09, 2022, 11:28:35 AMso theymos can choose the most appropriate one.When was the last time Theymos made a change on forum modules or added a new module since the DefaultTrust change? Anyway, let's note lose all hopes 😉Nice work OP.Style C looks good to me.Style A and B is good too but when a username is long then it may look odd or eventually the last part will take a newline. So Style C is safer and better.Stype D and E doesn't look it fits here but when we all get used to something then anything fits.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "September 10, 2022, 07:59:49 PM",
+      "body": "Quote from: PowerGlove on September 09, 2022, 11:28:35 AMBased on a suggestion from dkbit98, I've updated the patches above (A, B & C) to include a tooltip (explanation text) when you hover over the \"OP\" letters (see below for an example).I've also added a new style which uses this tooltip together with an icon (as suggested by KingsDen). Right now, the icon is Unicode character \"✍\" (U+270D: Writing Hand).I think this looks much better than every other propositions you posted before.Hand icon or something similar next to profile username is much better and especially with popup explanation.Adding letters instead of icon can be confusing for some people, so I think you find much better option.PSI am not sure how this would affect BPIP extension that have DT1 and DT2 icon in same place as your proposition.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "September 11, 2022, 12:03:37 AM",
+      "body": "Quote from: LoyceV on September 10, 2022, 11:56:52 AMA userscript could probably do this too, but I'm not sure if it would be able to get OP from the first page if you're reading the second page.Yep, I think this would be awkward to implement client-side. If you've already seen the first page then you could cache the OP, but on other pages things get pretty hacky & unreliable.Quote from: LoyceV on September 10, 2022, 08:43:31 AMCan you show a sample of what the actual page would look like? Or just the HTML around the username. I'm curious if this would break my (many) scripts that get amongst others the username from that location in the page.That's a good point. I didn't think much about breaking other extensions/scripts (BPIP, your stuff, etc.)Luckily, styles B & F (my favorites, and yours too) are quite unobtrusive and leave the username as it was (between <b><a>...</a></b>) and just add a <span>...</span> after it. I suppose style C does the same, but I've got a hunch that messing with things after the <div class=\"smalltext\"> might break more stuff. Here's the before & after HTML for each of the styles: Before: <b><a href=\"...\" title=\"View the profile of LoyceV\">LoyceV</a></b><div class=\"smalltext\"> ...Style A: <b><a href=\"...\" title=\"View the profile of LoyceV\">LoyceV</a> <span title=\"This member is the topic starter\" style=\"cursor: help;\">(OP)</span></b><div class=\"smalltext\"> ...Style B: <b><a href=\"...\" title=\"View the profile of LoyceV\">LoyceV</a></b> <span title=\"This member is the topic starter\" style=\"cursor: help;\">(OP)</span><div class=\"smalltext\"> ...Style C: <b><a href=\"...\" title=\"View the profile of LoyceV\">LoyceV</a></b><div class=\"smalltext\"> <span title=\"This member is the topic starter\" style=\"cursor: help;\">OP</span><br /> ...Style D: <i><a href=\"...\" title=\"View the profile of LoyceV\">LoyceV</a></i><div class=\"smalltext\"> ...Style E: <u><a href=\"...\" title=\"View the profile of LoyceV\">LoyceV</a></u><div class=\"smalltext\"> ...Style F: <b><a href=\"...\" title=\"View the profile of LoyceV\">LoyceV</a></b> <span title=\"This member is the topic starter\" style=\"cursor: help;\">&#x270d</span><div class=\"smalltext\"> ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 11, 2022, 09:05:59 AM",
+      "body": "Quote from: PowerGlove on September 11, 2022, 12:03:37 AMYep, I think this would be awkward to implement client-side. If you've already seen the first page then you could cache the OP, but on other pages things get pretty hacky & unreliable.What if the extension connects to a server that has a list of OPs for every topic? I'm thinking of TryNinja's API.QuoteHere's the before & after HTML for each of the styles:Thanks for this, I did some tests and I can survive this",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "September 11, 2022, 09:12:18 AM",
+      "body": "I would prefer the square brackets (bold or not).And on the discussion about getting this actually implemented I would say that indeed it may have a better chance to come as BPIP extension (and yes, it would be nice to not interfere with the DT mark the BPIP extension already adds).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

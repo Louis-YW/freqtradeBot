@@ -1,0 +1,29 @@
+{
+  "id": "topic_5456739",
+  "title": "simpleSliv3r",
+  "author": "simpleSliv3r",
+  "created_time": "June 18, 2023, 10:09:03 AM",
+  "content": "Hi,I've been trying to configure my bitcoin core node to be able to use rpc commands from another laptop in the same network, but I'm unable to do it. Idk if I am leaving out any necessary settings.Please, see bellow the bitcoin.conf fileCode:pi@raspberrypi:/mnt/btc_blockchian-externalDisk/bitcoin/data $ cat bitcoin.confproxy=127.0.0.1:9050listen=1bind=127.0.0.1prune=100000server=1rpcuser=****rpcpassword=****[main]rpcbind=127.0.0.1rpcbind=192.168.1.2rpcallowip=192.168.1.0/24rpcallowip=127.0.0.1Proxy settings on the top are for Tor connection, just ignore it.I think the problem is that port 8332 is only open for loopback and not for the entire net.Code:pi@raspberrypi:~ $ sudo netstat -tulpn | grep LISTENtcp        0      0 127.0.0.1:9050          0.0.0.0:*               LISTEN      545/tortcp        0      0 127.0.0.1:9051          0.0.0.0:*               LISTEN      545/tortcp        0      0 127.0.0.1:8334          0.0.0.0:*               LISTEN      556/bitcoindtcp        0      0 127.0.0.1:8332          0.0.0.0:*               LISTEN      556/bitcoindtcp        0      0 127.0.0.1:8333          0.0.0.0:*               LISTEN      556/bitcoindtcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      540/sshd: /usr/sbintcp6       0      0 :::22                   :::*                    LISTEN      540/sshd: /usr/sbinAlso, nmap from the other laptop shows port 8332, 8333 and 8334 closed.Code:PORT     STATE  SERVICE VERSION8332/tcp closed unknown8333/tcp closed bitcoin8334/tcp closed unknownNote: there are no iptables or something like that closing those ports. (at least that I know)Thanks for your time!SS",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5456739",
+  "comments": [
+    {
+      "author": "ABCbits",
+      "created_time": "June 18, 2023, 11:34:07 AM",
+      "body": "Replace value of your rpcbind to 0.0.0.0 which makes RPC accessible from other device. And IIRC value of bind should be changed as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "June 18, 2023, 12:22:36 PM",
+      "body": "Quote from: ETFbitcoin on June 18, 2023, 11:34:07 AMReplace value of your rpcbind to 0.0.0.0 which makes RPC accessible from other device. And IIRC value of bind should be changed as well.Changing rpcbind to 0.0.0.0 worked. Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

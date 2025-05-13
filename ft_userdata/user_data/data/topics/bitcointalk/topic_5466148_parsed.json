@@ -1,0 +1,77 @@
+{
+  "id": "topic_5466148",
+  "title": "JustCuriosity",
+  "author": "JustCuriosity",
+  "created_time": "September 08, 2023, 07:08:46 PM",
+  "content": "Hello All, could you help, please?The problem: I try to run a `curl` request but get \"401 Unauthorized error\"    Code:curl --user testuser --data-binary '{\"jsonrpc\": \"1.0\", \"id\": \"curltest\", \"method\": \"getrawtransaction\", \"params\": [\"e0cee...47ac5\", true]}' -H 'content-type: text/plain;' http://127.0.0.1:8332/ -D -    Enter host password for user 'testuser':    HTTP/1.1 401 Unauthorized    WWW-Authenticate: Basic realm=\"jsonrpc\"    Date: Sat, 02 Sep 2023 18:12:46 GMT    Content-Length: 0    Content-Type: text/html; charset=ISO-8859-1The messages in the debug log of the daemon:    Code:2023-09-02T15:59:44Z ThreadRPCServer incorrect password attempt from 127.0.0.1:36472I run `bitcoind` this way:    Code:/mnt/bitcoin/bin/bitcoind -conf=/mnt/bitcoin/bitcoin.confAlso, I have a symlink for this config:    Code:ll ~/.bitcoin/bitcoin.conf    lrwxrwxrwx 1 user user 25 Sep  1 18:42 /home/user/.bitcoin/bitcoin.conf -> /mnt/bitcoin/bitcoin.confConfig:     Code:grep -v \"#\" /mnt/bitcoin/bitcoin.conf | grep -v \"^$\"                                                                daemon=1    daemonwait=1    ...    rest=1    rpcallowip=192.168.0.128/25    rpcallowip=127.0.0.1    rpcauth=testuser:3ad8c2e058a161304a911bcc60c208d2$a364136d41edda037d267e909f9f0355537aefee08b6fd29da2eee59559cf084    server=1    [main]    [test]    [signet]    [regtest]`rpcauth` was created this way, and then inserted in the config:    Code:python3 bitcoin/share/rpcauth/rpcauth.py testuser testpasst                                                                                            String to be appended to bitcoin.conf:    rpcauth=testuser:3ad8c2e058a161304a911bcc60c208d2$a364136d41edda037d267e909f9f0355537aefee08b6fd29da2eee59559cf084    Your password:    testpasstAlso, I tried to replace `rpcauth` with Code:rpcuser=testuserrpcpassword=testpasstAnd did     Code:kill -HUP `cat /mnt/btc_data/bitcoind.pid`after every config change (idk wether it's needed or not)Yes, I have \"t\" at the end of pass everywhere (I'm too frustrated to re-do all this solely to remove the typo, but the password was copy-pasted many times so I 100% sure there's no mistype answering curl)I tried: https://bitcoin.stackexchange.com/questions/115668/401-unauthorized-connection-using-python-bitcoinrpchttps://bitcoin.stackexchange.com/questions/106395/bitcoinrpc-authproxy-jsonrpcexception-342-non-json-http-response-with-401-uhttps://bitcoin.stackexchange.com/questions/36433/bitcoin-rpc-works-in-bitcoin-cli-but-not-in-python-bitcoinrpc-no-json-objecthttps://bitcoin.stackexchange.com/questions/77214/bitcoin-rpc-returning-401Bitcoin Core ver 25.0What am I doing wrong?Thank you.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466148",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "September 09, 2023, 12:12:02 PM",
+      "body": "You are getting these errors because you are not passing in credentials when calling with CURL.When you use JSON-RPC with CURL it doesn't matter whether the RPC method requires a wallet or not, if you have set an RPC username and password then you are required to pass them to curl or you will get a 401 error.Just pass --user testuser:testpassword (NOT --user by itself)or after http:// change the url to this 'testuser:testpassword@127.0.0.1:8332/'",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JustCuriosity",
+      "created_time": "September 09, 2023, 02:50:07 PM",
+      "body": "Quoteyou are not passing in credentialsNot exactly. When I do not give the password to `curl`, it asks directly:Code:Enter host password for user 'testuser':You can see it in the very first code snippet in this thread. Nevertheless, I have just tried: re-created and added the `rpcauth` string, sent -HUP, then tried Code:curl --user testuser:testpassand Code:http://testuser:testpass@127.0.0.1:8332/ the same result, 401 Unauthorized. And yes, the curl request was taken directly from the doc.Anything else I can try here?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pinggoki",
+      "created_time": "September 10, 2023, 02:16:48 AM",
+      "body": "Quote from: JustCuriosity on September 09, 2023, 02:50:07 PMAnything else I can try here?I searched your problem and this is one of the link that popped up. It's not the same problem as you got thoughCode:https://talk.plesk.com/threads/curl-request-401-unauthorized.354153/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JustCuriosity",
+      "created_time": "September 10, 2023, 07:42:38 AM",
+      "body": "I know how it sounds, but it works now without any intervention from my side, using both `--user testuser` only and with password. Without adding `--http1.1`The only idea I can think of is that the daemon reloads config not immediately but after some time. Anyway, it's solved. Thanks to everyone who tried to help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "September 10, 2023, 11:22:33 AM",
+      "body": "Quote from: JustCuriosity on September 10, 2023, 07:42:38 AM...To my knowledge bitcoind only reads the config file when it starts. So, if you have to make changes, you should stop bitcoind gracefully (frankly, I'm not sure if your kill -HUP does initiate a graceful exit; I always use bitcoin-cli stop for a clean termination of bitcoind), make your changes to the config file and then restart the daemon.I'm not aware of another method to trigger bitcoind to re-read its config file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "September 10, 2023, 12:22:03 PM",
+      "body": "Some or even many unixoid daemons react on a HUP signal with a re-read of their config file. Maybe the OP thought it's the same for bitcoind when in fact it isn't. Nice find by ETFbitcoin with the cited Github issue. To allow a re-read of the config file likely opens a Pandora's box of cans of worms and a whole lot of problems with the proper internal states of bitcoind and that's why the devs dismissed the feature requests so far.Not only \"Don't trust, verify!\" but also \"Don't assume something is working, check to be sure!\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 12, 2023, 04:29:33 AM",
+      "body": "Quote from: Cricktor on September 10, 2023, 12:22:03 PMSome or even many unixoid daemons react on a HUP signal with a re-read of their config file. Maybe the OP thought it's the same for bitcoind when in fact it isn't. Nice find by ETFbitcoin with the cited Github issue. To allow a re-read of the config file likely opens a Pandora's box of cans of worms and a whole lot of problems with the proper internal states of bitcoind and that's why the devs dismissed the feature requests so far.In Bitcoin Core's case specifically, a lot of settings don't make sense to change without a full reload of the client. Take datadir or txindex for example. You can't really change these at runtime without discarding the application state (former) or incurring a short but huge performance penalty (latter). Or what if you change the RPC url or authentication? Then you'd have to wait for existing RPC calls to finish - which may be long running like importmulti - or abort them.SIGHUP reloading works best for simple programs, not those with complex states such as a full blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JustCuriosity",
+      "created_time": "September 12, 2023, 02:53:10 PM",
+      "body": "Quote from: ETFbitcoin on September 10, 2023, 12:02:17 PMGood to see your problem solved. Although your thread doesn't mention usage of --http1.1 parameter on curl though.It was mentioned in the link sent by @pinggoki. Re: reloading: yep, lessons learned.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

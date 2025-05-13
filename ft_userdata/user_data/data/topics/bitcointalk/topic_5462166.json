@@ -1,0 +1,85 @@
+{
+  "id": "topic_5462166",
+  "title": "pbies",
+  "author": "pbies",
+  "created_time": "August 05, 2023, 11:54:55 AMLast edit: August 08, 2023, 05:38:07 PM by pbies",
+  "content": "I am trying to make a SIGHASH_SINGLE transaction.I have two inputs, one output. I understand that second input can be not signed (really?).I use Python 3.11.4.I use these libraries:Code:apt install libssl-devpip3 install python-bitcoinlibScript I have is:Code:#!/usr/bin/env python3import hashlibimport subprocessfrom bitcoin import SelectParamsfrom bitcoin.core import b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160from bitcoin.core.script import CScript, OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG, SignatureHash, SIGHASH_ALL, SIGHASH_SINGLEfrom bitcoin.core.scripteval import VerifyScript, SCRIPT_VERIFY_P2SHfrom bitcoin.wallet import CBitcoinAddress, CBitcoinSecretSelectParams('mainnet')h = b'private key bytes in python hex format'seckey = CBitcoinSecret.from_secret_bytes(h)txid = lx('tx number 1')vout = 0txid2 = lx('tx number 2')vout2 = 1txin = CMutableTxIn(COutPoint(txid, vout))txin2 = CMutableTxIn(COutPoint(txid2, vout2))txin_scriptPubKey = CScript([OP_DUP, OP_HASH160, Hash160(seckey.pub), OP_EQUALVERIFY, OP_CHECKSIG])txout = CMutableTxOut(10000, CBitcoinAddress('output address').to_scriptPubKey())tx = CMutableTransaction([txin]+[txin2], [txout])sighash = SignatureHash(txin_scriptPubKey, tx, 0, SIGHASH_SINGLE)sig = seckey.sign(sighash) + bytes([SIGHASH_SINGLE])txin.scriptSig = CScript([sig, seckey.pub])VerifyScript(txin.scriptSig, txin_scriptPubKey, tx, 0, (SCRIPT_VERIFY_P2SH,))print(b2x(tx.serialize()))r=subprocess.run([\"/mnt/c/Program Files/Bitcoin/daemon/bitcoin-cli.exe\", \"sendrawtransaction\", b2x(tx.serialize())])I am getting error:Code:error code: -25error message:bad-txns-inputs-missingorspentBoth inputs have balance, I am sure of that. I am running script from WSL1 Bash on Windows.What am I missing here?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5462166",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "August 05, 2023, 11:27:04 PM",
+      "body": "The error bad-txns-inputs-missingorspent it means that you have UTXO missing or you might be trying to spend an already spent uTXO.Check this part belowCode:txid = lx('tx number 1')vout = 0txid2 = lx('tx number 2')vout2 = 1Did you add the hash of your unspent transaction under tx number 1 and 2? Can you add UTXO hash if ever you forgot to add it.And another thing don't forget to add where you want send it under txout.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 06, 2023, 06:10:54 AM",
+      "body": "Quote from: pbies on August 05, 2023, 11:54:55 AMWhat am I missing here?Seems like you're using the vout as the input's index number, while it's actually the UTXO's output_index.For example:If you want to spend the 3rd output of the transaction (testnet): d7a4d0f41a23af4b07ae75fa003ffa515c687f3da7045baa24d318649a4dbbe9; (0.00013000 tBTC)The vout would be '2'.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "August 06, 2023, 11:08:05 AM",
+      "body": "I've already verified that the library used does not work any way. Used one input address and one output, used for that script from examples and it does return the same error.Yes, I've changed \"tx number 1\" and second one to proper tx values. Also changed vouts to proper ones (different than here), and still no luck.Txout was included.Vouts are only variables names. They are indexing the outputs from previous transactions (check one and two). I checked few times that they were correct.Yes, I used proper transaction outputs from previous transactions using indexing from 0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "August 06, 2023, 02:45:37 PM",
+      "body": "Can you share the txid and txid2 here I just want to check if you are correct on giving value on vout for both TXIDs (you can share other txid with the same inputs and outputs if you don't want to share your TXIDs).And I would like you to try to change thisCode:txid = lx('tx number 1')vout = 0txid2 = lx('tx number 2')vout2 = 1To thisCode:txid0 = lx('tx number 1')vout0 = 0txid1 = lx('tx number 2')vout1 = 1Let see what will be the result",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "August 06, 2023, 02:49:22 PM",
+      "body": "Quote from: BitMaxz on August 06, 2023, 02:45:37 PMCan you share the txid and txid2 here I just want to check if you are correct on giving value on vout for both TXIDs (you can share other txid with the same inputs and outputs if you don't want to share your TXIDs)....Code:txid0 = lx('2bb8abb322b5087b21b4bb066a919b03b7ac69ce56840d44d7bf7050942f3d9a')vout0 = 5That's 1KkBjUXQ4rrB72PVonzwycJgZe6wXc3k6t address.txid1 = lx('0009f961969ec48571d3d22ec2d0e1bde9f0714e0edaa7bfb5b4914a21899212')vout1 = 0That's 1GKrP8NNcqgi8d7FpkDkjMcU5TKsAowZHf address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 07, 2023, 08:20:10 AM",
+      "body": "Quote from: BitMaxz on August 06, 2023, 02:45:37 PMAnd I would like you to try to change thisChanging those lines will break the script,and changing the relevant parts of the code to fix it will do nothing but change those variables' names.Quote from: pbies on August 06, 2023, 02:49:22 PMCode:txid0 = lx('2bb8abb322b5087b21b4bb066a919b03b7ac69ce56840d44d7bf7050942f3d9a')vout0 = 5This output is already spent on 2023 July 29 by e51364d28584038dbd26a600b56391db85d8e64bf386b3c9c7cb352bf9217713But it still has another unspent transaction output: f860007e0217aeec309060da55fbb3ea614663dfb93a0cfab1c0377be863383c:31 (0.00079261 BTC)Use that instead.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "August 07, 2023, 11:28:03 AMLast edit: August 07, 2023, 12:26:53 PM by pbies",
+      "body": "Quote from: nc50lc on August 07, 2023, 08:20:10 AM...Use that instead.Tried that and failing.I try to send myself part of the balance, but even that does not work.Script for now is:Code:#!/usr/bin/env python3import hashlibimport subprocessfrom bitcoin import *from bitcoin.core import *from bitcoin.core.script import *from bitcoin.core.scripteval import *from bitcoin.wallet import *from pprint import pprintSelectParams('mainnet')seckey = CBitcoinSecret.from_secret_bytes(lx('my private key in hex'))txid = lx('f860007e0217aeec309060da55fbb3ea614663dfb93a0cfab1c0377be863383c') # lx! surevout = 31txin = CMutableTxIn(COutPoint(txid, vout))txin_scriptPubKey = CScript([OP_DUP, OP_HASH160, Hash160(seckey.pub), OP_EQUALVERIFY, OP_CHECKSIG])txout = CMutableTxOut(77000, CBitcoinAddress('1KkBjUXQ4rrB72PVonzwycJgZe6wXc3k6t').to_scriptPubKey())tx = CMutableTransaction([txin], [txout])sighash = SignatureHash(txin_scriptPubKey, tx, 0, SIGHASH_ALL)sig = seckey.sign(sighash) + bytes([SIGHASH_ALL])txin.scriptSig = CScript([sig, seckey.pub])VerifyScript(txin.scriptSig, txin_scriptPubKey, tx, 0, (SCRIPT_VERIFY_P2SH,))r = subprocess.run([\"/mnt/c/Program Files/Bitcoin/daemon/bitcoin-cli.exe\", \"sendrawtransaction\", b2x(tx.serialize())])The error is:Code:error code: -26error message:mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)I suspect that this python-bitcoinlib is failing.Also, private key shouldn't change here, right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 07, 2023, 03:37:14 PM",
+      "body": "Quote from: pbiesAlso, private key shouldn't change here, right?Yes, same as the spent output that you're trying to spend.However, the new error indicates that it may have been signed with the wrong key or provided with the wrong signature.Quote from: pbies on August 07, 2023, 11:28:03 AMI suspect that this python-bitcoinlib is failing.I can't comment on that since I haven't checked that library.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "August 07, 2023, 07:20:53 PM",
+      "body": "Quote from: nc50lc on August 07, 2023, 03:37:14 PM...I can't comment on that since I haven't checked that library.Examples in this library were bad.I solved that - just needed to create tx first and set it once again at the end.I am now trying to sign both inputs (in created output transaction) as SIGHASH_SINGLE:1. Do I need to sign both inputs with SIGHASH_SINGLE?2. Do I need to give public key as 0x01000...000 or 0x000...00001 or as hash160 of one of these?3. How should be the second input signed if it is SIGHASH_SINGLE?4. I know I have to make signature SIGHASH_SINGLE at the last byte.5. I get now error \"mandatory-script-verify-flag-failed (Non-canonical DER signature)\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

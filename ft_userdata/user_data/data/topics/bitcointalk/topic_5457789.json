@@ -1,0 +1,77 @@
+{
+  "id": "topic_5457789",
+  "title": "maxirosson",
+  "author": "maxirosson",
+  "created_time": "June 27, 2023, 06:13:17 PM",
+  "content": "Hi all,I am trying to learn more about the best practices and tools to backup the Bitcoin Secure Multisig Setup (BSMS).When you create a multisig wallet, the coordinator app usually creates a .bsms file with all the descriptors to recreate the wallet. This is described on BIP129: https://github.com/bitcoin/bips/blob/master/bip-0129.mediawikiBut having access to that file reveals the funds of the multisig wallet, so I think is not a good idea to store it in plain text. It should at least be encrypted so you can decide who can access it. Splitting the BSMS content into multiple QRs shares would be ideal, so you can distribute each share in different locations. SeedHammer offer in my opinion one of the best approaches. They split the BSMS file content into 3 QRs and you need to scan 2 of them in order to recover your wallet. This is called \"BCR-2020-010 encoding for Output Descriptors QRs\". They show how to do that here: https://twitter.com/SeedHammer/status/1666875008105295873Nunchuk supports importing a wallet using those QRs, but not exporting a wallet in that format. So, if you don't have a SeedHammer, you can't use this approach. I created an issue so they implement that on their Nunchuk app: https://github.com/nunchuk-io/nunchuk-android/issues/21Not sure if there is another tool/app that can export a BSMS file in \"BCR-2020-010\" format.Any ideas or opinions?Thanks",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5457789",
+  "comments": [
+    {
+      "author": "dkbit98",
+      "created_time": "June 27, 2023, 09:46:03 PM",
+      "body": "Quote from: maxirosson on June 27, 2023, 06:13:17 PMBut having access to that file reveals the funds of the multisig wallet, so I think is not a good idea to store it in plain text. It should at least be encrypted so you can decide who can access it. Splitting the BSMS content into multiple QRs shares would be ideal, so you can distribute each share in different locations. Please don't create your own custom splitting solutions for anything.This is a sure recipe for disaster and can result in losing of all your coins (not saying you are doing this).I think that overcomplicating things can often create more problems if you don't know exactly what you are doing, and if you are not aware of all the risks.Quote from: maxirosson on June 27, 2023, 06:13:17 PMNot sure if there is another tool/app that can export a BSMS file in \"BCR-2020-010\" format.Any ideas or opinions?QR codes can be tricky and often times they are not supported with all apps.I will have to check SeedHammer and say my opinion about it tomorrow, but simple alternative is to save this data in offline password manager like KeePass (if you have strong password protection).KeePass is already encrypted and it have decent protection, but you will again have to backup and/or remmebmer password for that.This is not pefrect solution but it's much better than saving data in plain text.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "maxirosson",
+      "created_time": "June 27, 2023, 10:33:29 PM",
+      "body": "I am not creating a custom splitting solution. I am searching for any standard or good practice.I don't like the idea to store that on a password manager, because you are centralizing your backup there and complicating the inheritance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "maxirosson",
+      "created_time": "June 28, 2023, 02:44:06 PM",
+      "body": "I got confirmation from Nunchuk that they are working on support exporting to BCR-2020-010.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 28, 2023, 08:34:14 PM",
+      "body": "Quote from: maxirosson on June 27, 2023, 10:33:29 PMI am not creating a custom splitting solution. I am searching for any standard or good practice.I don't like the idea to store that on a password manager, because you are centralizing your backup there and complicating the inheritance. You don't have to decentralize everything, and you can add additional protection with KeyFile in KeePass, so you will have more secure split backup that way.I was not talking about using any random online password managers or any cloud backups.Quote from: maxirosson on June 28, 2023, 02:44:06 PMI got confirmation from Nunchuk that they are working on support exporting to BCR-2020-010.So imagine this gets supported with Nunchuk and they stop existing as a company/team in next few years for some (legal or financial) reason... there will be nobody to support this anymore.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 29, 2023, 01:37:40 PM",
+      "body": "Quote from: maxirosson on June 27, 2023, 10:33:29 PMI don't like the idea to store that on a password manager, because you are centralizing your backup there and complicating the inheritance.How's a password manager centralized? And also, what to store exactly? Wallet files? Not recommended.I think that the best approach to setup a secure N-of-M multi-sig wallet, is to write down the N seed phrases along with the M-1 master public keys (excluding the one that can be retrieved by using the given seed phrase). If you don't feel confident with writing down lots of xpubs, then maybe print them (but don't print the seed phrase).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "maxirosson",
+      "created_time": "June 29, 2023, 01:57:36 PMLast edit: June 29, 2023, 09:59:25 PM by Mr. Big",
+      "body": "Quote from: dkbit98 on June 28, 2023, 08:34:14 PMYou don't have to decentralize everything, and you can add additional protection with KeyFile in KeePass, so you will have more secure split backup that way.I was not talking about using any random online password managers or any cloud backups.Ok, I understand that you don't talk about any online service. But, still you have to properly backup that and be sure that your heirs have access to that.Quote from: dkbit98 on June 28, 2023, 08:34:14 PMSo imagine this gets supported with Nunchuk and they stop existing as a company/team in next few years for some (legal or financial) reason... there will be nobody to support this anymore.First of all, Nunchuk is open source. Second, I think the \"BCR-2020-010\" is going to be a standard and more wallets will implement it. This is not something invented by Nunchuk and SeedHammer, It is defined here: https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-010-output-desc.mdQuote from: BlackHatCoiner on June 29, 2023, 01:37:40 PMI think that the best approach to setup a secure N-of-M multi-sig wallet, is to write down the N seed phrases along with the M-1 master public keys (excluding the one that can be retrieved by using the given seed phrase). If you don't feel confident with writing down lots of xpubs, then maybe print them (but don't print the seed phrase). There is a BIP (https://github.com/bitcoin/bips/blob/master/bip-0129.mediawiki)  that standardizes the wallet configuration in BSMS format. The most important wallets are supporting it. It should be the way to backup a multisig config, instead of backing up each xpub. You need more info, not just the xpubs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "July 07, 2023, 08:10:22 PM",
+      "body": "Quote from: maxirosson on June 29, 2023, 01:57:36 PMFirst of all, Nunchuk is open source. Second, I think the \"BCR-2020-010\" is going to be a standard and more wallets will implement it. This is not something invented by Nunchuk and SeedHammer, It is defined Maybe Nunchuk is open source but it can be confusing for some people with guest mode and with creating online accounts that can always get hacked and leaked.I never had a chance to test Nunchuk more deeper, so I am saying this with reservation because I never uses this wallet in real world scenario. Correct me if I am wrong, but I don't think using Nunchuk as guest has any benefits, so I am forced to create account, right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "maxirosson",
+      "created_time": "July 07, 2023, 09:33:37 PM",
+      "body": "Quote from: dkbit98 on July 07, 2023, 08:10:22 PMMaybe Nunchuk is open source but it can be confusing for some people with guest mode and with creating online accounts that can always get hacked and leaked.I never had a chance to test Nunchuk more deeper, so I am saying this with reservation because I never uses this wallet in real world scenario. Correct me if I am wrong, but I don't think using Nunchuk as guest has any benefits, so I am forced to create account, right?You should use Nunchuk as guest unless you want to pay for inheritance features. Using as guest gives you almost all you need: coin control, multisig support, integration with lots of wallets, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

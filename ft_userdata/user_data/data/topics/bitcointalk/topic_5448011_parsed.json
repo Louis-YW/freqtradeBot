@@ -1,0 +1,69 @@
+{
+  "id": "topic_5448011",
+  "title": "cafter",
+  "author": "cafter",
+  "created_time": "April 08, 2023, 08:09:54 AM",
+  "content": "What if two miners mined same block simultaneously with 0ms gap between time. (at the same time, at once)what will happen? both miners will get half reward? what will be effect on network? how the protocol will resolve? this ever happened before?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5448011",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 08, 2023, 08:23:11 AM",
+      "body": "Quote from: cafter on April 08, 2023, 08:09:54 AMwhat will happen?There will be a chain split. Both miners will temporarily get the full reward for their individual block. Some of the network will accept Block A, while some of the network will accept Block B, both at the same height. Whichever block is built on top of first by another block will be kept, and the block which is not built on top of will be discarded. This is known as a stale block, although you will sometimes see it (incorrectly) referred to as an orphaned block.Let's say the next block found is Block A+1. The part of the network which initially accepted Block A will continue on as if nothing happened. The part of the network which initially accepted Block B will now discard Block B and swap to the other chain, since Block A and Block A+1 represent a chain with more work.Quote from: cafter on April 08, 2023, 08:09:54 AMboth miners will get half reward?As above. Both miners will temporarily get the full reward, but when the split is resolved and one block is discarded, then that miner will lose their reward. Block rewards are not spendable for 100 blocks, so there is no concern here about the block reward being spent in the interim.Quote from: cafter on April 08, 2023, 08:09:54 AMthis ever happened before?Yes, hundreds of times. The most recent such split I am aware of was when two blocks were mined at height 783,830, which was just a few days ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cafter",
+      "created_time": "April 08, 2023, 08:49:35 AM",
+      "body": "Quote from: o_e_l_e_o on April 08, 2023, 08:23:11 AMQuote from: cafter on April 08, 2023, 08:09:54 AMboth miners will get half reward?As above. Both miners will temporarily get the full reward, but when the split is resolved and one block is discarded, then that miner will lose their reward. Block rewards are not spendable for 100 blocks, so there is no concern here about the block reward being spent in the interim.I not understood this one, both miners with get full reward 'temporarily' and i found this researching online , the nodes will choose the block that has the most proof of work, which means the block with the longest chain of valid blocks leading up to it. this is because the longest chain represents the most computational effort (i think hashrate is it right?), and therefore the most secure chain.once one of the blocks is added to the blockchain, the other block becomes an orphan block, and the transactions included in that block are returned to the mempool. The miner who mined the orphan block will not receive a reward, and their computational effort will be wasted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 08, 2023, 09:00:47 AM",
+      "body": "Quote from: cafter on April 08, 2023, 08:49:35 AMI not understood this one, both miners with get full reward 'temporarily'Part of the network will accept Block A, and part of the network will accept Block B. The part of the network which accepts Block A will see the coinbase transaction which sends the block reward (6.25 BTC subsidy + fees) to Miner A. The part of the network which accepts Block B will see the coinbase transaction which sends the block reward to Miner B. Both Miner A and Miner B will, according to different parts of the network, have received the block reward for their blocks at the same height.Once either Block A+1 or Block B+1 is found, then the entire network will switch to the winning chain. The block which is not built upon will be discarded, and so the coinbase transaction which rewarded that miner will no longer exist.Quote from: cafter on April 08, 2023, 08:49:35 AMthe nodes will choose the block that has the most proof of work, which means the block with the longest chain of valid blocks leading up to it. this is because the longest chain represents the most computational effort (i think hashrate is it right?), and therefore the most secure chain.This is sort of correct, but the terminology is poor. First, it is not necessarily the longer chain, but the chain with the most work. These are usually the same thing, but not necessarily so. Also, nodes can't choose a \"block that has the most proof of work\". Two blocks mined at the same height as in this scenario both have the same amount of work. The chain split will be resolved when a new block is found on top of one of those two competing blocks. Only at that point will one chain have more work (in the form of one additional block) than the other chain and therefore be the main chain which all nodes will converge on.Quote from: cafter on April 08, 2023, 08:49:35 AMonce one of the blocks is added to the blockchain, the other block becomes an orphan block, and the transactions included in that block are returned to the mempool. The miner who mined the orphan block will not receive a reward, and their computational effort will be wasted.As I explained above, orphan block is the wrong term here, but lots of people use it by mistake. But yes. Once one of the blocks is built on top of, then the competing block is discarded and becomes a stale block. Any transactions which were in this discarded block but were also in the mined block will just stay as confirmed. Any transactions which were in this discarded block but were not also in the mined block will return to being unconfirmed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 08, 2023, 09:29:37 AMLast edit: April 08, 2023, 09:47:19 AM by Cricktor",
+      "body": "A recent example of a stale block (mined by Foundry USA) in the Bitcoin blockchain is:Code:...  {    \"height\": 781277,    \"hash\": \"0000000000000000000388f42000fa901c01f2bfae36042bbae133ee430e6485\",    \"branchlen\": 1,    \"status\": \"valid-fork\"  },...The accepted block 781277 was mined by ViaBTC.P.S.I edited my post little later after posting to add the miners and the valid block 781277 while in between @o_e_l_e_o wrote his post providing the same details.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 08, 2023, 09:32:11 AM",
+      "body": "Quote from: Cricktor on April 08, 2023, 09:29:37 AMA recent example of a stale block in the Bitcoin blockchain is:Code:...  {    \"height\": 781277,    \"hash\": \"0000000000000000000388f42000fa901c01f2bfae36042bbae133ee430e6485\",    \"branchlen\": 1,    \"status\": \"valid-fork\"  },...Correct.There was a block found by Foundry USA at this height with the following hash: 0000000000000000000388f42000fa901c01f2bfae36042bbae133ee430e6485This block now no longer exists.The competing (and winning) block was found by ViaBTC with hash: 000000000000000000014bdfbf46969d9b1f290ad21f27f263e14881ef595627",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 08, 2023, 01:08:22 PMLast edit: April 08, 2023, 06:54:35 PM by Cricktor",
+      "body": "One of my other Bitcoin nodes sees this as the currently most recent stale block (mined by ViaBTC):Code:...  {    \"height\": 783830,    \"hash\": \"0000000000000000000366d2c12772a350f507879a5325203424e58ec440249b\",    \"branchlen\": 1,    \"status\": \"valid-fork\"  },...The winning block 783830 was mined by AntPool.Interesting that my other node sees the stale block with another status.Code:...  {    \"height\": 783830,    \"hash\": \"0000000000000000000366d2c12772a350f507879a5325203424e58ec440249b\",    \"branchlen\": 1,    \"status\": \"valid-headers\"  },...The help for bitcoin-cli getchaintips says for possible values for \"status\":1.\"invalid\"This branch contains at least one invalid block2.\"headers-only\"Not all blocks for this branch are available, but the headers are valid3.\"valid-headers\"All blocks are available for this branch, but they were never fully validated4.\"valid-fork\"This branch is not part of the active chain, but is fully validated5.\"active\"This is the tip of the active main chain, which is certainly valid",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 08, 2023, 03:24:11 PM",
+      "body": "Quote from: Cricktor on April 08, 2023, 01:08:22 PM-snip-So this likely means that your first node actively reorganized, while you second node simply observed the reorganization.valid-fork on your first node means that this node downloaded and validated the now stale block. Presumably it did this and followed the stale chain for a short time until it became aware of the main chain and reorganized.valid-headers on the other hand means that this node validated the headers and downloaded the block, but by the time it downloaded the block it was already aware of a better chain and so never bothered to fully validate the rest of the block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

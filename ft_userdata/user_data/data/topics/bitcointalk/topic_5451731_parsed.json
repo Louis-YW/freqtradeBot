@@ -1,0 +1,69 @@
+{
+  "id": "topic_5451731",
+  "title": "digaran",
+  "author": "digaran",
+  "created_time": "May 06, 2023, 12:05:38 PMLast edit: January 20, 2024, 07:35:51 AM by digaran",
+  "content": "🖤",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5451731",
+  "comments": [
+    {
+      "author": "Pmalek",
+      "created_time": "May 06, 2023, 12:59:01 PM",
+      "body": "I think you posted this in the wrong sub-board. Some users who might know how to help you don't use this part of the forum.If you want to get the best eyes on this, I suggest moving the topic to Bitcoin Technical Support or Development & Technical Discussion.Alternatively, you can report it to the mods and ask them to move the thread where they think is appropriate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "May 06, 2023, 07:33:33 PM",
+      "body": "1. (r,s) pair is in the signature of your transaction.2. \"k\" is \"signature private key\", so \"r=k*G\", you can use your \"k\" to calculate \"r\" in the same way as you can do any other private to public key convertion.3. I guess \"m\" is the hash of the message to sign, I use \"z\" for that. There are different steps to get it, because it depends on your address type.4. I guess \"x\" is the private key, I use \"d\" for that.Usually, I use \"s=(z+rd)/k\" notation, in your language it will be something like that: \"s=(m+rx)/k\". So, your \"x\" and your \"k\" are those things that should be private, so you cannot get them from some public transaction if it was generated randomly, you have to know that. If not, then you can only operate on public keys alone.From publicly available transaction, you can get (r,s) pair quite easily, because you have to just locate signature in a given transaction, and copy those bytes, they are written explicitly, if you have r=0x1234 and s=0x5678, then you can find those \"1234\" and \"5678\" bytes in hex, probably with padding zeroes or DER encoding, it depends on address type. Also, you can get message hash, but it is harder, because there are different steps for getting that, depending on address type.And then, there are two options:1. You know \"k\" and \"x\", so you can check if \"s=(m+rx)/k\" is correct, you can generate (r,s) pairs for a given (m,x,k), you can control everything.2. You know \"k*G\" and \"x*G\", then you can check if \"m*G=s*(k*G)-r*(x*G)\" is correct. Then you can work only on public keys, you can add and subtract them freely, but multiply or divide only by a known number, and you don't know those private keys behind those public keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 06, 2023, 08:13:23 PM",
+      "body": "Quotehow to extract r/s /x /k /m from a transactionWhat kind of transaction? Legacy? Segwit? Taproot? Because extracting message hash is different for each type, for legacy addresses you have to use FindAndDelete to remove some parts, because it works by taking the original transaction, modifying it according to sighashes, and then using hash of that. For Segwit there is BIP-143, for Taproot we have BIP-341.Quoteor a signed message?You mean \"Bitcoin Signed Message\"? Or maybe BIP-322 signature? Or a signature from signet blocks, described in BIP-325?In general, there are many different formats, and it depends, what is your goal. For example, when I needed (r,s) pairs and message hashes, it was easier for me to do a small modification in Bitcoin Core, just to dump all of that into some files, instead of trying to implement it from scratch for each case. And then I noticed that when I want to test some ECDSA properties, then I can use public keys, and test things on pure ECDSA, without worrying about all of those formats, then using artificial messages like 'SHA-256(\"anything\")' was enough for me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 07, 2023, 04:12:13 AM",
+      "body": "Your question is too broad to answer, you are basically asking about at least 20 pages of details on how to process transactions. If you have anything particular in mind then be more specific so that we can help you better. If you just want to verify transactions (and see r,s,m, etc) or see how they are verified, then use a library (or any implementation of Bitcoin), enter a transaction for verification and \"debug\" the code to see the steps.If you want to learn more about the technical details of how things work then I suggest starting to learn how bitcoin scripts work as your first step since that is needed in computation of m (transaction hash used in signing).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "May 07, 2023, 12:07:01 PM",
+      "body": "Quotewhy does it matter which format we are using?Because for different address types, you have different ways of calculating message hash. Also, for different sighashes, there are different steps to process the transaction. Even if you know that your message hash is \"SHA-256(something)\", that \"something\" is different for different address types, so you need different code to process it, if you want to get it from scratch. The simplest one you can start with is \"Bitcoin Signed Message\", because then you need to take your message, and prefix it with some data, and then it is ready to be hashed.QuoteI guess the easiest way is to extract the k from p instead of trying to find another way.You mean extracting \"k\" from \"r\"? That way or another, if you know \"k\" or if you know the private key, then you can get everything, and you have full control, but the problem is: going from public to private key is hard, you can do that only if such key is non-random. But: even if getting message hash is not as simple as getting txid, it is always possible, because you need that message hash to validate any transaction, by using public keys.Quotedoes it matter whether you use your public key to sign a transaction or to sign a message?Yes, because your signature is attached to what you signed.Code:message=\"Hello World\"address=\"1psPJZYEJrjPtY6kw5Tqtj4mW2yXSSDuH\"signature=\"GwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=\"Here, you have an address, where people can calculate the public key, but nobody knows the private key. Another example is testnet transaction 3952b35bde53eb3f4871824f0b6b8c5ad25ca84ce83f04eb1c1d69b83ad6e448, where you can see this signature: 300602010102010103. As you can see, in both cases you have r=1 and s=1, but there are completely different public keys in use. This is because the message hash in each case is calculated in a different way. For that reason, if you take that 032baf163f5e27261ab3228e61fb86dc98054abd514751fce93d7444e8fbc6a293 public key from testnet transaction, and you convert it into Segwit for the mainnet, you will reach bc1qmp2zyz9tucw7vh599hl3cvyhdm5c6zfvlmfl02. If it would be legacy address, you could try to move it in the same way, as it was moved on testnet, because it uses SIGHASH_SINGLE bug. But because it is Segwit, those coins are burned on mainnet, because the message hash is calculated differently for Segwit addresses.Quotedo we also reveal just the p when we sign a message or something else could be revealed as well?You reveal your public key, your (r,s) signature, and your message, which after hashing should pass ECDSA verification.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 08, 2023, 04:21:13 AM",
+      "body": "Quote from: digaran on May 07, 2023, 09:04:34 AMI was generally interested to know the details of extracting private keys from a signed message with a legacy address,You sign a message using the private key, it makes no difference what the address type derived from that private key was. The result is also an ECDSA signature that contains r and s. You can NOT \"extract private key\" from that.Quotebut since addresses aren't used in the process of signing, why does it matter which format we are using? In OP you said \"from transaction or signed message\". The differences mentioned earlier are in transactions (output scripts) mostly.QuoteIf I'm not mistaken, does it matter whether you use your public key to sign a transaction or to sign a message?You use your private key to sign. Always.QuoteWhen we sign a transaction (spending) we reveal just the p,  do we also reveal just the p when we sign a message or something else could be revealed as well?When you create an ECDSA signature your public key can be derived from the signature + message.When you provide a message signature (BIP0137) you only provide the message, signature and a single byte helping the public key recovery.When you sign a transaction, you always include the public key to help the verification process.In any case when you provide ECDSA signature the public key is also revealed one way or another. And you can never derive a private key from a public key otherwise the whole asymmetric cryptography becomes obsolete.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "May 08, 2023, 06:47:25 AM",
+      "body": "Quote from: digaran on May 07, 2023, 09:04:34 AMdo we also reveal just the p when we sign a message or something else could be revealed as well?The only information needed to sign a message is a private key and address type to determine the leading byte for the actual signature. The message itself can be an empty string. As for nonce or \"k\" value, you usually rely on software to generate it: its value is either totally random or pseudorandom based on the message hash (in such a case you will be generating a unique signature for each combination of message and address type). The message hash constructs in a unique for message signing process way: before the calculation of the double SHA256 hash of a message, you encode it in UTF-8 format and prepend it with special bytes to specify its length and the fact that it is a special kind of message.If you are interested in what happens under the hood, you can check these threads:https://bitcointalk.org/index.php?topic=5435882.0https://bitcointalk.org/index.php?topic=5437423.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

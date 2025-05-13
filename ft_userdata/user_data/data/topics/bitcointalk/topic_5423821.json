@@ -1,0 +1,45 @@
+{
+  "id": "topic_5423821",
+  "title": "zander1983",
+  "author": "zander1983",
+  "created_time": "November 27, 2022, 04:24:27 PM",
+  "content": "HiIm following the guide here (https://github.com/bitcoin/bitcoin/blob/master/doc/build-osx.md) to install Bitcoin on my Mac. I want to be able to run bitcoind with and without the GUI. The first time I went though this guide, I DIDNT install berkeley-db@4, and used the configuration:    ./autogen.sh    ./configure --without-bdb --with-gui=yesHowever, when i run `make` and then `./src/bitcoind` it fails and I get the message:   2022-11-27T16:20:32Z Bitcoin Core version v24.99.0-9c47eb450346 (release build)   2022-11-27T16:20:32Z Using the 'sse4(1way),sse41(4way),avx2(8way)' SHA256 implementation   2022-11-27T16:20:32Z Using RdSeed as an additional entropy source   2022-11-27T16:20:32Z Using RdRand as an additional entropy source   2022-11-27T16:20:32Z Default data directory /Users/me/Library/Application Support/Bitcoin   2022-11-27T16:20:32Z Using data directory /Users/me/Library/Application Support/Bitcoin   2022-11-27T16:20:32Z Config file: /Users/me/Library/Application Support/Bitcoin/bitcoin.conf (not found, skipping)   2022-11-27T16:20:32Z Setting file arg: prune = \"1907\"   2022-11-27T16:20:32Z Setting file arg: wallet = [\"My Bitcoin Core Wallet\"]   2022-11-27T16:20:32Z Using at most 125 automatic connections (285 file descriptors available)   2022-11-27T16:20:32Z Using 16 MiB out of 16 MiB requested for signature cache, able to store 524288 elements   2022-11-27T16:20:32Z Using 16 MiB out of 16 MiB requested for script execution cache, able to store 524288 elements   2022-11-27T16:20:32Z Script verification uses 11 additional threads   2022-11-27T16:20:32Z scheduler thread start   2022-11-27T16:20:32Z Binding RPC on address ::1 port 8332   2022-11-27T16:20:32Z Binding RPC on address 127.0.0.1 port 8332   2022-11-27T16:20:32Z [http] creating work queue of depth 16   2022-11-27T16:20:32Z Using random cookie authentication.   2022-11-27T16:20:32Z Generated RPC authentication cookie /Users/me/Library/Application Support/Bitcoin/.cookie   2022-11-27T16:20:32Z [http] starting 4 worker threads   2022-11-27T16:20:32Z Using wallet directory /Users/me/Library/Application Support/Bitcoin/wallets   2022-11-27T16:20:32Z init message: Verifying wallet(s)…   2022-11-27T16:20:32Z Error: Failed to open database path '/Users/me/Library/Application Support/Bitcoin/wallets/My Bitcoin Core Wallet'. Build does not support Berkeley DB database format.   Error: Failed to open database path '/Users/me/Library/Application Support/Bitcoin/wallets/My Bitcoin Core Wallet'. Build does not support Berkeley DB database format.   2022-11-27T16:20:32Z Shutdown: In progress...   2022-11-27T16:20:32Z scheduler thread exit   2022-11-27T16:20:32Z Shutdown: doneThe error being `Error: Failed to open database path '/Users/me/Library/Application Support/Bitcoin/wallets/My Bitcoin Core Wallet'. Build does not support Berkeley DB database format`So I went back and installed berkley with `brew install berkeley-db@4`. Then I again ran:    ./autogen.sh    ./configure --without-bdb --with-gui=yesand then:    makeBut when I run `./src/bitcoind` I STILL get the same error above. What am I doing wrong?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5423821",
+  "comments": [
+    {
+      "author": "PawGo",
+      "created_time": "November 27, 2022, 04:39:17 PM",
+      "body": "Did you export BDB path to env variables?Code:export BDB_PREFIX=$(pwd)/db4Look at the section about bitcoind installation at this tutorial:https://medium.com/@meeDamian/bitcoin-full-node-on-rbp3-revised-88bb7c8ef1d1",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "November 27, 2022, 05:30:01 PM",
+      "body": "Remove --without-bdb from your ./configure invocation. As the option suggests, it configures the build to exclude BDB and anything that depends on it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "November 28, 2022, 09:54:49 AM",
+      "body": "Quote from: achow101 on November 27, 2022, 05:30:01 PMRemove --without-bdb from your ./configure invocation. As the option suggests, it configures the build to exclude BDB and anything that depends on it.Worked! Thanks a million.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "November 28, 2022, 10:04:21 AM",
+      "body": "Quote from: PawGo on November 27, 2022, 04:39:17 PMDid you export BDB path to env variables?Code:export BDB_PREFIX=$(pwd)/db4Look at the section about bitcoind installation at this tutorial:https://medium.com/@meeDamian/bitcoin-full-node-on-rbp3-revised-88bb7c8ef1d1Thats a nice tutorial, bookmarked. In the end leaving out  --without-bdb worked.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "id": "topic_5472116",
+  "title": "node.3",
+  "author": "node.3",
+  "created_time": "October 29, 2023, 07:40:01 PM",
+  "content": "I am looking to have an optimized version of Bitcoin Armory's encryption implementation re-written, aiming to efficiently recover a lost password. From my understanding, the algorithms used are designed to resist GPU-based attacks.Is it possible to devise an implementation that leverages a setup with abundant RAM?I came across some performance tests documentation for yescrypt, which utilizes a server with hundreds of GiB of RAM, preallocations of huge pages, etc.https://github.com/openwall/yescrypt/blob/main/PERFORMANCECan a similar approach be taken to parallelize password attempts for Armory's wallet?Thank you",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5472116",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "October 29, 2023, 11:40:07 PM",
+      "body": "There's no optimized version for the Armory wallet.If this is all about recovering lost passwords you can try the brute-force method of the BTCrecovery tool that you can download from this link below if you have control of yourwalletname.wallet you can use this tool to brute-force the password.- https://github.com/gurnec/btcrecoverRead the guide for password recovery below.- https://github.com/gurnec/btcrecover/blob/master/TUTORIAL.md#btcrecover-tutorial",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "node.3",
+      "created_time": "October 30, 2023, 07:58:30 AM",
+      "body": "Quote from: BitMaxz on October 29, 2023, 11:40:07 PMThere's no optimized version for the Armory wallet.Thank you for your input. I might have used the incorrect term \"optimized version\"...When reviewing KdfRomix::DeriveKey_OneIter(), as one example, it appears to me that removing memory allocations per iteration might be relevant when running lots of repeated iterations https://github.com/etotheipi/BitcoinArmory/blob/2a6fc5355bb0c6fe26e387ccba30a5baafe8cd98/cppForSwig/EncryptionUtils.cpp#L212If the nature of Armory's algorithm means that threading doesn't scale past the number of CPUs, then the solution may not lie in encryption code \"optimizations\". On the other hand, if there's significant CPU idle time due to I/O operations, etc., might a high-memory system with a custom implementation offer some advantages? Sadly, I don't have the necessary knowledge to explore this deeper or implement the needed modifications.So I guess this post is to figure out if I should look for outsourcing to analyze and improve the code, or if there's no point in going down that path.QuoteIf this is all about recovering lost passwords...It is indeed. My .wallet has a parameter of 32MiB memory with several iterations. I am well familiar with btcrecover and have been running it for a while now. However, I am only able to reach about 25 passwords per second. I do have most of the contents of the phrase, but I probably either mistyped a part of it when entering it in Armory or didn't document it correctly...I created a Python script that generates all the passwords I wish to check into a file, but with 25 P/s, it will take years. I was hoping to reach 1000 P/s, which would make a great difference. Also, I'm willing to invest in more relevant hardware, once I understand what that entails.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "October 30, 2023, 08:28:59 AM",
+      "body": "Quote from: node.3 on October 30, 2023, 07:58:30 AMThank you for your input. I might have used the incorrect term \"optimized version\"...It's an in house implementation of Scrypt. I believe that's what Litecoin uses for their block hashing, maybe you could look there for some breakthrough in implemetation?QuoteWhen reviewing KdfRomix::DeriveKey_OneIter(), as one example, it appears to me that removing memory allocations per iteration might be relevant when running lots of repeated iterations https://github.com/etotheipi/BitcoinArmory/blob/2a6fc5355bb0c6fe26e387ccba30a5baafe8cd98/cppForSwig/EncryptionUtils.cpp#L212If the nature of Armory's algorithm means that threading doesn't scale past the number of CPUs, then the solution may not lie in encryption code \"optimizations\". On the other hand, if there's significant CPU idle time due to I/O operations, etc., might a high-memory system with a custom implementation offer some advantages? Sadly, I don't have the necessary knowledge to explore this deeper or implement the needed modifications.So I guess this post is to figure out if I should look for outsourcing to analyze and improve the code, or if there's no point in going down that path.The allocation is done via the default STL container under the hood (underlying container is std::vector<uint8_t>). Not much for you to do here, lookup table is preallocated:Code:   lookupTable_.resize(memoryReqtBytes_);   lookupTable_.fill(0);QuoteI created a Python script that generates all the passwords I wish to check into a file, but with 25 P/s, it will take years. I was hoping to reach 1000 P/s, which would make a great difference. Also, I'm willing to invest in more relevant hardware, once I understand what that entails.You shouldn't do this from Python. It accesses the C++ code through the SWIG wrapper, this leads to multiple unnecessary allocations and copies. Also you're taking the hit for the Python runtime, and Python has no effective multi tasking, you'd have to multiprocess. That too isn't all that good, context switching for processes is significantly more expensive than for threads.If you want to squeeze the most of your hardware on this task you'd need the following:- Use an optimized, SSE/AVX enabled implementation of sha2-512. Armory 0.96.5 uses an old CryptoPP implementation from circa 2012, there could to be faster stuff out there by now. Building it with a modern compiler could help too.- Use the C++ code, do NOT go through Python, multithread it in C++- Run it in on some barethread Linux distro, not Windows. Do not mount a swap file either.- Profile the CPU load to figure out the optimal thread count. Try with hyperthreading/SMT on & off. Try pining threads to explicit cores.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "node.3",
+      "created_time": "October 30, 2023, 11:00:02 AM",
+      "body": "Thank you! AVX-512 appears to be a promising avenue towards improvement. I've found intel-ipsec-mb (https://github.com/intel/intel-ipsec-mb/tree/main) which I'll try to delve into. I'll sidestep using Python for this entirely as well.Should anyone wish to undertake this migration, I am willing to provide funding.Once completed, it will be made open source for the benefit of others (...although I hope no one else finds themselves in my predicament).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "October 30, 2023, 12:55:37 PM",
+      "body": "If you're looking to put money into this, you should consider a CUDA implementations and either buying a RTX card or renting a few hours worth of an A100. You first need to estimate the amount of attempts you need to crack the password (known characters vs unknown characters, dictionnary size, that kinda stuff). Based on that you can project a budget and decide if you need a CPU or GPU approach.Modern graphic & compute cards have plenty of RAM available. They can also make use of system RAM seamlessly (though at latency cost). Still, they're valid candidates for memory heavy KDFs, unlike 10 years ago. I don't know what the CUDA core to sha2 thread ratio looks like, but a rtx3080 has enough ram to handle ~400 32MB Scrypt instances.You would need a CUDA implementation of Scrypt, which I suspect the Litecoin community knows a thing or two about.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "node.3",
+      "created_time": "October 31, 2023, 07:53:39 AM",
+      "body": "Thank you very much. I'm looking into it!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

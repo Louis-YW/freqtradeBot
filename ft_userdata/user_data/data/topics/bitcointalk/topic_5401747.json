@@ -1,0 +1,165 @@
+{
+  "id": "topic_5401747",
+  "title": "n0nce",
+  "author": "n0nce",
+  "created_time": "June 08, 2022, 01:54:40 AM",
+  "content": "Node Install GuideThis is part of my Futurebit Apollo BTC Custom Linux install guide.See here for the prerequisites.I planned to just do a Debian version of my OpenSUSE Full Node install guide.However, it takes an incredibly long time to build and I got build errors, to the point where I got frustrated and would recommend to fetch the binaries from https://bitcoincore.org/en/download/. You can verify your download through the instructions on that webpage.More detailed instructions about PGP and signatures can be found on https://bitcoin.org/en/full-node#linux-instructions.Keep in mind that I assume the node was already booted at least once off of the original microSD; hence, the NVMe and the Bitcoin data folder on it are already initialized. In case it's needed, I'll add instructions for how to work with a freshly initialized SSD in a later post in this thread.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5401747",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "June 08, 2022, 01:55:27 AM",
+      "body": "Bitcoin Core[1] Create unprivileged bitcoin user and set a password for it.Code:sudo useradd -m bitcoinsudo passwd bitcoin[2] To mount NVMe drive, edit /etc/rc.local and add the following.Remove exit 0 if it exists.Code:#mount nvme drivemount /dev/nvme0n1p1 /media/nvmechown -R bitcoin:bitcoin /media/nvme[2.1] Create mount pointCode:sudo mkdir /media/nvmesudo chown bitcoin:bitcoin /media/nvmesudo /etc/rc.local[3] Switch to unprivileged bitcoin user. Commands should output bitcoin (user) and /home/bitcoin (working directory).Code:su - bitcoinwhoamipwd[4] Download latest build (replace URL accordingly) and the rpcauth.py script.Code:cd /home/bitcoinwget https://bitcoincore.org/bin/bitcoin-core-23.0/bitcoin-23.0-aarch64-linux-gnu.tar.gzwget https://github.com/bitcoin/bitcoin/raw/master/share/rpcauth/rpcauth.py[5] Unpack the binary folder.Code:tar xvf bitcoin-23.0-aarch64-linux-gnu.tar.gz[6] Create random username and password to access core via RPC. Note down the rpcauth=xxx:yyy line somewhere.Code:python3 rpcauth.py the_username_of_the_user_you_want cleartext_password_unique_long[6.1] Delete history, otherwise the password remains in history file in cleartext.Code:history -c[7] Create Bitcoin config fileCode:mkdir ~/.bitcoinnano ~/.bitcoin/bitcoin.conf[8] Fill it like follows:Code:daemon=1server=1maxmempool=50mempoolexpiry=2rpcauth=user_chose_in_step_4:hash_created_in_step_4dbcache=2048banscore=10datadir=/media/nvme/Bitcoin[9] Exit back to admin accountCode:exit[10] Install BitcoinCode:cd /home/bitcoin/bitcoin-*/sudo install -m 0755 -o root -g root -t /usr/local/bin bin/*cd[11] Still logged in as sudoer, create Bitcoin service:Code:sudo nano /usr/lib/systemd/system/bitcoind.service[12] Contents should be like shown:Code:[Unit]Description=Bitcoin daemonAfter=network.target[Service]ExecStart=/usr/local/bin/bitcoind -daemon -conf=/home/bitcoin/.bitcoin/bitcoin.conf# Make sure the config directory is readable by the service userPermissionsStartOnly=true# Process management####################Type=forkingRestart=on-failure# Directory creation and permissions##################################### Run as bitcoin:bitcoinUser=bitcoinGroup=bitcoin# Hardening measures##################### Provide a private /tmp and /var/tmp.PrivateTmp=true# Mount /usr, /boot/ and /etc read-only for the process.ProtectSystem=full# Disallow the process and all of its children to gain# new privileges through execve().NoNewPrivileges=true# Use a new /dev namespace only populated with API pseudo devices# such as /dev/null, /dev/zero and /dev/random.PrivateDevices=true# Deny the creation of writable and executable memory mappings.MemoryDenyWriteExecute=true[Install]WantedBy=multi-user.target[13] Enable & start serviceCode:sudo systemctl enable bitcoind.servicesudo service bitcoind start[14] Check if runningCode:sudo tail -f /media/nvme/Bitcoin/debug.log[15] Exit with Ctrl+C. Your node should be picking up the already finished initial block download and connect to peers just as always.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 08, 2022, 01:55:51 AMLast edit: June 18, 2022, 11:37:34 AM by n0nce",
+      "body": "Quote from: n0nce on October 21, 2021, 01:13:17 PMelectrsSince one of the main benefits of running a full node is privacy during transaction & address lookup, an Electrum server is needed. Otherwise you'd have to query using Bitcoin Core all the time and can't just use your mobile and desktop applications for that.[1] Install dependencies; make sure you're logged into admin and not bitcoin.Code:sudo apt install clang cargo rustc tor[2] Download and build electrs as bitcoin. This can take roughly half an hour (compared to ~10 minutes on a $50 'old laptop' node).Code:sudo service miner stopsu - bitcoingit clone https://github.com/romanz/electrscd electrscargo build --locked --release --no-default-featuresmkdir /media/nvme/databaseln -s /media/nvme/database database [3] Create electrs config fileCode:nano electrs.toml[4] Enter the following:Code:cookie_file = \"/media/nvme/Bitcoin/.cookie\"# The listening RPC address of bitcoind, port is usually 8332daemon_rpc_addr = \"127.0.0.1:8332\"# The listening P2P address of bitcoind, port is usually 8333daemon_p2p_addr = \"127.0.0.1:8333\"# Directory where the index should be stored. It should have at least 70GB of free space.db_dir = \"/home/bitcoin/electrs/database\"# bitcoin means mainnet. Don't set to anything else unless you're a developer.network = \"bitcoin\"# How much information about internal workings should electrs print. Increase before reporting a bug.log_filters = \"INFO\"[5] Log back out into your sudo account, and open the Tor config file.Code:exitsudo nano /etc/tor/torrc[6] Add the following contents, preferably in the right section (somewhere where there's HiddenServiceDir stuff commented out).Code:HiddenServiceDir /var/lib/tor/electrs_hidden_service/HiddenServiceVersion 3HiddenServicePort 50001 127.0.0.1:50001ExitPolicy reject *:* # no exits allowed[7] Start up Tor and fetch your electrs Tor hostname. The hostname can then be entered in wallets like Wasabi and BlueWallet settings.Code:sudo systemctl enable tor.servicesudo service tor restartsudo cat /var/lib/tor/electrs_hidden_service/hostname[8] Create a service so electrs starts on startupCode:sudo nano /usr/lib/systemd/system/electrs.service[9] Enter this informationCode:[Unit]Description=ElectrsAfter=bitcoind.service[Service]WorkingDirectory=/home/bitcoin/electrsExecStart=/home/bitcoin/electrs/target/release/electrsUser=bitcoinGroup=bitcoinType=simpleKillMode=processTimeoutSec=60Restart=alwaysRestartSec=60[Install]WantedBy=multi-user.target[10] Start the serviceCode:sudo systemctl enable electrs.servicesudo service electrs start[11] Check that it's running. This should return the electrs version.Code:echo '{\"jsonrpc\": \"2.0\", \"method\": \"server.version\", \"params\": [\"\", \"1.4\"], \"id\": 0}' | netcat 127.0.0.1 50001",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 08, 2022, 01:56:01 AM",
+      "body": "Core Lightning[1] Install dependenciesCode:sudo apt install autoconf automake build-essential git libtool libgmp-dev libsqlite3-dev python3 python3-pip python3-mako net-tools zlib1g-dev libsodium-dev gettextpip3 install --upgrade pippip3 install --user poetryecho -e '#!/bin/sh\\ntouch $2\\nexit 0' | sudo tee /usr/local/bin/mrkdsudo chmod 755 /usr/local/bin/mrkd[2] Create another Tor hidden service for C-Lightning. Similar procedure as before.Code:sudo nano /etc/tor/torrc[3] Below the other hidden service, add this info for Lightning.Code:HiddenServiceDir /var/lib/tor/lightningd_hidden_service/HiddenServiceVersion 3HiddenServicePort 9735 127.0.0.1:9735[4] Then restart Tor and retrieve the new v3 Tor hostname for your Lightning installation. Copy it somewhere so you have it handy in step 7.Code:sudo service tor restartsudo cat /var/lib/tor/lightningd_hidden_service/hostname[5] Log into bitcoin user and download + build Lightning. v0.11.1 is the currently latest version.Code:su - bitcoingit clone https://github.com/ElementsProject/lightning.gitcd lightninggit checkout v0.11.1./configuremake -j $(nproc)[6] Create Lightning config.Code:mkdir -p /home/bitcoin/.lightning/bitcoinnano /home/bitcoin/.lightning/bitcoin/lightningd.conf[7] Enter the following. Alias can be chosen at will!  Replace onion_address_you_got with the hidden service hostname you got in step 4!Code:daemonalias=alias_for_your_nodenetwork=bitcoinlog-level=debuglog-file=/home/bitcoin/.lightning/debug.log# incoming via torbind-addr=127.0.0.1:9735announce-addr=onion_address_you_got.onion# outgoing via torproxy=127.0.0.1:9050always-use-proxy=true[8] Log back out of the unprivileged bitcoin account to install Lightning and create the service.Code:exitcd /home/bitcoin/lightningsudo make installsudo nano /usr/lib/systemd/system/lightningd.service[9] In the service file, we need the following contents.Code:[Unit]Description=C-Lightning daemonRequires=bitcoind.serviceAfter=bitcoind.serviceWants=network-online.targetAfter=network-online.target[Service]ExecStart=/usr/local/bin/lightningd --daemon --conf /home/bitcoin/.lightning/bitcoin/lightningd.confUser=bitcoinGroup=bitcoinType=forkingRestart=on-failure# Hardening measures##################### Provide a private /tmp and /var/tmp.PrivateTmp=true# Mount /usr, /boot/ and /etc read-only for the process.ProtectSystem=full# Disallow the process and all of its children to gain# new privileges through execve().NoNewPrivileges=true# Use a new /dev namespace only populated with API pseudo devices# such as /dev/null, /dev/zero and /dev/random.PrivateDevices=true# Deny the creation of writable and executable memory mappings.MemoryDenyWriteExecute=true[Install]WantedBy=multi-user.target[10] Start the Lightning serviceCode:sudo systemctl enable lightningd.servicesudo service lightningd start[11] To check if it's running, we can use the lightning-cli command as bitcoin user with any of its parameters.Code:su - bitcoinlightning-cli getinfo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 08, 2022, 01:56:08 AM",
+      "body": "Reserved",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 08, 2022, 01:56:13 AM",
+      "body": "Reserved",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 09, 2022, 04:27:23 AM",
+      "body": "I am not sure which distro your guide is based on (same goes for the Miner thread), but if it's one that has SELinux enabled such as CentOS, you might want to turn that off to avoid arbitrary crashes from ill-understood \"policy violations\".(run as root)Code:setenforce 0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 09, 2022, 01:04:07 PM",
+      "body": "Quote from: NotATether on June 09, 2022, 04:27:23 AMI am not sure which distro your guide is based on (same goes for the Miner thread), but if it's one that has SELinux enabled such as CentOS, you might want to turn that off to avoid arbitrary crashes from ill-understood \"policy violations\".(run as root)Code:setenforce 0Hey, thanks for chiming in! I linked both guides to the common 'base' guide on top of which either (or both) of the guides can be applied. Maybe the hyperlink is too small, but it's there. Quote from: n0nce on June 08, 2022, 01:54:40 AMSee here for the prerequisites.I am pretty sure Armbian has SELinux disabled by default.Quote from: n0nce on June 07, 2022, 07:57:30 PMI planned to use openSUSE, since I have had good experiences with it as a node OS. Unfortunately, the SBC used by Futurebit is an Orange Pi 4 which doesn't have great software support, so for best chances of success I stick with Armbian, which is what Futurebit ships (just an older version of it).Honestly, I would have preferred something a little 'more enterprise' like openSUSE (or CentOS, why not) - however availability of compiled operating systems for this SBC is severely limited. I could have compiled something myself, but these guides are aimed at people who bought the device as an 'all in one solution' (as I mentioned, it was advertised like that), but who to this day can only run Bitcoin Core without Electrum or Lightning on it (so rather useless besides 'help the network').",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctotoro",
+      "created_time": "November 13, 2022, 09:50:45 AM",
+      "body": "Quote from: n0nce on June 08, 2022, 01:56:01 AMCore Lightning[1] Install dependenciesCode:sudo apt install autoconf automake build-essential git libtool libgmp-dev libsqlite3-dev python3 python3-pip python3-mako net-tools zlib1g-dev libsodium-dev gettextpip3 install --upgrade pippip3 install --user poetryecho -e '#!/bin/sh\\ntouch $2\\nexit 0' | sudo tee /usr/local/bin/mrkdsudo chmod 755 /usr/local/bin/mrkd[2] Create another Tor hidden service for C-Lightning. Similar procedure as before.Code:sudo nano /etc/tor/torrc[3] Below the other hidden service, add this info for Lightning.Code:HiddenServiceDir /var/lib/tor/lightningd_hidden_service/HiddenServiceVersion 3HiddenServicePort 9735 127.0.0.1:9735[4] Then restart Tor and retrieve the new v3 Tor hostname for your Lightning installation. Copy it somewhere so you have it handy in step 7.Code:sudo service tor restartsudo cat /var/lib/tor/lightningd_hidden_service/hostname[5] Log into bitcoin user and download + build Lightning. v0.11.1 is the currently latest version.Code:su - bitcoingit clone https://github.com/ElementsProject/lightning.gitcd lightninggit checkout v0.11.1./configuremake -j $(nproc)[6] Create Lightning config.Code:mkdir -p /home/bitcoin/.lightning/bitcoinnano /home/bitcoin/.lightning/bitcoin/lightningd.conf[7] Enter the following. Alias can be chosen at will!  Replace onion_address_you_got with the hidden service hostname you got in step 4!Code:daemonalias=alias_for_your_nodenetwork=bitcoinlog-level=debuglog-file=/home/bitcoin/.lightning/debug.log# incoming via torbind-addr=127.0.0.1:9735announce-addr=onion_address_you_got.onion# outgoing via torproxy=127.0.0.1:9050always-use-proxy=true[8] Log back out of the unprivileged bitcoin account to install Lightning and create the service.Code:exitcd /home/bitcoin/lightningsudo make installsudo nano /usr/lib/systemd/system/lightningd.service[9] In the service file, we need the following contents.Code:[Unit]Description=C-Lightning daemonRequires=bitcoind.serviceAfter=bitcoind.serviceWants=network-online.targetAfter=network-online.target[Service]ExecStart=/usr/local/bin/lightningd --daemon --conf /home/bitcoin/.lightning/bitcoin/lightningd.confUser=bitcoinGroup=bitcoinType=forkingRestart=on-failure# Hardening measures##################### Provide a private /tmp and /var/tmp.PrivateTmp=true# Mount /usr, /boot/ and /etc read-only for the process.ProtectSystem=full# Disallow the process and all of its children to gain# new privileges through execve().NoNewPrivileges=true# Use a new /dev namespace only populated with API pseudo devices# such as /dev/null, /dev/zero and /dev/random.PrivateDevices=true# Deny the creation of writable and executable memory mappings.MemoryDenyWriteExecute=true[Install]WantedBy=multi-user.target[10] Start the Lightning serviceCode:sudo systemctl enable lightningd.servicesudo service lightningd start[11] To check if it's running, we can use the lightning-cli command as bitcoin user with any of its parameters.Code:su - bitcoinlightning-cli getinfoHi N0nce,Thanks so much for this guide.  I thought I'd give it a go on my futurebit apollo ( I did not flash a custom install of linux ; I am using futurebit's latest OS).  I am pretty new to linux and working with it, but I thought I did a decent job getting through the steps you outlined.  However, I got to the point where I did: sudo service lightningd start, and I got the following message: Failed to start lightningd.service: Unit bitcoind.service not foundAny ideas or help you can provide would be greatly appreciated, would love to dive into lightning.  Thanks again I see you posting all the time and find you to be very helpful to the community.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 14, 2022, 07:54:48 PM",
+      "body": "Quote from: btctotoro on November 13, 2022, 09:50:45 AMHi N0nce,Thanks so much for this guide.  I thought I'd give it a go on my futurebit apollo ( I did not flash a custom install of linux ; I am using futurebit's latest OS).  I am pretty new to linux and working with it, but I thought I did a decent job getting through the steps you outlined.  However, I got to the point where I did: sudo service lightningd start, and I got the following message: Failed to start lightningd.service: Unit bitcoind.service not foundAny ideas or help you can provide would be greatly appreciated, would love to dive into lightning.  Thanks again I see you posting all the time and find you to be very helpful to the community.Very welcome! Indeed, it seems that 'Apollo OS' doesn't use a Systemd service to start up Bitcoin Core, and instead starts it headless using screen.  I found this magnificent piece of shellcode in the latest image.. *sigh*.Code:#!/bin/bashDEVICE=/dev/nvme0n1p1if [ -b \"$DEVICE\"  ]; then        screen -dmS node /opt/apolloapi/backend/node/bitcoind -datadir=/media/nvme/Bitcoin -conf=/opt/apolloapi/backend/node/bitcoin.confelse        exit 0fiI'd probably just take out the Requires=bitcoind.service line completely and replace it with Requires=apollo.service; it should work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctotoro",
+      "created_time": "November 14, 2022, 10:30:11 PM",
+      "body": "Hi n0nce,Thanks for the quick reply.  I tried just now to update and replace bitcoind.service with apollo.service.  Seems to be a similar issue, I got the following message:Failed to start lightningd.service: Unit apollo.service not found",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 14, 2022, 10:41:00 PM",
+      "body": "Quote from: btctotoro on November 14, 2022, 10:30:11 PMHi n0nce,Thanks for the quick reply.  I tried just now to update and replace bitcoind.service with apollo.service.  Seems to be a similar issue, I got the following message:Failed to start lightningd.service: Unit apollo.service not foundThat's odd; it should exist: https://github.com/jstefanop/apolloapi/blob/master/scripts/apollo.serviceHowever, try just deleting that line completely and see if it works that way. Might be fine.Worst-case, Lightning won't start after a reboot and you'll have to execute sudo service lightningd restart manually.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctotoro",
+      "created_time": "November 14, 2022, 11:34:56 PM",
+      "body": "Ya I see that..I tried removing entirely as you suggested.  I am getting this error now:Warning: The unit file, source configuration file or drop-ins of lightningd.service changed on disk. Run 'systemctl daemon-reload' to reload units.Job for lightningd.service failed because the control process exited with error code.See \"systemctl status lightningd.service\" and \"journalctl -xe\" for details.>>I executed system systemctl daemon-reload and tried again but got the same error.  Here is the system ctl status:● lightningd.service - C-Lightning daemon     Loaded: loaded (/lib/systemd/system/lightningd.service; enabled; vendor preset: enabled)     Active: failed (Result: exit-code) since Mon 2022-11-14 15:26:49 PST; 28s ago    Process: 1043529 ExecStart=/usr/local/bin/lightningd --daemon --conf /home/bitcoin/.lightning/bitcoin/lightningd.conf (code=exited, status=1/FAILURE)Nov 14 15:26:49 futurebitbtc systemd[1]: lightningd.service: Scheduled restart job, restart counter is at 5.Nov 14 15:26:49 futurebitbtc systemd[1]: Stopped C-Lightning daemon.Nov 14 15:26:49 futurebitbtc systemd[1]: lightningd.service: Start request repeated too quickly.Nov 14 15:26:49 futurebitbtc systemd[1]: lightningd.service: Failed with result 'exit-code'.Nov 14 15:26:49 futurebitbtc systemd[1]: Failed to start C-Lightning daemon.Thanks so much for your help, please don't hesitate to let this be at any moment as it is totally possible I screwed something up that you can't see in the instructions you provided.  I will take no offense to that. Cheers!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 15, 2022, 03:56:20 PM",
+      "body": "Quote from: btctotoro on November 14, 2022, 11:34:56 PM>>I executed system systemctl daemon-reload and tried again but got the same error.  Here is the system ctl status:Did you do this as root? I.e. sudo systemctl daemon-reload?Oh, also I should mention to replace bitcoin user with futurebit's default user, unless you created the bitcoin user yourself..If you don't have the bitcoin user, this command should have failed, though: su - bitcoin.Also make sure to cat /home/bitcoin/.lightning/debug.log to check if Core Lightning has an issue.Of course, if you didn't install it under the bitcoin user, but e.g. futurebit-user (not sure about the default futurebit username right now), the path would be: /home/futurebit-user/.lightning/debug.log",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctotoro",
+      "created_time": "November 15, 2022, 11:58:46 PM",
+      "body": "Hi N0nce,I did notice the difference in the guide between creating the 'bitcoin' user.  I believe I accounted for that in following the guide step by step and just used the futurebit user where necessary.  I just tried briefly to make the update you suggested to the debug file, however it is still not working.  I'll need to dive in a bit more tonight once my kid is asleep, maybe try again from scratch.  Thanks again for your help with a noobie like myself trying to fully utilize my apollo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 16, 2022, 09:09:30 AM",
+      "body": "Quote from: btctotoro on November 15, 2022, 11:58:46 PMI just tried briefly to make the update you suggested to the debug file, however it is still not working.You shouldn't modify the debug file (doesn't hurt if you try, just won't do anything); it's made for you to look at and identify a possible issue.That's why I recommended to output its contents with cat; but probably, tail -100 debug.log would be a better idea; no need to output the whole file.Quote from: btctotoro on November 15, 2022, 11:58:46 PMI'll need to dive in a bit more tonight once my kid is asleep, maybe try again from scratch.  Thanks again for your help with a noobie like myself trying to fully utilize my apollo No worries; I'd love for people to get Core Lightning and Electrum on their Apollos, even if they don't want to replace the base OS! Troubleshooting in forum threads can help future readers as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctotoro",
+      "created_time": "November 16, 2022, 09:15:30 AM",
+      "body": "Alas, I'm giving it my best shot here but I'm stuck with the following error message and resulting status info after going through the whole process again.  Made sure to double check my files and to use futurebit as the user instead of bitcoin:sudo service lightningd start:Job for lightningd.service failed because the control process exited with error code.See \"systemctl status lightningd.service\" and \"journalctl -xe\" for details.systemctl status lightningd.service:● lightningd.service - C-Lightning daemon     Loaded: loaded (/lib/systemd/system/lightningd.service; enabled; vendor preset: enabled)     Active: failed (Result: exit-code) since Wed 2022-11-16 01:06:38 PST; 1min 24s ago    Process: 2204936 ExecStart=/usr/local/bin/lightningd --daemon --conf /home/futurebit/.lightning/bitcoin/lightningd.conf (code=exited, status=1/FAILURE)Nov 16 01:06:38 futurebitbtc systemd[1]: lightningd.service: Scheduled restart job, restart counter is at 5.Nov 16 01:06:38 futurebitbtc systemd[1]: Stopped C-Lightning daemon.Nov 16 01:06:38 futurebitbtc systemd[1]: lightningd.service: Start request repeated too quickly.Nov 16 01:06:38 futurebitbtc systemd[1]: lightningd.service: Failed with result 'exit-code'.Nov 16 01:06:38 futurebitbtc systemd[1]: Failed to start C-Lightning daemon.I think I might just be in over my head.  I'll probably give it another try to implement on my futurebit after learning some more about working in linux.  Thanks again for your help N0nce and for putting together the guide.  And if any other troubleshooting ideas come to mind, let me know I'll give it a go.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctotoro",
+      "created_time": "November 16, 2022, 09:23:01 AM",
+      "body": "Hi N0nce,I ran the debug and this was the following result:2022-11-16T09:06:37.986Z DEBUG   lightningd: Opened log file /home/futurebit/.lightning/debug.log2022-11-16T09:06:37.986Z DEBUG   lightningd: Opened log file /home/futurebit/.lightning/debug.log2022-11-16T09:06:38.003Z DEBUG   plugin-manager: started(2204939) /usr/local/bin/../libexec/c-lightning/plugins/autoclean2022-11-16T09:06:38.018Z DEBUG   plugin-manager: started(2204940) /usr/local/bin/../libexec/c-lightning/plugins/bcli2022-11-16T09:06:38.030Z DEBUG   plugin-manager: started(2204941) /usr/local/bin/../libexec/c-lightning/plugins/fetchinvoice2022-11-16T09:06:38.047Z DEBUG   plugin-manager: started(2204942) /usr/local/bin/../libexec/c-lightning/plugins/funder2022-11-16T09:06:38.060Z DEBUG   plugin-manager: started(2204943) /usr/local/bin/../libexec/c-lightning/plugins/topology2022-11-16T09:06:38.076Z DEBUG   plugin-manager: started(2204944) /usr/local/bin/../libexec/c-lightning/plugins/keysend2022-11-16T09:06:38.090Z DEBUG   plugin-manager: started(2204945) /usr/local/bin/../libexec/c-lightning/plugins/offers2022-11-16T09:06:38.106Z DEBUG   plugin-manager: started(2204946) /usr/local/bin/../libexec/c-lightning/plugins/pay2022-11-16T09:06:38.120Z DEBUG   plugin-manager: started(2204947) /usr/local/bin/../libexec/c-lightning/plugins/txprepare2022-11-16T09:06:38.134Z DEBUG   plugin-manager: started(2204948) /usr/local/bin/../libexec/c-lightning/plugins/spenderp2022-11-16T09:06:38.154Z DEBUG   lightningd: testing /usr/local/libexec/c-lightning/lightning_channeld2022-11-16T09:06:38.163Z DEBUG   lightningd: testing /usr/local/libexec/c-lightning/lightning_closingd2022-11-16T09:06:38.172Z DEBUG   lightningd: testing /usr/local/libexec/c-lightning/lightning_connectd2022-11-16T09:06:38.183Z DEBUG   lightningd: testing /usr/local/libexec/c-lightning/lightning_gossipd2022-11-16T09:06:38.192Z DEBUG   lightningd: testing /usr/local/libexec/c-lightning/lightning_hsmd2022-11-16T09:06:38.199Z DEBUG   lightningd: testing /usr/local/libexec/c-lightning/lightning_onchaind2022-11-16T09:06:38.206Z DEBUG   lightningd: testing /usr/local/libexec/c-lightning/lightning_openingd2022-11-16T09:06:38.214Z DEBUG   hsmd: pid 2204956, msgfd 392022-11-16T09:06:38.271Z DEBUG   connectd: pid 2204957, msgfd 432022-11-16T09:06:38.272Z DEBUG   hsmd: new_client: 02022-11-16T09:06:38.275Z DEBUG   connectd: Proxy address: 127.0.0.1:90502022-11-16T09:06:38.275Z DEBUG   connectd: Created listener on 127.0.0.1:97352022-11-16T09:06:38.275Z DEBUG   connectd: REPLY WIRE_CONNECTD_INIT_REPLY with 0 fds2022-11-16T09:06:38.275Z DEBUG   connectd: connectd_init_done2022-11-16T09:06:38.300Z **BROKEN** plugin-bcli: \\nbitcoin-cli not found. Is bitcoin-cli (part of Bitcoin Core) available in your PATH?\\n\\nMake sure you have bitcoind running and that bitcoin-cli is able to connect to bitcoind.\\n\\nYou can verify that your Bitcoin Core installation is ready for use by running:\\n\\n    $ bitcoin-cli echo 'hello world'\\n2022-11-16T09:06:38.301Z INFO    plugin-bcli: Killing plugin: exited before we sent init>> i'm not really certain how to read the results, but if it helps for your troubleshooting thought I'd send it over.  Really appreciate working through this, learning a lot regardless",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 16, 2022, 09:32:38 AM",
+      "body": "Quote from: btctotoro on November 16, 2022, 09:23:01 AMi'm not really certain how to read the results, but if it helps for your troubleshooting thought I'd send it over.  Really appreciate working through this, learning a lot regardless Just reading; such logs are plain English and tell you exactly what's going on.Some logs prepend a short label like 'INFO', 'DEBUG', 'ERROR' to allow people to scan it more quickly.Errors are usually towards the end (because they cause the binary to exit); therefore I recommended the tail command.In this case, the error is: bitcoin-cli not found.I don't understand why FuturebitOS ships without bitcoin-cli. It's a small utility to interact with Bitcoin Core (bitcoind). Sure; it's not strictly needed for Futurebit, since they use RPC directly, but it's such a small binary that they might as well leave it in and prevent users such headache.You could download the latest build and install bitcoin-cli from there:Code:cd /home/futurebitwget https://bitcoincore.org/bin/bitcoin-core-23.0/bitcoin-23.0-aarch64-linux-gnu.tar.gztar xvf bitcoin-23.0-aarch64-linux-gnu.tar.gzcd bitcoin-*/sudo install -m 0755 -o root -g root -t /usr/local/bin bin/bitcoin-cliLike the log file states, you can verify if it worked like this:Code:bitcoin-cli echo 'hello world'If it exits without errors and echoes back 'hello world', Lightning should start up as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctotoro",
+      "created_time": "November 16, 2022, 05:14:19 PM",
+      "body": "Hi N0nce,I followed the steps you outlined to install bitcoin-cli.  Doesn't appear to have worked, unfortunately.  I am getting the same error after installation in the debug file and when I ran bitcoin-cli echo 'hello world', I got the following:error: Could not locate RPC credentials. No authentication cookie could be found, and RPC password is not set.  See -rpcpassword and -stdinrpcpass.  Configuration file: (/home/futurebit/.bitcoin/bitcoin.conf)I'm thinking I don't actually have bitcoin-cli installed as when I entered the command sudo install -m 0755 -o root -g root -t /usr/local/bin bin/bitcoin-cli, the command line simply reloaded to the base user and nothing was communicated about installation.  I tried tweaking your instructions so that I was in the folder with bitcoin-cli:cd /home/futurebit/bitcoin-23.0/binsudo install bitcoin-cliBut I got the following error about suffixes, unsure of which one to use after reviewing the help install --help text (if this alternative would even work for installing bitcoin-cli):install: missing destination file operand after 'bitcoin-cli'Try 'install --help' for more information",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

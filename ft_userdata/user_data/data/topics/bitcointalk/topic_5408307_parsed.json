@@ -1,0 +1,165 @@
+{
+  "id": "topic_5408307",
+  "title": "Jason Brendon",
+  "author": "Jason Brendon",
+  "created_time": "August 01, 2022, 08:12:21 AM",
+  "content": "Yes guys, oftentimes you hear people say connecting to someone else's electrum server will leak your public key information.As I am running electrs as an electrum server implementation, I am asking you guys how public key leaks?I mean, nothing is stored on my server(at least I didn't manage to find it).Or, let me put it this way:Is there a way that I can find out the public key information from whom is connecting to my electrum server?Or, perhaps it is electrs as one of the electrum implementations that I am using doesn't keep records or logs, whereas other implementations like EPS, or ElectrumX does keep logs?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408307",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "August 01, 2022, 11:13:57 AM",
+      "body": "I don't know electrs or how it is setup out of the box, but electrumx does allow for a fair amount of logging. With electrumx I can see your IP, what addresses you are checking and if you send a TX I again know your IP and have the information about the TX. That is what people are talking about. It does not send that information anywhere but you as the server operator can still see it.I *think* electrs does the same. But I never looked. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "August 01, 2022, 12:14:54 PM",
+      "body": "Quote from: Jason Brendon on August 01, 2022, 08:12:21 AMOr, let me put it this way:Is there a way that I can find out the public key information from whom is connecting to my electrum server?I don't use electrs, but there's configuration to make electrs to log more information according to https://github.com/romanz/electrs/blob/v0.9.8/doc/upgrading.md#important-changes-from-versions-older-than-093.Quote from: Jason Brendon on August 01, 2022, 08:12:21 AMOr, perhaps it is electrs as one of the electrum implementations that I am using doesn't keep records or logs, whereas other implementations like EPS, or ElectrumX does keep logs?Also consider someone could fork those implementation to add log feature or perform log on different level (e.g. on networking level)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "August 01, 2022, 12:17:41 PM",
+      "body": "Quote from: ETFbitcoin on August 01, 2022, 12:14:54 PM--snip--Also consider someone could fork those implementation to add log feature or perform log on different level (e.g. on networking level)this ^^^ is a very important aspect... It's all open source software... It's not like a node operator is going to tell you they modified the sourcecode of their node software to log everything.So, even if you know electrumx (or electrs, or....) and you have actually read the complete sourcecode and you're satisfied a default \"electrumx\" node cannot log anything you don't accept, you should still realise somebody could run a modified version of \"electrumx\".On top of this, electrs needs a reverse proxy if you want to add tls, this is one more level where log files can be created.Now, the fact does remain that private key(s) or seeds are not sent to the electrum node, so a node operator can harm your privacy, but he cannot steal your actual funds (unless there's an undiscovered bug).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "August 01, 2022, 12:31:38 PM",
+      "body": "Quote from: mocacinno on August 01, 2022, 12:17:41 PMNow, the fact does remain that private key(s) or seeds are not sent to the electrum node, so a node operator can harm your privacy, but he cannot steal your actual funds (unless there's an undiscovered bug).The questions is how to monetize that knowledge. Imagine you have a set of wallets - you know which addresses are asked for a wallet, you may assume they come from one seed or xpub, so you may assume the owner is the same. What would you do with that knowledge - sell to \"wallet trackers\" / explorers?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "August 01, 2022, 12:48:51 PM",
+      "body": "Quote from: ETFbitcoin on August 01, 2022, 12:45:09 PM--snip--It makes more sense if those server run by government or blockchain analysis service rather than individual who want to sell such information.Indeed, i think those services/governement are the biggest consumers of such data... Other than that, maybe hackers/spammers could maybe use that data to try to extort you, or to do a social engineering attack, or maybe a $5 wrench attack... Not sure if this attack vector is feasible tough.Personally, i don't really care all that much if a node operator would have this info about me... If you really worry, you can always use tor.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "August 01, 2022, 01:02:02 PM",
+      "body": "Thank you people all for commenting on this. You're beautiful honey badgers.BTCBTC One thing: regardless electrumx or electrs, usually where does it keep the logs? Name few please.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 01, 2022, 01:43:54 PM",
+      "body": "See if Code:sudo journalctl -n 10000 | grep electrs shows you anything.From what I saw with a quick read you can set the log level and location in the config but that should find it.Did you build from scratch or are you running a prepacked node setup? That may change the location / level and even availability of the logs.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "August 01, 2022, 02:03:52 PM",
+      "body": "Quote from: DaveF on August 01, 2022, 01:43:54 PMSee if Code:sudo journalctl -n 10000 | grep electrs shows you anything.From what I saw with a quick read you can set the log level and location in the config but that should find it.Did you build from scratch or are you running a prepacked node setup? That may change the location / level and even availability of the logs.-Daveexcept some chain tip updating info, some heights. No IP or public keys or anything like that. Don't get me wrong. I was just experimenting.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 02, 2022, 09:11:16 AM",
+      "body": "Quote from: PawGo on August 01, 2022, 12:31:38 PMWhat would you do with that knowledge - sell to \"wallet trackers\" / explorers?Data brokers will pay for all kinds of data. Far more likely though is that these blockchain analysis firms are just running a bunch of their own servers anyway, since the overhead for doing so is tiny and they can collect huge amounts of data through them.Quote from: mocacinno on August 01, 2022, 12:48:51 PMIf you really worry, you can always use tor.All this achieves is masking your IP address. The server can still link together all your addresses and all your transactions (and potentially even multiple wallets if you open them in close succession over the same Tor circuit). Far better to just run your own server.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "August 02, 2022, 09:14:09 AM",
+      "body": "Quote from: o_e_l_e_o on August 02, 2022, 09:11:16 AMData brokers will pay for all kinds of data. Far more likely though is that these blockchain analysis firms are just running a bunch of their own servers anyway, since the overhead for doing so is tiny and they can collect huge amounts of data through them.Do you know maybe how \"multi-server connection\" works in Electrum?I did not investigate the code but maybe it does requests \"randomly\" and for example if there are 2 addresses to check each one receives data from other server?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 02, 2022, 10:57:13 AM",
+      "body": "Quote from: PawGo on August 02, 2022, 09:14:09 AMDo you know maybe how \"multi-server connection\" works in Electrum?I did not investigate the code but maybe it does requests \"randomly\" and for example if there are 2 addresses to check each one receives data from other server?I don't use public Electrum servers and route all Electrum traffic through my own server, so my knowledge of the public server architecture is probably not complete. My understanding, however, is that Electrum will connect to around 8-10 servers in order to download block headers from them all (in order to avoid a single server returning incorrect or malicious data), but only one of these servers will be used to query the addresses within the wallet and to relay transactions. All 10 servers will be able to see your IP address, but the one main server will also be able to see everything you are querying.Tor can actually make things more risky. Some of the guides for using Tor with Electrum set it up in such a way that you are only connecting to a single server in order to maximize privacy. This obviously means you are downloading the block headers and all your wallet information from only a single source, which increases the risks of being fed incorrect or malicious information.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 02, 2022, 11:46:46 AM",
+      "body": "Quote from: DaveF on August 01, 2022, 11:13:57 AMI don't know electrs or how it is setup out of the box, but electrumx does allow for a fair amount of logging. With electrumx I can see your IP, what addresses you are checking and if you send a TX I again know your IP and have the information about the TX. I wonder why the logging is configured to be turned on by default? If I were the maintainer, I'd relegate the bulk of the logging to a \"debug\" option from the command line.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 02, 2022, 11:53:59 PM",
+      "body": "Quote from: o_e_l_e_o on August 02, 2022, 10:57:13 AMTor can actually make things more risky. Some of the guides for using Tor with Electrum set it up in such a way that you are only connecting to a single server in order to maximize privacy. This obviously means you are downloading the block headers and all your wallet information from only a single source, which increases the risks of being fed incorrect or malicious information.Do keep in mind this holds true if the one Tor server you're connecting to is not yours.When I connect to my own Electrum node through Tor, I do connect to a single Electrum server, but there is no risk of getting malicious information.As for the yet unanswered question about electrs default logfile location; electrs doesn't create a logfile by default. It uses Rust's built-in env_logger, which supports log levels from 'ERROR' (very serious errors) to 'TRACE' (extremely verbose) - all the log levels are declared in Rust's enum.Level. There's also a table in electrs' GitHub with pretty much the same information.By default, env_logger writes everything to stderr. But keep in mind it's a trivial task piping stderr to a file.In my little experiment with log level DEBUG, I could not see the IP or Tor address I was connecting from and in the code it doesn't seem that it's logged, either. But it's simple to add, as others mentioned.I do see the queried addresses, though.If you run electrs with log_filter = DEBUG and grep stderr for DEBUG electrs::server] 0:, you will get the communication between your SPV wallet and your Electrum server.Code:bitcoin@localhost:~/electrs> /home/bitcoin/electrs/target/release/electrs 2> >(grep 'DEBUG electrs::server] 0:')[~snip~ DEBUG electrs::server] 0: connected[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"server.version\",\"params\":[\"Sparrow\",\"1.4\"],\"id\":1}[~snip~ DEBUG electrs::server] 0: send {\"id\":1,\"jsonrpc\":\"2.0\",\"result\":[\"electrs/0.9.8\",\"1.4\"]}[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"blockchain.headers.subscribe\",\"params\":[],\"id\":2}[~snip~ DEBUG electrs::server] 0: send {\"id\":2,\"jsonrpc\":\"2.0\",\"result\":{\"height\":747717,\"hex\":\"00c00020c072fd1a50fe409f82942c9dfc46565761c38522589103000000000000000000d8c783dcd4e3eb05372ae116978d9fbd2d4fd1d29f3a3c6dfa4f841bb739ac623faee962042a0a17ae7fbf9d\"}}[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"server.banner\",\"params\":[],\"id\":3}[~snip~ DEBUG electrs::server] 0: send {\"id\":3,\"jsonrpc\":\"2.0\",\"result\":\"Welcome to electrs 0.9.8 (Electrum Rust Server)!\"}[~snip~ DEBUG electrs::server] 0: recv [{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[1],\"id\":4},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[2],\"id\":5},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[3],\"id\":6},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[4],\"id\":7},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[5],\"id\":8},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[10],\"id\":9},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[25],\"id\":10},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[50],\"id\":11}][~snip~ DEBUG electrs::server] 0: send [{\"id\":4,\"jsonrpc\":\"2.0\",\"result\":0.00013},{\"id\":5,\"jsonrpc\":\"2.0\",\"result\":0.00013},{\"id\":6,\"jsonrpc\":\"2.0\",\"result\":0.00013},{\"id\":7,\"jsonrpc\":\"2.0\",\"result\":0.00011838},{\"id\":8,\"jsonrpc\":\"2.0\",\"result\":0.00010052},{\"id\":9,\"jsonrpc\":\"2.0\",\"result\":0.00005394},{\"id\":10,\"jsonrpc\":\"2.0\",\"result\":0.00001},{\"id\":11,\"jsonrpc\":\"2.0\",\"result\":0.00001}][~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"mempool.get_fee_histogram\",\"params\":[],\"id\":12}[~snip~ DEBUG electrs::server] 0: send {\"id\":12,\"jsonrpc\":\"2.0\",\"result\":[[1023,560],[511,1662],[255,12801],[127,12906],[63,59896],[31,195453],[15,1397569],[7,756035],[3,430544],[1,314814],[0,0]]}[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"blockchain.relayfee\",\"params\":[],\"id\":13}[~snip~ DEBUG electrs::server] 0: send {\"id\":13,\"jsonrpc\":\"2.0\",\"result\":0.00001}[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"server.ping\",\"params\":[],\"id\":14}[~snip~ DEBUG electrs::server] 0: send {\"id\":14,\"jsonrpc\":\"2.0\",\"result\":null}[~snip~ DEBUG electrs::server] 0: recv [{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.scripthash.subscribe\",\"params\":[~scripthash~],\"id\":16},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.scripthash.subscribe\",\"params\":[~scripthash~],\"id\":17}, ...][~snip~ DEBUG electrs::server] 0: send [{\"id\":16,\"jsonrpc\":\"2.0\",\"result\":\"~snip~\"},{\"id\":17,\"jsonrpc\":\"2.0\",\"result\":\"~snip~\"}, ...]...I obviously had to redact a lot; but in essence, the client (in this case, Sparrow - I noticed our esteemed forum member achow101 is mentioned as contributor!) queries the blockchain.scripthash.subscribe Electrum protocol method (a list of all these methods).In this case, blockchain.scripthash refers to a 'hash of the binary bytes of the locking script, expressed as a hexadecimal string' [quote: https://electrumx.readthedocs.io/en/latest/protocol-basics.html#script-hashes].So basically wherever I wrote ~scripthash~, there are script hashes, a different representation of the addresses of whoever's querying. Especially since they're bunched together in a small number of individual requests, we can say that electrs does link transactions together in its default logs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 04, 2022, 01:27:00 PM",
+      "body": "Quote from: n0nce on August 02, 2022, 11:53:59 PMQuote from: o_e_l_e_o on August 02, 2022, 10:57:13 AMTor can actually make things more risky. Some of the guides for using Tor with Electrum set it up in such a way that you are only connecting to a single server in order to maximize privacy. This obviously means you are downloading the block headers and all your wallet information from only a single source, which increases the risks of being fed incorrect or malicious information.Do keep in mind this holds true if the one Tor server you're connecting to is not yours.When I connect to my own Electrum node through Tor, I do connect to a single Electrum server, but there is no risk of getting malicious information.As for the yet unanswered question about electrs default logfile location; electrs doesn't create a logfile by default. It uses Rust's built-in env_logger, which supports log levels from 'ERROR' (very serious errors) to 'TRACE' (extremely verbose) - all the log levels are declared in Rust's enum.Level. There's also a table in electrs' GitHub with pretty much the same information.By default, env_logger writes everything to stderr. But keep in mind it's a trivial task piping stderr to a file.In my little experiment with log level DEBUG, I could not see the IP or Tor address I was connecting from and in the code it doesn't seem that it's logged, either. But it's simple to add, as others mentioned.I do see the queried addresses, though.If you run electrs with log_filter = DEBUG and grep stderr for DEBUG electrs::server] 0:, you will get the communication between your SPV wallet and your Electrum server.Code:bitcoin@localhost:~/electrs> /home/bitcoin/electrs/target/release/electrs 2> >(grep 'DEBUG electrs::server] 0:')[~snip~ DEBUG electrs::server] 0: connected[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"server.version\",\"params\":[\"Sparrow\",\"1.4\"],\"id\":1}[~snip~ DEBUG electrs::server] 0: send {\"id\":1,\"jsonrpc\":\"2.0\",\"result\":[\"electrs/0.9.8\",\"1.4\"]}[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"blockchain.headers.subscribe\",\"params\":[],\"id\":2}[~snip~ DEBUG electrs::server] 0: send {\"id\":2,\"jsonrpc\":\"2.0\",\"result\":{\"height\":747717,\"hex\":\"00c00020c072fd1a50fe409f82942c9dfc46565761c38522589103000000000000000000d8c783dcd4e3eb05372ae116978d9fbd2d4fd1d29f3a3c6dfa4f841bb739ac623faee962042a0a17ae7fbf9d\"}}[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"server.banner\",\"params\":[],\"id\":3}[~snip~ DEBUG electrs::server] 0: send {\"id\":3,\"jsonrpc\":\"2.0\",\"result\":\"Welcome to electrs 0.9.8 (Electrum Rust Server)!\"}[~snip~ DEBUG electrs::server] 0: recv [{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[1],\"id\":4},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[2],\"id\":5},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[3],\"id\":6},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[4],\"id\":7},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[5],\"id\":8},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[10],\"id\":9},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[25],\"id\":10},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.estimatefee\",\"params\":[50],\"id\":11}][~snip~ DEBUG electrs::server] 0: send [{\"id\":4,\"jsonrpc\":\"2.0\",\"result\":0.00013},{\"id\":5,\"jsonrpc\":\"2.0\",\"result\":0.00013},{\"id\":6,\"jsonrpc\":\"2.0\",\"result\":0.00013},{\"id\":7,\"jsonrpc\":\"2.0\",\"result\":0.00011838},{\"id\":8,\"jsonrpc\":\"2.0\",\"result\":0.00010052},{\"id\":9,\"jsonrpc\":\"2.0\",\"result\":0.00005394},{\"id\":10,\"jsonrpc\":\"2.0\",\"result\":0.00001},{\"id\":11,\"jsonrpc\":\"2.0\",\"result\":0.00001}][~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"mempool.get_fee_histogram\",\"params\":[],\"id\":12}[~snip~ DEBUG electrs::server] 0: send {\"id\":12,\"jsonrpc\":\"2.0\",\"result\":[[1023,560],[511,1662],[255,12801],[127,12906],[63,59896],[31,195453],[15,1397569],[7,756035],[3,430544],[1,314814],[0,0]]}[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"blockchain.relayfee\",\"params\":[],\"id\":13}[~snip~ DEBUG electrs::server] 0: send {\"id\":13,\"jsonrpc\":\"2.0\",\"result\":0.00001}[~snip~ DEBUG electrs::server] 0: recv {\"jsonrpc\":\"2.0\",\"method\":\"server.ping\",\"params\":[],\"id\":14}[~snip~ DEBUG electrs::server] 0: send {\"id\":14,\"jsonrpc\":\"2.0\",\"result\":null}[~snip~ DEBUG electrs::server] 0: recv [{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.scripthash.subscribe\",\"params\":[~scripthash~],\"id\":16},{\"jsonrpc\":\"2.0\",\"method\":\"blockchain.scripthash.subscribe\",\"params\":[~scripthash~],\"id\":17}, ...][~snip~ DEBUG electrs::server] 0: send [{\"id\":16,\"jsonrpc\":\"2.0\",\"result\":\"~snip~\"},{\"id\":17,\"jsonrpc\":\"2.0\",\"result\":\"~snip~\"}, ...]...I obviously had to redact a lot; but in essence, the client (in this case, Sparrow - I noticed our esteemed forum member achow101 is mentioned as contributor!) queries the blockchain.scripthash.subscribe Electrum protocol method (a list of all these methods).In this case, blockchain.scripthash refers to a 'hash of the binary bytes of the locking script, expressed as a hexadecimal string' [quote: https://electrumx.readthedocs.io/en/latest/protocol-basics.html#script-hashes].So basically wherever I wrote ~scripthash~, there are script hashes, a different representation of the addresses of whoever's querying. Especially since they're bunched together in a small number of individual requests, we can say that electrs does link transactions together in its default logs.Makes you wonder how difficult it would be to recode some of the SPV wallets to never connect to the same server for more then one request before going to another random one and then going to another random one. You would have to keep a local log but it would make some analysis a bit more difficult. That or as others have said, run your own. As many of us have pointed out many times you can easily do it for under $100 in hardware. And with all the pre-packaged / pre-configured setups out there it is not that difficult for a novice to do.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 04, 2022, 08:47:35 PM",
+      "body": "Quote from: DaveF on August 04, 2022, 01:27:00 PMMakes you wonder how difficult it would be to recode some of the SPV wallets to never connect to the same server for more then one request before going to another random one and then going to another random one. You would have to keep a local log but it would make some analysis a bit more difficult. Not very.The protocol that Electrum uses isn't designed to enhance privacy but quite the opposite instead. It doesn't use any methods to try to obfuscate your data whatsoever. It is totally possible for the server to jump from one to another with each address but that is ridiculously inefficient and gets more inefficient as the number of addresses increases. It does nothing against topological leaks given the limited number of servers and the possibility that a malicious agent runs multiple servers. An example of a wallet that does this would be Wasabi but it is done with a combination of BIP 158 but Electrum just sends the Scripthash straight up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 04, 2022, 10:12:16 PM",
+      "body": "Quote from: DaveF on August 04, 2022, 01:27:00 PM~snip~Makes you wonder how difficult it would be to recode some of the SPV wallets to never connect to the same server for more then one request before going to another random one and then going to another random one. You would have to keep a local log but it would make some analysis a bit more difficult. It would also require to change the way requests are made. As seen in the log, the SPV wallet requests a whole bunch of addresses at once. In my case (Sparrow), it sent one request per wallet, each of which included all the addresses the software already knows are funded + an additional 5 or something like that. So even if each request went to a different server, the addresses in each wallet would have been linked; just no link between wallets.It's very implementation-specific, of course. But I don't suspect other wallets to create a new request for every single address. It would incur too much overhead.Quote from: DaveF on August 04, 2022, 01:27:00 PMThat or as others have said, run your own. As many of us have pointed out many times you can easily do it for under $100 in hardware. And with all the pre-packaged / pre-configured setups out there it is not that difficult for a novice to do.YES YES YES! [Guide] How to run a Bitcoin Core full node for under 50 bucks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 06, 2022, 09:07:44 AM",
+      "body": "Quote from: n0nce on August 02, 2022, 11:53:59 PMDo keep in mind this holds true if the one Tor server you're connecting to is not yours.Well, of course. I assume most people would trust themselves to not send themselves malicious data. Quote from: ranochigo on August 04, 2022, 08:47:35 PMIt does nothing against topological leaks given the limited number of servers and the possibility that a malicious agent runs multiple servers.Exactly this. It is trivial to run an Electrum server. An average home computer running a full node could run multiple servers simultaneously, meaning a large blockchain analysis firm could easily run the majority of public servers if they wanted (and indeed, this could very well already be the case). Even if you only ran a single server, then simply over time you could collect enough data to link addresses from most wallets simply by matching the IP of all the requests your server does receive.And given how trivial it is to run an Electrum server, no reason not to just spin up your own one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "August 12, 2022, 02:12:37 PM",
+      "body": "Quote from: o_e_l_e_o on August 06, 2022, 09:07:44 AMAnd given how trivial it is to run an Electrum server, no reason not to just spin up your own one.Preferably with static public ip (or dyndns/no-ip kind of service) to be able to use it on smartphone - mobile electrum and blue wallet allow setting custom electrum servers - or just outside home. Or install all on own laptop, but then you need a really big disk and each time after you disconnects you must later wait some time for resync.I do not know how about Ledger software, but Trezor Suite allows you to connect to your own node too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 12, 2022, 10:04:49 PM",
+      "body": "Quote from: PawGo on August 12, 2022, 02:12:37 PMQuote from: o_e_l_e_o on August 06, 2022, 09:07:44 AMAnd given how trivial it is to run an Electrum server, no reason not to just spin up your own one.Preferably with static public ip (or dyndns/no-ip kind of service) to be able to use it on smartphone - mobile electrum and blue wallet allow setting custom electrum servers - or just outside home. Or install all on own laptop, but then you need a really big disk and each time after you disconnects you must later wait some time for resync.I do not know how about Ledger software, but Trezor Suite allows you to connect to your own node too.I would highly suggest using a Tor tunnel instead. It is more secure, more private and even easier to set up.You basically just want to create such an entry in /etc/tor/torrc.Code:HiddenServiceDir /var/lib/tor/electrs_hidden_service/HiddenServiceVersion 3HiddenServicePort 50001 127.0.0.1:50001ExitPolicy reject *:* # no exits allowedThen after restarting Tor, you can retrieve the onion v3 URL and type it into all of your SPV wallets.Code:sudo systemctl enable tor.servicesudo service tor restartsudo cat /var/lib/tor/electrs_hidden_service/hostname",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "id": "topic_5437423",
+  "title": "witcher_sense",
+  "author": "witcher_sense",
+  "created_time": "January 31, 2023, 05:51:51 AMLast edit: October 23, 2024, 03:58:56 AM by witcher_sense",
+  "content": "IntroductionA lightweight fully open-source CLI tool for signing and verification of bitcoin messages. Bitcoin message is the most straightforward and natural way to prove ownership over a given address without revealing any confidential information.This tool closely follows specification described in BIP137:\"...While there was no BIP written for how to digitally sign messages with Bitcoin private keys with P2PKH addresses it is a fairly well understood process, however with the introduction of Segwit (both in the form of P2SH and bech32) addresses, it is unclear how to distinguish a P2PKH, P2SH, or bech32 address from one another. This BIP proposes a standard signature format that will allow clients to distinguish between the different address formats.\"Please note that: \"since this format includes P2PKH keys, it is backwards compatible, but keep in mind some software has checks for ranges of headers and will report the newer segwit header types as errors.\"More info: https://github.com/bitcoin/bips/blob/master/bip-0137.mediawikiWallets that fully support BIP137 type of signatures:1) Trezor2) Sparrow Wallet3) Coldcard?4) ...This tool is basically an attempt to expand the use of this standard.Installation1)To install with pip, run:Code:pip install bitcoin-message-toolYou can create a virtual environment for this application and run it from there, for example using Poetry.Create a new folder (bmt is short for Bitcoin Message Tool or you can choose whatever you want):Code:poetry new bmtCode:cd ./bmtCreate a new virtual environment:Code:poetry installCode:poetry shellDownload the application from PyPi via this command:Code:poetry add bitcoin-message-toolTo run it from the terminal use this command:Code:python3 -m bitcoin_message_toolWhen you run the app without arguments, you will see a help message.2) Alternatively, you can download the source code directly from GitHub via this command:Code:git clone https://github.com/shadowy-pycoder/bitcoin_message_tool.gitor you can fork the repo and than clone the forked versionInstall requirements via this command:Code:pip install -r /path/to/requirements.txtTo run an application from the forked or cloned repo, you can simply use the following:Code:python3 /path/to/bmt.py -hHow to use Bitcoin Message ToolThe following doctest should give a clear picture about how to sign a nd verify messages with this CLI tool:Basic usage:Code:python -m bitcoin_message_tool -horpython bmt.py -husage: python3 bmt.py [-h] {sign,verify} ...Bitcoin message signing/verification toolpositional arguments:{sign,verify}options:-h, --help     show this help message and exitMessage signing:Code:python bmt.py sign -husage: python3 bmt.py sign [-h] -p -a {p2pkh,p2wpkh-p2sh,p2wpkh} -m [MESSAGE ...] [-d] [-v]options:-h, --help            show this help message and exitSign messsage:-p, --privkey         private key in wallet import format (WIF)-a {p2pkh,p2wpkh-p2sh,p2wpkh}, --addr_type {p2pkh,p2wpkh-p2sh,p2wpkh}                        type of bitcoin address-m [MESSAGE ...], --message [MESSAGE ...]                        Message to sign-d, --deterministic   sign deterministtically (RFC6979)-v, --verbose         print prettified messageExample: Non-deterministic signature for compressed private key and p2pkh addressCode:$python bmt.py sign -p -a p2pkh -m ECDSA is the most fun I have ever experiencedPrivateKey(WIF): <insert private key here>Please note that private key won't show up on the terminal.Output:Code:Bitcoin address: 175A5YsPUdM71mnNCC3i8faxxYJgBonjWLMessage: ECDSA is the most fun I have ever experiencedSignature: IBuc5GXSJCr6m7KevsBAoCiX8ToOjW2CDZMr6PCEbiHwQJ237LZTj/REbDHI1/yelY6uBWEWXiOWoGnajlgvO/A=The same output with -v/--verbose flag:Code:-----BEGIN BITCOIN SIGNED MESSAGE-----ECDSA is the most fun I have ever experienced-----BEGIN BITCOIN SIGNATURE-----175A5YsPUdM71mnNCC3i8faxxYJgBonjWLIBuc5GXSJCr6m7KevsBAoCiX8ToOjW2CDZMr6PCEbiHwQJ237LZTj/REbDHI1/yelY6uBWEWXiOWoGnajlgvO/A=-----END BITCOIN SIGNATURE-----Message verification:Code:python bmt.py verify -husage: python3 bmt.py verify [-h] -a ADDRESS -m [MESSAGE ...] -s SIGNATURE [-v] [-r]options:-h, --help            show this help message and exitVerify messsage:-a ADDRESS, --address ADDRESS                        specify bitcoin address-m [MESSAGE ...], --message [MESSAGE ...]                        Message to verify-s SIGNATURE, --signature SIGNATURE                        bitcoin signature in base64 format-v, --verbose         print full message-r, --recpub          recover public keyExample: Message verification in verbose modeCode:python bmt.py verify -a 175A5YsPUdM71mnNCC3i8faxxYJgBonjWL \\> -m ECDSA is the most fun I have ever experienced \\> -s HyiLDcQQ1p2bKmyqM0e5oIBQtKSZds4kJQ+VbZWpr0kYA6Qkam2MlUeTr+lm1teUGHuLapfa43JjyrRqdSA0pxs= \\> -vOutput:Code:TrueMessage verified to be from 175A5YsPUdM71mnNCC3i8faxxYJgBonjWLMore examples and source code can be found here: https://github.com/shadowy-pycoder/bitcoin_message_toolTests with Sparrow WalletLet's verify a SegWit signature created with real wallet:Result:Let's verify a SegWit signature created by this tool:Result:Translations:Română: Bitcoin Message Tool – semnare și verificare în mod comandă, translation by GazetaBitcoinPidgin: Bitcoin Message Tool - command-line signer & verifier, translation by Mia ChloeУкpaїнcькa: Bitcoin Message Tool - CLI для пiдпиcy тa вepифiкaцiї, translation by DrBeerPyccкий: Bitcoin Message Tool — CLI для пoдпиcи и вepификaции, translation by DrBeerFrench: Bitcoin Message Tool - signer et vérifier des messages en ligne de commande, translation by paid2Urdu: بٹ کوائن میسج ٹول - کمانڈ لائن دستخط کنندہ او, translation by Adiljutt156Español: Bitcoin Message Tool - líneas de comando para firma y verificación , translation by PorfiriiIndonesian: Bitcoin Message Tool - command-line signer & verifier, translation by Husna QAArabic: أداة رسالة البيتكوين - أداة التوقيع والتحق\u0001, translation by Nalain420Turkish: Bitcoin Mesaj Aracı - Komut Satırı İmzalayıcı ve Doğrulayıcı, translation by mela65Bangla: বিটকয়েন মেসেজ টুল - কমান্ড লাইন সাইনার ও ভের&, translation by DYING_S0UL",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5437423",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "January 31, 2023, 10:28:13 AM",
+      "body": "Really awesome stuff you made there.In the case of Segwit addresses and BIP137, you can use this draft BIP I made a while ago (https://notatether.com/notabips/bip-notatether-messageverify/) that assigns some integer values for P2WPKH messages (39-42 for P2WPKH and even 43-46 for P2TR). It's unfortunate that it was never considered for numbering though (Luke didn't see the need for it).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 31, 2023, 01:31:15 PM",
+      "body": "Quote from: NotATether on January 31, 2023, 10:28:13 AMReally awesome stuff you made there.In the case of Segwit addresses and BIP137, you can use this draft BIP I made a while ago (https://notatether.com/notabips/bip-notatether-messageverify/) that assigns some integer values for P2WPKH messages (39-42 for P2WPKH and even 43-46 for P2TR). It's unfortunate that it was never considered for numbering though (Luke didn't see the need for it).This tool actually recognizes Taproot headers and doesn't necessarily consider them \"invalid\". Here is the code snippet:Code:def verify_message(address: str, message: str, signature: str, /) -> tuple[bool, str, str]:    ...    if header < 27 or header > 46:        raise SignatureError('Header byte out of range:', header)    ...    uncompressed = False    addr_type = 'p2pkh'    if header >= 43:        header -= 16        addr_type = ''    ...    if addr_type:        addr, _ = derive_address(pubkey, addr_type)    else:        raise SignatureError('Unknown address type')   ...When headers are within 42-46 range, addr_type variable is assigned to an empty string instead of 'p2tr' because derive_address function has no idea how to handle this type of addresses. Honestly, I don't know much about Taproot addresses, but I think that implementing it requires additional non-ECDSA functions for signature signing and verification.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "February 02, 2023, 02:23:27 PM",
+      "body": "Added experimental support for Electrum signatures. In order to sign and verify messages recognizable by Electrum wallet, specify a new flag:Code:-e/--electrumSome examples:Message signing:First, we create the signature in Bitcoin Message Tool:Second, check if Electrum understands what we feed it:Message verification:First we sign our message in Electrum wallet:Check if we can verify it:In all examples, I specified -e flag, otherwise, neither I nor Electrum would understand each other. Please note, however, Electrum will verify BIP137 signatures (without the -e flag), but it can't create them (we can't verify them without the -e flag specified). This is for Segwit only: legacy addresses should work with or without the -e flag.More information can be found here: https://github.com/spesmilo/electrum/pull/7668",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "August 14, 2023, 11:48:08 AM",
+      "body": "Quote from: NotATether on January 31, 2023, 10:28:13 AMReally awesome stuff you made there.In the case of Segwit addresses and BIP137, you can use this draft BIP I made a while ago (https://notatether.com/notabips/bip-notatether-messageverify/) that assigns some integer values for P2WPKH messages (39-42 for P2WPKH and even 43-46 for P2TR). It's unfortunate that it was never considered for numbering though (Luke didn't see the need for it).Since people on GitHub started requesting to add Taproot support in the bitcoin message tool, I am considering implementing the algorithm described in your proposal. But I ran into two problems: the first one is that the link you provided doesn't work anymore, and the second one, which is more serious, is that I completely unfamiliar with the Taproot algorithm, especially with the parts that describe how it deals with address creation, signature verification, and signature signing. Could you explain in very layman's terms how your algorithm is different from standard Legacy/Segwit ones?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 15, 2023, 08:32:19 AMLast edit: August 15, 2023, 08:49:37 AM by NotATether",
+      "body": "Quote from: witcher_sense on August 14, 2023, 11:48:08 AMQuote from: NotATether on January 31, 2023, 10:28:13 AMReally awesome stuff you made there.In the case of Segwit addresses and BIP137, you can use this draft BIP I made a while ago (https://notatether.com/notabips/bip-notatether-messageverify/) that assigns some integer values for P2WPKH messages (39-42 for P2WPKH and even 43-46 for P2TR). It's unfortunate that it was never considered for numbering though (Luke didn't see the need for it).Since people on GitHub started requesting to add Taproot support in the bitcoin message tool, I am considering implementing the algorithm described in your proposal. But I ran into two problems: the first one is that the link you provided doesn't work anymore, and the second one, which is more serious, is that I completely unfamiliar with the Taproot algorithm, especially with the parts that describe how it deals with address creation, signature verification, and signature signing. Could you explain in very layman's terms how your algorithm is different from standard Legacy/Segwit ones?Ah shit, looks like my website is down again since yesterday, so I'm going to have to diagnose that pronto.Edit: A plugin crashed, got rid of it and it works now.As for your second question:Message signing is only \"officially\" defined for Legacy address types, as it was added by Satoshi himself and there is not even a BIP for it.It basically works by doing a standard ECDSA with the private key and the message setting a value based on whether the address is compressed legacy or uncompressed legacy - this value is stored as bytes before the R and S values.In the case of Taproot, it is using Schnorr algorithm, not ECDSA. So all that is necessary to do is make a change of algorithm, and define new values for indicating Taproot (and segwit) addresses, and that's pretty much what this BIP does.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "August 15, 2023, 03:18:21 PM",
+      "body": "Quote from: NotATether on August 15, 2023, 08:32:19 AMIn the case of Taproot, it is using Schnorr algorithm, not ECDSA. So all that is necessary to do is make a change of algorithm, and define new values for indicating Taproot (and segwit) addresses, and that's pretty much what this BIP does.I am reading your proposal and also https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki but still fail to understand what such notations like BIP0340/challenge, BIP0340/aux, BIP0340/nonce actually mean. How are they calculated or where should I take them from? Also, what is tagged hash in layman terms?Just for reference, here is a python implementation of bech32m addresses: https://github.com/sipa/bech32/blob/master/ref/python/segwit_addr.pySomeone published it on PyPi: https://pypi.org/project/bech32m/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Financisto",
+      "created_time": "March 26, 2024, 04:30:44 AMLast edit: March 28, 2024, 04:40:51 PM by Financisto",
+      "body": "Is it possible (in the near future) to provide a single AppImage file (or single binary file, or single executable file, etc) as a Github-release?P.S. Your project reminded me of this HTML/Javascript Brainwallet (WarpWallet's fork) turned into a single CLI executable file: https://github.com/moncho/warpwalletProviding that option would be great for UX!Last but not least: your CLI BTC msg tool is awesome!Congratulations and keep it evolving!Cheers!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 14, 2024, 03:35:29 PMLast edit: July 14, 2024, 03:46:55 PM by witcher_sense",
+      "body": "Quote from: Financisto on March 26, 2024, 04:30:44 AMIs it possible (in the near future) to provide a single AppImage file (or single binary file, or single executable file, etc) as a Github-release?P.S. Your project reminded me of this HTML/Javascript Brainwallet (WarpWallet's fork) turned into a single CLI executable file: https://github.com/moncho/warpwalletProviding that option would be great for UX!Last but not least: your CLI BTC msg tool is awesome!Congratulations and keep it evolving!Cheers!Hello, sorry for the late reply and thank you for kind words and valuable feedback!I have good news for you because i managed to reimplement my CLI application in Golang, here is the link to GitHub page: https://github.com/shadowy-pycoder/go-bitcoin-message-toolIt almost the same as Python implementation except that it works much faster, contains less bugs (I finally added some tests to check if it works correctly) and offers some additional features. It also allows you to generate single Bitcoin wallets (by wallet I mean a standard private and public key pair, legacy, nested segwit and native segwit addresses. It takes around 6 secs for my 4 CPU notebook to generate 10000 wallets, which I think is a decent perfomance, especially considering the fact that I use standard library for big numbers arithmetics.Installation process as simple as running a single command (assuming you have Golang installed on your computer, instructions can be found here https://go.dev/doc/install)To install the command line tool you have to run this:Code:go install github.com/shadowy-pycoder/go-bitcoin-message-tool/cmd/bmt@latestThis will compile an executable program for your operating system and allow you to sign, verify messages and create wallets just by running a single command like bmt or bmt.exeAlternatively, you can clone GitHub repo and build directly from there, like this:Code:git clone https://github.com/shadowy-pycoder/go-bitcoin-message-tool.gitCode:make buildor Code:go build  -o ./bin/ ./cmd/bmt/Run the application by running this command:Code:./bin/bmtFull instructions on how to use the app you can find here: https://github.com/shadowy-pycoder/go-bitcoin-message-tool/blob/master/README.mdP.S. Forgot to mention that you should not use this tool for any serious stuff, it is created just for fun and cryptography education. So do not put your coins on any generated wallets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 14, 2024, 03:44:16 PM",
+      "body": "Quote from: witcher_sense on July 14, 2024, 03:35:29 PMInstallation process as simple as running a single command (assuming you have Golang installed on your computer, instructions can be found here https://go.dev/doc/install)To install the command line tool you have to run this:Code:go install github.com/shadowy-pycoder/go-bitcoin-message-tool/cmd/bmt@latestThis will compile an executable program for your operating system and allow you to sign, verify messages and create wallets just by running a single command like bmt or bmt.exe~Full instructions on how to use the app you can find here: https://github.com/shadowy-pycoder/go-bitcoin-message-tool/blob/master/README.mdIf you want, I can create an AppImage of that for you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 16, 2024, 06:37:42 AM",
+      "body": "Quote from: NotATether on July 14, 2024, 03:44:16 PMIf you want, I can create an AppImage of that for you.Why not? The only thing that I need to mention is that the master branch won't compile for Windows systems (unfortunately). I think I fixed it in development one but havent tested it yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Porfirii",
+      "created_time": "September 07, 2024, 10:51:52 AM",
+      "body": "Congratulations for this topic witcher_sense.It has raised our awareness and, with your permission, the members of the AoBT would like to translate and post it in different local boards for greater reach and visibility for non-English speakers.Please, let us know if you want us to meet any special requirements before posting the mentioned translations.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GazetaBitcoin",
+      "created_time": "September 07, 2024, 10:53:57 AM",
+      "body": "Hello witcher_sense,I hope this is good news  This topic also drew the attention of AOBTers and we will start to translate it in multiple languages. Similar to the other topic, you can see the progress and new translations here.The Romanian translation is already done.Cheers![Later edit: ooops, Porf was faster than me with 2'07\"]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "September 11, 2024, 08:14:14 AM",
+      "body": "Quote from: GazetaBitcoin on September 07, 2024, 10:53:57 AMHello witcher_sense,I hope this is good news  This topic also drew the attention of AOBTers and we will start to translate it in multiple languages. Similar to the other topic, you can see the progress and new translations here.The Romanian translation is already done.Cheers![Later edit: ooops, Porf was faster than me with 2'07\"]Thank you, guys, added all translation to the OP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GazetaBitcoin",
+      "created_time": "October 01, 2024, 08:35:33 AM",
+      "body": "Quote from: witcher_sense on September 11, 2024, 08:14:14 AMThank you, guys, added all translation to the OP.  Thank you for adding the translations to OP At same time, there is one more translation available for your topic. It is made by Nalain420, for Arabic language. The translation can be found here: أداة رسالة البيتكوين - أداة التوقيع والتحق.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DYING_S0UL",
+      "created_time": "October 09, 2024, 05:00:50 AM",
+      "body": "Quote from: witcher_sense on January 31, 2023, 05:51:51 AMIntroduction[...snip...]The following doctest should give a clear picture about how to sign a nd verify messages with this CLI tool:Isn't this a type or an extra space (and)? Noticed it when I was translating this topic!-DS",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GazetaBitcoin",
+      "created_time": "October 12, 2024, 05:31:10 PMLast edit: October 12, 2024, 06:42:42 PM by GazetaBitcoin",
+      "body": "Dear witcher_sense, another AOBTer finished a tenth translation for your topic: Bitcoin Mesaj Aracı - Komut Satırı İmzalayıcı ve Doğrulayıcı. It is in Turkish language and it was done by mela65.Can you add it to OP too, please? Later edit: and one more translation has been done meanwhile -- বিটকয়েন মেসেজ টুল - কমান্ড লাইন সাইনার ও ভেরিফায়ার. This one is done by DYING_S0UL, in Bangla language.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GazetaBitcoin",
+      "created_time": "December 09, 2024, 08:27:53 AM",
+      "body": "Hey witcher_sense, I am coming back to your thread with some more good news An AOBTer just made one more translation for your topic and this may be, perhaps, the most exotic one, as it was don in Hindi language!. Please find it here - Bitcoin Message Tool - कमांड-लाइन साइनर और वेरिफायर.And please add it to OP as well, if you find it suitable",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

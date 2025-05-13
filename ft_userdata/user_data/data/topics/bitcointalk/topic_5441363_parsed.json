@@ -1,0 +1,117 @@
+{
+  "id": "topic_5441363",
+  "title": "whanau",
+  "author": "whanau",
+  "created_time": "February 27, 2023, 04:22:34 AM",
+  "content": "Hello, I am trying to learn and I am confused by this transactionb7ca4adad64a5c8a57258d3943002ce3f9ffa543d794bfc9eba34f22905ded1cfor this already compromised and empty address from years ago 1PYwTzZZhMdaCh1QtU8LY61taUnFhuUMkXIt has a duplicate R value, 2c64be172f697261c08f9a9ede4f1359cd5a6a75f9c4bc60d359640acd2722b1with different S values,2575266b294a19029ac41b8f998ef883d8be2d38994932e493b0d6354034aa30 and55fe0b499af7f2c376a2f4e3fc960cd7402c05c8b9b821543244bb39ccc623beThe Z values are 12f47c9f1d683e991e4d9d38e8dca9c55df7fc4a346e7b747fe882f7a7a64f4d and82c2725f6fd394d544bc8532ce3b68116be8466006d04764d4d5b1d65dcb9459I have tried several different programs online and offline which give a consistent result,k = 0xa8ebe295be40b9b6363494de5844d8cc2003e45a39e8b398f714c832df1b2855x = 0x91c405583bb95ba30c9fde2d8ef5a9b79c0cdada4ee97710874bf0a217c3c06c But this key (x) does not match 1PYw....    What am I missing?? Thank you",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5441363",
+  "comments": [
+    {
+      "author": "witcher_sense",
+      "created_time": "February 27, 2023, 06:43:00 AM",
+      "body": "You say that 1PYwTzZZhMdaCh1QtU8LY61taUnFhuUMkX has already been compomised, which means its private key should already be know to the public. If this is the case and you have signature, message, message hash, you can calculate a signing secret which was used to calculate signature values.Use this formula:Code:k = (z + d * r)  / swhere z - message hash d - secretr, s - signaturePlease note that in order to calculate private key, you need to have a signing secret, and the opposite is also true: in order to calculate signing secret, you need to have private key which was used to sign message. The following formula can be used to derive d from known signing secret, signature and message:Code:d = (s * k - z)  /  rwhere z - message hash k - signing secretr, s - signature",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "February 27, 2023, 07:30:43 PM",
+      "body": "Thank you for taking the time to reply. All information is appreciated.I am more interested in why the math \"doesn't work\" .  My reading and experiments show that given the same R value and different S values,we can work out the private key if the public keys are the same. Private key  =   ((S * K) - Z) / R) % N. (Old news I know) .  So, for this transaction, which has the same public key, so must have the same private key and K value, the only thing I can imagine is that the data in the RSZ values must have been calculated differently?? Does anyone know how?You can play with the values in this online calculator.http://rawcdn.githack.com/nlitsme/bitcoinexplainer/aa50e86e8c72c04a7986f5f7c43bc2f98df94107/calculator.html#bTE9MHhjMGUyZDBhODlhMzQ4ZGU4OGZkYTA4MjExYzcwZDFkN2U1MmNjZWYyZWI5NDU5OTExYmY5NzdkNTg3Nzg0YzZlCm0yPTB4MTdiMGY0MWM4YzMzN2FjMWUxOGM5ODc1OWU4M2E4Y2NjYmMzNjhkZDlkODllNWYwM2NiNjMzYzI2NWZkMGRkYwpzMT0weDQ0ZTFmZjJkZmQ4MTAyY2Y3YTQ3YzIxZDVjOWZkNTcwMTYxMGQwNDk1M2M2ODM2NTk2YjRmZTlkZDJmNTNlM2UKczI9MHg5YTVmMWM3NWU0NjFkN2NlYjFjZjNjYWI5MDEzZWIyZGM4NWI2ZDBkYThjM2M2ZTI3ZTNhNWE1YjNmYWE1YmFiCnI9MHhkNDdjZTRjMDI1YzM1ZWM0NDBiYzgxZDk5ODM0YTYyNDg3NTE2MWEyNmJmNTZlZjdmZGMwZjVkNTJmODQzYWQxCgprPShtMS1tMikvKHMxLXMyKQoKeD0oczEqay1tMSkvcgo=Thank you",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "February 27, 2023, 08:31:41 PM",
+      "body": "The issue is that both (r, s) and (r, -s) are valid signatures. If you picks2 = N - 0x55fe0b499af7f2c376a2f4e3fc960cd7402c05c8b9b821543244bb39ccc623be = 0xaa01f4b665080d3c895d0b1c0369f3277a82d71df5907ee78d8da35303701d83and use that in your calculations instead, you will get the correct answer, which isk = 0xad8c707d60847d51fa28437c7a8e3659cf67f6509463f21872d543b160803e17x = 0x76515e29b11d76099d1858e6f97ec274040d7e43a435f5e4959217538448d9ea",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "February 27, 2023, 11:28:36 PM",
+      "body": "Thank you! Exactly what I wanted to know.Is there any way of spotting when (r,s) and (r, -s) are both valid ? Or is it a matter of trial and error?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "February 28, 2023, 03:50:38 AM",
+      "body": "Quote from: whanau on February 27, 2023, 11:28:36 PMIs there any way of spotting when (r,s) and (r, -s) are both valid ? If (r,s) is a valid signature then (r,-s) is also always a valid signature because of the way ECDSA works. However, you have no way of knowing whether the signer negated s value or not by just looking at the signature.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "February 28, 2023, 04:13:49 AM",
+      "body": "Thank you. Using the same public key/address there is also this transaction5D212D7AB71598B9A97E21B8A608713C97F46BE4E410BD1B6A03B3BF2B1AC574It also has duplicate but different R values (so K is different) and different S values. Accepting that K could be calculated as per witcher_sense post, let's assume we don't know K and have to calculate the 'usual' way. We should still be able to get the correct key and new K from the matching R values and different S values by the usual process but the values do not produce the correct result.I have tried with my new knowledge, (r,s)  (r, -s1) (r, -s2) .However I notice the second transaction DER is slightly different and is missing the usual length byte after the 02 for the S string.46304302205c89e3bcf8d3d25ed2be7071d086590394d912fb16e5c14643b1aba3b7668fda02 <- usually a length byte follows1f0cf57aee36c510f83741416e9330a21bbc06d09d34af3243e5ff4197c6a23801I have tried with S being as above and  0cf57aee36c510f83741416e9330a21bbc06d09d34af3243e5ff4197c6a238.Any ideas why this does not produce the correct values?Thank you",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "February 28, 2023, 04:19:33 AM",
+      "body": "The length byte is the 1f following 02. s = 0x000cf57aee36c510f83741416e9330a21bbc06d09d34af3243e5ff4197c6a238 so the first zero byte isn't included in the signature, therefore the length is 1f instead of the usual 20.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "February 28, 2023, 09:34:22 AM",
+      "body": "Thank you. That makes sense but the extra 00 does not seem to make any difference to the calculations.I still get the wrong answer of X = 209f1b692d307066bd4e70a945d657776e7b115d626e4302af0c6a710544ba60 which we know is wrong andK = ea32615633688185aa89ffe39e5aff9f0f1f9020477a61eb904db9aa16d561dewith the online calculatoragain I have tried 3 ways with s,  -s1 ,  -s2",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "February 28, 2023, 02:11:53 PM",
+      "body": "Too lazy to check another one, but notice that there are two possible k: N - k is also a valid value, maybe that one works?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "February 28, 2023, 06:59:37 PM",
+      "body": "thank you again. I will try all the permutations I can think of and publish the answer if I find it.If anyone else finds it in the meantime, please let me know.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "March 03, 2023, 03:06:14 AM",
+      "body": "I have not been able to work this out so a merit point for anyone who can show how to calculate the key only using the information in this transaction.I am interested in the math not the key or k. Thanks5D212D7AB71598B9A97E21B8A608713C97F46BE4E410BD1B6A03B3BF2B1AC574",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "March 03, 2023, 05:37:05 PM",
+      "body": "Not sure what you're doing wrong, 0xea32615633688185aa89ffe39e5aff9f0f1f9020477a61eb904db9aa16d561de is what you get when you don't negate s1 or s2.My numbers:Code:z1   0xa1807c2d03c25bd953b18d867a70a19a70ac4d1f2a867f1f16eb89e784812f1az2   0x422a028e6f65934a190b6f9b728b5a0be4feee358852fd544b4c3f5e80934aa6r1   0x5c89e3bcf8d3d25ed2be7071d086590394d912fb16e5c14643b1aba3b7668fdas1   0x1667166dfbcf50fb161cbeb839bd8619a2fb7e2a8e1fb8f40ed873d824478401N-s2 0xfff30a8511c93aef07c8bebe916ccf5c9ef2d6161213f1097bec5f4b386f9f09 (used as replacement for s2)k    0x155362cdb2f5c90d4d541e3feddf2e706a6b4e6b93dd1406520fcee6bb570454x    0x76515e29b11d76099d1858e6f97ec274040d7e43a435f5e4959217538448d9ea",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "March 04, 2023, 01:12:09 AM",
+      "body": "I am an idiot and had a typo in the r value - an extra 0 on the end.Thanks. merit added",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "topic_5454127",
+  "title": "Jodmapht",
+  "author": "Jodmapht",
+  "created_time": "May 26, 2023, 04:34:34 PMLast edit: May 26, 2023, 04:44:45 PM by Jodmapht",
+  "content": "Hi,I tried closing a channel using the fee-range feature to set a fee range that makes sense, but the fee range argument is not well documented and I must have passed it using wrong units, resulting in a stuck transaction. I need to close another channel so I need to figure this out. Could someone help me?Here is what I used. I thought I was specifying a fee rate argument in sat/vByte for the closing tx:lightning-cli close (channel_ID) 345600 (output_address) null null null '[45,50]'Here is the output from lightning-cli:# Sending closing fee offer 171sat, with range 171sat-171satHere is what I saw in the logs:State changed from CHANNELD_NORMAL to CHANNELD_SHUTTING_DOWNState changed from CHANNELD_SHUTTING_DOWN to CLOSINGD_SIGEXCHANGEOur ideal fee is 3395sat (5023 sats/perkw), but our maximum is 171sat: using thatPeer transient failure in CLOSINGD_SIGEXCHANGE: closingd WARNING: warning channel (channel hex id): closing fee range must not be below 2683 satIt seemed stuck there, then I restarted lightningd and I saw this: performing quickclose in range 1697sat-7564sat State changed from CLOSINGD_SIGEXCHANGE to CLOSINGD_COMPLETEAnd the tx was submitted to the mempool with an insufficient fee rate of 20.98 sat/vByte and a total fee of 0.00003544BTC.So what happened exactly and how should I specify the fee rate in the future to avoid this?Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454127",
+  "comments": [
+    {
+      "author": "Clark Anderson",
+      "created_time": "May 29, 2023, 08:18:09 AM",
+      "body": "fee ranges is usually in msat/kw rather than sat/vByte, I guess that's why your fee range argument didn't work as expected. in your command, you provided a fee range of 45,50 thinking it was in sat/vbyte. however, the lightning network uses a fee rate in msat/kw. so the range you specified was interpreted as 45msat/kw, 50msat/kw.QuoteHere is the output from lightning-cli:# Sending closing fee offer 171sat, with range 171sat-171satThe output from lightning-cli indicated that it received your closing fee offer as 171 satoshis and interpreted your fee range as 171 msat/kw to 171 msat/kw and  this resulted in the warning message stating that the closing fee range must not be below 2683 satoshis.Quoteseemed stuck there, then I restarted lightningd and I saw this: performing quickclose in range 1697sat-7564sat State changed from CLOSINGD_SIGEXCHANGE to CLOSINGD_COMPLETEWhen you restarted lightning-cli  it performed a quick close with a fee range of 1697 satoshis to 7564 satoshis and the resulting fee rate off 20.98 sat/vByte was just insufficient.Quotewhat happened exactly and how should I specify the fee rate in the future to avoid this?You can convert between sat/vByte and msat/kw using the formulaCode:msat/kw = (sat/vByte * 1000) / (weight / 1000)just make sure to specify the fee range in the correct unit, which is msat/kw and by doing this you should be able to close the channel with the desired fee range",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

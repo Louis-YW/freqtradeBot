@@ -1,0 +1,45 @@
+{
+  "id": "topic_5464114",
+  "title": "TopGame",
+  "author": "TopGame",
+  "created_time": "August 22, 2023, 07:22:58 AMLast edit: August 22, 2023, 09:00:22 AM by TopGame",
+  "content": "Hello world,We are about to launch our own Crash game. In order to provide an absolutely fair game, we will now announce the formula for fairness verification and how to determine the salt:GAME RESULT FORMULA:Code:const gameResult = (seed, salt) => {    const nBits = 52; // number of most significant bits to use    // 1. HMAC_SHA256(message=seed, key=salt)      const hmac = CryptoJS.HmacSHA256(CryptoJS.enc.Hex.parse(seed), salt);    seed = hmac.toString(CryptoJS.enc.Hex);    // 2. r = 52 most significant bits    seed = seed.slice(0, nBits / 4);    const r = parseInt(seed, 16);    // 3. X = r / 2^52    let X = r / Math.pow(2, nBits); // uniformly distributed in [0; 1)    X = parseFloat(X.toPrecision(9));    // 4. X = 99 / (1-X)    X = 99 / (1 - X);    // 5. return max(trunc(X), 100)    const result = Math.floor(X);    return Math.max(1, result / 100);  };  GET SALT:Prior to being used for calculation, each game hash is salted with the lowercase + hexadecimal string representation of the hash from pre-selected Bitcoin block 808,080. This block has not been mined yet as of this post, proving that we have not deliberately selected a mined block with a hash that could be favorable to the house. Once block 808,080 has been mined, the results will be posted to this thread as a reply.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464114",
+  "comments": [
+    {
+      "author": "AB de Royse777",
+      "created_time": "August 22, 2023, 07:25:29 AM",
+      "body": "Welcome to the forum. What is your website URL?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "August 22, 2023, 03:48:50 PM",
+      "body": "Well, you explain where the salt comes from on this function: Quoteconst gameResult = (seed, salt) => {But we need more information about the seed to understand how provably fair is the engine. Since your Salt is a constant then the seed should be variable, another way all the bets would have the same result. I would like to get see the formulas that you are using to get both of them, because from what I understand the seed should come from the future block, and the salt should be the game round, but maybe I'm wrong. Can you give us more information?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "husseinhere",
+      "created_time": "August 22, 2023, 03:57:55 PM",
+      "body": "Quote from: TopGame on August 22, 2023, 07:22:58 AMHello world,We are about to launch our own Crash game. In order to provide an absolutely fair game, we will now announce the formula for fairness verification and how to determine the salt:Hey TopGame,seoincorporation is correct. You're fairly picking a salt, but by itself this does nothing because you haven't proved the other input to gameResult function is fairly picked. Presumably you're using bustabit's method of provably fair. But what they do is first commit to a hashchain, and then prove the hashchain was not unfairly picked. You can see their seeding event:https://bitcointalk.org/index.php?topic=922898.0  which you should use as a template--Also if you're interested in collaborating, I would be happy to help you setup a slight improvement over that with provablyhonest.com.  You can see a casino that recently launched using it, here's there seeding event:  https://bitcointalk.org/index.php?topic=5459744.0It is significantly more complicated, but provides some additional guarantees. Specifically in the case of crash, it helps prevent the casino needing to store a long lived \"top secret\" that can derive all future games, making it much easier and safer to run a casino",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TopGame",
+      "created_time": "September 17, 2023, 07:05:34 AM",
+      "body": "Block 808,080 has been mined, so we have our salt: 0000000000000000000211eb82135b8f5d8be921debf8eff1d6b38b73bc03834https://blockchair.com/bitcoin/block/808080",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

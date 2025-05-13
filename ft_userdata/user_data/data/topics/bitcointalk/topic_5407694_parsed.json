@@ -1,0 +1,165 @@
+{
+  "id": "topic_5407694",
+  "title": "P2PECS",
+  "author": "P2PECS",
+  "created_time": "July 26, 2022, 04:21:36 PM",
+  "content": "Since the minimum fee to make a transaction is 546 sats, and less is considered dust, the question has come to my mind if it is per input or summed up for a transaction.I suppose it is per transaction but assuming that it is so, I am not clear what minimum fees would be paid in the case that I have two inputs, with 547 sats, because having two inputs also makes the transaction more expensive. I know this is very hypothetical, but it is to try to understand it. Then I can apply it to 10, 100 or any inputs of 547 sats.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5407694",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "July 26, 2022, 04:30:37 PM",
+      "body": "The transaction fee is independent from the number of inputs. It it a fixed amount calculated by multiplying the fee rate times the transaction size, and is not deducted from each transaction input, but sent from your wallet as well inside the transaction.This works because the amount that you must pay in fees plus the total sum of the outputs must be less than the sum of the inputs, e.g. if you have a 0.5BTC input and want to send all (i.e. 0.5BTC) of it to some other address, making an output in the process, you must either add another input into the transaction or lower the amount being sent to one of the outputs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "OmegaStarScream",
+      "created_time": "July 26, 2022, 04:36:56 PM",
+      "body": "Here's a good and simple explanation about the dust limit:Quote from: https://bitcoin.stackexchange.com/questions/86068/how-was-the-dust-limit-of-546-satoshis-was-chosen-why-not-550-satoshisThe dust limit is not actually fixed, technically - it varies based on the type of output. 546 satoshis is simply the most commonly known one, for a p2pkh output. Being the longest-lived output type, I suspect some wallets/blog posts/literature might treat it as a hard coded dust limit.As to how to arrive at 546 satoshis, we must first know what \"dust\" means. A dust output is an output which costs more to spend, than it is worth. In other words, an X BTC output that costs >X to spend, is a dust output. This is directly proportional to the amount of data required to spend an output, since fees in bitcoin are commonly denoted \"per-byte\". The more bytes you must add to your tx to spend an output, the higher its dust threshold.A very basic tx consisting of 1 p2pkh input (~148 bytes), and 1 p2pkh output (~34 bytes) comes out to 182 bytes. The dust limit is 3 times this number (assuming a relay fee of 1 satoshi), or 182*3 = 546 sats.For more complex txs, such as p2sh, this number is larger. For less space-intensive ones such as the newer segwit options, this number would be lower.-snip-",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cookdata",
+      "created_time": "July 26, 2022, 04:47:25 PM",
+      "body": "Quote from: P2PECS on July 26, 2022, 04:21:36 PMSince the minimum fee to make a transaction is 546 sats, and less is considered dust........The minimum sats output you mean and not transaction fee.You can combine numbers of inputs to make transactions as long as they are above 546 sats which is for legacy addresses, You can go below that number for segwit address with a minimum accepted sats of 294. The downside of using multiple inputs is that you will be paying more fees compared to when you use a single input.You are multiplying the size of the transaction by the fee set by you and that will give you the fee you will be paying for miners to include your transactions in the next block. For example, if you have 112 sat/vb and you set a fee of 2 sats, you will be multiplying 2x112=224 sats as a fee",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "July 26, 2022, 04:49:38 PM",
+      "body": "Quote from: P2PECS on July 26, 2022, 04:21:36 PMSince the minimum fee to make a transaction is 546 sats, and less is considered dust,This is wrong.It's possible to make a transaction with lower fee. A segwit transaction with 1 input and 1 output has a virtual size of around 140 vbytes. If you set the fee to 1 sat/vbyte, the fee would be only 140 satoshi. Note that dust limit is the minimum value of an output you can create and that has nothing to do with transaction fee. For a legacy output, the dust limit is 546 satoshi and for a segwit output, the dust limit is 294 satoshi.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "P2PECS",
+      "created_time": "July 26, 2022, 05:43:07 PM",
+      "body": "Quote from: hosseinimr93 on July 26, 2022, 04:49:38 PMIt's possible to make a transaction with lower fee. A segwit transaction with 1 input and 1 output has a virtual size of around 140 vbytes. If you set the fee to 1 sat/vbyte, the fee would be only 140 satoshi. Quote from: hosseinimr93 on July 26, 2022, 04:49:38 PMFor a legacy output, the dust limit is 546 satoshi and for a segwit output, the dust limit is 294 satoshi. But then, if I set the fee to 1 sat/vbyte for that 1 input and 1 output transaction, thus only 140 satoshi, it wouldn't be processed because the dust limit is 294 right? Or am I missing something here?I'll have to reread the other replies.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "_act_",
+      "created_time": "July 26, 2022, 05:48:53 PM",
+      "body": "Quote from: P2PECS on July 26, 2022, 04:21:36 PMSince the minimum fee to make a transaction is 546 sats, and less is considered dust, the question has come to my mind if it is per input or summed up for a transaction.I suppose it is per transaction but assuming that it is so, I am not clear what minimum fees would be paid in the case that I have two inputs, with 547 sats, because having two inputs also makes the transaction more expensive. I know this is very hypothetical, but it is to try to understand it. Then I can apply it to 10, 100 or any inputs of 547 sats. Dust limit is different from transaction fee. Quote from: hosseinimr93 on July 26, 2022, 04:49:38 PMIt's possible to make a transaction with lower fee.A segwit transaction with 1 input and 1 output has a virtual size of around 140 vbytes. If you set the fee to 1 sat/vbyte, the fee would be only 140 satoshi.That is true. He is confusing dust limit with transaction fee. I do make low fee transaction of 1 input and 1 output with very low fee. Example is this transaction which bitcoin is sent from a native segwit address to a nested segwit address:https://www.blockchain.com/btc/tx/332a58315b7a13c08de89db1f84bffd30013632ff7c4476c7f3ceaa67cfb64c7The fee used was 111 sat, the mempool with highest fee priority at the time was 1 sat/vbyte and the transaction was confirmed very fast within 10 minutes or around that time.Quote from: P2PECS on July 26, 2022, 05:43:07 PMBut then, if I set the fee to 1 sat/vbyte for that 1 input and 1 output transaction, thus only 140 satoshi, it wouldn't be processed because the dust limit is 294 right? Or am I missing something here?Yes it won't be processed if you have lower sat than the dust limit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 26, 2022, 05:55:21 PM",
+      "body": "Quote from: P2PECS on July 26, 2022, 05:43:07 PMQuote from: hosseinimr93 on July 26, 2022, 04:49:38 PMFor a legacy output, the dust limit is 546 satoshi and for a segwit output, the dust limit is 294 satoshi.But then, if I set the fee to 1 sat/vbyte for that 1 input and 1 output transaction, thus only 140 satoshi, it wouldn't be processed because the dust limit is 294 right? Or am I missing something here?If you have 546 sat on a legacy address, you can send 294 sat to a Segwit address. You could even send a bit more, if you use the minimum fee.This transaction is the best example I could remember, but the input is above the dust limit (and the fee 5 times higher than needed).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "P2PECS",
+      "created_time": "July 26, 2022, 06:05:01 PM",
+      "body": "Quote from: _act_ on July 26, 2022, 05:48:53 PMThat is true. He is confusing dust limit with transaction fee. I do make low fee transaction of 1 input and 1 output with very low fee. Example is this transaction which bitcoin is sent from a native segwit address to a nested segwit address:https://www.blockchain.com/btc/tx/332a58315b7a13c08de89db1f84bffd30013632ff7c4476c7f3ceaa67cfb64c7The fee used was 111 sat, the mempool with highest fee priority at the time was 1 sat/vbyte and the transaction was confirmed very fast within 10 minutes or around that time.Quote from: P2PECS on July 26, 2022, 05:43:07 PMBut then, if I set the fee to 1 sat/vbyte for that 1 input and 1 output transaction, thus only 140 satoshi, it wouldn't be processed because the dust limit is 294 right? Or am I missing something here?Yes it won't be processed if you have lower sat than the dust limit.Thank you, with this explanation the confusion I had is now clear.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 26, 2022, 09:10:48 PM",
+      "body": "It's important to point out that a transaction that sends less than the dust limit is perfectly valid; it's just non-standard. This means that it won't be relayed by the nodes of the Bitcoin network, but a block containing such transaction can be valid. Therefore, a miner or a user who'll give it to a miner can normally create and have such transactions confirmed. Here's an example: b8e9acf88c65c55b1f91094684cf513445202fda0601738bcda66153ded4f6b4.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 27, 2022, 05:41:03 AM",
+      "body": "Quote from: P2PECS on July 26, 2022, 06:05:01 PMQuote from: _act_ on July 26, 2022, 05:48:53 PM-snip-Quote from: P2PECS on July 26, 2022, 05:43:07 PMBut then, if I set the fee to 1 sat/vbyte for that 1 input and 1 output transaction, thus only 140 satoshi, it wouldn't be processed because the dust limit is 294 right? Or am I missing something here?Yes it won't be processed if you have lower sat than the dust limit.Thank you, with this explanation the confusion I had is now clear.How can this part clear your confusion while it contradicts the other part? The \"other part\" that tells fee and dust limit are different which is correct.The answer for this part is: \"it will be processed\" since a txn with 1sat/vB fee rate is standard.To make this even clearer, you'll just have to understand this:Don't complicate it since Bitcoin network's \"standard\" fee rate is @ 1sat/vB, as long as the fee rate is set to 1sat/vB or above, it's standard and will be processed.Do not bother with the absolute (total) fee since nodes do not base their txn relay settings from it, it all about the fee rate.The \"dust limit\" is compelled per output, means if you're sending to 10 addresses, the to-be-sent amount of each output should be at least the address type's dust limit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "P2PECS",
+      "created_time": "July 27, 2022, 05:52:29 AMLast edit: July 27, 2022, 06:15:12 AM by P2PECS",
+      "body": "Quote from: nc50lc on July 27, 2022, 05:41:03 AMQuote from: P2PECS on July 26, 2022, 06:05:01 PMQuote from: _act_ on July 26, 2022, 05:48:53 PM-snip-Quote from: P2PECS on July 26, 2022, 05:43:07 PMBut then, if I set the fee to 1 sat/vbyte for that 1 input and 1 output transaction, thus only 140 satoshi, it wouldn't be processed because the dust limit is 294 right? Or am I missing something here?Yes it won't be processed if you have lower sat than the dust limit.Thank you, with this explanation the confusion I had is now clear.How can this part clear your confusion while it contradicts the other part? The \"other part\" that tells fee and dust limit are different which is correct.The answer for this part is: \"it will be processed\" since a txn with 1sat/vB fee rate is standard.Are you telling me that if I have just 1 280 satoshi input in my mobile wallet in a segwit address and I send a transaction with just 1 segwit output setting the fee to 1 sat/vbyte it will be processed? So, sending 140 satoshi and paying 140 in fees, being the dust limit 294.Then it is not so clear to me anymore. I thought that because of the dust limit it would not be processed. Leaving aside the exceptions that BlackHatCoiner mentioned, I am not a miner and I don't know any of them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 27, 2022, 06:30:48 AM",
+      "body": "Quote from: P2PECS on July 27, 2022, 05:52:29 AMAre you telling me that if I have just 1 280 satoshi input in my mobile wallet in a segwit address and I send a transaction with just 1 segwit output setting the fee to 1 sat/vbyte it will be processed? So, sending 140 satoshi and paying 140 in fees, being the dust limit 294.You can't send 140 sat.Think of the dust limit as a limit of usefulness: if you'd have a 140 sat Bitcoin input that you want to use, you'd have to spend (almost) all of it on fees. Even if you use the minimum fee, it's useless. The dust limit prevents that from happening.If you want to send smaller amounts, see if you can use the Lightning Network for what you want to do. Here's a faucet that gets you 8 sat as a demonstration",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "P2PECS",
+      "created_time": "July 27, 2022, 06:33:58 AM",
+      "body": "Quote from: LoyceV on July 27, 2022, 06:30:48 AMThink of the dust limit as a limit of usefulness: if you'd have a 140 sat Bitcoin input that you want to use, you'd have to spend (almost) all of it on fees. Even if you use the minimum fee, it's useless. The dust limit prevents that from happening.This agrees with what I had understood but nc50lc's message confused me. If I have 300 sats, theoretically I could send them being the dust limit (segwit) of 294. If I have 280 sats, I cannot.Is it like that?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "July 27, 2022, 06:35:10 AMLast edit: July 27, 2022, 06:45:21 AM by hosseinimr93",
+      "body": "Quote from: P2PECS on July 27, 2022, 05:52:29 AMAre you telling me that if I have just 1 280 satoshi input in my mobile wallet in a segwit address and I send a transaction with just 1 segwit output setting the fee to 1 sat/vbyte it will be processed? So, sending 140 satoshi and paying 140 in fees, being the dust limit 294. First of all note that it's unlikely that you have an output of 280 satoshi in your address. Because that's smaller than the dust limit. Anyways, there is no problem with transaction fee of 140 satoshi if the fee rate isn't lower than 1 sat/vbyte.The problem is with the value of your output which is lower than the dust limit. Your transaction should meet following requirements:1. The fee rate should be at least 1 sat/vbyte.2. The outputs you create should be bigger than the dust limit. (Dust limit is 294 satoshi if the address is segwit and 546 satoshi if the address is legacy.)Quote from: P2PECS on July 27, 2022, 06:33:58 AMIf I have 300 sats, theoretically I could send them being the dust limit (segwit) of 294. If I have 280 sats, I cannot.Is it like that?Whether you have 300 satoshi or 280 satoshi, you can't make the transaction.If you have 300 satoshi and you create an output with the value of 294 satoshi, you can't pay the transaction fee. The remaining 6 satoshi isn't enough for the transaction fee. Assuming the transaction is 140 vbyte and you set the fee to 1 sat/vbyte, you need to pay 140 satoshi for the transaction fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "P2PECS",
+      "created_time": "July 27, 2022, 06:44:44 AM",
+      "body": "Quote from: hosseinimr93 on July 27, 2022, 06:35:10 AMWhether you have 300 satoshi or 280 satoshi, you can't make the transaction.If you have 300 satoshi and you create an output with the value of 294 satoshi, you can't pay the transaction fee. The remaining 6 satoshi isn't enough for the transaction fee. Assuming the transaction is 140 vbyte and you set the fee to 1 sat/vbyte, you need to pay 140 satoshi for the tranasction fee. In other words, the minimum number of satoshi you should have in that case would be 434 to be able to send a transaction and have it processed. 140 for the fee and 294 for the dust limit. Is that right?This leaving aside LN, as LoyceV commented, which I know is better for micro payments. I was trying to understand with this better the minimum transaction and fee limits.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 27, 2022, 06:49:04 AM",
+      "body": "Quote from: P2PECS on July 27, 2022, 06:44:44 AMIn other words, the minimum number of satoshi you should have in that case would be 434 to be able to send a transaction and have it processed. 140 for the fee and 294 for the dust limit. Is that right?Correct. And whoever receives this 294 sats, will need another 294 input to be able to send it. You're not really doing anyone a favor by sending $0.06 in on-chain Bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "P2PECS",
+      "created_time": "July 27, 2022, 06:52:59 AM",
+      "body": "Quote from: LoyceV on July 27, 2022, 06:49:04 AMYou're not really doing anyone a favor by sending $0.06 in on-chain Bitcoin.This was just a hypothetical question for better understanding, which has become clearer to me. I'm not goint to send anyone $0.06. In fact, I don't think there is any payment in my daily life that is of such a small amount.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "P2PECS",
+      "created_time": "July 27, 2022, 10:06:36 AM",
+      "body": "Ok, so I'm unlocking the topic because nc50lc wants to reply. I have locked it before, because I saw an answer from him to which I was going to reply, and when I went to quote him, it had disappeared. It seems to me that he complicates it too much, because I think that the main confusion that I had is already clear to me.But as I understand that he wants to answer with good intentions because he wants to help, I unlock the thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 27, 2022, 12:27:07 PM",
+      "body": "This is the reply that I wanted to post right before this topic was locked:Quote from: P2PECS on July 27, 2022, 05:52:29 AMQuote from: nc50lc on July 27, 2022, 05:41:03 AM-snip-Are you telling me that if I have just 1 280 satoshi input in my mobile wallet in a segwit address and I send a transaction with just 1 segwit output setting the fee to 1 sat/vbyte it will be processed? So, sending 140 satoshi and paying 140 in fees, being the dust limit 294.In the previous related replies, hosseinimr93 was talking about the virtual size of his 1in-1out transaction which is 140vB, he didn't sent 140 satoshi and didn't used a dust input.It's just an example which shows that the absolute fee can be lower than the dust limit (which shouldn't be linked together in the first place)What I'm telling is if the fee rate is @1sat/vB and the outputs aren't dust, the transaction is standard.Just take note of the thing's I've previously listed.Quote from: P2PECS on July 26, 2022, 04:21:36 PMI suppose it is per transaction but assuming that it is so, I am not clear what minimum fees would be paid in the case that I have two inputs, with 547 sats, because having two inputs also makes the transaction more expensive.One more things is, dust limit is by default based from 3sat/vB average equivalent of an input, so if you were to add a 546 sat (legacy) input to a regular 1~3 sat/vB transaction,usually it can still pay for the additional size that it will add to that transaction.But since it's only based from the input's size, if both inputs are only 547sats, it may not be enough to pay 2sat/vB (needs computation).But for 1 sat/vB, it's definitely more than enough.Here are some examples (testnet):9e3d0c4089ea141ca9f9870985c4bb0e37f05231628454381df92ce56fe1b7d1Two 546 sats input (min) sending 752 sats to one output @ 1sat/vB.05ffb639cc25b0c792e9dd075f3e1af5f92e5984260942b9b14b68255327c6cbThree 546 sats input (min) sending 1150 sats to one output @ 1sat/vB.Thanks for granting my request to unlock the topic for me clarify my previous post.Hope this can clear the confusion.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

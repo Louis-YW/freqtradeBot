@@ -1,0 +1,149 @@
+{
+  "id": "topic_5457403",
+  "title": "Portly3268",
+  "author": "Portly3268",
+  "created_time": "June 24, 2023, 11:16:24 AM",
+  "content": "Bitcoin Client Software and Version Number: Bitcoin Core v25.0.0Operating System: Windows 11System Hardware Specs: Processor - 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz   2.80 GHzRAM - 16.0 GBToshiba 1 TB external hard driveDescription of Problem: I am running a full node.I changed the network settings (based off of what I found on the internet in order to use it over Tor. I was trying to do the \"private\" thing...) to \"Connect through SOCKS5 proxy (default proxy): Proxy IP: 127.0.0.1 Port: 9050with IPv4 IPv6 and Tor all checkedI set the bitcoin.conf on my external hard drive to:server=1rpuser=abc123(not actual)rpcpassword=******rpcbind=127.0.0.1rpcbind=192.168.0.10rpcallowip=127.0.0.1rpcallowip=192.168.0.0/16After fully downloading the entire bitcoin blockchain to my external hard drive I connected to Sparrow wallet (V. 1.7.6) and changed the settings as stated above. I have not made any transactions. I was connected to the network for several days. I turned off Bitcoin Core for possibly ~8 hours and disconnected (safely) by external hard drive. I reconnected my external hard drive and turned Bitcoin Core. Bitcoin Core started, what I presumed, to resync. The message I was provided (attached image):(all info here is from after error message so might not be the same as started)Number of blocks left: Unknown. Syncing Headers ((numbers),(percent)...Last block time: Sat Jan 3 13:15:05 2009Progress: 0.00%Estimated time left until synced: UnknownWhat was odd was that the progress never changed and everything continued to say unknown. I figured this was normal (never having run a node before), and I left it over night to \"sync.\"When I woke this morning and checked the progress, I was met with a \"Bitcoin Core - Error\" message. \"Error: A fatal internal error occurred, see debug.log for details\".I have the debug.log in the link below. I have no idea what it is saying to me.I would greatly appreciate someone enlightening me.I really want to contribute to the Bitcoin Network.Any Related Addresses:n/aAny Related Transaction IDs:n/aScreenshot of the problem:https://imgur.com/a/hWJRlQeLog Files from the Bitcoin Client:(I am unsure what is relevant. I pasted what didn't seem like a lot of the same thing (even thought idk what I am looking at really))https://pastebin.com/BUpgPVXq",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5457403",
+  "comments": [
+    {
+      "author": "Cricktor",
+      "created_time": "June 24, 2023, 01:16:57 PMLast edit: June 24, 2023, 01:29:18 PM by Cricktor",
+      "body": "Your external drive fucks up some of the blk0nnnn.dat files in your \"D:\\Bitcoin Core\\blocks\" folder and maybe some other files, too. Could be that you're detaching the drive without properly unmounting it. There are clearly issues logged in the debug.log that expected blk0nnnn.dat files are not found which Bitcoin Core expected to be there already.Is your external drive properly powered? What kind of USB connection do you use? When you shutdown Bitcoin Core you have to wait until it has really shut down. Then you don't just pull the connection cable, but you explicitly tell Windows to detach the external drive and release it safely. Only once Windows tells you that you can safely remove the attached drive, you should do it then and only then to be safe.On a quick look, it seems fine until the shutdown on Code:2023-06-23T08:32:22Z Shutdown: doneFirst suspicious quirk follows: Code:2023-06-23T19:37:44Z GUI: \"registerShutdownBlockReason: Successfully registered: Bitcoin Core didn't yet exit safely…\"After...Code:2023-06-23T19:37:59Z LoadBlockIndexDB: last block file = 36722023-06-23T19:37:59Z LoadBlockIndexDB: last block file info: CBlockFileInfo(blocks=18, size=31633504, heights=795544...795561, time=2023-06-23...2023-06-23)2023-06-23T19:37:59Z Checking all blk files are present...2023-06-23T19:39:16Z Unable to open file D:\\Bitcoin Core\\blocks\\blk03152.dat2023-06-23T19:39:16Z : Error loading block database.Please restart with -reindex or -reindex-chainstate to recover.2023-06-23T19:39:36Z Aborted block database rebuild. Exiting.2023-06-23T19:39:36Z Shutdown: In progress...2023-06-23T19:39:36Z scheduler thread exit2023-06-23T19:39:36Z Shutdown: done...more and more issues with the blk0nnnn.dat files emerge.Solution is also right in front of you: fix the reason why your external drive messes up files (it's the hardware or it's you) and restart Bitcoin Core with command line options -reindex or -reindex-chainstate to recover.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Portly3268",
+      "created_time": "June 24, 2023, 03:10:04 PM",
+      "body": "Quote from: Cricktor on June 24, 2023, 01:16:57 PMYour external drive fucks up some of the blk0nnnn.dat files in your \"D:\\Bitcoin Core\\blocks\" folder and maybe some other files, too. Could be that you're detaching the drive without properly unmounting it. There are clearly issues logged in the debug.log that expected blk0nnnn.dat files are not found which Bitcoin Core expected to be there already.Is your external drive properly powered? What kind of USB connection do you use? When you shutdown Bitcoin Core you have to wait until it has really shut down. Then you don't just pull the connection cable, but you explicitly tell Windows to detach the external drive and release it safely. Only once Windows tells you that you can safely remove the attached drive, you should do it then and only then to be safe.On a quick look, it seems fine until the shutdown on Code:2023-06-23T08:32:22Z Shutdown: doneFirst suspicious quirk follows: Code:2023-06-23T19:37:44Z GUI: \"registerShutdownBlockReason: Successfully registered: Bitcoin Core didn't yet exit safely…\"After...Code:2023-06-23T19:37:59Z LoadBlockIndexDB: last block file = 36722023-06-23T19:37:59Z LoadBlockIndexDB: last block file info: CBlockFileInfo(blocks=18, size=31633504, heights=795544...795561, time=2023-06-23...2023-06-23)2023-06-23T19:37:59Z Checking all blk files are present...2023-06-23T19:39:16Z Unable to open file D:\\Bitcoin Core\\blocks\\blk03152.dat2023-06-23T19:39:16Z : Error loading block database.Please restart with -reindex or -reindex-chainstate to recover.2023-06-23T19:39:36Z Aborted block database rebuild. Exiting.2023-06-23T19:39:36Z Shutdown: In progress...2023-06-23T19:39:36Z scheduler thread exit2023-06-23T19:39:36Z Shutdown: done...more and more issues with the blk0nnnn.dat files emerge.Solution is also right in front of you: fix the reason why your external drive messes up files (it's the hardware or it's you) and restart Bitcoin Core with command line options -reindex or -reindex-chainstate to recover.I have my external drive on a usb port bus with an external power source to the usb bus. external drive is connected to the usb 3 port on the bus and the bus is connected to the usb 3 on my computer.When I exit Bitcoin Core, I use the Exit option and wait for all the windows about shutting down to disappear before properly ejecting the external hard drive, always waiting for the windows message that it is safe to disconnect.For the \"registerShutdownBlockReason: Successfully registered: Bitcoin Core didn't yet exit safely…\" yesterday, I think that is the first time that I actually disconnected my hard drive from my computer after fully downloading the entire blockchain. also ejecting safely before disconnecting. Is there another way to know if Bitcoin Core is really shut down? Should I be inspecting my task manager to make sure?Maybe I should connect the hard drive directly into my computer instead of through the bus. Or just never disconnect it lol.Thanks for looking over my logs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "June 24, 2023, 03:10:22 PMLast edit: June 24, 2023, 04:17:09 PM by BitMaxz",
+      "body": "Based on the logs provided by Cricktor above it seems you didn't close or shut down the Bitcoin core properly which cause some of your Bitcoin core data on an external drive to become corrupted.-reindex might fix this issue the easy way to run this flag alternatively from the suggestion above is by adding -reindex on the Bitcoin core shortcut properties you can check the image below where you can add the -reindex.Quote from: Portly3268 on June 24, 2023, 03:10:04 PMIs there another way to know if Bitcoin Core is really shut down? Should I be inspecting my task manager to make sure?.Yes, it would be better check the task manager if bitcoin core daemon still running on the background you might need to use bitcoin-cli stop command to properly shut down your node.And to know if it's properly shut down you will need to use this command belowCode:bitcoin-cli getblockchaininfo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Portly3268",
+      "created_time": "June 24, 2023, 04:32:33 PM",
+      "body": "Quote from: BitMaxz on June 24, 2023, 03:10:22 PMBased on the logs provided by Cricktor above it seems you didn't close or shut down the Bitcoin core properly which cause some of your Bitcoin core data on an external drive to become corrupted.-reindex might fix this issue the easy way to run this flag alternatively from the suggestion above is by adding -reindex on the Bitcoin core shortcut properties you can check the image below where you can add the -reindex.Thanks for the shortcut tip. I've added that and have started Bitcoin Core back up. Hopefully it is reindexing.https://imgur.com/a/jEswi7s",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 24, 2023, 05:26:52 PM",
+      "body": "Also, download a copy of crystaldisk info https://crystalmark.info/en/download/ and check the external drive for errors.I am constantly amazed at how many issues there are with good name brand externals, never mind the cheap generic ones.A little issue that you would never see playing back a video or listening to a song will cause issues with 'real' data.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 24, 2023, 06:55:52 PM",
+      "body": "Quote from: Portly3268 on June 24, 2023, 11:16:24 AM...Log Files from the Bitcoin Client:(I am unsure what is relevant. I pasted what didn't seem like a lot of the same thing (even thought idk what I am looking at really))https://pastebin.com/BUpgPVXqDefinitely check if your external drive is healthy. From the provided debug.log of the OP it didn't look to me that he disconnected his external drive before Bitcoin Core has shut down properly. There was always this final log entry Shutdown: done by Core, so no premature interruption of a proper exit of Core visible to me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Portly3268",
+      "created_time": "June 24, 2023, 07:55:59 PM",
+      "body": "I downloaded the crystaldiskinfo, but would this be something I should run while reindexing? I know that it was safe to stop my initial blockchain download, but idk if it would start over if I stop the reindex. I'm about 12% in going 3%+ /hr.Also, I am seeing in the debug.log that every time it would try to bind to RPC on address 192.168.0.10 port 8332 it would fail. \"2023-06-23T19:39:40Z Binding RPC on address 192.168.0.10 port 8332 failed.\"and it shows my config files with this address:2023-06-23T19:39:40Z Config file: D:\\Bitcoin Core\\bitcoin.conf2023-06-23T19:39:40Z Config file arg: rpcpassword=****2023-06-23T19:39:40Z Config file arg: rpcuser=****2023-06-23T19:39:40Z Config file arg: server=\"1\"2023-06-23T19:39:40Z Config file arg: [main] rpcallowip=\"127.0.0.1\"2023-06-23T19:39:40Z Config file arg: [main] rpcallowip=\"192.168.0.0/16\"2023-06-23T19:39:40Z Config file arg: [main] rpcbind=\"127.0.0.1\"2023-06-23T19:39:40Z Config file arg: [main] rpcbind=\"192.168.0.10\"Did I set up my config file wrong here?and every time is says anything about Socks5 it has a failure. \"2023-06-23T08:20:36Z Socks5() connect to 2604:a880:400:d0::261f:6001:8333 failed: general failure\"again, really thanks for everyone's help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 25, 2023, 05:55:11 AM",
+      "body": "Quote from: Portly3268 on June 24, 2023, 07:55:59 PMI downloaded the crystaldiskinfo, but would this be something I should run while reindexing?I don't know \"crystaldiskinfo\" (and I wouldn't just install any software), but in general, I wouldn't run disk checking software while the disk is busy.Then again, if you suspect the disk is faulty, it's better to rule it out before continuing.I wouldn't recommend to use an external drive for anything that's supposed to be accessible all the time. It's so easy to accidentally unplug them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Portly3268",
+      "created_time": "June 25, 2023, 09:56:16 AM",
+      "body": "Quote from: LoyceV on June 25, 2023, 05:55:11 AMI wouldn't recommend to use an external drive for anything that's supposed to be accessible all the time. It's so easy to accidentally unplug them.Yeah, you're right. I should have invested in a bigger internal hard drive.... I can just transfer the files from my external when I get a new internal hard drive right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 25, 2023, 10:04:15 AM",
+      "body": "Quote from: Portly3268 on June 25, 2023, 09:56:16 AMI can just transfer the files from my external when I get a new internal hard drive right?Yes.Depending on your needs, you can just prune the blockchain and use your internal storage already.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Portly3268",
+      "created_time": "June 25, 2023, 11:49:04 AM",
+      "body": "Quote from: LoyceV on June 25, 2023, 10:04:15 AMDepending on your needs, you can just prune the blockchain and use your internal storage already.I want to contribute to the network and I read that running a full node is how I can do that. I have yet to actually use my own node for a transaction for I have only recently started this entire process. I will eventually but I guess it is best to go through all the pains now instead of worrying that I lost something from some error like this. For now I want to run a full node, even if I am not using it myself, on the external hard drive, and upgrade my internal storage when I can.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 25, 2023, 05:45:27 PM",
+      "body": "Quote from: LoyceV on June 25, 2023, 05:55:11 AMQuote from: Portly3268 on June 24, 2023, 07:55:59 PMI downloaded the crystaldiskinfo, but would this be something I should run while reindexing?I don't know \"crystaldiskinfo\" (and I wouldn't just install any software), but in general, I wouldn't run disk checking software while the disk is busy.Then again, if you suspect the disk is faulty, it's better to rule it out before continuing.I wouldn't recommend to use an external drive for anything that's supposed to be accessible all the time. It's so easy to accidentally unplug them.Crystaldisk is a well known utility for reading the S.M.A.R.T. info from drives. Does not matter if it's doing something or not.The problem with externals is that a lot of time the PC & OS don't display those errors you need an external app.Even now one of my machines swears that all drives are fine but crystal shows this: So yes, you can run it. At yes, at times it will scare the crap out of you when you see some error rates.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Portly3268",
+      "created_time": "June 25, 2023, 11:34:25 PM",
+      "body": "I'm thinking that it might just be better to return this external, and pay a bit extra for a bigger internal ssd. I'm still in my 30 day return window.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 26, 2023, 04:40:35 AM",
+      "body": "Quote from: DaveF on June 25, 2023, 05:45:27 PMCrystaldisk is a well known utility for reading the S.M.A.R.T. info from drives.I have GSmartControl installed (it's a standard package on my Linux system). QuoteEven now one of my machines swears that all drives are fine but crystal shows this:That disk has been spinning for 7 years, that's not bad at all.Quoteat times it will scare the crap out of you when you see some error rates.Last week I had no warnings, but I just checked again: I now have a \"Number of Reported Uncorrectable Errors: 1\". I think this is what used to be a bad sector, except for now the drive remaps it to another location so it still passes the S.M.A.R.T. criteria. But I don't like it. And since that disk was terrible anyway (it's one of those that gets very slow when writing a lot), it's now on my list for replacement. That disk has another problem: it draws slightly more power than my DVD-bay can handle, so half the time my laptop doesn't boot. But once it works, it keeps working, and since I only reboot a few times per year, it's not that bad.Quote from: Portly3268 on June 25, 2023, 11:34:25 PMI'm thinking that it might just be better to return this external, and pay a bit extra for a bigger internal ssd. I'm still in my 30 day return window.If you have the space in your system, go for it! SSD prices have dropped a lot, I've recently seen 1TB SSDs from Crucial for €50 and Samsung for €60. PNY was even cheaper.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 26, 2023, 11:05:29 AM",
+      "body": "Quote from: LoyceV on June 26, 2023, 04:40:35 AMQuote from: DaveF on June 25, 2023, 05:45:27 PMThat disk has been spinning for 7 years, that's not bad at all.Not saying the drive should not have some issues after all this time, just that Windows and the BIOS are not reporting any.That is were the issues come in. Portly3268 could be spending hours tracking down a software or configuration issue that does not exist, because a new out of the box drive is not quite up to snuff.But, yes for just a little more money if you can a SSD is the way to go.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Portly3268",
+      "created_time": "June 27, 2023, 09:56:29 AM",
+      "body": "hehe so I had another error near the end of the reindex.it might have been my fault, idkI had to stop the reindex and shut Bitcoin Core off. I used the Bitcoin Core console to shut it down and checked my task manager that it was good.I didn't disconnect the external HD.When I restarted Bitcoin Core, a tiny window popped up about \"Loading Wallet\" and it never went away nor did Bitcoin Core ever fully start. Eventually the \"Not Responding\" window appeared and yeah. This happened over and over but strangely, no bug log of it.Sudden idea popped in my head, I still had the \"-reindex\" command enabled when Bitcoin Core started. I deleted the command and the wallet problem went away. However, I'm guessing, since it never fully reindexed, it was still fucked, so I restarted the reindexing.... another fatal error popped up after maybe 8 hrs or so.... in the bug log it said something about the error possibly being the reason of an \"I/O\" and there wasn't anything else. Bitcoin Core terminated itself after I clicked ok to the fatal error message.I do not have a bug log to show everyone bc out of frustration I formatted the external and packed it up to return it. Figured that whatever was on the external HD was corrupted anyway and was useless to transfer to the new internal ssd I am ordering.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 04, 2023, 05:56:12 PM",
+      "body": "Quote from: Portly3268 on June 27, 2023, 09:56:29 AManother fatal error popped up after maybe 8 hrs or so.... in the bug log it said something about the error possibly being the reason of an \"I/O\" and there wasn't anything else. Bitcoin Core terminated itself after I clicked ok to the fatal error message.That's a sign of corruption the external 1TB HDD is very problematic I have had external before where most of the files and software do not work after accidentally disconnecting it from the PC without removing it on \"Safely remove hardware\" even though I changed the \"remove policy\" to \"Quick removal/better performance\" it doesn't help. That is why I switch to HDD(Internal) and directly installed it as another drive on my PC it is way more better than using the HDD as an external drive. So it should fix your issue after adding this new drive(SSD) there is also big impact on the speed of your PC and syncing process if you use SSD.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

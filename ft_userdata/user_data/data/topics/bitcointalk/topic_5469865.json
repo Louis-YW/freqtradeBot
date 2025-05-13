@@ -1,0 +1,101 @@
+{
+  "id": "topic_5469865",
+  "title": "andre8ezkaro",
+  "author": "andre8ezkaro",
+  "created_time": "October 10, 2023, 10:35:01 AMLast edit: October 10, 2023, 11:22:35 AM by andre8ezkaro",
+  "content": "Hello, everyoneI have a problem with my application, and regarding to that I'm quite new to btc related development, I hope you can help me to figure out the right solution.So basically, I have a payment system API, wtitten in Nest.js which works with bcoin node implemenation (https://github.com/bcoin-org/bcoin)The node stores one master wallet and many account bind to it. The balance of wallet is splitted among accounts.The main problem is: When I need to send a bit large amount of BTC, the inputs quantity can reach 400-500, with the correspondinghigh transaction feeHow to decrease commision of such transactions? I've researched this topic and found the possible solution - make psbt's with my accounts, finalize all inputs, extract and broadcast the transaction with 1 computed input instead of 400-500, some kind of payjoin or coinjoin.But I discovered that bcoin doesn't support psbt bip174 standard and the whole implementation is no longer maintained. I was very disappointed.The one man from bitcoinjs-lib (https://github.com/bitcoinjs/bitcoinjs-lib) told me that I can try to use their lib to manage psbt's, and bcoin to fetch accounts, but it seems that nobody have done this kind of a fusion. Does anybody worked with bcoin this way? How can I deal with this problem? Please, other solutions or any help are very appreciated. Thank youUPD Some people proposed to use this CLI (https://github.com/payjoin/rust-payjoin) but I'm not sure about it, beacuse looks like it uses psbt's as well. How does deal with my node? And if this solution is suitable, how to implement it within Nest.js application?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5469865",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "October 10, 2023, 11:02:13 AM",
+      "body": "Quote from: andre8ezkaro on October 10, 2023, 10:35:01 AMThe main problem is: When I need to send a bit large amount of BTC, the inputs quantity can reach 400-500, with the corresponding high transaction feeHow to decrease commision of such transactions?I know nothing about \"Bcoin\", but I know a thing or two about consolidating small inputs. You should read that topic.One way or another, having 400 inputs will create a large transaction. If you can get away with 1.1 sat/vbyte, it's not that bad, so you'll have to time your transaction a bit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 10, 2023, 11:22:17 AM",
+      "body": "Quote from: LoyceV on October 10, 2023, 11:02:13 AMOne way or another, having 400 inputs will create a large transaction. If you can get away with 1.1 sat/vbyte, it's not that bad, so you'll have to time your transaction a bit.1.1 sat/vbyte in these network conditions basically means your transaction will be kicked out of most nodes mempools' off and on, and won't confirm for several days.It's not exactly something I can recommend. Then again, neither is including 400 inputs, so I strongly suggest to OP to find a way to optimize the service to make smaller input transactions. Experimenting with this on testnet first might help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 10, 2023, 11:25:46 AM",
+      "body": "Quote from: NotATether on October 10, 2023, 11:22:17 AM1.1 sat/vbyte in these network conditions basically means your transaction will be kicked out of most nodes mempools' off and on, and won't confirm for several days.All I can see is transactions <2 sat/vbyte are getting confirmed. If it gets dropped, raise the fee a bit. If it doesn't get dropped and doesn't confirm, use CPFP. Or just go for 2.1 sat/vbyte now, it's still less than 1 mBTC for 400 inputs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "andre8ezkaro",
+      "created_time": "October 10, 2023, 11:45:14 AM",
+      "body": "Thank you for your help. I think I need to test both, decreasing comission rate and destructuring one big tx into several smaller.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "October 10, 2023, 11:54:46 AMLast edit: October 10, 2023, 12:17:58 PM by Charles-Tim",
+      "body": "Quote from: NotATether on October 10, 2023, 11:22:17 AMIt's not exactly something I can recommend. Then again, neither is including 400 inputs, so I strongly suggest to OP to find a way to optimize the service to make smaller input transactions. Experimenting with this on testnet first might help.I do not know if this is pertaining to Electrum or SPV wallets, but the size of the transaction must not be more than 100 kilobytes or its corresponding vsizes in nested or native segwit.Quote from: LoyceV on October 10, 2023, 11:25:46 AMIf it doesn't get dropped and doesn't confirm, use CPFP.This is the reason it is good to use a wallet that supports RBF, because with it you can pump the fee, instead of spending more fee on CPFP.Edit: 400 inputs can be in one transaction. The size is not up to 100000 while the vsizes will be smaller, 27244 vbytes for native segwit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 10, 2023, 12:59:57 PM",
+      "body": "Quote from: Charles-Tim on October 10, 2023, 11:54:46 AMThis is the reason it is good to use a wallet that supports RBF, because with it you can pump the fee, instead of spending more fee on CPFP.That's correct for small transactions. However, for transactions with many inputs, the minimum increase to use RBF will be much more than it costs to slightly increase the fee by using CPFP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 10, 2023, 02:03:14 PM",
+      "body": "Quote from: andre8ezkaro on October 10, 2023, 10:35:01 AMThe main problem is: When I need to send a bit large amount of BTC, the inputs quantity can reach 400-500, with the correspondinghigh transaction feeHow to decrease commision of such transactions? -snip-This basically consolidates all your UTXO in the change (and the sent amount).The only way to decrease the absolute fee for such huge transaction size is to lower the \"fee rate\" itself.If you wish to consolidate those inputs first then send that \"bit large amount of BTC\" using its output just right now,it'll just be a waste since you'll just separate the above in two separate transactions that are bundled (parent and child).The child transaction (uses the consolidation txn's output), is still subjected to the unconfirmed parent's size and fee.Consolidation should be done if it's possible to send a transaction with relatively low fee rate that can be mined, then it'll save you some fee when the average fee rate is high.Quote from: andre8ezkaro on October 10, 2023, 10:35:01 AMI've researched this topic and found the possible solution - make psbt's with my accounts, finalize all inputs, extract and broadcast the transaction with 1 computed input instead of 400-500, some kind of payjoin or coinjoin.I don't think \"payjoin\" or \"coinjoin\" could be a solution since those aren't workaround that will enable you to spend all of those 400-500UTXO as a single input without consolidating first.You still need to consolidate those small inputs via transaction which pays its own transaction fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 11, 2023, 09:37:54 AM",
+      "body": "Quote from: andre8ezkaro on October 10, 2023, 10:35:01 AMThe main problem is: When I need to send a bit large amount of BTC, the inputs quantity can reach 400-500, with the correspondinghigh transaction feeI checked bcoin docs and found out there's parameter maxFee for API call POST /wallet/:id/send[1]? Have you tried using that?Quote from: LoyceV on October 10, 2023, 11:02:13 AMQuote from: andre8ezkaro on October 10, 2023, 10:35:01 AMThe main problem is: When I need to send a bit large amount of BTC, the inputs quantity can reach 400-500, with the corresponding high transaction feeHow to decrease commision of such transactions?I know nothing about \"Bcoin\"--snip--Bcoin basically is JS Bitcoin library with full node feature. In past, i reviewed it's full node feature.[1] https://bcoin.io/api-docs/#send-a-transaction",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "andre8ezkaro",
+      "created_time": "October 11, 2023, 03:34:26 PM",
+      "body": "Thank to all of the speakers, the information provided helped me to unrstand the way I should work, optimizing commission rate rather then consolidating inputs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 12, 2023, 04:21:31 AM",
+      "body": "Quote from: andre8ezkaro on October 11, 2023, 03:34:26 PMThank to all of the speakers, the information provided helped me to unrstand the way I should work, optimizing commission rate rather then consolidating inputs. Consolidating is still recommended when the time is right, when it's certain that it'll get confirmed even with a very low fee rate.So that if you ever need to spend while the average fee rate is too high, you wouldn't have to use hundreds of inputs but the single consolidated \"confirmed\" UTXO.Consolidating right when you need to send is the problem,since spending its \"unconfirmed\" unspent transaction output will just bundle the child transaction with it like I explained in the previous post.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "andre8ezkaro",
+      "created_time": "October 27, 2023, 12:32:19 PM",
+      "body": "Thank you to all of repliers. The advices helped me to implement the solution:1. Using actual rates with this API https://api.blockcypher.com/v1/btc/main2. Using RBF to increase comission rate of \"old\" txes",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

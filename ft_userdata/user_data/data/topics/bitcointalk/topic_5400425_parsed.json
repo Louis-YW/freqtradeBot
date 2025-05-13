@@ -1,0 +1,101 @@
+{
+  "id": "topic_5400425",
+  "title": "lorileemendoza",
+  "author": "lorileemendoza",
+  "created_time": "May 27, 2022, 04:43:08 PM",
+  "content": "Hey, guys!I'm trying to make several transactions automatically through a for loop in the console (Python and/or terminal), but I always get the following error:insufficient fee Your transaction is trying to replace another one in the mempool but does not meet the rules to do so. Try to increase fee.This happens even when I specify a high fee and ensure I have enough funds to cover all transactions. I'm not trying to 'pay to many', but rather to define a few receiving addresses in an array and make different transactions to each one in an automated way. The idea is to sign and broadcast them automatically by adding the password to the payto function. Is that possible?A pseudocode example would be:array = [address1, address2]for address in array:  payto(address, amount, password=password)Thank you very much for your time!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400425",
+  "comments": [
+    {
+      "author": "bitmover",
+      "created_time": "May 27, 2022, 05:48:56 PM",
+      "body": "Quote from: lorileemendoza on May 27, 2022, 04:43:08 PMinsufficient fee Your transaction is trying to replace another one in the mempool but does not meet the rules to do so. Try to increase fee.Are you trying to send funds from an unconfirmed transaction?This \"trying to replace another one in the mempool\" looks to be you are trying to RBF (Replace by Fee) or CPFP (Child pays for parent)  transaction.Edit:Someone also had a similar problem here and it was an unconfirmed transaction.You probably need to wait until the first transaction gets confirmed, if your first transaction do not have RBF enabled.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "May 27, 2022, 06:43:57 PM",
+      "body": "Quote from: lorileemendoza on May 27, 2022, 04:43:08 PMA pseudocode example would be:array = [address1, address2]for address in array:  payto(address, amount, password=password)Thank you very much for your time!Very interesting.  I've never tried this myself, but I'm curious: how do you ensure you're not picking the same UTXOs for the subsequent transactions?  Would the addresses identified in the \"array\" send all the coins locked in UTXOs to the address identified in \"payto?\"  Where does the change go?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lorileemendoza",
+      "created_time": "May 27, 2022, 07:25:46 PM",
+      "body": "Quote from: bitmover on May 27, 2022, 05:48:56 PMQuote from: lorileemendoza on May 27, 2022, 04:43:08 PMinsufficient fee Your transaction is trying to replace another one in the mempool but does not meet the rules to do so. Try to increase fee.Are you trying to send funds from an unconfirmed transaction?This \"trying to replace another one in the mempool\" looks to be you are trying to RBF (Replace by Fee) or CPFP (Child pays for parent)  transaction.Edit:Someone also had a similar problem here and it was an unconfirmed transaction.You probably need to wait until the first transaction gets confirmed, if your first transaction do not have RBF enabled.Hi! Actually, no. I tried this from a dummy wallet, with funds confirmed for a few days.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khaled0111",
+      "created_time": "May 27, 2022, 08:23:02 PMLast edit: May 27, 2022, 08:54:06 PM by khaled0111",
+      "body": "Not sure if this would solve the problem, but try to add a delay of few seconds after each iteration by using the Sleep() function.The code would look like this:array = [address1, address2]for address in array:    payto(address, amount, password=password)    time.sleep(5)The sleep function will give Electrum enough time to update the list of available coins and thus we ensure newer transaction will not re-use an already used UTXOs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 28, 2022, 05:30:45 AM",
+      "body": "Quote from: lorileemendoza on May 27, 2022, 04:43:08 PM-snip-A pseudocode example would be:array = [address1, address2]for address in array:  payto(address, amount, password=password)Is the actual code followed by broadcast() after all the payto() loop?Because you'll have to broadcast after each 'payto' instead of loop 'payto' to generate signed raw transactions and broadcast all later.Here's to reproduce the error using console commands:Use payto(\"address1\",\"amount1\")Save the created \"raw transaction1\" for later.Use payto(\"address2\",\"amount1\")Save the created \"raw transaction2\" for later.Use broadcast(\"raw transaction1\") and it will be sentUse broadcast(\"raw transaction2\") and it will be rejected with the same error because it's created by spending raw transaction1's inputsince transaction1's input(s) wasn't spent still (not broadcasted) while transaction 2 is being generated.If not, it could be the above, everything's too fast that the client/server is having trouble identifying unspent UTXO.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 28, 2022, 12:22:58 PM",
+      "body": "If you don't want to broadcast each transaction individually as nc50lc has suggested, then after creating each transaction using the payto command, you can then use the addtransaction command to save it to your Electrum wallet. Electrum will then know those coins are spent and it won't try to use them again in subsequent transactions, but it won't yet have broadcast the transaction. You can also use addtransaction as an additional option in the payto command.See here: https://github.com/spesmilo/electrum/blob/52b73880f95be5cf51742fec10cde0a2e4b23de4/electrum/commands.py#L676-L677Code:    async def payto(self, destination, amount, fee=None, feerate=None, from_addr=None, from_coins=None, change_addr=None,                    nocheck=False, unsigned=False, rbf=None, password=None, locktime=None, addtransaction=False, wallet: Abstract_Wallet = None):",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khaled0111",
+      "created_time": "May 28, 2022, 02:56:18 PM",
+      "body": "Sorry for my previous reply, I thought the payto() function creates the transaction and broadcast it which appeared to be not true. It only creates the signed raw transaction.I managed to reproduce the problem on the testnet mode but the error message is slightly different: \"insufficient fee, rejecting replacement xxxxxxx; new feerate x.xx BTC/kvB <= old feerate x.xx BTC/kvB\"All created transactions use the same UTXOs and since rbf is enabled by default, each subsequent transaction will be considered a rbf transaction trying to cancel the previous one but it will be rejected because it has to pay higher fees. You don't need that anyway. nc50lc and o_e_l_e_o's suggestion should solve the problem.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 28, 2022, 04:01:29 PM",
+      "body": "Quote from: khaled0111 on May 28, 2022, 02:56:18 PMI managed to reproduce the problem on the testnet mode but the error message is slightly different: \"insufficient fee, rejecting replacement xxxxxxx; new feerate x.xx BTC/kvB <= old feerate x.xx BTC/kvB\"If you use the Electrum console, then it displays both error messages for me. It first displays your error, followed by \"The above exception was the direct cause of the following exception:\", followed by OP's error.Quote from: khaled0111 on May 28, 2022, 02:56:18 PMAll created transactions use the same UTXOs and since rbf is enabled by default, each subsequent transaction will be considered a rbf transaction trying to cancel the previous one but it will be rejected because it has to pay higher fees.Not that RBF is only enabled by default when using this command in the console if you have checked the box in Tools -> Preferences marked \"Use Replace-By-Fee\". Otherwise, it is disabled by default when using this command.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lorileemendoza",
+      "created_time": "June 02, 2022, 01:25:35 AM",
+      "body": "Hey, everyone!I finally solved it (in a way at least). In addition to creating an array for my output addresses, I also created an array for the input address and one for the change addresses. Then, I iterated over each of them for each transaction, and it worked!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 02, 2022, 04:37:48 AM",
+      "body": "Quote from: lorileemendoza on June 02, 2022, 01:25:35 AMI finally solved it (in a way at least). In addition to creating an array for my output addresses, I also created an array for the input address and one for the change addresses. Then, I iterated over each of them for each transaction, and it worked!That's one way to work around it, you've utilized from_addr= and change_addr= params.So, it's something like?:Input1 ═══> Output1       ╚══> Change1/Input2 ═══> Output2                           ╚══> Change2/Input3 ∙∙∙You're lucky that Electrum by default spends all of the UTXO linked to a single address.Else, it could break the chain if an address in the change/input array has more than one UTXO then a smaller UTXO was selected as an input.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lorileemendoza",
+      "created_time": "June 02, 2022, 08:34:59 PM",
+      "body": "Quote from: nc50lc on June 02, 2022, 04:37:48 AMQuote from: lorileemendoza on June 02, 2022, 01:25:35 AMI finally solved it (in a way at least). In addition to creating an array for my output addresses, I also created an array for the input address and one for the change addresses. Then, I iterated over each of them for each transaction, and it worked!That's one way to work around it, you've utilized from_addr= and change_addr= params.So, it's something like?:Input1 ═══> Output1       ╚══> Change1/Input2 ═══> Output2                           ╚══> Change2/Input3 ∙∙∙You're lucky that Electrum by default spends all of the UTXO linked to a single address.Else, it could break the chain if an address in the change/input array has more than one UTXO then a smaller UTXO was selected as an input.Sort of. I did use those parameters, but I also specified different change and input addresses, so they are not linked. Since it is fairly trivial to spread one's funds into many addresses through a single pay-to-many transaction, it's possible to create an array of unique input addresses, an array of unique output addresses, and an array of unique change addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

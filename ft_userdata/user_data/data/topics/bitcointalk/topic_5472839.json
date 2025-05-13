@@ -1,0 +1,45 @@
+{
+  "id": "topic_5472839",
+  "title": "LNDmouse",
+  "author": "LNDmouse",
+  "created_time": "November 04, 2023, 04:13:20 PM",
+  "content": "Hello,I want to convert scriptPubKey into Bitcoin address, but unfortunately can't figure out how to do it. I have searched for some guide but can't find it  Please helpFor example there is transaction from bitcoin block 400.000.Transaction id: c1a0c3fe5a11dd8eaf543483e65415eb548429d0cddd744942c97c3b1cf8b4b7Link to blockchair.com: https://blockchair.com/bitcoin/transaction/c1a0c3fe5a11dd8eaf543483e65415eb548429d0cddd744942c97c3b1cf8b4b7ScriptPubKey is: 76a914a5d14911b042d61db6bff26b0e12f82b2aa590af88acCorrect address according to blockchair.com is: 1G7mD4PK42vKF8bDEvi93peFwmFpSZuzuJI used \"bitcoin-in-tiny-pieces\" Python code to convert scriptPubKey into bitcoin address, but it gives me different address (wrong) that one from blockchair.com.Link to code: https://github.com/circulosmeos/bitcoin-in-tiny-pieces/blob/aa536468c7f5a8a6ed5df813d43f68fc5fb872db/bitcoin-address-from-public-key.pyCan you please explain how to convert ScriptPubKey 76a914a5d14911b042d61db6bff26b0e12f82b2aa590af88ac into bitcoin address?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5472839",
+  "comments": [
+    {
+      "author": "Flavatron",
+      "created_time": "November 04, 2023, 06:13:47 PM",
+      "body": "Hi thereI can help you out with that. I did the calculation on my end and derived the same address as you got from Blockchair: 1G7mD4PK42vKF8bDEvi93peFwmFpSZuzuJLet me explain the process: First we need to extract the Public Key Hash from the scriptPubkey. The scriptPubkey is in this format: OP_DUP OP_HASH160 <PubKeyHash> OP_EQUALVERIFY OP_CHECKSIGWe need to strip out the PubKeyHash. Which in your key would look like: 76a914 <PubKeyHash> 88acNext we shall create the address: Address is derived from the <PubKeyHash> as follows:- Add a version prefix (0x00 for mainnet P2PKH addresses) to the <PubKeyHash>.- Calculate the double SHA-256 hash of the prefixed <PubKeyHash>.- Take the first 4 bytes of this hash as the checksum.- Concatenate the checksum to the prefixed <PubKeyHash>.- Encode the result in Base58 to get the Bitcoin address.Here's a small python script for you that will do what you need  from hashlib import sha256def base58_encode(data):    \"\"\"    Encode bytes into a base58-encoded string    \"\"\"    alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'    n = int.from_bytes(data, 'big')    res = []    while n > 0:        n, r = divmod(n, 58)        res.append(alphabet[r])    res = ''.join(res[::-1])    czero = 0    pad = 0    while czero < len(data) and data[czero] == 0:        pad += 1        czero += 1    return alphabet[0] * pad + resdef script_pub_key_to_address(script_pub_key):    \"\"\"    Convert a ScriptPubKey to a Bitcoin address    \"\"\"    # Extract the PubKeyHash    pub_key_hash_hex = script_pub_key[6:-4]    pub_key_hash_bytes = bytes.fromhex(pub_key_hash_hex)    # Add netowkr prefix (0x00 for mainnet P2PKH)    version_prefixed = b'\\x00' + pub_key_hash_bytes    # Double SHA256    checksum = sha256(sha256(version_prefixed).digest()).digest()[:4]    # Concatenate and encode Base58    address_bytes = version_prefixed + checksum    address = base58_encode(address_bytes)    return address# How to usescript_pub_key = \"76a914a5d14911b042d61db6bff26b0e12f82b2aa590af88ac\"address = script_pub_key_to_address(script_pub_key)print(address)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LNDmouse",
+      "created_time": "November 04, 2023, 08:57:29 PM",
+      "body": "Thank you very much for so precise answer and especially for Python code! I spent so much time and couldn't understand even where to start! It is super helpful, now it is much much more clear!I suppose that the most difficult part is to understand which type of script is in front of me. Is it right?Bitcoin script page shows there are many OP codes:https://en.bitcoin.it/wiki/ScriptOP codes can be before or after <PubKeyHash>.In my case ScriptPubKey is: 76a914a5d14911b042d61db6bff26b0e12f82b2aa590af88ac76 - OP_DUPa9 - OP_HASH16014 - Bytes to pusha5d14911b042d61db6bff26b0e12f82b2aa590af - <PubKeyHash>88 - OP_EQUALVERIFYac - OP_CHECKSIGTotal: OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIGAnd this type of constraction named 'pay-to-pubkey-hash' (P2PKH)From this https://bitcoin.stackexchange.com/questions/89008/how-do-i-extract-the-address-from-a-scriptpubkey answer I understand that to understand which script in front of you, you will need to do a pattern match.Bitcoin Core has a pattern matcher for going from scriptPubKeys to address types:https://github.com/bitcoin/bitcoin/blob/master/src/script/solver.cppIt is in C++ and my maximum right now is Python. Do you know if this pattern matcher exist in Python?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "November 04, 2023, 09:33:48 PM",
+      "body": "Yes, that's right. Here is something to get you started in Python(I've tested with P2PKH, and it works ok). Please flesh it out. # Identify the type of Script# Only tested with P2PKH, please do for othersdef identify_script_type(script_hex):    script_bytes = bytes.fromhex(script_hex)    # A P2PKH    if script_bytes[:3] == b'\\x76\\xa9\\x14' and script_bytes[-2:] == b'\\x88\\xac' and len(script_bytes) == 25:        return \"P2PKH (Pay-to-Public-Key-Hash)\"        # A P2SH    elif script_bytes[:2] == b'\\xa9\\x14' and script_bytes[-1] == 0x87 and len(script_bytes) == 23:        return \"P2SH (Pay-to-Script-Hash)\"        # A Null Data (OP_RETURN)    elif script_bytes[0] == 0x6a:        return \"Null Data (OP_RETURN)\"        # A Bare Multisig (assuming there is a small number of pubkeys)    elif script_bytes[0] in range(0x51, 0x53) and script_bytes[-1] == 0xae:        return \"Bare Multisig (No wrapper)\"        # A P2WPKH&P2WSH    elif script_bytes[0] in [0x00, 0x51]:        if len(script_bytes[1:-1]) == 0x14:            return \"P2WPKH (Pay-to-Witness-Public-Key-Hash)\"        elif len(script_bytes[1:-1]) == 0x20:            return \"P2WSH (Pay-to-Witness-Script-Hash)\"        # A P2TR    elif script_bytes[:2] == b'\\x51\\x20':        return \"P2TR (Pay-to-Taproot)\"        else:        return \"Unknown/Non-standard type\"# Use :script_hex = \"76a914a5d14911b042d61db6bff26b0e12f82b2aa590af88ac\"script_type = identify_script_type(script_hex)print(\"Script Type:\", script_type)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "November 08, 2023, 08:25:44 PM",
+      "body": "Quote from: LNDmouse on November 04, 2023, 08:57:29 PMa5d14911b042d61db6bff26b0e12f82b2aa590af - <PubKeyHash>What you are calling the PubKeyHash is better known as the \"RIPEMD-160 hash\" of the address, and this site shows you the step by step to go from the RIPEMD hash to the address:https://secretscan.org/PrivateKeyHexIt is important to mention that you can get different addresses from the same RIPEMD-160 hash, a Legacy address, a Segwit address, and a Bench32 address. This is just some complementation info, the answer from Flavatron was totally right.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

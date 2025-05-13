@@ -1,0 +1,77 @@
+{
+  "id": "topic_5411213",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "August 25, 2022, 05:32:48 PM",
+  "content": "I'm searching for an API that allows me to request an invoice from a lightning node, without owning that node. C-Lightning-REST does generate invoice with /invoice/genInvoice (see localhost:4001/api-docs/), but it needs access to the macaroon file (access.macaroon), because whoever has access to it can move the money. Therefore, only the owner can query the invoice (using RTL for example). What I want is a REST API that does not involve control of funds, and just returns information about that node (getinfo, invoice). Is there such thing or do I have to write the node js myself?Code:┌──────────┐    1. get invoice              ┌──────────────────┐│          ├───────────────────────────────►│                  ││  Server  │                                │  Lightning Node  ││          │◄───────────────────────────────┤                  │└──────────┘    2. lnbc...4gj5hs            └──────────────────┘",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5411213",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "August 25, 2022, 09:38:08 PMLast edit: August 26, 2022, 02:18:52 AM by n0nce",
+      "body": "Big edit: Now I remember. When calling getInvoice, indeed you need to provide the macaroon.You could set up a new HTTP server on the same machine that has access to the macaroon and calls c-lightning-REST through localhost.I think that's pretty much what https://github.com/lightningd/plugins/tree/master/donations plugin is doing.Surely there's a plugin that does the same but instead of serving a web page, it serves an API.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 26, 2022, 11:22:42 AM",
+      "body": "Thanks n0nce! That's exactly what I was looking for.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 26, 2022, 12:11:09 PM",
+      "body": "Quote from: BlackHatCoiner on August 26, 2022, 11:22:42 AMThanks n0nce! That's exactly what I was looking for. Glad to hear! Did you get it running already? I tried it myself, but it fails at https://github.com/lightningd/plugins/blob/eb03e4fbedc4f6e658611847ccea6d755a9e1cb6/donations/donations.py#L80.I think plugin.rpc is None, but maybe I started it from the wrong folder or something like that.Anyhow I think it's still good as inspiration, maybe just start with a basic Python plugin, add Flask and add whatever endpoints & accompanying logic you need. Should be pretty simple. I'm just a little bit surprised that it doesn't exist yet (pure REST API, not with webpage like donations.py).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 26, 2022, 12:17:55 PM",
+      "body": "Quote from: n0nce on August 26, 2022, 12:11:09 PMGlad to hear! Did you get it running already?Yep: http://cbjvi4cxrbjz4mgup7aa6fzcdhkq2thb22lx2t45rjx5225wrkvthrad.onion:8088/donation. You might guess what I'm trying to accomplish by the invoice's description.  Quote from: n0nce on August 26, 2022, 12:11:09 PMI tried it myself, but it fails at https://github.com/lightningd/plugins/blob/eb03e4fbedc4f6e658611847ccea6d755a9e1cb6/donations/donations.py#L80.Have you started lightningd with plugin=/path/donations.py? That's how I run plugins. Obviously, after I've installed the requirements. Quote from: n0nce on August 26, 2022, 12:11:09 PMShould be pretty simple.Yeah... But I don't think I will get away with node js.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 26, 2022, 01:05:07 PM",
+      "body": "Quote from: BlackHatCoiner on August 26, 2022, 12:17:55 PMQuote from: n0nce on August 26, 2022, 12:11:09 PMGlad to hear! Did you get it running already?Yep: http://cbjvi4cxrbjz4mgup7aa6fzcdhkq2thb22lx2t45rjx5225wrkvthrad.onion:8088/donation. You might guess what I'm trying to accomplish by the invoice's description.  The invoice description actually just seems to contain whatever I write in the 'leave a comment' field.Quote from: BlackHatCoiner on August 26, 2022, 12:17:55 PMQuote from: n0nce on August 26, 2022, 12:11:09 PMI tried it myself, but it fails at https://github.com/lightningd/plugins/blob/eb03e4fbedc4f6e658611847ccea6d755a9e1cb6/donations/donations.py#L80.Have you started lightningd with plugin=/path/donations.py? That's how I run plugins. Obviously, after I've installed the requirements. I have; not sure why it's not working, but I'm glad it works on your machine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 26, 2022, 01:20:15 PMLast edit: August 26, 2022, 01:30:37 PM by BlackHatCoiner",
+      "body": "Quote from: n0nce on August 26, 2022, 01:05:07 PMThe invoice description actually just seems to contain whatever I write in the 'leave a comment' field.Send your 2 sats as a donation, and you'll see what I mean. Edit: No need. \"Most recent donations\" is below. Second edit: Sent your 100 sats back. And the other 123 + 2. Third edit: Keep the 125 sats. My mistake :p. If it isn't clear yet, I'm building a forum lightning-tipping plugin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 26, 2022, 01:33:36 PM",
+      "body": "Quote from: BlackHatCoiner on August 26, 2022, 01:20:15 PMEdit: No need. \"Most recent donations\" is below. Oh yes, I saw that: 'post xxx tipped by theymos' - great! It would be especially nice if you could base it on BOLT12 offers / invoices, so a user can submit their invoice to the tipping plugin.Then, the plugin would display a 'tip' button next to every post whose author has deposited an offer.But it could also be 'custodial' in that you pay the plugin and the plugin keeps track of each user's balance, allowing them to withdraw by sending a regular invoice.Quote from: BlackHatCoiner on August 26, 2022, 01:20:15 PMSecond edit: Sent your 100 sats back. And the other 123 + 2. Actually, I only sent 100 sats once; the other 2 invoices I have not paid and I don't have them anymore, either. Good thing I have your node ID so I can do another keysend.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 26, 2022, 01:40:08 PM",
+      "body": "Quote from: n0nce on August 26, 2022, 01:33:36 PMIt would be especially nice if you could base it on BOLT12 offers / invoices, so a user can submit their invoice to the tipping plugin.I will, but the problem with BOLT12 is that privacy is mandatory. For example, you tip me 100 sats, nobody knows it in a merit-like style except us two. On the other hand, if there's an intermediary (who'll just exchange invoices), he can know if the payment is settled, and can save it in a database. Of course, you can have the option (from my server) to not reveal it publicly, but I'm sure most forum users would want from the rest to know who did they tip and how much. Quote from: n0nce on August 26, 2022, 01:33:36 PMthe other 2 invoices I have not paid and I don't have them anymore, eitherYeah, I know my bad, thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

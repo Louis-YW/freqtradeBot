@@ -1,0 +1,53 @@
+{
+  "id": "topic_5412743",
+  "title": "privacycentricguy",
+  "author": "privacycentricguy",
+  "created_time": "September 07, 2022, 02:30:54 PM",
+  "content": "I believe there have been intentional attack on Tornado Cash contracts. Although it was sanctioned, Tornado Cash frontend is still usable if you access via IPFS (tornadocash.eth) and use a different RPC node. It worked fine for me until I ran into this issue recently.I deposited into the 1 ETH tornado cash pool 3+ weeks ago and am now unable to withdraw my note. I believe there has been an attack on the 1 ETH pool that now prevents all users from withdrawing. It appears there have been no withdraws in the past 2 weeks from the 1 eth pool.I get the error \"Failed to fetch all deposit events from contract\" in the GUI, console further reveals an error \"Missing deposit event for deposit #51577\". When looking through the deposit events array, 51577 has failed the \"checkCommitments()\" call (https://github.com/tornadocash-community/tornado-classic-ui/blob/a83fae0772c8da084c0e76b3a756b456f5b9f5bb/utils/crypto.js#L93). This is because in this specific deposit the leafIndex variable does not match the position in the array. I am not sure how it was possible for this event to be emitted, possibly by error or malicious attack.See the following events on chain:Code:Deposit #51576:leafIndex=51576tx=\"0x5edd0931ce53ed5aafec9842d238fea7e222bfd37c3d81ce6e8fa1e0e3da61d8\"Code:Deposit #51577:leafIndex=51578 (double increment bug)tx=\"0x5468c98b5590dad45f6ae3929df644d7e29ec74272b44941234e26191cf78e16\"Because of this error, the signing algorithm no longer works to withdraw coins from the contract. I attempted to manually modify the RPC responses and correct the leafIndex in the events to be sequential but it did not work. I also tried removing the leafIndex check from the frontend source and that also did not work.Reward token: Code:tornado-eth-1-1-0x246528b30a8270c44d6f5317c37c0fbe893889f7b7c723575bb49cf224422505ce64b1f5f266500c92a2e3cbe0b7249dafb3f4708fe7bae1ff87ae823ce2If anyone can figure out how this attack was performed, and how to actually withdraw stuck funds, feel free to keep the 1 ETH reward attached to the note that I put above. The fact that this happened right after Tornado Cash was sanctioned makes me believe it could have been a nation state actor trying to brick the contract.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412743",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "September 07, 2022, 02:56:32 PM",
+      "body": "Is there a location where deposits can be seen? I saw a list of withdrawals on etherscan but no deposits.Is it possible the liquidity has dried up quite a bit? I can't seem to find anything that shows how much liquidity there is (probably to do with the nature of the smart contract) but it'd make sens eif it's being sanctioned quite a lot and I don't know if liquidity providers got paid for providing that or if it was meant to be done by users actively mixing their coins.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "privacycentricguy",
+      "created_time": "September 07, 2022, 03:15:31 PM",
+      "body": "Quote from: jackg on September 07, 2022, 02:56:32 PMIs there a location where deposits can be seen? I saw a list of withdrawals on etherscan but no deposits.Is it possible the liquidity has dried up quite a bit? I can't seem to find anything that shows how much liquidity there is (probably to do with the nature of the smart contract) but it'd make sens eif it's being sanctioned quite a lot and I don't know if liquidity providers got paid for providing that or if it was meant to be done by users actively mixing their coins.doesn't really make sense that there would be a liquidity problem, any money taken out had to be deposited in the first place.if you look here, you can see deposits in the 'internal transactions' section: https://etherscan.io/address/0x47ce0c6ed5b0ce3d3a51fdb1c52dc66a7c3c2936#internaltxdeposits are sent tornadocash router, and then from the router to the contract. the contract also appears to have 2000+ eth in it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "September 07, 2022, 08:04:15 PM",
+      "body": "Can you interact with the contract via etherscan with your relevant information from the contract (with your proof, secret and lock information - did you get these from the website you used or could that be what's been compromised here)?I've been reading through this for context on where I got the proof, secret and lock and what those might be: https://www.coincenter.org/education/advanced-topics/how-does-tornado-cash-work/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "privacycentricguy",
+      "created_time": "September 08, 2022, 04:54:47 PM",
+      "body": "Quote from: jackg on September 07, 2022, 08:04:15 PMCan you interact with the contract via etherscan with your relevant information from the contract (with your proof, secret and lock information - did you get these from the website you used or could that be what's been compromised here)?I've been reading through this for context on where I got the proof, secret and lock and what those might be: https://www.coincenter.org/education/advanced-topics/how-does-tornado-cash-work/the web frontend isn't compromised, as it's served off of IPFS. I've also tried a locally hosted version of the web UI, as well as the command line utility.unfortunately, i don't have a good enough understanding of the cryptography or math behind how this all works to manually generate a proof and test it. i was hoping posting my 1 ETH note would compel someone with the proper skill set to try to figure out what is going on here.im not sure if this was done intentionally, or is just a bug in the contract, but the fact that it happened right after TC was sanctioned is strange to me, and i'm very curious what is going on.it seems the 10 eth and 100 eth contracts are okay still, but i don't believe anyone is able to withdraw funds currently from the 1 ETH pool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Rickorick",
+      "created_time": "September 09, 2022, 11:22:30 PM",
+      "body": "It's Already spent, I guess you figured it out.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

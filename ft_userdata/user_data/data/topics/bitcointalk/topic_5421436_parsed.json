@@ -1,0 +1,165 @@
+{
+  "id": "topic_5421436",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "November 16, 2022, 06:23:21 PMLast edit: November 16, 2022, 06:41:14 PM by NotATether",
+  "content": "I have a very weird problem.Yesterday I was transferring my Bitcoins out of Guarda wallet (as I had just swapped some Ethereum for it) to my Electrum wallet, with a fee of 6 sats/vB - this was before I looked at the mempool volume.Long story short, now my transaction is buried under 120vMB of other transactions, almost all of them paying double my fee (which would be 12 sats).The transaction is broadcasted, but without RBF as apparently Guarda does not support RBF, so I cannot change the fee and broadcast it again, as my tx gets rejected by ndoes.I do not see the transaction in Electrum. I also do not see it at all in block explorers. This explorer https://bitcoinblockexplorers.com/tx/c56fdc357a22471256302626d9c1da186499b74bad641b688703c89c625d0fd2 used to show the tx as at least \"unconfirmed\" but now its not showing anything.The tx does not have a change output (I transferred all bitcoins out anyway), so I am afraid I cannot do CPFP either.Short of a tx accelerator [and not even ViaBTC can find my tx], is there anything I can do to make my tx visible on block explorers?Yes, the address in the transaction matches the one I intended to send it to.I seem to be able to see it on this particular explorer now, but on all the other explorers I tested, it is not found:- Blockchain.info- Blockstream- Blockchair- BlockcypherEDIT: It's not found again even on the one explorer that worked.What the heck is going on here?EDIT 2: I just imported the private key of the Guarda wallet to another Electrum wallet and initiated the transfer from there. This time I can see the unconfirmed transaction in my other Electrum and explorers. So maybe this is a Guarda bug or something?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5421436",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "November 16, 2022, 06:58:40 PM",
+      "body": "Currenly, my Bitcoin Core uses 267 MB. As far as I know, most nodes limit their mempool to 300 MB, after which they start dropping the transactions with the lowest fee. My guess is that's what happened, and if that's the case, all your wallet has to do is keep broadcasting the transaction so that it will show up when mempool clears.Quote from: NotATether on November 16, 2022, 06:23:21 PMSo maybe this is a Guarda bug or something?I know nothing about that wallet, so I have no idea how it broadcasts transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AB de Royse777",
+      "created_time": "November 16, 2022, 07:44:06 PM",
+      "body": "Quote from: LoyceV on November 16, 2022, 06:58:40 PMQuote from: NotATether on November 16, 2022, 06:23:21 PMSo maybe this is a Guarda bug or something?I know nothing about that wallet, so I have no idea how it broadcasts transactions.https://guarda.com/It once used this wallet. You can have multi-currency there and swipe each with others. The online version felt like metamask type wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "November 16, 2022, 09:39:53 PM",
+      "body": "That's weird, if the transaction isn't showing in the block explorer that means your wallet didn't push the transaction on the network, or your wallet is out of sync. Another option for this kind of scenarios is a double spend, those kind of transactions are visible for some time, but then they get deleted.Move the private keys to a new wallet and try to spend them again is the right way to recover those coins because if the transaction isn't in the blockchain then the coins haven't been spend.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 17, 2022, 04:07:32 AM",
+      "body": "Quote from: seoincorporation on November 16, 2022, 09:39:53 PMThat's weird, if the transaction isn't showing in the block explorer that means your wallet didn't push the transaction on the network, or your wallet is out of sync. Another option for this kind of scenarios is a double spend, those kind of transactions are visible for some time, but then they get deleted.Move the private keys to a new wallet and try to spend them again is the right way to recover those coins because if the transaction isn't in the blockchain then the coins haven't been spend.Yeah, I did that and was able to successfully move the coins. It generated the same txid.Not sure what on earth is wrong with Guarda but I don't feel like sending BTC anymore with it...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "November 17, 2022, 04:25:09 AM",
+      "body": "Quote from: NotATether on November 17, 2022, 04:07:32 AMIt generated the same txid.No, you generate a new transaction with the same keys, inputs and outputs, but not the same txid, let me explain.When you take the secret keys from one wallet to another and make a transaction, even you use the same inputs, same amounts, and same outputs, the Transaction ID (txid) will be different. I know you are a pro in the topic and was a miss spelling, you generate the same transaction, but is important to mention that you can get a different transaction ID (txid) in the sign process before the broadcast. So, if some one offer you 1 btc for  a transaction id ending in fff, you could get it by brute force without spending a single coin because you get the txid before pushing the transaction in the network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "casinotester0001",
+      "created_time": "November 17, 2022, 11:01:00 AM",
+      "body": "Quote from: NotATether on November 17, 2022, 04:07:32 AMYeah, I did that and was able to successfully move the coins. It generated the same txid.Quote from: seoincorporation on November 17, 2022, 04:25:09 AMNo, you generate a new transaction with the same keys, inputs and outputs, but not the same txid, let me explain.When you take the secret keys from one wallet to another and make a transaction, even you use the same inputs, same amounts, and same outputs, the Transaction ID (txid) will be different. If you generate a new transaction with the same input/output you will get the same txid. Else blockchain would not work, so Bitcoin wouldn't exist",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "November 17, 2022, 11:32:16 AM",
+      "body": "Quote from: NotATether on November 17, 2022, 04:07:32 AMNot sure what on earth is wrong with Guarda but I don't feel like sending BTC anymore with it...From what I've read, Guarda is non-custodial?If so, maybe there's a chance to get the raw transaction hex and re-broadcast it with a few such free service over the internet?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "November 17, 2022, 05:45:27 PM",
+      "body": "Quote from: casinotester0001 on November 17, 2022, 11:01:00 AMQuote from: NotATether on November 17, 2022, 04:07:32 AMYeah, I did that and was able to successfully move the coins. It generated the same txid.Quote from: seoincorporation on November 17, 2022, 04:25:09 AMNo, you generate a new transaction with the same keys, inputs and outputs, but not the same txid, let me explain.When you take the secret keys from one wallet to another and make a transaction, even you use the same inputs, same amounts, and same outputs, the Transaction ID (txid) will be different. If you generate a new transaction with the same input/output you will get the same txid. Else blockchain would not work, so Bitcoin wouldn't exist  As Linus Torvalds says... talk is cheap, show me the code.Code:[bitcoin@talk bin]$ a=$(./clamd createrawtransaction '[{\"txid\":\"263f3b50037f2a596a640939ac6f47a688e63fe211a5d06b28ce35180ad97850\",\"vout\":1}]' '{\"xCPd81UNFhHvhNjNQWyWTJKMJMv1JDijnY\":12.47903878}')[bitcoin@talk bin]$ echo $a02000000ac6f7663015078d90a1835ce286bd0a511e23fe688a6476fac3909646a592a7f03503b3f260100000000ffffffff018680614a000000001976a9142cd1efeb26e5602d121ef98f5630089dd142e2fb88ac000000002a45787072657373696f6e206f6620506f6c69746963616c2046726565646f6d3a204175746f6372616379[bitcoin@talk bin]$ ./clamd decoderawtransaction $a{    \"txid\" : \"015505cb52c24fa83e174dd496e8682323164ebeb7ff5613f484ef00b44fd29f\",    \"version\" : 2,    \"time\" : 1668706220,    \"locktime\" : 0,    \"clam-speech\" : \"Expression of Political Freedom: Autocracy\",    \"vin\" : [        {            \"txid\" : \"263f3b50037f2a596a640939ac6f47a688e63fe211a5d06b28ce35180ad97850\",            \"vout\" : 1,            \"scriptSig\" : {                \"asm\" : \"\",                \"hex\" : \"\"            },            \"sequence\" : 4294967295        }    ],    \"vout\" : [        {            \"value\" : 12.47903878,            \"n\" : 0,            \"scriptPubKey\" : {                \"asm\" : \"OP_DUP OP_HASH160 2cd1efeb26e5602d121ef98f5630089dd142e2fb OP_EQUALVERIFY OP_CHECKSIG\",                \"reqSigs\" : 1,                \"type\" : \"pubkeyhash\",                \"addresses\" : [                    \"xCPd81UNFhHvhNjNQWyWTJKMJMv1JDijnY\"                ]            }        }    ]}[bitcoin@talk bin]$ a=$(./clamd createrawtransaction '[{\"txid\":\"263f3b50037f2a596a640939ac6f47a688e63fe211a5d06b28ce35180ad97850\",\"vout\":1}]' '{\"xCPd81UNFhHvhNjNQWyWTJKMJMv1JDijnY\":12.47903878}')[bitcoin@talk bin]$ ./clamd decoderawtransaction $a{    \"txid\" : \"e9d9b7086dc7ca23ba1d7bd37ff3fb7ced0416adb170d69eacc659f66ebf578b\",    \"version\" : 2,    \"time\" : 1668706346,    \"locktime\" : 0,    \"clam-speech\" : \"Expression of Political Freedom: Religious socialism\",    \"vin\" : [        {            \"txid\" : \"263f3b50037f2a596a640939ac6f47a688e63fe211a5d06b28ce35180ad97850\",            \"vout\" : 1,            \"scriptSig\" : {                \"asm\" : \"\",                \"hex\" : \"\"            },            \"sequence\" : 4294967295        }    ],    \"vout\" : [        {            \"value\" : 12.47903878,            \"n\" : 0,            \"scriptPubKey\" : {                \"asm\" : \"OP_DUP OP_HASH160 2cd1efeb26e5602d121ef98f5630089dd142e2fb OP_EQUALVERIFY OP_CHECKSIG\",                \"reqSigs\" : 1,                \"type\" : \"pubkeyhash\",                \"addresses\" : [                    \"xCPd81UNFhHvhNjNQWyWTJKMJMv1JDijnY\"                ]            }        }    ]}I was wrong and the TxID comes from the create raw transaction step, and not from the sign raw transaction step.As you can see in the code i created a transaction with the same inputs, outputs, and amounts and the first one gets the TxID:Code:015505cb52c24fa83e174dd496e8682323164ebeb7ff5613f484ef00b44fd29fWhile the second one:Code:e9d9b7086dc7ca23ba1d7bd37ff3fb7ced0416adb170d69eacc659f66ebf578bThis is why it's important to know how to build your transactions by hand and understand how the transactions works.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 17, 2022, 06:13:23 PM",
+      "body": "Quote from: casinotester0001 on November 17, 2022, 11:01:00 AMIf you generate a new transaction with the same input/output you will get the same txid.No. This is wrong. The transaction ID is calculated by hashing the transaction data through SHA256 function twice. So, with any change in the transaction data, you get a new transaction ID. For example, the new transaction can have a different fee or a different locktime and even with the same inputs and same outputs would have a different ID.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "casinotester0001",
+      "created_time": "November 17, 2022, 06:44:23 PMLast edit: November 17, 2022, 07:15:53 PM by casinotester0001",
+      "body": "Quote from: NotATether on November 17, 2022, 04:07:32 AMYeah, I did that and was able to successfully move the coins. It generated the same txid.NotATether didn't say that he changed the fee or locktime.Quote from: hosseinimr93 on November 17, 2022, 06:13:23 PMFor example, the new transaction can have a different fee or a different locktime and even with the same inputs and same outputs would have a different ID.Yes, if you change these intentionally, you will get a different txid. But what is the reason to change the txid? Do the nodes accept it as a new transaction (with the same input) if the old one is in the mempool?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 17, 2022, 08:01:53 PM",
+      "body": "Quote from: casinotester0001 on November 17, 2022, 06:44:23 PMNotATether didn't say that he changed the fee or locktime.I don't know what exactly NotATether did.He probably made a new transaction which should have a different ID. If you click on the link he provided in the OP, you will see that transaction doesn't exist. Quote from: casinotester0001 on November 17, 2022, 06:44:23 PMYes, if you change these intentionally, you will get a different txid. But what is the reason to change the txid? Do the nodes accept it as a new transaction (with the same input) if the old one is in the mempool?If the transaction has the same ID, that's not a new transaction at all. That would be the same transaction. If the original transaction hasn't been flagged as FBF, nodes will reject the new transaction.If the original transaction has been flagged as RBF and the new transaction meets the requirements specified in BIP125, it will be accepted by the nodes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "November 17, 2022, 08:57:22 PM",
+      "body": "Quote from: NotATether on November 16, 2022, 06:23:21 PMYesterday I was transferring my Bitcoins out of Guarda wallet (as I had just swapped some Ethereum for it) to my Electrum wallet, with a fee of 6 sats/vB - this was before I looked at the mempool volume.I think that Guarda wallet is using some third parties like ChangeNow for exchanging coins, so this could be the root cause problem for your transaction.Few years ago I tested Guarda wallet desktop version and I didn't liked it, I think it still had old address formats and all interface was terrible.I would really stay away from closed source wallets like this, there are much better alternative both for mobile and dekstop.Did balance of your BTC address changed in any way on your wallet and in explorers?Maybe you should try importing private key or seed words to other wallet and see if everything works or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "buwaytress",
+      "created_time": "November 17, 2022, 09:28:05 PM",
+      "body": "Quote from: hosseinimr93 on November 17, 2022, 06:13:23 PMQuote from: casinotester0001 on November 17, 2022, 11:01:00 AMIf you generate a new transaction with the same input/output you will get the same txid.No. This is wrong. The transaction ID is calculated by hashing the transaction data through SHA256 function twice. So, with any change in the transaction data, you get a new transaction ID. For example, the new transaction can have a different fee or a different locktime and even with the same inputs and same outputs would have a different ID.OK I'm suddenly curious now and want to try this next time I fire up as I actually never noticed. I don't know how it all works but using explanations above... if tx ID is made by hashing tx data, and the data doesn't change (destination, amount fee, locktime, etc), then the hash result will always be the same, correct?So the tx ID should always be the same if you're attempting to create the raw tx with the exact same changeable perimeters (which I guess is what casinotester really wanted to say).Though now I'm curious also about seoincorporation's post... what did they change to get a diff ID? Is it that \"clam-speech\" bit? What's that?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 17, 2022, 10:53:10 PM",
+      "body": "Quote from: buwaytress on November 17, 2022, 09:28:05 PMif tx ID is made by hashing tx data, and the data doesn't change (destination, amount fee, locktime, etc), then the hash result will always be the same, correct?If nothing is changed, you have actually made the same transaction and if you broadcast it, you actually re-broadcast the previous transaction. Quote from: buwaytress on November 17, 2022, 09:28:05 PMThough now I'm curious also about seoincorporation's post... what did they change to get a diff ID? Is it that \"clam-speech\" bit? What's that?I don't really know what's \"clam-speech\". As I see in the post made by seoincorporation the \"time\" has been also changed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 18, 2022, 12:26:48 AM",
+      "body": "Quote from: NeuroticFish on November 17, 2022, 11:32:16 AMFrom what I've read, Guarda is non-custodial?If so, maybe there's a chance to get the raw transaction hex and re-broadcast it with a few such free service over the internet?Yes, it is non-custodial (now why would I use a custodial wallet myself?) - that's how I was able to import its private key into Electrum and initiate the transaction from there.Quote from: hosseinimr93 on November 17, 2022, 08:01:53 PMQuote from: casinotester0001 on November 17, 2022, 06:44:23 PMNotATether didn't say that he changed the fee or locktime.I don't know what exactly NotATether did.He probably made a new transaction which should have a different ID. If you click on the link he provided in the OP, you will see that transaction doesn't exist. I made a second transaction with the same source/destination address and amount, just with a higher fee. From there I got the same transaction hex. Since that one went through, it means that my first transaction never went or in the first place.Quote from: dkbit98 on November 17, 2022, 08:57:22 PMQuote from: NotATether on November 16, 2022, 06:23:21 PMYesterday I was transferring my Bitcoins out of Guarda wallet (as I had just swapped some Ethereum for it) to my Electrum wallet, with a fee of 6 sats/vB - this was before I looked at the mempool volume.I think that Guarda wallet is using some third parties like ChangeNow for exchanging coins, so this could be the root cause problem for your transaction.Few years ago I tested Guarda wallet desktop version and I didn't liked it, I think it still had old address formats and all interface was terrible.I would really stay away from closed source wallets like this, there are much better alternative both for mobile and dekstop.Did balance of your BTC address changed in any way on your wallet and in explorers?Maybe you should try importing private key or seed words to other wallet and see if everything works or not.Before making the transaction I exchanged some Ethereum for Bitcoin. I waited for the bitcoin transaction to confirm before sending it out, and it somehow worked the first time, but then subsequent broadcasts of the rawtx failed with some \"RPC error\".Normally I just use TradeOgre when I need to exchange large amounts of coin, but if I happen to need to exchange urgently, a wallet with that sort of feature is a nice to-have. Hence Guarda (but now that it's acting up, I might jump ship to something like Unstoppable Wallet).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 18, 2022, 12:48:03 AM",
+      "body": "Quote from: NotATether on November 18, 2022, 12:26:48 AMI made a second transaction with the same source/destination address and amount, just with a higher fee. From there I got the same transaction hex.This is not possible.For increasing transaction fee, you have to either add an extra input or decrease the output value. With the change in transaction data, the transaction hash should change as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 18, 2022, 06:43:58 AMLast edit: November 18, 2022, 08:18:22 AM by LoyceV",
+      "body": "Quote from: buwaytress on November 17, 2022, 09:28:05 PMOK I'm suddenly curious now and want to try this next time I fire up as I actually never noticed. I don't know how it all works but using explanations above... if tx ID is made by hashing tx data, and the data doesn't change (destination, amount fee, locktime, etc), then the hash result will always be the same, correct?Isn't this related to not reusing the same k value?It's easy to test by signing the same message twice: the signature changes. I just tested it, and I get the same signature. I thought the \"k value\" was a random, but clearly this isn't my area of expertise.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 18, 2022, 07:36:59 AM",
+      "body": "Quote from: LoyceV on November 18, 2022, 06:43:58 AMIt's easy to test by signing the same message twice: the signature changes.The signature changes? It seems that there's something I don't understand here. I just signed a message. Code:Address: bc1qy22tj52f469y8zf9jalzyhc6snldqq8nqzfw56private key: L5VtBJJUv6NKym6JZLfF53iqAfA34kadmAsFAc5DV8vqrNYNJJwKMessage: This message is signed for testing purposes. Signature: IGu0FwHYh48v5UU9/SQLTq/f9WPEi6N0qz4N7+oT4/GXIpjmvlZ8rj72r8Eoyj6DEkLsWX9D/c9qSvkwsHYvCZI=How can you have a different signature if you sign the same message from the same address? Shouldn't you have the same signature every time you sign the the same message from the same address?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 18, 2022, 09:44:19 AM",
+      "body": "Quote from: LoyceV on November 18, 2022, 06:43:58 AMIt's easy to test by signing the same message twice: the signature changes. I just tested it, and I get the same signature. I thought the \"k value\" was a random, but clearly this isn't my area of expertise.AFAIK, Electrum is using a deterministic 'k' based from the private key and the hash of the message to be signed (actual formula, IDK).So it'll produce the same 'k' for same message, thus same signature; but not if the message is different since it'll produce a different 'k'.That's essentially not reusing nonce. [CMIIAW]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

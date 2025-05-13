@@ -1,0 +1,45 @@
+{
+  "id": "topic_5467128",
+  "title": "HoBzY",
+  "author": "HoBzY",
+  "created_time": "September 17, 2023, 07:40:22 PMLast edit: September 24, 2023, 09:18:15 AM by HoBzY",
+  "content": "Я пытаюсь импортировать хоть какой-то приватный ключ в кошелек но в результате получаю ошибку: Эта команда поддерживает только устаревшие кошельки.И при создание кошелька много раз менял disable_private_keys: true/false и ничего не помоглоD:\\Bitcoin\\daemon>bitcoin-cli -conf=D:\\Bitcoin\\bitcoin.conf createwallet Test false false \"1\"{  \"name\": \"Test\"}D:\\Bitcoin\\daemon>bitcoin-cli -conf=D:\\Bitcoin\\bitcoin.conf getwalletinfo{  \"walletname\": \"Test\",  \"walletversion\": 169900,  \"format\": \"sqlite\",  \"balance\": 0.00000000,  \"unconfirmed_balance\": 0.00000000,  \"immature_balance\": 0.00000000,  \"txcount\": 0,  \"keypoolsize\": 4000,  \"keypoolsize_hd_internal\": 4000,  \"unlocked_until\": 0,  \"paytxfee\": 0.00000000,  \"private_keys_enabled\": true,  \"avoid_reuse\": false,  \"scanning\": false,  \"descriptors\": true,  \"external_signer\": false}D:\\Bitcoin\\daemon>bitcoin-cli -conf=D:\\Bitcoin\\bitcoin.conf walletpassphrase 1 6000D:\\Bitcoin\\daemon>bitcoin-cli -conf=D:\\Bitcoin\\bitcoin.conf importprivkey 1error code: -4error message:Эта команда поддерживает только устаревшие кошельки.CONFIG:debug=blockchain,net,mempooltestnet=1rpcpassword=Testrpcuser=Testdatadir=D:\\Bitcoin\\BitcoinDatatxindex=1zmqpubrawtx=tcp://127.0.0.1:28332zmqpubhashtx=tcp://127.0.0.1:28332zmqpubrawblock=tcp://127.0.0.1:28332zmqpubhashblock=tcp://127.0.0.1:28332zmqpubsequence=tcp://127.0.0.1:28332server=1====================================================================Я хочу отслеживать транзакции в нескольких кошельках одновременно с проверкой баланса.Пытаюсь реализовать аналогичный принцип проверки транзакций как на обменниках.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5467128",
+  "comments": [
+    {
+      "author": "A-Bolt",
+      "created_time": "September 17, 2023, 08:54:52 PM",
+      "body": "Quote from: HoBzY on September 17, 2023, 07:40:22 PMЯ пытаюсь импортировать хоть какой-то приватный ключ в кошелек но в результате получаю ошибку: Эта команда поддерживает только устаревшие кошельки.По-умолчанию создаётся дескрипторный кошелёк. Это новый тип кошелька, одной из особенностей которого является невозможность импортировать приватный ключ командой importprivkey.Вы можете создать старый тип кошелька так:Code:createwallet Test false true \"1\" false falseШестой параметр со значением \"false\", указывает что не нужно создавать дескрипторный кошелёк. Будет создан пустой старый (legacy) кошелёк, в который можно будет импортировать приватные ключи командой importprivkey.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HoBzY",
+      "created_time": "September 17, 2023, 09:30:55 PM",
+      "body": "Получилось) А как получить из этого созданного адрес кошелька и как импортировать private key?D:\\Bitcoin\\daemon>bitcoin-cli -conf=D:\\Bitcoin\\bitcoin.conf getwalletinfo{  \"walletname\": \"Test\",  \"walletversion\": 169900,  \"format\": \"bdb\",  \"balance\": 0.00000000,  \"unconfirmed_balance\": 0.00000000,  \"immature_balance\": 0.00000000,  \"txcount\": 0,  \"keypoololdest\": 1694985896,  \"keypoolsize\": 0,  \"keypoolsize_hd_internal\": 0,  \"unlocked_until\": 1695045232,  \"paytxfee\": 0.00000000,  \"private_keys_enabled\": true,  \"avoid_reuse\": false,  \"scanning\": false,  \"descriptors\": false,  \"external_signer\": false}Пробовал hex/wif:D:\\Bitcoin\\daemon>bitcoin-cli -conf=D:\\Bitcoin\\bitcoin.conf importprivkey \"0000000000000000000000000000000000000000000000000000000000000001\"error code: -5error message:Invalid private key encodingD:\\Bitcoin\\daemon>bitcoin-cli -conf=D:\\Bitcoin\\bitcoin.conf getnewaddress \"\" legacyerror code: -4error message:Error: This wallet has no available keys",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "A-Bolt",
+      "created_time": "September 17, 2023, 09:46:58 PM",
+      "body": "Quote from: HoBzY on September 17, 2023, 09:30:55 PMПробовал hex/wif:D:\\Bitcoin\\daemon>bitcoin-cli -conf=D:\\Bitcoin\\bitcoin.conf importprivkey \"0000000000000000000000000000000000000000000000000000000000000001\"error code: -5error message:Invalid private key encodingПриватный ключ должен быть в формате WIF, а вы пытаетесь в формате HEX импортировать.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HoBzY",
+      "created_time": "September 17, 2023, 09:52:36 PMLast edit: September 17, 2023, 10:05:28 PM by HoBzY",
+      "body": "А я оказывается не тестовой сети WIF ключ вписывал. Спасибо",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

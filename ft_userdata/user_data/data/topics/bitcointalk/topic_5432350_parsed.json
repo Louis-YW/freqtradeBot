@@ -1,0 +1,101 @@
+{
+  "id": "topic_5432350",
+  "title": "DdmrDdmr",
+  "author": "DdmrDdmr",
+  "created_time": "December 30, 2022, 06:55:20 AMLast edit: December 30, 2022, 02:58:12 PM by DdmrDdmr",
+  "content": "It’s never late to place a decent question on Beginners & Help (where I'd prefer it to have stayed):Here’s a case I encountered the other day. I sent two consecutive TXs minutes apart, let’s call them TX1 and TX2, both from the same wallet, and sent to different recipients with seemingly (at the time) adequate fees to be processed within a block or two.Since things were taking their time to be confirmed, and encountering a sudden spike in Bitcoin’s network activity, I bumped TX2 using RBF. I then (subsequently) tried doing likewise with TX1, but the wallet software would not let me. I therefore had TX2 in the mempool at a rate of let’s say 3x the fee of TX1. Now when TX2 got confirmed, I also saw that TX1 also got confirmed within the same block. The weird thing was that TX2 was obviously within the block’s effectively processed min/max fee range, but TX1 was not (my fee on TX1 was way lower than that processed in the mined block).Now In the aftermaths, I looked at the inputs and outputs, and saw that TX2 was using as an input TX1’s output change address. TX2 therefore depended on TX1.Now here are the questions:Q1) Would it be correct to infer that TX1 was mined alongside TX2 because what I pulled off was a CPFP (without using the wallet’s CPFP function, but by performing the steps I described above)?Q2) Could the said dependency be the cause for the wallet not being able to apply RBF on TX1 (after successfully being able to do in on TX2)?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432350",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "December 30, 2022, 07:30:09 AMLast edit: December 30, 2022, 07:50:56 AM by Charles-Tim",
+      "body": "Quote from: DdmrDdmr on December 30, 2022, 06:55:20 AMQ1) Would it be correct to infer that TX1 was mined alongside TX2 because what I pulled off was a CPFP (without using the wallet’s CPFP function, but by performing the steps I described above)?Yes, as long as they both have UTXO in connection (I mean spending from the same UTXO which is the UTXO in the transaction 1 change address that transaction 2 spend from). I have done this many times without using the wallet CPFP and it worked as the transaction are included into the same block. Transaction 2 is CPFP transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Upgrade00",
+      "created_time": "December 30, 2022, 07:38:29 AM",
+      "body": "Quote from: DdmrDdmr on December 30, 2022, 06:55:20 AMQ1) Would it be correct to infer that TX1 was mined alongside TX2 because what I pulled off was a CPFP (without using the wallet’s CPFP function, but by performing the steps I described above)?Q2) Could the said dependency be the cause for the wallet not being able to apply RBF on TX1 (after successfully being able to do in on TX2)?• I would assume the same. In this situation TX2 would not be valid if the output from the change address (of TX1) is not included, and output would not be included if TX1 isn't confirmed, so the miner must have been compelled to include both into the block.• I am not aware of how the link would prevent a bump of the fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DiMarxist",
+      "created_time": "December 30, 2022, 07:38:52 AM",
+      "body": "Quote from: DdmrDdmr on December 30, 2022, 06:55:20 AMNow here are the questions:Q1) Would it be correct to infer that TX1 was mined alongside TX2 because what I pulled off was a CPFP (without using the wallet’s CPFP function, but by performing the steps I described above)?Q2) Could the said dependency be the cause for the wallet not being able to apply RBF on TX1 (after successfully being able to do in on TX2)?Newbies that are not well knowledgeable in the forum, bitcoin and mining won't understand the thread. We are to observe the comments from experts. If I may say TX1 and TX2 are two different Miners that confirm your transaction at the same time in coincident. I don't think the dependency caused the RBF rejection but probably because TX1 was unconfirmed",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "December 30, 2022, 08:14:39 AM",
+      "body": "Quote from: DdmrDdmr on December 30, 2022, 06:55:20 AMQ1) Would it be correct to infer that TX1 was mined alongside TX2 because what I pulled off was a CPFP (without using the wallet’s CPFP function, but by performing the steps I described above)?Right. You did CPFP.Your second transaction used the output of the first transaction and the miner had to include the first transaction as well. When miners see a transactions spending an unconfirmed output, they usually calculate the effective fee rate and include the transactions (the child and the parent) in the same block if the fee rate is high enough. For calculating the effective fee rate, they add the total fee of the transactions together and divide the result to the total size of transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "December 30, 2022, 08:18:41 AM",
+      "body": "Quote from: DdmrDdmr on December 30, 2022, 06:55:20 AMQ1) Would it be correct to infer that TX1 was mined alongside TX2 because what I pulled off was a CPFPQ2) Could the said dependency be the cause for the wallet not being able to apply RBF on TX1 (after successfully being able to do in on TX2)?[A2] It depends on the client, for example in Bitcoin Core: you wont be able to replace the parent if it already has a child saved in your mempool or wallet.In other clients, like Electrum: it's possible to replace the parent but by doing so, it will invalidate the children txns.[A1] Yes",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DdmrDdmr",
+      "created_time": "December 30, 2022, 10:37:15 AM",
+      "body": "Quote from: Charles-Tim on December 30, 2022, 07:30:09 AM<…>That was the first time I recall encountering the situation on my end, likely because I tend to perform single widely spaced TXs in practice.Quote from: DiMarxist on December 30, 2022, 07:38:52 AM<…>Whilst the casuistry is not necessarily common knowledge, it is a potential common situation that one may encounter, even though it took me quite a while to come across it myself in practical terms.Both TXs were confirmed within the same block, so there’s no option for both TXs to have been deal with by different miners.Quote from: nc50lc on December 30, 2022, 08:18:41 AM<…> In other clients, like Electrum: it's possible to replace the parent but by doing so, it will invalidate the children txns. <…>I was actually using Electrum (mobile), but since I bumped TX2 (the child TX) I didn’t get a chance to see what would have happened to it (child TX2), had I bumped TX1 instead.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "December 30, 2022, 11:27:58 AM",
+      "body": "Quote from: DdmrDdmr on December 30, 2022, 10:37:15 AMQuote from: nc50lc on December 30, 2022, 08:18:41 AM<…> In other clients, like Electrum: it's possible to replace the parent but by doing so, it will invalidate the children txns. <…>I was actually using Electrum (mobile), but since I bumped TX2 (the child TX) I didn’t get a chance to see what would have happened to it (child TX2), had I bumped TX1 instead.If you're using Desktop, the child will suddenly vanish from your history and nodes will remove it from their mempool since its input(s) are now missing.If the recipient of TX2 is also Electrum, it will appear as a \"local transaction\" instead of \"unconfirmed parent\", broadcasting it will just return with \"input missing or spent error\".I haven't tested it in Mobile Electrum but based from the info in the OP, it seems like it's the same as Bitcoin Core where you wont be able to replace the txn if it has a child txn.Interesting, I though both Android and Desktop versions work the same way.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "December 30, 2022, 05:19:14 PM",
+      "body": "This is the only way I normally end up doing cpfp (to give myself a reason to send the other transaction) so it does work that way.I think you set your fee a bit high if you did 3x the recommended.Funds are spent in transactions by using the hash of the receiving transaction to reference the unspent funds, that's likely why you couldn't rbf the first transaction.I had some funds to spend yesterday and I originally sent a low fee transaction and then did recommended and both were confirmed in the next block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 31, 2022, 10:13:06 AM",
+      "body": "Yeah, I would also have assumed that Electrum would have no issues RBFing the first transaction even if it invalidated the second one. The first transaction was definitely opted in to RBF?Quote from: jackg on December 30, 2022, 05:19:14 PMI think you set your fee a bit high if you did 3x the recommended.Not necessarily if the fee on the second transaction was also being used to bump the first. Most wallets and software will base their suggested fee only on the size of the child transaction, and will not include the size of any unconfirmed parent transactions. Depending on the sizes of the two transactions, you might end up needing 10x or more the recommended fee on the child transaction to get the combined fee for both transactions up to a suitable level.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khaled0111",
+      "created_time": "December 31, 2022, 07:42:55 PM",
+      "body": "Quote from: DdmrDdmr on December 30, 2022, 06:55:20 AMQ1) Would it be correct to infer that TX1 was mined alongside TX2 because what I pulled off was a CPFP (without using the wallet’s CPFP function, but by performing the steps I described above)?Yes, bacause on your wallet settings, the \"Spend Unconfirmed\" feature is turned on. To avoid this, either turn it off or use the coin control feature to select which UTXOs to spend. QuoteQ2) Could the said dependency be the cause for the wallet not being able to apply RBF on TX1 (after successfully being able to do in on TX2)?Not sure, but did you have enough balance to pay for the extra fee? Put in mind that the change you received from TX2 does not count as that transaction is not valid any more!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "January 01, 2023, 11:07:53 AM",
+      "body": "Quote from: khaled0111 on December 31, 2022, 07:42:55 PMQuoteQ2) Could the said dependency be the cause for the wallet not being able to apply RBF on TX1 (after successfully being able to do in on TX2)?Not sure, but did you have enough balance to pay for the extra fee? Put in mind that the change you received from TX2 does not count as that transaction is not valid any more! If that's the case, TX2's input (TX1's change) is not enough to fill both transaction's total fee plus 1sat/vB rate of the replacement txn.Electrum's default rbf behavior is: \"decrease change, or add new inputs, or decrease any outputs\" in particular order.Replacing TX1 will invalidate TX2 anyways so it'll use TX2's input for additional fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

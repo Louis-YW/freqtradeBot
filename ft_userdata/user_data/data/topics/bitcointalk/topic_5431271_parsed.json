@@ -1,0 +1,61 @@
+{
+  "id": "topic_5431271",
+  "title": "zander1983",
+  "author": "zander1983",
+  "created_time": "December 24, 2022, 06:09:21 PM",
+  "content": "I am having so many problems simply trying to connect to a python script connect to a local bitcoin node running regtest. I posted another thread here using a different Python library https://bitcointalk.org/index.php?topic=5431250.0Im now trying the library python-bitcoinrpc. I run:    Code:pip3 install python-bitcoinrpcAnd the script is:Code:import bitcoinrpc.authfrom bitcoinrpc.authproxy import AuthServiceProxy# Connect to the local Bitcoin nodeconnection = AuthServiceProxy(    \"http://username:password@localhost:8332\",    network='regtest'  # specify the network parameters as 'regtest')# List the transactions in the walletprint(connection.listtransactions())I run it with Code:python3 scripts.py And I get the response:Code:    import bitcoinrpc.authModuleNotFoundError: No module named 'bitcoinrpc.auth'When I do Code:which pythonI get: Code:/Users/me/opt/anaconda3/bin/pythonThe python version is  3.9.7I am truly reaching the end of my tether with this. If anyone has any ideas whats going on, or even has a suggestion of better libraries in different languages - I've spent 3 days on various Python libraries and cannot get any of them working, some I cant even seem to import. Im more experienced with Java and Javascript than Python.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5431271",
+  "comments": [
+    {
+      "author": "vv181",
+      "created_time": "December 24, 2022, 06:29:10 PM",
+      "body": "Do note if you have multiple installations, using the command python/pip or python3/pip3, might execute a different python version.Within your current Python environment, make sure you have installed the package. Check using \"pip list\" command or, run a Python shell, then type out \"help('modules')\", to see if those particular packages exist. If it does not, the PATH variable on your terminal might haven't yet been set up correctly.As last resort, You should try to install the package using \"conda install <package>\" way or install the package directly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "December 24, 2022, 07:10:05 PM",
+      "body": "Quote from: vv181 on December 24, 2022, 06:29:10 PMDo note if you have multiple installations, using the command python/pip or python3/pip3, might execute a different python version.Within your current Python environment, make sure you have installed the package. Check using \"pip list\" command or, run a Python shell, then type out \"help('modules')\", to see if those particular packages exist. If it does not, the PATH variable on your terminal might haven't yet been set up correctly.As last resort, You should try to install the package using \"conda install <package>\" way or install the package directly.When I do pip list (from within the virtualenv) I see:bitcoin           1.1.42pip               22.3.1python-bitcoinrpc 1.0setuptools        65.6.3wheel             0.38.4When I run the script:Code:import bitcoinfrom bitcoin.rpc import Proxy# create a connection to the local bitcoin nodeconn = Proxy(    service_url='http://user:pass@localhost:8332/')print(\"conn is \")print(conn)# list the transactions in the walletprint(conn.listtransactions())I get the error:Code:    from bitcoin.rpc import ProxyModuleNotFoundError: No module named 'bitcoin.rpc'When I deactivate and run again, I get:Code:    print(conn.listtransactions())AttributeError: 'Proxy' object has no attribute 'listtransactions'Which is a new problem, but does show that for whatever reason, the bitcoin lib cant be used within a virtual env",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "December 24, 2022, 08:51:27 PM",
+      "body": "python-bitcoinrpc creates the package bitcoinrpc. In your second script, you are using the package bitcoin which is completely different. Your system environment has a package with the name bitcoin that is not in your virtualenv.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "December 24, 2022, 09:41:06 PM",
+      "body": "Quote from: achow101 on December 24, 2022, 08:51:27 PM Your system environment has a package with the name bitcoin that is not in your virtualenv.Why do you say that? I ran pip list while within the virtualenv",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "December 25, 2022, 11:07:04 AMLast edit: December 25, 2022, 11:19:20 AM by vv181",
+      "body": "The bitcoin package can come from python-bitcoinlib, it may be installed on your system environment because the second script works.The reason why it returns an error is that the listtransactions() method does not exist. You can see any available method at https://github.com/petertodd/python-bitcoinlib/blob/4b8fa0ced0b7b57fe5fe6254956d6db5fa934732/bitcoin/rpc.py#L336.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "December 25, 2022, 01:11:35 PM",
+      "body": "Quote from: vv181 on December 25, 2022, 11:07:04 AMThe bitcoin package can come from python-bitcoinlib, it may be installed on your system environment because the second script works.The reason why it returns an error is that the listtransactions() method does not exist. You can see any available method at https://github.com/petertodd/python-bitcoinlib/blob/4b8fa0ced0b7b57fe5fe6254956d6db5fa934732/bitcoin/rpc.py#L336.Ok thanks, that cleared it up, got it working.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

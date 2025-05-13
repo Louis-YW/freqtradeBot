@@ -1,0 +1,125 @@
+{
+  "id": "topic_5454334",
+  "title": "Meuserna",
+  "author": "Meuserna",
+  "created_time": "May 28, 2023, 11:18:09 PM",
+  "content": "I downloaded Bitcoin Core (for Mac) here and set it up to store data on an external HD.  I installed BTC RPC Explorer on the same Mac, but I can't get it to authenticate.  I'm using blocksonly=1 and listen=0 (at least, for now) because I have bandwidth caps and I'm just getting started with running a node (it's fully synced).  I'm mostly doing this to learn.Here are the settings for my bitcoin.conf and BTC RPC Explorer .env files:bitcoin.conf:datadir=/Volumes/Core HD/Bitcoin/blocksonly=1server=1txindex=1listen=0rpcallowip=127.0.0.1rpcport=8332rpcuser=MyUsernamerpcpassword=aRandomlyChosenPassword.env:BTCEXP_HOST=127.0.0.1BTCEXP_PORT=3002BTCEXP_BITCOIND_HOST=127.0.0.1BTCEXP_BITCOIND_PORT=8332BTCEXP_BITCOIND_USER=MyUsernameBTCEXP_BITCOIND_PASS=aRandomlyChosenPasswordBTCEXP_BITCOIND_COOKIE=/Volumes/Core HD/Bitcoin/.cookie#BTCEXP_BITCOIND_RPC_TIMEOUT=5000Apparently, rpcuser and rpcpassword are deprecated?  If I list them in bitcoin.conf, Bitcoin Core doesn't create a .cookie file.Can I get some help?  I'm in a bit over my head here, so please be gentle",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454334",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "May 28, 2023, 11:33:12 PM",
+      "body": "Take note of BTC RPC explorer it would not work if your Bitcoin core is not fully synced because it requires txindex it is currently supported only on a full node or non-pruned node.So start to let your Bitcoin core sync first until it downloads the entire blockchain before you can use BTC RPC explorer.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Meuserna",
+      "created_time": "May 28, 2023, 11:40:26 PM",
+      "body": "My node is fully synced.  I mentioned that in the post (I tried to make sure I gave all the details)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "May 29, 2023, 01:30:56 PM",
+      "body": "Quote from: Meuserna on May 28, 2023, 11:40:26 PMMy node is fully synced.  I mentioned that in the post (I tried to make sure I gave all the details)Would you mind to try to change BTCEXP_HOST=127.0.0.1 to 0.0.0.0Since you are running it on the same device you might have an IP conflict and also it is the default config according to their GitHub guide.And also do you have NodeJS installed?Would you mind to share your logs from BTC RPC Explorer or enable debug log to troubleshoot the issue?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Meuserna",
+      "created_time": "May 29, 2023, 08:40:47 PM",
+      "body": "When I run btc-rpc-explorer in Terminal, everything seems to run fine:  btcexp:app Searching for config files... +0ms  btcexp:app Config file not found at /Users/me/.config/btc-rpc-explorer.env, continuing... +0ms  btcexp:app Config file not found at /etc/btc-rpc-explorer/.env, continuing... +0ms  btcexp:app Config file found at /Users/me/.env, loading... +0ms  btcexp:app Default cacheId '3.3.0' +498ms  btcexp:app Enabling view caching (performance will be improved but template edits will not be reflected) +12ms  btcexp:app Environment(development) - Node: v20.1.0, Platform: darwin, Versions: {\"node\":\"20.1.0\",\"acorn\":\"8.8.2\",\"ada\":\"2.3.0\",\"ares\":\"1.19.0\",\"brotli\":\"1.0.9\",\"cldr\":\"42.0\",\"icu\":\"72.1\",\"llhttp\":\"8.1.0\",\"modules\":\"115\",\"napi\":\"8\",\"nghttp2\":\"1.52.0\",\"openssl\":\"1.1.1t\",\"simdutf\":\"3.2.8\",\"tz\":\"2022e\",\"undici\":\"5.22.0\",\"unicode\":\"15.0\",\"uv\":\"1.44.2\",\"uvwasi\":\"0.0.16\",\"v8\":\"11.3.244.8-node.6\",\"zlib\":\"1.2.11\"} +4ms  btcexp:app No sourcecode version available, continuing to use default cacheId '3.3.0' +0ms  btcexp:app Starting BTC RPC Explorer, v3.3.0 at http://127.0.0.1:3002/ +0ms  btcexp:app Connecting to RPC node at 127.0.0.1:8332 +0ms  btcexp:app Verifying RPC connection... +3ms  btcexp:app Loading mining pools config +0ms  btcexp:app RPC Connected: version=220000 subversion=/Satoshi:22.0.0/, parsedVersion(used for RPC versioning)=22.0.0, protocolversion=70016, chain=main, services=[NETWORK, WITNESS, NETWORK_LIMITED] +12ms  btcexp:app Loading historical data for chain=main +0ms  btcexp:app Skipping performance-intensive task: fetch last 24 hrs of blockstats to calculate transaction volume. This is skipped due to the flag 'slowDeviceMode' which defaults to 'true' to protect slow nodes. Set this flag to 'false' to enjoy UTXO set summary details. +0ms  btcexp:app txindex check: trying getindexinfo +0ms  btcexp:app txindex check: getindexinfo={\"txindex\":{\"synced\":true,\"best_block_height\":792001}} +1ms  btcexp:app txindex check: available! +0ms  btcexp:app Skipping performance-intensive task: fetch UTXO set summary. This is skipped due to the flag 'slowDeviceMode' which defaults to 'true' to protect slow nodes. Set this flag to 'false' to enjoy UTXO set summary details. +1ms...but when I go to the explorer in a browser at http://127.0.0.1:3002, I get errors immediately in Terminal:  btcexp:error Error RpcError-002: Error: RpcError: type=errorResponse-03, json: {\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[1,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([1,\\\"CONSERVATIVE\\\"])\"}) +0ms  btcexp:errorVerbose Stack: Error: RpcError: type=errorResponse-03  btcexp:errorVerbose     at Object.rpcCall (/opt/homebrew/lib/node_modules/btc-rpc-explorer/app/api/rpcApi.js:519:13)  btcexp:errorVerbose     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) +0msError: RpcError: type=errorResponse-03    at Object.rpcCall (/opt/homebrew/lib/node_modules/btc-rpc-explorer/app/api/rpcApi.js:519:13)    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)BitMaxz asked me to try changing BTCEXP_HOST=127.0.0.1 to 0.0.0.0I tried that.If I go to http://0.0.0.0:3002 in a browser, Safari says it can't open the page because the address isn't valid.If I go to http://127.0.0.1:3002 in a browser, Safari says it can't connect to server 127.0.0.1, and Terminal kicks out the following error:  btcexp:error Error RpcError-002: Error: RpcError: type=errorResponse-03, json: {\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[1,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([1,\\\"CONSERVATIVE\\\"])\"}) +0ms  btcexp:errorVerbose Stack: Error: RpcError: type=errorResponse-03  btcexp:errorVerbose     at Object.rpcCall (/opt/homebrew/lib/node_modules/btc-rpc-explorer/app/api/rpcApi.js:519:13)  btcexp:errorVerbose     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) +0msError: RpcError: type=errorResponse-03    at Object.rpcCall (/opt/homebrew/lib/node_modules/btc-rpc-explorer/app/api/rpcApi.js:519:13)    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "May 30, 2023, 12:24:23 AM",
+      "body": "Quote from: Meuserna on May 29, 2023, 08:40:47 PM~snip~So the error came from the browser what is your current local IP would you mind to try accessing it to 192.168.1.1:3002 only if 192.168.1.1 is your local IP.I'm not expert on MacOS but if the result still the same check this guide below who also use MacOS to run RPC explorer.- https://youtu.be/gnVCsstoupkBased on the video you might need to edit credentials.js and put the right rpc user and password.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Meuserna",
+      "created_time": "May 30, 2023, 02:48:39 AM",
+      "body": "\"Based on the video you might need to edit credentials.js and put the right rpc user and password.\"Since that video was made, rpc username and rpc password have been deprecated in Bitcoin Core.  Authentication has changed.  I'm pretty sure that's why I'm stuck.\"So the error came from the browser what is your current local IP would you mind to try accessing it to 192.168.1.1:3002 only if 192.168.1.1 is your local IP.\"I tried accessing it at my Mac's IP :3002 but I got the same error (\"Safari can't open the page ... because the page's address isn't valid.\")",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "May 30, 2023, 06:36:16 AM",
+      "body": "Quote from: Meuserna on May 29, 2023, 08:40:47 PM  btcexp:app RPC Connected: version=220000 subversion=/Satoshi:22.0.0/, parsedVersion(used for RPC versioning)=22.0.0, protocolversion=70016, chain=main, services=[NETWORK, WITNESS, NETWORK_LIMITED] +12msThat indicates the authentication has been successfully done. There is nothing wrong with your auth configuration.Quote  btcexp:error Error RpcError-002: Error: RpcError: type=errorResponse-03, json: {\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[1,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([1,\\\"CONSERVATIVE\\\"])\"}) +0ms  btcexp:errorVerbose Stack: Error: RpcError: type=errorResponse-03If you are able to run $ bitcoin-cli estimatesmartfee 1, the problem is on the explorer's side.And how did you install the explorer and what version do you use? If you install it via NPM, it contains the older version. You should try to run it from the source:QuoteRun from source:    git clone https://github.com/janoside/btc-rpc-explorer    cd btc-rpc-explorer    npm install    npm startMake sure before you started it, you already set the .env file on that new folder.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Meuserna",
+      "created_time": "May 30, 2023, 07:10:16 AM",
+      "body": "\"If you install it via NPM, it contains the older version. You should try to run it from the source:\"You're right!  That's how I installed it.  I've uninstalled that version and followed your directions, but now I'm getting this error:npm ERR! code ENOENTnpm ERR! syscall opennpm ERR! path /Users/me/package.jsonnpm ERR! errno -2npm ERR! enoent ENOENT: no such file or directory, open '/Users/me/package.json'npm ERR! enoent This is related to npm not being able to find a file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Meuserna",
+      "created_time": "May 30, 2023, 07:16:55 AM",
+      "body": "HOOO!!!!!  I think we're close!It seems to be working.  The explorer comes up in my browser and everything looks good, but in Terminal I'm getting these errors:  btcexp:error Error RpcError-002: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"4ed2a787-a898-4294-8808-c3e2be1268da\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[1,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([1,\\\"CONSERVATIVE\\\"])\"}) +0ms  btcexp:app Unhandled Rejection at: Promise Promise {  <rejected> Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"4ed2a787-a898-4294-8808-c3e2be1268da\"}        at IncomingMessage.<anonymous> (/Users/me/btc-rpc-explorer/node_modules/jayson/lib/client/http.js:78:23)      at IncomingMessage.emit (node:events:523:35)      at endReadableNT (node:internal/streams/readable:1367:12)      at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {    code: 500,    userData: { request: [Object] }  }} reason: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"4ed2a787-a898-4294-8808-c3e2be1268da\"}    at IncomingMessage.<anonymous> (/Users/me/btc-rpc-explorer/node_modules/jayson/lib/client/http.js:78:23)    at IncomingMessage.emit (node:events:523:35)    at endReadableNT (node:internal/streams/readable:1367:12)    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {  code: 500,  userData: { request: { method: 'estimatesmartfee', parameters: [Array] } }} stack: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"4ed2a787-a898-4294-8808-c3e2be1268da\"}    at IncomingMessage.<anonymous> (/Users/me/btc-rpc-explorer/node_modules/jayson/lib/client/http.js:78:23)    at IncomingMessage.emit (node:events:523:35)    at endReadableNT (node:internal/streams/readable:1367:12)    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) +6s  btcexp:error Error RpcError-002: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"14da2046-0ac7-4a5e-9152-a761d7bff3f4\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[144,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([144,\\\"CONSERVATIVE\\\"])\"}) +5ms  btcexp:error Error RpcError-002: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"b1438105-7a68-4583-bf93-df1488cda343\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[6,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([6,\\\"CONSERVATIVE\\\"])\"}) +3ms  btcexp:error Error RpcError-002: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"8b0c7234-7ced-473f-9b28-848c34a67c49\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[1008,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([1008,\\\"CONSERVATIVE\\\"])\"}) +45ms(node:65181) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 1)(Use `node --trace-warnings ...` to show where the warning was created)  btcexp:error Error awaitPromises_rejected: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"4ed2a787-a898-4294-8808-c3e2be1268da\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[1,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {}) +3s  btcexp:error 404 NotFound: path=/style/light.css?v=3.3.0, ip=127.0.0.1, userAgent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Safari/605.1.15 (crawler=false) +0ms  btcexp:error Error NotFound: Error: Not Found: /style/light.css?v=3.3.0, json: {\"status\":404}, userData: [object Object] (json: {\"path\":\"/style/light.css?v=3.3.0\"}) +412ms  btcexp:error Error RpcError-002: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"a67dba54-f19f-4e3a-9514-92e25cc97880\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[144,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([144,\\\"CONSERVATIVE\\\"])\"}) +471ms  btcexp:error Error awaitPromises_rejected: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"a67dba54-f19f-4e3a-9514-92e25cc97880\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[144,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {}) +0ms  btcexp:error Error RpcError-002: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"eaa84328-f498-4fc1-9da5-7dc119bd40cb\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[6,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([6,\\\"CONSERVATIVE\\\"])\"}) +6ms  btcexp:error Error RpcError-002: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"35e6d5dd-373d-4483-b007-0036f077e2c7\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[1,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([1,\\\"CONSERVATIVE\\\"])\"}) +0ms  btcexp:error Error RpcError-002: Error: {\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"},\"id\":\"b248ed79-c6b5-4993-805b-1563bf048d15\"}  btcexp:error , json: {\"code\":500,\"userData\":{\"request\":{\"method\":\"estimatesmartfee\",\"parameters\":[1008,\"CONSERVATIVE\"]}}}, userData: [object Object] (json: {\"request\":\"estimatesmartfee([1008,\\\"CONSERVATIVE\\\"])\"}) +1ms",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Meuserna",
+      "created_time": "May 30, 2023, 09:06:12 AM",
+      "body": "Well, it seems to be working, but I have to figure out how to get BTC RPC Explorer to show address info.  It's returning \"No transactions found\" when I look up my addresses, but I assume that's because I haven't figured out configuration to get it to pull the info from my node.I've added the following to my .env but I'm missing something.BTCEXP_ADDRESS_API=electrumBTCEXP_ELECTRUM_SERVERS=tcp://127.0.0.1:50001Also, every time I want to start it (if I make any changes to the .env for example), I have to do this in Terminal:cd btc-rpc-explorernpm init...press enter for each prompt, then type yes at the final prompt.npm start",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "May 30, 2023, 09:11:19 AM",
+      "body": "Quote from: Meuserna on May 30, 2023, 07:16:55 AM{\"result\":null,\"error\":{\"code\":-32603,\"message\":\"Fee estimation disabled\"}Yeah, right. I barely know that fee estimation is disabled on blocksonly=1, so that is expected.Estimating fee requires your node to calculate using the current mempool on your node. Since you use blocksonly mode, that means you didn't relay and keep any upcoming transaction, thus you won't be able to have any estimation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Meuserna",
+      "created_time": "May 30, 2023, 10:07:38 AM",
+      "body": "Gotcha!  Thanks for that.  I don't care about seeing fees.  I just want to be able to look up addresses and transactions.I especially want to be able to look up my own addresses privately.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 30, 2023, 10:58:25 AM",
+      "body": "Quote from: Meuserna on May 30, 2023, 10:07:38 AMGotcha!  Thanks for that.  I don't care about seeing fees.  I just want to be able to look up addresses and transactions.I especially want to be able to look up my own addresses privately.If you are looking for more privacy you might want to look at also putting together an electrum server and only running under TOR.Doing it yourself is a good learning experiance, but you will wind up pulling your hair out at times getting things to work.Or, you could just use one of the pre-packaged ones like mynodebtc or umbel and so on.Just checking addresses is not much of a privacy leak, vs actually sending TX and having a client connecting to some random electum node.Not MUCH more mind you, just a bit more.And they have all the other good things, like coinjoin apps, explorers and so on. You don't learn as much, but they do work.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Meuserna",
+      "created_time": "May 31, 2023, 06:47:08 AM",
+      "body": "I must be missing something really basic here.  Any address I look up returns \"No transactions found.\"For example:34xp4vRoCGJym3xR7yCVPFHoCNxv4TwseoMy BTC RPC Explorer says no transactions found.I have my node fully synced.  I have BTC RPC Explorer up and running.  Do I need to install an electrum server?  I guess I mistakenly believed all I needed was a node and BTC RPC Explorer.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

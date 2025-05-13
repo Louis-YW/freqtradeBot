@@ -1,0 +1,93 @@
+{
+  "id": "topic_5407983",
+  "title": "Sandra_hakeem",
+  "author": "Sandra_hakeem",
+  "created_time": "July 28, 2022, 11:27:57 PM",
+  "content": "Hey there, I'm confused and stressed at the same time I don't really know why HODLing Bitcoin is simple, but the technical part of it becomes a 'hard nut to crack'; this is prolly the same thing achow said yesterday or maybe I have a lighter brain?I'm currently tutoring kids in school since I took it upon myself to add BTC to thier scheme (though I took some prior permissions from the school mgn team )also running adolescents on BITCOIN THEORY...I made that exclusively for close doors lectures anyways 🙂I have understood that nodes are sub-divided into full nodes,archival and pruned nodes and they all work dependently on each other, alright? Now based on the fact that the whole network ensures utmost security and freedom which is one of the main reasons why Bitcoin is in existence; here is it+ I have learnt that in running a P2P tnx,since it's impossible to know the IP address to any active fullnode, you'll need to hardcode DNS seeds into a fullnode and an SPV client right??   questionsThe whole problem is; since it's possible for a  random node on default to be connected to the network,why are fullnodes not just made on standby so other subsidiary nodes could connect on thier diverse command?+ I have also read that other nodes(unspecified) can be added to the developed DNS seed only if they're running on a default port for mainnet and testnet; if a subsidiary node which is not of this default port (and cannot creat a DNS seed on its own)wants to connect, can it? Confusing right? Well,thanks to anyone who can help!Sandra_",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5407983",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "July 28, 2022, 11:53:49 PM",
+      "body": "The DNS seeds are used for initial detection only, your node then grows its peers.dat from them and can connect to other nodes via that (the seed nodes are just the initial connection to the network).It's only a few packets/kb of data at most being transferred so I don't think any other nodes are needed to help with this (if it becomes more intense/or has, seed nodes don't need the blockchain to forward the user a list of their peers).Peers that don't use the default port are able to connect to the network. Peers that do may be added to the seed because then you don't have to store the port along with the seed (and if you're using a different port, what's the chance it changes - probably high).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 29, 2022, 12:22:49 AM",
+      "body": "Wow, kids are taught about Bitcoin at school these days? What a time to be alive! Keep it up Sandra.I find your question interesting in light of the latest Bitcoin release, v23.0 not too long ago (April 2022) which changed a few things with regards to the P2P network.Quote from: https://github.com/bitcoin/bitcoin/blob/master/doc/release-notes/release-notes-23.0.md#p2p-and-network-changesP2P and network changes A bitcoind node will no longer rumour addresses to inbound peers by default. They will become eligible for address gossip after sending an ADDR, ADDRV2, or GETADDR message. (#21528) Before this release, Bitcoin Core had a strong preference to try to connect only to peers that listen on port 8333. As a result of that, Bitcoin nodes listening on non-standard ports would likely not get any Bitcoin Core peers connecting to them. This preference has been removed. (#23542)So yes, there are DNS seeds for initial configuration, but as jackg mentioned they are not needed for further operation, since Bitcoin Core will discover other nodes quickly.When it comes to SPV nodes, you may have misunderstood a little bit. They typically don't use DNS seeds like Bitcoin Core, but just connect to a trusted node. This type of software often has something hard-coded that connects to the software developers' own Bitcoin node and should absolutely be changed to point to your own node. There are different connection methods, such as connecting to a local node, or using the Electrum protocol (not to be confused with the Electrum wallet, even though it does use this protocol).Quote from: https://bitcoin.org/bitcoin.pdf8. Simplified Payment VerificationIt is possible to verify payments without running a full network node. A user only needs to keepa copy of the block headers of the longest proof-of-work chain, which he can get by queryingnetwork nodes until he's convinced he has the longest chain, and obtain the Merkle branchlinking the transaction to the block it's timestamped in. He can't check the transaction forhimself, but by linking it to a place in the chain, he can see that a network node has accepted it,and blocks added after it further confirm the network has accepted it.The Bitcoin wiki is also a good place to look at.Quote from: https://en.bitcoin.it/wiki/Scalability#Simplified_payment_verificationSimplified payment verificationIt's possible to build a Bitcoin implementation that does not verify everything, but instead relies on either connecting to a trusted node, or puts its faith in high difficulty as a proxy for proof of validity. bitcoinj is an implementation of this mode.In Simplified Payment Verification (SPV) mode, named after the section of Satoshi's paper that describes it, clients connect to an arbitrary full node and download only the block headers. They verify the chain headers connect together correctly and that the difficulty is high enough. They then request transactions matching particular patterns from the remote node (ie, payments to your addresses), which provides copies of those transactions along with a Merkle branch linking them to the block in which they appeared. This exploits the Merkle tree structure to allow proof of inclusion without needing the full contents of the block.As a further optimization, block headers that are buried sufficiently deep can be thrown away after some time (eg. you only really need to store as low as 2016 headers).The level of difficulty required to obtain confidence the remote node is not feeding you fictional transactions depends on your threat model. If you are connecting to a node that is known to be reliable, the difficulty doesn't matter. If you want to pick a random node, the cost for an attacker to mine a block sequence containing a bogus transaction should be higher than the value to be obtained by defrauding you. By changing how deeply buried the block must be, you can trade off confirmation time vs cost of an attack.Programs implementing this approach can have fixed storage/network overhead in the null case of no usage, and resource usage proportional to received/sent transactions. In case you are interested what the Bitcoin Core project has to say about DNS seed operators, there is a policy on GitHub.https://github.com/bitcoin/bitcoin/blob/master/doc/dnsseed-policy.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 29, 2022, 03:15:42 AM",
+      "body": "Quote from: Sandra_hakeem on July 28, 2022, 11:27:57 PM+ I have learnt that in running a P2P tnx,since it's impossible to know the IP address to any active fullnode, you'll need to hardcode DNS seeds into a fullnode and an SPV client right??On the internet you always have to have an address to connect to another computer. For example you can not visit bitcointalk without knowing its address. This is where DNS seeders come in. These are servers that are connected to the bitcoin network and store a list of active nodes that are listening for incoming connections.The process is similar for SPV clients too, except that most of them have to connect to specialized nodes so they use a different database of addresses.Quote+ I have also read that other nodes(unspecified) can be added to the developed DNS seed only if they're running on a default port for mainnet and testnet; if a subsidiary node which is not of this default port (and cannot creat a DNS seed on its own)wants to connect, can it? You don't create a DNS seed, you fetch it and download to IPs from that list.You also have to connect to the other peer on the port that they are listening to which is the default port and DNS seeds will return IPs of nodes listening on default port only.If your node can't use that port then manual intervention is required to add another node listening on other ports since that is a special case.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sandra_hakeem",
+      "created_time": "July 29, 2022, 09:02:53 AM",
+      "body": "Quote from: n0nce on July 29, 2022, 12:22:49 AMWow, kids are taught about Bitcoin at school these days? What a time to be alive! Keep it up Sandra.Yeah I added these voluntarily though; other staffs aren't interested except one, he has a vast knowledge and I sometimes go to him for help but he isn't a part of this community, I wonder why?!QuoteSo yes, there are DNS seeds for initial configuration, but as jackg mentioned they are not needed for further operation, since Bitcoin Core will discover other nodes quickly.Okay, that's clear.Since I'm tutoring grown ups too infact,I'm into some technical analysis and they're gonna ask silly questions,so I need proper understanding..+ If Bitcoin Core discovers new DNS seeds and the search limit is just 11 secs,what if it doesn't get any node at that point since the time is limited? + Is distance a factor to consider during DNS search?+Bitcoinj doesn't need DNS seeds, I get this now; but it's only automated to work with some specific address which mean some nodes are left out in the process?Thanks for kind replies 😳Sandra_",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 29, 2022, 09:15:44 AM",
+      "body": "Quote from: Sandra_hakeem on July 29, 2022, 09:02:53 AM+ If Bitcoin Core discovers new DNS seeds and the search limit is just 11 secs,what if it doesn't get any node at that point since the time is limited? Technically the DNS seed has to return valid and responsive nodes. So there shouldn't be any problems.Also each of them returns a list of nodes so even if one or two weren't responsive you still have more to choose from.There is also more than one DNS seed that can be dug to get an even bigger list.You can try to Dig DNS online using a tool like this to see what the response it looks like: https://toolbox.googleapps.com/apps/dig/#A/Just enter one of the seeds like seed.bitcoin.sipa.be and click A.Quote+ Is distance a factor to consider during DNS search?Distance of what? Are you talking about distance between IP addresses the DNS seed returns? I looks like the returned results aren't close to each other so they may honor the distance.Quote+Bitcoinj doesn't need DNS seeds, I get this now; but it's only automated to work with some specific address which mean some nodes are left our in the process?All nodes have to start from somewhere, either to dig DNS or to have hard-coded IPs with the later being unlikely. If you look at the code you can see bitcoinj also has the DNS seeds and digs them for the first connection:https://github.com/bitcoinj/bitcoinj/blob/a057cd04f6614b05aecc0b99a950eca181887d0f/core/src/main/java/org/bitcoinj/params/MainNetParams.java#L71",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "July 29, 2022, 11:55:41 AM",
+      "body": "Quote from: Sandra_hakeem on July 28, 2022, 11:27:57 PMI have understood that nodes are sub-divided into full nodes,archival and pruned nodes and they all work dependently on each other, alright?Take note on Bitcoin, term \"full node\" and \"archival node\" usually refer to same thing and used interchangeably. But for cryptocurrency such as Ethereum, those term might refer to different thing.Quote from: Sandra_hakeem on July 29, 2022, 09:02:53 AMSince I'm tutoring grown ups too infact,I'm into some technical analysis and they're gonna ask silly questions,so I need proper understanding..Have you checked this page https://developer.bitcoin.org/devguide/p2p_network.html? It has decent amount of information about P2P network and peer discovery.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 29, 2022, 01:39:19 PM",
+      "body": "Quote from: Sandra_hakeem on July 29, 2022, 09:02:53 AM+ If Bitcoin Core discovers new DNS seeds and the search limit is just 11 secs,what if it doesn't get any node at that point since the time is limited? I think actually that the link ETFbitcoin posted should answer most of your questions. For example this one is cleared up pretty nicely in my opinion.Quote from: https://developer.bitcoin.org/devguide/p2p_network.htmlBitcoin Core keeps a record of known peers in a persistent on-disk database which usually allows it to connect directly to those peers on subsequent startups without having to use DNS seeds.This 'record of known peers' is a list of IP addresses. These have been found earlier through DNS seeders or P2P node discovery:QuoteOnce a program has connected to the network, its peers can begin to send it addr (address) messages with the IP addresses and port numbers of other peers on the network, providing a fully decentralized method of peer discovery.About the 11 seconds:Quote from: https://developer.bitcoin.org/devguide/p2p_network.htmlif Bitcoin Core has entries in its peer database, it spends up to 11 seconds attempting to connect to at least one of them before falling back to seeds; if a connection is made within that time, it does not query any seeds.So it tries to connect to the saved IP addresses in its database for 11 seconds; after that it queries the DNS seeds to get more IPs to try to connect to.Worst-case fallback option in case the DNS seeders don't work or are offline, there are even hardcoded IPs Bitcoin Core can try.Quote from: https://developer.bitcoin.org/devguide/p2p_network.htmlBoth Bitcoin Core and BitcoinJ also include a hardcoded list of IP addresses and port numbers to several dozen nodes which were active around the time that particular version of the software was first released. Bitcoin Core will start attempting to connect to these nodes if none of the DNS seed servers have responded to a query within 60 seconds, providing an automatic fallback option.You can also set a custom IP address to try, e.g. by having your own node somewhere whose IP you know, or asking someone you know. It's just needed to get the node up and running, since then it creates its own 'record of known peers' that is saved to disk, and updated / maintained during its normal operation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sandra_hakeem",
+      "created_time": "July 30, 2022, 10:30:22 AM",
+      "body": "I made good use of the link from @ETFbitcoin's post earlier...a great deal🙂uhmm, i might ask necessary questions where I still have some difficulties in the futureThanks for the help! See ya!Sandra_",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 30, 2022, 01:12:28 PM",
+      "body": "Quote from: Sandra_hakeem on July 29, 2022, 09:02:53 AM+ If Bitcoin Core discovers new DNS seeds and the search limit is just 11 secs,what if it doesn't get any node at that point since the time is limited? Practically speaking, the list of DNS seeds is hard-coded, and Core does not go out and look for other seeds not in its source code.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "July 30, 2022, 05:32:56 PM",
+      "body": "I wonder why so much effort is put into understanding the node discovery details. Sure, it's important and part of the Bitcoin network code, but to promote interest and understanding of Bitcoin this seems to be a very particular and niche detail for me. There's so much more to grasp in Bitcoin...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

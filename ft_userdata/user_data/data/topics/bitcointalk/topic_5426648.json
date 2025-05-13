@@ -1,0 +1,29 @@
+{
+  "id": "topic_5426648",
+  "title": "Pecheur",
+  "author": "Pecheur",
+  "created_time": "December 07, 2022, 10:48:38 PMLast edit: December 08, 2022, 09:52:46 PM by Mr. Big",
+  "content": "Hello,I'm able to connect to bitcoind remotely from my laptop using following CURL command:curl --user user:password --data-binary '{\"jsonrpc\":\"2.0\",\"id\":\"curltest\",\"method\":\"getblockchaininfo\",\"params\":[]}'  -H 'content-type:text/plain;' http://1.2.3.4:18332 -vbut I'm not able to call the lightingd remotely from my laptop using following CURL command:curl --user user:password --data-binary '{\"jsonrpc\":\"2.0\",\"id\":\"curltest\",\"method\":\"listpeers\",\"params\":[]}'  -H 'content-type:text/plain;' http://1.2.3.4:9735 -vTrying 1.2.3.4:9735...* connect to 1.2.3.4 port 9735 failed: Connection refused* Failed to connect to 1.2.3.4 port 9735 after 517 ms: Connection refused* Closing connection 0curl: (7) Failed to connect to 1.2.3.4 port 9735 after 517 ms: Connection refusedLightningd is running and I opened 9735 on the firewall.  I can successfully run \"lightning-cli -testnet listpeers\" on the node locally.When running \"netstat -anpe | grep \"9735\" | grep \"lightning\"\" I see there's already an established session on 9735.  tcp         0      0 1.2.3.4:34918        5.6.7.8:9735       ESTABLISHED 1000       41663      1508/lightning_conn tcp6       0      0 :::19735                :::*                    LISTEN      1000       40773      1508/lightning_connShould I use another port for json-rpc access and leave 9735 for node/peer communication?I already added 0.0.0.0/0 as rpcallow for testing in the bitcoin.conf file.Anyone know how I should access lightning json-rpc remotely?thanks,PecheurAlso, I know there's \"lightning-cli connect\" to connect remotely using the CLI.But I would like to use JSON-RPC calls instead.  First using CURL then using a nodejs request.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5426648",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "December 08, 2022, 02:30:51 AM",
+      "body": "Have you tried using a port different from 9735 already? Is there a change there's another port open (netstat let's you see a lot of info based on searching for the specific job or the name that would be given to any other port that's open).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pecheur",
+      "created_time": "December 08, 2022, 04:53:13 AMLast edit: December 08, 2022, 02:56:11 PM by mprep",
+      "body": "I found the answer on https://github.com/ElementsProject/lightning/blob/master/doc/lightningd-config.5.mdIf 'PORT' is not specified, the default port 9735 is used for mainnet (testnet: 19735, signet: 39735, regtest: 19846). If we can determine a public IP address from the resulting binding, the address is announced.For testnet I must use 19735 instead of 9735.bumping into another errorAuthorization: Basic cnBjdXNlcjpxxxzEE> User-Agent: curl/7.79.1> Accept: */*> content-type:text/plain;> Content-Length: 66> * Recv failure: Connection reset by peer* Closing connection 0curl: (56) Recv failure: Connection reset by peerthis seems to be a better fit for what I need.https://github.com/ElementsProject/lightning/blob/ee3f059e800b7ffcd7f0ffc6e5037899132b05cd/cln-grpc/README.md[moderator's note: consecutive posts merged]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

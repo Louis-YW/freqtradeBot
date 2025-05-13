@@ -1,0 +1,53 @@
+{
+  "id": "topic_5412025",
+  "title": "dejong1968",
+  "author": "dejong1968",
+  "created_time": "September 01, 2022, 03:48:57 PMLast edit: September 01, 2022, 05:40:48 PM by dejong1968",
+  "content": "Hi there, I'm going through the book of Jimmy Song: Programming Bitcoin: Learn How to Program Bitcoin from Scratch.Peek here: https://books.google.nl/books?id=QWaHDwAAQBAJ&pg=PA66&lpg=PA66&dq=bitcoin+uG%2BvP+%3DR&source=bl&ots=6iNPaefGNc&sig=ACfU3U1nrwO6y8-O_BdpUf-GaRC_JeiX8w&hl=nl&sa=X&ved=2ahUKEwjXka7X8fP5AhVE2qQKHau0BVUQ6AF6BAgfEAM#v=onepage&q=bitcoin%20uG%2BvP%20%3DR&f=falseOn p63, a variable R is introduced as 'the target that is aimed for...', referring to the story of the archer on p62.It is calculated by R = k*G where k is a secret random number and G is the starting point in the group of the btc-curve.On the  same page, e*G = P is mentioned, where e is the private key and P is the public key.I just can't figure out what the difference between P and R is, or better: what is the meaning/function of R, when already P is the result of point multiplication of e and G.Is it perhaps this:1. With k*G = R you do point multiplication of k and G to find a new point R (x,y)  'r' is defined as the x-coordinate of R and that x-coordinate 'r' is used in the signature (r,s) with s  = (z+re)/k.2. With  e*G = P you do point multiplication of e and G to find e new point P (x,y) that is the public key.So there are two different point multiplications: one with the goal to get a number 'r' for the signature and one with the goal to get a private key.If this is true, I don't understand why mr Song is calling R the target. In my perception, P is the target. So I can't see yet how to image/explain the R.Thanks in advance!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412025",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "September 01, 2022, 06:33:21 PM",
+      "body": "It is just a notation to differentiate the different uses of these values.P is for public keys, R is for the nonce. P, and it's scalar e are meant to be retained and stored in permanent storage, while R and k are ephemeral values used only for a particular signature and can be destroyed/forgotten once the signature is created.Furthermore, signature validation requires having the both P and R, so having these named the same would be confusing. Using different names makes it clear which value is to be used where. Just because they are calculated in the same way does not mean that they should be named the same.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "September 03, 2022, 12:40:43 PM",
+      "body": "Quote from: dejong1968 on September 01, 2022, 03:48:57 PMHi there, I'm going through the book of Jimmy Song: Programming Bitcoin: Learn How to Program Bitcoin from Scratch.Peek here: https://books.google.nl/books?id=QWaHDwAAQBAJ&pg=PA66&lpg=PA66&dq=bitcoin+uG%2BvP+%3DR&source=bl&ots=6iNPaefGNc&sig=ACfU3U1nrwO6y8-O_BdpUf-GaRC_JeiX8w&hl=nl&sa=X&ved=2ahUKEwjXka7X8fP5AhVE2qQKHau0BVUQ6AF6BAgfEAM#v=onepage&q=bitcoin%20uG%2BvP%20%3DR&f=falseOn p63, a variable R is introduced as 'the target that is aimed for...', referring to the story of the archer on p62.It is calculated by R = k*G where k is a secret random number and G is the starting point in the group of the btc-curve.On the  same page, e*G = P is mentioned, where e is the private key and P is the public key.I just can't figure out what the difference between P and R is, or better: what is the meaning/function of R, when already P is the result of point multiplication of e and G.Is it perhaps this:1. With k*G = R you do point multiplication of k and G to find a new point R (x,y)  'r' is defined as the x-coordinate of R and that x-coordinate 'r' is used in the signature (r,s) with s  = (z+re)/k.2. With  e*G = P you do point multiplication of e and G to find e new point P (x,y) that is the public key.So there are two different point multiplications: one with the goal to get a number 'r' for the signature and one with the goal to get a private key.If this is true, I don't understand why mr Song is calling R the target. In my perception, P is the target. So I can't see yet how to image/explain the R.Thanks in advance! Brute of R is like brute of P. And yes, this is work.https://github.com/demining/CryptoDeepTools/tree/main/08ReducePrivateKey",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 03, 2022, 03:00:49 PM",
+      "body": "Quote from: COBRAS on September 03, 2022, 12:40:43 PMBrute of R is like brute of P. And yes, this is work.https://github.com/demining/CryptoDeepTools/tree/main/08ReducePrivateKeyYou do realize that behind the trivial equation for the RSZ in the ECDSA signature, there are a lot of complications in correlating the nonce, even for the case of RFC 6979 deterministic nonces, right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "September 03, 2022, 05:34:22 PM",
+      "body": "Quote from: NotATether on September 03, 2022, 03:00:49 PMQuote from: COBRAS on September 03, 2022, 12:40:43 PMBrute of R is like brute of P. And yes, this is work.https://github.com/demining/CryptoDeepTools/tree/main/08ReducePrivateKeyYou do realize that behind the trivial equation for the RSZ in the ECDSA signature, there are a lot of complications in correlating the nonce, even for the case of RFC 6979 deterministic nonces, right?This is not my doc.No, bthen success brute R , result will be nonce. With nonse known easy get private  key . But, for brute need get first, - partial nonce ,for get range for brute.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 04, 2022, 11:59:40 AM",
+      "body": "Quote from: COBRAS on September 03, 2022, 05:34:22 PMBut, for brute need get first, - partial nonce ,for get range for brute.You can't just combine partial nonces with each other unless you are 100% sure they are created that way, because nonces use the full 256-bit number range (modulo secp256k1 curve order) and it would take a very weak wallet to generate nonces in an extremely limited range (think 40 or 60 bits).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

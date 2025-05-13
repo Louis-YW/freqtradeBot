@@ -1,0 +1,117 @@
+{
+  "id": "topic_5434761",
+  "title": "Pocketchange",
+  "author": "Pocketchange",
+  "created_time": "January 14, 2023, 11:06:29 PMLast edit: January 16, 2023, 07:49:13 PM by Pocketchange",
+  "content": "Hi everyone,I'm trying to install mempool along a bitcoin core node.Can anyone tell me what the ip of my node is when its running under tor? I thought it was just 127.0.0.1:8332?I'm having issues installing and getting \"Got permission denied while trying to connect to docker daemon socket\"Thank you!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5434761",
+  "comments": [
+    {
+      "author": "BitcoinPanther",
+      "created_time": "January 14, 2023, 11:48:45 PM",
+      "body": "It looks like you are running into a problem with permission when trying to connect to the Docker daemon socket since this error message convey that the user running the command does not have permission to access the Docker daemon.Try running the command with \"sudo\" prefixes or  try to fix the issue by adding your user to the docker groupCode:sudo usermod -aG docker $USERThen relog-in (log out then log-in)QuoteCan anyone tell me what the ip of my node is when its running under tor? I thought it was just 127.0.0:8332?The IP should be a tor hidden service address like string of letters with .onion (abcdefghjkl.onion) which is accessible only via TOR network and I think cannot be accesed by a regular IP.It looks like you want to run your node as hidden service, so you need to configure your node by editing your torrc file and add the follwing linesCode:HiddenServiceDir /var/lib/tor/bitcoin-service/HiddenServicePort 8332 127.0.0.1:8332 You will find the actual address of your node in the file named hostname in the directory you specified on the HiddenServiceDir option",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pocketchange",
+      "created_time": "January 15, 2023, 12:19:19 AMLast edit: January 15, 2023, 12:32:39 AM by Pocketchange",
+      "body": "Thanks Panther!I appreciate it!Now Im getting: WARN: runMainLoop error: connect ECONNREFUSED 127.0.0.1:8332EDIT: I added the lines into the torrc file but still getting the message aboveHiddenServiceDir /var/lib/tor/bitcoin-service/HiddenServicePort 8332 127.0.0.1:8332Thanks again!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackBoss_",
+      "created_time": "January 15, 2023, 03:12:02 AM",
+      "body": "You will get better support by moving this thread to Bitcoin Technical Support board. Forum experts are more actively in that board than in the Bitcoin Discussion board that has more spam topics.Click on Move topic at bottom left and choose Bitcoin Technical Support board.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pocketchange",
+      "created_time": "January 15, 2023, 05:40:17 AM",
+      "body": "Quote from: BlackBoss_ on January 15, 2023, 03:12:02 AMClick on Move topic at bottom left and choose Bitcoin Technical Support board.Done & thank you! Nice that we can move a thread on our own.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "January 15, 2023, 11:45:50 AM",
+      "body": "8332 is the default port of bitcoin RPC. You should use the actual mempool frontend port.What tutorial did you follow to install Mempool? Did you use this one Configure with Bitcoin Core Only?Quote from: Pocketchange on January 15, 2023, 12:19:19 AMNow Im getting: WARN: runMainLoop error: connect ECONNREFUSED 127.0.0.1:8332That error, where did you get that from?Quote from: Pocketchange on January 15, 2023, 12:19:19 AMHiddenServiceDir /var/lib/tor/bitcoin-service/HiddenServicePort 8332 127.0.0.1:8332This is an incorrect configuration to expose the mempool to Tor networks.If you follow the mempool docker guidelines above, the default mempool frontend application is exposed on port 80, so the Tor configuration you should use isCode:HiddenServiceDir /var/lib/tor/bitcoin-service/HiddenServiceVersion 3HiddenServicePort 80 127.0.0.1:80To see the onion address, after restarting Tor service, run the command:Code:sudo cat /var/lib/tor/bitcoin-service/hostname",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pocketchange",
+      "created_time": "January 15, 2023, 05:26:30 PMLast edit: January 15, 2023, 06:28:44 PM by Pocketchange",
+      "body": "Quote from: vv181 on January 15, 2023, 11:45:50 AMWhat tutorial did you follow to install Mempool? Did you use this one Configure with Bitcoin Core Only?Quote from: Pocketchange on January 15, 2023, 12:19:19 AMNow Im getting: WARN: runMainLoop error: connect ECONNREFUSED 127.0.0.1:8332That error, where did you get that from?I used ministry of nodes youtube install but he's on electrum  : https://www.youtube.com/watch?v=I2SzBqcsXaE&t=601sThe error is when I try to run docker-compose upwhat ip should I use when editing nano docker-compose.yml  Here are the defaults:api:    environment:      MEMPOOL_BACKEND: \"none\"      CORE_RPC_HOST: \"172.27.0.1\"      CORE_RPC_PORT: \"8332\"      CORE_RPC_USERNAME: \"customuser\"      CORE_RPC_PASSWORD: \"custompassword\"Thank you vv181!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "January 16, 2023, 04:10:39 AM",
+      "body": "Quote from: Pocketchange on January 15, 2023, 12:19:19 AMNow Im getting: WARN: runMainLoop error: connect ECONNREFUSED 127.0.0.1:8332The error seems not caused by a wrongly configured IP setting, but rather the bitcoin RPC itself is not working. Make sure the bitcoin daemon have run properly, you can test it by running this command, $ bitcoin-cli -getinfo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pocketchange",
+      "created_time": "January 16, 2023, 04:18:36 AMLast edit: January 16, 2023, 06:22:23 AM by Pocketchange",
+      "body": "Quote from: vv181 on January 16, 2023, 04:10:39 AMQuote from: Pocketchange on January 15, 2023, 12:19:19 AMNow Im getting: WARN: runMainLoop error: connect ECONNREFUSED 127.0.0.1:8332The error seems not caused by a wrongly configured IP setting, but rather the bitcoin RPC itself is not working. Make sure the bitcoin daemon have run properly, you can test it by running this command, $ bitcoin-cli -getinfoHmm after running $ bitcoin-cli -getinfoI get a bunch of info on blocks, headers, version and proxies- no warnings.My apologies but Im really new to the space.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "January 16, 2023, 07:24:24 AM",
+      "body": "Nice, that means the bitcoin daemon is running and the RPC is working fine.Now, for this particular config,Code:      CORE_RPC_USERNAME: \"customuser\"      CORE_RPC_PASSWORD: \"custompassword\"make sure it reflects the RPC authentication you have set up on bitcoin.confFor example, the following config should be the minimum setting to make it works.Code:txindex=1server=1rpcuser=customuserrpcpassword=custompasswordAfter you have done that, restart the bitcoin service. Then start again the mempool docker.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pocketchange",
+      "created_time": "January 16, 2023, 08:37:13 AM",
+      "body": "Quote from: vv181 on January 16, 2023, 07:24:24 AMNice, that means the bitcoin daemon is running and the RPC is working fine.Now, for this particular config,Code:      CORE_RPC_USERNAME: \"customuser\"      CORE_RPC_PASSWORD: \"custompassword\"make sure it reflects the RPC authentication you have set up on bitcoin.confFor example, the following config should be the minimum setting to make it works.Code:txindex=1server=1rpcuser=customuserrpcpassword=custompasswordAfter you have done that, restart the bitcoin service. Then start again the mempool docker.Thanks vv181,Ive done those steps above and added this into my torrc file.Code:HiddenServiceDir /var/lib/tor/bitcoin-service/HiddenServiceVersion 3HiddenServicePort 80 127.0.0.1:80Ive also added my node ip and 8332 into:    nano docker-compose.yml Still the same error.Im stumped-",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gunhell16",
+      "created_time": "January 17, 2023, 06:08:10 AM",
+      "body": "Quote from: Pocketchange on January 15, 2023, 12:19:19 AMNow Im getting: WARN: runMainLoop error: connect ECONNREFUSED 127.0.0.1:8332In this situation your node is trying to connect to a server in which is not reachable or running. And there are some other way to fix this problem such as follows below:a. Your firewall possible is blocking the connection, in this case you can check the port 8332 is open and    accepting the connection in which is incoming. b. Your node configuration file of course must double check, to make sure that the configured with the ip address    correct were the port of your server (127.0.0.1:8332).c. Now if your node is running on a container, make it sure the port is mapped correctly same goes with the cointainer   is also correctly running. d. You also need to confirm that you have done this correctly with the bitcoin core daemon, and it should also be running    on the IP address and port specified (127.0.0.1:8332)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pocketchange",
+      "created_time": "January 17, 2023, 07:45:08 AM",
+      "body": "Quote from: gunhell16 on January 17, 2023, 06:08:10 AMIn this situation your node is trying to connect to a server in which is not reachable or running. b. Your node configuration file of course must double check, to make sure that the configured with the ip address    correct were the port of your server (127.0.0.1:8332).Thanks gunhell16,Will adding these lines into the config file be enough?rpcport=8332rpcallowip=127.0.0.1rpcbind=0.0.0.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pocketchange",
+      "created_time": "February 27, 2023, 10:35:55 PM",
+      "body": "This installation of mempool.space is still nagging me even though it warns:Most people should use a one-click install method. Other install methods are meant for developers and others with experience managing servers. My question is: Does this only work alongside an electrum server? ---Ive tried to Configure with Bitcoin Core Only with no luck.https://github.com/mempool/mempoolhttps://citadels.org/install-your-own-mempool-space-instance-on-ubuntu-server-upgrade-your-bitcoin-node/Thanks again!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

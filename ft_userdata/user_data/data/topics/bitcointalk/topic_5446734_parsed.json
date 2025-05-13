@@ -1,0 +1,29 @@
+{
+  "id": "topic_5446734",
+  "title": "antonphp",
+  "author": "antonphp",
+  "created_time": "March 29, 2023, 06:13:09 AM",
+  "content": "OverviewE-commerce software that operates in multisig mode. What we have:* zpub key of the vendor selling through our software* bech32 address public key of the buyer* descriptor wallet we run with bitcoin coreScenario1. Generate a new address in our descriptor wallet - order_01_address, and get its public key: order_01_pubkey2. Generate new public key from the vendor's zpub. Get its public key: vendor_pubkey3. Use the pub key provided by the buyer - buyer_pubkey4. Now we have three public keys and we create a 2-of-3 multisig address from them - order_01_ms:1st. order_01_pubkey2nd. vendor_pubkey3rd. buyer_pubkey5. Fund the multisig address.6. Create a partially-signed PSBT transaction to distribute the coins from the multisig address to the parties - us to take the commission, and the vendor OR the buyer OR both depending on the success of the order resolution. The transaction must be signed by the wallet (remember it was our wallet that generated order_01_address and order_01_pubkey, so it must be able to sign (that's what we assume).Step 6 is where we are stuck.ProblemWe cannot find the right way to generate a PSBT that is already signed by the descriptor wallet that bitcoin core manages.Whatever we try, we end up with a PSBT that is not signed.How should it be done? What bitcoin core command to run, what input data to supply to it?Other infoBitcoin Core Version: 24.0.1Calling through RPC",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5446734",
+  "comments": [
+    {
+      "author": "antonphp",
+      "created_time": "April 04, 2023, 05:42:10 AM",
+      "body": "Have I formulated the question in such a way that it is confusing?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 04, 2023, 11:07:25 AM",
+      "body": "Quote from: antonphp on April 04, 2023, 05:42:10 AMHave I formulated the question in such a way that it is confusing?Providing the supplied commands may help.For now:Importing another MultiSig descriptor containing order_01's private key, \"vendor_pubkey\" and \"buyer_pubkey\"should enable you to sign a the partially signed bitcoin transaction but you still wont be able to create a psbt using it.You'll also have to create a \"watching-only\" descriptor wallet containing the same descriptor but with pub keys to be able to create a psbt (without signatures).(I'd recommend to create new blank descriptor wallets for each since the first descriptor will break some wallet commands)Another option is to import an HD multisig descriptor based from order_01's master private key, vendor's extended public key and buyer's extended public key.The extended public keys should be converted to xpub and you'll have to specify the correct derivation paths for it to derive the correct MultiSig addresses.Here's the example commands to setup HD MultiSig in Bitcoin Core: http://bitcointalk.org/index.php?topic=5427745.msg61426872#msg61426872The guide uses extended private and public key pairs, the derivation path will be different if the master private key is used instead.Reference for descriptors: https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

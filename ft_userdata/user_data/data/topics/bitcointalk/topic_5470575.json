@@ -1,0 +1,53 @@
+{
+  "id": "topic_5470575",
+  "title": "BitcoinCanSaveUsAll",
+  "author": "BitcoinCanSaveUsAll",
+  "created_time": "October 16, 2023, 05:08:51 PM",
+  "content": "Hi everyone,I've been troubleshooting an issue I posted the other day regarding a discrepancy between my two nodes having different sized mempools which led me to trying to use the maxmempool in the config file to double the default value to 600. For some reason the v. 20.2 wasn't accepting the option and kept the default 300 MB size.  I then decided to click the GUI button that says \"reset options\" button which restarted the node.  Unfortunately now when I try to relaunch it I'm getting the following error:Error:  Prune mode is incompatible with -txindexAs soon as I click ok the node terminates and I can't seem to relaunch it.  Does anyone know how I can get this node back up online?  Thanks in advance for your support.A few additional notes:- My blockchain directory is being stored on an external hard drive so I'll need to point it to the correct directory.- Also I did have txindex enabled in the options file.- I've reran the installation for the 20.2 version with no change.Thanks.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5470575",
+  "comments": [
+    {
+      "author": "seek3r",
+      "created_time": "October 16, 2023, 05:23:08 PM",
+      "body": "Hiyou already did a good job fixing this error. However, you may have forgotten just a few small things.  This happened when you decided to hit the 'reset button'.You noticed that you have to point out to the correct directory since you store the data on an external hard drive.Have you changed the setting \"datadir\" in the bitcoin.conf file with the exact directory?The error code clearly says that pruning is not possible when -txindex is enabled. So if you use 'txindex=1' you also need to set prune to 0 to disable it. Make sure that 'prune=0' is set - any other value enables it. This steps should already fix your problem, try em out, save the options and restart ur node. If there are still problems, you could check the debug logfile for further errors, which will also be on your external drive directory.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "October 16, 2023, 05:32:49 PM",
+      "body": "Thank you!  I did resolve it by modifying the options file as you noted.  Very much appreciate!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 17, 2023, 11:53:59 AM",
+      "body": "The reason why you can't use pruning and -txindex at the same time is because the Bitcoin node makes a list of all of the transactions, including the ones that are not in any of the wallets, and selecting pruning mode impedes this by deleting all but the first N blocks worth of transactions. That means it is impossible to keep a list of all the transactions in such a case, since doing so is not really different from turning off pruning from a size standpoint.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "October 17, 2023, 12:07:55 PM",
+      "body": "Quote from: NotATether on October 17, 2023, 11:53:59 AMThe reason why you can't use pruning and -txindex at the same time is because the Bitcoin node makes a list of all of the transactions, including the ones that are not in any of the wallets, and selecting pruning mode impedes this by deleting all but the first N blocks worth of transactions. That means it is impossible to keep a list of all the transactions in such a case, since doing so is not really different from turning off pruning from a size standpoint.Correct. It can have advantages and disadvantages for both functions. Again, it depends on the user.With pruning, old blocks are deleted from memory in order to only save a small part of the blockchain data. Of course, this doesn't require a lot of storage on the hard drives and is suitable for people who only have a certain amount of space available.The indexing of transactions (txindex) function however needs the whole blockchain data on a local drive. This creates a seperate index of all transactions stored in the blockchain. Might be useful if the user need to lookup any transaction or he or she uses services that require this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "October 17, 2023, 04:14:24 PM",
+      "body": "Thanks again folks.  The odd thing is that I don't recall enabling pruning so I'm assuming it must be set by default or at least set if you hit reset options.  Either way it seems to be running ok now.  Oddly after enabling the prune=0 option I now see that two different options I set in my configuration file there was a message that said:Options set in the dialog are overridden by the command line or in the configuration file:-prune=0 -dBcache=5000It should be noted that the dBcache message was there prior to this change.  Although I'm honestly not sure why either is there. Regardless, at this time my node is back up and running and I wanted to thank you all again for your help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

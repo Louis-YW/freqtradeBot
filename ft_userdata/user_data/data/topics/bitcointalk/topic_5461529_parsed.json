@@ -1,0 +1,61 @@
+{
+  "id": "topic_5461529",
+  "title": "d5000",
+  "author": "d5000",
+  "created_time": "July 30, 2023, 10:56:36 PM",
+  "content": "According to posts of @gmaxwell, there are techniques which will probably allow full nodes in the future to verify transactions and blocks without having to store the full blockchain.Originally, the topic came up due to the discussion about illegal material stored in the local database of full nodes (copyright infringement, illegal pornography, classified information etc.). However, such a technique would also allow to reduce the amount of data which has to be shared between full nodes, which could lead to a significant scalability improvement.I quote some of the relevant sections:Quote from: gmaxwell on June 13, 2023, 07:52:41 AMIt's possible using cryptography to construct proof for statements like \"0xDEADBEEF is the hash of the tip of a blockchain starting at the genesis block where all rules pass, with total difficulty Y\", where the proof is much smaller than the blockchain (in some cases only a few hundred bytes).Such systems are already in production use for small programs today. Scaling them up to work over the whole bitcoin blockchain is a (considerable) engineering exercise, but I think it's inevitable-- well inevitable that the proof systems are developed to that extent.  If Bitcoin will deploy them or not will depend on if anyone is still willing to work on it.Quote from: gmaxwell on June 15, 2023, 01:10:10 AMQuote from: larry_vw_1955 on June 15, 2023, 12:30:54 AMi'm skeptical that such a system could work for bitcoin unless they changed up the structure of bitcoin blocks to include some type of utxo set commitment inside each block. but i guess if you did that, maybe it could work.because the way it is right now, an individual block doesn't really tell you anything about what the existing utxo set is or any of its properties. that would need to change somehow. Nah.  That could be side information computed as part the proving process, it doesn't need to be part of the block commitment.E.g. prove \"block hash x with resulting utxo state hash xu is a valid successor to block y with utxo state hash yu\".And each block commits to every prior utxo set state by committing to the history of all blocks before it.  So, for example its possible to construct a proof that says \"output 0xDEADBEEF:01 is a member of the utxo set at height 1000 of this chain with height 1001 hash Y\" its just that the prover must process the whole chain up to height 1000 while constructing the proof.  The prover might be more efficient with an optimized commitment structure but it isn't necessary.  You can produce a proof for the output of ANY program. If a program can validate it, a proof can be provided.I'd like to discuss this topic here as it was OT in the BRC-20/Ordinals thread and thus the discussion there didn't last long nor reached the depth I'd have desired. Above all, it would be cool to see some examples and ELI5-style explanations (if this is possible).In the BRC-20 thread I cited some research I found on related topics, but I think gmaxwell's solution refers to another one. I'll list them here anyway:- The mini-blockchain scheme [1][2] allows a collective pruning of everything but the latest blocks, but it has flaws which increase the danger of an 51% attack.- \"Rollerchain\" [3] seems to improve on mini-blockchain. I've not found a \"rebuttal\" of its claims, but it doesn't seem to have been applied in a major altcoin.- There are some techniques to at least make the data required for verification a bit smaller (approx. by half or more), maybe in a similar vein this could ignore Taproot/OP_RETURN data? [4]- One I stumbled upon recently is the Mina Protocol, a centralized altcoin but the tech may be related to what gmaxwell wrote - it aims to reduce the storage requirement for all nodes. Have not researched it thoroughly, so it may be dubious. [5][1] https://www.semanticscholar.org/paper/The-Mini-Blockchain-Scheme-Bruce/2b52355f76fca0ac23c5730f4e1a6a7e653f0237[2] http://cryptonite.info/wiki/index.php?title=Weaknesses_and_attack_vectors[3] https://www.semanticscholar.org/paper/A-Prunable-Blockchain-Consensus-Protocol-Based-on-Chepurnoy-Larangeira/48f1b027c7ec96fa8a4ca4f53e2be6b95643e3f4[4] https://www.semanticscholar.org/paper/How-to-Securely-Prune-Bitcoin%E2%80%99s-Blockchain-Matzutt-Kalde/d855ac1c3fe47a5b47d808bf763ba95b993ce8da[5] https://minaprotocol.com/lightweight-blockchain",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5461529",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "July 31, 2023, 05:15:13 AM",
+      "body": "Validity Rollups is probably what gmaxwell was talking about: https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2022-October/020998.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "July 31, 2023, 05:32:49 AM",
+      "body": "I don't think i've seen that post as I don't follow the list. But the idea of running validation under a ZKP to skip participants needing to do it is old (discussed widely in 2013 at least) and not particularly clever on its own-- all the challenge is in the engineering to make it practically viable with the available ZKP technology rather than merely theoretically possible.   A lot of the discussions just skip right over putting the whole system under a ZKP because while theoretically the most attractive it would be very resource intensive, but in the long run it seems obvious to me that's where things will go.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d5000",
+      "created_time": "July 31, 2023, 04:24:04 PM",
+      "body": "Thank you for your answers! I'm of course much less an expert than you both, but I'll try to investigate and understand the technologies / discussions you linked to. I've had a brief look at ZK rollups some months ago (and also had already seen the proposal for Bitcoin on https://bitcoinrollups.org), but it didn't occur to me that a similar technique could be used for the main chain validation. But thinking about it, the goal is essentially the same (not having to store everything).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "July 31, 2023, 04:29:53 PMLast edit: July 31, 2023, 05:27:10 PM by tromp",
+      "body": "ZeroSync [1] is implementing a zero knowledge implementation of the Initial Block Download, that roughly speaking would allow you to download only a few dozen KB of data (instead of 100s of GB) to prove that some header and commitment to a UTXO set has a valid history behind it. Verifying recent blocks still requires downloading the UTXO set.[1] https://zerosync.org/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 01, 2023, 06:34:05 AM",
+      "body": "In the case of illegal content, most of it is stored via OP_RETURN, and so those UTXOs would be immediately discarded from the full node after encountering them during transaction verification, unless the node was running with full transaction indexing enabled. So maybe that is one of the reasons why we are not seeing widespread legal action against nodes - but that's assuming most of them are not running with txindex in the first place (it's disabled by default). And there aren't stats that I know of that list the percentage of nodes running with that turned on.But now, Ordinals have complicated things quite a bit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "August 01, 2023, 02:46:37 PM",
+      "body": "QuoteBut now, Ordinals have complicated things quite a bit.Not that much, because if your node can strip OP_RETURN, then it can also discard any witness, exactly in the same way. Taproot address is just 32-byte public key, and some constant fields for formatting. And only that is stored in UTXO database, so if your node is in pruning mode, then every input is automatically pruned, as well as every witness. It is in the name: UTXO = Unspent Transaction Outputs. Only outputs, and Ordinals are inside inputs (or, more specifically: inside witness data).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

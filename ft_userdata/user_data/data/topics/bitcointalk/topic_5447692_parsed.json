@@ -1,0 +1,53 @@
+{
+  "id": "topic_5447692",
+  "title": "lcharles123",
+  "author": "lcharles123",
+  "created_time": "April 05, 2023, 03:27:14 PM",
+  "content": "Bitcoin Client Software and Version Number: Bitcoin Core version v24.0.0 (release build)Operating System: Linux casa2 5.10.0-20-amd64 #1 SMP Debian 5.10.158-2 (2022-12-13) x86_64 GNU/LinuxSystem Hardware Specs: 4GB RAM , 4 Cores Intel(R) Atom(TM) CPU D525 , 2 HDDs 500GB pooled with mergerfs: total of around 1 TBDescription of Problem: I have some issues with this node. I think is a issue with mergerfs. I tested the system, filled all of the ~1 TB pool space with 100MB files and worked fine. Started syncing from scratch, have downloaded around 20GB and occurred a irrecoverable error, because -reindex did not worked:2023-04-05T14:35:47Z Fatal LevelDB error: IO error: /home/bob/bitcoin-core/.bitcoin/blocks/index/000005.ldb: No such deviceI does not have physical access to this computer now.Code:$ ls blocks/index000003.log  000004.log  CURRENT  LOCK  MANIFEST-000002Code:root@casa2:~# cat /etc/fstab# <file system> <mount point>   <type>  <options>       <dump>  <pass># / was on /dev/sda5 during installationUUID=85701e6a-0a36-4295-8f57-41bb44eb53bc /               ext4    noatime,nodiratime,errors=remount-ro 0       1# /boot was on /dev/sda1 during installationUUID=819cb633-8fa4-4384-843e-486d7ce3c53c /boot           ext4    defaults        0       2# /home was on /dev/sda6 during installation# partition with systemUUID=4551582e-57a9-4a4c-9a95-4b5e3d1df2d6 /mnt/hdd1       ext4    noatime,nodiratime        0       0# 2nd partition,    mount /dev/sdb1 /mnt/hdd2UUID=661363b3-eec9-4cf6-a1a0-0ee06df52604 /mnt/hdd2        ext4    noatime,nodiratime        0       0# mergint the two mount points into home/mnt/hdd1:/mnt/hdd2                       /home          fuse.mergerfs  fsname=mergerFS,use_ino,cache.files=off,dropcacheonclose=true,allow_other,category.create=mfsLog Files from the Bitcoin Client: https://pastebin.com/Q4htt3UeSomeone uses mergerfs or know if the mount options are ok? Thank you!!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5447692",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "April 05, 2023, 04:28:05 PM",
+      "body": "How did you run the -reindex?I never heard someone use mergefs for Bitcoin node but it looks like you are trying to combine two hard drives?Bitcoin core might be confused on reading the drive. If I were you better not to use mergerfs instead use the 2nd drive or external drive as a Bitcoin directory for downloaded blocks and point the Bitcoin core manually on that drive(path).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "April 06, 2023, 11:50:20 AM",
+      "body": "Quote from: lcharles123 on April 05, 2023, 03:27:14 PMOperating System: Linux casa2 5.10.0-20-amd64 #1 SMP Debian 5.10.158-2 (2022-12-13) x86_64 GNU/LinuxI'm not aware of any Linux distro called casa? By any chance, do you own computer created by https://keys.casa/ (which no longer receive update since 2-3 years ago)?Quote from: lcharles123 on April 05, 2023, 03:27:14 PMStarted syncing from scratch, have downloaded around 20GB and occurred a irrecoverable error, because -reindex did not worked:2023-04-05T14:35:47Z Fatal LevelDB error: IO error: /home/bob/bitcoin-core/.bitcoin/blocks/index/000005.ldb: No such deviceI does not have physical access to this computer now.After you saw this error, did you check whether you can access /home and perform file read/write?Quote from: lcharles123 on April 05, 2023, 03:27:14 PMSomeone uses mergerfs or know if the mount options are ok? This isn't related with Bitcoin Core, so i expect you have better luck if you ask this question on mergerfs issue page or it's discord community.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lcharles123",
+      "created_time": "April 06, 2023, 12:27:07 PM",
+      "body": "Quote from: BitMaxz on April 05, 2023, 04:28:05 PMHow did you run the -reindex?I never heard someone use mergefs for Bitcoin node but it looks like you are trying to combine two hard drives?Bitcoin core might be confused on reading the drive. If I were you better not to use mergerfs instead use the 2nd drive or external drive as a Bitcoin directory for downloaded blocks and point the Bitcoin core manually on that drive(path).I Just run ./bitcoind -reindexYesI choose mergerfs because it is easy to replace and add drives without effort or losing data.There is some other alternatives to easy combine drives?Quote from: ETFbitcoin on April 06, 2023, 11:50:20 AMQuote from: lcharles123 on April 05, 2023, 03:27:14 PMOperating System: Linux casa2 5.10.0-20-amd64 #1 SMP Debian 5.10.158-2 (2022-12-13) x86_64 GNU/LinuxI'm not aware of any Linux distro called casa? By any chance, do you own computer created by https://keys.casa/ (which no longer receive update since 2-3 years ago)?No, casa2 is a hostname. Can be translated as \"house2\"Quote from: ETFbitcoin on April 06, 2023, 11:50:20 AMQuote from: lcharles123 on April 05, 2023, 03:27:14 PMStarted syncing from scratch, have downloaded around 20GB and occurred a irrecoverable error, because -reindex did not worked:2023-04-05T14:35:47Z Fatal LevelDB error: IO error: /home/bob/bitcoin-core/.bitcoin/blocks/index/000005.ldb: No such deviceI does not have physical access to this computer now.After you saw this error, did you check whether you can access /home and perform file read/write?Yes, I can do it as root and normal user in any directory from home, .bitcoin and others.Quote from: ETFbitcoin on April 06, 2023, 11:50:20 AMQuote from: lcharles123 on April 05, 2023, 03:27:14 PMSomeone uses mergerfs or know if the mount options are ok? This isn't related with Bitcoin Core, so i expect you have better luck if you ask this question on mergerfs issue page or it's discord community.Ok, I will search and ask there, maybe I will need physical access to the machine, so will be in a few months. Thank you all for the answers!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 06, 2023, 12:45:09 PM",
+      "body": "Quote from: lcharles123 on April 05, 2023, 03:27:14 PMI have some issues with this node. I think is a issue with mergerfs. I tested the system, filled all of the ~1 TB pool space with 100MB files and worked fine. Started syncing from scratch, have downloaded around 20GB and occurred a irrecoverable error, because -reindex did not worked:Why are you using -loadblock=boostrap.dat?Have you downloaded a bootstrap file containing the full blockchain? Asked this because you've mentioned that you \"started from scratch\".If you didn't intended to use -loadblock, I'd suggest you to just let the node sync normally by skipping that command line option.Also, try to set the default start-up block verification first and just change them to your preference later once it's stable.Specifically: checkblocks=\"24\" which is set a bit high from the default (6) and checklevel=\"0\" which skips all verification of checkblocks.If you can afford to discard the 20GB of already downloaded blocks and since -reindex didn't work, you can try to start with fresh datadir.(backup your current datadir before doing so)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "April 06, 2023, 10:44:16 PM",
+      "body": "Quote from: lcharles123 on April 06, 2023, 12:27:07 PMI Just run ./bitcoind -reindexYesCan you tell us what error did you get when you enter the -reindex command to the terminal?When performing this command did you close your Bitcoin core wallet?If not, try it again and make sure to close the bitcoin core wallet or go to wallet folder and open terminal there and use this command Code:./wallet-cli stopAfter that command use the ./bitcoind -reindex again and then update here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

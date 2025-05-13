@@ -1,0 +1,53 @@
+{
+  "id": "topic_5438966",
+  "title": "seekererebus",
+  "author": "seekererebus",
+  "created_time": "February 09, 2023, 01:28:08 AM",
+  "content": "You may know that Lightning channels implement a 1% \"endcap\" of the channel size on each side. The receiver side initially has none, but that 1% fills up as funds are sent. This means in practice, the only part of a well connected lightning channel that is truly locked up is the 1-2% endcaps.Perhaps however, you did not know about this. I certainly didn't until I dug rather deep into why I couldn't send funds that I actually had in the channel. It's not well explained, the error message is useless for diagnosing the true problem when you try to send endcap funds (insufficient funds even when the funds are there, just are partly endcap), and frankly it's far too confusing. To the uninformed, it looks like a weird bug, and I suspect I'm not the only one that got very worried the amount the node said I had was a lie.To be clear, the endcaps are a good thing, they should be there for security. The way that LND (and other lightning node software) provide information simply needs to properly acknowledge the endcaps. I would suggest that such a UI change mark endcaps as part of on-chain balance rather than as available lightning balance, and then delineate them as unique when examining outstanding UTXO's. Also that Lightning Pool have filling the endcap on a purchase as an option, and additional clarity when you receive funds through a received channel that are partly filling up your side of the endcap; so people don't think they didn't receive funds they did.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5438966",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "February 12, 2023, 03:04:44 AM",
+      "body": "It's the first time I hear of these being called 'endcaps'. Did you come up with the term yourself or did you read it somewhere?You should find more information about this by looking for 'channel reserves' instead. They are required to pay for channel closing transaction and as a means to discourage attacks.There is a pretty good writeup about it on Bitcoin.design [1] with nice graphics as shown below.I didn't monitor it closely, but I believe that the channel reserve also increased a lot when mempool levels were much much higher than now, to be able to pay for a quick channel closing transaction. So the channel reserve is part of the continuously updating channel state.[1] https://bitcoin.design/guide/how-it-works/liquidity/#channel-reserve",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "February 12, 2023, 02:32:15 PM",
+      "body": "Quote from: seekererebus on February 09, 2023, 01:28:08 AMas part of on-chain balance rather than as available lightning balanceIf what you are talking about are indeed channel reserves they really are neither. You cannot spend them until the channel is closed but you don't know the amount you will have until the channel is closed and the TX fee is paid. Anyone who has been working with LN or running their own LN node knows that you have to have these funds there.Slightly OT but every once in a while you see people who get some ETH token who don't have any ETH in that address so they can't spend the token. (insert any other chain that has tokens in place of ETH if you want) This is an nice and elegant solution to prevent people from winding up with funds 'stuck' in a channel.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seekererebus",
+      "created_time": "February 12, 2023, 11:13:35 PM",
+      "body": "Quote from: n0nce on February 12, 2023, 03:04:44 AMIt's the first time I hear of these being called 'endcaps'. Did you come up with the term yourself or did you read it somewhere?You should find more information about this by looking for 'channel reserves' instead. They are required to pay for channel closing transaction and as a means to discourage attacks.Yeah, channel reserve makes more sense as a term. I called it endcaps, because when you look at at the UI of Thunderhub or RTL, the channels are shown as bars, and in that context \"endcaps\" make sense.Quote from: DaveF on February 12, 2023, 02:32:15 PMAnyone who has been working with LN or running their own LN node knows that you have to have these funds there.I do now, but I doubt it's widespread knowledge given that nowhere in any Lightning Node UI I've seen is channel reserve referenced, and it's completely possible to setup a node box with lightning without ever encountering the term.I didn't know channel reserves existed for months after setting mine up. I only found out they existed after I went searching the net trying to understand why I was getting insufficient fund messages when I apparently had the funds.This is really my point. The UI should clearly indicate that channel reserves aren't spendable. Preferably by not including them as part of available lightning balance and instead as a separate component. I suggested that it be shown as part of the on chain balance because that syncs up well with closing reserve: the 10k sats reserved per channel on-chain to cover fee bumping. Though frankly, that should also be more clear in the UI. A wallet user shouldn't have to calculate how much of their lightning balance is channel reserve when determining what they can actually spend; that gets pretty complicated when they're running multiple channels.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "February 13, 2023, 01:12:13 AM",
+      "body": "Quote from: seekererebus on February 12, 2023, 11:13:35 PMI do now, but I doubt it's widespread knowledge given that nowhere in any Lightning Node UI I've seen is channel reserve referenced, and it's completely possible to setup a node box with lightning without ever encountering the term.You can also set up Bitcoin wallets without making backups, you can send transactions without verifying the address, ...  The system is not fool-proof. It was made by satoshi and others that decided to take matters into their own hands instead of just trusting someone (like a bank). You usually see the channel reserve whenever you query your channels on the command-line.Quote from: https://lightning.readthedocs.io/lightning-listpeerchannels.7.html their_reserve_msat (msat, optional): Minimum we insist they keep in channel (default is 1% of the total channel capacity). If they have less than this in the channel, they cannot send to us on that channel our_reserve_msat (msat, optional): Minimum they insist we keep in channel. If you have less than this in the channel, you cannot send out via this channel.Of course, you can avoid this command, but it doesn't mean you should avoid reading the documentation at least once to get an idea what your node is capable of.Quote from: https://xkcd.com/293/But I do agree that visualizing channel reserve may be a nice touch, especially as an opt-in toggle for new users. Although I'm not sure which display size / resolution will be needed to be able to see it; 1% is not a lot on a bar chart.Here is how it would look like.Stacked bars:Quote from: seekererebus on February 12, 2023, 11:13:35 PMThis is really my point. The UI should clearly indicate that channel reserves aren't spendable.Do you have a suggestion for how to implement it visually in the UI?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "February 13, 2023, 12:20:38 PM",
+      "body": "Quote from: seekererebus on February 12, 2023, 11:13:35 PMI do now, but I doubt it's widespread knowledge given that nowhere in any Lightning Node UI I've seen is channel reserve referenced, and it's completely possible to setup a node box with lightning without ever encountering the term.True, BUT and this is an important but, if you are using real money you should have at least skimmed the documents. Not saying read and know them, but at least a brief overview.The other part is it seems MOST people who are doing it themselves do have a decent understating, there are a lot of others using wallet of satoshi or other managed ones that take care of all of that for you. So users never see itYou should probably poke some of the GUI devs on github about it. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "id": "topic_5405616",
+  "title": "dragospirvu75x",
+  "author": "dragospirvu75x",
+  "created_time": "July 08, 2022, 01:15:30 PM",
+  "content": "Hello guys, I have a little problem. I decided to run my full node with tor, and after much effort, it's working, but my IP is still showing on bitnodes instead of .onion address.https://prnt.sc/QZVcdgdA2yKjThese are my configurations:https://prnt.sc/tTKXXmg3zPV2https://prnt.sc/r5w75ZY6fC-BI also installed the tor service:https://prnt.sc/nLQYLIhMxKqiSorry for using links, I don't know how to put images.I want to have an onion address like this ( https://prnt.sc/3H_AO8speDNg ) and my real ip to disappear from site.How do I solve that? Thank you!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5405616",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "July 08, 2022, 01:24:04 PM",
+      "body": "Most sites that list mødes wither take user input to determine what nodes are out there or use their own peers for discovery (afaik).I think you just have to wait out them realising your old node is offline and then wait for them to find your new one to list that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "July 08, 2022, 02:53:27 PM",
+      "body": "Quote from: dragospirvu75x on July 08, 2022, 01:15:30 PMHow do I solve that? Thank you!You have to add bind=127.0.0.1 into your config file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dragospirvu75x",
+      "created_time": "July 09, 2022, 04:51:53 AMLast edit: July 09, 2022, 07:06:51 AM by dragospirvu75x",
+      "body": "It looks like they still don't realise that my old node is offline.I've added bind=127.0.0.1 in config file and now it's not accepting incoming nodes anymore.Any other ideas?PS: I have Bitcoin Core on Windows 10, I've installed Tor on C partition and Bitcoin Core on D partitionI also have this Cookie authentication error: https://prnt.sc/QTrpDK5yeVvf",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "July 09, 2022, 08:45:50 AM",
+      "body": "Quote from: dragospirvu75x on July 09, 2022, 04:51:53 AMAny other ideas?I also have this Cookie authentication error: https://prnt.sc/QTrpDK5yeVvfSeems that is the reason why you didn't get an incoming connection.Quote from: https://github.com/bitcoin/bitcoin/blob/master/doc/tor.md#cookie-authenticationIf a permissions problem is seen in the debug log, e.g. tor: Authentication cookie /run/tor/control.authcookie could not be opened (check permissions), it can be resolved by adding both the user running Tor and the user running bitcoind to the same Tor group and setting permissions appropriately.It has something to do with the user/permission of bitcoind and Tor service that you are running for. I don't know how to do it on Windows, so you have to figure it out yourself. Another solution would be to use the second option for authentication(https://github.com/bitcoin/bitcoin/blob/master/doc/tor.md#torpassword-authentication). You can generate the hashed password with: Code:tor --hash-password <password>Run the command where there is tor.exe located. Then put the output(e.g. HashedControlPassword 16:xxx) of it on the Tor configuration file(torrc). Lastly, update your bitcoin config to include torpassword=<password>.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dragospirvu75x",
+      "created_time": "July 09, 2022, 10:16:38 AM",
+      "body": "I found that link too, I will try to figure out how to do it on Windows.I will try the second option, too. Thank you vv181 for your help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dragospirvu75x",
+      "created_time": "July 09, 2022, 04:45:17 PMLast edit: July 10, 2022, 04:01:04 AM by dragospirvu75x",
+      "body": "I searched on google how to add users in the same Tor group and I found nothing.If anyone knows how to solve it, it would be great.Update: IT WORKED! With the hash password, thank you so much!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "July 10, 2022, 03:44:55 AM",
+      "body": "Quote from: dragospirvu75x on July 09, 2022, 04:45:17 PMUpdate: I tried second solution but it results in : \"tor: Password provided with -torpassword, but HASHEDPASSWORD authentication is not available\". Do I have to make an edit in torrc to make hashpassword auth available?Yes, that error indicates you haven't set up the password auth method on the torrc. You should put the generated hashed password on there.Code: (torrc)HashedControlPassword 16:xxx",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dragospirvu75x",
+      "created_time": "July 10, 2022, 04:04:41 AM",
+      "body": "Yes, I forgot to add HashedControlPassword in torrc. It finally works! Thank you for your help",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 10, 2022, 06:21:01 AM",
+      "body": "Quote from: dragospirvu75x on July 08, 2022, 01:15:30 PMHello guys, I have a little problem. I decided to run my full node with tor, and after much effort, it's working, but my IP is still showing on bitnodes instead of .onion address.Try running Core with \"-addnode=88.99.167.186:41859\". This is the IP and port of a Bitnodes peer that is connected to me (and might be running in a Hetzner data center based on the 88.99 subnet, not that its relevant).If you connect using onlynet=tor, it might prevent your node from connecting to the IPv4 address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dragospirvu75x",
+      "created_time": "July 10, 2022, 01:16:38 PMLast edit: July 10, 2022, 01:33:15 PM by dragospirvu75x",
+      "body": "I establish outbound connections only with onion addresses but that's not a problem for me. If I keep port 8333 on port forwarding I still get IPv4 inbound connections, but if I delete it from port forwarding, all inbound IPv4 dissapear, it remains only Onion Networks (Sometimes 1 single connection, at the best 2, but normally 0; besides the full/block relays) and I believe that's a problem. Can you tell if it's okay or not?https://prnt.sc/mANVxR2-l5BCAnd should I add -addnode and just that, or should I remove another line too?https://prnt.sc/SbiBC4VKZ7yF - And all incoming Onion addresses look the same: 127.0.0.1 (only ports are different). But establishing only 1-2 inbound connections it's too low (I believe).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 14, 2022, 04:58:33 PM",
+      "body": "Quote from: dragospirvu75x on July 10, 2022, 01:16:38 PMhttps://prnt.sc/SbiBC4VKZ7yF - And all incoming Onion addresses look the same: 127.0.0.1 (only ports are different). But establishing only 1-2 inbound connections it's too low (I believe).127.0.0.1 onion addreses are merely making an inbound connection using the Tor Network using a random port on your PC. They are localhost because your Tor relay is running on 127.0.0.1:9050 [the default Tor control port].Remember that peer discovery depends on fetching the peer lists of other nodes that you are connected to, so if the TOR nodes you are connected to are only connected to IPV4 nodes, then you're not going to get TOR nodes from them, until they happen to connect to a TOR peer by accident. So you should leave IPv4 on until you notice that a sizeable amount of TOR nodes have been discovered (at least half a dozen).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dragospirvu75x",
+      "created_time": "July 15, 2022, 02:02:44 PM",
+      "body": "Good to know, thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

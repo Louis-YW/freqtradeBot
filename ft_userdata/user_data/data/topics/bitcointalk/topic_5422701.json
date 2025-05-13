@@ -1,0 +1,77 @@
+{
+  "id": "topic_5422701",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "November 22, 2022, 07:30:43 PM",
+  "content": "Hello everybody,Electrum on GNU/Linux has following command-line restore function which can be viewed in source-code here.Code:electrum help restoreQuoteusage: electrum restore [-h] [--passphrase PASSPHRASE] [-W PASSWORD] [--encrypt_file ENCRYPT_FILE] [-w WALLET_PATH] [--forgetconfig] [-v VERBOSITY] [-V VERBOSITY_SHORTCUTS] [-D ELECTRUM_PATH] [-P] [--testnet]                        [--regtest] [--simnet] [--signet] [-o] [--rpcuser RPCUSER] [--rpcpassword RPCPASSWORD]                        textRestore a wallet from text. Text can be a seed phrase, a master public key, a master private key, a list of bitcoin addresses or bitcoin private keys. If you want to be prompted for an argument, type '?' or ':'(concealed)positional arguments:  textIt works fine when I use one single private key, either by supplying it into the command-line or using a one-liner text file with the key in it.Following two commands workCode:electrum restore -w my_wallet p2pkh:KyRNwetceteraCode:electrum restore -w my_wallet $(cat my_list.txt)whereas my_list.txt has following content:Quotep2pkh:KyRNwetceteraBut as soon as I want to import several keys it doesn't work. I am using a list with several private keys. The text file I am using has one private key per each line including the prefix p2pkh, here an example:my_list.txtCode:p2pkh:KyRNwetceterap2pkh:L3UDbPkandsoonp2pkh:KyjLwWsomEmoRep2pkh:L3ve7kqlore1psumI also tried various formatting likeCode:p2pkh:KyRNwetcetera,p2pkh:L3UDbPkandsoon,p2pkh:KyjLwWsomEmoRe,p2pkh:L3ve7kqlore1psum,orCode:p2pkh:KyRNwetcetera p2pkh:L3UDbPkandsoon p2pkh:KyjLwWsomEmoRe p2pkh:L3ve7kqlore1psumorCode:p2pkh:KyRNwetcetera,p2pkh:L3UDbPkandsoon,p2pkh:KyjLwWsomEmoRe,p2pkh:L3ve7kqlore1psumorCode:p2pkh:KyRNwetcetera\\np2pkh:L3UDbPkandsoon\\np2pkh:KyjLwWsomEmoRe\\np2pkh:L3ve7kqlore1psumnothing works, the error is:QuoteSeed or key not recognizedorQuoteusage: electrum [-h] [--version] [-v VERBOSITY] [-V VERBOSITY_SHORTCUTS] [-D ELECTRUM_PATH] [-P] [--testnet] [--regtest] [--simnet] [--signet] [-o] [--rpcuser RPCUSER] [--rpcpassword RPCPASSWORD]                [-w WALLET_PATH] [--forgetconfig]                <command> ...electrum: error: unrecognized arguments: p2pkh:KyRNwetcetera p2pkh:L3UDbPkandsoon p2pkh:KyjLwWsomEmoRe p2pkh:L3ve7kqlore1psumany clues ?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5422701",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 22, 2022, 10:14:53 PM",
+      "body": "I don't use the cli often, but if the single line works, can't a loop satisfy your goal?You said this works:Code:electrum restore -w my_wallet p2pkh:KyRNwetceteraDo this:Code: (\"foo.sh\")#!/bin/bashelectrum restore -w my_wallet p2pkh:FIRST_WIF_OF_THE_LIST;for i in {2..30};do    line=\"`head -$i my_list.txt`\"    electrum importprivkey -w my_wallet $line;doneIt restores the wallet with 1 private key, and then it imports the rest. Replace 30 with your number of private keys.To execute it in Linux, run:Code:bash foo.sh(Haven't tried it, but it should work... Gulp!)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 23, 2022, 06:50:17 AM",
+      "body": "Hi BlackHatCoiner,of course, with a for loop in bash I can help myself but it doesn't solve the outgoing question with the Electrum command line. The for loop is also worlds slower than if the processing was done directly by the Python script. I just wanted to understand up front if there is anything I am overlooking in the syntax input and entering incorrectly, or if it is a bug. Maybe the developer simply forgot to include the list processing function that he named in the description.PS: You should avoid the obsolete form of `command` using those backticks (grave accent) for command execution in bash and use $(command) instead, which is also POSIX compliant.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "November 23, 2022, 11:38:21 AM",
+      "body": "I did quick test with AppImage and using double quote seems to solve the problem.Code:$ ./electrum-4.3.2-x86_64.AppImage restore --offline -w wallet_3 \"bc1qjhp55vytnyhagfvecz4alf090pdgpjeuf6lz36 3KbaSDf8T8SawvQtofqy1Pk6KdugNbyCF7 3CBDis55qYMsyUoAx6JdqXpsNskqMRaFRU\"{    \"msg\": \"This wallet was restored offline. It may contain more addresses than displayed. Start a daemon and use load_wallet to sync its history.\",    \"path\": \"/home/user/Downloads/wallet_3\"}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 23, 2022, 12:19:46 PM",
+      "body": "Bingo! That's it. THANK YOU @ETFbitcoin, appreciate your helpful reply.I went ahead and tried various files (one privkey per line as shown above) to see how many lines Electrum can import. The limit seems to be at 2221. That means you can have a line which contains 2221 various private keys which you can import in one step into a wallet. Whenever you try to import 2222 lines Electrum will output an error message, that the file being processed is too long and no keys will be imported. Maybe this information is helpful, so I added it here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 23, 2022, 12:36:17 PM",
+      "body": "Thanks for pointing out dear ETFbitcoin. However I cannot image that this limit caused the mentioned behavior ? See here what my terminal outputsCode:$ getconf ARG_MAXQuote2097152Side note:As far as I understood, Electrum's restore command creates a new wallet with the -w parameter. In case you try to restore some more keys into an existing wallet, Electrum refuses this action with the error message \"Remove the existing wallet first\".What a pity that electrums similar command \"importprivkey\" does not work with file lists. With importprivkey you can import a private key into an existing wallet. What I've found so far it supports only one single privkey to import. So there is no chance to use Electrums internal routines to mass-import several keys. One would need to rewrite the code in python or use the alternative method with bash for loops (which is extremely slow, about 2 keys per second)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 23, 2022, 02:21:36 PM",
+      "body": "Quote from: citb0in on November 23, 2022, 12:19:46 PMI went ahead and tried various files (one privkey per line as shown above) to see how many lines Electrum can import. The limit seems to be at 2221. That means you can have a line which contains 2221 various private keys which you can import in one step into a wallet. Whenever you try to import 2222 lines Electrum will output an error message, that the file being processed is too long and no keys will be imported. Maybe this information is helpful, so I added it here.How did you come across a 2221-line limit?Quote from: citb0in on November 23, 2022, 12:36:17 PMSide note:As far as I understood, Electrum's restore command creates a new wallet with the -w parameter. In case you try to restore some more keys into an existing wallet, Electrum refuses this action with the error message \"Remove the existing wallet first\".What a pity that electrums similar command \"importprivkey\" does not work with file lists. With importprivkey you can import a private key into an existing wallet. What I've found so far it supports only one single privkey to import. So there is no chance to use Electrums internal routines to mass-import several keys. One would need to rewrite the code in python or use the alternative method with bash for loops (which is extremely slow, about 2 keys per second)Making Electrum read from a file is quite trivial to do, as someone who has edited Electrum's RPC calls. It's just like normally reading from a file normally in Python.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 23, 2022, 05:43:12 PM",
+      "body": "Quote from: NotATether on November 23, 2022, 02:21:36 PMHow did you come across a 2221-line limit?Code:cat privkey.listQuotep2pkh:KyRNwetceterap2pkh:L3UDbPkandsoonp2pkh:KyjLwWsomEmoRe......p2pkh:L3ve7kqlore1psumCode:$ cat privkey.list | wc -lQuote2221Code:electrum restore -w wallet4test \"$(cat privkey.list)\"Quote{    \"msg\": \"This wallet was restored offline. It may contain more addresses than displayed. Start a daemon and use load_wallet to sync its history.\",    \"path\": \"/home/citb0in/wallet4test\"}Now we add another key to that privkey list so in total it contains 2222 lines/keys...Code:$ cat privkey.list | wc -lQuote2222Code:$ electrum restore -w wallet4test2 \"$(cat privkey.list)\"Quotebash: /home/citb0in/.local/bin/electrum: list of parameters is too long",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 24, 2022, 12:35:34 PM",
+      "body": "Thank you. On my system there is no such specificationCode:$ getconf -a |grep ARGQuoteARG_MAX                            2097152NL_ARGMAX                          4096_POSIX_ARG_MAX                     2097152[...]Nevertheless I cannot imagine this is the cause that leads to the explained limitation, numbers don't match.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

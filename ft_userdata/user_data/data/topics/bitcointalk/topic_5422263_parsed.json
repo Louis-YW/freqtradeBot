@@ -1,0 +1,149 @@
+{
+  "id": "topic_5422263",
+  "title": "pwn8",
+  "author": "pwn8",
+  "created_time": "November 20, 2022, 08:06:14 AM",
+  "content": "I have an idea for a new consensus protocol and i would like to get some feedback. Instead of producing hashes via computational power validators produce hashes by a fixed amount of coins for example 50 coins (a block reward). Nodes create a pool of hashes and select the smallest one just like in proof of work, but it doesn't necessarily have to start with zeros. The winner puts their \"proof\" on block that will be accepted by others. If network produces two valid blocks the right chain is the smallest proof. The hash is called \"ticket\" and consist of HashPrevBlock, PubKey, Signature. This way it is easy to verify the amount of coins. Every ticket hash changes but validators need to put your coins in different addresses to have more tickets. But I can't tell if it increases the chance of winning given the magnitude of possibilities. However by simply having more coins you are removing tickets from other possible validators. I don't know if it works yet. I created a repository with a simple python script that shows the idea. It makes sense to me.https://github.com/pwn8/ProofOfLuck",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5422263",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 20, 2022, 01:52:14 PM",
+      "body": "Everything besides \"Validators must hold at least one block reward\" that you briefly describe in Github is Proof-of-Work. How's this mechanism ensuring luck, to be named Proof-of-Luck? Let me catch you: if instead of computational power there's interaction with system's units, it's Proof-of-Stake.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 21, 2022, 05:47:06 AM",
+      "body": "This is no different from a (cryptographically secure) random number generator. In fact, you might as well just replace the entire PoW consensus with calls to getrandom() or the OpenSSL equivalent and use the result as in index into a list of block hashes, if this is what you're trying to do.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hZti",
+      "created_time": "November 21, 2022, 08:25:45 AM",
+      "body": "If I understand it correctly every node will be able to participate with its random numbers. What would stop an attacker then to just get a very high amount of nodes so that he can have a much higher chance to get the ticket?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joniboini",
+      "created_time": "November 21, 2022, 04:50:43 PM",
+      "body": "Quote from: hZti on November 21, 2022, 08:25:45 AMWhat would stop an attacker then to just get a very high amount of nodes so that he can have a much higher chance to get the ticket?Judging from what OP wrote, I think he doesn't consider it a problem. It might be encouraged to do so since you need a fixed amount of coins to get tickets and collecting more coins remove the competition. You just need money to control the network basically. I don't know why but this reminds me of a gacha game since the richer you are the chance to get the reward increase.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 21, 2022, 05:13:18 PM",
+      "body": "Quote from: pwn8 on November 20, 2022, 10:16:35 PMThat's the idea. An infinitely simpler PoS that uses solid properties of PoW. It does not take into consideration quantity of coins and coin age. Name doesn't matter.\"Infinitely simpler than PoS\", as if PoS is complicated.  I still don't get how are these \"solid properties of PoW\" even used in the process of securing the network. Do large coin holders have advantage, yes or no? If yes, it's Proof-of-Stake. Quote from: joniboini on November 21, 2022, 04:50:43 PMYou just need money to control the network basically. I don't know why but this reminds me of a gacha game since the richer you are the chance to get the reward increase.It's also called fiat currency, but it's unfortunately deliberately more complicated than a Proof-of-Stake shitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "November 21, 2022, 09:56:50 PM",
+      "body": "QuoteNodes create a pool of hashes and select the smallest one just like in proof of work, but it doesn't necessarily have to start with zeros.If it will be \"the smallest one\", then it will \"necessarily have to start with zeros\", just because that's how \"less than\" operator works.QuoteIf network produces two valid blocks the right chain is the smallest proof.In Bitcoin, it is different. We have something called \"chainwork\". Where there are two valid blocks on the same height, both are treated as valid, and nodes are waiting for next blocks to resolve that. If there is a disagreement, then the total work is counted, and the heaviest chain is picked, not the heaviest block. So, if you have only one different block in both chains, and the difficulty is the same, then the chainwork will be identical in Bitcoin.So, in Bitcoin, the block could have smaller proof than needed, but it will be counted according to the difficulty. For example, the Genesis Block has a lot of work, but still is counted as a block with difficulty one, no matter how small that hash is.QuoteThe hash is called \"ticket\" and consist of HashPrevBlock, PubKey, Signature.We have the hash as SHA-256(SHA-256(blockHeader)), there is no need to change that. By hashing the whole 80-byte block header, you have all needed things, including the merkle tree, so you can attach any SPV-proof for any kind of coinbase output, including PubKey, Signature, multisig, Taproot, or any future-address-type, or even any custom script. There is no need to use PubKey and Signature in some fixed format, because then upgrading that model will be harder, when you will want to upgrade your address type for any reason.QuoteThis way it is easy to verify the amount of coins.What about verifying the amount of coins, where the basic block reward is equal to zero? Then you need to check all transactions. For every \"ticket\". And every block can contain different transactions, because miners could include any custom transactions in their blocks.QuoteHowever by simply having more coins you are removing tickets from other possible validators.Then it is simply Proof of Stake: by having 51% of coin supply, you can control it forever. And it is not that hard in times, where there are huge exchanges that accumulate a lot of coins from many users. It is much harder to control 51% of hashing power, just because you have to maintain the whole equipment. But when it comes to having coins, then you only need to run some kind of exchange. And for altcoins it is even easier to get 51%, than it is for Bitcoin, especially if you can be involved at the beginning.QuoteUsing the bitcoin example, it is only possible to have 420000 tickets.Bitcoin will not have exactly 21 million coins. It will be less than that, because halvings will end, and because some coins were burned or lost.QuoteAs it is not possible to predict the signatures so it is not possible to predict the winner in advance.For a given public key, if you use deterministic signatures, where R-value is well-defined, then the signature will be predictable. Hashes are unpredictable, but signatures could be perfectly predictable, if they are constructed in a deterministic way. And now, Bitcoin Core use deterministic signatures by default.QuoteEthereum's implementation is very complex.On the other hand, your implementation is not well-defined, for example you use simple text data, instead of binary format (so under different encodings it will hash into different values), and you define coin amounts as strings.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Accardo",
+      "created_time": "November 22, 2022, 02:51:53 AMLast edit: November 22, 2022, 03:05:58 AM by Accardo",
+      "body": "Instead of out ruling computational operations why not, like actual Proof of luck, initiate the usage of a spec of computer like Intel SGX that allows Trusted execution environment. That'll prevent attackers from controlling the blockchain within the Trusted execution environment threshold. Also to ease energy and CPU cycle, the TEE (Trusted execution environment) allows a participant to wait for the expected time to pass during transaction verification without doing any work unlike in proof of work where the participant is expected to do work while waiting for an enforced sufficient amount of time to pass. This will also keep your consensus secured and different from POS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "November 22, 2022, 05:08:31 AM",
+      "body": "QuoteAs far as I know you can't predict signatures from other validators.Unless you are running more than one validator. And nobody knows that. If you assume that each participant will act as a single entity, then you can just trust that one node is one person. But in practice it is not, and that's why computing power is used, instead of counting nodes, keys, signatures, or whatever.QuoteTrusted execution environmentTrusted by whom? Because if it relies on the manufacturer, then you can just start with a fixed set of keys, one per each manufacturer, and use staking on top of that. You don't need Proof of Work at all if you can trust manufacturers.Quoteallows a participant to wait for the expected time to pass during transaction verification without doing any workWaiting is not a solution, because then you create a treasure for designing and producing some new compatible hardware, that will always run. And because that hardware will produce more coins, it will dominate soon. Also because it could be programmed to fake timestamps and produce longer chains in advance, and then just publish them with some delay.QuoteSo we have the perfect 1 ticket one node scenario.If you have one ticket per node, then the solution is to use any software that will emulate running many nodes. What about one user owning 10 machines? What about one user mining with virtual machines, that will pretend nodes are owned by different people? What about modifying the source code to mine in a non-standard way, and running one node per each thread?Also, I remember this Luck altcoin that relied on two phases, where people were trying to re-design mining. And of course miners optimized it, so that all luck-related parameters reached the maximum value, and then everything degenerated into a classical Proof of Work: https://bitcointalk.org/index.php?topic=5254068.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hZti",
+      "created_time": "November 22, 2022, 06:43:47 AM",
+      "body": "Quote from: pwn8 on November 22, 2022, 05:43:00 AMYou can have more tickets, but it is not guaranteed that you will increase your chances of winning.Obviously it will increase your chance of winning. If it is really random numbers I will have a 1% chance if I own 1 % nodes and 50% chance if I own 50% of the nodes. Still there is not really a difference to PoS then, if I need the coins to have the node.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 23, 2022, 01:27:49 AM",
+      "body": "Quote from: pwn8 on November 22, 2022, 10:38:54 PMI did some tests and it does increase the chance. I know PoS is not well accepted, but this proposal aims to simplify the code and consequently make it more secure and more decentralized since the requirement to run a node would be lower. The issue with PoS is inherent. There is no way to fix PoS. No matter if or how you make it more decentralized, that's not the issue. PoS is inherently flawed. This means that to fix it, you'd have to change it to the point that it's not PoS anymore.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "November 23, 2022, 06:55:26 AM",
+      "body": "Quotethis proposal aims to simplify the codeIf something is simpler, but not fully specified, then it won't be better. For example, you use Python, so you don't care about data types and their sizes. But they are crucial when sent to the network, because they have to be received on the other end. And when writing that code for receiving it, you may find out that your format cannot be used out of the box, because it will be hard to parse, and hard to extend if needed.Quoteand consequently make it more secure and more decentralized since the requirement to run a node would be lowerI don't think so. You put your signature into hashed parts quite easily, without realizing, how many ECDSA operations has to be performed by each device. You put strings like \"Alice\" and \"Bob\" as sample signatures, without realizing, that even if you include some library, and put real signatures there, then still, that part will be quite complex. And if signatures will be hashed, then you will sooner or later need to separate it. I wonder how you will implement SegWit in your model. Not to mention things like Schnorr signatures, or any kind of joining many signatures into one.QuoteUsing hashes, it is possible to guarantee that each number is unique without prior communication.You assume that there will be no prior communication. But what if there will be attackers that will communicate? That changes a lot. Because hashing is not a magic process that produces random numbers just like that. They are pseudorandom, and if you want to attack, you can use that determinism to perform some actions. For example, you may assume that nodes are selected randomly, because they submit some kind of hashes. But if some smart programmers will discover that, then they could change it to try more than once, and reach better results by optimizing some parameters, and by sending only the best results, and pretending they hit it during the first try.QuoteAnd even if there is a fork it will always converge to a single network because there is always one hash smaller than other.There is a reason, why chainwork is not measured per block hash, but per difficulty instead. In your network, it is possible to reorganize many blocks with one strong block. And it is dangerous, because if it is difficulty-based, then more blocks are needed, and then triggering difficulty change is needed, and that requires much more power (and there are limits, so the difficulty can only raise or drop four times, it is unlikely for a single block to alter the average time during two weeks period, also because the time of the block has to be within some range, and be higher than the median time of the past 11 blocks).QuoteThe big difference is that in Proof of Stake it was possible to try to modify the hash of the block to manipulate the result which would be a kind of proof of work.If you will have no nonce, then it will be picked artificially. Public keys are random, they can be used as a nonce. The same for signatures, you have R-value, that is just some ECDSA point, so it has the same properties as any other public key. Also, the order of transactions, and their content, can be altered by miners, just because each miner can use its own coins to create its own transactions. And the destination address can be also used as a nonce.Quotea checkpoint system like nodes can only reverse three previous blocksWhat is the time of the block? 10 minutes? So, 30 minutes can be reversed? In Bitcoin we had cases like Value Overflow Incident, and that required reversing hours of work. That kind of checkpoint means that your network could be easily splitted just by producing three blocks, and the probability described in the whitepaper for that is around 1% if the attacker has 10% hashrate. So, on average, a huge pool with 10% domination, could try to split the network once per 100 blocks.QuoteCode:q=0.1z=0 P=1.0000000z=1 P=0.2045873z=2 P=0.0509779z=3 P=0.0131722z=4 P=0.0034552z=5 P=0.0009137z=6 P=0.0002428z=7 P=0.0000647z=8 P=0.0000173z=9 P=0.0000046z=10 P=0.0000012",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "takuma sato",
+      "created_time": "November 25, 2022, 04:43:42 AM",
+      "body": "PoW is already \"proof of luck\". More lottery tickets = more ASIC machines.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ir.hn",
+      "created_time": "December 01, 2022, 01:11:10 PM",
+      "body": "Quote from: pwn8 on November 21, 2022, 07:10:26 PMThe problem with generating random numbers is that if there is not perfect communication between nodes, there will be two winners. Using hashes always has only one winner, even if the network produces two blocks, the smaller hash will be considered the correct block. For the ticket to be considered valid, it is necessary to hold 50 coins in the address that will be used to make the ticket.I think it is also possible to use multisignatures to do a kind of delegation. Using the bitcoin example, it is only possible to have 420000 tickets.The \"ticket\" is actually a message that contains the previous ticket hash, public key and signature. So it is not possible to fabricate a block in a way that manipulates the result. As it is not possible to predict the signatures so it is not possible to predict the winner in advance.Ethereum's implementation is very complex.This is a hybrid PoW/PoSBasically you are using \"proof of coins\" to weight your mining power.I guess it would be useful to prevent miners from dumping their coins but other than that it just reduces decentralization since buying a miner does not put you on equal footing with a rich person who has a miner.And yes even with this idea it would still be using asics to mine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 09, 2022, 03:15:06 PM",
+      "body": "Quote from: pwn8 on December 09, 2022, 03:33:20 AMWhat happens if we store the proof of work as a transaction and use the proof of stake algorithm to select the winner.So, transaction mining with extra steps? What's the point of having both Proof-of-Work and Proof-of-Stake, when only Proof-of-Stake is used in voting? Unless it isn't, which at this case will neither make sense, because you now have both miners and stakers, with the former being stakers as well. Quote from: pwn8 on December 09, 2022, 03:33:20 AMWe can select multiple validators per block and give preference to blocks that contain proofs of work.What's the problem with Proof-of-Work again?Quote from: pwn8 on December 09, 2022, 03:33:20 AMWhen the block reward ends or is no longer profitable the network will continue to operate without problems. So you're proposing to switch to Proof-of-Stake overtime?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "December 09, 2022, 04:03:17 PM",
+      "body": "QuoteWhat happens if we store the proof of work as a transaction and use the proof of stake algorithm to select the winner.We already have proof of work in some transactions, see: https://mempool.space/tx/000000000fdf0c619cd8e0d512c7e2c0da5a5808e60f12f1e0d01522d2986a51By moving proof of work to transactions, it could weaken the work in the block headers, and would complicate the whole block validation. It is better to use Merged Mining on block headers, and check those 80-byte headers in your network, then you will mine Bitcoin and your coins at the same time, so those headers will remain the strongest source of work.QuoteThen no power consumption is needed to confirm blocks just to be a validator.It will require the same work. Even worse: then you will need to be a miner to create a valid transaction. Or you will be forced to stake, that would be even worse, because it would mean your coins will be locked for some time, so the whole effect will be the same as increasing time to confirm your transaction.QuoteThe proof of work could have a difficulty setting of 10 minutes and the block 20 seconds for example.P2Pool has 30 seconds per block, and is compatible with Bitcoin, if you want that, just use their code. Or change it to 20 seconds if you really need.QuoteSome may argue that it is a Permissioned Network but I believe proof of stake faces a similar problem and has already solved it.No, it is not solved. And if you talk about ETH, then it is definitely not yet solved, because they use Proof of Burn, as long as you cannot unstake your coins.QuoteWe can select multiple validators per block and give preference to blocks that contain proofs of work.If you will have multiple validators enforced every block, then you will end up with more on-chain data than needed. Currently, there is one coinbase transaction per block, and it is sufficient for every use case, because it is better to accumulate rewards, than to pay everyone on-chain in every block. Because then transactions made by miners will take the whole space, and nothing will be left for non-mining users.QuoteWhen the block reward ends or is no longer profitable the network will continue to operate without problems.The block reward will end by design. By having limited supply, coins will not be destroyed by inflation in the future. There are two sides: supply and demand. If demand will be too low, then messing with the supply won't solve it. Creating more coins will cause inflation, so existing coins will be worth less. And burning more coins will create only speculation, not real usage (also, altcoins that burn a lot of coins usually do that, because they produced too many coins first, so they constantly solve problems they created by their own decisions).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 09, 2022, 05:21:49 PM",
+      "body": "Quote from: pwn8 on December 09, 2022, 04:59:52 PMBy issuing a proof of work transaction you get a \"ticket\" that is valid forever.Unless someone provides more work than you did.Quote from: pwn8 on December 09, 2022, 04:59:52 PMIn bitcoin, miners \"lose\" their energy after mining a block.And what's the difference with a merged Proof-of-Work with Proof-of-Stake? You still have energy that's used to do hashing.Quote from: pwn8 on December 09, 2022, 04:59:52 PMMiners will not need to raise fees when the block reward goes to zero.I recommend you have a look on this thread: https://bitcointalk.org/index.php?topic=5405755.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "December 10, 2022, 11:33:24 AM",
+      "body": "QuoteThe idea is to have two types of transactions: common and pow transactions.But miners include transactions into blocks. And being rewarded is more important for them than including transactions from users. So, if they will gain more by including their own transactions, then they will do that first. And the result could be that the whole space will be occupied by miners' transactions. If you want to avoid that, then you need some kind of batching, then miners will be rewarded every sometimes, and not every block. Or, to be more specific: they will be rewarded in a single multisig address per block. For example, it is cheaper to use one Taproot address with N-of-N multisig, and send it to miners only when they will accumulate some coins, and when they want to go on-chain, than to assign them all of those fractions of coins in every block, and force them to pick the dust every sometimes. It is also easier to use one 6.25 BTC multisig output, and pay someone 1 BTC from that address, than force the miner to grab thousands of outputs below 0.001 BTC.QuoteAn attacker will need 51% hashrate of the entire blockchain history to succeed, not just the current hashrate.Not really, because you usually don't want to overwrite everything. Also, getting 10 blocks with difficulty one is easier than getting a single block with difficulty 10. If you have some smaller unit for measuring hashes, then it is profitable to include more hashes, and it is more likely that the sum will be greater than one single hit. You can easily check that on your CPU: first, use the regtest difficulty, and try to mine a block with difficulty one. And compare, how fast you will get a lot of blocks with very small difficulty, that will sum into one.QuoteBy issuing a proof of work transaction you get a \"ticket\" that is valid forever.And that's the problem: that makes attacking easier, because you can use that \"ticket\" to reorganize the chain. Also, that allows offline mining, and could be dangerous, because then your system is widely opened to a \"deus ex machina attack\", when suddenly some miner is lucky, and can reorganize everything.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

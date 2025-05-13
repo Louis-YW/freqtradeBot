@@ -1,0 +1,117 @@
+{
+  "id": "topic_5466042",
+  "title": "Zenp",
+  "author": "Zenp",
+  "created_time": "September 07, 2023, 08:09:13 PM",
+  "content": "Hi Everyone,A few years ago, I bought some bitcoin (very small amount, don't worry) and wrote down the 12 mnemonic words on small flashcards. I recently found these cards but seem to have forgotten what the order of the words were. Is there a method using python or any other tools to figure out the order of the words?The number of bitcoins in this was less than 0.04, and as such expensive computational resources would be out of the scope.My rough thoughts lead me to believe that there are 12! possible wallets which is 479,001,600 possible combinations.I read this post online where it claimed that BIP39 uses a checksum word. Does anyone know how / if this checksum can be used for valid mnemonic determination?https://bitcoin.stackexchange.com/questions/79249/i-have-my-12-word-bip39-phrase-but-not-in-the-right-orderAny help would be appreciated.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466042",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "September 07, 2023, 08:20:14 PM",
+      "body": "You can use btcrecover. Read o_e_l_e_o post about 12 word seed phraseHow long to crack 24 word phrase if you know all 24 words out of order?https://btcrecover.readthedocs.io/en/latest/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "blue Snow",
+      "created_time": "September 08, 2023, 02:03:23 AM",
+      "body": "Quote from: Zenp on September 07, 2023, 08:09:13 PMA few years ago, I bought some bitcoin (very small amount, don't worry) and wrote down the 12 mnemonic words on small flashcards. I recently found these cards but seem to have forgotten what the order of the words were. I just ignore what you find (small flashcards). I have a question, What wallet did you use?I've also had this case before where the words cannot be read clearly. But, I try to remember the wallet I used and try to find that wallet file on my ext drive. After I found it, I just imported it to the wallet and worked.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 08, 2023, 05:15:18 AM",
+      "body": "Yes, fairly easily done using btcrecover as Charles-Tim has pointed out above.Do you know the address the coins are on? It will be a much quicker process if you do. If you don't it will still be possible, but you'll need to set up an address database first. It would also be useful if you know that the address you used was the first (or at least one of the first) addresses in that wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "September 08, 2023, 07:30:47 AM",
+      "body": "Quote from: Lattice Labs on September 08, 2023, 06:11:12 AM...This script generates permutations and checks each one. With 12 words, there are indeed 479,001,600 possible permutations, so this method could be time-consuming.The BIP39 checksum is used to detect errors in the mnemonic phrase, but it won't help you recover the correct word order....The checksum might help as an optimization. I think it is faster to validate the checksum than it is to check if the phrase generates a known address.So, for each permutation, first checking the checksum would eliminate 93.75% of them. For the remaining 6.25% you would still have to check against the known addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 08, 2023, 08:36:35 AM",
+      "body": "Quote from: odolvlobo on September 08, 2023, 07:30:47 AMI think it is faster to validate the checksum than it is to check if the phrase generates a known address.It's much faster. The checksum is a single SHA256, while to generate an address you need 2048 rounds of HMAC-SHA512, a variable number of further rounds of HMAC-SHA512 alongside elliptic curve multiplication to work down the derivation path, and then three SHA256s, one RIPEMD160, and a Base58 conversion to turn that final public key in to an address.Still, the account you are replying to is an AI spammer, which is why the script they shared is nonsense.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zenp",
+      "created_time": "September 08, 2023, 01:22:04 PM",
+      "body": "Quote from: Charles-Tim on September 07, 2023, 08:20:14 PMYou can use btcrecover. Read o_e_l_e_o post about 12 word seed phraseHow long to crack 24 word phrase if you know all 24 words out of order?https://btcrecover.readthedocs.io/en/latest/Thank you for the btcrecover source. I initially didn't have my public address and tried to figure out how to use the public address database to decode but was unsuccessful.Then I was able to trace back some of my old transactions to public address and was able to use it to crack the order of the wallet. It only took 115 minutes using my hardware, which is pretty solid. Successfully recovered 0.0309 btc.Thank you everyone for your help, Much Appreciated!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 09, 2023, 04:00:45 AM",
+      "body": "Quote from: Zenp on September 08, 2023, 01:22:04 PMThen I was able to trace back some of my old transactions to public address and was able to use it to crack the order of the wallet. It only took 115 minutes using my hardware, which is pretty solid. Successfully recovered 0.0309 btc.Nice. So it looks like it is possible to brute-force the order of 12 words of a seed phrase. If it was 24 words, I would've been less sure, since that's even more possible combinations and would take in the magnitude of hundreds of thousands or even millions possibly.Quote from: ETFbitcoin on September 08, 2023, 12:35:31 PMFortunately current btcrecover developer already provide such address database, although it was last updated on 2022. Although it shouldn't be problem since OP said \"A few years ago...\".Do you know how the btcrecover devs \"refresh\" the address database? What kind of tools do they use?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 09, 2023, 06:28:36 AMLast edit: September 09, 2023, 07:59:45 AM by LoyceV",
+      "body": "Quote from: NotATether on September 09, 2023, 04:00:45 AMSo it looks like it is possible to brute-force the order of 12 words of a seed phrase. If it was 24 words, I would've been less sure, since that's even more possible combinations and would take in the magnitude of hundreds of thousands or even millions possibly.Make that half a billion more possibilities.12 words gives 12! = 479001600 possibilities.24 words gives 24! = 620448401733239439360000 possibilities.Half a billion times 115 minutes is a million years.Quote from: o_e_l_e_o on September 09, 2023, 07:27:51 AMNot sure where you got half a billion from?You're right. I didn't even have to read further, let's say I'm an idiot before my caffeine sometimes. I was indeed surprised I got to \"only\" a million years, while it's closer to a few billion years.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 09, 2023, 07:27:51 AM",
+      "body": "Not sure where you got half a billion from?If you have a benchmark for calculating 12!, then to calculate 24 you would need to take that benchmark and multiply it by 13*14*15*...*23*24. More easily written as 24!/12!.24!/12! is over 1 thousand trillion. With 115 minutes for 12 words, then it would be around 283 billion years for 24 words. (In reality it would be a bit quicker than this since with 12 words you can reject 93.75% of combinations as having an invalid checksum and with 24 words you can reject 99.61% of seed phrases, but that is not relevant.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coding Enthusiast",
+      "created_time": "September 09, 2023, 09:21:34 AMLast edit: September 09, 2023, 10:07:45 AM by Coding Enthusiast",
+      "body": "Isn't 115 minutes (at best 1.1k permutation/sec) too slow? Although FinderOuter doesn't have this feature but I get 22k perm/sec for BIP39 and 1.2m perm/sec for Electrum mnemonic on CPU when recovering 12-word mnemonics with missing words.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "September 09, 2023, 09:38:58 AMLast edit: September 09, 2023, 11:37:30 AM by ETFbitcoin",
+      "body": "Quote from: NotATether on September 09, 2023, 04:00:45 AMQuote from: ETFbitcoin on September 08, 2023, 12:35:31 PMFortunately current btcrecover developer already provide such address database, although it was last updated on 2022. Although it shouldn't be problem since OP said \"A few years ago...\".Do you know how the btcrecover devs \"refresh\" the address database? What kind of tools do they use?btcrecover documentation mention 2 ways to create the address DB (from blk*dat file[1] and list of addresses[1]). But the developer doesn't mention which method he use to create his prepared DB. On the documentation, he mention few .py file script.Quote from: Coding Enthusiast on September 09, 2023, 09:21:34 AMIsn't 115 minutes (at best 1.1k permutation/sec) too slow? Although FinderOuter doesn't have this feature but I get 22k perm/sec for BIP39 and 1.2m perm/sec for Electrum mnemonic on CPU when recovering 12-word mnemonics with missing words.Nice catch, reference benchmark shows i7-8750 shows it has 33K permutation/sec[3]. So it's possible OP used sub optimal configuration. As stated by @o_e_l_e_o below, the actual speed was 70K/sec. So actually it's not slow.[1] https://btcrecover.readthedocs.io/en/latest/Creating_and_Using_AddressDB/#creating-an-addressdb-from-blockchain-data[2] https://btcrecover.readthedocs.io/en/latest/Creating_and_Using_AddressDB/#creating-an-addressdb-from-an-address-list[3] https://btcrecover.readthedocs.io/en/latest/GPU_Acceleration/#performance-notes",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 09, 2023, 09:55:53 AM",
+      "body": "Quote from: Coding Enthusiast on September 09, 2023, 09:21:34 AMIsn't 115 minutes (at best 1.1k permutation/sec) too slow? Although FinderOuter doesn't have this feature but I get 22k perm/sec for BIP39 and 1.2m perm/sec for Electrum mnemonic on CPU when recovering 12-word mnemonics with missing words.How did you get 1.1k permutations a second? Have you divided by an extra 60 by mistake?12!/115/60 = 70k permutations a second, but that is assuming he had to search the entire space. Even assuming on average he would search half the space, that's still 35k/sec.I can get around 100k/sec on my hardware for a BIP39 seed phrase, but 35k is not unreasonable by any means.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coding Enthusiast",
+      "created_time": "September 09, 2023, 10:05:31 AM",
+      "body": "Quote from: ETFbitcoin on September 09, 2023, 09:38:58 AMNice catch, reference benchmark shows i7-8750 shows it has 33K permutation/sec[3]. So it's possible OP used sub optimal configuration.Thanks for the link, that's very useful. For the sake of comparison the speed I reported above is using i3-6100 CPU with 4 threads.Quote from: o_e_l_e_o on September 09, 2023, 09:55:53 AMHow did you get 1.1k permutations a second? Have you divided by an extra 60 by mistake?That's embarrassing I must need some coffee too...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

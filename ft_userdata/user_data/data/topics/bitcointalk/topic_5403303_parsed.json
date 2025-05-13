@@ -1,0 +1,117 @@
+{
+  "id": "topic_5403303",
+  "title": "Majestic-milf",
+  "author": "Majestic-milf",
+  "created_time": "June 20, 2022, 07:20:05 AM",
+  "content": "From my understanding of transactions, there are usually signed by the owners. But in this case,  the signature does not cover all the data in a transaction that is hashed to create a hash. Thus, while rare, it is possible for a node on the network to change a transaction the sender sends in such a way that the hash is rendered invalid. I got a bit confused and thought to ask: in such a situation, will the transaction be reversed back to the owner of the wallet, or since it has been rendered invalid, will the coins be lost? https://link.springer.com/chapter/10.1007/978-3-319-11212-1_18",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403303",
+  "comments": [
+    {
+      "author": "witcher_sense",
+      "created_time": "June 20, 2022, 11:23:36 AM",
+      "body": "I am not sure that I understand your question correctly because part of your post is the paraphrased text from bitcoin wiki, but I'll try to answer. Quote from: Majestic-milf on June 20, 2022, 07:20:05 AMFrom my understanding of transactions, there are usually signed by the owners.A sender of a transaction must provide proof that he has a right to spend from specific outputs, which is why inputs always contain an unlocking script that satisfies conditions specified in specific outputs. Each node checks both locking and unlocking scripts, and, if something isn't right, rejects such transaction.Quote from: Majestic-milf on June 20, 2022, 07:20:05 AMBut in this case,  the signature does not cover all the data in a transaction that is hashed to create a hash. The signature is part of the unlocking script and cannot be modified by a malicious actor, but it is still possible to modify an unlocking script itself by adding additional opcodes that do nothing. Your unlocking script will remain valid, but the hash of transaction data will change because additional data was added.Quote from: Majestic-milf on June 20, 2022, 07:20:05 AMThus, while rare, it is possible for a node on the network to change a transaction the sender sends in such a way that the hash is rendered invalid. Given that the data in the unlocking script is modified, the resulting hash will change, but the transaction will still be spending the same coins to the same address. Non-standard transactions like that (with modified unlocking scripts) are usually rejected by most full nodes, but if you find a miner willing to include your transaction, it can get into the block.Quote from: Majestic-milf on June 20, 2022, 07:20:05 AMI got a bit confused and thought to ask: in such a situation, will the transaction be reversed back to the owner of the wallet, or since it has been rendered invalid, will the coins be lost? https://link.springer.com/chapter/10.1007/978-3-319-11212-1_18Such a transaction may be rejected by nodes, but coins won't be lost in any case.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 20, 2022, 11:54:29 AM",
+      "body": "Quote from: witcher_sense on June 20, 2022, 11:23:36 AMThe signature is part of the unlocking script and cannot be modified by a malicious actor, but it is still possible to modify an unlocking script itself by adding additional opcodes that do nothing.Transactions with added unnecessary OP_DROP codes are non-standard and therefore, aren't relayed to the network, though. Transaction malleability can happen in a more efficient and shady way, by re-signing the same transaction with a different k value. Also, that this can't happen in a SegWit transaction, because changes of witness do not affect TXID.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 20, 2022, 12:10:12 PM",
+      "body": "Quote from: Majestic-milf on June 20, 2022, 07:20:05 AMThus, while rare, it is possible for a node on the network to change a transaction the sender sends in such a way that the hash is rendered invalid.The scriptsig is filled with dummy data (a bunch of 0's I think) while signing the trasaction and is then replaced by the real scriptsig generated from elements of the signed transaction.So, if any wallet modifies the dummy scriptsig values before signing, of course it will generate a different transaction hash but it will not be accepted by the network because the raw transaction does not hash into the correct hash as in the mempool/block. Such transactions usually never go into a block anyway - except for user-generated blocks while the node is in an offline state, but even those blocks with invalid transactions would be rejected during a verification anyway.QuoteI got a bit confused and thought to ask: in such a situation, will the transaction be reversed back to the owner of the wallet, or since it has been rendered invalid, will the coins be lost?The network will behave as if your transaction was never broadcasted (since it was ignored by all nodes anyway due to its invalidness).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 20, 2022, 01:34:03 PM",
+      "body": "Quote from: Majestic-milf on June 20, 2022, 07:20:05 AMin such a situation, will the transaction be reversed back to the owner of the wallet, or since it has been rendered invalid, will the coins be lost? In any case, if someone doesn't relay your transaction to the miners for whatever reason (including, but not limited to: having been modified in an incorrect way by an intermediary node), the coins are absolutely not lost. They're never sent. You will be able to just submit a new transaction.Coins are only then 'really sent' when the transaction you signed reached a miner and that miner included it in a block template; then found a nonce such that the double-hash of the block matches the required difficulty target.Give this a thorough read:https://learnmeabitcoin.com/beginners/transactions",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "June 20, 2022, 02:08:24 PMLast edit: June 20, 2022, 02:22:21 PM by odolvlobo",
+      "body": "The basic issue with transaction malleability is that anyone can duplicate a transaction and give it a different txid. This is not a problem for the Bitcoin protocol, but it is a problem for users who use the txids to track payments. Since txids are really the only way to track payments, it is a usability problem for Bitcoin.For example, transaction malleability contributed in a small way to the failure of Mt. Gox. Mt. Gox used txids to control when an account was debited after a withdrawal. Certain customers used transaction malleability to duplicate withdrawal transactions, and when the duplicated transaction was confirmed but the original was not, the account was not debited even though the customer received their funds.It is not the original transaction's hash that is made invalid when the duplicate is confirmed. The transaction itself is invalid because it becomes a double-spend.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "June 20, 2022, 02:27:02 PM",
+      "body": "Quote from: odolvlobo on June 20, 2022, 02:08:24 PMThe basic issue with transaction malleability is that anyone can duplicate a transaction and give it a different txid. As far as I know it's not that anyone can duplicate the transaction.Assigning a new ID to the transaction can be done only by the miner and the main problem is that if there's an unconfirmed child, it would be invalidated.Quote from: odolvlobo on June 20, 2022, 02:08:24 PMIt is not the original transaction's hash that is made invalid when the duplicate is confirmed. The transaction itself is invalid because it becomes a double-spend.I don't think it's true to call it double-spend.The sender can't broadcast a new transaction with same input(s). It's the miner that can change the ID and make the child (if there's any) invalid.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "June 20, 2022, 02:36:23 PM",
+      "body": "QuoteThe scriptsig is filled with dummy data (a bunch of 0's I think)No, it is filled with the previous output script. That's why you cannot put \"<signature> <pubkey> OP_CHECKSIG\" as your output script, and use empty input script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "June 20, 2022, 04:13:58 PMLast edit: September 12, 2022, 04:08:12 PM by odolvlobo",
+      "body": "Quote from: hosseinimr93 on June 20, 2022, 02:27:02 PMQuote from: odolvlobo on June 20, 2022, 02:08:24 PMThe basic issue with transaction malleability is that anyone can duplicate a transaction and give it a different txid. As far as I know it's not that anyone can duplicate the transaction.Assigning a new ID to the transaction can be done only by the miner and the main problem is that if there's an unconfirmed child, it would be invalidated.The transaction ID is not assigned by anyone. It is simply a SHA-256 hash of the transaction.Transaction malleability involves altering any of the bytes in a transaction that are not protected by a signature (such as the signature itself) and producing a equivalent transaction with a different hash/TXID. Anyone can broadcast a valid altered version of any transaction.Quote from: hosseinimr93 on June 20, 2022, 02:27:02 PM... and the main problem is that if there's an unconfirmed child, it would be invalidated.That's also a problem, but spending an unconfirmed UTXO is risk even without transaction malleability.Quote from: hosseinimr93 on June 20, 2022, 02:27:02 PMQuote from: odolvlobo on June 20, 2022, 02:08:24 PMIt is not the original transaction's hash that is made invalid when the duplicate is confirmed. The transaction itself is invalid because it becomes a double-spend.I don't think it's true to call it double-spend.Strictly speaking, it is a double-spend, but I agree that is not what people normally think of as a double-spend. If you want to get really pedantic, an RBF transaction is also a double-spend. In both cases, there are two transactions trying to spend the same UTXOs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "June 20, 2022, 04:54:58 PM",
+      "body": "Quote from: odolvlobo on June 20, 2022, 04:13:58 PMThe transaction ID is not assigned by anyone. It is simply a SHA-256 hash of the transaction.You are Right. But my point was that when it comes to malleability problem, it's the miner that can change the data and cause the transaction to have to a new ID. It's not that anyone can do that (unless the original transaction has been marked as RBF which is a different topic) Let's say I created a non-RBF and non-segwit transaction and broadcast it to the network. Now I create another transaction with same inputs and outputs, but a different transaction ID. Will the new transaction be accepted by the nodes? It's so unlikely. Can the miner change the data, so a transaction with same inputs and outputs but a different ID as the one I had broadcast is included into the blockchain? Yes. Quote from: odolvlobo on June 20, 2022, 04:13:58 PMThat's also a problem, but spending an unconfirmed UTXO is risk even without transaction malleability.Right. Especially if the parent has been flagged as RBF. Quote from: odolvlobo on June 20, 2022, 04:13:58 PMStrictly speaking, it is a double-spend, but I agree that is not what people normally think of as a double-spend. If you want to get really pedantic, an RBF transaction is also a double-spend. In RBF, the new transaction can have different outputs and you are right that it's a double-spend. One can easily abuse RBF, if the recipient accept the unconfirmed transaction.   You can abuse transaction malleability only if you are a miner and the unconfirmed (non-segwit) transaction has a child. If there's no child, there is no way to use malleability bug to scam someone. Because the new transaction will have same inputs and same outputs. Correct me if I am wrong, please.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "June 20, 2022, 06:07:12 PM",
+      "body": "Quote from: hosseinimr93 on June 20, 2022, 04:54:58 PMBut my point was that when it comes to malleability problem, it's the miner that can change the data and cause the transaction to have to a new ID. It's not that anyone can do that (unless the original transaction has been marked as RBF which is a different topic) Let's say I created a non-RBF and non-segwit transaction and broadcast it to the network. Now I create another transaction with same inputs and outputs, but a different transaction ID. Will the new transaction be accepted by the nodes? It's so unlikely. Can the miner change the data, so a transaction with same inputs and outputs but a different ID as the one I had broadcast is included into the blockchain? Yes. I think we are just talking semantics. When I say \"can\", I mean it is possible. When you say \"can't\", you mean it is difficult or unlikely to succeed. I agree with both. However, it has actually occurred in the past without involving miners (I presume), so I don't think that saying it can only be done by miners is accurate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "June 20, 2022, 06:28:10 PMLast edit: June 20, 2022, 08:35:28 PM by hosseinimr93",
+      "body": "Quote from: odolvlobo on June 20, 2022, 06:07:12 PMI think we are just talking semantics. When I say \"can\", I mean it is possible. When you say \"can't\", you mean it is difficult or unlikely to succeed. Yes.Quote from: odolvlobo on June 20, 2022, 06:07:12 PMHowever, it has actually occurred in the past without involving miners (I presume), so I don't think that saying it can only be done by miners is accurate.To be more accurate: If I want to abuse the malleability bug, I should create a new transaction with same inputs and outputs and different ID and broadcast it. The chance of being successful to do that is same as the chance of replacing any other transaction (double-spending). It's still possible to broadcast the new transaction, but that's very unlikely. If I am the miner and I can include that transaction into a block before others, I will surely succeed. The post has been edited.Thank you BlackHatCoiner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 20, 2022, 08:02:16 PM",
+      "body": "Quote from: hosseinimr93 on June 20, 2022, 06:28:10 PMIf the transaction has been flagged as RBF, I will likely succeed.If the transaction is flagged as RBF (full-RBF to be precise) then the double-spending transaction has to raise the fee. But, if the fee rises and the inputs remain the same, then the outputs have to change. So, those two transactions can't be exactly the same. If two transactions are the same, with a different ID, then the signature is the only different part. RBF is irrelevant, because you don't replace by fee anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lida93",
+      "created_time": "June 22, 2022, 01:34:54 PM",
+      "body": "Quote from: Majestic-milf on June 20, 2022, 07:20:05 AMFrom my understanding of transactions, there are usually signed by the owners. But in this case,  the signature does not cover all the data in a transaction that is hashed to create a hash. Thus, while rare, it is possible for a node on the network to change a transaction the sender sends in such a way that the hash is rendered invalid. I got a bit confused and thought to ask: in such a situation, will the transaction be reversed back to the owner of the wallet, or since it has been rendered invalid, will the coins be lost? https://link.springer.com/chapter/10.1007/978-3-319-11212-1_18To the best of my knowledge transaction on BTC is irreversible especially to a wrong address. So one got to be very careful while doing any transact.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "id": "topic_5475733",
+  "title": "takuma sato",
+  "author": "takuma sato",
+  "created_time": "November 28, 2023, 04:29:51 AM",
+  "content": "If you open a wallet.dat file, will it leave any traces anywhere at all? Im talking about a linux step, specifically Debian 12.Suppose you have 2 wallets, wallet1.dat is a KYC wallet, wallet2.dat is a non-KYC wallet. You have wallet2.dat saved elsewhere, but copy it into this partition where you run Bitcoin Core and open it to check funds. You check funds and are ok with it, the funds are there, I don't need this file in there anymore, so you shred it.My question is, if an attacker where to inspect this hard drive, would they see that wallet2.dat was ever there? This is a matter of forensics, but this has also to do with the software. For instance, some software leave temporary files in certain \"temp folders\", or have a \"recently opened\" files on a dropdown menu, etc.Does Bitcoin Core leave any of these necessary traces that a file was used? if so then how does one disable any of that?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5475733",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "November 28, 2023, 06:20:23 AM",
+      "body": "Quote from: takuma sato on November 28, 2023, 04:29:51 AMMy question is, if an attacker where to inspect this hard drive, would they see that wallet2.dat was ever there?This is a matter of forensics, but this has also to do with the software. For instance, some software leave temporary files in certain \"temp folders\", or have a \"recently opened\" files on a dropdown menu, etc.Your 'debug.log' file may contain the files names and full path of the recently loaded wallet filesbut since you've \"shredded\" it, there may not be any recoverable data from the drive depending on its effectiveness.But in order to fully remove the trace, shred the logs as well.The 'database' folder inside your 'wallets' directory could contain a log file that may contain traces of recently loaded wallets.The 'settings.json' file may still contain its name if you just deleted the wallet file without unloading it first.The \"Open Wallet\" drop-down menu in Bitcoin Core is based from the available wallets in the data directory, so previously used but deleted wallets wont appear there.The cached data in your RAM wont be an issue after a few minutes.Other than those, I don't know if there's any other traces of it. (wait for other users' inputs)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DifDrama",
+      "created_time": "November 28, 2023, 09:24:15 AM",
+      "body": "Quote from: takuma sato on November 28, 2023, 04:29:51 AMThis is a matter of forensics, but this has also to do with the software. For instance, some software leave temporary files in certain \"temp folders\", or have a \"recently opened\" files on a dropdown menu, etc.Do you mean that some desktop environments or file managers maintain a list of recently accessed files? I usually ensure proper data wiping using tools to securely delete files and overwrite the data multiple times to prevent forensic recovery. And maybe you can consider running it in a more controlled or isolated environment, like a virtual machine or container, to contain its activity. During the learning process, corrections and guidance are always welcome.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "November 28, 2023, 10:32:15 AM",
+      "body": "I guess @nc50lc summed it up pretty well.Just make sure to shred the Bitcoin Core logs which are located in the data directory /.bitcoin (default) since they could have timestamps and activites that correspond to when the wallet was accessed. The specific wallet.dat should be mentioned in these logs. If you accessed the wallet via the command line you should shred the bash history (\"/.bash_history\") aswell. This file keeps a record of all commands that are executed in the terminal. And again, shouldn't be a problem with ur specific wallet.dat - but it certainly makes sense if you really want to cover up all traces.For highly sensitive operations, consider using a dedicated environment (like a bootable USB) where traces are less likely to be left or can be easily contained.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "November 28, 2023, 10:39:09 AM",
+      "body": "Most of the important stuff has already been covered... The only thing that worries me is your definition of *shredding*.Most others have already assumed you're actually using a tool that's overwriting the sectors on your disk when you're *shredding* a file. I just want to make sure your definition of shredding isn't using a gui file manager to remove a file and then emptying the recycle bin (my first job required me to man the endusers helpdesk for 1 day a week... I've learned that assuming somebody is using the correct definition of a process might lead to disasters).OP, how are you shredding the wallet file? If you do this correctly, the attack vector is small, if you mess this up anybody able to run an forensic toolkit on your disk might be able to recover you wallet (depending on things like encryption, physical access, the ability to log in to your running system, etc)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "November 28, 2023, 11:18:10 AM",
+      "body": "Depending on how paranoid you are, there are few things worth to mention.1. Swap file/partition isn't cleared when you perform shutdown.2. TRIM only run on certain schedule (e.g. daily or weekly). So until then your file isn't really deleted.3. Faulty TRIM on few SSD doesn't really delete your data.But based on other thread, it seems you encrypt your drive/partition which means forensic guys need to decrypt your drive/partition first which is very difficult task.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 28, 2023, 11:46:38 AM",
+      "body": "Quote from: mocacinno on November 28, 2023, 10:39:09 AMThe only thing that worries me is your definition of *shredding*.Most others have already assumed you're actually using a tool that's overwriting the sectors on your disk when you're *shredding* a file.My assumption is OP would use shred, which by default overwrites the file 3 times (but you can go wild with -n 30). I'm not sure how effective this is on an SSD though, since those drives have their internal wear leveling. It may overwrite a different location.I often use this:Code:mkdir /dev/shm/priv # this is a RAM drivecd /dev/shm/privecho 'super secret' >> myfile.txtrm 'myfile.txtNo need to use disk storage for files I don't want to keep.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "takuma sato",
+      "created_time": "November 29, 2023, 05:22:25 AM",
+      "body": "Quote from: mocacinno on November 28, 2023, 10:39:09 AMMost of the important stuff has already been covered... The only thing that worries me is your definition of *shredding*.Most others have already assumed you're actually using a tool that's overwriting the sectors on your disk when you're *shredding* a file. I just want to make sure your definition of shredding isn't using a gui file manager to remove a file and then emptying the recycle bin (my first job required me to man the endusers helpdesk for 1 day a week... I've learned that assuming somebody is using the correct definition of a process might lead to disasters).OP, how are you shredding the wallet file? If you do this correctly, the attack vector is small, if you mess this up anybody able to run an forensic toolkit on your disk might be able to recover you wallet (depending on things like encryption, physical access, the ability to log in to your running system, etc)I mean the shred tool on the Linux terminal which I think comes preinstalled in all distributions. The average Ubuntu user should at least have these installed by default. I personally use shred -uvz. This will deliver 3 passes by default, but you can specify with -n x where x is number of passes. The default should be enough for HDD. And for SSD, if you use full disk encryption, im not sure if they would realistically recover anything.From stackexchange:-u ensures that after the shred operation is completed, the file is unallocated and removed.-v enables verbose output for tracking the shred progress-z performs a final zero-ization of the file to hide that the allocation on disk was shredded.I navigate manually into the folder and use shred for the specific file instead of using path on the command to not accidentally screw something up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 29, 2023, 11:01:47 AM",
+      "body": "Quote from: takuma sato on November 29, 2023, 05:22:25 AMAnd for SSD, if you use full disk encryption, im not sure if they would realistically recover anything.The same applies to HDD  Unless your password gets compromised, in that case it's better to overwrite sectors.I sometimes use a \"quick and dirty manual full disk overwrite\" after deleting data:Code:mkdir crap; cd crapecho -n '0000000000000000000000000000000000000000000000000000000000000000000' > tmpfilei=1; while test $i -le 50000; do cat tmpfile >> tmpfile2; echo $i; i=$((i+1)); done # This creates a few MB temp filei=1; while test 1; do cp tmpfile2 $i; echo $i; i=$((i+1)); done # This fills the partition. Do this as root to also fill reserved disk spaceCTRL-C when it runs out of disk spacesync; cd ..; rm -r crapThis also works on USB sticks, or to reduce the size of a compressed partition image by not backing up deleted data. At least this way I'm sure wear leveling doesn't mess up wiping data. But it's only one rewrite, so for the truely paranoid it's not enough.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "takuma sato",
+      "created_time": "December 09, 2023, 02:14:24 AM",
+      "body": "Quote from: LoyceV on November 29, 2023, 11:01:47 AMQuote from: takuma sato on November 29, 2023, 05:22:25 AMAnd for SSD, if you use full disk encryption, im not sure if they would realistically recover anything.The same applies to HDD  Unless your password gets compromised, in that case it's better to overwrite sectors.I sometimes use a \"quick and dirty manual full disk overwrite\" after deleting data:Code:mkdir crap; cd crapecho -n '0000000000000000000000000000000000000000000000000000000000000000000' > tmpfilei=1; while test $i -le 50000; do cat tmpfile >> tmpfile2; echo $i; i=$((i+1)); done # This creates a few MB temp filei=1; while test 1; do cp tmpfile2 $i; echo $i; i=$((i+1)); done # This fills the partition. Do this as root to also fill reserved disk spaceCTRL-C when it runs out of disk spacesync; cd ..; rm -r crapThis also works on USB sticks, or to reduce the size of a compressed partition image by not backing up deleted data. At least this way I'm sure wear leveling doesn't mess up wiping data. But it's only one rewrite, so for the truely paranoid it's not enough.You know what, I think im just going to hop by some shop now that is xmas sales and just pick up some kind of an HDD that you can plug and play into a laptop or in any computer on the go for that matter. An external HDD I think it's called. Im assuming those exist. I would simply just plug it into an USB port, and have the private keys in there, and have a separate SSD that acts as the watch-only wallet that has the full blockchain, which I already got synced, and it's 1 TB so it should last me for 4 or 5 year last time I checked. Do you recommend any external HDD for this? I remember there were some sort of hybrid between SSDs and HDDs that had some dodgy firmware on it, so you have to consider all these things before buying.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "December 09, 2023, 08:30:31 AM",
+      "body": "Quote from: takuma sato on December 09, 2023, 02:14:24 AMYou know what, I think im just going to hop by some shop now that is xmas sales and just pick up some kind of an HDD that you can plug and play into a laptop or in any computer on the go for that matter. An external HDD I think it's called. Im assuming those exist. I would simply just plug it into an USB port, and have the private keys in there, and have a separate SSD that acts as the watch-only wallet that has the full blockchain, which I already got synced, and it's 1 TB so it should last me for 4 or 5 year last time I checked. Do you recommend any external HDD for this? I remember there were some sort of hybrid between SSDs and HDDs that had some dodgy firmware on it, so you have to consider all these things before buying.I have an external (and internal) HDD that gets terribly slow when writing a lot. It's not the firmware, it's the design of the disk with \"small fast areas\" and \"large slow areas\" (so it needs to move data from fast to slow areas, overwriting blocks). Most of the time they don't tell you this, so you need to rely on hardware reviews. But they also change disk designs without telling you, so you can still get the wrong disk. This seems slightly off-topic though.I think your whole setup can be improved. Worrying about an attacker that gains physical access to your disk seems like one of the least likely scenarios compared to other risks. Where do you store the wallets now? Are they hot wallets or cold wallets? I prefer to do offline signing, but Electrum is much easier for that than Bitcoin Core. And Electrum can run from a Linux Live DVD, which doesn't use your hard drive.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

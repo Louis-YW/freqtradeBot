@@ -1,0 +1,117 @@
+{
+  "id": "topic_5407869",
+  "title": "ncentrepreneur.investor",
+  "author": "ncentrepreneur.investor",
+  "created_time": "July 28, 2022, 03:16:48 AM",
+  "content": "I will probably get in trouble for this but I posted this 8 days ago with not one response. It was probably posted way down in the abyss and nobody saw it. Here it is: I need a seemingly an experienced person. I just installed a rasberry pi 4 node and went through the sync. I installed sparrow wallet and connected sparrow to my node using the electrum server setting. I connected using my nodes IP address and port 50001. Umbrel.local does not work for my node. My question is how does sparrow use tor without an onion address? The other question is, if you log into my router, you can see the umbrel and the IP address. So with sparrow connected to the node, and the node is hooked to the router, how is this secure? Does the electrum server make the difference? And how does it work(electrum vs tor)? So sorry but I had to get it all out. Wondered with this configuration if sparrow is using it’s built in tor. Thanks",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5407869",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "July 28, 2022, 06:20:43 AM",
+      "body": "Well for starters, the Tor network uses three levels of redirection, from your own computer, to a node, and then to a second node, and finally to an exit node, but by no means are the exit nodes restricted to viewing .onion hidden service sites only, they can also read HTTP site content. That's most likely what Sparrow is doing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "July 28, 2022, 06:35:14 AMLast edit: July 28, 2022, 06:45:29 AM by mocacinno",
+      "body": "I have very little experience with sparrow wallet and umbrel... Tried sparrow once but didn't really see features that i didn't already have with my running setup (this does not mean sparrow is bad, just that i only tested it a couple of times and never used it anymore afterwards).Now, it's a bit difficult to \"parse\" your post, but it looks to me that your setup is the following:you have a full node, and since you're talking about tor, i can only assume it was setup to only use the tor networkyou have electrs running on the same machine aswell (i can only assume it's electrs since that seems to be the implementation i found on the umbrel homepage)you have sparrow wallet connected to localhost port 50001This means that only the full node is actually creating outbound (and/or inbound) connections. If it's setup over tor, it shouldn't even be port forewarding, NATting or firewall issues (cause that's how tor connections work).Is my assumption of your setup correct? If so, you should probably only make sure electrs is only listening on localhost and electrum is defenately only connected to electrs... On top of that, you should probably make sure bitcoin is setup to only use tor.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "July 28, 2022, 07:38:59 AM",
+      "body": "Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMMy question is how does sparrow use tor without an onion address?Not sure what you mean by it, but if you configure Sparrow to use Tor, any non-local outgoing connection will happen over Tor.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMif you log into my router, you can see the umbrel and the IP address. So with sparrow connected to the node, and the node is hooked to the router, how is this secure? Umbrel came with this security disclosure:Quote from: https://github.com/getumbrel/umbrel/blob/master/SECURITY.mdAssuming the local network is secureUmbrel currently makes the assumption that the local network is secure. This means local network communication is unencrypted using plain text HTTP. (Remote access via Tor is encrypted)This is pretty much the industry standard when it comes to locally networked devices. All routers and smart devices that expose a web interface work this way. Bootstrapping a secure connection over an insecure network and avoiding MITM attacks without being able to rely on certificate authorities is not an easy problem to solve.So, not secure at all.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMDoes the electrum server make the difference? And how does it work(electrum vs tor)?Assuming your local network isn't safe, using an Electrum server with SSL or Electrum server over Tor,  I think it could help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ncentrepreneur.investor",
+      "created_time": "July 28, 2022, 12:57:05 PMLast edit: July 28, 2022, 10:12:41 PM by Mr. Big",
+      "body": "Quote from: NotATether on July 28, 2022, 06:20:43 AMWell for starters, the Tor network uses three levels of redirection, from your own computer, to a node, and then to a second node, and finally to an exit node, but by no means are the exit nodes restricted to viewing .onion hidden service sites only, they can also read HTTP site content. That's most likely what Sparrow is doing.absolutely awesome. Thanks a bunch. I hope soQuote from: vv181 on July 28, 2022, 07:38:59 AMQuote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMMy question is how does sparrow use tor without an onion address?Not sure what you mean by it, but if you configure Sparrow to use Tor, any non-local outgoing connection will happen over Tor.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMif you log into my router, you can see the umbrel and the IP address. So with sparrow connected to the node, and the node is hooked to the router, how is this secure? Umbrel came with this security disclosure:Quote from: https://github.com/getumbrel/umbrel/blob/master/SECURITY.mdAssuming the local network is secureUmbrel currently makes the assumption that the local network is secure. This means local network communication is unencrypted using plain text HTTP. (Remote access via Tor is encrypted)This is pretty much the industry standard when it comes to locally networked devices. All routers and smart devices that expose a web interface work this way. Bootstrapping a secure connection over an insecure network and avoiding MITM attacks without being able to rely on certificate authorities is not an easy problem to solve.So, not secure at all.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMDoes the electrum server make the difference? And how does it work(electrum vs tor)?Assuming your local network isn't safe, using an Electrum server with SSL or Electrum server over Tor,  I think it could help.Thats what Im having an issue with. So, If I choose to connect sparrow via bitcoin core tab, it takes my nodes onion address and works, but makes the wallet clunky when sending and receiving information. When I choose the electrum server option, the only thing that seems to connect is using the nodes IP address and the port #. But its not an onion address so I then believe it is not then using tor. I have not toggled the SSL button and am not using the \"use proxy\" setting. Just IP address and port #. the electrum server tab will not connect using my nodes onion address and port #. So where is the protection? Can you explain what \"Electrum server with SSL or Electrum server over Tor\" means and how to do that? Thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 28, 2022, 01:14:10 PM",
+      "body": "Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMMy question is how does sparrow use tor without an onion address?It cannot.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMThe other question is, if you log into my router, you can see the umbrel and the IP address.Yes, umbrel has a local IP address. The format is 192.168.X.X in most routers.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMSo with sparrow connected to the node, and the node is hooked to the router, how is this secure?It's secure if you use encryption. If it restricts you to port 50001 (which is for non-encrypted connections AFAIK), it's not secure.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMAnd how does it work(electrum vs tor)? Electrum isn't meant to replace Tor, to be compared with it. Read what your Electrum server implementation does here: https://github.com/romanz/electrs.Quote from: NotATether on July 28, 2022, 06:20:43 AMWell for starters, the Tor network uses three levels of redirection, from your own computer, to a node, and then to a second node, and finally to an exit nodeThat's true only if you connect to the clear net.  The Tor network uses six level of redirection in onion services, the first three of which are only known by you, and the last three of which are only known by the service: https://community.torproject.org/onion-services/overview/.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "July 28, 2022, 01:15:54 PM",
+      "body": "Quote from: ncentrepreneur.investor on July 28, 2022, 01:06:26 PM--snip--Thats what Im having an issue with. So, If I choose to connect sparrow via bitcoin core tab, it takes my nodes onion address and works, but makes the wallet clunky when sending and receiving information. When I choose the electrum server option, the only thing that seems to connect is using the nodes IP address and the port #. But its not an onion address so I then believe it is not then using tor. I have not toggled the SSL button and am not using the \"use proxy\" setting. Just IP address and port #. the electrum server tab will not connect using my nodes onion address and port #. So where is the protection? Can you explain what \"Electrum server with SSL or Electrum server over Tor\" means and how to do that? ThanksIf electrs is only listening on localhost, and your sparrow wallet connects to localhost (or 127.0.0.1) this is safer than making a hidden service for your electrs daemon and connecting your sparrow wallet to electrs hosted on the same machine, but making it go all the way over the tor network.I've posted this before... This flow:Code:Other nodes<=[Tor]=>Bitcoin core <=[same machine/localhost/127.0.0.1]=>Electrs<=[same machine/localhost/127.0.0.1]=>Sparrowis about as safe as it gets, assuming your node, your electrs and your sparrow are ALL on the same rPi AND your electrs is ONLY listening on 127.0.0.1.You do not need SSL to connect sparrow to an electrum node that's running on the same machine and is only listening on 127.0.0.1!If your electrs and sparrow are NOT on the same host, but they ARE on the same LAN, you could potentially use an nginx reverse proxy to add tls.. I have posted the exact config a couple of times in the past on bitcointalk when i explained how i configured my public electrs service.Sparrow gets it's info only from electrs (on the same host), electrs connects to bitcoind on the same host... The only need for SSL or tor routing is between bitcoind and the other nodes of the network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ncentrepreneur.investor",
+      "created_time": "July 28, 2022, 01:22:38 PM",
+      "body": "Quote from: BlackHatCoiner on July 28, 2022, 01:14:10 PMQuote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMMy question is how does sparrow use tor without an onion address?It cannot.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMThe other question is, if you log into my router, you can see the umbrel and the IP address.Yes, umbrel has a local IP address. The format is 192.168.X.X in most routers.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMSo with sparrow connected to the node, and the node is hooked to the router, how is this secure?It's secure if you use encryption. If it restricts you to port 50001 (which is for non-encrypted connections AFAIK), it's not secure.Quote from: ncentrepreneur.investor on July 28, 2022, 03:16:48 AMAnd how does it work(electrum vs tor)? Electrum isn't meant to replace Tor, to be compared with it. Read what your Electrum server implementation does here: https://github.com/romanz/electrs.Quote from: NotATether on July 28, 2022, 06:20:43 AMWell for starters, the Tor network uses three levels of redirection, from your own computer, to a node, and then to a second node, and finally to an exit nodeThat's true only if you connect to the clear net.  The Tor network uses six level of redirection in onion services, the first three of which are only known by you, and the last three of which are only known by the service: https://community.torproject.org/onion-services/overview/.It does restrict me to node IP and port 50001. Uh oh!! What do you suggest? Is there another configuration that is more secure that I am unaware of?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "July 28, 2022, 01:27:00 PM",
+      "body": "Quote from: ncentrepreneur.investor on July 28, 2022, 01:22:38 PM--snip--It does restrict me to node IP and port 50001. Uh oh!! What do you suggest? Is there another configuration that is more secure that I am unaware of?You keep ignoring my post...Could you please tell me if your bitcoin node, your electrum node and your sparrow wallet are on the same rpi. If so, don't worry about port 50001. I'd potentially even argue that if your sparrow wallet and your electrs server are in the same LAN, it's still ok if you don't use ssl... If a hacker penetrated your network, you have other problems than the fact he could potentially capture some packages on your local lan.The only daemon that has packages coming from or going to untrusted systems is your bitcoind. As long as the traffic between bitcoind and electrs on one side and electrs and sparrow on the other side are within the same LAN (or even better, on the same machine), everything is fine. If a hacker penetrates your LAN, he might be able to capture your packages (so he might learn which addresses belong to your sparrow wallet), but at this point everything boils down to the security of your sparrow wallet (and the machine running this sparrow wallet).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ncentrepreneur.investor",
+      "created_time": "July 28, 2022, 01:32:27 PM",
+      "body": "Quote from: mocacinno on July 28, 2022, 01:15:54 PMQuote from: ncentrepreneur.investor on July 28, 2022, 01:06:26 PM--snip--Thats what Im having an issue with. So, If I choose to connect sparrow via bitcoin core tab, it takes my nodes onion address and works, but makes the wallet clunky when sending and receiving information. When I choose the electrum server option, the only thing that seems to connect is using the nodes IP address and the port #. But its not an onion address so I then believe it is not then using tor. I have not toggled the SSL button and am not using the \"use proxy\" setting. Just IP address and port #. the electrum server tab will not connect using my nodes onion address and port #. So where is the protection? Can you explain what \"Electrum server with SSL or Electrum server over Tor\" means and how to do that? ThanksIf electrs is only listening on localhost, and your sparrow wallet connects to localhost (or 127.0.0.1) this is safer than making a hidden service for your electrs daemon and connecting your sparrow wallet to electrs hosted on the same machine, but making it go all the way over the tor network.I've posted this before... This flow:Code:Other nodes<=[Tor]=>Bitcoin core <=[same machine/localhost/127.0.0.1]=>Electrs<=[same machine/localhost/127.0.0.1]=>Sparrowis about as safe as it gets, assuming your node, your electrs and your sparrow are ALL on the same rPi AND your electrs is ONLY listening on 127.0.0.1.You do not need SSL to connect sparrow to an electrum node that's running on the same machine and is only listening on 127.0.0.1!If your electrs and sparrow are NOT on the same host, but they ARE on the same LAN, you could potentially use an nginx reverse proxy to add tls.. I have posted the exact config a couple of times in the past on bitcointalk when i explained how i configured my public electrs service.Sparrow gets it's info only from electrs (on the same host), electrs connects to bitcoind on the same host... The only need for SSL or tor routing is between bitcoind and the other nodes of the network.Just to clear things up a bit, the node is on a rasberry pi using Umbrel on my home network. (\"you could potentially use an nginx reverse proxy to add tls\"), I have no idea. Thats gibberish. lol",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ncentrepreneur.investor",
+      "created_time": "July 28, 2022, 01:37:07 PM",
+      "body": "Quote from: mocacinno on July 28, 2022, 01:27:00 PMQuote from: ncentrepreneur.investor on July 28, 2022, 01:22:38 PM--snip--It does restrict me to node IP and port 50001. Uh oh!! What do you suggest? Is there another configuration that is more secure that I am unaware of?You keep ignoring my post...Could you please tell me if your bitcoin node, your electrum node and your sparrow wallet are on the same rpi. If so, don't worry about port 50001. I'd potentially even argue that if your sparrow wallet and your electrs server are in the same LAN, it's still ok if you don't use ssl... If a hacker penetrated your network, you have other problems than the fact he could potentially capture some packages on your local lan.The only daemon that has packages coming from or going to untrusted systems is your bitcoind. As long as the traffic between bitcoind and electrs on one side and electrs and sparrow on the other side are within the same LAN (or even better, on the same machine), everything is fine. If a hacker penetrates your LAN, he might be able to capture your packages (so he might learn which addresses belong to your sparrow wallet), but at this point everything boils down to the security of your sparrow wallet (and the machine running this sparrow wallet).I have the sparrow wallet installed on my MAC OS, and the node (rpi Umbrel) has bitcoin core installed on the Umbrel software. The Node and Mac OS is on the same LAN but of course separate machines.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "July 28, 2022, 01:44:37 PM",
+      "body": "Quote from: ncentrepreneur.investor on July 28, 2022, 01:37:07 PM--snip--I have the sparrow wallet installed on my MAC OS, and the node (rpi Umbrel) has bitcoin core installed on the Umbrel software. The Node and Mac OS is on the same LAN but of course separate machines. OK... so it's an rPi with bitcoind running.I assume your electrum node (electrs) is also included in this \"umbrel\" system, so it's also installed on your rpi.So, basically, the traffic between bitcoind and electrs isn't an issue... It's all on the same host.Since you tell us electrs is only listening on port 50001, it isn't using ssl and it is listening on a port other than 127.0.0.1.When you're on the same lan, i wouldn't say this is a big issue... Somebody that has access to your LAN could potentially capture packages between your laptop and your rpi, but those packages do NOT include data that could be used to steal from you! somebody on your home lan could potentially learn which addresses belong to you, but that's about it. Really, you have bigger problems if somebody with the capability to capture and understand traffic between your laptop and your rpi has access to your home LAN.Just make sure you're not forewarding ports from the WAN side to port 50001 on your rpi!When i was talking about a reverse proxy (nginx for example), i basically mean installing a daemon on the same rpi that's running electrs. This daemon is listening on 50002 using tls and \"forewarding\" those packages to port 50001 on localhost without tls. It's actually pretty easy to do this setup... i have it somewhere in my historical posts if you're interested... But i have no idear if \"umbrel\" will make it easy for you to install nginx (i have never used umbrel), if not you'll need a tiny bit of technical background to get things up and running.If the above it TL;DR;, here's the short version:sparrow wallet is managing your private keys, these keys do not leave this wallet. Make sure your macOS is secured, your sparrow wallet is genuine, make sure you pick a strong random password, make sure you don't save a backup of your wallet somewhere vulnerable.Bitcoind is the only daemon talking to the \"outside world\", as long as bitcoind is using Tor, you have privacy. All other traffic is on your LAN. Sure it would be nice if it had TLS, but if it doesn't, i wouldn't worry to much. Sure, a hacker (or a family member) could learn which addresses you own, but your funds will be safe as long as your macOS is safe, your sparrow wallet is genuine, you pick a strong random password, you don't save a backup of your wallet somewhere vulnerable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ncentrepreneur.investor",
+      "created_time": "July 28, 2022, 03:40:47 PM",
+      "body": "I am embarrassed as hell. You mentioned that you assume electrs is installed on the umbrel as well. So I looked. WHAT A DUMB ASS!! I wondered all this time what they meant when they said \"connect electrum server URL\". It gave me the proper onion address that worked. I am so so sorry. In my defense, I am new to this and figuring things out on my own besides youtube.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "July 29, 2022, 05:37:23 AM",
+      "body": "Quote from: ncentrepreneur.investor on July 28, 2022, 03:40:47 PMI am embarrassed as hell. You mentioned that you assume electrs is installed on the umbrel as well. So I looked. WHAT A DUMB ASS!! I wondered all this time what they meant when they said \"connect electrum server URL\". It gave me the proper onion address that worked. I am so so sorry. In my defense, I am new to this and figuring things out on my own besides youtube. No worries... i'm happy you figured it out, and it works. Thanks for the update!I still think connecting a wallet inside your own network to an electrs server in your own network wouldn't need tor. They probably do it this way so you can connect your wallet to your own electrs server from anywhere in the world. I would argue that, whilst in your own network, connecting to the LAN ip, port 50001 is about as safe as connecting over Tor.But anyways, if you run into other problems, don't hesitate to ask... In this particular case i feel we haven't contributed all that much, and you pretty much figured it out yourself, but that shouldn't stop you from asking help if you need it",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

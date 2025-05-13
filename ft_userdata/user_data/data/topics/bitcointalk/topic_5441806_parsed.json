@@ -1,0 +1,165 @@
+{
+  "id": "topic_5441806",
+  "title": "cedricfung",
+  "author": "cedricfung",
+  "created_time": "March 02, 2023, 05:16:26 AMLast edit: March 02, 2023, 01:34:55 PM by cedricfung",
+  "content": "I'm working on a wallet solution to use 2/3 multisig with timelock. A and B can spend the UTXO together before the timelock, but C can only spend the UTXO with A or B after the timelock expires.So I wrote the script as below, is it correctly implemented as the requirement?Code:OP_IF2OP_ELSE4194311 OP_CHECKSEQUENCEVERIFY OP_DROP key_C OP_CHECKSIGVERIFY1OP_ENDIFkey_A key_B 2 OP_CHECKMULTISIGThank you",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5441806",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "March 02, 2023, 11:49:04 AM",
+      "body": "Looks correct to me but you can always test things like this on the TestNet to be more sure, specially when it comes to setting the time value in the timelock.Also what you called \"OP_PUSHNUM_2\" and \"OP_PUSHNUM_1\" should be OP_2 and OP_1 respectively with 0x52 and 0x51 as their byte representations.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "March 02, 2023, 01:02:44 PM",
+      "body": "Thank you, the bitcoin-cli script ASM is Code:OP_IF 2 OP_ELSE 4194311 OP_CHECKSEQUENCEVERIFY OP_DROP key_C OP_CHECKSIGVERIFY 1 OP_ENDIF key_A key_B 2 OP_CHECKMULTISIGI used the number 2 and 1, not OP_2 or OP_1, as I understand from the tutorial https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line/blob/master/10_4_Scripting_a_Multisig.md#create-a-raw-multisig According to this tutorial https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line/blob/master/11_3_Using_CSV_in_Scripts.md#create-a-csv-relative-timeI calculated the relative lock time of 1 hour as belowCode:nSequence = (1 << 22) | (3600 >> 9)=> 4194311But one thing confused me is the miniscript sample https://bitcoin.sipa.be/miniscript/For 90 days, it uses 12960 in miniscript, and the compiled sequence is a032, that's too small a number.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "March 02, 2023, 01:26:02 PM",
+      "body": "For the nSequence value in the miniscript example, it's using relative block number instead of time, that's why it's such a small number.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "March 13, 2023, 06:39:32 AM",
+      "body": "very impressive. But can people tell all the spend conditions from the blockchain?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "March 14, 2023, 06:44:38 AM",
+      "body": "Quote from: ETFbitcoin on March 13, 2023, 12:37:19 PMQuote from: Jason Brendon on March 13, 2023, 06:39:32 AMvery impressive. But can people tell all the spend conditions from the blockchain?For P2WSH and P2SH, everyone will know spend condition/redeem script after the coin has been spent. If you don't want that, consider P2TR instead.taproot? what wallet can send coins from taproot addresses to others?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "March 14, 2023, 07:20:30 AM",
+      "body": "In the timelock branch:Code:key_C OP_CHECKSIGVERIFY1OP_ENDIFkey_A key_B 2 OP_CHECKMULTISIGYou would have to put C's signature in the last cosigner of the output in order for the script to work properly, correct?Other than that, this script looks well-formed to me.Quote from: Jason Brendon on March 14, 2023, 06:44:38 AMtaproot? what wallet can send coins from taproot addresses to others? Sparrow Wallet can do that. I think maybe Bitcoin Core can do that now too, because Ordinals claim to use that feature. And it's always possible to construct Taproot transactions with spend paths by hand if you are sufficiently masochist",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "March 14, 2023, 09:25:35 AM",
+      "body": "Quote from: NotATether on March 14, 2023, 07:20:30 AMIn the timelock branch:Code:key_C OP_CHECKSIGVERIFY1OP_ENDIFkey_A key_B 2 OP_CHECKMULTISIGYou would have to put C's signature in the last cosigner of the output in order for the script to work properly, correct?Yes, when timelock expired, to spend the output with key_C, the script is likeCode:<empty> sig_A sig_C <empty> WITNESSIs this correct?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "March 14, 2023, 12:16:11 PM",
+      "body": "Quote from: ETFbitcoin on March 14, 2023, 10:30:40 AMI just checked my Bitcoin Core (v24.0.1) and it has Taproot support which can be generated on tab \"Receive\" and choose \"Bech32m (Taproot)\" on drop-down list. But for custom scripting, i expect you'll need to use CLI and create script manually. And for information purpose, Wasabi wallet also support Taproot although IIRC it lacks some feature for power user.I think no wallets support real custom scripting yet, at least Bitcoin Core is only able to watch those custom script address, can't spend from them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "March 14, 2023, 02:08:25 PM",
+      "body": "Quote from: ETFbitcoin on March 14, 2023, 01:08:39 PMQuote from: cedricfung on March 14, 2023, 12:16:11 PMQuote from: ETFbitcoin on March 14, 2023, 10:30:40 AMI just checked my Bitcoin Core (v24.0.1) and it has Taproot support which can be generated on tab \"Receive\" and choose \"Bech32m (Taproot)\" on drop-down list. But for custom scripting, i expect you'll need to use CLI and create script manually. And for information purpose, Wasabi wallet also support Taproot although IIRC it lacks some feature for power user.I think no wallets support real custom scripting yet, at least Bitcoin Core is only able to watch those custom script address, can't spend from them.But since Bitcoin Core support Output Descriptors[1], spending should be possible[2] if you know how to convert the script into descriptors. Although it's still not real custom scripting since AFAIK descriptors due to limited support of opcodes.[1] https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md[2] https://bitcoin.stackexchange.com/a/99541Bitcoin Core supports custom script with output descriptors, that's the miniscript from blockstream, it has full capability to support all popular opcodes. But still, most of output descriptors support in Bitcoin Core are limited to watch only, the core devs have some ongoing issues to solve this.https://github.com/bitcoin/bitcoin/pull/24149 This PR makes miniscript completely solvable in Bitcoin Core, merged last month, and it's just the miniscript support in the code level, not full bitcoin-cli support yet, maybe in a few months.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "May 28, 2023, 12:04:15 PM",
+      "body": "Now it looks like full descriptors support arrived with Bitcoin Core 25.0 https://github.com/bitcoin/bitcoin/releases/tag/v25.0So now I'm going to use this descriptor script to achieve the same goal.Code:wsh(thresh(2,pk(A),s:pk(B),sj:and_v(v:pk(C),n:older(1728))))",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "May 28, 2023, 12:06:40 PM",
+      "body": "Quote from: cedricfung on May 28, 2023, 12:04:15 PMNow it looks like full descriptors support arrived with Bitcoin Core 25.0 https://github.com/bitcoin/bitcoin/releases/tag/v25.0So now I'm going to use this descriptor script to achieve the same goal.Code:wsh(thresh(2,pk(A),s:pk(B),sj:and_v(v:pk(C),n:older(1728))))This produces the asmCode:A OP_CHECKSIG OP_SWAP B OP_CHECKSIG OP_ADD OP_SWAP OP_SIZE OP_0NOTEQUALOP_IFC OP_CHECKSIGVERIFY 1728 OP_CHECKSEQUENCEVERIFY OP_0NOTEQUALOP_ENDIFOP_ADD 2 OP_EQUAL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "June 21, 2023, 03:42:16 AM",
+      "body": "Quote from: cedricfung on May 28, 2023, 12:06:40 PMQuote from: cedricfung on May 28, 2023, 12:04:15 PMNow it looks like full descriptors support arrived with Bitcoin Core 25.0 https://github.com/bitcoin/bitcoin/releases/tag/v25.0So now I'm going to use this descriptor script to achieve the same goal.Code:wsh(thresh(2,pk(A),s:pk(B),sj:and_v(v:pk(C),n:older(1728))))This produces the asmCode:A OP_CHECKSIG OP_SWAP B OP_CHECKSIG OP_ADD OP_SWAP OP_SIZE OP_0NOTEQUALOP_IFC OP_CHECKSIGVERIFY 1728 OP_CHECKSEQUENCEVERIFY OP_0NOTEQUALOP_ENDIFOP_ADD 2 OP_EQUALAre you able to spend the coins by btc core? The cli seems pretty cumbersome to use.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 11, 2023, 08:50:11 AM",
+      "body": "Quote from: Jason Brendon on June 21, 2023, 03:42:16 AMQuote from: cedricfung on May 28, 2023, 12:06:40 PMQuote from: cedricfung on May 28, 2023, 12:04:15 PMNow it looks like full descriptors support arrived with Bitcoin Core 25.0 https://github.com/bitcoin/bitcoin/releases/tag/v25.0So now I'm going to use this descriptor script to achieve the same goal.Code:wsh(thresh(2,pk(A),s:pk(B),sj:and_v(v:pk(C),n:older(1728))))This produces the asmCode:A OP_CHECKSIG OP_SWAP B OP_CHECKSIG OP_ADD OP_SWAP OP_SIZE OP_0NOTEQUALOP_IFC OP_CHECKSIGVERIFY 1728 OP_CHECKSEQUENCEVERIFY OP_0NOTEQUALOP_ENDIFOP_ADD 2 OP_EQUALAre you able to spend the coins by btc core? The cli seems pretty cumbersome to use.After changed to this miniscript solution, I'm able to spend the coins with both Bitcoin Core cli and Ledger Nano X.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Supporters00",
+      "created_time": "July 11, 2023, 06:02:37 PM",
+      "body": "Quote from: cedricfung on March 02, 2023, 05:16:26 AMI'm working on a wallet solution to use 2/3 multisig with timelock. A and B can spend the UTXO together before the timelock, but C can only spend the UTXO with A or B after the timelock expires.So I wrote the script as below, is it correctly implemented as the requirement?Code:OP_IF2OP_ELSE4194311 OP_CHECKSEQUENCEVERIFY OP_DROP key_C OP_CHECKSIGVERIFY1OP_ENDIFkey_A key_B 2 OP_CHECKMULTISIGThank you Based on your description, it seems like you want to create a script that enforces a 2-of-3 multisig with a timelock. A and B can spend the UTXO together before the timelock, but after the timelock expires, C can spend the UTXO with either A or B.The script you provided is almost correct, but there's a small mistake. Here's the corrected version:Code:OP_IF    2OP_ELSE    <timelock> OP_CHECKSEQUENCEVERIFY OP_DROP    <key_C> OP_CHECKSIGVERIFYOP_ENDIF<key_A> <key_B> 2 OP_CHECKMULTISIGIn the script above, replace <timelock> with the desired timelock value (in blocks or seconds) and <key_A>, <key_B>, and <key_C> with the respective public keys or their corresponding script hashes.The modified script enforces the following conditions:If the condition inside OP_IF is true (timelock has not expired):The top stack element should be the number 2 (indicating a 2-of-2 multisig condition between A and B).If the condition inside OP_ELSE is true (timelock has expired):The top stack element should be the timelock value.C's public key or script hash should successfully verify using OP_CHECKSIGVERIFY.Finally, <key_A>, <key_B>, and the number 2 are used for the final 2-of-2 multisig check.Remember to provide the actual values for <timelock>, <key_A>, <key_B>, and <key_C> when implementing this script in a real-world scenario .",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 13, 2023, 08:09:26 AM",
+      "body": "Quote from: Supporters00 on July 11, 2023, 06:02:37 PMBased on your description, it seems like you want to create a script that enforces a 2-of-3 multisig with a timelock. A and B can spend the UTXO together before the timelock, but after the timelock expires, C can spend the UTXO with either A or B.The script you provided is almost correct, but there's a small mistake. Here's the corrected version:Code:OP_IF    2OP_ELSE    <timelock> OP_CHECKSEQUENCEVERIFY OP_DROP    <key_C> OP_CHECKSIGVERIFYOP_ENDIF<key_A> <key_B> 2 OP_CHECKMULTISIGIn the script above, replace <timelock> with the desired timelock value (in blocks or seconds) and <key_A>, <key_B>, and <key_C> with the respective public keys or their corresponding script hashes.The modified script enforces the following conditions:If the condition inside OP_IF is true (timelock has not expired):The top stack element should be the number 2 (indicating a 2-of-2 multisig condition between A and B).If the condition inside OP_ELSE is true (timelock has expired):The top stack element should be the timelock value.C's public key or script hash should successfully verify using OP_CHECKSIGVERIFY.Finally, <key_A>, <key_B>, and the number 2 are used for the final 2-of-2 multisig check.Remember to provide the actual values for <timelock>, <key_A>, <key_B>, and <key_C> when implementing this script in a real-world scenario .Hi, thank you for suggestion. But I don't understand how the OP_ELSE branch makes key_C and key_A enough to unlock the script? Because from your explanation, key_C should verify, then both key_A and key_B should do the 2-of-2 multisig check.And I also don't get how is this 2-of-2 multisig produced, since the OP_ELSE branch doesn't provide a threshold number for the OP_CHECKMULTISIG. That's why I provide the number 1 before ENDIF to make 1 key_A key_B 2 CHECKMULTISIG.BTW, I have changed the script to miniscript, any suggestions to this?Code:wsh(thresh(2,pk(A),s:pk(B),sj:and_v(v:pk(C),n:older(1728))))A OP_CHECKSIG OP_SWAP B OP_CHECKSIG OP_ADD OP_SWAP OP_SIZE OP_0NOTEQUALOP_IFC OP_CHECKSIGVERIFY 1728 OP_CHECKSEQUENCEVERIFY OP_0NOTEQUALOP_ENDIFOP_ADD 2 OP_EQUAL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 13, 2023, 09:06:53 AM",
+      "body": "Quote from: cedricfung on July 13, 2023, 08:09:26 AMQuote from: Supporters00 on July 11, 2023, 06:02:37 PMBased on your description, it seems like you want to create a script that enforces a 2-of-3 multisig with a timelock. A and B can spend the UTXO together before the timelock, but after the timelock expires, C can spend the UTXO with either A or B.The script you provided is almost correct, but there's a small mistake. Here's the corrected version:Code:OP_IF    2OP_ELSE    <timelock> OP_CHECKSEQUENCEVERIFY OP_DROP    <key_C> OP_CHECKSIGVERIFYOP_ENDIF<key_A> <key_B> 2 OP_CHECKMULTISIGIn the script above, replace <timelock> with the desired timelock value (in blocks or seconds) and <key_A>, <key_B>, and <key_C> with the respective public keys or their corresponding script hashes.The modified script enforces the following conditions:If the condition inside OP_IF is true (timelock has not expired):The top stack element should be the number 2 (indicating a 2-of-2 multisig condition between A and B).If the condition inside OP_ELSE is true (timelock has expired):The top stack element should be the timelock value.C's public key or script hash should successfully verify using OP_CHECKSIGVERIFY.Finally, <key_A>, <key_B>, and the number 2 are used for the final 2-of-2 multisig check.Remember to provide the actual values for <timelock>, <key_A>, <key_B>, and <key_C> when implementing this script in a real-world scenario .Hi, thank you for suggestion. But I don't understand how the OP_ELSE branch makes key_C and key_A enough to unlock the script? Because from your explanation, key_C should verify, then both key_A and key_B should do the 2-of-2 multisig check.And I also don't get how is this 2-of-2 multisig produced, since the OP_ELSE branch doesn't provide a threshold number for the OP_CHECKMULTISIG. That's why I provide the number 1 before ENDIF to make 1 key_A key_B 2 CHECKMULTISIG.In the ELSE branch, the sequence number is being verified, and if that's correct, then key_C is verified (and should be the top-most item on the witness data stack). If key_C is verified successfully, then OP_CHECKSIGVERIFY pushes True, which is actually represented as 1 according to  https://en.bitcoin.it/wiki/Script#Constants .So this 1 value means that only one of key_A or key_B need to be present below key_C in the stack, in order for OP_CHECKMULTISIG to succeed. In other words, the ELSE branch converts the signing into Verify key_C + 1-of-2 multisig, as opposed to 2-of-2 multisig (without Key_C) in the IF branch.I hope you understand it now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 14, 2023, 02:57:09 AM",
+      "body": "Quote from: NotATether on July 13, 2023, 09:06:53 AMIn the ELSE branch, the sequence number is being verified, and if that's correct, then key_C is verified (and should be the top-most item on the witness data stack). If key_C is verified successfully, then OP_CHECKSIGVERIFY pushes True, which is actually represented as 1 according to  https://en.bitcoin.it/wiki/Script#Constants .So this 1 value means that only one of key_A or key_B need to be present below key_C in the stack, in order for OP_CHECKMULTISIG to succeed. In other words, the ELSE branch converts the signing into Verify key_C + 1-of-2 multisig, as opposed to 2-of-2 multisig (without Key_C) in the IF branch.I hope you understand it now.Thank you! Any comments on the miniscript version?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 14, 2023, 11:11:26 AM",
+      "body": "Quote from: cedricfung on July 14, 2023, 02:57:09 AMThank you! Any comments on the miniscript version?I don't fully know Miniscript so there's not much I can say about the one-line version, but if the script immediately below it is the result of compiling the Miniscript to Script, then I must say it's significantly larger than the original script, and so I can't advise using it if this is going to be used hundreds of times (you, or the user who is making it, will have to pay extra fees per tx).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 14, 2023, 12:21:33 PM",
+      "body": "Quote from: NotATether on July 14, 2023, 11:11:26 AMQuote from: cedricfung on July 14, 2023, 02:57:09 AMThank you! Any comments on the miniscript version?I don't fully know Miniscript so there's not much I can say about the one-line version, but if the script immediately below it is the result of compiling the Miniscript to Script, then I must say it's significantly larger than the original script, and so I can't advise using it if this is going to be used hundreds of times (you, or the user who is making it, will have to pay extra fees per tx).I agree it's more expensive, but miniscript is the only option to get wallets support.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

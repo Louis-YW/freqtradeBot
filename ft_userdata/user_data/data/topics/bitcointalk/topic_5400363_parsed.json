@@ -1,0 +1,165 @@
+{
+  "id": "topic_5400363",
+  "title": "witcher_sense",
+  "author": "witcher_sense",
+  "created_time": "May 27, 2022, 05:41:33 AMLast edit: August 13, 2024, 08:58:49 AM by witcher_sense",
+  "content": "IntroductionIn this thread, I would like to discuss an interesting proposal by Ruben Somsen called \"Silent payments,\" which is a privacy-improving technique aimed at making payments between two parties on the blockchain less transparent for an outside observer. It is based on such concepts as \"stealth addresses\" and \"reusable payment codes\" and essentially is trying to solve the same problem but in a more elegant way.The basic ideaThe basic idea is the following: user A publishes some identifier (usually a public key), and user B combines his private key with the published key of A and creates a unique address from which only A can spend. User C can also send money to user A by combining his private key with an address of A and deriving another unique address. User A will know that both users B and C sent him money, but B and C won't know about each other. Therefore, that allows user A to receive payments on completely delinked addresses using only one public address.How it worksSay Bob wants to send a silent payment to Alice.1) Alice creates a unique identifier (say, a public key) using standard elliptic curve mathematics: A = a*G, where A - Alice's public key (a point on an elliptic curve), a - Alice's private key (a random number which should be kept in secret), and G - the generator point (some pre-defined point on an elliptic curve).2) Alice makes this identifier A public so that Bob (and also other users such as Carol) can know where to send payments.3) Bob chooses one of the inputs he controls which contains a public key B = b*G, whereB - Bob's public key (a point on an elliptic curve), b - Bob's private key (a random integer which only Bob knows), and G - the generator point.4) Bob takes Alice's public key A and constructs a new public key using the following formula:A' = hash(b*A)*G + A, whereA' - a public key to which Bob's payment is made.5) Bob makes a payment to Alice creating an output associated with a previously constructed public key A'.6) Given that b*A = b*a*G = a*b*G = a*B, Alice can reconstruct the same public key A' using her private key a with the following formula:A' = (hash(a*B) + a)*G, wherehash(a*B) + a - Alice's new private key which allows her to spend money from the output corresponding to public key A'. However, the problem is Alice needs to know Bob's public key B to detect her payment, which is why she continually scans the blockchain trying to figure out which of the public keys can be combined with her private key a to reconstruct existing bitcoin addresses.Pros:1) No interaction between senders and receivers is needed. For a sender to make a payment, he only needs to construct one address from the receiver's silent public key.2) Silent payments use blockspace more efficiently since there is no need for any \"announcement\" transactions, as in the case of BIP47. Therefore, one transaction equals one payment, which is perfect for one-time donations3) Silent transactions are indistinguishable from regular transactions (e.g. no OP_RETURN outputs to share an ephemeral public key as in the case of \"Stealth addresses\"), which means with them, it is trivial for users to hide in the crowd - the anonymity set is the whole blockchain.4) Addresses derived from the initial silent public key are always deterministic and unique because each sender uses his own unique keys to tweak the receiver's silent public key.5) Silent payments incentivize a receiver of funds to keep their own Bitcoin full node running, which automatically results in a more decentralized network.6) No one, except for the sender of the transaction and its receiver, will know that the payment actually occurred.7) Silent payments greatly improve the fungibility of bitcoin transactions.Cons:1) The biggest disadvantage of this technique is the relatively high validation cost. Given that a recipient of payments doesn't know in advance which bitcoin addresses can be spent with a private key he controls, he has to check each input of each transaction, calculating and comparing public keys.2) Sender's potential for address reuse. When a sender has multiple inputs sharing the same public key, each of these inputs will result in the same calculated address. Reusing the address is considered bad privacy practice and should be avoided at all costs. This could be mitigated by including additional information into the computational process, but creates an additional burden, especially for light clients. Alternatively, a sender can spend all inputs in a single transaction, but this also reveals common ownership, which damages privacy.References:1] https://gist.github.com/RubenSomsen/c43b79517e7cb701ebf77eec6dbb46b82] https://github.com/genjix/bips/blob/master/bip-stealth.mediawiki3] https://github.com/bitcoin/bips/blob/master/bip-0047.mediawiki4] https://en.m.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman5] https://bitcoinops.org/en/newsletters/2022/04/06/6] https://bitcoinmagazine.com/technical/bitcoin-silent-payments-secret-keys7] https://bitcoinmagazine.com/technical/improving-bitcoin-privacy-with-silent-payments8] https://gist.github.com/w0xlt/72390ded95dd797594f80baba5d2e6eeTranslations:Română: Plăți silențioase, translation by GazetaBitcoinEspañol: Pagos silenciosos, translation by PorfiriiУкpaїнcькa: Tиxi плaтeжi, translation by DrBeerPyccкий: Tиxиe плaтeжи, translation by DrBeerPidgin: Payments wey dey Silent, translation by HatchyUrdu: خاموش ادائیگیاں, translation by Adiljutt156German: Silent payments (Stille Zahlungen), translation by cyganIndonesian: Silent Payment Bitcoin, translation by dansus021Polish: Silent payments (Ciche płatności), translation by cyganTurkish: Silent Payments- Sessiz Ödemeler, translation by mela65",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400363",
+  "comments": [
+    {
+      "author": "baro77",
+      "created_time": "May 27, 2022, 06:54:55 AM",
+      "body": "Your schema remember me what in Monero is called Stealth Addresses:Maybe this can be useful to compare the ideas:https://www.getmonero.org/library/MoneroAddressesCheatsheet20201206.pdf",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 27, 2022, 09:05:05 AM",
+      "body": "After reading it a few times, I think I'm starting to understand it. I would add another Con: something very simple suddenly becomes very complicated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "May 27, 2022, 03:39:47 PM",
+      "body": "There are differences between public key and address while referring to bitcoin. In the proposal, public key is referred to as address which would be very confusing because public key is different from address. Although, I get the fact that this type of payment is completely different from onchain payment. The recipient publishes their silent payment address, a single 32 byte public key: X = x*GQuote from: witcher_sense on May 27, 2022, 05:41:33 AM5) Silent payments incentivize a receiver of funds to keep their own Bitcoin full node running, which automatically results in a more decentralized network.It would be quite worth it to discuss more about this, I scanned through the proposal on GitHub but I did not see anything like incentivizing a receiver running node.Quote from: witcher_sense on May 27, 2022, 05:41:33 AM7) Silent payments greatly improve the fungibility of bitcoin transactions.To be sincere, the process is kind of complicated and not supporting BIP32 HD keys which even BIP44, 49, 84 and 86 are using its path for HD key generation. I mean which defines HD wallet. How is this a benefit, according to the proposal?Quote from: https://gist.github.com/RubenSomsen/c43b79517e7cb701ebf77eec6dbb46b8#light-clientsEffect on BIP32 HD keysOne side-benefit of silent payments is that BIP32 HD keys4 won't be needed for address generation, since every address will automatically be unique. This also means we won't have to deal with a gap limit.Quote from: witcher_sense on May 27, 2022, 05:41:33 AMThe biggest disadvantage of this technique is the relatively high validation cost. Given that a recipient of payments doesn't know in advance which bitcoin addresses can be spent with a private key he controls, he has to check each input of each transaction, calculating and comparing public keys.Which makes address reuse prevention not to be possible and also not favoring light clients. A complicated process that will enhance address reuse should not be recommended like you also commented, it is really a disadvantage.Never mind my questions, I will also like to know more about fee in relation to silent payment? Having no fee? Or this may lead to more discussion.Even while using lightning network, onchain transactions are used to open and close a channel and yet the bitcoin would be credited to an address generated by standardized derivation path which this proposal do not include and yet indicating not including the derivation path as a benefit.Likely, some address types will not be supported which has not happened before.This is just my opinion, I may not be totally right, but if I am corrected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 28, 2022, 04:12:55 AM",
+      "body": "I have an idea to somewhat reduce the cost of scanning transactions:We know that a spending transaction will automatically reveal the sender's public key (in the DER signature area). Each block has on average 10K-20K transactions nowadays (sometimes upwards to 50K). That automatically assumes 50K validations required, which will increase if a transaction has multiple outputs.In the case of Bitcoin Core, the validation can be multi-threaded if so desired to save time. An additional thread can scan the incoming block to harvest public keys from transactions, and save this to an additional file (perhaps a BDB called pubkeys.dat.xxxx). This will make block validation & wallet balance scanning on startup much quicker as block data doesn't need to be parsed again.In such a way, we not only have a cache of pubkeys, we can also speed up the silent key scanning process if we so wanted.Some pseudo [because I don't know libsecp256k1 semantics] C++ that could form the nucleus of validation is given below.Code:struct Pair {    PublicKey P;    PrivateKey p;};bool FindSilentKey(std::vector<PublicKey> AA, std::vector<Pair> Keys, PublicKey C, PublicKey& RetP, Pair& RetPair) {    // Pseudo C++ for checking if public key `C` combines with any of the wallet public keys `Keys` to create a key that is in the set of silent keys `AA`.    // Returns true if found and sets `RetP` and `RetPair`, else returns false.    // An efficient implementation that uses thousands of silent keys should use a bloom filter instead of a vector.    for (auto K: Keys) {        // This nested loop can be replaced with bloom filter check        for (auto A: AA) {            uint64_t cof = Hash(K.p * C) + K.p;            if (cof * G == A) {                RetP = A;                RetPair = K;                return true;            }        }     }    RetP = nullptr;    RetPair = nullptr;    return false;}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 28, 2022, 01:01:24 PM",
+      "body": "Quote from: witcher_sense on May 27, 2022, 05:41:33 AM7) Silent payments greatly improve the fungibility of bitcoin transactions.They don't, because there is not such thing as fungibility. It's a made up nonsense. One coin is, and should be equal with any other. Period. The only ones who disagree with this principle are exchanges that cooperate with surveillance companies, and which enforce completely arbitrary rules. They blacklist coins that are either CoinJoined, PayJoined or come from a mixer. It won't surprise me if they asked to provide further info because of \"input silence\". You were probably referring to privacy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 28, 2022, 01:45:46 PM",
+      "body": "Quote from: BlackHatCoiner on May 28, 2022, 01:01:24 PMThey don't, because there is not such thing as fungibility. It's a made up nonsense. One coin is, and should be equal with any other.That's literally what fungibility means  Bitcoin is fungible. You could argue it's not possible to \"improve fungibility\" because it's perfect already. But some people talk about \"dirty Bitcoin\", which means they don't think all Bitcoins are equal:Quote from: Best_Change on May 24, 2022, 12:49:47 PMQuote from: rokuen on May 09, 2022, 06:14:21 PM~ sent me tainted btc.we will certainly investigate the matter~offer them to change the counterpartyIt's like complaining to a bank that the banknotes you received were previously used in a crime. It doesn't matter.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 28, 2022, 02:10:48 PM",
+      "body": "Quote from: LoyceV on May 28, 2022, 01:45:46 PMThat's literally what fungibility meansYep, that was my point.Quote from: LoyceV on May 28, 2022, 01:45:46 PMYou could argue it's not possible to \"improve fungibility\" because it's perfect already.I don't think there's a reason to put this verb next to it. Something is either fungible or it isn't. You can't have it both ways.Quote from: LoyceV on May 28, 2022, 01:45:46 PMIt's like complaining to a bank that the banknotes you received were previously used in a crime. It doesn't matter.Even worse. The bank rejects your deposit and requires personal info to... Verify you're an idiot?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "May 28, 2022, 05:49:06 PM",
+      "body": "Quote from: BlackHatCoiner on May 28, 2022, 01:01:24 PMQuote from: witcher_sense on May 27, 2022, 05:41:33 AM7) Silent payments greatly improve the fungibility of bitcoin transactions....You were probably referring to privacy. Privacy and fungibility are directly related because bitcoins can be discriminated by address and addresses can be associated with people, but I agree that \"privacy\" is more appropriate.Anyway, I don't think that this payment method greatly improves privacy because it only removes the need for the receiver to communicate with the sender. If communication is already private, then nothing is gained.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "May 30, 2022, 07:47:23 AM",
+      "body": "Quote from: LoyceV on May 27, 2022, 09:05:05 AMAfter reading it a few times, I think I'm starting to understand it. I would add another Con: something very simple suddenly becomes very complicated.Once you get yourself familiar with how Elliptic-curve Diffie–Hellman key exchange scheme works, it becomes much easier to understand the idea of silent payments and other similar cryptographic privacy-enhancing methods of obscuring transaction processes in the bitcoin network. In a nutshell, all bitcoin users, who practice self-custody of their coins and therefore have direct access to private-public keypairs, can create a shared secret between each other using Diffie–Hellman algorithm. Alice and Bob exchange their public keys, multiply the new public key by the private key they control (elliptic curve multiplication, not an ordinary one), and use this new value in some function they both know about. In the case of silent payments, they create a new public key to which only one party will have a private key. Quote from: Charles-Tim on May 27, 2022, 03:39:47 PMThere are differences between public key and address while referring to bitcoin. In the proposal, public key is referred to as address which would be very confusing because public key is different from address. Although, I get the fact that this type of payment is completely different from onchain payment. This part is indeed confusing. I think when they say \"payment address,\" they mean a public key encoded in a specific format to be distinguishable from regular non-silent public key.Quote from: Charles-Tim on May 27, 2022, 03:39:47 PMEven while using lightning network, onchain transactions are used to open and close a channel and yet the bitcoin would be credited to an address generated by standardized derivation path which this proposal do not include and yet indicating not including the derivation path as a benefit.Your primary \"silent public key\" can be derived using standard derivation scheme, whereas all derived silent payments addresses constructed by senders will have a strong mathematical relationship with your public address and therefore are always deterministic. If you lose your private or public key, you can calculate them using your main seed, and than search again to find all connected silent addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 30, 2022, 11:12:40 AM",
+      "body": "Quote from: witcher_sense on May 30, 2022, 07:47:23 AMOnce you get yourself familiar with how Elliptic-curve Diffie–Hellman key exchange scheme worksThat's a lot to ask, and I don't expect 99% of the Bitcoin users to ever fully understand it.Quoteit becomes much easier to understand the idea of silent payments and other similar cryptographic privacy-enhancing methods of obscuring transaction processes in the bitcoin network.I can have a general idea, but I don't have the illusion I'll ever fully understand all the details of cryptography. And I think that's okay, we don't need to fully understand it to be able to use it.My layman summary: Silent payments allow me to post an \"address\" on a public website, and someone can pay me without anyone else knowing they paid me. If that's correct, this is brilliant!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 30, 2022, 12:31:34 PM",
+      "body": "Quote from: LoyceV on May 30, 2022, 11:12:40 AMMy layman summary: Silent payments allow me to post an \"address\" on a public website, and someone can pay me without anyone else knowing they paid me. If that's correct, this is brilliant!That is correct, but remember, it *only* works if the address is received from exactly once (and is marked as \"spend immediately in the next transaction\").Otherwise, it just becomes a fancy method of generating a single, normal, address from a privkey, nothing else.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "May 30, 2022, 12:45:34 PM",
+      "body": "Quote from: LoyceV on May 30, 2022, 11:12:40 AMMy layman summary: Silent payments allow me to post an \"address\" on a public website, and someone can pay me without anyone else knowing they paid me. If that's correct, this is brilliant!Exactly. Consider the following possible use case where silent payments may be very helpful. Say, you're applying for a signature campaign or for some other paid activity where many participants are involved whom you don't trust. In the job application, you specify your silent pseudonym instead of a static bitcoin address accessible to literally everyone who can read. Other participants do exactly the same because they don't want others spying on their financial affairs. The employer makes a list of approved silent pseudonyms, imports this in his private bitcoin wallet, and generates corresponding \"real\" addresses when it is due time to pay. Each time his wallet makes a payment, it adds multiple unique parameters (txid, index, timestamp, etc) into the address construction process in order to prevent address reuse. If you work for ten weeks, you will end up with ten unique addresses completely unrelated to your initial pseudonym or your other addresses. Even if the employer makes his payment transactions public, it will be impossible for an outside observer to determine which coins belong to which pseudonym. In this case, even employees themselves cannot map transactions with pseudonyms due to equal amounts of some transactions. Only the employer (campaign manager) will know to whom he sent a payment, when, and how much, but he should have access to this information anyway.Quote from: NotATether on May 30, 2022, 12:31:34 PMThat is correct, but remember, it *only* works if the address is received from exactly once (and is marked as \"spend immediately in the next transaction\").Otherwise, it just becomes a fancy method of generating a single, normal, address from a privkey, nothing else.Could you elaborate on that?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zilon",
+      "created_time": "May 30, 2022, 05:30:17 PM",
+      "body": "Quote from: NotATether on May 30, 2022, 12:31:34 PMQuote from: LoyceV on May 30, 2022, 11:12:40 AMMy layman summary: Silent payments allow me to post an \"address\" on a public website, and someone can pay me without anyone else knowing they paid me. If that's correct, this is brilliant!That is correct, but remember, it *only* works if the address is received from exactly once (and is marked as \"spend immediately in the next transaction\").Otherwise, it just becomes a fancy method of generating a single, normal, address from a privkey, nothing else.Does it imply if there are multiple transaction on the address even when the sender and receiver alone knows about the transaction there is still no privacy? I was thinking if no one else knows about the transaction since it's silent payment then a strong privacy is established. I will like to know more about the \"fancy method of generating a single, normal, address from a privkey, nothing else.\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "May 30, 2022, 06:05:04 PM",
+      "body": "Great Article mate, while more I read more it makes me think about monero... I remember the 'Fungibility' term in the Mastering Monero book, and I would like to quote that section, because that's the way they worked around the 'Silent Payments':QuoteFungibility: The term fungibility refers to assets whose units are considered indistinguishable and interchangeable.. For example, imagine that you let your neighbor borrow 1 kilogram of flour for a cake. When they return flour the next week, of course it will be 1 kilogram of flour from a different source (since they used your original flour for baking). This is not a problem, since flour is fungible. However, vehicles are not fungible; if you let your neighbor borrow your car, you probably want the same one back!In the case of Monero, its fungibility is a feature of its sophisticated privacy practices; the obfuscated transaction record obscures the history of all Monero. If you let your friend borrow 1 Monero, they can return any 1 Monero, since they're indistinguishable. This particular quality may seem like a minor nuance; however, fungibility is crucially necessary for most practical uses of any currency. This characteristic is absent from most cryptocurrencies, with transparent ledgers and trackable histories.About this point:Quote from: witcher_sense on May 27, 2022, 05:41:33 AM6) No one, except for the sender of the transaction and its receiver, will know that the payment actually occurred.I like the logic behind the 'Silent payments', but thinking about how the bitcoin blockchain should work with this idea makes my mind blows up.Bitcoin blockchain was made to be public information, if we start obfuscating transactions then the community will divide, and then the fork will come. That's why I think these silent payments should be focused on a new coin and not be implemented in bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LightningResponse",
+      "created_time": "May 30, 2022, 08:58:17 PM",
+      "body": "It looks like btc will go closer to what Monero was am I right? The problem I see with that is Monero was limited in growth because of the mass bans probably because of KYC. If Bitcoin implements silent payments to increase privacy (Woo!) would this put us at risk of meeting the same fate as Monero? or are we too big?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 31, 2022, 03:36:21 AM",
+      "body": "Quote from: LightningResponse on May 30, 2022, 08:58:17 PMIt looks like btc will go closer to what Monero was am I right? The problem I see with that is Monero was limited in growth because of the mass bans probably because of KYC. If Bitcoin implements silent payments to increase privacy (Woo!) would this put us at risk of meeting the same fate as Monero? or are we too big? Don't worry about that. The exchanges could only afford to ban Monero because of it's small market cap. If they were to put a similar ban on BTC then they would have to liquidate their BTC holdings [which represent most of their reserves] and most of them would go under.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "May 31, 2022, 06:34:41 AM",
+      "body": "Quote from: seoincorporation on May 30, 2022, 06:05:04 PMI like the logic behind the 'Silent payments', but thinking about how the bitcoin blockchain should work with this idea makes my mind blows up.Bitcoin blockchain was made to be public information, if we start obfuscating transactions then the community will divide, and then the fork will come. That's why I think these silent payments should be focused on a new coin and not be implemented in bitcoin.The bitcoin community has never lived in harmony: there have always been disagreements regarding different aspects of bitcoin, namely how bitcoin should work: block size war, what bitcoin should be: a store of value or medium of exchange, and what is more important: adoption at all costs by flirting with governments and corrupt banksters or self-sovereignty of individual users who value being free and independent. There have always been compliant and non-compliant people; there have always been people who understand the importance of privacy and who don't care because \"they have nothing to hide\"; there have always been people who despise KYC/AML useless regulations and who readily give up everything to gain a small yield. This community has many faces merely because bitcoin is for enemies and friends, for villains and heroes; it's for everyone because it doesn't judge.As for silent payments, they won't make blockchain less transparent; blockchain will remain public, open, and accessible for everyone to subjectively interpret transactions occurring inside it. Let us not confuse \"transparency and openness\" with \"KYCed transactions\" where the identities of both the sender and receiver are known to the world. If the privacy of transactions is compromised by attaching KYC information of participants, bitcoin can no longer be a censorship-resistant and decentralized network. These things simply can't work without one another.  Silent payments may help users protect their right to privacy, which is the right to \"selectively reveal yourself to the world.\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 31, 2022, 07:05:03 AM",
+      "body": "Quote from: seoincorporation on May 30, 2022, 06:05:04 PMBitcoin blockchain was made to be public information, if we start obfuscating transactions then the community will divide, and then the fork will come. That's why I think these silent payments should be focused on a new coin and not be implemented in bitcoin.Why? From the blockchain's perspective, nothing changes. It will just show a transaction from address A to address B, and it doesn't matter how the owner of address B gave their address to the owner of address A.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "May 31, 2022, 07:24:22 AMLast edit: May 31, 2022, 07:42:34 AM by Charles-Tim",
+      "body": "Quote from: seoincorporation on May 30, 2022, 06:05:04 PMBitcoin blockchain was made to be public information, if we start obfuscating transactions then the community will divide, and then the fork will come. That's why I think these silent payments should be focused on a new coin and not be implemented in bitcoin.Quote from: LightningResponse on May 30, 2022, 08:58:17 PMIt looks like btc will go closer to what Monero was am I right? The problem I see with that is Monero was limited in growth because of the mass bans probably because of KYC. If Bitcoin implements silent payments to increase privacy (Woo!) would this put us at risk of meeting the same fate as Monero? or are we too big? I do not think any exchange can decide not to accept bitcoin because it will have side effect on the exchange, it is true that the transparent bitcoin blockchain helps in adoption but exchanges can decide to accept only on-chain transactions if they want transparency. Even, in a lightning network payment, only what is most transparent is when opening and closing a channel, lightning payment transaction is not also recorded on blockchain.Quote from: witcher_sense on May 31, 2022, 06:34:41 AMAs for silent payments, they won't make blockchain less transparent; blockchain will remain public, open, and accessible for everyone to subjectively interpret transactions occurring inside it.Quote from: LoyceV on May 31, 2022, 07:05:03 AMWhy? From the blockchain's perspective, nothing changes. It will just show a transaction from address A to address B, and it doesn't matter how the owner of address B gave their address to the owner of address A.But silent payment will not be transparent as it is not even existing on blockchain at all and the public will not know about the transaction. The payment will not be traceable.If this can be like a layer 2, it will be better, in a way there will be a bridge between silent payment and on-chain transaction just like lightning network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

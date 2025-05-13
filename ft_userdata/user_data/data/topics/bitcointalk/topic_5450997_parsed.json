@@ -1,0 +1,61 @@
+{
+  "id": "topic_5450997",
+  "title": "simpleSliv3r",
+  "author": "simpleSliv3r",
+  "created_time": "May 02, 2023, 05:43:59 PM",
+  "content": "Hi all,First of all thanks for taking your time to read this. I will give you some context so you can understand why I'm doing this and maybe would be easier for you to help me.I'm doing a study about the response of the nodes when they're victims of a Contract Breach Attack. In a nutshell a Contract Breach Attack consist in broadcasting an old commitment transaction of a LN channel trying to win money of an old state that is not the actual one.Note: I'm doing this in a simulator, not on real channels. Currantly using Polar.I've been able to replicate that attack. And the victims respond correctly, as expected, taking all funds of the channel with a penalty transaction.The issue comes when I disconnect the victim node before attacking, so he cannot respond and the attacker should be able to take the funds after a defined amount of time (num of blocks specific in the script). I mined like 500 blocks and I still unable to take the funds. My attacker node does not recognize the UTXOs as their UTXOs, so, I cannot spend it.Could anyone help me with this? I just need to be able to spend that UTXO from my attacker node.I tried to spend it using \"lightning-cli withdraw\" command, but it does not work as it does not detect the UTXO on their \"lightning-cli listbalance\" UTXO set.Please, don't hesitate to ask for more information or instructions if you want to replicate the attack so you can check on your own experimental environment.Thanks again for reading.Best Regards,SSAdditional interesting information:  - Attacker node implementation --> C-Lighting  - Channel funding transaction in raw -->  02000000000101d26448c4f74bc2a1d67cbf3b020fec6eab7ca057d8b3f95677541099b36cd89c0 100000000fdffffff02f6cf030000000000160014de1b0aafa4abf814dd1f8b498f4a8642e790c8 4f90d0030000000000220020c8aea95160aa2288daf781f158edda793531202af95a122daeb011b 1a0b97bdf0247304402205eee39e29b07a27615bafcc0381f736f5b1c1d53d22ff3582def157d08 2c40ed0220496699204fbd9dce6154bfb63ace05e933938b5b258ab675c4b0f99ca577f7b701210 2465e45bea01f3fbfd296e279a18efe87c2abeca9649d57d3010ffc2fcac7c8cd6b000000  - Malicious commitment transaction in raw --> 020000000001016b49869e036602c7612c30b1fc7c0ceb11ba9e9e85b175b07404730e707df4bd0 10000000086d0c980023075000000000000160014dea667f2fb02ad8a324802011b93bda8731f44 8ba95a030000000000220020ba0debe6ad86cd924a6158afd200b9ae3444ad7e8b7b8b9956204fd 34f15e493040047304402202ac1513ddc07e2e020aa1be5dd1ceabd52c158a4517c9d63c94a87c7 1b788b870220079b64978ecbd12a627f687a5614f07f86a83aab205219a19e714da925cc51d9014 7304402206d50abc880e23ba5a924f7e68f383233fdec06c676d1f55f9f6bd2ab47a738b102207a 728a19b68b0c1c255a190de5f6b2dd1693421fa2cb3f90a9234b45ab02470401475221033f4a9ca 985fddd1884d6ae98b4e926de07b53881629c11cd191f6b541413e3ef210380ab7bdecadd57ad80 0872930bb45ee6811897fcb1668999dade2e4b8418a0d552ae70cb2920",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5450997",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "May 02, 2023, 06:23:23 PM",
+      "body": "Quote from: simpleSliv3r on May 02, 2023, 05:43:59 PM...The issue comes when I disconnect the victim node before attacking, so he cannot respond and the attacker should be able to take the funds after a defined amount of time (num of blocks specific in the script). I mined like 500 blocks and I still unable to take the funds....On mobile so I can't check deeply but, what time lock did you have set when you created the channel? 500 blocks is 3 1/2 days give or take. IIRC the default time for the HTLC setup in c-lightning is in the range of weeks not days.Could be wrong on that but no matter what you do it may just be sitting there waiting.It's been a while, like a couple of years, since I played around with doing things like this but I do vaguely remember the default time being high.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "May 02, 2023, 06:32:59 PM",
+      "body": "Quote from: DaveF on May 02, 2023, 06:23:23 PMQuote from: simpleSliv3r on May 02, 2023, 05:43:59 PM...The issue comes when I disconnect the victim node before attacking, so he cannot respond and the attacker should be able to take the funds after a defined amount of time (num of blocks specific in the script). I mined like 500 blocks and I still unable to take the funds....On mobile so I can't check deeply but, what time lock did you have set when you created the channel? 500 blocks is 3 1/2 days give or take. IIRC the default time for the HTLC setup in c-lightning is in the range of weeks not days.Could be wrong on that but no matter what you do it may just be sitting there waiting.It's been a while, like a couple of years, since I played around with doing things like this but I do vaguely remember the default time being high.-DaveHi Dave,Thanks for your answer!It could be what you're saying.I thought 500 blocks was enough. Do you know how can I check the lock time configured? I tried to take from the transaction script, but I'm unable. If not, I guess I will have to mine thousands of blocks, lucky I'm in a simulation environment and I can mine them in seconds",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 02, 2023, 07:06:10 PM",
+      "body": "Try:lightning-cli --testnet listconfigssomewhere in there should be max blocks locktime or something like that. In the past that seemed to be the default also if you did not specify. As I said, it's been a couple of years. You might get better / quicker responses asking the C-lightning discord and github there here. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "May 02, 2023, 07:16:35 PM",
+      "body": "Quote from: DaveF on May 02, 2023, 07:06:10 PMTry:lightning-cli --testnet listconfigsFrom listconfigs I got this:   \"ignore-fee-limits\": true,   \"watchtime-blocks\": 6,   \"max-locktime-blocks\": 2016,   \"funding-confirms\": 1,I mined 13000 blocks and still nothing. So I think I can discard a problem with the time locks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "May 04, 2023, 09:13:52 PM",
+      "body": "Hi all,Just adding some more information, checking node logs I saw that the node realized that we cheated but he is unable to spend the outputs:Code:2023-05-04T20:35:06.677Z **BROKEN** 027b214a85e350c65c7cb2c32ecd509d2900502efa27a7fd4bb86b3de78b6daa6b-onchaind-chan#1: Could not find resolution for output 0: did *we* cheat?2023-05-04T20:35:06.693Z DEBUG   027b214a85e350c65c7cb2c32ecd509d2900502efa27a7fd4bb86b3de78b6daa6b-onchaind-chan#1: Grinding for commitment to_local (theirs)2023-05-04T20:35:06.779Z DEBUG   lightningd: Adding block 118: 07127ff019e83accfbde56f8c86544b689aa591fbb38601f3d88b1c93b3f85462023-05-04T20:35:06.900Z DEBUG   plugin-bookkeeper: coin_move 2 (penalty) 10000000msat -0msat chain_mvt 16832325062023-05-04T20:35:06.958Z **BROKEN** 027b214a85e350c65c7cb2c32ecd509d2900502efa27a7fd4bb86b3de78b6daa6b-onchaind-chan#1: Could not find resolution for output 1: did *we* cheat?2023-05-04T20:35:06.958Z DEBUG   027b214a85e350c65c7cb2c32ecd509d2900502efa27a7fd4bb86b3de78b6daa6b-onchaind-chan#1: billboard: All outputs resolved: waiting 100 more blocks before forgetting channel",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "May 05, 2023, 04:26:25 PM",
+      "body": "Hi,I finally found the solution. I let the explanation here in case someone has the same problem.The node just saves the information required for the last commitment transaction and the penalty transaction from older commitment transactions, but does not save the info to spend it.You can see in the logs below that the node realizes that we cheated and he is not able to spend the UTXO of that transaction.Quote from: simpleSliv3r on May 04, 2023, 09:13:52 PMCode:2023-05-04T20:35:06.677Z **BROKEN** 027b214a85e350c65c7cb2c32ecd509d2900502efa27a7fd4bb86b3de78b6daa6b-onchaind-chan#1: Could not find resolution for output 0: did *we* cheat?2023-05-04T20:35:06.693Z DEBUG   027b214a85e350c65c7cb2c32ecd509d2900502efa27a7fd4bb86b3de78b6daa6b-onchaind-chan#1: Grinding for commitment to_local (theirs)2023-05-04T20:35:06.779Z DEBUG   lightningd: Adding block 118: 07127ff019e83accfbde56f8c86544b689aa591fbb38601f3d88b1c93b3f85462023-05-04T20:35:06.900Z DEBUG   plugin-bookkeeper: coin_move 2 (penalty) 10000000msat -0msat chain_mvt 16832325062023-05-04T20:35:06.958Z **BROKEN** 027b214a85e350c65c7cb2c32ecd509d2900502efa27a7fd4bb86b3de78b6daa6b-onchaind-chan#1: Could not find resolution for output 1: did *we* cheat?2023-05-04T20:35:06.958Z DEBUG   027b214a85e350c65c7cb2c32ecd509d2900502efa27a7fd4bb86b3de78b6daa6b-onchaind-chan#1: billboard: All outputs resolved: waiting 100 more blocks before forgetting channelTo be able to do that you must save a snapshot of the database \".sqlite\" at the moment when the commitment transaction that you will use is the last state. Continue using the channel and when you want to do the attack simply remove the current database and load the old one. The node will think that the fraudulent commitment transaction is the correct state, It's like a brain wash.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

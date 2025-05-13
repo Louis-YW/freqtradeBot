@@ -1,0 +1,109 @@
+{
+  "id": "topic_5458228",
+  "title": "GR Sasa",
+  "author": "GR Sasa",
+  "created_time": "July 01, 2023, 12:52:13 PM",
+  "content": "Hi,Suppose i have 2 same r values from different addresses/privatekeys. Would it be possible to calculate private key for both of the addresses from the same r values?Or its only possible when the same private key has done 2 different transaction but used the same r values?I hope my question was clear und understandable",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5458228",
+  "comments": [
+    {
+      "author": "stanner.austin",
+      "created_time": "July 01, 2023, 01:48:30 PM",
+      "body": "HelloIts possible if you know K of that R Or if you know one of private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 01, 2023, 01:50:56 PMLast edit: July 01, 2023, 02:10:11 PM by o_e_l_e_o",
+      "body": "Quote from: GR Sasa on July 01, 2023, 12:52:13 PMOr its only possible when the same private key has done 2 different transaction but used the same r values?It is only possible when the same private key has reused the same r value.The equation you are interested in is as follows (all equations mod n):s = (z + x*r)/kWhere z is the message hash (usually a hash of part of the transaction data) and x is your private key.Let's say you have two transactions using the same private key and the same k value. You now have following two equations:s1 = (z1 + x*r)/ks2 = (z2 + x*r)/kThis can be reformatted as:k = (z1 - z2)/(s1 - s2)Given that you know both s values and both z values from the transactions themselves, you can calculate k. Once you know k, you can go back to the initial equation and calculate x, the private key.If, on the other hand, the private keys (x) are different, then you have the following transactions:s1 = (z1 + x1*r)/ks2 = (z2 + x2*r)/kReformat that, and you end up with the following:k = ((z1 - z2) + r(x1 - x2))/(s1 - s2)Given that you have two unknowns in this equation (x1 and x2), you cannot calculate k.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GR Sasa",
+      "created_time": "July 01, 2023, 05:45:10 PM",
+      "body": "Dear friend oeleo,Thank you so much for your answer and the great understandable clarifications! I didn't expect you to merit me too; haha! You didn't have to. I did nothing but asked a question XDEnjoy your weekend m8!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "July 01, 2023, 06:41:22 PM",
+      "body": "Quote from: o_e_l_e_o on July 01, 2023, 01:50:56 PMIt is only possible when the same private key has reused the same r value.Not only that, if the private keys have a known relationship then it's also vulnerable. For example if they are two private keys from a public derivation wallet and you know the chain code you can recover the keys.The right intuition is that each signature is a linear equation in a system of linear equations-- you can solve the whole thing when the number of knows equal the unknowns.   Things like linearly related private keys mean that the 'different' private key changes the equation slightly but it doesn't introduce another unknown.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GR Sasa",
+      "created_time": "July 01, 2023, 07:51:47 PM",
+      "body": "What if the same private key shares two r values that are (almost) identical to each other? Does this help calculating the private key in any possible way?Suppose r1 = cabc3692f1f7ba75a8572dc5d270b35bcc00650534f6e5ecd6338e55355454d5             r2 = cabc3692f1f7ba75a8572dc5d270b35ba54694a2d2302093d8b0a93ed5d83f2cHere r1 + r2 from the same private key shares only their first 128 bits.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 01, 2023, 07:55:41 PMLast edit: July 01, 2023, 08:07:01 PM by o_e_l_e_o",
+      "body": "Quote from: gmaxwell on July 01, 2023, 06:41:22 PMThings like linearly related private keys mean that the 'different' private key changes the equation slightly but it doesn't introduce another unknown.Well, sure. If you want to go down that line of reasoning, then by the same logic if you use different but related k values, such as flawed software which simply does k+1 for each new transaction, then you are also at risk.Quote from: GR Sasa on July 01, 2023, 07:51:47 PMWhat if the same private key shares two r values that are (almost) identical to each other? Does this help calculating the private key in any possible way?No.The r value is obtained by taking the x coordinate of the point reached by multiplying the k value with G, the generator point of the secp256k1 curve. It is essentially the same process as using a private key to generate a public key. As with any other public key, two similar r values do not correlate to two similar k values, and vice versa.If you have two closely related k values then there is a potential risk as discussed above (assuming an attacker knows about the relation), but not with two closely related r values.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "July 01, 2023, 09:45:04 PM",
+      "body": "Quote from: o_e_l_e_o on July 01, 2023, 07:55:41 PMWell, sure. If you want to go down that line of reasoning, then by the same logic if you use different but related k values, such as flawed software which simply does k+1 for each new transaction, then you are also at risk.Indeed, but I raised it because related private keys are extremely common, like every hardware wallet generates them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Greg Tonoski",
+      "created_time": "July 02, 2023, 10:36:24 AM",
+      "body": "Quote from: gmaxwell on July 01, 2023, 09:45:04 PMQuote from: o_e_l_e_o on July 01, 2023, 07:55:41 PMWell, sure. If you want to go down that line of reasoning, then by the same logic if you use different but related k values, such as flawed software which simply does k+1 for each new transaction, then you are also at risk.Indeed, but I raised it because related private keys are extremely common, like every hardware wallet generates them.Can I ask to elaborate on the notion that \"related private keys are extremely common, like every hardware wallet generates them\", please? I would appreciate an example and possibly reference to long form article.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 02, 2023, 03:23:43 PM",
+      "body": "Quoterelated private keys are extremely common, like every hardware wallet generates themIf you use any HD wallet, then your keys are generated in some deterministic way. That means, in practice, you only have a single key, called master key. Everything is derived from that, which means, all keys are related. If someone will break that single key, then all of them will be also broken. If you want another confirmation, then read that sentence in this context:Quote from: gmaxwell on July 01, 2023, 06:41:22 PMFor example if they are two private keys from a public derivation wallet and you know the chain code you can recover the keys.Also, the next paragraph about linear equations is quite important: as I described many times, each signature is just a relation between some public key, and signature R-value, that also is in fact some ECDSA point. That means you just have two points, that are connected in a linear way, like in \"y=ax+b\" function. You have one key under \"x\", and you can reach another key under \"y\" by applying \"a\" and \"b\" constants, that are publicly known. This equation is true for both cases, for private and public keys. Both sides should be always equal modulo \"n\", for each and every signature.The same way of thinking can lead you to another important facts: deterministic wallets are widely used, even in the famous puzzle from 2015, you have some HD wallet.Quote from: saatoshi_rising on April 27, 2017, 06:41:08 AMA few words about the puzzle.  There is no pattern.  It is just consecutive keys from a deterministic wallet (masked with leading 000...0001 to set difficulty).  It is simply a crude measuring instrument, of the cracking strength of the community.That means, there is some single key, that was used to generate all 256 addresses. Also, it means bruteforcing next keys is not the only way to unlock them. Another method is to pick some HD wallet, go through all steps, and apply more restrictions to the initial key, based on values derived from it. For example, the first key is of course equal to one. But the second key can be two or three. In this puzzle, it is three, that means, around half of the seeds can be rejected.However, that is not the end of the road. Computers are deterministic, if you know all inputs, you can always reach the same outputs. That means, even if you have some keys from non-HD wallet, then still, you can find some value, that will allow you to deteministically generate all keys. It is all about the size of your inputs, and it is related to exhausting the whole space of possibilities, and applying the proper compression to that. You can see it clearly in neural networks, where you can begin with some data, and you will always reach some model, even if it will be overfitted.QuoteIn April 2019, it was announced that ⁠not one but two⁠ ⁠solutions of Rivest’s puzzle had been made: the first solution of the puzzle was made by Belgian programmer Bernard Fabrot as a hobby, who skipped Rivest’s Java implementation to run a GNU GMP squaring routine for ~3.5 years on an ordinary Intel Core i7-6700 CPU core; and the second was done in 2 months by the Cryptophage research project using new squaring algorithms optimized to run on an FPGA with an ASIC implementation ⁠possibly running in ~6 days⁠⁠.The same can be applied here: even if the author of the original puzzle used just some single key to derive all addresses, then still, it is technically possible to find another seed, and even another algorithm, that will lead to the same solution. However, practically speaking, I think if we will ever get there, it will be long after breaking all hash functions and ECDSA, where all of those things will be obsolete, and replaced with something else through another soft-fork. But mathematically speaking, I think there exist such solutions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "icynote_original",
+      "created_time": "July 05, 2023, 07:07:59 PM",
+      "body": "Quote from: GR Sasa on July 01, 2023, 07:51:47 PMWhat if the same private key shares two r values that are (almost) identical to each other? Does this help calculating the private key in any possible way?Suppose r1 = cabc3692f1f7ba75a8572dc5d270b35bcc00650534f6e5ecd6338e55355454d5             r2 = cabc3692f1f7ba75a8572dc5d270b35ba54694a2d2302093d8b0a93ed5d83f2cHere r1 + r2 from the same private key shares only their first 128 bits.if you mean this, then you are wrong. R value must be the same in 1 wallet address with 2 different transactions. and if you have a script to auto calculate, maybe i can send you the script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "July 06, 2023, 12:57:42 AM",
+      "body": "Quote from: icynote_original on July 05, 2023, 07:07:59 PMQuote from: GR Sasa on July 01, 2023, 07:51:47 PMWhat if the same private key shares two r values that are (almost) identical to each other? Does this help calculating the private key in any possible way?Suppose r1 = cabc3692f1f7ba75a8572dc5d270b35bcc00650534f6e5ecd6338e55355454d5             r2 = cabc3692f1f7ba75a8572dc5d270b35ba54694a2d2302093d8b0a93ed5d83f2cHere r1 + r2 from the same private key shares only their first 128 bits.if you mean this, then you are wrong. R value must be the same in 1 wallet address with 2 different transactions. and if you have a script to auto calculate, maybe i can send you the script.  A few hours ago you were wondering how to use brute force applications, now you are a cryptography expert?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "icynote_original",
+      "created_time": "July 06, 2023, 03:50:42 AM",
+      "body": "Quote from: digaran on July 06, 2023, 12:57:42 AMQuote from: icynote_original on July 05, 2023, 07:07:59 PMQuote from: GR Sasa on July 01, 2023, 07:51:47 PMWhat if the same private key shares two r values that are (almost) identical to each other? Does this help calculating the private key in any possible way?Suppose r1 = cabc3692f1f7ba75a8572dc5d270b35bcc00650534f6e5ecd6338e55355454d5             r2 = cabc3692f1f7ba75a8572dc5d270b35ba54694a2d2302093d8b0a93ed5d83f2cHere r1 + r2 from the same private key shares only their first 128 bits.if you mean this, then you are wrong. R value must be the same in 1 wallet address with 2 different transactions. and if you have a script to auto calculate, maybe i can send you the script.  A few hours ago you were wondering how to use brute force applications, now you are a cryptography expert?please revise, I ask the use of btcrecover and the correct way of installation.but the R value script I made myself, even just an R variable is easy. so the R value is not the way to bruteforce.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

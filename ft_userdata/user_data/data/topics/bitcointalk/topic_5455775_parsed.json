@@ -1,0 +1,53 @@
+{
+  "id": "topic_5455775",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "June 08, 2023, 05:43:45 PM",
+  "content": "Not just the ones that the Bitcoin Core client made. listtransactions won't work if I've just imported a few addresses and did a rescan, because no transactions have been made with the wallet and it returns an empty list. gettransaction works if txindex option is set, but I need to get the transaction IDs first, ideally only with Core. So how can I get a list of all txids for a wallet or address inside a wallet?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5455775",
+  "comments": [
+    {
+      "author": "RickDeckard",
+      "created_time": "June 09, 2023, 12:12:51 PM",
+      "body": "Have you tried using listunspent instead of listtransacttions? The code would be something like this:Code:bitcoin-cli listunspent 1 9999999 '[\"add1\", \"add2\", ...]'According to ChainQuery[1] that command will give you a list of all unspent transaction outputs for the addresses that you want. The result will be a list that will include the transaction ID (txid) for each UTXO. I've set the minconf and maxconf to their default values, but you are free to play around with those numbers.[1]https://www.chainquery.com/bitcoin-cli/listunspent",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 09, 2023, 12:38:35 PM",
+      "body": "Quote from: NotATether on June 08, 2023, 05:43:45 PMSo how can I get a list of all txids for a wallet or address inside a wallet?For imported address within your wallet., you can use listreceivedbyaddress but with the address arg to filter it.Otherwise it'll list the whole wallet's receiving addresses' TXID list. (excluding change for HD wallet)Example command:Code:bitcoin-cli listreceivedbyaddress 0 false true \"address\"(works with imported addresses via importaddress)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 11, 2023, 09:11:35 AM",
+      "body": "Thanks guys, but I just realized that listtransactions can take a parameter argument: \"include_watchonly\" that toggles the display of transactions from imported addresses. Not sure why this is defaulting to false as it would be really useful behavior to have on. But anyway, the listreceivedbyaddress RPC also works as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 11, 2023, 10:34:03 AM",
+      "body": "Quote from: NotATether on June 11, 2023, 09:11:35 AM-snip- Not sure why this is defaulting to false as it would be really useful behavior to have on. But anyway, the listreceivedbyaddress RPC also works as well.You must be using a legacy wallet (non-descriptor).The wallet where you execute the command should have the \"disable_private_keys\" argument set to \"true\" when it's created.In the GUI, the check box with the same name \"Disabled Private Keys\" should be ticked.In Descriptor wallets, it's not possible to import plain address descriptors to a non-watching-only wallet so this wouldn't have happened.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 12, 2023, 12:45:54 PM",
+      "body": "Quote from: nc50lc on June 11, 2023, 10:34:03 AMQuote from: NotATether on June 11, 2023, 09:11:35 AM-snip- Not sure why this is defaulting to false as it would be really useful behavior to have on. But anyway, the listreceivedbyaddress RPC also works as well.You must be using a legacy wallet (non-descriptor).The wallet where you execute the command should have the \"disable_private_keys\" argument set to \"true\" when it's created.In the GUI, the check box with the same name \"Disabled Private Keys\" should be ticked.In Descriptor wallets, it's not possible to import plain address descriptors to a non-watching-only wallet so this wouldn't have happened.Yes, I explicitly created a legacy wallet for the purposes of testing some Python core that uses the RPC, so that I don't have to spin up a bunch of altcoin nodes as well (except for maybe DOGE, which has seemingly removed any way of selecting wallet files via createwallet and -rpcwallet).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

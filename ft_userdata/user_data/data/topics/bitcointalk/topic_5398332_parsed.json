@@ -1,0 +1,93 @@
+{
+  "id": "topic_5398332",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "May 12, 2022, 02:58:33 PMLast edit: May 12, 2022, 03:43:15 PM by BlackHatCoiner",
+  "content": "I'd noticed Electrum did this before, but I didn't know what was the issue and it magically got fixed later. Now, that I'm facing this problem again, I know what probably causes it: The unconfirmed transaction(s). I just broadcasted a tx few minutes ago, from another computer, and it can't startup the wallet on this one. It synchronizes 'til 56/56, but then it immediately starts from 0/56 and redoes this whole process. That's, I presume, until the transaction gets confirmed. This is the only error in my log file:Code:ERROR | interface.[192.168.2.2:50002] | Exception in run: RequestCorrupted('heights of confirmed txs must be in increasing order')Traceback (most recent call last):  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/util.py\", line 1163, in wrapper    return await func(*args, **kwargs)  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/interface.py\", line 498, in wrapper_func    return await func(self, *args, **kwargs)  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/interface.py\", line 521, in run    await self.open_session(ssl_context)  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/interface.py\", line 671, in open_session    await group.spawn(self.monitor_connection)  File \"/home/angelo/Desktop/Electrum-4.2.1/packages/aiorpcx/curio.py\", line 297, in __aexit__    await self.join()  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/util.py\", line 1258, in join    task.result()  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/synchronizer.py\", line 83, in _run_tasks    await group.spawn(self.main())  File \"/home/angelo/Desktop/Electrum-4.2.1/packages/aiorpcx/curio.py\", line 297, in __aexit__    await self.join()  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/util.py\", line 1258, in join    task.result()  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/synchronizer.py\", line 180, in _on_address_status    result = await self.interface.get_history_for_scripthash(h)  File \"/home/angelo/Desktop/Electrum-4.2.1/electrum/interface.py\", line 986, in get_history_for_scripthash    raise RequestCorrupted(f'heights of confirmed txs must be in increasing order')electrum.interface.RequestCorrupted: heights of confirmed txs must be in increasing orderI DuckDuckWent it and it turns out that it has to do with monotonicity of heights?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398332",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "May 12, 2022, 03:11:14 PM",
+      "body": "I don't have an answer for you, I will only link to correct file, since you've picked Electrum for LTC.The error is the same.https://github.com/spesmilo/electrum/blob/4.2.1/electrum/interface.py#L986Edit: I'll add that it might be that using the same server in both clients might work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "May 12, 2022, 03:37:09 PM",
+      "body": "Have/had you received multiple transactions that are unconfirmed? I'm guessing your wallet file might be considered \"corrupted\" by electrum if it's expecting transactions to appear in order of height (height looks like it means blockheight here since mempool transactions are set to inf).The only way I can think of to fix this would be to make a new wallet or to wait for the transactions to confirm and see if it fixes itself (but the second option might not work).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 12, 2022, 03:45:22 PM",
+      "body": "Quote from: NeuroticFish on May 12, 2022, 03:11:14 PMyou've picked Electrum for LTC.Hadn't noticed that. I updated the OP.Quote from: NeuroticFish on May 12, 2022, 03:11:14 PMI'll add that it might be that using the same server in both clients might work.I don't use it at the same time, if that's what you're saying, but it should neither be the cause, even in that case. Quote from: jackg on May 12, 2022, 03:37:09 PMHave/had you received multiple transactions that are unconfirmed?I only broadcasted one transaction. It just wasn't from the same machine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Abdussamad",
+      "created_time": "May 12, 2022, 09:37:12 PM",
+      "body": "try restoring from seed in a fresh wallet file",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "May 12, 2022, 11:11:03 PM",
+      "body": "Would you mind telling us the exact OS you use while having this issue?I suggest try to reinstall Electrum but this time uninstall it first and delete all Electrum data and folder under Appdata then restore your wallet again with your seed backup then test it again.If it does not work try to change or connect to other servers then test it again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 13, 2022, 07:00:04 AM",
+      "body": "Quote from: Abdussamad on May 12, 2022, 09:37:12 PMtry restoring from seed in a fresh wallet fileI restored with master public key, same thing happens.Quote from: BitMaxz on May 12, 2022, 11:11:03 PMWould you mind telling us the exact OS you use while having this issue?Linux Mint 20.3 UnaQuote from: BitMaxz on May 12, 2022, 11:11:03 PMI suggest try to reinstall Electrum but this time uninstall it first and delete all Electrum data and folder under Appdata then restore your wallet again with your seed backup then test it again.Deleted .electrum directory, restored the mpk, nothing.Reinstalled Electrum 4.2.1, nothingUninstalled, Electrum 4.2.1, installed Electrum 4.1.5, it worked.  So, yeah. Apparently there's something going on with 4.2.1. Perhaps it's related with my Electrum server's version?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "May 14, 2022, 11:16:27 AM",
+      "body": "Quote from: BlackHatCoiner on May 13, 2022, 07:00:04 AMSo, yeah. Apparently there's something going on with 4.2.1. Perhaps it's related with my Electrum server's version?  1. Which Electrum server implementation do you use?2. Do you know whether version of server you use support Electrum protocol 1.4? Electrum 4.2.1 seek server which support protocol version 1.4[1].3. Have you checked log on your Electrum server when the problem occurred? [1] https://github.com/spesmilo/electrum/blob/4.2.1/electrum/version.py#L4",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 15, 2022, 09:53:30 AM",
+      "body": "It's definitely a mismatch between server response format and client's expected response format, if it works using 4.1.5.I should conclude that this is an edge case of 4.2.1 specifically, unless you were using Electrum connected to a specific server. Try filing a bug report on their Issues page on Github.Meanwhile just keep using 4.1.5 client version until it's fixed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 15, 2022, 12:35:15 PM",
+      "body": "Quote from: ETFbitcoin on May 14, 2022, 11:16:27 AM1. Which Electrum server implementation do you use?Electrs 0.8.11.Quote from: ETFbitcoin on May 14, 2022, 11:16:27 AM2. Do you know whether version of server you use support Electrum protocol 1.4? Electrum 4.2.1 seek server which support protocol version 1.4[1].Electrs does support version 1.4, and it seems they have been supporting it since 0.4.3.Quote from: ETFbitcoin on May 14, 2022, 11:16:27 AM3. Have you checked log on your Electrum server when the problem occurred? No, because I don't save any logs! Quote from: NotATether on May 15, 2022, 09:53:30 AMI should conclude that this is an edge case of 4.2.1 specifically, unless you were using Electrum connected to a specific server. Try filing a bug report on their Issues page on Github.Electrs could also be the fault here; I've been using a relatively old version. I also didn't try it in any other server, because of my privacy. All's well that ends well. I don't find any reason to switch to 4.2.1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Abdussamad",
+      "created_time": "May 15, 2022, 09:04:16 PM",
+      "body": "you should make an issue on github then. email the developers your mpk and they'll attempt a restore and find the bug:https://github.com/spesmilo/electrum/issues",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

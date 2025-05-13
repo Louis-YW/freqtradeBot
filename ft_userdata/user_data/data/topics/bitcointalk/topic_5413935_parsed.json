@@ -1,0 +1,109 @@
+{
+  "id": "topic_5413935",
+  "title": "Dr.Detroit",
+  "author": "Dr.Detroit",
+  "created_time": "September 18, 2022, 05:34:45 AM",
+  "content": "hello all,   has anyone heard of bypassing the power supply and just using DC power to run a miner?   we are able to adjust the wattage the S9s can run on.. if we turned an S9 down and had a few hundred watts of solar panels \" without a battery bank\" would they fire up when the sun was giving them enough watts?? I know there is a lot more involved with making the power \"steady\" but I am just wondering if I could spark some guy who know a little more about this than I thanks ALL..",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5413935",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "September 18, 2022, 11:15:26 AM",
+      "body": "Could it be done that way? Yes.Should it be done that way? Probably not.You need 12V and at a bit more then a couple of hundred watts per board to run a downlococked board + a few watts to run the controller.And you would have to make a custom power supply to get the panels to put out a clean 12V.Would probably be better to run a stock inverter on the solar to get to 120 / 240 AC then plug that into a UPS and then that into a regular power supply.That is all off the shelf stock components. You could probably build a custom setup to do what you want to do but it's going to take a lot more time and effort and since it's custom you will be doing all the troubleshooting.If something is not right on the custom setup as the sun moves and power changes you could be seriously underpowering or overpowering the hashboards. And that is just going to damage them.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mikeywith",
+      "created_time": "September 18, 2022, 10:24:07 PM",
+      "body": "Quote from: Dr.Detroit on September 18, 2022, 05:34:45 AMhas anyone heard of bypassing the power supply and just using DC power to run a miner? The control board and the hash boards couldn't care less where the 12V DC comes from, so ya, you could bypass the miner's PSU but then you will have a lot of issues to deal with.You will need to stabilize the DC input which can't happen if you want to supply the miner directly from the solar panels, and then two, you will need something to attach those 6-pin connectors to, you can't just a run couple of wires from the solar panels and attach them to the miner.So technically, this can be done, practically, it seems like a terrible idea.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Dr.Detroit",
+      "created_time": "September 18, 2022, 11:45:23 PM",
+      "body": "thanks for the reply. here we GO! I'm trying it. I did plan on using the aw3p or \"something similar\" to power the computer.. just thinking most solar setups are going for AC power.. when they already put out DC power and possibly \"bypass\" the inverter. so if there is a charge controller that is stable enough and can handle enough amps I should be good if the panels are producing enough amps. \"in thinking.. I planned on powering the computer with 110v ac.  if that changes the game?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "September 18, 2022, 11:55:30 PM",
+      "body": "Quote from: Dr.Detroit on September 18, 2022, 11:45:23 PMthanks for the reply. here we GO! I'm trying it. I did plan on using the aw3p or \"something similar\" to power the computer.. just thinking most solar setups are going for AC power.. when they already put out DC power and possibly \"bypass\" the inverter. so if there is a charge controller that is stable enough and can handle enough amps I should be good if the panels are producing enough amps. \"in thinking.. I planned on powering the computer with 110v ac.  if that changes the game?  my partner buysolar and i try 2 or three ways to do this.He has installed and designed solar systems for 22 years.We could not get a stable setup without batteries and inverters.3 venders claimed they had exactly what we wanted and all three power devices could not work as desired.it has been two years so maybe someone is selling something that will work for you good luck",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Dr.Detroit",
+      "created_time": "September 19, 2022, 12:39:10 AM",
+      "body": "ok ok.. yea nobody is selling me anything.. i was just thinking \"what if?\" I was given a burned up S9 and the computer and only one hashboard worked. and I noticed the power supply wouldn't even break a sweat so I unplugged the two bad boards and it still does fine. I am going to see if its just the one port for a hashboard working on the computer?? Im not sure if they all will run like that. thanks for the reply!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "September 19, 2022, 09:25:45 PM",
+      "body": "this is a great idea! Mining chips are fundamentally low voltage DC devices, just like solar cells.As others have said though, it will require some extra equipment in addition to the solar panel.Solar panels have a maximum power point for every different level of light shining on them. Solar Inverters / Battery chargers will have Maximum Power Point Trackers (MPPT) in them to adjust the solar panel output voltage and current to stay right in this maximum power point. Outside of the maximum power point you'll see dramatically lower power output. Sometimes even crashing to zero power (not so good for mining).Basically this means that if you hooked up a big enough solar panel to your miner via a 12V DC regulator, it _might_ work for a little bit. But as soon as a cloud goes by or the light changes in any way, the panel output power could crash and shutoff/brownout your miner. At best it's going to be *very* inefficient, and likely very unstable.When you're charging batteries with solar it's a relatively simple task of regulating the charging current to get into the solar panel's maximum power point. Batteries are fine with reducing the current -- they'll just charge slower. Not so much with a bitcoin miner. When you're running a miner (like the S9) you put in how many ever hashboards you want and then configure it with Braiins. The miner's current requirement is going to be pretty static with a given hash frequency (and maybe chip voltage).What you really need for solar mining is to have the mining chip's (it's called an ASIC, yo) mining frequency as a part of the MPPT control loop! I call it Maximum Hash Point Tracking (MHPT). Basically the miner firmware is constantly looking at the solar panel's voltage and current, and adjusting the hashing frequency to keep the solar panel from crashing and keep it at maximum power. You'll extract the maximum power that's available from the solar panel at any given instant, and use that to hash as much as you can. You'll avoid the inefficiency of high voltage inverters and rectifiers, which just means more hashes. I think there are some other efficiency gains to be had by changing up the DC-DC conversion inside the miner and changing the number of ASICs in series, but that's another project.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Dr.Detroit",
+      "created_time": "September 19, 2022, 09:36:50 PM",
+      "body": "wow that what was I was looking for! thank you!  so I'm thinking of  maybe having a small battery bank just to keep the power steady \"as possible during the day.. then just have a 12v timer to shut it down at sunset or near. what \"device does that a \"12v \"speed controller\" like for a motor? am I on the right track? thanks again for your reply I'm going to look into that firmware for solar! that is beautiful!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "September 19, 2022, 11:18:04 PM",
+      "body": "Quote from: Dr.Detroit on September 19, 2022, 09:36:50 PMwow that what was I was looking for! thank you!  so I'm thinking of  maybe having a small battery bank just to keep the power steady \"as possible during the day.. then just have a 12v timer to shut it down at sunset or near. what \"device does that a \"12v \"speed controller\" like for a motor? am I on the right track? thanks again for your reply I'm going to look into that firmware for solar! that is beautiful!Are you talking about a speed controller for your fan? I think you don't need it if you want to control the speed of both exhaust and front fan then you can control them like other said on different firmware. BraiinsOS is mostly one of the firmware that you can use to control power voltage, fan, and other features and options. If you want to install this firmware you can find the official thread here below- https://bitcointalk.org/index.php?topic=5036844.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "September 20, 2022, 01:25:47 PM",
+      "body": "Quote from: Dr.Detroit on September 19, 2022, 09:36:50 PMwow that what was I was looking for! thank you!  so I'm thinking of  maybe having a small battery bank just to keep the power steady \"as possible during the day.. then just have a 12v timer to shut it down at sunset or near. what \"device does that a \"12v \"speed controller\" like for a motor? am I on the right track? thanks again for your reply I'm going to look into that firmware for solar! that is beautiful!As far as I know, what I’m describing above doesn’t exist (yet). I think it would be amazing if it did exist though. Solar is the best decentralized power we have so far. It’s a perfect match for decentralized Bitcoin mining.Speed controller doesn’t sound like the right term. If you’re trying to charge batteries with solar, look for a “Solar charge controller”",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Dr.Detroit",
+      "created_time": "September 20, 2022, 08:18:37 PM",
+      "body": "yes. I am just trying to make the panels give 12v or nothing.. and possibly need a battery bank just for the \"steadiness\" I don't know all the tech terms but.. a device that will wait until it has enough power (12v) before it \"lets the power thru\" and have a low voltage \"kill switch\" I'm not trying to run them all night just when the sun is \"bright enough\" like it might turn off before sunset.. or a stormy day it would never even get triggered to \"go\" sorry I don't know the technical words to get out my idea?? but all this is helping thank you!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "September 20, 2022, 10:50:54 PM",
+      "body": "Quote from: Dr.Detroit on September 20, 2022, 08:18:37 PMyes. I am just trying to make the panels give 12v or nothing.. and possibly need a battery bank just for the \"steadiness\" I don't know all the tech terms but.. a device that will wait until it has enough power (12v) before it \"lets the power thru\" and have a low voltage \"kill switch\" I'm not trying to run them all night just when the sun is \"bright enough\" like it might turn off before sunset.. or a stormy day it would never even get triggered to \"go\" sorry I don't know the technical words to get out my idea?? but all this is helping thank you!!Not all day can generate or produce energy the best time for solar panels to generate power is around 11 am to 4 pm which should be the most productive time to generate power(Depending on how you set up your solar panels). Also, May June July August would be the best month that can produce high-quality power.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hZti",
+      "created_time": "October 03, 2022, 08:44:06 AM",
+      "body": "You could run the S9 with an UPS that will be charged with the solar panels. If the battery of the UPS is low it will automatically with the power of and will let the power through again when the solar panels start to produce again.Maybe even something as small as this can work: https://www.amazon.de/revolt-Ups-Mini-USV-unterbrechungsfreie-DC-Stromversorgung/dp/B01HOIC9HM (is German but you can translate)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "id": "topic_5467661",
+  "title": "DifDrama",
+  "author": "DifDrama",
+  "created_time": "September 22, 2023, 02:09:33 AM",
+  "content": "Are there some recommended approaches for running Bitcoin Core on a laptop with constrained storage capacity? Is it possible to use an external hard drive as the data directory (datadir)? How does this setup work, and would I need to pay attention to? Thank you in advance to everyone who responds to this question.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5467661",
+  "comments": [
+    {
+      "author": "EL MOHA",
+      "created_time": "September 22, 2023, 03:58:07 AM",
+      "body": "I have read on the forum that it is possible. Yes you can use an external hard drive to store the data directory but you might have to manually specify it since bitcoin core will not know it is on the hard drive. So when you start the client just specify that the dir is on the external drive not the system hard drive where it is installed on. Here is what I saw on how to specify itCode:bitcoind --datadir=<your_external_drive_location>This YouTube video might help  https://m.youtube.com/watch?v=mLCOW6KkbQM Note the external hard drive might always be connected when using the bitcoin core",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "September 22, 2023, 09:31:46 AM",
+      "body": "Quote from: DifDrama on September 22, 2023, 02:09:33 AMAre there some recommended approaches for running Bitcoin Core on a laptop with constrained storage capacity?1. Use pruned mode.2. Replace current storage drive with new internal storage drive to the laptop, which have bigger capacity.Quote from: DifDrama on September 22, 2023, 02:09:33 AMIs it possible to use an external hard drive as the data directory (datadir)?It is possible.Quote from: DifDrama on September 22, 2023, 02:09:33 AMHow does this setup work, and would I need to pay attention to?You just need to specific where should Bitcoin Core store it's data. Just be careful sudden power loss or disconnect on external storage could cause corruption, which force you to perform reindex and even redownload corrupt blockchain data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 22, 2023, 04:51:05 PMLast edit: September 22, 2023, 05:06:26 PM by satscraper",
+      "body": "Quote from: DifDrama on September 22, 2023, 02:09:33 AMAre there some recommended approaches for running Bitcoin Core on a laptop with constrained storage capacity? Is it possible to use an external hard drive as the data directory (datadir)? How does this setup work, and would I need to pay attention to? Thank you in advance to everyone who responds to this question.Yes, it is not only possible but highly recommended setup as it makes a bit faster the sync and, at the same time,  ease the burden of the drive that holds OS.I would advocate for external SSD instead of HDD  to not wait too long time for the  initial synchronization  completion .Put down into bitcoin.conf the following entriesdbcache=<M># where   M equals to 1/4 RAM, for instance if you RAM = 8Gb then dbcache=2048blocksonly=1 # this will increase the sync  speed as it  disables node listening and \"stop requesting and relaying transactions unless they are part of the block\". After full initial sync you may remove this  entry.datadir=<path to directory on external drive where Bitcoin Core will keep its data># For instance my path looks like this datadir=F:/ BitcoinData. Instead of BitcoinDta you can use any set of permissible characters you want",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "September 23, 2023, 09:54:19 AM",
+      "body": "Quote from: DifDrama on September 22, 2023, 02:09:33 AMAre there some recommended approaches for running Bitcoin Core on a laptop with constrained storage capacity? Is it possible to use an external hard drive as the data directory (datadir)? How does this setup work, and would I need to pay attention to? Thank you in advance to everyone who responds to this question.All what you said is possible, you can run it with a low storage capacity and you can use an external hard drive to have more capacity.If you use your first option, then you need to prune your BitcoinCore, that means that you will only store a certain amount of blocks according the configuration that you specified.In order to prune it, you just have to add the following line on bitcoin.conf file:Code:prune=10000This would allow to store all blocks possible in 10Gb if you have 5Gb then use 5000, etc.For the second option, using an external hard drive, you just have to add the parameter -datadir=$pathToStorage when running the Btc Core:Code:bitcoind --datadir=/mnt/dataYou can also add that parameter on the bitcoin.conf file so you'll not have to specify it every time. (Use your own /data path)This article does it with a rapsberry:  https://ishaana-misra.medium.com/using-raspberry-pi-to-run-a-full-bitcoin-node-a30c6339b06eThe setup is the same so you can follow the part where she uses the parameter datadir: - Setting Up The External Hard Drive - Installing & Running The Bitcoin CoreHope this helps SS",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "promise444c5",
+      "created_time": "September 23, 2023, 01:51:44 PM",
+      "body": "Quote from: DifDrama on September 22, 2023, 02:09:33 AMAre there some recommended approaches for running Bitcoin Core on a laptop with constrained storage capacity? Yes as it has been said you can always use external drives to a save all your blockchain  datas which will serve as you directory to be precise. It now depends on you find a suitable drive for it,you could use hard drives as you've asked.Quote from: DifDrama on September 22, 2023, 02:09:33 AM How does this setup work,I did some research for you and I found out a quote with a detailed explanation on how to go about itIt's a post made by HI-TEC99 on January 08 2017Quote from:  HI-TEC99There is a way to to that if you create a shortcut to your Bitcoin-qt inside a folder you installed it to.Right click your blackcoin qt Bitcoin-qt and select \"create shortcut\". Right click the shortcut and select properties. A popup should open containing a text box with the word target written to the left of it. Add the line of text below to the end of whatever is already written in it. Make sure there is a space between the text that was already in the text box and the text below. -datadir=.Press the apply button, then the OK button.Double click the shortcut to start the blackcoin Bitcoin-qt wallet and it should store its largest files (the blockchain) and also its wallet.dat inside the folder containing the shortcut.You can install the blackcoin qt Bitcoin-qt to a folder on a thumbdrive, use that shortcut technique, and when you double click the shortcut the blockchain and wallet.dat will get stored on your thumbdrive, not in appdata.If you use that technique, and accidentally double click the qt instead of the shortcut a new wallet dat and blockchain will get created on your C drive inside appdata. Make sure you always start your wallet using the shortcut.You can go through and follow the directions if there's seems to be no change in the aspect. It should help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DifDrama",
+      "created_time": "September 26, 2023, 03:16:16 AM",
+      "body": "I extend my heartfelt gratitude to all those who take the time to offer their assistance and insights.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "September 26, 2023, 04:00:03 AM",
+      "body": "Quote from: DifDrama on September 22, 2023, 02:09:33 AMAre there some recommended approaches for running Bitcoin Core on a laptop with constrained storage capacity? Is it possible to use an external hard drive as the data directory (datadir)? How does this setup work, and would I need to pay attention to? Thank you in advance to everyone who responds to this question.Why must people do things like this?Here is my cheap solution buy a used laptop that allows a ssd to be put inside of it.under 1 minute search on ebay I find a 2tb ssd i5 8th gen dell for $253.00Problem solved.https://www.ebay.com/itm/295574053536?there really is not an easier way.cheaper way yes search long on ebay and find a laptop with 1tb ssdhttps://www.ebay.com/itm/195976457193?the one above is under 200 usdplease note I did fast searches on ebay and found suitable laptops. I do not know the sellers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctodamon",
+      "created_time": "October 01, 2023, 05:16:15 PM",
+      "body": "Quote from: DifDrama on September 22, 2023, 02:09:33 AMAre there some recommended approaches for running Bitcoin Core on a laptop with constrained storage capacity? Is it possible to use an external hard drive as the data directory (datadir)? How does this setup work, and would I need to pay attention to? It is feasible to run Bitcoin Core on a laptop with limited storage, but you will need to make certain tweaks to effectively manage the storage needs. Here are suggestion.Pruning: which limits the amount of data retained on your disc, is a feature of Bitcoin Core that you may enable. Pruning keeps the most current blocks while removing old block data. Add the following line to your bitcoin.conf configuration file (found in the bitcoin data directory) to enable pruning.amount of megabytes prunedSubstitute the appropriate size of the blockchain data you wish to save for \"number of megabytes.\" The latest 2 GB of blockchain data will be kept by Bitcoin Core for instance if you set it to 2048.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 03, 2023, 01:34:36 PM",
+      "body": "Yes it is absolutely possible to use an external hard drive as your data directory, bit it must be connected to your computer at all times, otherwise there's a risk for data corruption. Bitcoin Core is very slow at cleaning up its state, so if you just disconnect the drive without ejecting it safely first, it's not going to have enough time to dump its memory database of transactions onto the disk.Also it would be much simpler to buy a big enough internal storage disk and a SATA connector assuming your laptop has room for an extra cable/device inside.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DifDrama",
+      "created_time": "October 07, 2023, 06:51:06 AM",
+      "body": "Quote from: philipma1957 on September 26, 2023, 04:00:03 AMWhy must people do things like this?Here is my cheap solution buy a used laptop that allows a ssd to be put inside of it.Your response broadened my perspective on this issue, and I appreciate your suggestion. It's indeed worth considering purchasing a used laptop with a suitable SSD, and your detailed considerations provide valuable guidance. Thank you for your helpful input!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "October 07, 2023, 07:00:06 PM",
+      "body": "I can't make assumptions where OP lives. In my country there are quite some dealers who trade with refurbished business laptops or leasing returns. This is not the hottest new electronic shit on the market but mostly very affordable and durable business laptops which are easier to open, to repair or to exchange parts, e.g. when you need a bigger storage device in them.You don't need the newest hottest stuff for big money, you can enjoy laptops that are built to last and do the job. Stay away from consumer laptops, some of them are a pain to open to replace RAM or storage. If you don't need the mobility aspect, then battery life might not be top priority either. Very common older business laptops sometimes still have some suppliers for the battery. Stay away from cheap battery crap, you don't want to risk to burn down your living space.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DifDrama",
+      "created_time": "October 12, 2023, 05:39:25 AM",
+      "body": "Quote from: Cricktor on October 07, 2023, 07:00:06 PMI can't make assumptions where OP lives. In my country there are quite some dealers who trade with refurbished business laptops or leasing returns. You're absolutely right, this kind of business with refurbished business laptops is quite common worldwide. While affordability and durability are key advantages, ensuring the security of these devices remains a crucial consideration for me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 12, 2023, 12:27:27 PM",
+      "body": "Quote from: DifDrama on October 12, 2023, 05:39:25 AMYou're absolutely right, this kind of business with refurbished business laptops is quite common worldwide. While affordability and durability are key advantages, ensuring the security of these devices remains a crucial consideration for me.Side question, how long do these refurbished devices last? It obviously cannot last as long as a brand-new device, which means it will fall apart sooner, is that not the case?Quote from: Cricktor on October 07, 2023, 07:00:06 PMYou don't need the newest hottest stuff for big money, you can enjoy laptops that are built to last and do the job. Stay away from consumer laptops, some of them are a pain to open to replace RAM or storage. If you don't need the mobility aspect, then battery life might not be top priority either. Very common older business laptops sometimes still have some suppliers for the battery. Stay away from cheap battery crap, you don't want to risk to burn down your living space.Why are you buying a laptop if you do not need the battery? An older generation tower + peripherals can also be assembled or bought for less than a new laptop.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "October 15, 2023, 12:11:24 PMLast edit: October 15, 2023, 02:05:15 PM by Cricktor",
+      "body": "Quote from: NotATether on October 12, 2023, 12:27:27 PMSide question, how long do these refurbished devices last? It obviously cannot last as long as a brand-new device, which means it will fall apart sooner, is that not the case?I have a refurbished Dell Latitude E6440 now since at least 2017 and it still works like a charm. When I purchased it I could barely see any signs of usage, lucky me. The battery that came with the laptop is still quite OK. To preserve battery life and when I don't need the battery when I can run the laptop on a power cord, I usually disconnect the battery when it is charged around 40%. On a Latitude you could also configure the battery management to only charge the battery to 50% max. when you're always plugged to the power cord. Such low charging levels are beneficial for battery life and endurance. I treat my laptops also always with some care and don't bang them around.Other refurbished laptops I use are a Thinkpad T520 and another Dell Latitude E7440. Both work just fine for years now.Quote from: NotATether on October 12, 2023, 12:27:27 PMWhy are you buying a laptop if you do not need the battery? An older generation tower + peripherals can also be assembled or bought for less than a new laptop.Because older generation towers are usually more power hungry than laptops which are mostly designed for power efficiency. I do care about power consuption of devices in my household, particularly those that operate for longer periods of a day or even 24/7.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DifDrama",
+      "created_time": "October 16, 2023, 02:51:24 AM",
+      "body": "Quote from: NotATether on October 12, 2023, 12:27:27 PMSide question, how long do these refurbished devices last? It obviously cannot last as long as a brand-new device, which means it will fall apart sooner, is that not the case?That's the reason to seek out trustworthy refurbishers and assess the device's initial build quality. Reputable refurbishers go the extra mile by either replacing or refurbishing essential components, ensuring the device functions well and enjoys an extended lifespan.Then another important question arises: how can one identify a reliable refurbisher?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "October 16, 2023, 04:00:01 AMLast edit: October 16, 2023, 04:11:56 AM by philipma1957",
+      "body": "ebay usa based has thousands of good laptops or pcs.  lots of good sellers.newegg has a ton of good used pcs and laptops.https://www.newegg.com/p/1VK-0001-69VD3?Item=9SIADT2JBS4330quick search.  first find the windows 11 key write it downthen-pull the windows ssd it is too small.put in a 1tb ssd. install a fresh windows 11.activate windows 11 with the code you copied.under $ 250 cost if you attach it to your tv for a monitor.plus you have a spare 512gb ssd.load your core 25 to it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 16, 2023, 07:27:28 AM",
+      "body": "Quote from: DifDrama on October 12, 2023, 05:39:25 AMYou're absolutely right, this kind of business with refurbished business laptops is quite common worldwide. While affordability and durability are key advantages, ensuring the security of these devices remains a crucial consideration for me.Easy: wipe them and install whatever Linux distribution you prefer. I'd never use any pre-installed operating system, and prefer to buy my laptops empty.Quote from: NotATether on October 12, 2023, 12:27:27 PMSide question, how long do these refurbished devices last? It obviously cannot last as long as a brand-new device, which means it will fall apart sooner, is that not the case?Can I answer with \"forever\"?  I've had new laptops break within a few years, sometimes mechanical (the hinges), sometimes the mainboard just giving up. I also have laptops 8-12 years old, and they get useless because of old age, not because they're breaking. Amazingly, most laptop batteries are still working after 10 years, although they run out quicker. And I do replace the CPU fan once in a while.Another thing to check: power consumption. The less, the better. It's quiet, saves money, attracts less dust and stays colder. Whenever I buy a laptop, I first search the \"TDP\" for the CPU. The lower the better.Quote from: Cricktor on October 15, 2023, 12:11:24 PMI have a refurbished Dell Latitude E6440 now since at least 2017 and it still works like a charm. When I purchased it I could barely see any signs of usage, lucky me. The battery that came with the laptop is still quite OK. To preserve battery life and when I don't need the battery when I can run the laptop on a power cord, I usually disconnect the battery when it is charged around 40%. On a Latitude you could also configure the battery management to only charge the battery to 50% max. when you're always plugged to the power cord. Such low charging levels are beneficial for battery life and endurance. I treat my laptops also always with some care and don't bang them around.I never remove my laptop battery, and after 8 years it's at 70%. If I'd disconnect it, I can't use it when I need it (for instance when I unplug the laptop).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "October 16, 2023, 08:34:28 PM",
+      "body": "Quote from: LoyceV on October 16, 2023, 07:27:28 AMQuote from: DifDrama on October 12, 2023, 05:39:25 AMYou're absolutely right, this kind of business with refurbished business laptops is quite common worldwide. While affordability and durability are key advantages, ensuring the security of these devices remains a crucial consideration for me.Easy: wipe them and install whatever Linux distribution you prefer. I'd never use any pre-installed operating system, and prefer to buy my laptops empty.If you're really paranoid or security conscious, see if the firmware isn't the last version or if it is the last available version, maybe you can downgrade it temporarily. Any refurbished laptop that came to me so far didn't have the latest bios/firmware. Flash the latest version, wipe the storage as LoyceV said and install the OS of your desire fresh. That's safe enough for me, I'm likely not a target for three letter agencies and bios malware is probably quite rare and/or more something for specifically targeted attacks.Quote from: LoyceV on October 16, 2023, 07:27:28 AMAnother thing to check: power consumption. The less, the better. It's quiet, saves money, attracts less dust and stays colder. Whenever I buy a laptop, I first search the \"TDP\" for the CPU. The lower the better.I'm kind of in the same boat as I rarely need any of my laptops for computation and energy heavy stuff. Keeping the cooling section clean gives you a longer life for your device. Dust is the enemy.Quote from: LoyceV on October 16, 2023, 07:27:28 AMI never remove my laptop battery, and after 8 years it's at 70%. If I'd disconnect it, I can't use it when I need it (for instance when I unplug the laptop).Well, it depends on the level of wear the supplied battery of the refurbished laptop already had. You can be lucky or not so much. That's also dependent on the refurbisher and availability of good batteries for your laptop model.I rarely need any of my laptops in a truely mobile situation with no power plug. But that's me and YMMV.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "October 16, 2023, 11:37:40 PM",
+      "body": "Quote from: Cricktor on October 16, 2023, 08:34:28 PMQuote from: LoyceV on October 16, 2023, 07:27:28 AMQuote from: DifDrama on October 12, 2023, 05:39:25 AMYou're absolutely right, this kind of business with refurbished business laptops is quite common worldwide. While affordability and durability are key advantages, ensuring the security of these devices remains a crucial consideration for me.Easy: wipe them and install whatever Linux distribution you prefer. I'd never use any pre-installed operating system, and prefer to buy my laptops empty.If you're really paranoid or security conscious, see if the firmware isn't the last version or if it is the last available version, maybe you can downgrade it temporarily. Any refurbished laptop that came to me so far didn't have the latest bios/firmware. Flash the latest version, wipe the storage as LoyceV said and install the OS of your desire fresh. That's safe enough for me, I'm likely not a target for three letter agencies and bios malware is probably quite rare and/or more something for specifically targeted attacks.Quote from: LoyceV on October 16, 2023, 07:27:28 AMAnother thing to check: power consumption. The less, the better. It's quiet, saves money, attracts less dust and stays colder. Whenever I buy a laptop, I first search the \"TDP\" for the CPU. The lower the better.I'm kind of in the same boat as I rarely need any of my laptops for computation and energy heavy stuff. Keeping the cooling section clean gives you a longer life for your device. Dust is the enemy.Quote from: LoyceV on October 16, 2023, 07:27:28 AMI never remove my laptop battery, and after 8 years it's at 70%. If I'd disconnect it, I can't use it when I need it (for instance when I unplug the laptop).Well, it depends on the level of wear the supplied battery of the refurbished laptop already had. You can be lucky or not so much. That's also dependent on the refurbisher and availability of good batteries for your laptop model.I rarely need any of my laptops in a truely mobile situation with no power plug. But that's me and YMMV.I am a big fan of hp,dell,lenovo tiny gear.basically 8 by 8 by 2.easy to swap out parts very durable.you can’t game much with them but they are workhorses and very easy to clone the internal ssd to have a back up booter.https://www.ebay.com/itm/266453641170?cheapabout 110 with shipping and tax.grab the windows 10 activation code use magic jelly bean write it down.put in an 85 dollar crucial ssd 2tb or a 129 dollar samsung ssd 2tbfor 200 bucks you have a low power  i7 6700t cpu .you can do a lot of basic shit with it. All the content I had ever done on this website could be done with it.If you take your time looking at them you some times find one with 32gb and an i7 8700twhich is a nice machine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

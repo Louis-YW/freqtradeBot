@@ -1,0 +1,117 @@
+{
+  "id": "topic_5466559",
+  "title": "Pmalek",
+  "author": "Pmalek",
+  "created_time": "September 12, 2023, 06:38:26 PM",
+  "content": "Ledger's security team Ledger Donjon attempted to manipulate the Coldcard MK4 chip to reveal sensitive information and keys using Laser Fault Injection.The Coldcard MK4 uses two secure elements and splits the seed between those two chips + the MCU. Ledger Donjon attempted to attack one of these SEs, namely the DS28C36. They injected the chip with single and multiple laser pulses and were partially successful. They did not manage to recover any private keys, though. That's because the device is set up to split the keys between the 3 different chips. The laser attack only revealed part of the decryption key that was stored on the DS28C36 chip. But without full compromise of the other 2 chips, they can't decrypt the seed. Coldcard has said they have been in contact with Ledger Donjon due to Responsible Disclosure standards. Both companies agree that the attack was not successful.  Sources and further reading:1. https://fdtc.deib.polimi.it/FDTC23/slides/FDTC2023-slides-3-3.pdf2. https://blog.coinkite.com/donjon-faults-2023/3. https://twitter.com/DonjonLedger/status/1701224148226208255",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466559",
+  "comments": [
+    {
+      "author": "Yamane_Keto",
+      "created_time": "September 13, 2023, 01:28:48 PM",
+      "body": "From what I understand, the test was not for the possibility of extracting the private key from COLDCARD Mk4 because that was clearly stated, as after the private key is generated encrypted, then stored in SE1 using a 256-bit key determined by a SE1, SE2 and the main microcontroller. above test was SE1 and showed that data could be leaked (the private key is encrypted there). However, the ability to identify the private key failed. They verified that the wallet was working properly, but I did not find tests on SE1, SE2, and the main processor (MCU) at the same time.Source https://blog.coinkite.com/understanding-mk4-security-model/Frankly, it is a good thing, but I will not trust any company if I lose my HW wallet, and anyone must withdraw directly as soon as discover that HW has been stolen or disappeared.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "September 13, 2023, 03:26:00 PM",
+      "body": "I didn't get the impression that they weren't targeting sensitive information like the seed, private keys, or the PIN. What else would they be looking for?It's correct that they only focused on one chip, the DS28C36. The second one and the MCU weren't submitted to the laser. I guess they were only interested in the security of the DS28C36, not the rest. The Coldcard MK4 is the only hardware wallet that uses this chip I think.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "September 14, 2023, 06:19:55 AM",
+      "body": "Quote from: Pmalek on September 13, 2023, 03:26:00 PMI didn't get the impression that they weren't targeting sensitive information like the seed, private keys, or the PIN. What else would they be looking for?They targeted this data but the PIN is stored in SE2 and seed decryption depends on SE2 and MCU.Quote from: Pmalek on September 13, 2023, 03:26:00 PMThe second one and the MCU weren't submitted to the laser. I guess they were only interested in the security of the DS28C36, not the rest. The Coldcard MK4 is the only hardware wallet that uses this chip I think.Your guess is correct. After searching a little, I found that it is related to this story https://blog.ledger.com/coldcard-pin-code/. It seems that they want to test it compared to ATECC508A, they want to say that MK4 is safer than MK2.The cost of these devices is more than $200,000 and they require a specialized team. I think they may be used after the permission of the wallet owner if he forgets the PIN.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 14, 2023, 06:27:12 AM",
+      "body": "I don't understand why the exploit did not work. If they were able to break into one of the secure elements using laser fault injection, what was stopping them from breaking into the other one similarly, or even both at the same time?Is there some sort of hardware feature that keeps only part of the key decrypted at any given time, and changes the key at fixed interval to another one?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 14, 2023, 07:01:44 AMLast edit: September 14, 2023, 07:23:51 AM by satscraper",
+      "body": "Quote from: NotATether on September 14, 2023, 06:27:12 AMI don't understand why the exploit did not work. If they were able to break into one of the secure elements using laser fault injection, what was stopping them from breaking into the other one similarly, or even both at the same time?Is there some sort of hardware feature that keeps only part of the key decrypted at any given time, and changes the key at fixed interval to another one?Because the probability to break three chips by technique they used  is  vanishingly small.To do this one should illuminate simultaneously three correct  points on  three chips by laser beam spitted into three sub-beams. If probability to choose the correct point on the fist  chip is P(1) , on the second - P(2) and on the third - P(3) then the target value is  P(1) x P(2) x P(3).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 14, 2023, 07:06:16 AM",
+      "body": "Quote from: satscraper on September 14, 2023, 07:01:44 AMQuote from: NotATether on September 14, 2023, 06:27:12 AMI don't understand why the exploit did not work. If they were able to break into one of the secure elements using laser fault injection, what was stopping them from breaking into the other one similarly, or even both at the same time?Is there some sort of hardware feature that keeps only part of the key decrypted at any given time, and changes the key at fixed interval to another one?Because the probability to do this is is vanishingly small.To do this one should illuminate simultaneously three correct  points on  three chips by laser beam spitted into three sub-beams. If probability to chose the correct point on the fist  chip is P(1) , on the second - P(2) and on the third - P(3) then the target value is  P(1) x P(2) x P(3). With one laser beam, I guess that is true. How would you be able to accurately split the beam in 3 to the correct locations using a beam splitter anyway.But what is the probability of getting a laser through to one of the secure elements in the first place? If it was something like 1% or even 10% then your math starts to make more sense.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 14, 2023, 07:22:46 AMLast edit: September 14, 2023, 09:58:51 AM by satscraper",
+      "body": "Quote from: NotATether on September 14, 2023, 07:06:16 AMBut what is the probability of getting a laser through to one of the secure elements in the first place? If it was something like 1% or even 10% then your math starts to make more sense.I guess they just scanned the whole surface and recorded response from each illuminated point. Quote from: NotATether on September 14, 2023, 07:06:16 AMWith one laser beam, I guess that is true. How would you be able to accurately split the beam in 3 to the correct locations using a beam splitter anyway.The only reasonable technique would the fixing two splitted beams and scanning by third beam, then moving first beam into new position and scanning again with the third beam, and so on, then repeating the whole process with the second beam. Too complicated to be realized on practice.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "September 14, 2023, 07:33:02 AM",
+      "body": "Quote from: NotATether on September 14, 2023, 06:27:12 AMI don't understand why the exploit did not work. If they were able to break into one of the secure elements using laser fault injection, what was stopping them from breaking into the other one similarly, or even both at the same time?Is there some sort of hardware feature that keeps only part of the key decrypted at any given time, and changes the key at fixed interval to another one?According to what I understand, they are required to test the DS28C36 against the ATECC508A, a previous test of which using the same tools proved the success of the attack and the possibility of knowing the data. https://blog.ledger.com/coldcard-pin-code/the attempt was only aimed at SE1 and one vendor and not to hack the wallet.It is true that there was a leak, but the attack was not successful due to the use of permanent-protected pages used for P256 curve.Details are better explained here https://fdtc.deib.polimi.it/FDTC23/slides/FDTC2023-slides-3-3.pdf about the reasons for the failure of this attack and recommendations for the future.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "September 14, 2023, 03:27:42 PM",
+      "body": "Quote from: NotATether on September 14, 2023, 06:27:12 AMI don't understand why the exploit did not work. If they were able to break into one of the secure elements using laser fault injection, what was stopping them from breaking into the other one similarly, or even both at the same time? Hasn't it been proven already that older STM32 chips are vulnerable to fault injection already in the past with different companies proving it with various successful attacks? Even Ledger carried out such attacks but so did certain security firms. I think even Joe Grand mentioned back when I talked to him for our interview that STM32 chips are susceptible to these types of manipulation.Ledger might even be testing this new SE and considers using it in some of their future hardware wallets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 14, 2023, 06:12:37 PM",
+      "body": "Quote from: Pmalek on September 14, 2023, 03:27:42 PM[Hasn't it been proven already that older STM32 chips are vulnerable to fault injection already in the past with different companies proving it with various successful attacks? In my view  wallet  makers should look for 3D-stacked SE and MCU  which  have the natural protection against laser beam for silicon die on both side, front and back. I find it hard to believe that such chips do not exist in the market,  but, probably,  they are driven by money and use the cheaper solution considering that LFI attacks are expensive to execute as they require  sophisticated equipment and skills.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "September 14, 2023, 06:24:21 PM",
+      "body": "The production of those chips are already high. Introducing new stacks or layers just adds more costs on top of that. If it's a new technology that involves a lot of testing, you are looking at many faulty units until they perfect the production process. And if you are creating a chip that is capable of withstanding laser beam attacks, you would need to attempt to attack it to make sure it does. So again, we are looking at new investment into the tools needed for the attack, etc. All that will then affect the final cost of the hardware wallet that uses such a SE chip.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tread93",
+      "created_time": "September 27, 2023, 06:12:26 PM",
+      "body": "Woah, this is insane! You mean to tell me that they are now using LASERS to pierce through the element chips and gain access. Even if they were only partially successful they are not far off from being completely successful! If they do become completely successful that is certainly very alarming for the security of these cards.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "September 28, 2023, 03:26:10 PM",
+      "body": "Laser Fault Injections or Fault Attacks have been a thing for a few years already, and several chips have proven to be susceptible to them. Ledger's Donjon Team has performed several such attacks but so have other security firms. The chips in the older Coldcard models are just one example.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

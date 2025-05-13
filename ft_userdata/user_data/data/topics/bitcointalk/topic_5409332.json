@@ -1,0 +1,37 @@
+{
+  "id": "topic_5409332",
+  "title": "satscraper",
+  "author": "satscraper",
+  "created_time": "August 10, 2022, 08:27:41 AM",
+  "content": "Hi to all. I'm relatively new to bitcoin technicalities and in my understanding it is  solely the responsibility of every node to hold up levelDB of bitcoin feeding it up and  renewing with  the data obtained from other nodes. LevelDB itself is not in blockchain. If not so, feel free to shoot it down in flames.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5409332",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "August 10, 2022, 08:38:14 AM",
+      "body": "Quote from: satscraper on August 10, 2022, 08:27:41 AMit is  solely the responsibility of every node to hold up levelDB of bitcoin feeding it up and  renewing with  the data obtained from other nodes.The responsibility of a full node is to download and verify all the blocks from the start until the last one while enforcing consensus rules. What database that node uses to store the blockchain and the related data is not important at all. In other words LevelDB is just one of many possible key-value stores that could be used to store the bitcoin related data such as the chainstate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 10, 2022, 09:32:06 AM",
+      "body": "Quote from: satscraper on August 10, 2022, 08:27:41 AMLevelDB itself is not in blockchain. If not so, feel free to shoot it down in flames.While the database itself isn't serialized inside the blockchain, we know that the blockchain consists of blocks, the data of which is stored inside levelDB databases.So the entirety of all the blocks is stored in the blockchain, but as @pooya87 said, a storage medium is needed for all those blocks, and so that's where LevelDB comes in.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Accardo",
+      "created_time": "August 12, 2022, 06:46:58 AM",
+      "body": "Level DB is a database that works with no SQL which can be used to store data not only for Bitcoin any project can make use of it, as the database is leveled on choosing what key and value you want to store in the program or get from the database. A running Bitcoin node saves Bitcoin related data on block or chainstate directories, then the leveldb can be used to call those files saved in the directory. For instance we can retrieve a bunch of key values from the blocks index using one operation.  Code:const level = require('level')const db = level('my-db')const ops = [  { type: 'get', key: 'block' },  { type: 'get', key: 'b'+32, value: 'byte block hash' },  { type: 'get', key: 'F+4', value: 'byte file number' },  { type: 'get', key: 'I-4', value: 'byte file number' },  { type: 'get', key: 't+32', value: 'byte transaction hash' }]db.batch(ops, function (err) {  if (err){     return console.log(err)  }  console.log('Great success')})We have an ops array with a bunch of objects to define the operations.The type is the type of the operation we want to do. They are the same as the method names.The key is needed for getting the items to delete.And the value is what we insert as the value of the keyOther additional functions include;Get- get a key from the databasePut- put a value from the databaseDel - delete a key in the current range L.S- get all the keys in the current rangeStart - defines the start of the current rangeEnd - denfine the end of the current range This will help you get to know leveldb better https://bitcoindev.network/understanding-the-data/amp/https://thewebdev.info/2020/09/21/node-js-basics%E2%80%8A-%E2%80%8Alevel-db/https://imil.net/blog/posts/2020/bitcoin-leveldb-debugging/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

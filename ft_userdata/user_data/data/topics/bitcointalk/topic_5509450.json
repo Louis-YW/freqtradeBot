@@ -1,0 +1,85 @@
+{
+  "id": "topic_5509450",
+  "title": "Question:",
+  "author": "d5000",
+  "created_time": "September 16, 2024, 11:50:58 PM",
+  "content": "I'd like to know how many in this forum know about Discreet Log Contracts and how popular they are.In short, DLCs are a form of smart contract achievable with pure Bitcoin Script, but involving an Oracle.How it works: The participants of the contract define the rules of the contract, defining an action (a particular way the coins to be spent) to be taken when a certain event happens, for example when the Bitcoin price reaches a certain value. Then they sign a large amount of transactions but don't broadcast them, but share them among themselves and with an Oracle. The Oracle signs only one of these transactions, which is the one corresponding to the outcomeAn example is a simple bet: Alice bets 0.01 BTC that Bitcoin will reach $70000 until November 1, 2024, and Bob bets 0.01 BTC against that. The rules of the contract are: If the price reaches $70000 until November 1, 2024, Alice gets 0.02 BTC, otherwise Bob gets the 0.02 BTC. So they sign two transactions, both with Alice's 0.01 and Bob's 0.01 BTC input: one paying 0,02 to Alice, and one paying 0,02 to Bob. Once November 1, 2024 has been reached, the Oracle signs one of both transactions according to what happened with the price. If the price has reached 70,000, then it signs the tx paying to Alice, and if not, then it signs the transaction to Bob.There can be much more complex contracts with this technique, like contracts-for-difference (\"DLCFD's\").I would first like to know if the concept is known in the Bitcointalk community and if someone already used them  If there are people interested, I'd like to discuss some concepts for interesting contracts.A site with good info resources is this Github link collection. There was also a related Bitcointalk thread last year with an easy explanation.Also, a question for those who have experiences with DLCs: Is their any platform/forum where these contracts are discussed, for example where new contracts are proposed?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5509450",
+  "comments": [
+    {
+      "author": "SmartGold01",
+      "created_time": "September 16, 2024, 11:57:11 PM",
+      "body": "Quote from: d5000 on September 16, 2024, 11:50:58 PMAn example is a simple bet: Alice bets 0.01 BTC that Bitcoin will reach $70000 until November 1, 2024, and Bob bets 0.01 BTC against that. The rules of the contract are: If the price reaches $70000 until November 1, 2024, Alice gets 0.02 BTC, otherwise Bob gets the 0.02 BTC. So they sign two transactions, both with Alice's 0.01 and Bob's 0.01 BTC input: one paying 0,02 to Alice, and one paying 0,02 to Bob. Once November 1, 2024 has been reached, the Oracle signs one of both transactions according to what happened with the price. If the price has reached 70,000, then it signs the tx paying to Alice, and if not, then it signs the transaction to Bob.Sorry I have little questions here.. following up this examples you gave. What if the two prediction isn't correct or doesn't match their bet as you said who then received the payment among the two. Like I have never covered this range of knowledge so far so would want to know more about this, though the link you shared I will take time to study them to know more about this mechanism.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Hatchy",
+      "created_time": "September 17, 2024, 12:09:04 AM",
+      "body": "Quote from: SmartGold01 on September 16, 2024, 11:57:11 PMQuote from: d5000 on September 16, 2024, 11:50:58 PMAn example is a simple bet: Alice bets 0.01 BTC that Bitcoin will reach $70000 until November 1, 2024, and Bob bets 0.01 BTC against that. The rules of the contract are: If the price reaches $70000 until November 1, 2024, Alice gets 0.02 BTC, otherwise Bob gets the 0.02 BTC. So they sign two transactions, both with Alice's 0.01 and Bob's 0.01 BTC input: one paying 0,02 to Alice, and one paying 0,02 to Bob. Once November 1, 2024 has been reached, the Oracle signs one of both transactions according to what happened with the price. If the price has reached 70,000, then it signs the tx paying to Alice, and if not, then it signs the transaction to Bob.Sorry I have little questions here.. following up this examples you gave. What if the two prediction isn't correct or doesn't match their bet as you said who then received the payment among the two. Like I have never covered this range of knowledge so far so would want to know more about this, though the link you shared I will take time to study them to know more about this mechanism.It has to be either of alice or Bob to win the prediction. If Alice bets that BTC reaches $70,000, that means his bet is going to be from $70,000 above. Again since Bob bet against Alice meaning that BTC won't get to $70,000 that means any price below $70k eg $69999 will make Bob the winner of the bet. So you see that either way, someone has to be a winner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d5000",
+      "created_time": "September 17, 2024, 12:38:47 AM",
+      "body": "Quote from: SmartGold01 on September 16, 2024, 11:57:11 PMSorry I have little questions here.. following up this examples you gave. What if the two prediction isn't correct or doesn't match their bet as you said who then received the payment among the two. @Hatchy has already explained that in this example all cases are covered by the contract.There may however be examples for contracts where ambiguities could occur. For example, in a \"contract for difference\", the outcome of the contract depend on the exact price at a certain date. However it is inefficient to sign a transaction for every possible outcome. Let's say you sign transactions for all possible outcomes from $1000 to $1000000, with a step of 1000. You still have to sign 1000 transactions then, which is still doable (those transactions will take approximately 300-400 bytes each I think, so you'll have to share 400 kB).Two things in theory could occur though in this case:- $1000000 is surpassed.- The price reaches exactly $50500 for example. Is it already $51000 or still $50000?It's actually the Oracle who has to decide in these cases which transaction to sign. One of the core ideas of DLCs is that the Oracle doesn't know which party has taken a certain position, to be immune against bribery. So the Oracle shouldn't know exactly what the parties agreed. Thus, it's the contract participants who have to know and follow the Oracle's rules.Something that also can go wrong is that an Oracle fails or is unresponsive. To prevent these cases, afaik several Oracles could be used.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 17, 2024, 04:17:00 AM",
+      "body": "QuoteWhat if the two prediction isn't correct or doesn't match their bet as you said who then received the payment among the two.It depends on the script. If something is not covered, and people are protected by N-of-N multisig, then they all have to agree. But if the contract is weaker, and is for example a classical 2-of-3 multisig, then only two parties have to agree on what happened.But technically, it is possible to use a \"cancel\" path, if participants prepared it. In this case, people will just lose some fees.QuoteSomething that also can go wrong is that an Oracle fails or is unresponsive.That's why 2-of-3 multisig also means, that both parties can agree, without an Oracle.QuoteThe price reaches exactly $50500 for example. Is it already $51000 or still $50000?That's why many things are often written as \"<condition> OP_IF <keyAlice> OP_ELSE <keyBob> OP_ENDIF\". And if you use classical math rules, then an approximation of 0.5 to a single digit is 1.0, not 0.0. In this way, you have {0,1,2,3,4} digits approximated to the floor, and {5,6,7,8,9} digits, approximated to the ceil. And then, 0.5 contains \"5\", so it is approximated to the ceil.QuoteIs their any platform/forum where these contracts are discussed, for example where new contracts are proposed?Sometimes, when you explore other blockchain data, you can encounter some interesting raw scripts. And then, you can often see, what was the intention of a given script, and what was the real outcome. For example: some people tried to use math operations on 256-bit numbers, and then their coins turned out to be unspendable, but their goals were quite clear, for example: https://mempool.space/testnet/tx/952656e19ce57698880ad6ada935f29ee2cae82c4e7486516908b630671dd84b",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ImThour",
+      "created_time": "September 17, 2024, 05:04:22 AM",
+      "body": "Thanks for sharing it with us, I am sure many of us were not aware of this so called DLCs. The only DLCs I am aware of is Downloadable Content for Games.And with the example you shared, I am sure if it's easy to integrate with a website, you can make a betting platform using these Discreet Log Contracts.Just like how many web3 applications are using Ethereum based contracts, which I feel like are far superior.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Apocollapse",
+      "created_time": "September 17, 2024, 05:35:03 AM",
+      "body": "I voted Never heard about DLCs.Unfortunately this smart contract seems not be useful and it's function is very limited. It can be used to bet if the results are come from the Bitcoin blockchain aka internal data, you can't bet if the results are from external data like betting on sports etc.For people who care about the fee they pays will not use this since the transaction will be made automatically even though the mempool is congested.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 17, 2024, 06:24:01 AM",
+      "body": "Quoteyou can't bet if the results are from external dataA lot of things can be made \"internal\". For example: if you want to trade between BTC and ALT, then it is all about signing a proper message, and then, if you count only \"in the system trades\", then you can write conditions about it.Also, if you want to make for example swaps, then only one chain needs new opcodes. Then, you can have OP_CHECKSIG on BTC, and OP_CHECKSIGFROMSTACK on ALT, and then, just a regular multisig can be used, to move both coins, with the same signature.Another thing is that for all external data, it is also possible, if you can write some software, executing a given contract, then you can make a SCIP version of that, and then, it works on any data: https://bitcointalk.org/index.php?topic=277389.0For example, some time ago, people moved some coins, for providing a solution for sudoku puzzle: https://github.com/zcash-hackworks/pay-to-sudokuSo: on Bitcoin, you can just use some hash, or some signature. However, if it will unlock some external proof, then it can be as complex, as you want. And you don't need to push everything on-chain: you can only put the hashed password, or a OP_CHECKSIG-compatible signature.Quotethe transaction will be made automatically even though the mempool is congestedTo control the congestion, transaction joining is needed. And note, that batching N transactions into one can be achieved through full-RBF. And if you combine it with SCIP, then the password can for example unlock a batched transaction. Also, because of homomorphic encryption, people can externally join their payments in a trustless way, and then, the last recipient can just use decryption key, and submit the final version on-chain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "davis196",
+      "created_time": "September 17, 2024, 10:20:37 AM",
+      "body": "Quote from: Apocollapse on September 17, 2024, 05:35:03 AMI voted Never heard about DLCs.Unfortunately this smart contract seems not be useful and it's function is very limited. It can be used to bet if the results are come from the Bitcoin blockchain aka internal data, you can't bet if the results are from external data like betting on sports etc.For people who care about the fee they pays will not use this since the transaction will be made automatically even though the mempool is congested.I kinda agree with this opinion(about betting on external events), but there must be a way to include data about the BTC price in the smart contract. Can the smart contract be written in a way so that it tracks the Bitcoin price from sources like Coinmarketcap? I'm not a programmer, but I think that this is possible. The automatic payment can also be delayed, when the transaction fee is above a certain level. This can also be included in the smart contract.I am aware about contracts for a difference and binary options, but I've never heard about discreet log contracts. I also don't think that DLCs are very popular and they won't become popular anytime soon, because they aren't user-friendly enough for the average crypto user.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d5000",
+      "created_time": "September 17, 2024, 07:38:41 PM",
+      "body": "Quote from: Apocollapse on September 17, 2024, 05:35:03 AMUnfortunately this smart contract seems not be useful and it's function is very limited. It can be used to bet if the results are come from the Bitcoin blockchain aka internal data, you can't bet if the results are from external data like betting on sports etc.This is incorrect. The BTC/USD price I mentioned in my example is not an on-chain element, but would be extracted from the data of an exchange.Basically the \"bets\" can involve any data two parties agree on 1) the data source (in our example, it may be Binance or Kraken for example) and 2) the Oracle. So it can also be sports, election results and any other data. The Oracle of course must support the type of data and the source the parties use. So the challenge is to find a suitable and trustable Oracle.Regarding usefulness, the DLCFD (Discreet Log Contract-for-difference) is useful, for example, if you have:1) one party that needs to ensure the value of an amount of BTC doesn't go lower than a certain price - they want their Bitcoin investment to stay stable at least. This can be a person who wants to ensure that at least a part of their Bitcoins holds their value. The use case is similar to a put option.2) one party wanting to leverage a long position, i.e. profit in a higher proportion from a price increase.The DLCFD allows the parties (let's again go with Alice and Bob) to agree on a contract where each party  contribute 1 BTC when the value is at $60000, and Alice (it could be called a \"conservative short\" position) always receives the value of $60000, in Bitcoin, while Bob (the \"leveraged long\" position) receives the rest. The outcome is then as following:1) If the price goes above $60000 at the deadline of the contract, then Alice receives less than 1 BTC but always the value of $60000, while Bob receives more than 1 BTC (and thus more than 60000), which means he's making profit.2) If the price goes below $60000 at the deadline, then Alice receives more than 1 BTC but still always the value of $60000, while Bob receives less than 1 BTC, and thus is at loss.3) If the price goes to $30000, Alice receives the whole value of the contract (because 2 BTC are now worth 60000), and Bob doesn't get nothing.4) If the price goes below $30000, Alice receives the whole value of the contract, but it's now worth less than 60000. This is an additional risk for the short position in DLCFDs, in comparison to \"normal\" CFDs, where Bob would have to provide always $60000 for Alice. However, normally this outcome is unlikely, at least for contracts over short timeframes.DLCFDs of course could also be done involving stablecoins, although there seem to be currently few stablecoins on the Bitcoin blockchain, and on Ethereum other contracts are more useful for this use case.As DLCFDs are more risky for the long position (Bob), who can lose everything (cases 3/4 above) Bob could probably in most market situations demand the payment of a premium as it occurs with put options.Quote from: Apocollapse on September 17, 2024, 05:35:03 AMFor people who care about the fee they pays will not use this since the transaction will be made automatically even though the mempool is congested.DLCs can also be entered and settled via Lightning Network, so the fees are not necessarily an issue.Here's the original whitepaper of DLCs: https://adiabat.github.io/dlc.pdf",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

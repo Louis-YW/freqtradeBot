@@ -1,0 +1,61 @@
+{
+  "id": "topic_5454038",
+  "title": "unknowncustomer",
+  "author": "unknowncustomer",
+  "created_time": "May 25, 2023, 09:23:22 PM",
+  "content": "Hello,I would need some help on Python:I am trying to import helper package on Python with module hash256 like the colored lined of the below code however it’s not working. from ecc import S256Point, G, Nfrom helper import hash256e = int.from_bytes(hash256(b'my secret'), 'big')z = int.from_bytes(hash256(b'my message'), 'big')k = 1234567890r = (k*G).x.numk_inv = pow(k, N-2, N)s=(z+r*e)*k_inv%Npoint = e*Gprint(point) # S256Point(028d003eab2e428d11983f3e97c3fa0addf3b42740df0d211795ffb3be2f6c52, \\ 0ae987b9ec6ea159c78cb2a937ed89096fb218d9e7594f02b547526d8cd309e2)print(hex(z)) # 0x231c6f3d980a6b0fb7152f85cee7eb52bf92433d9919b9c5218cb08e79cce78print(hex(r)) # 0x2b698a0f0a4041b77e63488ad48c23e8e8838dd1fb7520408b121697b782ef22print(hex(s)) # 0xbb14e602ef9e3f872e25fad328466b34e6734b7a0fcd58b1eb635447ffae8cb9Or do you have an idea to do a double sha256 (it is hash256)?I tried this:from hashlib import sha256 as hprint(h(h(\"my secret\".encode()).hexdigest().encode()).hexdigest())It's almost working however the result does not match as it is not starting with 0x.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454038",
+  "comments": [
+    {
+      "author": "PowerGlove",
+      "created_time": "May 26, 2023, 05:12:21 AM",
+      "body": "Howdy! Yup, it looks to me like that hash256 function would've done a double SHA-256. You can define your own function to replace that import, like this:Code:from hashlib import sha256def hash256(data):    return sha256(sha256(data).digest()).digest()That should work identically to the missing function (i.e. print(hex(int.from_bytes(hash256(b'my message'), 'big'))) should emit 0x231c6f3d980a6b0fb7152f85cee7eb52bf92433d9919b9c5218cb08e79cce78).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "unknowncustomer",
+      "created_time": "May 26, 2023, 08:28:06 AM",
+      "body": "OMG it is working thanks a lot !!I am quite new to Python and Programming Bitcoin, any idea where I should start ? which books ?Thanks !!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "May 26, 2023, 08:32:22 AM",
+      "body": "Quote from: unknowncustomer on May 25, 2023, 09:23:22 PMprint(h(h(\"my secret\".encode()).hexdigest().encode()).hexdigest())It's almost working however the result does not match as it is not starting with 0x.Your solution produces a completely different hash because before making a second hash, you represent bytes as hex values instead of raw bytes. Only use hexdigest() method after you have calculated a final hash.Instead of Code:print(h(h(\"my secret\".encode()).hexdigest().encode()).hexdigest())DoCode:print(h(h(\"my secret\".encode()).digest()).hexdigest())You can also use f-strings to add 0x to final representation:Code:print(f'0x{h(h(\"my secret\".encode()).digest()).hexdigest()}')",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "May 26, 2023, 10:29:45 AM",
+      "body": "Quote from: unknowncustomer on May 26, 2023, 08:28:06 AMOMG it is working thanks a lot !!I'm glad I could help! Quote from: unknowncustomer on May 26, 2023, 08:28:06 AMI am quite new to Python and Programming Bitcoin, any idea where I should start ? which books ?I'd say you're already on the right path; just keep trying to do stuff and ask questions when you get really stuck. The best programmers I know basically taught themselves by trial-and-error. Books, and courses, etc. can help, but (in my experience) nothing will teach you better or faster than mindful practice.In the beginning, you'll feel like this guy:But after a while, you'll start to feel like this guy:Just keep practicing. (Feel free to send me a PM if you get really stuck on something.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "May 26, 2023, 10:39:52 AM",
+      "body": "Quote from: unknowncustomer on May 26, 2023, 08:28:06 AMOMG it is working thanks a lot !!I am quite new to Python and Programming Bitcoin, any idea where I should start ? which books ?Thanks !!If you really insist to use book, people (including me) usually would recommend Mastering Bitcoin 2nd Edition[1]. Although if you prefer something shorter, check learn me a bitcoin website[2] instead. Aside from @PowerGlove said, i find reading documentation and example of certain library/function is helpful to prevent problem like this.[1] https://github.com/bitcoinbook/bitcoinbook[2] https://learnmeabitcoin.com/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bettercrypto",
+      "created_time": "May 26, 2023, 04:51:46 PM",
+      "body": "Quote from: unknowncustomer on May 26, 2023, 08:28:06 AMOMG it is working thanks a lot !!I am quite new to Python and Programming Bitcoin, any idea where I should start ? which books ?Thanks !!Well, perhaps this might help you, friend, if you really want to, just check if this is what you are looking forGood luck...source:- https://bitcoin.stackexchange.com/questions/5671/how-do-you-perform-double-sha-256-encoding- https://gist.github.com/vincenzopalazzo/78c3545090ce609a145f4f6261a7fa0f- https://stackoverflow.com/questions/72411835/how-to-correctly-do-a-double-sha256-hashing",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

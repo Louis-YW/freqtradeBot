@@ -1,0 +1,165 @@
+{
+  "id": "topic_5400742",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "May 30, 2022, 01:50:15 PMLast edit: May 22, 2023, 06:47:14 PM by BlackHatCoiner",
+  "content": "PrologueSo, a month ago, I was trying to find out which hardware wallet should I buy. My conditions were simple; it had to be open-source and I had to make the purchase in the most private way possible. My only option was to buy BitBox 1, but it happens to be old, deprecated and their developers aren't known for being privacy seekers, which really underwhelmed me. My only choice was to purchase a hardware wallet outside my country using a poste restante, which I didn't want to do for personal reasons. But, then dkbit98 suggested something I hadn't thought of; do the job with a Pi.Quote from: dkbit98 on April 29, 2022, 09:47:23 AMI don't know if you want to use hardware wallet just for Bitcoin or for other shitcoins, but if it's only for good old BTC than you can buy Raspberry Pi zero locally and make your own SeedSigner signing device.And so I did. I bought a RPi Zero, a camera, a little screen and a few other stuff, and built a SeedSigner; an air-gapped hardware wallet signing device, which takes security into the next level.  Disclaimer: There's no affiliation with SeedSigner and this thread isn't sponsored. I just bought it and share my thoughts.Review In summary:Pros:Open source, github page: https://github.com/SeedSigner/seedsignerAir-gappedRelatively cheap ($50~$100)Separation between private key storage and signingCan be bought anonymously (without KYC, AOPP etc.)Cons:Little hard setupExperimental software; the project is, well from what I can judge, in an early stageWorks only with BlueWallet, Nunchuk, Sparrow, Specter DesktopIt's forcing you to generate the entropy yourselfAlright, let's begin.SeedSigner aims to give a solution to one problem; the cost and complexity of multi-sig usage. However, at the same time, it can be used for single-sig setups, lowering the cost of your \"hot\" storage as well. There's nothing saved inside the SD card, besides your settings which is optional, therefore there's less danger for funds' loss. When you shut down SeedSigner, it erases the seeds; they're meant to be kept temporarily in memory and you have to import the seed on each startup. And that's basically one of the features that makes SeedSigner differentiate. This has the following advantage: You can have the device on plain sight (don't, but you get the idea). As far as I understand, this is implemented to reduce the risk of money loss. For cold storage, create the QR code and find a good hiding spot. For daily transactions, you can just insert it into your drawer etc., without minding much.For quick imports, use QR scanning:Unfortunately, you can't create a new seed with an internal RNG. SeedSigner somewhat forces you to generate the entropy yourself. Either with a picture or dice rolls.   I get the spirit of \"trust none!\", but that's just wrong. It should allow you to generate random entropy, even with a warning. Furthermore, it gives a false sense of security. If you don't test the dice is decently fair, then you shouldn't generate a wallet. Period. Quoting a forum legendary is needed here:Quote from: nullius on March 26, 2021, 05:05:11 AMCoders who make their own ad hoc randomness schemes are like kids playing with matches.Hashing a picture can also be problematic, see thread: Turn photos into Bitcoin wallets. So, here's a feedback: Include /dev/urandom. Simple. Do it for those who want to avoid this fuss.This is how they justify it:One thing I also don't understand is how the rolls are 50/99 exactly. Doesn't each give 1.66 bits of entropy on average?  These are the features:Quote from: https://github.com/SeedSigner/seedsignerFeature Highlights:Calculate word 12/24 of a BIP39 seed phraseCreate a 24-word BIP39 seed phrase with 99 dice rollsCreate a 24-word BIP39 seed phrase by taking a digital photoTemporarily store up to 3 seed phrases while device is poweredGuided interface to manually create a SeedQR for instant input (demo video here)BIP39 passphrase / word 25 supportNative Segwit Multisig XPUB generation w/ QR displayScan and parse transaction data from animated QR codesSign transactions & transfer XPUB data using animated QR codes (demo video here)Live preview during photo-to-seed and QR scanning UXOptimized seed word entry interfaceSupport for Bitcoin Mainnet & TestnetSupport for custom user-defined derivation pathsOn-demand receive address verificationUser-configurable QR code display densityResponsive, event-driven user interfaceOne thing I've forgotten to say is that, besides open-source, the code is also easy to read. It's 100% written in Python, and there aren't many files to check. It doesn't take more than an hour. The src/seedsigner/models is what's all about.How to use itThese are the steps to spend money:Create a seed.Export the master public key with a QR code.Import the master public key to a wallet software. (From the available, I prefer Sparrow*)Create a transaction.Export the PSBT in QR code from your computer's screen.Scan the QR code from SeedSigner.Sign the transaction from Seed Signer.Export the signed transaction in QR code.Scan the QR code from your computer.Broadcast the signed transactionTa-da! Transaction signed in the air!  *Sparrow is a wallet I'd never used, as I put Electrum above others, but I'll have to admit it's good. Perhaps even better than Electrum. The reason you can't use Electrum (at least not easily) is because it doesn't support animated QR codes, which is the way SeedSigner exports xpub keys and signs transactions. That's because the screen isn't big enough. No, these cool, freshly 3D printed mined bitcoins in the images above aren't included in the SeedSigner Kit.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400742",
+  "comments": [
+    {
+      "author": "Welsh",
+      "created_time": "May 30, 2022, 02:12:49 PM",
+      "body": "Always a massive fan of users DIYing this sort of stuff. I've sadly run out of merit though. I'm assuming the dearest piece of kit here is the camera, which might not be necessary for users that don't want to scan QR codes? Since, most other hardware wallets don't offer this, you could potentially even argue that this is an additional expense that isn't really needed. I guess the convenience is there if you need it though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 30, 2022, 04:29:37 PM",
+      "body": "Quote from: Welsh on May 30, 2022, 02:12:49 PMSince, most other hardware wallets don't offer this, you could potentially even argue that this is an additional expense that isn't really needed.It's necessary. Without the camera you can't scan the PSBT from your computer's monitor.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "May 30, 2022, 05:02:42 PM",
+      "body": "Quote from: BlackHatCoiner on May 30, 2022, 01:50:15 PMNice review! It looks like a wonderfully nice toy, it's on my wish list too for some while, for when my HW dies or Pi Zero will be again in stock in my country, whichever comes first.Until then the software should also get more mature + maybe Electrum will also implement the missing feature(s).Quote from: Welsh on May 30, 2022, 02:12:49 PMI'm assuming the dearest piece of kit here is the camera, which might not be necessary for users that don't want to scan QR codes? Since, most other hardware wallets don't offer this, you could potentially even argue that this is an additional expense that isn't really needed. I guess the convenience is there if you need it though. Camera + screen are the two directions/devices for transferring information between SeedSigner and the hot wallet. Both are crucially important.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "May 30, 2022, 06:03:23 PM",
+      "body": "Nice to see you decided to give SeedSigner a try BlackHatCoiner, but you didn't say if you ordered that orange pill case from third party or you  3d printed it yourself?I have to say there are much better and smaller SeedSigner cases and I prefer them instead of this default option, my favorite is Lil'Pill but there are other .STL files released as open source.Quote from: BlackHatCoiner on May 30, 2022, 01:50:15 PMUnfortunately, you can't create a new seed with an internal RNG. SeedSigner somewhat forces you to generate the entropy yourself. Either with a picture or dice rolls. This is fortunately advantage for me, and I prefer to generate my own seed words.Most people would just use default entropy generation that is not really random nor secure, that is why they decided to go this direction.If you make any mistake during this process you can only blame yourself, not SeedSigner aka Rpi Quote from: BlackHatCoiner on May 30, 2022, 01:50:15 PM*Sparrow is a wallet I'd never used, as I put Electrum above others, but I'll have to admit it's good. Perhaps even better than Electrum. The reason you can't use Electrum (at least not easily) is because it doesn't support animated QR codes, which is the way SeedSigner exports xpub keys and signs transactions. That's because the screen isn't big enough. I tested Sparrow wallet before and I think it's even better for multisig setup compared to Electrum wallet.There are some stuff they need to fix with adding and removing devices (that was when I tried it), but I generally liked it and it's good alternative for Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 30, 2022, 06:18:51 PM",
+      "body": "Quote from: dkbit98 on May 30, 2022, 06:03:23 PMbut you didn't say if you ordered that orange pill case from third party or you  3d printed it yourself?I ordered it from gobrrr.Quote from: dkbit98 on May 30, 2022, 06:03:23 PMI have to say there are much better and smaller SeedSigner cases and I prefer them instead of this default optionYep, but I thought the default would be a better option. Proved wrong.  Quote from: dkbit98 on May 30, 2022, 06:03:23 PMMost people would just use default entropy generation that is not really random nor secure, that is why they decided to go this direction.Which thing isn't random nor secure exactly? Pi's RNG? urandom?Quote from: dkbit98 on May 30, 2022, 06:03:23 PMIf you make any mistake during this process you can only blame yourself, not SeedSigner aka Rpi.But, I don't blame them for my possibly less unpredictable entropy. Of course and it's my responsibility to ensure the dice is fair. But, you don't get to force me go with your way, just because you think it's right. This attitude is translated to a little disrespect, one might say, towards actual cryptographers who've studied more than you've done, and have concluded to using a CSPRNG. Let me choose a \"Use Pi's RNG\" option, and if you don't recommend it, show a warning.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "May 30, 2022, 06:19:22 PM",
+      "body": "Excellent review.In all honesty I feel the idea is a lot better than the execution.  I had considered conducting this experiment myself but decided against it feeling it's not as safe, secure, or functional as an air-gapped Pi (or other PC) running an open-source OS such as Ubuntu.  My main concern with the setup is that you have to keep your seed phrases accessible or pull them out of hiding once in a while, which exposes them to significantly more risk than is necessary.  Conversely, an air-gapped PC can store your seeds relatively safely behind strong encryption, and multiple layers of encryption can be implemented.  Once you're seeds are paired with wallets they never need to be exposed again.Theft of loss of SeedSigner appears to pose slightly less risk, assuming the seed is thoroughly purged from the system.  I haven't audited the code, but I assume the seed is stored in ram while the device is in use.  If the OS uses swap files to store the seed it can retain the information unless it's overwritten with random bits as the device is being powered down.  I don't know about you, but none of that would really ease my concerns if the device was stolen.  Again, a thoroughly encrypted OS is likely to buy you more time to discover the loss of the device and move your funds.One benefit to the experiment, however is that if you tire of it you have all you need to convert it into an air-gapped PC (with the exception that I would want a bigger screen.)All in all, it looks like a really fun project whether you use it to manage funds or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Welsh",
+      "created_time": "May 30, 2022, 07:49:18 PM",
+      "body": "Not sure I agree with their explanation of wanting to generate entropy via meatspace. I'd like to think that a hardwallet takes much of the responsibility of generating entropy off the person as possible, since for me hardware wallets are more likely to be bought, and used by newbies. Alright, maybe SeedSigner isn't as accessible as ready made options, but still I prefer to idea of taking that out of the users hands or at very least giving an option to the user. Quote from: BlackHatCoiner on May 30, 2022, 04:29:37 PMIt's necessary. Without the camera you can't scan the PSBT from your computer's monitor. Ah, yeah I seem to have forgotten about that small detail . That makes sense. Well cheers for the review, wasn't overly familiar with SeedSigner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 01, 2022, 10:44:16 AM",
+      "body": "I have thought a while ago to build the Seedsigner but unfortunately, the components that are available in my country are just too expensive so I just hang it for some time while waiting for the prices to come down. Anyway, props to you, this review furtherly explains about what Seedsigner is all about.Quote from: DireWolfM14 on May 30, 2022, 06:19:22 PMI haven't audited the code, but I assume the seed is stored in ram while the device is in use.  If the OS uses swap files to store the seed it can retain the information unless it's overwritten with random bits as the device is being powered down.Their whole OS is indeed fully booted up from the ram[1]. Even if you do a manual installation, it recommends the user to disable the swap file[2].Quote from: BlackHatCoiner on May 30, 2022, 01:50:15 PMThis is how they justify itQuote from: Welsh on May 30, 2022, 07:49:18 PMNot sure I agree with their explanation of wanting to generate entropy via meatspace.I found this repo which may explain the reasoning why they decided to go that way: https://github.com/SeedSigner/independent_custody_guide#creating-secure-private-keys-in-a-trust-minimized-way.Quote from: https://github.com/SeedSigner/independent_custody_guide#creating-secure-private-keys-in-a-trust-minimized-way~snip~Though there have been advances in the ability of software to generate unpredictable data, disagreements persist on the theoretical ability of truly random data to arise from organized, logical code created by human beings. (This may go without saying, but it's not a best practice to trust a private key generated by a bitcoin storage device that does not incorporate some kind of user input into the process.)It turns out that the simplest, easiest, and perhaps best way to capture entropic data is via the randomness inherent in the movements of the physical world that surrounds us. ~snip~",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 02, 2022, 08:54:37 PM",
+      "body": "Quote from: BlackHatCoiner on May 30, 2022, 06:18:51 PMI ordered it from gobrrr.First time I heard about gobrrr website was in bitcointalk forum and I think they have very good prices for everything, especially when we know how hard is to find Raspberry Pi with lower prices on other websites.Quote from: BlackHatCoiner on May 30, 2022, 06:18:51 PMYep, but I thought the default would be a better option. Proved wrong.There is nothing wrong with Orange Pill case and you can change it anytime if you do it carefully.I prefer printing my own case with custom colors with freely available .STL files.Quote from: BlackHatCoiner on May 30, 2022, 06:18:51 PMWhich thing isn't random nor secure exactly? Pi's RNG? urandom?Any device that have RNG option is not really generating true random results that can't be reproduced, that is why we have TRNG, but wallets like trezor are trying to fix this with mixing multiple sources to create better random value, that is still not good in my opinion.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 02, 2022, 11:21:45 PM",
+      "body": "Thanks for the review. RPis have a hardware RNG as /dev/hwrng and to my knowledge it passes most of the die-hard tests. Throw your dice or hash a picture and XOR it with /dev/urandom and/or /dev/hwrng: this way even suboptimal dice throws don't matter when XORed with a good-enough \"true\" random independent entropy source.For meatspace it's difficult to produce good randomness.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "The Sceptical Chymist",
+      "created_time": "June 03, 2022, 06:13:21 AM",
+      "body": "Quote from: NeuroticFish on May 30, 2022, 05:02:42 PM It looks like a wonderfully nice toyYes it does, and that's what it'll remain for me, because not only don't I have enough crypto to justify another HW wallet, but I'd have to learn how to do everything BlackHatCoiner did to create this neat-looking wallet.  I give him props for doing so, because it looks cool as hell and I've long been fascinated by Raspberry Pi's.Thanks for posting this, OP.  I'm going to go back and give your post a closer read and try to learn something.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 03, 2022, 02:30:51 PMLast edit: June 03, 2022, 04:05:28 PM by dkbit98",
+      "body": "For anyone who is interested to test how SeedSigner wallet works, without actually purchasing RaspberryPi and other hardware elements, you can try testing SeedSigner elmulator.This is working on desktop computers for all operating systems (windows/linux/mac) and I saw someone was able to install it on old android smartphone.Code is released on github by enteropositivo:https://github.com/enteropositivo/seedsigner-emulator",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "m2017",
+      "created_time": "June 03, 2022, 08:08:42 PM",
+      "body": "It seems that the time is not far off when users will massively assemble devices for themselves using open-source software and available components, following the example of BlackHatCoiner. This allows you to individualize each device to suit your needs and tasks. I wanted something similar to appear, but to my surprise, as it turned out, it is already possible to assemble the device myself and it's just great. The issue of security of funds for bitcoiners will always be relevant and the emergence of such a hand-made direction was inevitable. Especially considering that hardware wallet manufacturers are increasingly gaining influence and power in this niche, which in itself contradicts the idea of ​​freedom and decentralization. So, people who understand the advantages of homemade devices (of course, I mean assembly from ready-made components, as in the review of this topic) will abandon the already widespread hardware wallets, like ledger and trezor.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 04, 2022, 07:27:35 AM",
+      "body": "One more interesting thing I saw is that some people are working on new SeedSigner OS with minimal Raspberry Pi image.I didn't test this myself, but this is step in good direction because I never liked slow loading speed for SeedSigner, and I think this can speed up things a lot.This project is open source, and it's freely posted with easy instructions on github by DesobedienteTecnologico: https://github.com/DesobedienteTecnologico/seedsigner-os",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 05, 2022, 09:40:40 AM",
+      "body": "Quote from: dkbit98 on June 02, 2022, 08:54:37 PMThere is nothing wrong with Orange Pill case and you can change it anytime if you do it carefully.I can change it whenever I want, but I don't want to wait 2+ weeks again nor to pay 20+ EUR for a case. The one I have does the job nevertheless. No, I don't have a 3D printer.Quote from: dkbit98 on June 02, 2022, 08:54:37 PMAny device that have RNG option is not really generating true random results that can't be reproduced, that is why we have TRNG(xkcd.com)Seriously though, why isn't an RNG generating true random results, and if it isn't, which opens up a philosophical question, why does the TRNG, indeed, generate true randomness? To be precise, urandom is a Cryptographically Secure Pseudorandom Number Generator (CSPRNG), and to be honest, I'm a complete noob when it comes to this field, but I somewhat agree with this perspective.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 05, 2022, 09:58:23 AM",
+      "body": "Quote from: BlackHatCoiner on June 05, 2022, 09:40:40 AMSeriously though, why isn't an RNG generating true random results, and if it isn't, which opens up a philosophical question, why does the TRNG, indeed, generate true randomness? To be precise, urandom is a Cryptographically Secure Pseudorandom Number Generator (CSPRNG), and to be honest, I'm a complete noob when it comes to this field, but I somewhat agree with this perspective. The issue with this (besides the slight argument from authority) is that it's a little bit like the issue of 'n-th generation PoS blockchain' - if you're building sophisticated, fancy stuff on top of a bad foundation, you won't get the best results and will always be restricted by the limits of your foundation. PRNG is only pseudo-random and doesn't use any 'real' source of entropy; just algorithms that try to get as close as possible to that. Sure, they're well researched and gradually improved in decades of research, but they remain 'pseudo'-random.Quote from: https://en.wikipedia.org/wiki/Pseudorandom_number_generatorA [PRNG] is an algorithm for generating a sequence of numbers whose properties approximate the properties of sequences of random numbers. The PRNG-generated sequence is not truly random, because it is completely determined by an initial value, called the PRNG's seed [...].Quote from: https://en.wikipedia.org/wiki/Hardware_random_number_generatorA [...] true random number generator (TRNG) is a device that generates random numbers from a physical process, rather than by means of an algorithm. Such devices are often based on microscopic phenomena that generate low-level, statistically random \"noise\" signals, such as thermal noise, the photoelectric effect, involving a beam splitter, and other quantum phenomena. These stochastic processes are, in theory, completely unpredictable for as long as an equation governing such phenomena is unknown or uncomputable, and the theory's assertions of unpredictability are subject to experimental test. This is in contrast to the paradigm of pseudo-random number generation commonly implemented in computer programs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 05, 2022, 11:18:50 AM",
+      "body": "Quote from: n0nce on June 05, 2022, 09:58:23 AMPRNG is only pseudo-random and doesn't use any 'real' source of entropy;It does use \"real\" source of entropy, or to formulate more properly: It does use events happening outside the machine, such as environmental noises:Quote from: https://linux.die.net/man/4/urandomThe random number generator gathers environmental noise from device drivers and other sources into an entropy pool. The generator also keeps an estimate of the number of bits of noise in the entropy pool. From this entropy pool random numbers are created.Quote from: n0nce on June 05, 2022, 09:58:23 AMSure, they're well researched and gradually improved in decades of research, but they remain 'pseudo'-random.Does this make them more susceptible to a brute-force attack? I'm trying to understand what's the weakness of pseudo-randomness, but I feel like beating a dead horse.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 05, 2022, 01:51:10 PMLast edit: June 05, 2022, 02:01:17 PM by n0nce",
+      "body": "Quote from: BlackHatCoiner on June 05, 2022, 11:18:50 AMQuote from: n0nce on June 05, 2022, 09:58:23 AMPRNG is only pseudo-random and doesn't use any 'real' source of entropy;It does use \"real\" source of entropy, or to formulate more properly: It does use events happening outside the machine, such as environmental noises:Quote from: https://linux.die.net/man/4/urandomThe random number generator gathers environmental noise from device drivers and other sources into an entropy pool. The generator also keeps an estimate of the number of bits of noise in the entropy pool. From this entropy pool random numbers are created.That's interesting; I suppose though that the quality of randomness (entropy) will vary by the type of device in question. Some may have more 'sensors' or other ways to acquire external noise. It should also be kept in mind that a big challenge of hardware entropy is digitizing an analog entropy source without 'moulding' it in a certain way that introduces a bias, which would detrimentally affect the entropy.Quote from: BlackHatCoiner on June 05, 2022, 11:18:50 AMQuote from: n0nce on June 05, 2022, 09:58:23 AMSure, they're well researched and gradually improved in decades of research, but they remain 'pseudo'-random.Does this make them more susceptible to a brute-force attack? I'm trying to understand what's the weakness of pseudo-randomness, but I feel like beating a dead horse.To be honest, I don't think a state-of-the-art PRNG (especially if it does use external sources of entropy as you described) will be realistically easier to attack (think of stuff like a hundred years instead of 200 and numbers like this, if not higher). Even though it might be off by magnitudes from a true randomness source, today's software randomness is usually good enough for all practical scenarios.If /dev/urandom really incorporates what I'd call true randomness and doesn't degrade its entropy too much, it means it's trying to get more and more similar (or even become) a TRNG in the long run. This again shows that on paper, a TRNG is always better; it's just that it's not always feasible or practical to implement in off-the-shelf devices. Even an outdated, seed-based PRNG is enough for most (read: non-cryptographic) use-cases, like generating random bytes for something.By the way, a quick web search revealed, that apparently, /dev/random is better for cryptograhpy.Quote from: https://stackoverflow.com/questions/3690273/did-i-understand-dev-urandom/33471611#33471611/dev/urandom is best used when:You just want a large file with random data for some kind of testing.You are using the dd command to wipe data off a disk by replacing it with random data.Almost everywhere else where you don’t have a really good reason to use /dev/random instead./dev/random is likely to be the better choice when:Randomness is critical to the security of cryptography in your application – one-time pads, key generation.Actually, this seems like pretty sensible advice before generating a seed from /dev/random or /dev/urandom:Quote from: https://en.wikipedia.org/wiki/Dev/randomThe current amount of entropy and the size of the Linux kernel entropy pool, both measured in bits, are available in /proc/sys/kernel/random/ and can be displayed by the command cat /proc/sys/kernel/random/entropy_avail and cat /proc/sys/kernel/random/poolsize respectively.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 05, 2022, 05:03:12 PM",
+      "body": "Quote from: BlackHatCoiner on June 05, 2022, 09:40:40 AMI can change it whenever I want, but I don't want to wait 2+ weeks again nor to pay 20+ EUR for a case. The one I have does the job nevertheless. No, I don't have a 3D printer.Dude, you can print the case anywhere you want in your local area for few bucks  I am sure you can find bunch of ads from people and services who are offering 3d printing services, most I know are 3d designers or just owners of 3d printers.They don't even know what they are printing when I order it from them, it's dirt cheap and I don't have to wait more than few hours or a day for delivery.Quote from: BlackHatCoiner on June 05, 2022, 09:40:40 AMSeriously though, why isn't an RNG generating true random results, and if it isn't, which opens up a philosophical question, why does the TRNG, indeed, generate true randomness? To be precise, urandom is a Cryptographically Secure Pseudorandom Number Generator (CSPRNG), and to be honest, I'm a complete noob when it comes to this field, but I somewhat agree with this perspective. It's simple math, and if you are not mathematician you can't understand it easily.Companies wouldn't waste millions of dollars to achieve true randomness if gameboy, nintendo or raspberry pi was able to achieve this.Research this subject deeper to understand it better, key point is if something can be reproduced or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

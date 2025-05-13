@@ -1,0 +1,93 @@
+{
+  "id": "topic_5437422",
+  "title": "krashfire",
+  "author": "krashfire",
+  "created_time": "January 31, 2023, 05:44:57 AM",
+  "content": "Hi, i need help to check my code. Code:import ecdsaz = int(input(\"Enter value of z: \"))r = int(input(\"Enter value of r: \"))k = int(input(\"Enter value of k: \"))s = int(input(\"Enter value of s: \"))private_key = (z + (r * k)) / sprint(\"Private Key =\", private_key)and after giving my inputs, i got this output, Private Key = 2.378864885847563e+77I just wanna make sur.  is my formula written correctly?and how do i actually read that answer? i tried googling but i cant get an answer on how do I read it as integer.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5437422",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "January 31, 2023, 06:22:46 AM",
+      "body": "It is invalid, because:1. You have to calculate it modulo \"n\".2. The correct formula is \"s=(z+rd)/k\", so your private key \"d\" is \"(sk-z)/r\".Also, if 256-bit numbers are too big for you to start with, then compute everything on smaller numbers first: https://www.coindesk.com/markets/2014/10/19/the-math-behind-the-bitcoin-protocol/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 31, 2023, 06:31:23 AM",
+      "body": "I already have given you  a link to a correct formula in your previous thread:Quote from: witcher_sense on December 31, 2022, 09:14:16 AMQuote from: krashfire on December 31, 2022, 06:03:08 AMWhat is the formula to calculate private keys if you already have all the R,S,Z(H) K Value?  Where d= private_key. d = (k * s - z) * r-1 mod nSource: https://learnmeabitcoin.com/technical/ecdsa (Why do you need to generate a random point each time? (Mathematical Explanation) Why not just use it instead of inventing your own?Also, your resulting private key shouldn't be a floating point number, which is why it is better to use floor division (//) instead of real division ( / ) that always gives you floats (even when you divide intehers without remainder)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "January 31, 2023, 06:51:38 AM",
+      "body": "Quote from: garlonicon on January 31, 2023, 06:22:46 AMIt is invalid, because:1. You have to calculate it modulo \"n\".2. The correct formula is \"s=(z+rd)/k\", so your private key \"d\" is \"(sk-z)/r\".Also, if 256-bit numbers are too big for you to start with, then compute everything on smaller numbers first: https://www.coindesk.com/markets/2014/10/19/the-math-behind-the-bitcoin-protocol/ thank you garlonicon. I got this answer from ChatGPT... Damn.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "January 31, 2023, 06:52:21 AM",
+      "body": "Quote from: witcher_sense on January 31, 2023, 06:31:23 AMI already have given you  a link to a correct formula in your previous thread:Quote from: witcher_sense on December 31, 2022, 09:14:16 AMQuote from: krashfire on December 31, 2022, 06:03:08 AMWhat is the formula to calculate private keys if you already have all the R,S,Z(H) K Value?  Where d= private_key. d = (k * s - z) * r-1 mod nSource: https://learnmeabitcoin.com/technical/ecdsa (Why do you need to generate a random point each time? (Mathematical Explanation) Why not just use it instead of inventing your own?Also, your resulting private key shouldn't be a floating point number, which is why it is better to use floor division (//) instead of real division ( / ) that always gives you floats (even when you divide intehers without remainder)Quote from: witcher_sense on January 31, 2023, 06:31:23 AMI already have given you  a link to a correct formula in your previous thread:Quote from: witcher_sense on December 31, 2022, 09:14:16 AMQuote from: krashfire on December 31, 2022, 06:03:08 AMWhat is the formula to calculate private keys if you already have all the R,S,Z(H) K Value?  Where d= private_key. d = (k * s - z) * r-1 mod nSource: https://learnmeabitcoin.com/technical/ecdsa (Why do you need to generate a random point each time? (Mathematical Explanation) Why not just use it instead of inventing your own?Also, your resulting private key shouldn't be a floating point number, which is why it is better to use floor division (//) instead of real division ( / ) that always gives you floats (even when you divide intehers without remainder) yeah yeah...I forgot about that ..thanks for reminding.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "January 31, 2023, 07:15:42 AM",
+      "body": "ChatGPT also gave me this formula to find K nonce ValueCode:k= (z + r*s) % n",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "January 31, 2023, 03:48:56 PM",
+      "body": "QuoteCode:k= (z + r*s) % nBut there is no private key \"d\" here, so I am certain this formula is invalid. If it would be possible to calculate \"k\" from publicly known values r,s,z, then you could do that for every signature, and move any coins in this way.QuoteChatGPT also gave me this formulaChatGPT is already banned in Stack Overflow, because of bad answers it gave for technical questions. Who knows, if there will be more such cases here, then maybe we will get \"automatically generated post\" as one of the reasons to report such posts. Because now, the quality of that bot is far from perfect, and even worse, typical answers seems to be correct, but are often misleading.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 31, 2023, 04:01:45 PM",
+      "body": "Quote from: garlonicon on January 31, 2023, 03:48:56 PMQuoteCode:k= (z + r*s) % nBut there is no private key \"d\" here, so I am certain this formula is invalid. If it would be possible to calculate \"k\" from publicly known values r,s,z, then you could do that for every signature, and move any coins in this way.Just for reference, the correct formula is the following (we still need private key to obtain nonce value):k = (z + d * r) * s-1 mod n",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "January 31, 2023, 07:31:58 PM",
+      "body": "Quote from: witcher_sense on January 31, 2023, 04:01:45 PMQuote from: garlonicon on January 31, 2023, 03:48:56 PMQuoteCode:k= (z + r*s) % nBut there is no private key \"d\" here, so I am certain this formula is invalid. If it would be possible to calculate \"k\" from publicly known values r,s,z, then you could do that for every signature, and move any coins in this way.Just for reference, the correct formula is the following (we still need private key to obtain nonce value):k = (z + d * r) * s-1 mod nJust to be sure, I again ask ChatGPT Code:The mathematical formula to calculate k nonce from r,s,z signatures is:k = (z + r*s) / s mod n where n is the order of the elliptic curve.YeahThis forum should ban CHATGPT as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Critical_Thoughts",
+      "created_time": "February 01, 2023, 08:23:08 AM",
+      "body": "OP you need to understand chatGPT is not a computational operated model, it just generates answers based on a limited database, we don't know the source of it's outputs, they could be wrong in many cases. chatGPT is an experimental project, don't expect much from it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "February 02, 2023, 04:45:51 AM",
+      "body": "Quote from: garlonicon on January 31, 2023, 03:48:56 PMQuoteCode:k= (z + r*s) % nBut there is no private key \"d\" here, so I am certain this formula is invalid. If it would be possible to calculate \"k\" from publicly known values r,s,z, then you could do that for every signature, and move any coins in this way.The divisor is also missing here, instead the s is being multiplied instead of divided.QuoteChatGPT is already banned in Stack Overflow, because of bad answers it gave for technical questions. Who knows, if there will be more such cases here, then maybe we will get \"automatically generated post\" as one of the reasons to report such posts. Because now, the quality of that bot is far from perfect, and even worse, typical answers seems to be correct, but are often misleading.Alternatively you can feed the input of a post into ChatGPT and prompt it to explain why it's a bad bitcointalk post, and you will get an automated report message out of it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

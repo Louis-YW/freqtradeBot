@@ -1,0 +1,69 @@
+{
+  "id": "topic_5475320",
+  "title": "Mia Chloe",
+  "author": "Mia Chloe",
+  "created_time": "November 24, 2023, 11:47:11 AM",
+  "content": "Using mnemonic phrases also known as seed phrase to generate private keys for a wallet is normal during wallet creation.however I been wanting to try generating a private key by myself from the seed phrase outside the wallet software. I tried using the seed from  an HD wallet of BIP-32 standard But am having a hard time getting the right algorithm for generation of the master key and chain code . How do I go about this pls?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5475320",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "November 24, 2023, 11:55:33 AM",
+      "body": "For the generation of the master keys and child keys:Use https://iancoleman.io/bip39/ offline, not online. You can use it to generate the keys and addresses from seed phrase.For offline usage:Use the html on a word editor: https://github.com/iancoleman/bip39/releases/latest/For security reasons, use it offline on a word editor.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zaguru12",
+      "created_time": "November 24, 2023, 12:04:01 PM",
+      "body": "Here is a little guide by blue Snow on how to generate your master  private key from seed phrase. Make sure you are doing it offline. Although I don’t know why you wish to generate the master private key from the seed phrase but in case of back up there is no point of backing up the master private key even though it will recover the same address as the seed phrase will do but seed phrase back is more convenient than the key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mia Chloe",
+      "created_time": "November 24, 2023, 12:09:08 PM",
+      "body": "Quote from: Charles-Tim on November 24, 2023, 11:55:33 AMFor the generation of the master keys and child keys:Use https://iancoleman.io/bip39/ offline, not online. You can use it to generate the keys and addresses from seed phrase.For offline usage:Use the html on a word editor: https://github.com/iancoleman/bip39/releases/latest/For security reasons, use it offline on a word editor.Thanks alot Charles Tim and Zaguru12Is there a similar script I can run on phyton?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "November 24, 2023, 12:33:17 PM",
+      "body": "Quote from: Mia Chloe on November 24, 2023, 12:09:08 PMIs there a similar script I can run on phyton?I do not know much about this. You can wait for other reputed members and see what they will reply. Let me quote nc50lc so that he can see this thread. I believe he will have something good to reply.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "November 27, 2023, 04:01:13 PM",
+      "body": "Quote from: Mia Chloe on November 24, 2023, 12:09:08 PMQuote from: Charles-Tim on November 24, 2023, 11:55:33 AMFor the generation of the master keys and child keys:Use https://iancoleman.io/bip39/ offline, not online. You can use it to generate the keys and addresses from seed phrase.For offline usage:Use the html on a word editor: https://github.com/iancoleman/bip39/releases/latest/For security reasons, use it offline on a word editor.Thanks alot Charles Tim and Zaguru12Is there a similar script I can run on phyton?It is possible to run this on python aswell. You have to use mnemonic library for the BIP39 functionalities and the bip32utils library for the BIP32 key derivation. Create a new mnemonic phrase with the mnemonic library. The individual passphrase is optional. Code:from mnemonic import Mnemonicmnemo = Mnemonic(\"english\")words = mnemo.generate(strength=128)  # 128, 160, 192, 224, 256 bitsseed = mnemo.to_seed(words, passphrase=\"INSERT_PASSPHRASE_HERE\")print(\"Mnemonic:\", words)print(\"Seed:\", seed.hex())Now use the bip32utils library to derrive the masterkey and the child keys:Code:from bip32utils import BIP32Keymaster_key = BIP32Key.fromEntropy(seed)child_key = master_key.ChildKey(44 + BIP32Key.HARDENED) \\                        .ChildKey(0 + BIP32Key.HARDENED) \\                        .ChildKey(0 + BIP32Key.HARDENED) \\                        .ChildKey(0).ChildKey(0)print(\"Master Key:\", master_key.ExtendedKey())print(\"Child Key:\", child_key.Address())I have used \"m/44'/0'/0'/0/0\" as derivation path since this path is widely used by many wallets and allows a structured way to generate multiple addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mia Chloe",
+      "created_time": "November 27, 2023, 04:31:20 PM",
+      "body": "Quote from: seek3r on November 27, 2023, 04:01:13 PMQuote from: Mia Chloe on November 24, 2023, 12:09:08 PMQuote from: Charles-Tim on November 24, 2023, 11:55:33 AMFor the generation of the master keys and child keys:Use https://iancoleman.io/bip39/ offline, not online. You can use it to generate the keys and addresses from seed phrase.For offline usage:Use the html on a word editor: https://github.com/iancoleman/bip39/releases/latest/For security reasons, use it offline on a word editor.Thanks alot Charles Tim and Zaguru12Is there a similar script I can run on phyton?It is possible to run this on python aswell. You have to use mnemonic library for the BIP39 functionalities and the bip32utils library for the BIP32 key derivation. Create a new mnemonic phrase with the mnemonic library. The individual passphrase is optional. Code:from mnemonic import Mnemonicmnemo = Mnemonic(\"english\")words = mnemo.generate(strength=128)  # 128, 160, 192, 224, 256 bitsseed = mnemo.to_seed(words, passphrase=\"INSERT_PASSPHRASE_HERE\")print(\"Mnemonic:\", words)print(\"Seed:\", seed.hex())Now use the bip32utils library to derrive the masterkey and the child keys:Code:from bip32utils import BIP32Keymaster_key = BIP32Key.fromEntropy(seed)child_key = master_key.ChildKey(44 + BIP32Key.HARDENED) \\                        .ChildKey(0 + BIP32Key.HARDENED) \\                        .ChildKey(0 + BIP32Key.HARDENED) \\                        .ChildKey(0).ChildKey(0)print(\"Master Key:\", master_key.ExtendedKey())print(\"Child Key:\", child_key.Address())I have used \"m/44'/0'/0'/0/0\" as derivation path since this path is widely used by many wallets and allows a structured way to generate multiple addresses. Thanks a lot seek3r although I was able to use Charles-Tim help which was very very easy to use I would definitely use this phyton script also .",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 28, 2023, 12:52:21 PM",
+      "body": "Quote from: Mia Chloe on November 27, 2023, 04:31:20 PMThanks a lot seek3r although I was able to use Charles-Tim help which was very very easy to use I would definitely use this phyton script also .I do not recommend directly using private keys which are derived from the seed phrase for holding bitcoins because there is a change that you might mess up the generation process which leads to the coins becoming inaccessible. This should be done only for learning purposes. (As you hopefully already know).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

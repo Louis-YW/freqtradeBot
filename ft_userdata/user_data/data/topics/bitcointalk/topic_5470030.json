@@ -1,0 +1,117 @@
+{
+  "id": "topic_5470030",
+  "title": "seoincorporation",
+  "author": "seoincorporation",
+  "created_time": "October 11, 2023, 07:32:13 PM",
+  "content": "Let's say you have a webpage where users can make crypto deposits and withdrawals, something like a wallet, but you want them to be able to see their private key if they send the request. So, I was thinking of two ways to make this.1.-Calling bitcoin-cli dumpprivatekey each time the user makes the request, that way we don't have that sensitive information in the database.2.-Calling the Privatekey from the SQL database each time the user makes the request. But for some reason I don't like these ideas at all because i can smell a risk in both of them. Maybe using some seed to hash it like we do with the passwords is a good idea, but would like to know what's the secure way to do it.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5470030",
+  "comments": [
+    {
+      "author": "LucyFurr",
+      "created_time": "October 11, 2023, 07:41:26 PM",
+      "body": "Both ways are vulnerable to attacks, for example in bitcoin-cli dumpprivatekey whem the server is compromised for short term still the private key can be exposed at that time period will lead to loss of funds.About SQL it is riskier than earlier, if the database has been compromised then it will lead to all the private keys to be exposed.So what will be the better approach is Hierarchical Deterministic.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "October 11, 2023, 09:49:11 PM",
+      "body": "Quote from: seoincorporation on October 11, 2023, 07:32:13 PMLet's say you have a webpage where users can make crypto deposits and withdrawals, something like a wallet, but you want them to be able to see their private key if they send the request. So, I was thinking of two ways to make this.You want to create a website that will have the private keys of customers, but in a way the customers can request for it? That is not a good idea. If you want people to have full control, you can develop a noncustodial wallet. If you want to have the control of the coins for people that are using your website, develope a custodial wallet. But if people are like me, there will not be anything called custodial wallet when noncustodial wallet are existing for me to have full control over my coins.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nelson4lov",
+      "created_time": "October 11, 2023, 10:13:24 PM",
+      "body": "Private Keys should always be kept private. Except users are creating new wallets, I don't see a reason why you will provide a way for them to request for their private keys that are supposed to be stored privately by the users? The risk <> reward for that use case is not good enough since it leaves your users vulnerable to attacks should any of the approaches get compromised.Anything that makes users vulnerable to attacks shouldn't even make it to production which is why Ledger's recovery service got heavy backlash from the community.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "October 11, 2023, 11:30:15 PM",
+      "body": "In short, you are planning to develop a web wallet?There are some ready-made web wallet which is open-source why not check it's code and apply the code to the web wallet you are planning to develop?Here's the web wallet https://coinb.in/#wallet scroll to the bottom to find the the GitHub page.The only difference is it requires an email and a password but once you create a wallet you can dump the private key there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "October 12, 2023, 05:29:54 AM",
+      "body": "Quote from: seoincorporation on October 11, 2023, 07:32:13 PMLet's say you have a webpage where users can make crypto deposits and withdrawals, something like a wallet, but you want them to be able to see their private key if they send the request. So, I was thinking of two ways to make this.1.-Calling bitcoin-cli dumpprivatekey each time the user makes the request, that way we don't have that sensitive information in the database.2.-Calling the Privatekey from the SQL database each time the user makes the request. But for some reason I don't like these ideas at all because i can smell a risk in both of them. Maybe using some seed to hash it like we do with the passwords is a good idea, but would like to know what's the secure way to do it.From my point of view, the server should not have direct access to the client's private keys, which automatically implies that you also shouldn't have an SQL database with all private keys stored in plain text. Before saving to a database, each private key and other pieces of sensitive information should be properly encrypted with a strong anf time-tested encryption algorithm. But remember that sensitive information should not be known on the server side, which is why both encryption and decryption should take place on the client side. The client generates a private key locally, encrypts the data, and sends it back to the server, the server saves this information to the database. When a client wants to display a private key, he sends a request to the server and receives a response with encrypted private information, which he then decrypts back with the key he created previously.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 12, 2023, 10:08:47 AM",
+      "body": "Quote from: witcher_sense on October 12, 2023, 05:29:54 AMFrom my point of view, the server should not have direct access to the client's private keys, which automatically implies that you also shouldn't have an SQL database with all private keys stored in plain text. Before saving to a database, each private key and other pieces of sensitive information should be properly encrypted with a strong anf time-tested encryption algorithm. But remember that sensitive information should not be known on the server side, which is why both encryption and decryption should take place on the client side. The client generates a private key locally, encrypts the data, and sends it back to the server, the server saves this information to the database. When a client wants to display a private key, he sends a request to the server and receives a response with encrypted private information, which he then decrypts back with the key he created previously.Client/Server communication with sensitive data is not safe! (Unless you are using HTTPS.)But unlike credit cards, in the case of crypto private keys they are decentralized so impossible to block or close from fraud. So all malware has to do is hit any of the sensitive parts of the client computer e.g. a browser exploit and/or OS-level export that lets it read raw network traffic, and you're toast.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "October 12, 2023, 02:27:08 PM",
+      "body": "Quote from: witcher_sense on October 12, 2023, 05:29:54 AMFrom my point of view, the server should not have direct access to the client's private keys...But if the service offers withdrawals then the server need to have access to it.Quote from: NotATether on October 12, 2023, 10:08:47 AMClient/Server communication with sensitive data is not safe! (Unless you are using HTTPS.)But unlike credit cards, in the case of crypto private keys they are decentralized so impossible to block or close from fraud. So all malware has to do is hit any of the sensitive parts of the client computer e.g. a browser exploit and/or OS-level export that lets it read raw network traffic, and you're toast.In know there is a risk, but there are some services that already do this, for example, blockchain.com/es/#/login?product=wallet lets us import private keys and see get the private key of our address.Quote from: BitMaxz on October 11, 2023, 11:30:15 PMHere's the web wallet https://coinb.in/#wallet scroll to the bottom to find the the GitHub page.The only difference is it requires an email and a password but once you create a wallet you can dump the private key there.Thanks for this github repo, i take a look to the code and it doesn't call the DB or the bitcoin-cli. It works in a different way, looks like it generates the address from parameters like the mail and the password, so, once we log in the session keeps the private key as part of the cookie, and to be honest that's an interesting approach.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "October 13, 2023, 12:29:30 PM",
+      "body": "Quote from: seoincorporation on October 12, 2023, 02:27:08 PMBut if the service offers withdrawals then the server need to have access to it.So, want kind of service do you want to build? A non-custodial cryptocurrency web wallet in which both client and server have access to sensitive information like seed phrases and private keys? If a user already knows a private key for his address, why does he need additional withdrawal service from the server? How the server can guarantee the integrity of data and the safety of customers' funds if it has no control over who can and who cannot withdraw from it? What prevents the server's owners from stealing customers' cryptocurrency holdings? In my opinion, you either have a custodial-type of service where customers have no access to private keys or non-custodial ones where the server helps clients perform interactions with the blockchain without having direct access to their sensitive data. The other models where both client and server know a secret is a recipe for disaster.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 13, 2023, 03:38:13 PM",
+      "body": "Also, keep in mind if you are doing this as a service using core is probably not the right way to go. You would want some other code generating keys and some other code handling the transactions and so on.Core is good as a desktop wallet, and a lot of things use it as a back end for stuff. But they do the key generation and other things in their own code.BUT, as others have said once you give your clients their own keys it's all over for security. Who lost the BTC? Did you have a breach? Was the PC that the customer used compromised? Was there a MITM attack?And so on.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Winterfrost",
+      "created_time": "October 16, 2023, 06:17:19 PM",
+      "body": "I understand your point of view. Jus as the word implies private keys. Whether good or bad reasons your private key should always stay hidden. I don't know for sure but perhaps the reason why you are thinking of showing some few letters of a private key when performing some transactions in your web page is so that the sender or receiver can identity who performed a transaction just by looking at the private key. If that's the case it is no more a private key even if its showing few of the letters. If we want to identify a wallet then we can use the wallet address that is the main reason why it was there. You might be trying to do something different and unique but I don't think it is necessary.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 17, 2023, 08:35:38 AM",
+      "body": "Quote from: seoincorporation on October 12, 2023, 02:27:08 PM-snip-In know there is a risk, but there are some services that already do this, for example, blockchain.com/es/#/login?product=wallet lets us import private keys and see get the private key of our address.It may not look like it, but their non-custodial wallet doesn't always have to query the \"wallet.aes.json\" file from their server in every request.After logging-in, the encrypted wallet file is downloaded from their server to the browser and decrypted locally to be accessed in the whole session.So when exporting private keys (now only for imported Bitcoin keys), it just shows them without even asking for password since the wallet is already decrypted.Perhaps this is similar to what you want to implement?Check their API and front-end software: https://github.com/blockchain",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 17, 2023, 11:35:00 AM",
+      "body": "Quote from: seoincorporation on October 12, 2023, 02:27:08 PMQuote from: NotATether on October 12, 2023, 10:08:47 AMClient/Server communication with sensitive data is not safe! (Unless you are using HTTPS.)But unlike credit cards, in the case of crypto private keys they are decentralized so impossible to block or close from fraud. So all malware has to do is hit any of the sensitive parts of the client computer e.g. a browser exploit and/or OS-level export that lets it read raw network traffic, and you're toast.In know there is a risk, but there are some services that already do this, for example, blockchain.com/es/#/login?product=wallet lets us import private keys and see get the private key of our address.In this case there is a correct way to manipulate the wallet without exposing the private key, and that is by doing everything client-side, and then encrypt the wallet file using the wallet password as the key, and then send that as the payload to the server whenever making any calls. Because the server itself has no reason to be checking on balances and other things without the client front-end, it should just be storing data and also sending notifications on the public part of the data like addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 17, 2023, 12:11:31 PM",
+      "body": "I'm a little confused on what you are trying to accomplish. - If you want to make a custodial wallet, then keep things simple. Custodial means no access to private keys.- If you want to make a non-custodial wallet on the browser, then you don't need dumpprivatekey.- If you want to make a service in which people will send and receive bitcoin, then just take care of signing transactions from the backend.In any case, you should never share private keys over a communication channel.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

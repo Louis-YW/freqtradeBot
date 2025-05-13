@@ -1,0 +1,85 @@
+{
+  "id": "topic_5413585",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "September 14, 2022, 05:33:04 PM",
+  "content": "I'm in an exercise mood, and said to have some fun with custom scripts. But, I have some hard time understanding signrawtransactionwithkey, and said to open a thread, to avoid any testnet coin losses. To begin with, isn't it improper grammar-wise to name it \"sign with key\" when in a scriptSig, ECDSA signature isn't necessarily required? Spending custom scripts, such as for hash collisions, requires no signature (but does require scriptSig).Let's take my input:scriptSig: OP_PUSHDATA1 80 0x0100000000000000000000000000000000000000000000000000000000000000000000002ba3e dfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac 2b7cscriptPubKey: OP_HASH256 32 0xd751d5b58a9d143185a943cf85753ec3c0738bd4a1f27af94bac591033428036 OP_EQUALResulting in an input hex of:Code:0x4c500100000000000000000000000000000000000000000000000000000000000000000000002ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7caa20d751d5b58a9d143185a943cf85753ec3c0738bd4a1f27af94bac59103342803687Address: 2NDNgMiVUtDADp3iTgcure2s857ohwhfduP according to bitcoin-script-debugger. (You can take the tBTC if you want)What I don't understand (assuming I've understood everything correctly so far) is how to spend it. Bitcoin Core spends inputs of such transactions with createrawtransaction followed by a signrawtransaction. I do create the transaction:Code:$ bitcoin-cli --testnet createrawtransaction \"[{\\\"txid\\\":\\\"9f3e800aeef891ad654aa453bcff843014bec82f0f95bea9beaadf6053b40d76\\\",\\\"vout\\\":0}]\" \"[{\\\"tb1q3xyzqkylfj9p5nhulcggwtgdmuy608kdg05c8p\\\":0.00099}]\"0200000001760db45360dfaabea9be950f2fc8be143084ffbc53a44a65ad91f8ee0a803e9f0000000000ffffffff01b882010000000000160014898820589f4c8a1a4efcfe10872d0ddf09a79ecd00000000But, I don't know what to submit with signrawtransactionwithkey. According to the docs, private key(s) are required as an argument, but I don't want to sign anything. I only want and need to enter the redeemScript.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5413585",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "September 14, 2022, 06:47:04 PM",
+      "body": "Currently Bitcoin Core's signing is unable to sign for any script it does not understand. So signrawtransactionwithkey can only sign for the standard single key scripts and multisigs. It cannot sign for arbitrary scripts regardless of whether a key is required.The script that you are using is a non-standard script so Bitcoin Core will be unable to create any scriptSig or witness for it, regardless of the options you give it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "September 15, 2022, 01:56:35 AM",
+      "body": "Quote from: BlackHatCoiner on September 14, 2022, 05:33:04 PM...What I don't understand (assuming I've understood everything correctly so far) is how to spend it. Bitcoin Core spends inputs of such transactions with createrawtransaction followed by a signrawtransaction. To spend the inputs you have 2 of 3 steps, the sendrawtransaction transaction is the real way to spend them, some time ago i made a post in the spanish section explaining this with bash, and here is the example:Code:a=$(./bitcoin-cli createrawtransaction '[{\"txid\":\"d42065fea1331ecc8e05d4f2d07d12b3b56d61a749e1db8cf56ab7b3ab0aedbc\",\"vout\":1}]' '{\"1QzkZdiuodaAXoB1XJc3YmihQe7v6bAfxJ\":0.17960000}')Code:b=$(./bitcoin-cli signrawtransaction $a)Code:./bitcoin-cli sendrawtransaction $(echo $b | cut -d \" \" -f4 | sed 's/,//g' | sed 's/\"//g')People can create a transaction from any input in the blockchain, but only those with the private keys can sign those transactions. If the private key of the address is loaded in the Bitcoin Core, then the signrawtransaction command will be able to do the magic, but if you don't have the private keys imported in the core, then you can use the signrawtransactionwithkey option:Code:bitcoin-cli signrawtransactionwithkey \"myhex\" \"[\\\"key1\\\",\\\"key2\\\"]\"Quote from: BlackHatCoiner on September 14, 2022, 05:33:04 PMI do create the transaction:Code:$ bitcoin-cli --testnet createrawtransaction \"[{\\\"txid\\\":\\\"9f3e800aeef891ad654aa453bcff843014bec82f0f95bea9beaadf6053b40d76\\\",\\\"vout\\\":0}]\" \"[{\\\"tb1q3xyzqkylfj9p5nhulcggwtgdmuy608kdg05c8p\\\":0.00099}]\"0200000001760db45360dfaabea9be950f2fc8be143084ffbc53a44a65ad91f8ee0a803e9f0000000000ffffffff01b882010000000000160014898820589f4c8a1a4efcfe10872d0ddf09a79ecd00000000But, I don't know what to submit with signrawtransactionwithkey. According to the docs, private key(s) are required as an argument, but I don't want to sign anything. I only want and need to enter the redeemScript. Private keys are required to sign the transactions, let's say you can give that signed transaction to someone else to push it. You can see it as a money check ready to get redeem on the bank. And that last part is confusing mate, if you don't get at all why you are using signraw if you don't want to sign anything.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 15, 2022, 02:58:37 AM",
+      "body": "Quote from: seoincorporation on September 15, 2022, 01:56:35 AMPrivate keys are required to sign the transactions, let's say you can give that signed transaction to someone else to push it.You misunderstood the question here.In bitcoin you do not use a signature to spend coins, you provide an unlocking script that contains whatever is needed to spend those coins. That script may or may not contain one or more signatures.If you look at the example provided in OP you can see that the unlocking script (scriptsig) is just an arbitrary data that has to have the same double SHA256 hash as the hash provided in the scriptpub (aka locking script).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 15, 2022, 04:22:17 PM",
+      "body": "Quote from: achow101 on September 14, 2022, 06:47:04 PM[...]Alright, thanks. So, I'll have to write my own program that does this. Sounds like more exercise. Quote from: seoincorporation on September 15, 2022, 01:56:35 AMPrivate keys are required to sign the transactionsAs said by pooya (and me in the OP), transactions don't need necessarily a signature. They're consisted of locking and unlocking scripts, that are Script-based, but signature is sometimes not required. For example, I can lock 1 BTC to \"OP_HASH256 32 0x0000000000000000000000000000000000000000000000000000000000000000 OP_EQUAL\". To spend it, you \"only\" need to find a message that once hashed twice with SHA256, it'll return you the value 0. Zero ECDSA signatures there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "September 16, 2022, 10:32:53 AM",
+      "body": "Quote from: BlackHatCoiner on September 15, 2022, 04:22:17 PMScript-based, but signature is sometimes not required. For example, I can lock 1 BTC to \"OP_HASH256 32 0x0000000000000000000000000000000000000000000000000000000000000000 OP_EQUAL\". To spend it, you \"only\" need to find a message that once hashed twice with SHA256, it'll return you the value 0. Zero ECDSA signatures there. Is there any \"waiting list\" or list of proposed operations to be added to the protocol? Or is it udoable because of \"old' nodes which would reject transaction with unknown OP?Maybe it could be solved by some kind of \"vacatio legis\"?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 16, 2022, 11:16:19 AM",
+      "body": "Quote from: PawGo on September 16, 2022, 10:32:53 AMIs there any \"waiting list\" or list of proposed operations to be added to the protocol? Or is it udoable because of \"old' nodes which would reject transaction with unknown OP?There are a bunch of proposals that can be found among the BIPs and they also post about ideas on the bitcoin mailing list. I don't know of anything that is awaiting activation though. The last new OP we had was activated with Taproot soft-fork and it was called OP_CHECKSIGADD.More new OP codes could be added through existing OP_NOPs or through OP_SUCCESS as part of SegWit/Taproot or new witness versions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 16, 2022, 03:59:24 PMLast edit: September 17, 2022, 12:39:13 AM by nc50lc",
+      "body": "Quote from: BlackHatCoiner on September 14, 2022, 05:33:04 PMLet's take my input:scriptSig: OP_PUSHDATA1 80 0x0100000000000000000000000000000000000000000000000000000000000000000000002ba3e dfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac 2b7cscriptPubKey: OP_HASH256 32 0xd751d5b58a9d143185a943cf85753ec3c0738bd4a1f27af94bac591033428036 OP_EQUAL-snip-Address: 2NDNgMiVUtDADp3iTgcure2s857ohwhfduPThe other issue is: The whole scriptSig is used to compute the hash in the scriptPubKey: OP_HASH160 OP_PUSHBYTES_20 dccb70880a6a3667464f1de5e106d7ec1cf75e17 OP_EQUALWhile it should only be the RedeemScript which is the one you've labeled as scriptPubKey above; that made the output unlockable with your unlocking script.You also forgot to include the redeemscript's size to the unlocking script, that's why verification failed.By following the correct procedure, you'll get these values instead:scriptSig (include the Redeem Script): OP_PUSHDATA1 0100000000000000000000000000000000000000000000000000000000000000000000002ba3edf d7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b 7cRedeem Scipt: OP_HASH256 d751d5b58a9d143185a943cf85753ec3c0738bd4a1f27af94bac591033428036 OP_EQUALscriptPubKey: OP_HASH160 21bc25ba80f04ab78a0c59711bb21fd399451901 OP_EQUAL = 2MvKbgKhpPS4ho3hF3zBVdcqoVS8y2Yrq28Which can be unlocked using this unlocking script (from the values above plus the data's 'sizes'):Code:4c500100000000000000000000000000000000000000000000000000000000000000000000002ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c23aa20d751d5b58a9d143185a943cf85753ec3c0738bd4a1f27af94bac59103342803687Raw transaction (transaction: e3b5eb2c7a687f94ab64e6f2b04c6c2eecd9a1db71bda5550ea34e127226fd3e):Code:0200000001ff0a8d34a8db7fa613d0a59b374a6cf1e2ff3ab4a11bbfecceaad8dad0154c0a00000000764c500100000000000000000000000000000000000000000000000000000000000000000000002ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c23aa20d751d5b58a9d143185a943cf85753ec3c0738bd4a1f27af94bac59103342803687ffffffff0154240000000000001976a914ec221c4fb4fe530a3c284cdcaa05cc81d4b022f088ac00000000-edit-The issue is -> The other issue is",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "September 19, 2022, 09:26:52 PM",
+      "body": "If you want to test CPU mining, you can try to get some outputs from this testnet3 transaction: 16fb1c624b3658c78630c39f1c33e8f3dbdb71373f33eb22c6abe4405c0815bcTo create such transactions, you just need any text editor, and then by using Bitcoin Core you can check if your transaction is valid or not. Usually, no keys are needed, and if there are no OP_CHECKSIG-like opcodes, then you don't need any keys, which usually means that anyone can get those coins. So, in a typical case, it is just a matter of replacing some \"00\" with some \"<size> <rawHexData>\", and then checking if \"decoderawtransaction\" can correctly parse it. Also, you can try to mine it under regtest or wait 20 minutes and mine a testnet3 block with minimal difficulty on your CPU, there are many options, there are also online services that can provide \"testmempoolaccept\" command, if you don't have a full node for testnet3.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 20, 2022, 02:46:42 AM",
+      "body": "Quote from: garlonicon on September 19, 2022, 09:26:52 PMIf you want to test CPU mining, you can try to get some outputs from this testnet3 transaction: 16fb1c624b3658c78630c39f1c33e8f3dbdb71373f33eb22c6abe4405c0815bcThose outputs don't look spendable since they require an 80-byte input that has an exact hash as the provided in the pubscript (OP_EQUAL instead of a <= like the difficulty which we don't have an OP code for). Also the 32-byte data in the outputs that look like block hashes couldn't be found found on block explorers. Unless you can find the corresponding block header and copy those, it is not possible to spend these outputs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

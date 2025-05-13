@@ -1,0 +1,93 @@
+{
+  "id": "topic_5415936",
+  "title": "HoBzY",
+  "author": "HoBzY",
+  "created_time": "October 04, 2022, 06:01:17 PMLast edit: December 06, 2022, 05:05:41 PM by HoBzY",
+  "content": "https://developer.bitcoin.org/reference/transactions.html#raw-transaction-formathttps://developer.bitcoin.org/reference/transactions.html#outpoint-the-specific-part-of-a-specific-outputHow to get an outpoint in a transaction?I'm trying to parse the structure of an unprocessed transaction.How to get this c997a5e56e104102fa209c6a852dd90660a20b2d9c352423edce25857fcd3704 hash?Code:0100000055bd840a78798ad0da853f68974f3d183e2bd1db6a842c1feecf222a00000000ff104ccb05421ab93e63f8c3ce5c2c2e9dbb37de2764b3a3175c8166562cac7d51b96a49ffff001d283e9e700201000000 01 0000000000000000000000000000000000000000000000000000000000000000 ffffffff 07 04ffff001d0102 ffffffff 0100f2052a010000 00 43 4104d46c4968bde02899d2aa0963367c7a6ce34eec332b32e42e5f3407e052d64ac625da6f0718e7b302140434bd725706957c092db53805b821a85b23a7ac61725bac 000000000100000001   Outpoint: The Specific Part Of A Specific Output       c997a5e56e104102fa209c6a852dd90660a20b2d9c352423edce25857fcd3704000000004847304402204e45e16932b8af514961a1d3a1a25fdf3f4f7732e9d624c6c61548ab5fb8cd410220181522ec8eca07de4860a4acdd12909d831cc56cbbac4622082221a8768d1d0901ffffffff0200ca9a3b00000000434104ae1a62fe09c5f51b13905f07f06b99a2f7159b2225f374cd378d71302fa28414e7aab37397f554a7df5f142c21c1b7303b8a0626f1baded5c72a704f7e6cd84cac00286bee0000000043410411db93e1dcdb8a016b49840f8c53bc1eb68a382e97b1482ecad7b148a6909a5cb2e0eaddfb84ccf9744464f82e160bfa9b8b64f9d4c03f999b8643f656b412a3ac00000000Help me figure it out.Can you give an example of generating this hash?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415936",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "October 04, 2022, 08:10:11 PM",
+      "body": "The long string you posted starting with c997... is he transactions ID of the spent output. The 00000000 immediately following it indicates it was the first output of this transaction that has been spent (beware - this and other fields might stored in big-endian, so endian conversion might be necessary)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HoBzY",
+      "created_time": "October 04, 2022, 08:14:41 PM",
+      "body": "Quote from: NotATether on October 04, 2022, 08:10:11 PMThe long string you posted starting with c997... is he transactions ID of the spent output. The 00000000 immediately following it indicates it was the first output of this transaction that has been spent (beware - this and other fields might stored in big-endian, so endian conversion might be necessary)How does it look in code? well, creating such a hash",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "October 04, 2022, 11:59:24 PM",
+      "body": "Are you talking about Raw/Hex transaction? Thats the link you provided above.If you want to generate unsigned raw/hex transaction Electrum watch-only wallet have this option just import the public or Btc address that you own to Electrum wallet then make a transaction it should generate a raw/hex transaction.Or you can use this https://coinb.in/#newTransaction to generate unsigned raw/hex transaction.What exactly wallet did you generate this hash c997a5e56e104102fa209c6a852dd90660a20b2d9c352423edce25857fcd3704?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 05, 2022, 03:16:58 AM",
+      "body": "You have to first parse/deserialize the transaction, so you either have to read the first link you posted (raw-transaction-format) to learn how to do it or find a library that does this.Then you'll have a transaction that has a list of inputs (tx_in), in each input you will have a transaction hash and an index. The combination of these two is the outpoint.That hash in each outpoint is the double SHA256 hash of the transaction that contains the output (or coins) you are spending.That index is the index of that output (or coin) inside the previous transaction's output (tx_out) list.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 05, 2022, 03:18:49 AM",
+      "body": "Quote from: HoBzY on October 04, 2022, 06:01:17 PMHow to get an outpoint in a transaction?I'm trying to parse the structure of an unprocessed transaction.-snip-Help me figure it out.Can you give an example of generating this hash?Here's an example then:Let's say you want to spend the first output of this transaction: blockstream.info/tx/4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306The short version is, that's the TXID that should be used in your transaction input's outpoint.The long version is, you can get that by hashing (SHA256D) the to-be-spent RAW transaction;for SegWit, witness data should be omitted first.getrawtransaction 4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306:Code:02000000 ↓----Witness----↓0001 ↑----Witness----↑01edbc78c31ef4beb3f99727513772c95438ab938d0e9e012fb63c21d971d59eed1600000017160014bfe3f2baee0e4e0acb9a09564d85f95f64a08644fdffffff02a086010000000000225120c7da8b195d9e93cb321000adfd2c56ffe30969780cf4e09b782966e38d76761d70e1080000000000160014eee8c12b1093ef4780509809116f931b1fc6ea5a ↓----Witness----↓02473044022002a98b8b8745339ddeb3d485e240035ab4e42e5836ea3cbe6b324a13cd8b8334022062e8e047e1dcb4a7d9f826ca8194be66a116108021fe7e7139fec22ef5f677b6012102dcfa3aff14e12c8eb96f3cf03880aca6ba451798533f58bd30de8eac93fc047c ↑----Witness----↑dc8b0b00Without the witnesses, you'll be left with:Code:0200000001edbc78c31ef4beb3f99727513772c95438ab938d0e9e012fb63c21d971d59eed1600000017160014bfe3f2baee0e4e0acb9a09564d85f95f64a08644fdffffff02a086010000000000225120c7da8b195d9e93cb321000adfd2c56ffe30969780cf4e09b782966e38d76761d70e1080000000000160014eee8c12b1093ef4780509809116f931b1fc6ea5adc8b0b00SHA256:                    19911b5338814ae41175533e224bfdadbe1319f78c194659baaa4ac80fbb9f91SHA256:                    06434a888fda769b0255deb79bc447555c60c28bfdbadfb9e6043b397e2eca4aReverse byte order: 4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306A few references:Transaction data: learnmeabitcoin.com/technical/transaction-dataTXID: https://learnmeabitcoin.com/technical/txidWitnesses: https://learnmeabitcoin.com/technical/transaction-weight",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HoBzY",
+      "created_time": "October 05, 2022, 07:32:44 AM",
+      "body": "Quote from: nc50lc on October 05, 2022, 03:18:49 AMQuote from: HoBzY on October 04, 2022, 06:01:17 PMHow to get an outpoint in a transaction?I'm trying to parse the structure of an unprocessed transaction.-snip-Help me figure it out.Can you give an example of generating this hash?Here's an example then:Let's say you want to spend the first output of this transaction: blockstream.info/tx/4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306The short version is, that's the TXID that should be used in your transaction input's outpoint.The long version is, you can get that by hashing (SHA256D) the to-be-spent RAW transaction;for SegWit, witness data should be omitted first.getrawtransaction 4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306:Code:02000000 ↓----Witness----↓0001 ↑----Witness----↑01edbc78c31ef4beb3f99727513772c95438ab938d0e9e012fb63c21d971d59eed1600000017160014bfe3f2baee0e4e0acb9a09564d85f95f64a08644fdffffff02a086010000000000225120c7da8b195d9e93cb321000adfd2c56ffe30969780cf4e09b782966e38d76761d70e1080000000000160014eee8c12b1093ef4780509809116f931b1fc6ea5a ↓----Witness----↓02473044022002a98b8b8745339ddeb3d485e240035ab4e42e5836ea3cbe6b324a13cd8b8334022062e8e047e1dcb4a7d9f826ca8194be66a116108021fe7e7139fec22ef5f677b6012102dcfa3aff14e12c8eb96f3cf03880aca6ba451798533f58bd30de8eac93fc047c ↑----Witness----↑dc8b0b00Without the witnesses, you'll be left with:Code:0200000001edbc78c31ef4beb3f99727513772c95438ab938d0e9e012fb63c21d971d59eed1600000017160014bfe3f2baee0e4e0acb9a09564d85f95f64a08644fdffffff02a086010000000000225120c7da8b195d9e93cb321000adfd2c56ffe30969780cf4e09b782966e38d76761d70e1080000000000160014eee8c12b1093ef4780509809116f931b1fc6ea5adc8b0b00SHA256:                    19911b5338814ae41175533e224bfdadbe1319f78c194659baaa4ac80fbb9f91SHA256:                    06434a888fda769b0255deb79bc447555c60c28bfdbadfb9e6043b397e2eca4aReverse byte order: 4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306A few references:Transaction data: learnmeabitcoin.com/technical/transaction-dataTXID: https://learnmeabitcoin.com/technical/txidWitnesses: https://learnmeabitcoin.com/technical/transaction-weightThis is understandable, but how to get this hash from json?ed9ed571d9213cb62f019e0e8d93ab3854c97237512797f9b3bef41ec378bcedCode:{    \"hash\": \"4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306\",    \"ver\": 2,    \"vin_sz\": 1,    \"vout_sz\": 2,    \"size\": 257,    \"weight\": 701,    \"fee\": 500,    \"relayed_by\": \"0.0.0.0\",    \"lock_time\": 756700,    \"tx_index\": 220354657254222,    \"double_spend\": false,    \"time\": 1664710026,    \"block_index\": 756701,    \"block_height\": 756701,    \"inputs\": [        {            \"sequence\": 4294967293,            \"witness\": \"02473044022002a98b8b8745339ddeb3d485e240035ab4e42e5836ea3cbe6b324a13cd8b8334022062e8e047e1dcb4a7d9f826ca8194be66a116108021fe7e7139fec22ef5f677b6012102dcfa3aff14e12c8eb96f3cf03880aca6ba451798533f58bd30de8eac93fc047c\",            \"script\": \"160014bfe3f2baee0e4e0acb9a09564d85f95f64a08644\",            \"index\": 0,            \"prev_out\": {                \"tx_index\": 8364599542013591,                \"value\": 682500,                \"n\": 22,                \"type\": 0,                \"spent\": true,                \"script\": \"a91453f6e374ee53ef349d5293c49547438bb55f8b7a87\",                \"spending_outpoints\": [                    {                        \"tx_index\": 220354657254222,                        \"n\": 0                    }                ],                \"addr\": \"39Lymaa222Ryp9DMdDcRviYcBijTJS2e5j\"            }        }    ],    \"out\": [        {            \"type\": 0,            \"spent\": true,            \"value\": 100000,            \"spending_outpoints\": [                {                    \"tx_index\": 6930009354916659,                    \"n\": 0                }            ],            \"n\": 0,            \"tx_index\": 220354657254222,            \"script\": \"5120c7da8b195d9e93cb321000adfd2c56ffe30969780cf4e09b782966e38d76761d\",            \"addr\": \"bc1pcldgkx2an6fukvssqzkl6tzkll3sj6tcpn6wpxmc99nw8rtkwcws04nvas\"        },        {            \"type\": 0,            \"spent\": true,            \"value\": 582000,            \"spending_outpoints\": [                {                    \"tx_index\": 3451925364636683,                    \"n\": 41                }            ],            \"n\": 1,            \"tx_index\": 220354657254222,            \"script\": \"0014eee8c12b1093ef4780509809116f931b1fc6ea5a\",            \"addr\": \"bc1qam5vz2csj0h50qzsnqy3zmunrv0ud6j6m9szd7\"        }    ]}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 05, 2022, 11:49:07 AM",
+      "body": "Quote from: HoBzY on October 05, 2022, 07:32:44 AMQuote from: nc50lc on October 05, 2022, 03:18:49 AM-snip-This is understandable, but how to get this hash from json?ed9ed571d9213cb62f019e0e8d93ab3854c97237512797f9b3bef41ec378bcedCode:{    \"hash\": \"4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306\",...}It's already in json format so the transaction's txid should be already available.In that specific case, it's the line that I left in the code snippet, it's the same as the one in my example.Now I saw where the confusion is.The \"hash\" ed9ed571d9213cb62f019e0e8d93ab3854c97237512797f9b3bef41ec378bced is the txid of the input of that example transaction.You can't get that hash from that transaction's sha256d result, it's only referencing that txid (& vout) to find the UTXO that it's trying to spend.What we want to get is the hash 4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306 in order to spend the example output.Like here, where it's spent: blockstream.info/tx/13fb6a1f56cd383ecbf90fd5b9463553f2fa4cacff34eb5ba99d991e4f74f6c4As you can see, the first input is referencing 4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306 (vout: 0).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HoBzY",
+      "created_time": "October 05, 2022, 12:17:18 PM",
+      "body": "Quote from: nc50lc on October 05, 2022, 11:49:07 AMQuote from: HoBzY on October 05, 2022, 07:32:44 AMQuote from: nc50lc on October 05, 2022, 03:18:49 AM-snip-This is understandable, but how to get this hash from json?ed9ed571d9213cb62f019e0e8d93ab3854c97237512797f9b3bef41ec378bcedCode:{    \"hash\": \"4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306\",...}It's already in json format so the transaction's txid should be already available.In that specific case, it's the line that I left in the code snippet, it's the same as the one in my example.Now I saw where the confusion is.The \"hash\" ed9ed571d9213cb62f019e0e8d93ab3854c97237512797f9b3bef41ec378bced is the txid of the input of that example transaction.You can't get that hash from that transaction's sha256d result, it's only referencing that txid (& vout) to find the UTXO that it's trying to spend.What we want to get is the hash 4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306 in order to spend the example output.Like here, where it's spent: blockstream.info/tx/13fb6a1f56cd383ecbf90fd5b9463553f2fa4cacff34eb5ba99d991e4f74f6c4As you can see, the first input is referencing 4aca2e7e393b04e6b9dfbafd8bc2605c5547c49bb7de55029b76da8f884a4306 (vout: 0).Well, my goal is to study the blockchain, or rather, how mining and all its structures work, but I'm stuck on this txid, I can't figure out how to get it to add it to the structure chain and send RPC. I'm learning blockchain in less than a weekI take the json object itself from blockchain.infoCode:    \"inputs\": [        {            \"sequence\": 4294967293,            \"witness\": \"02473044022002a98b8b8745339ddeb3d485e240035ab4e42e5836ea3cbe6b324a13cd8b8334022062e8e047e1dcb4a7d9f826ca8194be66a116108021fe7e7139fec22ef5f677b6012102dcfa3aff14e12c8eb96f3cf03880aca6ba451798533f58bd30de8eac93fc047c\",            \"script\": \"160014bfe3f2baee0e4e0acb9a09564d85f95f64a08644\",            \"index\": 0,            \"prev_out\": {                \"tx_index\": 8364599542013591,                \"value\": 682500,                \"n\": 22,                \"type\": 0,                \"spent\": true,                \"script\": \"a91453f6e374ee53ef349d5293c49547438bb55f8b7a87\",                \"spending_outpoints\": [                    {                        \"tx_index\": 220354657254222,                        \"n\": 0                    }                ],                \"addr\": \"39Lymaa222Ryp9DMdDcRviYcBijTJS2e5j\"            }        }    ],I understand that 'tx_index = 220354657254222' is responsible for txid, but I don't understand how to get that hex txid is needed from it",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 05, 2022, 12:52:21 PM",
+      "body": "Quote from: HoBzY on October 05, 2022, 12:17:18 PMI take the json object itself from blockchain.infoCode:-snip-You can't get it from that transaction.You can get it from this transaction: blockstream.info/tx/ed9ed571d9213cb62f019e0e8d93ab3854c97237512797f9b3bef41ec378bced?output:22 which is what that outpoint is referring to.You or your wallet should already know that hash in order to \"add it to the structure\", you can't get it from the transaction being builtFor example, you can get a txid from your wallet's inbound transactions which you can also get with listunspent RPC, then use the txid of the one you want to spend as the outpoint.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HoBzY",
+      "created_time": "October 06, 2022, 07:43:38 AM",
+      "body": "Quote from: nc50lc on October 05, 2022, 12:52:21 PMQuote from: HoBzY on October 05, 2022, 12:17:18 PMI take the json object itself from blockchain.infoCode:-snip-You can't get it from that transaction.You can get it from this transaction: blockstream.info/tx/ed9ed571d9213cb62f019e0e8d93ab3854c97237512797f9b3bef41ec378bced?output:22 which is what that outpoint is referring to.You or your wallet should already know that hash in order to \"add it to the structure\", you can't get it from the transaction being builtFor example, you can get a txid from your wallet's inbound transactions which you can also get with listunspent RPC, then use the txid of the one you want to spend as the outpoint.ok thanks good forum)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

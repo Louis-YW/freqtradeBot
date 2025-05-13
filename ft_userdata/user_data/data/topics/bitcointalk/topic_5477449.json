@@ -1,0 +1,69 @@
+{
+  "id": "topic_5477449",
+  "title": "cmpeq",
+  "author": "cmpeq",
+  "created_time": "December 11, 2023, 02:35:58 PM",
+  "content": "Hey all!I have recently managed to get my big integer multiplication TapScript down to ~100k ops and wanted to share it with the community incase anyone else is playing around with computing pairings/other math on Bitcoin Core without the introduction of a new op code (no OP_MUL/OP_CAT/etc., only op codes supported on mainnet).The script takes in two 255-bit integers stored on the stack as 17 15-bit limbs for each multiplicand. Example: 44347314585423944296568073680235476145090606693409235654433373536726375170836 * 9628150406871048387672957393486229355897913529239184982050969653467095200131 = 4269826149692879278283822366332213235970922053177304029789293080711203124290059 69624498190083611110183647917852272397071883279052900012128915830734579516Input to the stack:Code://44347314585423944296568073680235476145090606693409235654433373536726375170836<25099><22628><4378><17693><627><25528><24377><28384><14745><26534><13152><27940><18633><23354><13719><31767><788>// 9628150406871048387672957393486229355897913529239184982050969653467095200131<5449><11141><17843><25029><21077><6343><14634><24263><12683><16977><19183><29977><14928><17779><29424><12654><29059>Output (4269826149692879278283822366332213235970922053177304029789293080711203124290059 69624498190083611110183647917852272397071883279052900012128915830734579516 decomposed into 15-bit limbs):Code:<4174><3116><1924><19299><23030><27800><5381><6034><31418><31294><262><30355><31272><22827><29455><11620><28890><346><22997><3751><23056><2402><6753><26215><23780><10102><22583><13422><25541><1693><29266><1570><20503><26428>If you don't want to decompose the bigints limbs by hand you can also use the big int limb-ifier to generate the inputs for any number you like (set the number size to 255 bits).Full TapRoot Script: https://gist.github.com/cf/1ec22b5334f74f33200774c45bbe9c43  hopefully we get OP_MUL/some big int operations (maybe even bn128?) enabled in the future, until then, this can make due if you don't mind paying",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5477449",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "December 12, 2023, 04:35:08 AM",
+      "body": "Quote from: cmpeq on December 11, 2023, 02:35:58 PMhopefully we get OP_MUL/some big int operations (maybe even bn128?) enabled in the future, until then, this can make due if you don't mind paying Unless a new use case in payment system is found for such big integer arithmetic, I don't see the need for implementing any new arithmetic OP or changing the existing OPs. In fact that's the reason why OP_MUL and similar OPs were disabled/removed from the code.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "December 12, 2023, 04:50:58 AM",
+      "body": "Quote from: pooya87 on December 12, 2023, 04:35:08 AMQuote from: cmpeq on December 11, 2023, 02:35:58 PMhopefully we get OP_MUL/some big int operations (maybe even bn128?) enabled in the future, until then, this can make due if you don't mind paying Unless a new use case in payment system is found for such big integer arithmetic, I don't see the need for implementing any new arithmetic OP or changing the existing OPs. In fact that's the reason why OP_MUL and similar OPs were disabled/removed from the code.bitcoin arithmetic need for solve 256 bit DLO",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cmpeq",
+      "created_time": "December 12, 2023, 05:08:05 AM",
+      "body": "Quote from: pooya87 on December 12, 2023, 04:35:08 AMQuote from: cmpeq on December 11, 2023, 02:35:58 PMhopefully we get OP_MUL/some big int operations (maybe even bn128?) enabled in the future, until then, this can make due if you don't mind paying Unless a new use case in payment system is found for such big integer arithmetic, I don't see the need for implementing any new arithmetic OP or changing the existing OPs. In fact that's the reason why OP_MUL and similar OPs were disabled/removed from the code.You can scale payments with zero knowledge proofs to Visa/MasterCard scale without increasing the block size if we can verify zero knowledge proofs, but this requires working in very large fields (for example bn128 is a 254-bit field), hence bigint finite field arithmetic.If we had OP_CAT we could verify merkle proofs and do FRI which works on smaller fields but again also requires to computing a polynomial (so multiplication)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "December 12, 2023, 06:07:28 AM",
+      "body": "What about using OP_MUL on an altcoin, to have it connected with Bitcoin, instead of using it on Bitcoin directly? If you have connected coins, it doesn't matter if you initiate things on ALT, and it is broadcasted into BTC, or if you initiate it on BTC, and broadcast it into ALT. And because of that, maybe it is not needed to introduce OP_MUL at all, but instead, start for example from implementing OP_ZKP on that altcoin, and make it easier for the users?Also note that if you want to introduce any feature on BTC, you can now do so, without any forks (not even a soft-fork is needed). Because all you need, is to sign coins, to transfer them from BTC to ALT, and then just move them on BTC, to transfer them back. And then, if you apply Homomorphic Encryption on your BTC transaction, then you can process it in encrypted form on your altcoin, and then the last owner can decrypt it, and broadcast on BTC, to do a successful peg-out if needed. And then, the whole \"sidechain\" implementation can be simplified into \"Lightning Network\", where channel closing transactions are publicly known, but stored in encrypted form, and where \"punishment transactions\" are broadcasted by the community, so the altcoin nodes can just act as a huge watchtower in this case.So, if you want to introduce anything new, I would rather think about complete implementation of OP_ZKP, than about OP_MUL alone. Because then, it will be easier to avoid XY problem, if you promote it as ZKP, rather than multiplication.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cmpeq",
+      "created_time": "December 14, 2023, 09:40:16 AM",
+      "body": "Quote from: garlonicon on December 12, 2023, 06:07:28 AMWhat about using OP_MUL on an altcoin, to have it connected with Bitcoin, instead of using it on Bitcoin directly? If you have connected coins, it doesn't matter if you initiate things on ALT, and it is broadcasted into BTC, or if you initiate it on BTC, and broadcast it into ALT. And because of that, maybe it is not needed to introduce OP_MUL at all, but instead, start for example from implementing OP_ZKP on that altcoin, and make it easier for the users?Also note that if you want to introduce any feature on BTC, you can now do so, without any forks (not even a soft-fork is needed). Because all you need, is to sign coins, to transfer them from BTC to ALT, and then just move them on BTC, to transfer them back. And then, if you apply Homomorphic Encryption on your BTC transaction, then you can process it in encrypted form on your altcoin, and then the last owner can decrypt it, and broadcast on BTC, to do a successful peg-out if needed. And then, the whole \"sidechain\" implementation can be simplified into \"Lightning Network\", where channel closing transactions are publicly known, but stored in encrypted form, and where \"punishment transactions\" are broadcasted by the community, so the altcoin nodes can just act as a huge watchtower in this case.So, if you want to introduce anything new, I would rather think about complete implementation of OP_ZKP, than about OP_MUL alone. Because then, it will be easier to avoid XY problem, if you promote it as ZKP, rather than multiplication.A sidechain could definitely be built in this way, but it kind of defeats the whole purpose of we want to use succint zero knowledge proofs, specifically to allow large stateful computations (such as processing a layer 2 block) to have the same security of Bitcoin consensus/Bitcoin PoW (with ZKP the user only has to trust proof of math + the security of Bitcoin). Unless the watch towers have the same security/decentralization as Bitcoin (never been done, likely never will be), then the user is essentially at the mercy of the watch towers for peg-out.A similar argument can be made as to why use Bitcoin in the first place, and of course the answer is that is that Bitcoin is far and along the safest, most decentralized place to transact.Perhaps the next most secure is Ethereum, but I need only point to the terrifying rise of Lido which seems to be indicitive in chains which have security which depends on anything other than Proof of Work + Proof of Math. The watch towers could of course use a PoW system, but this has its own pitfalls as again it is highly unlikely that an alt/layer 2 could reach anything like the decentralization and security of Bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 14, 2023, 10:01:13 AM",
+      "body": "Quote from: COBRAS on December 12, 2023, 04:50:58 AMbitcoin arithmetic need for solve 256 bit DLOBut you can do that without making it a script inside Bitcoin Core. The whole purpose of having opcodes is so that they can be used to lock and unlock transaction outputs. Since most DLO problem-solving is done with specialized programs, and not on-chain, then you don't need stuff like OP_MUL and OP_CAT.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "December 17, 2023, 12:34:45 AM",
+      "body": "Quote from: pooya87 on December 12, 2023, 04:35:08 AMIn fact that's the reason why OP_MUL and similar OPs were disabled/removed from the code.Meh, Satoshi disabled all opcodes that allocated memory because there wasn't any control to prevent them from allocating too much. It was an urgent vulnerability. You could do dup mul dup mul dup mul dup mul dup mul... and run every node out of memory validating it. Like cat a multiply output is the sum of the size of the inputs.There was no fast way to make the validation engine safe because all the script numbers were openssl bignumber objects at the time, and there was no clear specification on how those suckers worked.  God knows what consensus and resource exhaustion bugs existed there.The story today would be different, script numbers are now integers not some weird library object. A safe multiply would be trivial to add (and there is one I think from elements that has been copied into a bunch of forks of Bitcoin).There are clear uses for arithmetic operations, particularly it lets you implement some alternative cryptographic schemes... like for example an anonymous accumulator output.But there is less of a case for implementing them in the abstract since the 'generic' things that get implemented may be too inefficient or just not do exactly the right thing for the use to actually work.  So it's important to have clear use cases just to validate that the construct is actually useful.I think things should be easier to justify with taproot, because if your application only needs to use the fancy opcodes in an exceptional case, the fact that they may be expensive to use isn't a problem.Consider this scheme:  A cryptographic accumulator like Zerocoin lets parties put in coins and then take them out without any linkage between the transactions.  But it requires 3KB proofs making it costly to use.  A group of N people could come together and create an output which has a musig2 N-of-N threshold signature as the root,  and the expensive accumulator thing as a hidden branch.  So long as all N people are online they all just jointly sign to make changes to the accumulator, keeping all the accumulator proof stuff private and offline.  But if one of the N parties goes offline for whatever reason, no ones funds are frozen-- they can use the accumulator to kick out the unresponsive party at a one time cost and continue on.Particularly if the N parties tend to pay each other often, this scheme is really efficient since it can encapsulate all the N*(N-1) potential payments between parties simultaneously in a transaction that uses the resources of a single party payment.There are ways to do these schemes without a cryptographic accumulator, but once N is over a threshold size an accumulator is probably the cheapest way to implement it... even if it requires a pretty expensive script.  Of course it's more useful the cheaper that backup escape hatch is, so it's important that the right operations are implemented for it. The simple and stupid multiply would probably not result in a usefully efficient implementation.I don't say this to advocate for any proposal (I don't even known if any exist right now) but to just point out that there are applications and not just trivial or dubious ones.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

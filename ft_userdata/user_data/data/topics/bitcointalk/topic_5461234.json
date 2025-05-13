@@ -1,0 +1,77 @@
+{
+  "id": "topic_5461234",
+  "title": "Picaflor",
+  "author": "Picaflor",
+  "created_time": "July 27, 2023, 05:58:23 PMLast edit: July 27, 2023, 06:23:57 PM by Picaflor",
+  "content": "Hello,I can't connect to my electrs, not even from the machine it's running on.My HW/SW:Intel NUC, 1TB SDD, 8GB RAMUbuntu 22.04 LTSBitcoin Core 25.0.0Electrs 0.10.0I've tried connecting with both Electrum wallet and Sparrow, both directly and via SSL, and none of it worked. I set up SSL by following this video.Electrum says nothing, the bullet just stays red. Sparrow says \"Connecting to tcp://127.0.0.1:50001...\" and won't connect.In electrs I have logging set to DEBUG and get these lines, respectively:Code:electrs::server] 6: recv {\"jsonrpc\":\"2.0\",\"method\":\"server.version\",\"id\":0,\"params\":[\"electrum/4.4.5\",\"1.4\"]}andCode:electrs::server] 5: recv {\"jsonrpc\":\"2.0\",\"method\":\"server.version\",\"params\":[\"Sparrow\",\"1.4\"],\"id\":1}Logs from Electrum client:Code: 2.54 | I | n/network | connecting to 127.0.0.1:50002:s as new interface  2.54 | I | i/interface.[127.0.0.1:50002] | looks like localhost: not using proxy for this server  2.54 | I | n/network | starting taskgroup (0x7f89842504f0).  2.54 | I | storage.WalletStorage | wallet path /home/sov/.electrum/wallets/test  2.54 | D | util.profiler | WalletDB._load_transactions 0.0010 sec  2.54 | D | util.profiler | AddressSynchronizer.load_local_history 0.0000 sec  2.54 | D | util.profiler | AddressSynchronizer.check_history 0.0001 sec  2.54 | D | util.profiler | Daemon._load_wallet 0.0103 sec  2.79 | I | w/wallet.Imported_Wallet.[test] | starting taskgroup.  2.80 | D | util.profiler | AddressList.update 0.0000 sec  3.02 | D | util.profiler | Imported_Wallet.try_detecting_internal_addresses_corruption 0.0003 sec  3.02 | D | util.profiler | ElectrumWindow.load_wallet 0.0593 sec  3.16 | I | gui.qt.history_list.HistoryModel | refreshing... reason: update_tabs  3.17 | D | util.profiler | Abstract_Wallet.get_full_history 0.0003 sec  3.17 | D | util.profiler | HistoryModel.refresh 0.0099 sec  3.19 | D | util.profiler | AddressList.update 0.0000 sec  3.89 | I | gui.qt.update_checker.UpdateCheckThread | valid sig for version announcement '4.4.5' from address '13xjmVAB1EATPP8RshTE8S8sNwwSUM9p1P'  5.70 | I | gui.qt.ElectrumGui | starting Qt main loopIn Sparrow logs there is nothing.Any idea what's going on?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5461234",
+  "comments": [
+    {
+      "author": "DireWolfM14",
+      "created_time": "July 27, 2023, 07:40:06 PM",
+      "body": "It won't accept connections unlit it's fully synchronized.  With an SSD that shouldn't take more than a few hours, maybe 12 at the most.  Have you tried connecting using the unsecured connection, i.e. port 50001?Are you running it using systemd?  If so, try this to see what it's doing, and if it's currently synchronized:Code:journalctl -u electrs.serviceThis assumes the systemd file is named electrs.service.  Modify the command if that's not the case.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Picaflor",
+      "created_time": "July 27, 2023, 08:18:39 PM",
+      "body": "I believe it is fully synchronized, have been running it for a few days. I've tried connecting via port 50001 with no luck.I'm not running it using systemd; I start it manually. It writes logs to the console, which presumably is the same I'd get with journalctl.After starting it the last few lines look like this:Code:[2023-07-27T20:09:22.850Z DEBUG electrs::p2p] got 4 new headers[2023-07-27T20:09:22.850Z INFO  electrs::index] indexing 4 blocks: [800522..800525][2023-07-27T20:09:22.850Z DEBUG electrs::p2p] loading 4 blocks[2023-07-27T20:09:25.698Z DEBUG electrs::index] writing 29471 funding and 32801 spending rows from 10260 transactions, 4 blocks[2023-07-27T20:09:25.868Z INFO  electrs::chain] chain updated: tip=00000000000000000000a1a96c9dc4b97842999d39edaeb0e1629066dc38be91, height=800525[2023-07-27T20:09:28.986Z DEBUG electrs::p2p] got 0 new headers[2023-07-27T20:09:29.438Z INFO  electrs::db] starting config compaction[2023-07-27T20:09:29.456Z INFO  electrs::db] starting headers compaction[2023-07-27T20:09:36.079Z INFO  electrs::db] starting txid compaction",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "July 27, 2023, 09:26:53 PM",
+      "body": "The console logs look okay.  Not sure about the compaction lines, it's been a while since I've looked at my logs but I'll check when I get home.It's usually the simplest things...  Do you have a firewall running, and if so, have you allowed incoming connections to ports 50001 and 50002?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Picaflor",
+      "created_time": "July 28, 2023, 12:10:19 AM",
+      "body": "I do have a firewall running, it allows connections to port 50002, which I had set up for SSL access within the LAN.Disabling the firewall doesn't help.But in any case I can't even connect to 127.0.0.1:50001 on the same PC, where the firewall is irrelevant.`sudo netstat -tunlp` returns the line:Code:tcp        0      0 127.0.0.1:50001         0.0.0.0:*               LISTEN      45274/electrs",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WillyAp",
+      "created_time": "July 28, 2023, 12:28:22 AM",
+      "body": "Quote from: Picaflor on July 28, 2023, 12:10:19 AMI do have a firewall running, it allows connections to port 50002, which I had set up for SSL access within the LAN.Disabling the firewall doesn't help.But in any case I can't even connect to 127.0.0.1:50001 on the same PC, where the firewall is irrelevant.`sudo netstat -tunlp` returns the line:Code:tcp        0      0 127.0.0.1:50001         0.0.0.0:*               LISTEN      45274/electrs Looks as if your wallet is listening on a different port. I don't know electrum though What falvor you are on, In case you don't know if the port is open. have you scanned it with nmap? sudo nmap -sT -p- 10.10.8.8How to open a port:https://www.howtouselinux.com/post/linux-command-open-a-port-on-linux",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 28, 2023, 02:03:09 AM",
+      "body": "How are you sure that your Bitcoin core is fully sync? What command did you use to start Bitcoind?Take note electrs won't work if your Bitcoin core is set to pruned mode you need to run Bitcoind this command below to disable prune while syncing.Code:$ bitcoind -server=1 -txindex=0 -prune=0Can you share your electrs config.toml, let us check if you are using the default config.Would you mind to try this first to force Electrum to connect on TPC using this command below.Code:electrum --oneserver --server 127.0.0.1:50001:tUpdate here after.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Picaflor",
+      "created_time": "July 28, 2023, 10:23:15 AM",
+      "body": "Thanks guys, finally it connected! And I didn't change anything.I've also successfully connected from another PC on the same LAN to my electrs via SSL.It wasn't about the ports, and Bitcoin Core was indeed fully synced.I think the issue was electrs still compacting the DB.When electrs indexed, the DB took 60 GB of space, then it started compacting and the DB kept shrinking. Last night it was 44 GB and I still couldn't connect. Now it's 42 GB and I can connect.The `starting txid compaction` message in electrs logs was the telltale sign, but it could have been clearer as there was no indication of progress and it took longer than expected to complete. My Bitcoin Core synced in under 72 hours, I was expecting electrs to be done within hours, and that most of it would be the indexing and not the compacting.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WillyAp",
+      "created_time": "July 28, 2023, 03:17:38 PM",
+      "body": "Quote from: Picaflor on July 28, 2023, 10:23:15 AMThanks guys, finally it connected! And I didn't change anything.I've also successfully connected from another PC on the same LAN to my electrs via SSL.That's great news. Information or the lack of it is, unfortunately so, often the case in newer tech.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

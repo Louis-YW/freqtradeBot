@@ -1,0 +1,165 @@
+{
+  "id": "topic_5427845",
+  "title": "chipmasterbtc",
+  "author": "chipmasterbtc",
+  "created_time": "December 11, 2022, 03:50:23 PM",
+  "content": "Hallo liebe Community,ich habe mir eine CompacF zugelegt um mich mit dem Thema mal näher zu beschäftigen.Der USB-Miner sollte 200-350 GH/s schaffen, je nach Taktrate.Ich bekomme aber keinen sinnvollen Zusammenhang zwischen Taktrate und Hashrate zusammen und weiß keine Rat, was ich noch tun kann.Zur Konfig:- Raspi 4 mit Ubuntu 20.04 LTS- GekkoScience Compac F- 120 mm Lüfter mit Lufttrichter so angeordnet, dass Vorder - und Rückseite des Miners sehr gut gekühlt werden- der Kühlkörper des Miners wird auch nur Handwarm, bei dieser sehr leistungsstarken Kühlung- 5 V / 6 A Netzteil zur Versorgung des Raspi, Lüfter und Miner- der Miner ist Spannungsseitig direkt am Netzteil , so dass er wirklich auch ausreichend Strom ziehen kann- die Spannung habe ich überwacht und sie bleibt auch stabil bei 5.0 - 5.1 VoltInstalliert ist der cgminer 4.12.1. Auf dem Raspi läuft tmux, so dass der Miner auch bei getrennter SSH-Verbindung in der Session weiterlaufen kann.Der Start des Miners erfolgt mit folgendem Befehl ./cgminer -o stratum+tcp://solo.ckpool.org:3333 -u \"meineBTCAdresse\" -p x --gekko-compac-freq 420 --gekko-start-freq 420 --gekko-mine2 --gekko-tune2 60Ich habe Frequenzen bis 500 Mhz getestet. Alles über 430 Mhz bringt aber nur eine extrem schlechte Performance.  Das wird aber auf der Herstellerseite gesagt \"Geschwindigkeit abhängig von Chipqualität\"). Bei 420 Mhz hatte ich eine Hashrate von 285 GH/s erreicht - stabil. Allerdings musste ich den Miner mal neu starten und erreiche diese Hashrate nun einfach nicht mehr. Wenn ich jetzt mit 420 MHz starte, dann geht die Hashrate nicht mehr höher als 70 Gh/s...kein Schreibfehler...70!Bei niedrigeren Frequenzen (360 MHz) shafft er es grad noch auf 165 Gh/s. Ich komme einfach nicht mehr auf meine Spitzenwerte.Was habe ich probiert:- Frequenzen ändern- Optionen durchprobiert (--suggest-diff 32) keine Ahnung ob sinnvoll war- Neustart des Raspis- Kaltstart aller Komponenten- Updates Linux- cgminer neu installiertHat jemand ähnliche Erfahrungen oder hat einen Tipp, was ich noch probieren könnte?Vielen Dank und Glück Auf !",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5427845",
+  "comments": [
+    {
+      "author": "o_solo_miner",
+      "created_time": "December 11, 2022, 06:44:03 PMLast edit: December 11, 2022, 07:00:53 PM by o_solo_miner",
+      "body": "Quote from: chipmasterbtc on December 11, 2022, 03:50:23 PM./cgminer -o stratum+tcp://solo.ckpool.org:3333 -u \"meineBTCAdresse\" -p x --gekko-compac-freq 420 --gekko-start-freq 420 --gekko-mine2 --gekko-tune2 60Wilkommen im Forum, dein Post wäre besser in Mining, evtl. kann Mole den ja dorthin verschieben.Du hast ein \"F\" vergessen  versuche es mal so:./cgminer -o stratum+tcp://solo.ckpool.org:3333 -u \"meineBTCAdresse\" -p x --gekko-compacf-freq 475 lasse den Rest mal weg.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chipmasterbtc",
+      "created_time": "December 11, 2022, 10:27:11 PM",
+      "body": "Hallo o_solo_miner und Danke für deinen Tipp. Das f habe ich in meiner Befehlszeile eingefügt aber ohne Besserung.Dann habe ich deinen Befehlsvorschlag kopiert mit folgendem Ergebnis:Der miner geht bis 440 Mhz, dann dauert es etwas und er fängt bei 200 Mhz wieder an.Bis 370 Mhz steigende Hashrate auf 138 Gh/s, danach bis 445 Mhz fallend bis auf 70 Gh/sDie 445 MHz schafft er nicht mehr und startet automatisch den nächsten Durchlauf ab 200 MHz.Im zweiten Durchlauf (nach dem automatischen Runtertakten auf 200 Gh/s) Werte noch schlechter.Die Taktrate steigt nun bis auf 430 Mhz aber die Hashrate kommt dabei bei keiner Taktrate über 90 Gh/s.435 MHz schafft er scheinbar nicht mehr und startet automatisch den nächsten Durchlauf bei 200 MHz.Temperaturseitig wird der Miner nicht mal handwarm.Der dritte Durchlauf wird noch schlechter. Nun kommt der Miner nicht mehr über 78 Gh/s und taktetbis maximal 420 Mhz. Beim Versuch 425 Mhz zu takten, fängt er wieder bei 200 MHz an.Bei 415 Mhz fing er dann mal an zu minen mit 77 Gh/s. Das lief dann ca. 15 Minuten und danachtaktete er wieder auf 200 MHz runter, wobei die Hashrate bei 76 Gh/s lief.Also das Verhältnis Taktfrequenz/Hashrate sollte doch eigentlich parallel steigend sein oder?Nach einiger Laufzeit (ca 1-2 Stunden) läuft er nur noch unter 200 Mhz, wobei die Hashrate annäherndgleich bleibt um die 78 Gh/s.Ich bin echt etwas ratlos. In den nächsten Tagen werde ich das System mal komplett neu machen und RaspberryOS nehmen. Das Netzteil prüfe ich mal auf Gleichspannungsreinheit oder tausche das auchmal aus. Die Kühlung ist definitiv ausreichend - es sei denn zu gut ? Braucht der etwa eine bestimmte Betriebstemperatur?Mal schauen was rauskommt....",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tux1975",
+      "created_time": "December 12, 2022, 08:13:13 AM",
+      "body": "Moinsidehack hat im Support thread die Empfehlung gegeben den Stick bei Problemen erstmal mit diesen Parametern zu starten : --gekko-compacf-freq 400 --gekko-start-freq 300 --gekko-tune-up 85hast Du mal den USB Hub gewechselt ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mole0815",
+      "created_time": "December 12, 2022, 01:42:50 PM",
+      "body": "Herzlich willkommen chipmasterbtc,ich verschiebe deinen Thread hiermit da er im Mining besser aufehoben ist.Quote from: o_solo_miner on December 11, 2022, 06:44:03 PMWilkommen im Forum, dein Post wäre besser in Mining, evtl. kann Mole den ja dorthin verschieben.Hätte ich schneller gefunden wenn es per \"Report to moderator\" gemeldet worden wäre aber auch so bin ich nun drüber gestolpert  Danke!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lafu",
+      "created_time": "December 12, 2022, 01:48:35 PM",
+      "body": "Quote from: chipmasterbtc on December 11, 2022, 10:27:11 PMDie Kühlung ist definitiv ausreichend - es sei denn zu gut ? Braucht der etwa eine bestimmte Betriebstemperatur?Willkomen hier im Forum und deutschen bereich chipmasterbtc !Also an der Kühlung kann es aufjedenfall nicht liegen oder das die zuviel ist , um so besser der Miner gekühlt wird um sp besser ist es.Das erhöht die Lebensdauer und ist gut für die verbauten Chips auf dem Minerboard.Ich würde an deiner stelle auch mal alles neu aufsetzen und dann schauen ob das problem immernoch besteht.Falls ja auch mal einen anderen USB Hub ausprobieren , es kann aber auch gut sein das der Miner bereits einen defekten Chip hat.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 12, 2022, 06:13:35 PM",
+      "body": "Hallo. Ich lese in deiner Beschreibung nichts von einem USB Hub. Dieser ist zwingend Voraussetzung! du kannst den Compac F nicht einfach an einen USB port an deinem Raspi anschließen, das wird nicht gut gehen und im schlimmsten Fall kannst du auch den USB port deines Geräts kaputt machen wenn zuviel Leistung durchfließt. Welchen USB hub verwendest du? Ich würde dir für die Fehlerausgrenzung erstmal empfehlen, einen anderen USB hub zu probieren. Bedenke, dass du unbedingt einen aktiven USB-hub betreibst, einen mit eigener Stromversorgung. Dann solltest du mit debug log aktivieren und schauen welche Informationen die Logausgabe liefert. Sonst tappst du weiterhin im Dunkeln (und wir auch )viel Erfolg",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tux1975",
+      "created_time": "December 13, 2022, 08:58:24 AM",
+      "body": "Quote from: citb0in on December 12, 2022, 06:13:35 PMWelchen USB hub verwendest du? Ich würde dir für die Fehlerausgrenzung erstmal empfehlen, einen anderen USB hub zu probieren. Bedenke, dass du unbedingt einen aktiven USB-hub betreibst, einen mit eigener Stromversorgung. Dann solltest du mit debug log aktivieren und schauen welche Informationen die Logausgabe liefert. Sonst tappst du weiterhin im Dunkeln (und wir auch )viel ErfolgDa er weiter oben geschrieben hat das der Stick direkt vom 5 Volt Netzteil versorgt wird reicht da auch ein 0815 /2,99€ billig Hub aus dem Land des umgefallen Reissack´s   (es werden dort ja nur GND und die beiden Datenleitungen benötigt)Einzig wichtig bei der Sache wär da nur das die +5V Spannungsversorgung über den USB Hub zum Stick sauber getrennt ist !!!Weil sonst unter umständen je nach Intelligenz des Hub´s die dort implimentierte Strombegrenzung  dazwischen funkt und eventuell sogar den Port hin und her schaltet ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chipmasterbtc",
+      "created_time": "December 13, 2022, 08:30:47 PM",
+      "body": "Wow so viele Tipps - ich bin begeistert... Danke Leute  Ich geh mal schrittweise durch:@tux1975: Leider wird er auch mit deinen empfohlenen Parametern nicht schneller und kraxelt erst bei 120 Gh/s rum und fällt dann unter 100 Gh/s. Mit meinen Parametern lief er immerhin noch um die 140 Gh/s - aber alles noch weit entfernt von den mal erreichten 280 Gh/s@mole0815: Danke fürs verschieben @Lafu: Das Neu Aufsetzen steht die Woche noch an und dann gebe ich sofort Bescheid. Das wird aber nicht vor dem Wochenende.@citB0in: Ja wie tux1975 auch angemerkt hat, verwende ich keinen USB-Hub. Ich habe einen USB Stecker und eine USB Buchse gekauft - die bis auf die + Leitung zusammengeschaltet und das 5V/6A Netzteil so angeschlossen, dass es den Stick direkt mit Strom versorgt. USB-Seitig ist also die Spannungsversorgung getrennt. Wenn ich die Spannungsversorgung geprüft habe, dann immer direkt am Stick gemessen. Dort geht die Spannung nie unter 5.0 V.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_solo_miner",
+      "created_time": "December 13, 2022, 08:48:37 PMLast edit: December 13, 2022, 09:25:16 PM by o_solo_miner",
+      "body": "Quote from: chipmasterbtc on December 13, 2022, 08:30:47 PMWow so viele Tipps - ich bin begeistert... Danke Leute  Ich geh mal schrittweise durch:@citB0in: Ja wie tux1975 auch angemerkt hat, verwende ich keinen USB-Hub. Ich habe einen USB Stecker und eine USB Buchse gekauft - die bis auf die + Leitung zusammengeschaltet und das 5V/6A Netzteil so angeschlossen, dass es den Stick direkt mit Strom versorgt. USB-Seitig ist also die Spannungsversorgung getrennt. Wenn ich die Spannungsversorgung geprüft habe, dann immer direkt am Stick gemessen. Dort geht die Spannung nie unter 5.0 V. Das funktioniert so leider nicht!Der USB Chip Signalisiert das ein Device Angesteckt wurde über den Stromfluß. Das habe ich auch mal probiert, der Aufwand ist groß um das stabil zum Funktionieren zu bekommen.Sende mir eine PM, ich sende dir einen USB-Hub an dem du das Netzteil anlöten kannst (ist ohne Gehäuse aber für Miner).Ich verwende den gleichen mit einem Meanwell RS 25-5 und das funktioniert gut.Zur Info: mein CompacF wollte unter 400 MHz nicht funktionieren, ab 425 MHz ging er und läuft nun bei mir mit 475 MHz.Ich habe meinen CompacF auf einen alten CPU-Lüfter montiert und den 12V Lüfter an 5V Angeschloßen, der Miner bleibt Kalt und den Lüfter kannst du nicht hören  Ich habe schon Bilder gemacht, muß die noch verkleinern und dann hänge ich die später hier an.EDIT: Bild angehangen, der Staub wurde nun entfernt, der Lüfter läuft auch wenn es auf dem Bild nicht so Aussieht  Den USB-HUB siehst du jetzt von der Unterseite, ist noch von den Rockminern.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chipmasterbtc",
+      "created_time": "January 08, 2023, 11:03:55 PM",
+      "body": "So liebe Leute - noch ein gesundes neues Jahr und viel Erfolg beim schürfen Ich bin erst jetzt dazu gekommen , mich mal wieder um das Thema zu kümmern und das ist schon merkwürdig.Vielen lieben Dank für eure Tipps.@o_solo_miner: ich bin nicht sicher, ob das mit der USB Erkennung so korrekt ist. Der Datenfluß über USB funktioniert auch ohne die positive Versorgungsspannung, da die Datenleitungen gegen Masse getaktet werden. Aber es gibt sicherlich USB-Hubs die es so wie Du beschrieben hast, verarbeiten. Mit der Taktrate kann ich bei mir übrigens bis 100 MHz runtergehen und der Miner arbeitet (natürlich mit entsprechend geringer Hashrate).Folgendes ist bei mir passiert. Der Miner lief in meiner beschriebenen Konfig weiter. Kurz vor Weihnachten habe ich bemerkt, dass die Hashrate immer weiter absank über Tage hinweg. Zum Jahreswechsel lag die Hashrate nur noch bei 60 GH/s. Ein Temperatur- oder Stromversorgungsproblem lag aber nicht vor.Bei den Prüfungen habe ich vermutlich die Lüfterhalterung nicht richtig befestigt. Vor einigen Tagen schau ich auf den Miner und der blöde Lüfter lag daneben. Trotzdem war der Miner kalt - vermutlich durch Überhitzung irgendwann selbst abgeschaltet. Ich dacht schon das wars - das Ding ist im Nirvana.Aber ne - ich hab meine Konfig wieder so aufgebaut (aber den Lüfter stabiler befestigt   ) und nun läuft das Ding bei 420 MHz stabil mit 275 GH/s. Habe ich nochmal einen Neustart durchgeführt, wobei die Hashrate wiederum erreicht wurde. Der Miner wird nun mal einige Tage laufen und hoffentlich stabil bleiben. Ich geb nochmal Bäschaid",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chipmasterbtc",
+      "created_time": "January 09, 2023, 08:24:47 PM",
+      "body": "Tag 2 - noch immer stabil 275 GH/s +- 2 GH/sEine (vermutlich weit hergeholte Vermutung) ist, dass evtl. durch das aufheizen beim ausgefallenen Lüfter eventuelle Kontaktprobleme des Chips behoben wurden? Ich kann mir sonst keinen Reim auf das plötzliche funktionieren nach dem Lüfterausfall machen. Es gibt an der Verkabelung, Softwareeinstellung, Standort, Netzteil keinen Unterschied zu vorher, als das Problem auftrat.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hZti",
+      "created_time": "January 11, 2023, 06:41:29 PM",
+      "body": "Quote from: chipmasterbtc on January 09, 2023, 08:24:47 PMTag 2 - noch immer stabil 275 GH/s +- 2 GH/sEine (vermutlich weit hergeholte Vermutung) ist, dass evtl. durch das aufheizen beim ausgefallenen Lüfter eventuelle Kontaktprobleme des Chips behoben wurden? Ich kann mir sonst keinen Reim auf das plötzliche funktionieren nach dem Lüfterausfall machen. Es gibt an der Verkabelung, Softwareeinstellung, Standort, Netzteil keinen Unterschied zu vorher, als das Problem auftrat.Tatsächlich lassen sich ja manche defekte bei hardware durch \"backen\" im Backofen beheben. Eventuell ist hier das selbe passier, auch wenn es natürlich reiner Zufall war, dass durch einen Lüfterausfall eine Besserung eingetreten ist  Wenn du das tatsächlich vermutest kannst du dich ja mal über das \"backen\" informieren. Eventuell ist es die Lösung bei zukünftigen Problemen.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "March 22, 2023, 08:40:52 AM",
+      "body": "Quote from: POD5 on March 22, 2023, 08:28:34 AMHallo zusammen,Kommt eigentlich der USB-Stick Miner GekkoScience Compac F 200-350 GH/s mit Bedienungsanleitung?   nein, der kommt ohne. den brauchst du auch nur in dein usb port reinstecken und cgminer starten. und für dieses tool gibt es hier im forum eine art 'bedienungsanleitung' wo diverse befehle erklärt werden.es gibt auch einen offiziellen faden für den compac f stick: GekkoScience has a new stickminer that does 300+GH - hier solltest du alle infos dann finden",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chipmasterbtc",
+      "created_time": "April 09, 2023, 10:20:18 PM",
+      "body": "Nachtrag.Hallo liebe Bergleute. Also der Miner lief nun monatelang problemlos und stabil mit durchschnittlich 270 GH/s.Nun musste ich den Miner mal umsetzen und tada - gleiches Problem wie am Anfang. Die Hashrate war wiederunterirdisch.@hZti - nun hab ich mal bewusst etwas Wärme zugelassen. Die montierte Lüftung ist sehr stark, so dass derMiner nur handwarm wird. Wenn er aber frisch gestartet wird (der Lüfter läuft mit einer extra Stromversorgungpermanent), dann ist der Miner richtig kalt.Also hab ich nun den Lüfter abgeschaltet und cgminer gestartet für ca. 10 Sekunden - und siehe da - das habeich 3-4 mal gemacht und jedesmal steig die Hashrate. Beim 5. mal wurde der Miner nicht mehr erkannt - war auchschweineheiß.Nun 20 Sekunden gewartet, Lüfter an, cgminer gestartet - und hab wieder meine Hasrate.Na da werd ich mich mal bei nem Backkurs einschreiben    Vielleicht springt ja nebenbei noch ein Käsekuchen raus",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "April 10, 2023, 08:04:12 AM",
+      "body": "klingt für mich nach einem Defekt oder Hardwareproblem. In dem englischsprachigen Thread habe ich solche ähnliche Probleme von anderen Teilnehmern ebenfalls schon gesichtet. Schau dort mal rein, vielleicht findet sich eine Lösung. Wobei ich aber eher denke, dass du nicht drum rum kommen wirst, das Teil einzuschicken und von denen überprüfen oder austauschen zu lassen. Tut mir leid, dass du solch Probleme damit hast. Meiner läuft auf 'ner Taktfrequenz von 555 MHz über Monate hinweg und bringt 360 GH/s im average.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COMPAC F",
+      "created_time": "April 12, 2023, 10:35:28 PM",
+      "body": "Hallo ich habe ein ähnliches Problem.Der Miner erreicht zwar die 220Ghs bei 400Mhz aber taktet immer runter nach wenigen Minuten. Die Anzeige WU wo ich nicht weiß was sie bedeutet , geht immer von 100% auf 30 % .Wenn ich 200MHz machen würde , genau das selbe nur das er da meistens WU nichtmal 60% erreicht.Dass heißt ca 55Ghs.Ich habe die Kühlpaste gewechselt hatt  leider auch nicht  viel gebracht. Der Miner wird auch extrem heiß trotz Kühlung.Kann mir jemand weiterhelfen?Mfg",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chipmasterbtc",
+      "created_time": "April 24, 2023, 09:43:09 PM",
+      "body": "Quote from: citb0in on April 10, 2023, 08:04:12 AMMeiner läuft auf 'ner Taktfrequenz von 555 MHz über Monate hinweg und bringt 360 GH/s im average.Ja da hast Du wohl leider Recht. Interessant dass dein CompacF mit 555 MHz läuft. Alles bei mir über 500 MHz bei wird mit \"Value out of Range\" nicht ausgeführt. Gibts da einen Trick dazu?Hab heut auf der Bitminer Webseite auch gelesen, dass der CompacF mit 400-800 MHz laufen soll, dank einstellbarer Kernspannung.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "April 25, 2023, 04:59:41 AM",
+      "body": "Ich denke, das hängt alles mit der Kühlung zusammen. Sobald er außerhalb der erlaubten Temperaturen betrieben wird, schaltet er ab, um sich zu schützen. Dabei wird die Taktfrequenz gesenkt. Bei mir war's so, dass ich ihn problemlos auf 585 MHz betreiben konnte, über Monate hinweg. Irgendwann fing es dann damit an, dass er immer öfter Aussetzer hatte und dadurch ein klein wenig runtertaktete und dann im Anschluss wieder versuchte seine konfigurierte Taktfrequenz zu erklimmen. Die errors wurden mit den Wochen häufiger und die Zeitabstände dazwischen kürzer. Das konnte also nur bedeuten, dass es sich um ein mechanisches Problem handelt. Ich habe den Stick untersucht und auch sofort visuell den Staub diagnostizieren können. Ich habe den Lüfter abmontiert und auch dort war etlicher Staub vorhanden. Ich habe den Kühlkörper jedoch belassen. Dann habe ich ein Luftdruckspray genommen (aus Bürozubehör) mit dem ich normalerweise die Tastatur reinige und alles frei geblasen. Sah anschließend aus wie neu. Seit dem läuft er wieder wochenlang problemlos auf 585 MHz, ohne Surren und Murren   ich habe dann nach einem Monat wieder etwas runtergetaktet und zwar auf 555, wo ich ihn 24/365 laufen lasse.Soviel zu meiner Erfahrung. Aber summa summarum nach all dem was ich hier im Forum zum Stick lese geht es meist um die Wärmeentwicklung, die sollte man bestmöglichst in den Griff bekommen.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "unamic",
+      "created_time": "July 16, 2023, 01:46:19 PM",
+      "body": "Ich würde gerne 2 Stück davon betreiben könnt ihr mir sagen wo ihr euren USB Hub gekauft habt? Der Hub von Gekkoscience ist schon ziemlich teuer + man benötigt noch ein Netzteil. Das oben auf dem Bild sieht selbst gebastelt aus von sowas habe ich leider keine Ahnung.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

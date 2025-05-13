@@ -1,0 +1,69 @@
+{
+  "id": "topic_5398858",
+  "title": "vinshet",
+  "author": "vinshet",
+  "created_time": "May 16, 2022, 10:13:08 AM",
+  "content": "I set up my bitcoin node to run over tor with the following in the config file# Coreconf=<some_path>/.bitcoin/bitcoin.confserver=1daemon=1prune=23552maxconnections=1000# TORproxy=127.0.0.1:9050listenonion=1listen=1onlynet=onion#RPCrpcuser=usernamerpcpassword=passwordQuestion 1 :I see some inbound connections that have IPv4 addresses. These IPv4 addresses do not show up on bitnodes, so I am a bit curious as to what these addresses are.Question 2:Is my node running both on IP and TOR?Question 3:If I understand correctly when running a node on TOR, DNS seeders are not utilized and it defaults to the harcoded list of .onion addresses. My first outbound peer was not in the list of addresses in the file. Where could this have come from?Question 4:I have what is the difference between onion and not_publicly_routable  in the network fields ?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398858",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 16, 2022, 10:21:50 AM",
+      "body": "Quote from: vinshet on May 16, 2022, 10:13:08 AMQuestion 1 :I see some inbound connections that have IPv4 addresses. These IPv4 addresses do not show up on bitnodes, so I am a bit curious as to what these addresses are.As said in your other thread,Quote from: BlackHatCoiner on May 16, 2022, 10:16:03 AMDue to decentralization, it's possible for few nodes to not be crawled by bitnodesQuote from: vinshet on May 16, 2022, 10:13:08 AMQuestion 2:Is my node running both on IP and TOR?It's weird that you have both IPv4 and Tor connections. Do the IPv4 allow incoming connections? Try setting listen=0. Quote from: vinshet on May 16, 2022, 10:13:08 AMQuestion 3:If I understand correctly when running a node on TOR, DNS seeders are not utilized and it defaults to the harcoded list of .onion addresses. My first outbound peer was not in the list of addresses in the file. Where could this have come from?Bitcoin Core contains some IP addresses by default, so this is one guess.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vinshet",
+      "created_time": "May 16, 2022, 11:07:12 AM",
+      "body": "QuoteIt's weird that you have both IPv4 and Tor connections. Do the IPv4 allow incoming connections? Try setting listen=0. Error: Cannot set -listen=0 together with -listenonion=1",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 16, 2022, 11:24:58 AM",
+      "body": "Which IPv4 addresses show up? It's weird, I have similar configuration with yours, but I only connect with onion addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 16, 2022, 11:27:50 AM",
+      "body": "Quote from: vinshet on May 16, 2022, 10:13:08 AMI see some inbound connections that have IPv4 addresses. These IPv4 addresses do not show up on bitnodes, so I am a bit curious as to what these addresses are.Likely node that do not accept incoming connections. They do not show up on bitnodes because bitnodes cannot connect to them through the crawlers. Can also be due to the other reasons I outlined in the other thread as well.Quote from: vinshet on May 16, 2022, 10:13:08 AMIs my node running both on IP and TOR?You are only connecting to onion addresses through the proxy because you specified oniononly. However, the reason why you're seeing IPV4 nodes is because you didn't bind your node to your Tor instance. As such, peers are still able to connect to you because you are still listening on your local IPV4 address. To prevent this, add bind=127.0.0.1.Quote from: vinshet on May 16, 2022, 10:13:08 AMIf I understand correctly when running a node on TOR, DNS seeders are not utilized and it defaults to the harcoded list of .onion addresses. My first outbound peer was not in the list of addresses in the file. Where could this have come from?Connections do not necessarily have to be maintained after connections. The primary and intended purpose of your seeds is to establish an initial point of contact to the network and your peers will populate and allow you to connect and get to know other peers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "May 16, 2022, 12:18:50 PM",
+      "body": "Quote from: vinshet on May 16, 2022, 10:13:08 AMIf I understand correctly when running a node on TOR, DNS seeders are not utilized and it defaults to the harcoded list of .onion addresses.~AFAIK, the node won't fetch any DNS seed only if you set up a config to disable it. Even if the node is running over Tor, it still fetches the DNS seeders, but the Tor exit nodes will resolve the DNS for the Bitcoin node.Quote from: vinshet on May 16, 2022, 10:13:08 AMI have what is the difference between onion and not_publicly_routable  in the network fields ? Onion means, the in/outbound connection is using the Tor network. The other one may come from a local P2P connection, as an example, if you are running Electrs, the electrs connection will result not_publicly_routable. Other than that, it just means that the connection/network isn't routable over the internet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bobdole01",
+      "created_time": "November 28, 2023, 02:06:30 PM",
+      "body": "I don't know if you ever found the solution for this but for anyone else with this issue -onlynet=onion is what you likely need..  Everything else didn't work for me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "November 28, 2023, 08:47:03 PM",
+      "body": "For my Tor-only node I have the following lines related to network connectivity in my bitcoin.conf file:Code:...server=1daemon=1daemonwait=1# Network#listen=1listenonion=1proxy=127.0.0.1:9050bind=127.0.0.1onlynet=onion...With bitcoin-cli getnetworkinfo the only reachable network is \"onion\", all other networks areCode:...      \"limited\": true,      \"reachable\": false,...Works for me...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

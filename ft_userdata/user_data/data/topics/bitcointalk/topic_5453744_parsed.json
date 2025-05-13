@@ -1,0 +1,165 @@
+{
+  "id": "topic_5453744",
+  "title": "o_e_l_e_o",
+  "author": "o_e_l_e_o",
+  "created_time": "May 23, 2023, 08:06:39 AM",
+  "content": "Over the last few days, I've noticed a few of my Whirlpool coinjoins no longer being the usual 5-input-5-output transactions, and instead having more inputs and outputs. Turns out Samourai have implemented what they are calling \"surge cycles\": https://nitter.net/SamouraiDev/status/1658020576491978752Essentially, if the total fee is more than is needed after selecting the two fee paying pre-mix inputs in order to perform a coinjoin, instead of enrolling three post-mix inputs as usual the coordinator will now enroll additional post-mix inputs. This makes the coinjoin transactions larger and therefore even harder to break, as well as increasing the throughput of remixes meaning everyone gets more free remixes faster, all for no additional cost to the users.Here are a few such coinjoins from the last couple of hours, each with 8 inputs and 8 outputs instead of the usual 5:0.001 pool - https://mempool.space/tx/d66520a1e4a38bbca788e70bce95803d62850441eab6ddee7645f6addbc25c480.01 pool - https://mempool.space/tx/7e0814e83270dc7c733b2a71308985419625a612d756852027d81a4c5490314d0.05 pool - https://mempool.space/tx/f4fd5cad5d4db3716fe2081d1bc20f0beb33a417adf22c8fcca131cb6249adb6",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5453744",
+  "comments": [
+    {
+      "author": "dkbit98",
+      "created_time": "May 23, 2023, 08:37:39 PM",
+      "body": "Quote from: o_e_l_e_o on May 23, 2023, 08:06:39 AMEssentially, if the total fee is more than is needed after selecting the two fee paying pre-mix inputs in order to perform a coinjoin, instead of enrolling three post-mix inputs as usual the coordinator will now enroll additional post-mix inputs. This makes the coinjoin transactions larger and therefore even harder to break, as well as increasing the throughput of remixes meaning everyone gets more free remixes faster, all for no additional cost to the users.Wouldn't this in theory also increase fees a lot for coinjoins?If we have another ''ordinals tsunami'' like we did recently I doubt this will be usable for most people, except maybe for big whales, but they would also experience big delays.I am more interested in mixing and privacy in second-layer and I heard about one interesting project is coming out soon, or even better to introduce privacy on protocol level for bitcoin (but that probably won't happen any time soon).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goldkingcoiner",
+      "created_time": "May 23, 2023, 10:11:35 PM",
+      "body": "Quote from: dkbit98 on May 23, 2023, 08:37:39 PMQuote from: o_e_l_e_o on May 23, 2023, 08:06:39 AMEssentially, if the total fee is more than is needed after selecting the two fee paying pre-mix inputs in order to perform a coinjoin, instead of enrolling three post-mix inputs as usual the coordinator will now enroll additional post-mix inputs. This makes the coinjoin transactions larger and therefore even harder to break, as well as increasing the throughput of remixes meaning everyone gets more free remixes faster, all for no additional cost to the users.Wouldn't this in theory also increase fees a lot for coinjoins?If we have another ''ordinals tsunami'' like we did recently I doubt this will be usable for most people, except maybe for big whales, but they would also experience big delays.I am more interested in mixing and privacy in second-layer and I heard about one interesting project is coming out soon, or even better to introduce privacy on protocol level for bitcoin (but that probably won't happen any time soon).If we had another \"ordinals tsunami\", might it not have happened already? The transaction fee is not quite where we want it but the mempool congestions have stabilized. I have no idea what the developers have been planning in the last few days since I am not up to speed but what is the possibility that the Bitcoin NFT hype has cooled down for good?Last I read, the devs were planning on introducing a runtime option to delete or invalidate all non-standard taproot transactions? Sounded like a plan to me. If I were to guess I would say thats exactly the reason why the hype has been dying out in the last few days. Now nobody wants to board the near-future trainwreck which are ordinals and BRC-20 tokens, now that they are on the cancel list...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 24, 2023, 07:09:09 AMLast edit: June 03, 2023, 06:40:34 PM by o_e_l_e_o",
+      "body": "Quote from: dkbit98 on May 23, 2023, 08:37:39 PMWouldn't this in theory also increase fees a lot for coinjoins?It won't change the fees at all.The way Whirlpool coinjoins work(ed) is that they would always pick 2 fresh inputs from Tx0s, and 3 already mixed inputs from previous coinjoins. The 2 inputs from Tx0 were the ones which paid the fees. Every input which was already mixed gets unlimited free remixes. If you look at the 0.05 pool transaction I linked to above (https://mempool.space/tx/f4fd5cad5d4db3716fe2081d1bc20f0beb33a417adf22c8fcca131cb6249adb6), you'll see one input of 0.05014520 BTC and one of 0.05006037 BTC, and the others all of 0.05 BTC exactly. These two new inputs are created from an initial transaction called Tx0 which splits the amount of be coinjoined in to the needed denominations to join the chosen pool, along with a few extra sats in to each input to pay the fee for that first coinjoin transaction. This is obviously an estimate at the time given the current mempool conditions. None of this has changed.When it comes around to actually joining a coinjoin, before it would always be 5 inputs and 5 outputs, and any extra sats on these two fresh inputs were simply paid as a higher transaction fee to miners. Now if this is the case, the protocol will add in one or more additional inputs/outputs in order to bring the transaction fee down to a more appropriate level.Nothing changes for the users, except some of their coinjoins now benefit from larger anonymity sets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "May 24, 2023, 10:55:14 AM",
+      "body": "Quote from: dkbit98 on May 23, 2023, 08:37:39 PMI am more interested in mixing and privacy in second-layer and I heard about one interesting project is coming out soon. I am not sure how that is going to work. I assume you are talking about lightning, liquid or a similar protocol. You are still going to need to make an on-chain transaction to join that second-layer mixing protocol and a second transaction to get back full control of your coins and record the changes on the blockchain. Unless you mix regularly, you aren't going to have open channels and routes to whatever nodes you need to connect to perform your off-chain mixing. People who don't mix on a regular basis won't save anything if they don't maintain their LN channels.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "May 29, 2023, 11:23:11 AM",
+      "body": "Quote from: Pmalek on May 24, 2023, 10:55:14 AMI am not sure how that is going to work. I assume you are talking about lightning, liquid or a similar protocol. You are still going to need to make an on-chain transaction to join that second-layer mixing protocol and a second transaction to get back full control of your coins and record the changes on the blockchain. Unless you mix regularly, you aren't going to have open channels and routes to whatever nodes you need to connect to perform your off-chain mixing. People who don't mix on a regular basis won't save anything if they don't maintain their LN channels. You're right, off-chain mixing doesn't make much sense in a world where it is still possible for a single individual to make economically viable transactions on a base layer, without having to rely on a pool of co-signers and fee share payers. Mixing through Lightning Network and similar solutions is no different conceptually from CoinSwap but leaves even more traces in the blockchain. You exchange two unrelated UTXOs or transaction histories, but some of your off-chain activity may reveal the real purpose of the transaction and give an observer additional information about transaction participants. The more tools a user employs to facilitate a private transaction, the greater the chance of messing up things and lowering the anonymity set. This is why I support this new Whirlpool feature: your behavior doesn't change, whereas your anonymity increases, and you get additional privacy for free.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kryptowerk",
+      "created_time": "June 03, 2023, 12:07:04 AM",
+      "body": "Pretty neat upgrade. I don't really understand why this is possible without additional fees, but glad to hear it is working anyway.btw, is there a statistic showing how many coin-join tx whirlpool is running per day? Just curious to see how popular their service has become.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 03, 2023, 12:13:33 PMLast edit: June 03, 2023, 06:42:55 PM by o_e_l_e_o",
+      "body": "Quote from: Kryptowerk on June 03, 2023, 12:07:04 AMPretty neat upgrade. I don't really understand why this is possible without additional fees, but glad to hear it is working anyway.Basically, when you first enroll coins in to Whirlpool, it does so with what it thinks will be a safe fee for relatively quick confirmation of a 5-input-5-output coinjoin. If, when those coins actually come to be coinjoined, it turns out that fee is higher than necessary, it will enroll additional inputs in order to lower the overall fee rate back to a more appropriate level.Quote from: Kryptowerk on June 03, 2023, 12:07:04 AMbtw, is there a statistic showing how many coin-join tx whirlpool is running per day? Just curious to see how popular their service has become.See the \"Samourai Whirlpool\" box in the final third of the boxes here: https://bitcoin.clarkmoody.com/dashboard/. 7,657 transactions coinjoins over the last 30 days.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RickDeckard",
+      "created_time": "June 03, 2023, 03:28:21 PM",
+      "body": "Quote from: o_e_l_e_o on June 03, 2023, 12:13:33 PMQuote from: Kryptowerk on June 03, 2023, 12:07:04 AMbtw, is there a statistic showing how many coin-join tx whirlpool is running per day? Just curious to see how popular their service has become.See the \"Samourai Whirlpool\" box at the top of the 4th column here: https://bitcoin.clarkmoody.com/dashboard/. 7,657 transactions coinjoins over the last 30 days.Nice dashboard, bookmarked! I might be wrong, but I suppose you're an avid user of coin-join usage. What would be the best method that one could apply to run a coin-join? I suppose using Sparrow Wallet would be the best bet?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 03, 2023, 04:55:03 PM",
+      "body": "The best method is to set up and use JoinMarket - https://github.com/JoinMarket-Org/joinmarket-clientserverYou run the software yourself via your own node, connect to other users in a peer to peer manner over Tor, and there is no centralized coordinator. It also gives you the most options in terms of customizing your fees, size of your coinjoins, size of your outputs, and so on. It is the best coinjoin implementation at present. However, it is also the most technical to set up and use. There are very good guides on their GitHub, and I have no doubt that a technically minded user such as yourself would be able to get it set up and running, but it will take a bit of time and work to do so.The other option is using Samourai's Whirlpool, as is being discussed in this thread. Whirlpool does use a central coordinator, so it is absolutely vital that you use it with your own node and Tor to keep your privacy from the central coordinator. Your best options at the moment for connecting to Whirlpool are either Samourai wallet on mobile or Sparrow wallet on desktop. There are some other wallets starting to develop Whirlpool access as well, but I haven't tried or reviewed them so I won't recommend them. Again, there are good guides and both wallets provide a nice friendly GUI so they are much easier to set up and use than JoinMarket.Regardless of which one you choose, I would spend some time reading about that specific implementation works, how it handles things like toxic change, and the steps you need to take to not mess up and negate the privacy it provides.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RickDeckard",
+      "created_time": "June 03, 2023, 10:01:04 PM",
+      "body": "Quote from: o_e_l_e_o on June 03, 2023, 04:55:03 PMThe best method is to set up and use JoinMarket - https://github.com/JoinMarket-Org/joinmarket-clientserverYou run the software yourself via your own node, connect to other users in a peer to peer manner over Tor, and there is no centralized coordinator. It also gives you the most options in terms of customizing your fees, size of your coinjoins, size of your outputs, and so on. It is the best coinjoin implementation at present. However, it is also the most technical to set up and use. There are very good guides on their GitHub, and I have no doubt that a technically minded user such as yourself would be able to get it set up and running, but it will take a bit of time and work to do so.Wasn't aware of this project, seems interesting! I've checked their GitHub and it has a ton of information, I'll have to invest some time in trying to make sure that I set it up correctly. Thank you for that! Have you been using it for a while? Could you share some feedback?Quote from: o_e_l_e_o on June 03, 2023, 04:55:03 PMThe other option is using Samourai's Whirlpool, as is being discussed in this thread. Whirlpool does use a central coordinator, so it is absolutely vital that you use it with your own node and Tor to keep your privacy from the central coordinator. Your best options at the moment for connecting to Whirlpool are either Samourai wallet on mobile or Sparrow wallet on desktop. There are some other wallets starting to develop Whirlpool access as well, but I haven't tried or reviewed them so I won't recommend them. Again, there are good guides and both wallets provide a nice friendly GUI so they are much easier to set up and use than JoinMarket.If JoinMarket proves to be way to technical for me I guess I'll end up using either of those. Sparrow seems a balanced option and after a quick Google search I managed to find good guides in using Whirlpool with it, so if everything fails, this would be a nice 2nd option.Quote from: o_e_l_e_o on June 03, 2023, 04:55:03 PMRegardless of which one you choose, I would spend some time reading about that specific implementation works, how it handles things like toxic change, and the steps you need to take to not mess up and negate the privacy it provides.At the end of the day this is what concerns me (fully understand what's the concept behind the implementation), so I guess it will take some time before I run any coinjoins. The path is more clear to me however, so thank you for that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 04, 2023, 08:27:13 AM",
+      "body": "Quote from: RickDeckard on June 03, 2023, 10:01:04 PMHave you been using it for a while? Could you share some feedback?Yes, indeed. It's been ages since I set it up so I can't comment on that side specifically, but I don't remember any major hurdles by just following the installation guide. I am obviously on Linux which it is designed for - I imagine trying to install on Windows would be more challenging.Once you have it set up, you can be either a maker (also called a yield generator) or a taker. Most people run as takers only, because it is much simpler. As a taker, you decide which outputs you want to coinjoin, how many other outputs you want to include in your coinjoin, how many coinjoins you want to perform, and so on. You pay the transaction fee and a small fee to each of the other inputs joining your coinjoin, usually in the order of 5-300 sats depending on the size of your inputs. You can do PayJoins to an external address, and you can also do a series of internal coinjoins in a so called \"Tumbler\" to mix your coins back to your own wallet. It's very versatile. You can also run it via testnet (instructions are on their guides) to get familiar with it first.If you want to be a maker, then there is further software to set up, but you essentially post your outputs on an orderbook and other users will pay you to use your outputs in one of their coinjoins. You get to mix your outputs and you get paid a little for the trouble. Be aware that there are risks and drawbacks to doing this, such as if you don't set up your configuration properly then you can end up with many small outputs that you have to consolidate, which obviously costs as well as decreases your privacy. You can actually view the JoinMarket orderbook here: https://nixbitcoin.org/orderbook/I've also heard good things about this implementation, but I haven't tried it myself yet, so cannot vouch for it directly: https://github.com/joinmarket-webui/jamQuote from: RickDeckard on June 03, 2023, 10:01:04 PMSparrow seems a balanced option and after a quick Google search I managed to find good guides in using Whirlpool with it, so if everything fails, this would be a nice 2nd option.Sparrow have an official guide available here which is fairly comprehensive: https://sparrowwallet.com/docs/mixing-whirlpool.html. As I said above, if you do use Sparrow, you must link it to your own node and connect via Tor, but this is very simple to do.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RickDeckard",
+      "created_time": "June 04, 2023, 10:53:05 PM",
+      "body": "Quote from: o_e_l_e_o on June 04, 2023, 08:27:13 AMQuote from: RickDeckard on June 03, 2023, 10:01:04 PMHave you been using it for a while? Could you share some feedback?Yes, indeed. It's been ages since I set it up so I can't comment on that side specifically, but I don't remember any major hurdles by just following the installation guide. I am obviously on Linux which it is designed for - I imagine trying to install on Windows would be more challenging.Once you have it set up, you can be either a maker (also called a yield generator) or a taker. Most people run as takers only, because it is much simpler. As a taker, you decide which outputs you want to coinjoin, how many other outputs you want to include in your coinjoin, how many coinjoins you want to perform, and so on. You pay the transaction fee and a small fee to each of the other inputs joining your coinjoin, usually in the order of 5-300 sats depending on the size of your inputs. You can do PayJoins to an external address, and you can also do a series of internal coinjoins in a so called \"Tumbler\" to mix your coins back to your own wallet. It's very versatile. You can also run it via testnet (instructions are on their guides) to get familiar with it first.If you want to be a maker, then there is further software to set up, but you essentially post your outputs on an orderbook and other users will pay you to use your outputs in one of their coinjoins. You get to mix your outputs and you get paid a little for the trouble. Be aware that there are risks and drawbacks to doing this, such as if you don't set up your configuration properly then you can end up with many small outputs that you have to consolidate, which obviously costs as well as decreases your privacy. You can actually view the JoinMarket orderbook here: https://nixbitcoin.org/orderbook/I wasn't aware that I was losing such an interesting piece of software up until now. This week will be impossible for me, but I'll try it out in the coming weeks and I'll let you know how it went! This is a nice alternative to mixers as you are the sole \"owner\" of the process  (or at least, you control some variable of it). I'll try to have it running on a docker image and report back. Once again, thank you for this!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "June 05, 2023, 06:18:40 AMLast edit: June 05, 2023, 08:06:41 AM by satscraper",
+      "body": "Quote from: o_e_l_e_o on May 23, 2023, 08:06:39 AMOver the last few days, I've noticed a few of my Whirlpool coinjoins no longer being the usual 5-input-5-output transactions, and instead having more inputs and outputs. Turns out Samourai have implemented what they are calling \"surge cycles\": https://nitter.net/SamouraiDev/status/1658020576491978752Essentially, if the total fee is more than is needed after selecting the two fee paying pre-mix inputs in order to perform a coinjoin, instead of enrolling three post-mix inputs as usual the coordinator will now enroll additional post-mix inputs. This makes the coinjoin transactions larger and therefore even harder to break, as well as increasing the throughput of remixes meaning everyone gets more free remixes faster, all for no additional cost to the users.Here are a few such coinjoins from the last couple of hours, each with 8 inputs and 8 outputs instead of the usual 5:0.001 pool - https://mempool.space/tx/d66520a1e4a38bbca788e70bce95803d62850441eab6ddee7645f6addbc25c480.01 pool - https://mempool.space/tx/7e0814e83270dc7c733b2a71308985419625a612d756852027d81a4c5490314d0.05 pool - https://mempool.space/tx/f4fd5cad5d4db3716fe2081d1bc20f0beb33a417adf22c8fcca131cb6249adb6How would you compare the coin mixing via  coinjoin  (Sparrow/Samourai) and Whirlwind in term of trust? I'm aware that both of them are centralized services but they might have traps and pitfalls which are not known for me. I'm more or less aware of technicalities used by both of services and think their mixing  provide almost equivalent privacy but the trust has the matter for me.P.S. I'm active user of Sparrow.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 05, 2023, 07:41:06 AMLast edit: June 07, 2023, 08:09:31 AM by o_e_l_e_o",
+      "body": "In terms of trust, there is no denying that you need to trust Whirlwind more since you need to deposit coins to their service, as opposed to Whirlpool where you stay in custody of your coins. There is also the issue of trusting the service not to log what you are doing, which can be prevented with Whirlpool by using your own node and Tor. This could change in the future though, as Whirlwind have talked about decentralizing their service and implementing blinded certificates, which would eliminate any trust requirements.In terms of privacy to an outside observer, then at the moment it depends on how you use them, but in the future I would say Whirlwind will provide better privacy than Whirlpool. If you coinjoin on Whirlpool, then your privacy is dependent on how many times you let the coins be mixed before you spend them. Assuming 5-input and 5-output coinjoins, then after one mix your backwards looking anonymity set is a maximum of 5. After two mixes, a maximum of 25. After three mixes, a maximum of 125. And so on. I say maximum, because if other people in the coinjoin do something stupid and deanonymize their coins, than that lowers your anonymity set. If you leave your coins in Whirlpool for months and months and end up with 10+ remixes then that's a very good anonymity set, but if you just let them be coinjoined once or twice before you spend them then that's not a very good anonymity set. This same principle applies to any coinjoin implementation. Whirlwind, on the other hand, currently has an anonymity set of 414 as long as you don't deposit huge amounts, and this is only going to grow. In the future, you will be able to get an anonymity set with Whirlwind of 10,000 or more.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 06, 2023, 07:48:40 PM",
+      "body": "Quote from: o_e_l_e_o on June 04, 2023, 08:27:13 AMOnce you have it set up, you can be either a maker (also called a yield generator) or a taker. Most people run as takers only, because it is much simpler.In my experience, it isn't simplicity, but competition. I simply can't compete makers with hundreds of times more money than I have, and with a fortune locked in fidelity bonds. If you want to be a maker, you need serious amount of money, which comes with even more serious awareness of the protocol and the security measures you need to take. Unfortunately, being a taker with current fees isn't very attractive. You still have to pay for the entire coinjoin transaction (makers don't pay their inputs), so it comes quite expensive. I haven't tried Whirlpool, but it sounds like the second best to coinjoin. Is it cheaper than Joinmarket?Quote from: o_e_l_e_o on June 05, 2023, 07:41:06 AMWhirlwind, on the other hand, currently has an anonymity set of 414 as long as you don't deposit huge amounts, and this is only going to grow. In the future, you will be able to get an anonymity set with Whirlpool of 10,000 or more.That. If this continues as it's going, and implements blinded certificates, I don't think Joinmarket or Whirlpool will be even competitive.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 07, 2023, 09:23:27 AM",
+      "body": "Quote from: BlackHatCoiner on June 06, 2023, 07:48:40 PMI haven't tried Whirlpool, but it sounds like the second best to coinjoin. Is it cheaper than Joinmarket?It's the only other option at the moment, since you shouldn't go anywhere near Wasabi for obvious reasons.In terms of being cheaper - it's variable, and difficult to compare exactly. The fees for Whirlpool are all flat, as opposed to based on amounts or number of coinjoins. You have to pay a fee to join the pool, which depends on which pool you are joining. So if I join the 0.01 BTC pool, then my Tx0 pays a 50,000 sat fee. But I pay that fee regardless of whether I enroll one UTXO or one hundred UTXOs. Then each input needs to pay the transaction fee for its first coinjoin. So if we take the 0.01 BTC pool transaction I linked to in the first post, you'll see two inputs paying more than 0.01 BTC - one paying 5,000 sats more, and one paying 15,000 sats more. But then once you are in the pool and coinjoined once, you get unlimited free coinjoins for as long as you are happy to leave your coins in the pool.So in summary, if you coinjoin a small number of UTXOs a small number of times, your relative fees are high. But if you coinjoin lots of UTXOs lots of times, the relative fees are much smaller.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 07, 2023, 07:16:16 PM",
+      "body": "Quote from: o_e_l_e_o on June 07, 2023, 09:23:27 AMBut then once you are in the pool and coinjoined once, you get unlimited free coinjoins for as long as you are happy to leave your coins in the pool.Does this mean I forfeit the ownership of my coins as long as they stay in the pool? The thing I really like with Joinmarket is that coins never leave my house. We saw how terribly this involved with ChipMixer, when you woke up and the German authorities have had your coins seized without you knowing anything. I've had, fortunately, only a small amount seized, but I put myself in the position of people who lost thousands, and it must have been awful. Whirlwind tries to minimize the consequences of this by dividing custody into multiple trustworthy forum members, but it doesn't eliminate it completely, and it's yet to implement this shared custody.We're far from ideal mixing, but we've got worse comparably to the last years with the shut down of CM, the censoring Wasabi and the overcrowded mempool. Mixing is now inferior and more expensive.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 07, 2023, 08:30:35 PM",
+      "body": "Quote from: BlackHatCoiner on June 07, 2023, 07:16:16 PMDoes this mean I forfeit the ownership of my coins as long as they stay in the pool?No, the coins remain under your control in either Samourai (mobile) or Sparrow (desktop), but with the obvious risk that these are hot wallets.The central coordinator keeps track of all previous coinjoin outputs. As long as your wallet is online and connected to the coordinator, then any of your previous coinjoin outputs which you have spent are eligible to be included in a future coinjoin for free, with the new entrants paying the transaction fee as I described above. The coordinator sets this up, but your wallet signs the transaction for your input. Your wallet also doesn't need to remain online 24/7. You can shut down your phone or computer for days or even weeks at a time, and when you start it back up your unspent coinjoin outputs will still be eligible to be selected for new coinjoins. The biggest downside to this is time. Your first mix is almost instant, since you are paying the fee. After that, free remixes can take a long time, since you depend on new volume entering the pool to create new coinjoins, and random chance that your outputs are selected. There is no time limit to how long you can wait or how many free remixes you can have, but sometimes you can be waiting over a week for a single remix.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "September 30, 2023, 10:36:40 AM",
+      "body": "Quote from: o_e_l_e_o on June 03, 2023, 12:13:33 PMQuote from: Kryptowerk on June 03, 2023, 12:07:04 AMPretty neat upgrade. I don't really understand why this is possible without additional fees, but glad to hear it is working anyway.Basically, when you first enroll coins in to Whirlpool, it does so with what it thinks will be a safe fee for relatively quick confirmation of a 5-input-5-output coinjoin. If, when those coins actually come to be coinjoined, it turns out that fee is higher than necessary, it will enroll additional inputs in order to lower the overall fee rate back to a more appropriate level.So that is what the Sparrow's Premix Fee Rate is supposed to do, right? Things that make the postmix-ed UTXOs able to be remixed repeatedly and the coinjoin that has more than 5-input-5-output is come from that premix fee, if the current pool participant/condition has a low fee that would reduce the number of inputs and postmix remix rounds availability. Am I understand it correctly?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "id": "topic_5469542",
+  "title": "SwayStar123",
+  "author": "SwayStar123",
+  "created_time": "October 07, 2023, 01:22:18 PM",
+  "content": "Since you cant delete your account here, and deleting posts manually one by one is a pain, i made a python script to automatically delete all posts that can be deleted, and to edit those which can only be edited (changes subject and message to \"x\")I couldnt find any terms of service for this website, so not sure if this is even allowed.RequirementsPythonChrome (you can edit the script yourself to change browser if you want)Selenium installed in pythonCode:pip install seleniumHow to useAfter installing selenium, simply run the python script, it will ask you how many pages of posts your account has (Profile -> Show Posts -> Highest page number available)just enter the number you see in your profile and then hit enter. It will then open up a chrome browser with the login page for bitcointalk open, you will have 60 seconds to log in and when the 60 seconds are up, the script will start deleting and editing posts from your profile.Note: When logging in, you should set number of minutes to be logged in to a higher number if you have many postsWARNINGThis should be obvious, but running this script will try to delete as many of your posts as it can, so dont run it if you dont want that..Code: https://github.com/SwayStar123/del_btctalk_postsCode:import reimport timefrom selenium import webdriverfrom selenium.webdriver.common.by import Byfrom selenium.webdriver.support.ui import WebDriverWaitfrom selenium.webdriver.support import expected_conditions as ECfrom selenium.common.exceptions import TimeoutExceptiondef extract_ids_from_url(post_url):    # Splitting the URL based on \"?\"    parameters = post_url.split('?')[1]        # Extracting topic and msg IDs from the parameters    topic_id = parameters.split('.msg')[0].split('topic=')[1]    msg_id = parameters.split('.msg')[1].split('#')[0]        return topic_id, msg_iddef delete_post(browser, post_url, sesc_token):    topic_id, msg_id = extract_ids_from_url(post_url)        # Constructing the delete URL    delete_url = f\"https://bitcointalk.org/index.php?action=deletemsg;topic={topic_id}.0;msg={msg_id};sesc={sesc_token}\"    browser.get(delete_url)    time.sleep(1)    if browser.current_url == f\"https://bitcointalk.org/index.php?topic={topic_id}.0\":        return True    else:        return Falsedef edit_post(browser, post_url, sesc_token):    topic_id, msg_id = extract_ids_from_url(post_url)            # Navigate to edit URL    edit_url = f\"https://bitcointalk.org/index.php?action=post;msg={msg_id};topic={topic_id}.0;sesc={sesc_token}\"    browser.get(edit_url)        try:        # Change the subject to \"x\"        subject_elem = WebDriverWait(browser, 2).until(            EC.presence_of_element_located((By.NAME, 'subject'))        )        subject_elem.clear()        subject_elem.send_keys('x')                # Change the message content to \"x\"        message_elem = WebDriverWait(browser, 2).until(            EC.presence_of_element_located((By.NAME, 'message'))        )        message_elem.clear()        message_elem.send_keys('x')                # Click the Save button        save_button = WebDriverWait(browser, 2).until(            EC.presence_of_element_located((By.NAME, 'post'))        )        save_button.click()            except Exception as e:        print(f\"Error editing post: {e}\")        time.sleep(0.5)  # Introduce a delay before processing the next post or actiondef scrape_post_urls(browser, start):    browser.get(BASE_URL + str(start))    post_urls = []    try:        # Target <a> elements within <td> of class 'middletext' and get the third (last) link        post_elements = WebDriverWait(browser, 10).until(            EC.presence_of_all_elements_located((By.XPATH, '//td[@class=\"middletext\"]/a[3]'))        )        for post_element in post_elements:            post_urls.append(post_element.get_attribute(\"href\"))    except Exception as e:        print(f\"Error scraping post URLs at start={start}: {e}\")    return post_urlsdef extract_sesc_token(browser):    # Go to the homepage or any page where the logout link is visible    browser.get(\"https://bitcointalk.org/index.php\")    try:        # Locate the logout link and extract the sesc token from its href attribute        logout_link = WebDriverWait(browser, 10).until(            EC.presence_of_element_located((By.XPATH, '//a[contains(@href, \"action=logout\")]'))        )        href = logout_link.get_attribute('href')        sesc_token = href.split('sesc=')[1]        return sesc_token    except Exception as e:        print(f\"Error extracting sesc token: {e}\")        return Nonedef extract_user_id(browser):    # Navigate to main profile page    browser.get('https://bitcointalk.org/index.php?action=profile')        try:        # Extracting the URL of the 'Account Related Settings' link        account_related_settings_url = WebDriverWait(browser, 10).until(            EC.presence_of_element_located((By.XPATH, '//a[contains(text(), \"Account Related Settings\")]'))        ).get_attribute('href')                # Extracting the user ID from the URL        user_id = re.search(r'u=(\\d+)', account_related_settings_url).group(1)        return user_id        except (TimeoutException, AttributeError):        print(\"Failed to extract user ID.\")        return None    if __name__ == '__main__':    num_pages = int(input(\"How many pages of posts do you have in your profile?: \"))    browser = webdriver.Chrome()    # Navigate to login page or homepage    browser.get(\"https://bitcointalk.org/index.php?action=login\")    print(\"Please login manually within the next 60 seconds...\")    time.sleep(60)  # Give 60 seconds for manual login    # Extract user ID    user_id = extract_user_id(browser)    if not user_id:        print(\"Failed to extract user ID.\")        browser.quit()        exit()    BASE_URL = f'https://bitcointalk.org/index.php?action=profile;u={user_id};sa=showPosts;start='    sesc_token = extract_sesc_token(browser)    if sesc_token:        print(f\"Extracted sesc token: {sesc_token}\")        # Continue with rest of your logic, e.g., scraping post URLs and deleting posts        all_post_urls = []        for start in range(0, num_pages*20, 20):            all_post_urls.extend(scrape_post_urls(browser, start))        for post_url in all_post_urls:            res = delete_post(browser, post_url, sesc_token)            if res == True:                continue            else:                edit_post(browser, post_url, sesc_token)    else:        print(\"Failed to extract sesc token.\")        browser.quit()",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5469542",
+  "comments": [
+    {
+      "author": "Nwada001",
+      "created_time": "October 07, 2023, 01:30:06 PM",
+      "body": "To those who want to edit and delete their post and profile, this might appear to be helpful to them, but it's not entirely helpful, as when you create a post as an author, there are many members who will quote a few parts or some parts of those posts that you want to delete in order for the post not to be linked to your name and profile, so deleting these posts won't help in any way as they can still see the original author, the content of the post, who posted it, and the time that it was posted by checking through others who have quoted the post on the history. And I also don't think there is anything that can be entirely deleted in this forum with the kind of tools we have that were made available by some members, and the forum also has archives where deleted files can also be seen and traced.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "October 07, 2023, 03:10:34 PM",
+      "body": "Quote from: SwayStar123 on October 07, 2023, 01:22:18 PMSince you cant delete your account here, and deleting posts manually one by one is a pain, i made a python script to automatically delete all posts that can be deleted, and to edit those which can only be edited (changes subject and message to \"x\")I couldnt find any terms of service for this website, so not sure if this is even allowed.The delete option I think is allowed but editing all posts and changing it to just X or anything I think it should be not allowed because if someone finds your tool I'm sure they will take advantage of using it to spam links.I think it would be better if you removed the editing option instead and I don't see any reason why they want to delete old posts it is already part of the forum history.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hugeblack",
+      "created_time": "October 08, 2023, 07:55:05 AM",
+      "body": "Quote from: SwayStar123 on October 07, 2023, 01:22:18 PMjust enter the number you see in your profile and then hit enter. It will then open up a chrome browser with the login page for bitcointalk open, you will have 60 seconds to log in and when the 60 seconds are up, the script will start deleting and editing posts from your profile.Note: When logging in, you should set number of minutes to be logged in to a higher number if you have many postsYou don't need that, you can create a config.ini file which can be in this formatCode:[LOGIN]# Enter your username and passworduser = YOUR_USERNAMEpass = YOUR_PASSWORD# after login go to -------> https://bitcointalk.org/captcha_code.php and copy that code#Paste that code herecaptcha_code = YOUR_CAPTCHA_CODEUsing ----> https://bitcointalk.org/captcha_code.php the user will not need to do this manually.Code: def login(        self, user, pass, captcha_code    ):self.logger.info(\"Attempting to login...\")        session = HTMLSession()        login_uri = \"https://bitcointalk.org/index.php?action=login2;ccode={}\".format(            captcha_code        )Although I think your code is useful, unfortunately there are several bots that scrape data now.You can communicate with some of the well-known people here, but I do not know who do this without us knowing them. Therefore, I assume that once data is published here, it will not be deleted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 08, 2023, 08:10:04 AM",
+      "body": "Quote from: BitMaxz on October 07, 2023, 03:10:34 PMThe delete option I think is allowed but editing all posts and changing it to just X or anything I think it should be not allowedI'm pretty sure this falls under rule #1:Quote from: mprep on July 21, 2014, 05:27:51 PM1. No zero or low value, pointless or uninteresting posts or threads.@SwayStar123: at least move those useless topics to the Archival board. Or click \"Report to Moderator\" yourself, so they can be deleted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hd49728",
+      "created_time": "October 08, 2023, 11:27:35 AM",
+      "body": "You broke the series of PowerGlove and you are a new name there.I don't see your script is useful for me but one idea to make your Python script more useful.Could you make this script more customized for users by allowing them to choose what boards to delete their posts?Like if I want to delete all my posts in Meta, can I do it with your Python script?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hugeblack",
+      "created_time": "October 08, 2023, 11:35:52 AM",
+      "body": "Quote from: hd49728 on October 08, 2023, 11:27:35 AMCould you make this script more customized for users by allowing them to choose what boards to delete their posts?Like if I want to delete all my posts in Meta, can I do it with your Python script?Is this even possible? The @OP code basically browses the forum using https://bitcointalk.org/index.php?topic=XXXX.0 while changing the topic ID.I don't see if there is a way to do this, or if the topic ID might refer to the board.In general, you will not be able to hide anything because everyone is watching.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shahzadafzal",
+      "created_time": "October 08, 2023, 11:47:05 AM",
+      "body": "Quote from: SwayStar123 on October 07, 2023, 01:22:18 PMSince you cant delete your account here, and deleting posts manually one by one is a pain, i made a python script to automatically delete all posts that can be deleted, and to edit those which can only be edited (changes subject and message to \"x\")I couldnt find any terms of service for this website, so not sure if this is even allowed.I can't test run your script but I got the idea and I think this script might be helpful for someone. Yes there are no specific T&C which prevents you from writing the script also it depends on the user who's going to run the script. I just want to emphasize that it should come with some sort of clear warning before actually executing the script. For example  Please note all your \"xxxx\" number of posts will be permanently deleted/edited. Are you sure to execute the script type \"Yes\".:>_Quote from: hugeblack on October 08, 2023, 11:35:52 AMIs this even possible? The @OP code basically browses the forum using https://bitcointalk.org/index.php?topic=XXXX.0 while changing the topic ID.I don't see if there is a way to do this, or if the topic ID might refer to the board.In general, you will not be able to hide anything because everyone is watching.Yes it should be possible OP is using the profile posts page to go through each post one by one and on this page Board, Sub Board or Topic is mentioned with each posts and can be checked before deleting the posts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hd49728",
+      "created_time": "October 08, 2023, 12:03:02 PM",
+      "body": "Quote from: hugeblack on October 08, 2023, 11:35:52 AMIs this even possible? The @OP code basically browses the forum using https://bitcointalk.org/index.php?topic=XXXX.0 while changing the topic ID.I don't see if there is a way to do this, or if the topic ID might refer to the board.I know a topic link does not have information about board ID but can the script do that customization for deletion by using a user post history page?If I manually visit my personal post history page, I can manually use search with Meta key word and find posts in Meta board. Can the script do one more step to choose post in a board like Meta board for deletion?QuoteIn general, you will not be able to hide anything because everyone is watching.I don't mean hide anything or everything as I shared I personally don't use it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "owlcatz",
+      "created_time": "October 09, 2023, 12:06:47 AM",
+      "body": "https://ninjastic.space/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "October 09, 2023, 05:50:49 PM",
+      "body": "Quote from: SwayStar123 on October 07, 2023, 01:22:18 PMSince you cant delete your account here, and deleting posts manually one by one is a pain, i made a python script to automatically delete all posts that can be deleted, and to edit those which can only be edited (changes subject and message to \"x\")I agree with other users who said that it would be a good idea to move all edited X posts to archive board as a last step.Note that all posts are archived by Ninjastic.space, Loyce.club and probably few other archiving websites like WaybackMachine and Archive.is, so we can't really delete anything.If someone wants to find old posts they will find a way to do it.Quote from: LoyceV on October 08, 2023, 08:10:04 AMI'm pretty sure this falls under rule #1:Is there any better option to force moderators to nuke and delete all your posts?That might be a good option if you don't want to leave any X posts in archival board.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goxcraft",
+      "created_time": "October 10, 2023, 01:23:59 PM",
+      "body": "Great tool, but why delete in the first place? Even if someone deletes all of their posts, the data remains in the archive and ninjastic. Anyone can type your username and look up your previous posts.OP, can you make a script that can delete personal messages? The script should have an option to select a specific user and date range. From which to where you want to delete. It might be very useful. Especially for those who get thousands of PMs every day.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "libert19",
+      "created_time": "October 11, 2023, 04:00:55 AM",
+      "body": "I had this wild idea to delete my useless posts, but then realized what took me to get here. I had reddit account with 130k+ karma and deleted it due to Impulsivity. Not again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "id": "topic_5456166",
+  "title": "bitmover",
+  "author": "bitmover",
+  "created_time": "June 12, 2023, 07:48:31 PM",
+  "content": "Recentemente um usuário (iwantmyhomepaidwithbtc2) me deu uma Tip e escreveu uma mensagem usando OP_RETURN. https://bitcointalk.org/index.php?topic=5454426.msg62392116#msg62392116Transação: https://mempool.space/fr/tx/c2b5eea3e485a284ed9c7fad814e69fa6f23aff26ac0176c6262a80e3ca04691Achei interessante e lembrei que recentemente houve uma discussão sobre isso, não achei onde.Resolvei deixar o passo a passo aqui (fonte: https://armantheparman.com/op_return/)1 - Transforme seu texto em HEX usando a ferramenta https://www.rapidtables.com/convert/number/ascii-to-hex.htmlNo meu caso, usei a frase \"Bitcoin é liberdade\" e gerei o código abaixoCode:426974636F696E20E9206C69626572646164652 - Depois disso, escolhe um UTXO para ser gasto e enviado (pode ser pra voce mesmo). Precisa ser enviado completamente, senão ele irá para o miner.. Vá na aba \"Coins\" (ou moedas) e escolha o UTXO que voce quer gastar. Eu mandei o saldo para o mesmo endereço que ele estava antes.3 - Pressione enter e na linha de baixo coloque \"OP_RETURN hex, 0\" (para enviar zero)4 - Termine a transação e faça o broadcast. Lembre-se de gastar todo o UTXO escolhido, senao ele irá para o miner.e aqui está minha transação:https://mempool.space/tx/c282cff017132fc15d2625bcb2eb5ee24101de30956171109e6a7017ef477878Infelizmente, descobri que não é possível utilizar caracteres especiais. Daí o texto ficou \"Bitcoin liberdade\"",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5456166",
+  "comments": [
+    {
+      "author": "joker_josue",
+      "created_time": "June 14, 2023, 11:57:32 AM",
+      "body": "Quote from: bitmover on June 12, 2023, 07:48:31 PM4 - Termine a transação e faça o broadcast. Lembre-se de gastar todo o UTXO escolhido, senao ele irá para o miner.Só uma questão:Porque é que se tem de usar todo saldo do endereço?  Ele vai para o minerador, por que?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "June 14, 2023, 01:45:01 PM",
+      "body": "Quote from: joker_josue on June 14, 2023, 11:57:32 AMQuote from: bitmover on June 12, 2023, 07:48:31 PM4 - Termine a transação e faça o broadcast. Lembre-se de gastar todo o UTXO escolhido, senao ele irá para o miner.Só uma questão:Porque é que se tem de usar todo saldo do endereço?  Ele vai para o minerador, por que?São as regras do protocolo. Se voce nao botar um destino para o UTXO que voce está gastando (um endereço de troco ou qualquer outro), tudo entra como fee.Como a Electrum permite que você monte a transação de certa forma manualmente, existe o risco da pessoa desavisada botar todo o saldo como fee (Já que você está inserindo 0 de BTC no envio no OP_RETURN).Esse alerta é repetido diversas vezes no tutorial que eu botei, então repeti aqui também.Contudo, a versão da electrum que eu usei, mais moderna que a tutorial, automaticamente coloca um endereço de change caso a sobra seja grande. Não deveria acontecer isso em versões anteriores, dai o aviso repetido no tutorial em questão.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nikolaspaolo",
+      "created_time": "June 14, 2023, 08:23:14 PM",
+      "body": "Excelente, testarei muito em breve.Outro dia, notei que na TRON também pode escrever uma mensagem e custa apenas 1 TRX, coisa de 0,07 $, só não sei onde será possível ler a mensagem escrita ali.seria aqui?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 15, 2023, 06:49:02 AM",
+      "body": "Quote from: bitmover on June 14, 2023, 01:45:01 PMContudo, a versão da electrum que eu usei, mais moderna que a tutorial, automaticamente coloca um endereço de change caso a sobra seja grande. Não deveria acontecer isso em versões anteriores, dai o aviso repetido no tutorial em questão.Pelo sim e pelo não, é melhor por sempre um endereço de destino com o valor total. Tem número limite de caracteres nessa opção?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "June 15, 2023, 11:34:16 AM",
+      "body": "Quote from: joker_josue on June 15, 2023, 06:49:02 AMQuote from: bitmover on June 14, 2023, 01:45:01 PMContudo, a versão da electrum que eu usei, mais moderna que a tutorial, automaticamente coloca um endereço de change caso a sobra seja grande. Não deveria acontecer isso em versões anteriores, dai o aviso repetido no tutorial em questão.Pelo sim e pelo não, é melhor por sempre um endereço de destino com o valor total. Tem número limite de caracteres nessa opção?Sim, de acordo com o site tem uma limitação de 160 caracteres no hex, o que são 80 bytes.Maior será a sua transação, quanto maior a quantidade de caracteres. E assim, maior  afee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "rdluffy",
+      "created_time": "June 15, 2023, 01:37:55 PM",
+      "body": "Quote from: bitmover on June 15, 2023, 11:34:16 AMMaior será a sua transação, quanto maior a quantidade de caracteres. E assim, maior  afee.Boa bitmover, bem interessanteEu ia perguntar exatamente isso, com o envio da mensagem a fee também sobe certo?Confesso que até pra mim que já estou acostumado a fazer transações, dá um certo gelo na barriga fazer uma desse tipo, pois se errar alguma coisa ou não prestar tanta atenção, pode ir tudo para um miner sortudo hahahaAté hoje quando faço minhas transações, confiro umas 3x, comparo o endereço completo, caractere por caractere",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 15, 2023, 03:50:14 PM",
+      "body": "Quote from: rdluffy on June 15, 2023, 01:37:55 PMConfesso que até pra mim que já estou acostumado a fazer transações, dá um certo gelo na barriga fazer uma desse tipo, pois se errar alguma coisa ou não prestar tanta atenção, pode ir tudo para um miner sortudo hahahaA melhor estratégia é usar um endereço com um saldo baixo, para o causa de algo não correr tão bem, a perda não ser grande.Para vocês, isso é útil para que situações?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "June 15, 2023, 03:59:15 PMLast edit: June 15, 2023, 04:19:24 PM by bitmover",
+      "body": "Quote from: joker_josue on June 15, 2023, 03:50:14 PMPara vocês, isso é útil para que situações?Nas transações coinbase o minerador coloca uma identificação dele ou uma mensagem qualquerhttps://mempool.space/tx/0cecb00855b171f6f9c092e6d285468fab266cf9e9201acfd902d653b5ef7beaJá teve outroas casos, como na pandemia botaram algo sobre a impressão de dinheiro mas não achei..E o próprio genesis block o satoshi escreveu a mensagem assimhttps://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 16, 2023, 06:34:37 AM",
+      "body": "São casos interessantes de uso.E para ti bitmover (ou outro user), usurarias para que?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nikolaspaolo",
+      "created_time": "June 16, 2023, 01:53:37 PM",
+      "body": "Acabei de testar e escrevi uma mensagem em uma transação bitcoin. Para melhorar, separei alguns bloco exploradores entre:Não Decodificão(Exibem o hexadecimal ou error) = 7777772e626974636f696e7032702e636f6d2e62721 - btc.com2 - blockexplorer.one3 - oklink.com4 - bitpay.com5 - blockonomics.coDecodificam(Exibem a mensagem que foi codificada) = WWW.BITCOINP2P.COM.BR1 - blockcypher.com2 - blockchain.com(antigo ponto info)3 - blockstream.info4 - mempool.spaceQueria muito ver isso em mobile wallets, mas entendo que depederá de qual bloco explorador venha nativamente configurado nelas. Na Mycelium por exemplo pode escolher o bloco explorador.......Na criação da hash, acabei me empolgado e coloquei feezinha, então talvez demore bastante a confirmar, como sextou é fechamento do câmbio, é normal que a fee caia e confirme hoje pra domingo. Tamanho   ‎285 B da mensagem de satoshi.Tamanho   ‎257 B a minha mensagem.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "June 16, 2023, 02:25:13 PM",
+      "body": "Quote from: joker_josue on June 14, 2023, 11:57:32 AMQuote from: bitmover on June 12, 2023, 07:48:31 PM4 - Termine a transação e faça o broadcast. Lembre-se de gastar todo o UTXO escolhido, senao ele irá para o miner.Só uma questão:Porque é que se tem de usar todo saldo do endereço?  Ele vai para o minerador, por que?Eu costumo explicar isto de outra forma.Imagina que tens apenas uma nota de 20€ no bolso. Não podias dividir essa nota de forma nenhuma. Tens uma conta para pagar de 7€. O que é que tu fazes? Entregas a nota de 20€. Se não esperares pelo troco, o dono da loja fica com os 13€.Aqui é o mesmo. Uma UTXO é uma nota de 20€. Se tens que pagar 7€, tens que dizer ao gajo da loja que necessitas de receber de volta 13€. Isto porque tu não podes gastar apenas parte de uma UTXO. Tens que a gastar toda e portanto, tens que avisar o dono da loja que tens 13€ a receber.Quote from: joker_josue on June 16, 2023, 06:34:37 AMSão casos interessantes de uso.E para ti bitmover (ou outro user), usurarias para que?Por exemplo como forma de assinalar uma determinada transacção. Tipo, compraste um carro com Bitcoin. Decides assinalar essa transacção como um marco na tua vida! Pode ser uma celebração, por exemplo!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 16, 2023, 06:32:46 PM",
+      "body": "Quote from: nikolaspaolo on June 16, 2023, 01:53:37 PMAcabei de testar e escrevi uma mensagem em uma transação bitcoin. Para melhorar, separei alguns bloco exploradores entre:É incrível como em 9 exploradores, apenas 4 descodificam a mensagem.Será isso intencional ou meramente algo que não foi configurado?Quote from: darkv0rt3x on June 16, 2023, 02:25:13 PMPor exemplo como forma de assinalar uma determinada transacção. Tipo, compraste um carro com Bitcoin. Decides assinalar essa transacção como um marco na tua vida! Pode ser uma celebração, por exemplo!Isso é um facto que todo o mundo vai ficar a saber que tu compras-te um carro.  Mas, sim é uma ideia interessante, para registar um marco na nossa vida blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nikolaspaolo",
+      "created_time": "June 16, 2023, 06:42:58 PM",
+      "body": "QuoteÉ incrível como em 9 exploradores, apenas 4 descodificam a mensagem.Será isso intencional ou meramente algo que não foi configurado?Acho que se trata de dados(economia), alguns não mostram quase nada, outros quase tudo. Então acho que todos ali são grátis, fazem bem do básico mesmo. Decodificar uma mensagem parece fácil, mas imagina checar isso a cada bloco de 10 minutos?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 16, 2023, 07:03:22 PM",
+      "body": "Quote from: nikolaspaolo on June 16, 2023, 06:42:58 PMAcho que se trata de dados(economia), alguns não mostram quase nada, outros quase tudo. Então acho que todos ali são grátis, fazem bem do básico mesmo. Decodificar uma mensagem parece fácil, mas imagina checar isso a cada bloco de 10 minutos?Não propriamente, pode acontecer só quando a pagina do bloco é carregada.Alem disso a informação esta no blockchain, o espaço ocupado é sempre o mesmo.Julgo que não seja esse o motivo.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nikolaspaolo",
+      "created_time": "June 16, 2023, 07:56:32 PM",
+      "body": "acabei de fazer envio de USDT usando a rede TRX, paguei 1 TRX para adicionar uma nota na hash. Mas não achei minha mensagem em block explorador nenhum e debitou meu 1 TRX + TRX de fee.Hash:563d7035340d82f59702245987a847c0f87bf9a5ba6826cd447ff8b2eab31a78",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 16, 2023, 10:47:30 PM",
+      "body": "Quote from: nikolaspaolo on June 16, 2023, 07:56:32 PMacabei de fazer envio de USDT usando a rede TRX, paguei 1 TRX para adicionar uma nota na hash. Então, mas a rede TRX suporta isso também?Quer dizer, até deve suportar, mas será que o método é o mesmo? Talvez exista alguma configuração adicional, digo eu...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "rdluffy",
+      "created_time": "June 17, 2023, 01:40:02 AM",
+      "body": "Quote from: nikolaspaolo on June 16, 2023, 07:56:32 PMacabei de fazer envio de USDT usando a rede TRX, paguei 1 TRX para adicionar uma nota na hash. Mas não achei minha mensagem em block explorador nenhum e debitou meu 1 TRX + TRX de fee.Hash:563d7035340d82f59702245987a847c0f87bf9a5ba6826cd447ff8b2eab31a78Como você fez esse acréscimo da mensagem? Em que carteira?Eu fiquei curioso pra saber se existe essa possibilidade mas não encontrei. Eu usei pouquíssimas vezes a rede TRX mas não me lembro bem se tinha essa opção. Também dei uma breve pesquisada nos explorers da rede e não encontrei.Será que tem a possibilidade de essa nota só aparecer para o recebedor da transação? Ou ainda essa nota só servir para o remetente da transação?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nikolaspaolo",
+      "created_time": "June 17, 2023, 02:08:35 AM",
+      "body": "Quote from: nikolaspaolo on June 14, 2023, 08:23:14 PMExcelente, testarei muito em breve.Outro dia, notei que na TRON também pode escrever uma mensagem e custa apenas 1 TRX, coisa de 0,07 $, só não sei onde será possível ler a mensagem escrita ali.seria aqui? @rdluffy isso aparece na tronlink antes de enviar qualquer token. Realmente não sei onde foi parar essa nota que paguei pra escrever kkkkkkAchei um exemplode alguém que conseguiu enviar a mensagem. Entendi ali que foi no envio de TRX de um endereço a outro. No meu caso, eu não enviei a moeda TRX, mas sim o Toekn USDT, será que foi isso?Note: a_memo_here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "June 17, 2023, 11:37:28 AM",
+      "body": "Quote from: joker_josue on June 16, 2023, 06:32:46 PMQuote from: darkv0rt3x on June 16, 2023, 02:25:13 PMPor exemplo como forma de assinalar uma determinada transacção. Tipo, compraste um carro com Bitcoin. Decides assinalar essa transacção como um marco na tua vida! Pode ser uma celebração, por exemplo!Isso é um facto que todo o mundo vai ficar a saber que tu compras-te um carro.  Mas, sim é uma ideia interessante, para registar um marco na nossa vida blockchain.Sim, mas não compras um carro às escondidas para o teres depois escondido na garagem, certo? É algum que toda a gente vai saber. Ou melhor, não é nada privado de qualquer das maneiras! xD",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

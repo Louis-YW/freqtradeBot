@@ -1,0 +1,37 @@
+{
+  "id": "topic_5425332",
+  "title": "garlonicon",
+  "author": "garlonicon",
+  "created_time": "December 03, 2022, 08:45:23 PMLast edit: December 03, 2022, 10:55:28 PM by garlonicon",
+  "content": "I tested two ways of creating transaction: one is by clicking that in GUI, and another one is by using createrawtransaction in the console. What surprised me, that if some transaction is marked as non-RBF in the console, it gets 0xffffffff sequence number. However, when the same thing is done in the GUI, it has 0xfffffffe sequence number!I wonder, what is the reason behind that. Because for now it seems like another possibility to check if someone is using console or GUI, so it may be harmful for privacy. Of course, by using console, it is possible to assign any sequence number. What I described, is automatically selected value, when the whole transaction is marked as replaceable or not, and when sequence numbers are not selected manually by the user.Edit: It is also surprising that PSBTs also use 0xfffffffe for non-RBF. So, why createrawtransaction use 0xffffffff? Also, I wonder why using sendrawtransaction with 0xfffffffe gives a \"non-final\" error. It is above RBF range, so it should be final, right?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5425332",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "December 04, 2022, 07:03:45 AM",
+      "body": "Quote from: garlonicon on December 03, 2022, 08:45:23 PMEdit: -snip- Also, I wonder why using sendrawtransaction with 0xfffffffe gives a \"non-final\" error. It is above RBF range, so it should be final, right?I've tried it and it worked without an error at my end.Command used (RegTest):Code:createrawtransaction \"[{\\\"txid\\\":\\\"58a898970f0de331a61b4912d26c0721dcfe2f7825fad6f9788b739005a35673\\\",\\\"vout\\\":0,\\\"sequence\\\":4294967294}]\" \"[{\\\"bcrt1pv4xmga6fzuz9svh02sxg8rfqn9jsp39534qm5jpgdarg6zfetjws8hxy6j\\\":9.99875255},{\\\"bcrt1ppthegxrypyfq4xx8nvk79tdzc73e9cllnltu53sy6jqug6hjrveqew6xy9\\\":0.00123450}]\"The only way that error would show is if you set the \"locktime\" to 4294967294 (which is about 100 years in the future) instead of the sequence.Compare your command with mine to see the possible issue.I can't comment on the sequence's inconsistency in createrawtransaction command and GUI. (you may consider opening a new issue for that)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "December 04, 2022, 08:12:42 AM",
+      "body": "It seems that I messed up with locktime. Because if it is set to zero, the sequence number is 0xffffffff, so that the locktime is ignored entirely. But if it is set to any higher value, then the sequence number is changed into 0xfffffffe, simply to enforce that locktime.So, by using console, the locktime is explicitly set by user, or set to zero by default. By using GUI, the locktime is different, based on the current block number. And that's the reason, why results from the console are different.And about this non-final error: my locktime was simply too big for regtest, even if it was reached in other networks long time ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "December 04, 2022, 08:59:38 AM",
+      "body": "Quote from: garlonicon on December 03, 2022, 08:45:23 PMI wonder, what is the reason behind that. Because for now it seems like another possibility to check if someone is using console or GUI, so it may be harmful for privacy. Harmful for privacy in what way? Are you saying that the difference in the sequence number can help identify the user or can it help in identifying that the person creating the transaction is using a wallet that has a console? Knowing that the person is using a console, limits the scope of potential wallets being used.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "id": "topic_5474911",
+  "title": "raptor-bravo",
+  "author": "raptor-bravo",
+  "created_time": "November 21, 2023, 03:07:02 PMLast edit: November 21, 2023, 07:01:52 PM by raptor-bravo",
+  "content": "Hello. This link leads to a solution posted by someguy123 with bitcoin-min.js to generate public addr/private key, just with 3 lines of code:https://bitcointalk.org/index.php?topic=750022.msg9974990#msg9974990The method is:First, for the head in html document:Code:<script src=\"js/bitcoinjs-min.js\"></script>Then the function to call is:Code:var key = Bitcoin.ECKey.makeRandom();var PubKey = key.pub.getAddress().toString();var PrivKey = key.toWIF();And that's it. An elegant, \"nodeless\" solution.My issue is this: How to use such a simple method, but for building a btc transaction instead? You know, a nodeless method, just a dir with bitcoinjs-lib inside (or -min, whatever) and pure javascript to call the corresponding functions. Thank you in advance.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5474911",
+  "comments": [
+    {
+      "author": "vv181",
+      "created_time": "November 22, 2023, 02:13:59 AM",
+      "body": "You need to compile it first using node or reuse any available compiled code of the library, although I won't recommend that.For the compilation process guide refer to: https://github.com/bitcoinjs/bitcoinjs-lib#browserCode:$ npm install bitcoinjs-lib browserify$ npx browserify --standalone bitcoin - -o bitcoinjs-lib.js <<<\"module.exports = require('bitcoinjs-lib');\"After it is compiled, you can call the library as a JavaScript module, and then do the transaction parts plainly in JS. I don't know if it already exists, but you can see the currently available examples for guidance: https://github.com/bitcoinjs/bitcoinjs-lib/tree/master#examples.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "November 22, 2023, 12:32:43 PM",
+      "body": "Prepairing/Building a btc transaction in JS with \"bitcoinjs-lib\" takes a few more steps than generating a new public address/private key.This include following steps: Create a new transaction, add in- and outputs, sign the transaction and build it to get the raw transaction hex to be able to broadcast the transaction. First obvious step is to install the library.Now import the library and setup the network configuration for the transaction:Code:const bitcoin = require('bitcoinjs-lib');const network = bitcoin.networks.bitcoin; If you want to use the testnet replace it with \"bitcoin.networks.testnet\"Next step is to setup the variables of the sender adresses. You will need the private key in WIF-format to be able to sign the transaction later:Code:const privateKeyWIF = 'insert_privkey_here';const keyPair = bitcoin.ECPair.fromWIF(privateKeyWIF, network);Add the transaction ID and the output index of the UTXO you want to spend:Code:const txId = 'insert_txId_here';const vout = 0;Define the receiving address, the amount and the fee that you are using for the transaction:Code:const recipientAddress = 'insert_address_here';const amountToSend = insert_amount_in_satoshi_here;const fee = insert_fee_amount_in_satoshi_here;We can finally build ur transaction by adding the input and output:Code:const txBuilder = new bitcoin.TransactionBuilder(network);txBuilder.addInput(txId, vout);txBuilder.addOutput(recipientAddress, amountToSend);Now sign the transaction with the private key that we set up in the first step:Code:txBuilder.sign(0, keyPair);Lets finish and compile it to get raw transaction hex:Code:const rawTx = txBuilder.build().toHex();console.log(\"Raw Transaction Hex: \", rawTx);With the output you are finally able to broadcast your transaction to the network. There are a few services that offer to push ur transaction by using the raw transaction hex. One example would be Blockstream - just enter the raw transaction hex and the transaction will be broadcasted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "raptor-bravo",
+      "created_time": "November 23, 2023, 04:38:23 PMLast edit: November 23, 2023, 05:10:05 PM by raptor-bravo",
+      "body": "Thank you, guys, all answers add priceless info to my knowlege. Now, some details:I´m cuban, so my connection is not the best to npm libraries; it takes too long. Is there a way to npm my already dowloaded lib instead?Now some other considerations: if bitcoinjs-min.js can be used in an off-node manner, why not the same principle to build a Tx with same lib? Any special reason?No matter whether bitcoinjs-lib.js or -min.js, as stated by me before, no matter if more -libs are needed, the matter is to manage a .js lib like any other .js file, just from the browser. If not possible, a reason could be indicated.I´m aware that more steps are needed, of course, but the function to create a new public address/private key is in the same lib containing functions to build a transaction. No matter how many steps, npm installation doesn´t add functions to the library, and this is a .js file, not a special one that can only be read by node.js, I guess.Hope you understand my concern.ETFbitcoin, coinb.in is according to my goal: prepare an off-line Tx. However, a testnet addr is not accepted:\"The address or redeem script you have entered is invalid\". That´s the message. My addr is fine and funded:muKdpCX1tGhaREkY9foqSkPCCQqXbXB6QQ, but is not accepted, even after selecting bitcoin testnet at setting page. Any sugestion? I wanna test the wallet with fake btc before entering real money addr/key in mainnet.Thank you all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "raptor-bravo",
+      "created_time": "November 24, 2023, 04:56:17 PM",
+      "body": "Quote from: ETFbitcoin on November 24, 2023, 09:48:13 AMYou can do that by open \"Help\" -> \"Setting\" or visit https://coinb.in/#settings and choose \"Bitcoin (Testnet)\" on Network option.Not working at all, now trying another one: mm7BAhJKvL9FrAim1gCYoM3WJHGYYfcXLVThe address or redeem script you have entered is invalidIs testnet working to you on coinb.in?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "raptor-bravo",
+      "created_time": "December 01, 2023, 02:27:27 PM",
+      "body": "ETFbitcoin, what did you exactly put in the first field of the tx, labeled Address, WIF key, Redeem Script or Transaction ID:, an address, a script, a TxID or a key?  I enter my address and it´s not accepted, and my goal is to use my address, if possible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "December 02, 2023, 08:48:31 AM",
+      "body": "Quote from: raptor-bravo on December 01, 2023, 02:27:27 PMETFbitcoin, what did you exactly put in the first field of the tx, labeled Address, WIF key, Redeem Script or Transaction ID:, an address, a script, a TxID or a key?  I enter my address and it´s not accepted, and my goal is to use my address, if possible.Actually i didn't enter any value on first field. I haven't personally test it, but you should copy unsigned TX which created by https://coinb.in/#newTransaction and visit https://coinb.in/#sign to sign it with your private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "id": "topic_5427726",
+  "title": "alexrossi",
+  "author": "alexrossi",
+  "created_time": "December 10, 2022, 11:10:26 AMLast edit: December 10, 2022, 11:42:26 AM by alexrossi",
+  "content": "Apro questa discussione per parlare dei trade off (ovvero, delle difficoltà che nascono sfruttando i vantaggi riguardo LN), può essere d'aiuto per chi si deve avvicinare e chi è interessato.Parlo di una situazione in cui si va oltre le prove ed i test, dove è possibile perdere tutto. Parlo quindi di un ambiente di produzione.In primis, l'hardware richiesto:LN (io l'ho utilizzato nella sua implementazione lnd) gira senza problemi su un raspberry pi 4, però dobbiamo assicurarci un uptime e backup 100% efficienti, questo perché qualsiasi downtime e perdita di dati \"live\" potenzialmente è una falla di sicurezza in cui l'altra parte può chiudere un canale in maniera non consensuale (senza tutte e due le parti online). Questo può causare indubbiamente seccature a livello di riscatto dei fondi, perché l'altra parte potrà far partire una transazione che farà il \"settlement\" finale in 15-30 giorni, in quel periodo di tempo dovremo stare ad aspettare senza avere accesso ai fondi.Un raspberry pi tenuto a casa non è paragonabile ad un server ospitato in un datacenter commerciale, sia a livello hardware che a livello di connettività. Ci sono alcuni palliativi (tenerlo sotto UPS, ecc..) ma non mi fiderei a lasciarci grosse somme, per poi avere un rischio di corruzione dati e quindi fondi bloccati.Seconda cosa, la scelta dei canali:Anzitutto c'è la problematica di dover avere sia canali in uscita (facile) che in ingresso (meno facile), altrimenti almeno inizialmente si potrà solo inviare. Nel mio caso, essendo il mio un nodo di spesa, ho aperto un unico canale verso coingate che è ben collegato alla maggior parte dei nodi LN. Ovviamente almeno all'inizio ho dovuto inviare e basta.Terza cosa, la fee riservata alla chiusura:nel momento in cui si apre un canale LN, c'è una fee di apertura che si paga come una qualsiasi transazione BTC e c'è una fee di chiusura che non viene pagata ma semplicemente riservata secondo la policy del nodo verso cui si apre il canale. Se si ha in mente di aprire tanti piccoli canali (per maggiore resilienza) questo importo diventa abbastanza consistente, perché ho avuto l'impressione che i nodi, per tutelarsi, simulano una situazione di chiusura forzata del canale con mempool piena, quindi pre-calcolano delle fee abbastanza alte.Non ho i numeri in mano, ma mi sembrava che aprendo un canale da 100 euro, circa 10 se ne andavano tra fee di apertura e pre-calcolo della fee di chiusura, ma mi prometto di riportare dei numeri più precisi appena apro un nuovo canale.Quarta cosa, il backup:Il backup non è realizzabile e utilizzabile in semplicità, bisognerebbe proprio scrivere un libro a riguardo, provo a dire cosa ho capito:Su LND ci sono tre parti di backup:Il seed (transazioni on-chain)I canali statici (backup dei riferimenti dei propri canali)Il DB interno \"live\" (backup dei canali con gli ultimi stati all'interno)Questi non sono \"livelli\" ma \"parti\", ovvero non sono intercambiabili e se non sa cosa si fa si può perdere tutto.Il seed è la parte più immediata, solite 24 parole salvate che funzionano come un Wallet e tiene le chiavi private dei nostri fondi on-chainI canali statici, insieme al seed, hanno i riferimenti dei nostri canali aperti senza stati all'interno (per stati si intendono le transazioni off-chain LN avvenute), quindi in un ipotetico recupero, dopo il seed, avendo i canali statici si possono recuperare canali già aperti se l'altra parte (l'altro nodo) concorda e co-opera nel recupero (altrimenti chiusura forzata).Il DB interno con gli ultimi stati è potenzialmente pericolosissimo, perché sarebbe il contenitore con il backup più completo, ma può portare a perdere tutti i fondi se usato male, infatti si consiglia sempre di usare seed + canali statici e \"sperare\" nella cooperazione degli altri nodi, questo perché:Se il DB interno viene salvato e ripristinato, e nel lasso di tempo in cui venisse ripristinato sul canale avvengono movimenti, il nodo in corso di recovery sarebbe rimasto indietro e pubblicherebbe come ultimo movimento una transazione più vecchia, e questo dall'altra parte verrebbe visto come \"barare\", autorizzando, da protocollo LN, al recupero di tutti i fondi e chiusura del canale. Sostanzialmente il nostro nodo perderebbe tutto.Quindi bisogna essere ben informati riguardo ai backup e ai potenziali rischi. LN rimane un grande progetto, ambiziosissimo, ma non è facile da utilizzare come un bitcoin core + seed salvato da qualche parte.Prossimi argomenti su cui scriverò saranno watchtowers e zombie channels",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5427726",
+  "comments": [
+    {
+      "author": "alexrossi",
+      "created_time": "December 13, 2022, 08:07:14 AM",
+      "body": "Prima di tornare sul tecnico, due implicazioni pratiche per l'uso nelle spese di Lightning network:Attualmente c'è the bitcoin company, app su Android, che consente di acquistare prepagate anonime tramite Lightning, a partire da 10 usd. Funziona bene, ma se si spende in euro c'è una commissione fissa di cambio di 2USD + 2%, quindi caro per piccole spese frequenti non negli Stati Uniti.Il mio Gateway preferito attualmente è kraken, con kyc, che però consente di tornare in eur con fee basse via sepa.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fillippone",
+      "created_time": "December 15, 2022, 07:22:44 AM",
+      "body": "Quote from: alexrossi on December 10, 2022, 11:10:26 AMLN rimane un grande progetto, ambiziosissimo, ma non è facile da utilizzare come un bitcoin core + seed salvato da qualche parte.Ottimo thread. Seguo con interesse. Se troverò risorse in italiano sugli argomenti dei quali scrivi, spero di poterle mettere qui. Riguardo alla \"difficoltà\" di LN concordo. Non a caso il \"Lightning Node Operator\" pare essere la prima \"Professione del futuro\" disponibile oggi.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitbollo",
+      "created_time": "December 15, 2022, 06:23:50 PM",
+      "body": "Quote from: fillippone on December 15, 2022, 07:22:44 AMQuote from: alexrossi on December 10, 2022, 11:10:26 AMLN rimane un grande progetto, ambiziosissimo, ma non è facile da utilizzare come un bitcoin core + seed salvato da qualche parte.Ottimo thread. Seguo con interesse. Se troverò risorse in italiano sugli argomenti dei quali scrivi, spero di poterle mettere qui. Riguardo alla \"difficoltà\" di LN concordo. Non a caso il \"Lightning Node Operator\" pare essere la prima \"Professione del futuro\" disponibile oggi. Non sono un esperto di LN ed anche io per il momento mi appoggio ad un exchange per ricevere transazioni...Ma in findeiconti \"Lightning Node Operator\" potrebbe essere considerato come una attività post-mining? Ovvero, in futuro a causa degli halvening la ricompensa avrà dei cali drastici e ok ci saranno le fee a compensare ma considerato l'arrivo di LN non è detto che ci siano tutte queste fee a bilanciare le reward per i miners... in pratica sarà un processo che potrebbe diventare talmente \"tecnico\" e costoso da coinvolgere operatori sempre più specializzati.Viceversa con i nodi del LN si avrebbe in pratica un altro modo per tenere sicura la rete, solo che l'accesso sarà più facile e meno dispendioso...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mendace",
+      "created_time": "December 15, 2022, 06:39:11 PM",
+      "body": "Sì, ci sono sicuramente dei trade-off da considerare quando si utilizza Lightning Network. Come hai menzionato, i requisiti hardware per l'esecuzione di un nodo possono essere significativi e i requisiti di uptime e backup possono essere impegnativi. Inoltre, trovare canali a cui collegarsi e gestire le commissioni associate all'apertura e alla chiusura dei canali può essere una sfida. E come hai detto, il processo di backup del tuo nodo e la protezione dei tuoi fondi può essere complesso e richiede una attenzione accurata.Io generalmente quando uso LN mi affido a Bluemoon che trovo di facile utilizzo e anche nella conversione da onchain a LN e non devo sbattermi pla preoccuparmi anche se ammetto di avere un nodo e fare pratica anche li.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alexrossi",
+      "created_time": "January 05, 2023, 03:22:04 PM",
+      "body": "Qualcuno è riuscito a hostare un trampoline server di LN, per esempio da collegare poi a Electrum?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alexrossi",
+      "created_time": "January 14, 2023, 02:30:33 PM",
+      "body": "Continuando le scoperte su LN in fatto di trade-off:Zombie channels:Un canale su LN è registrato sui due nodi che lo aprono, onchain invece è presente una transazione che fa da base per quello che poi passa sul canale.La transazione onchain e le chiavi private dei due nodi NON sono sufficienti per coordinare il recupero di un canale, serve il protocollo LN per gestire queste situazioni e venirne fuori, in caso di problemi (per es. uno dei due nodi va offline per molto tempo e si vuole chiudere il canale)La gestione dei \"conflitti\" e downtime è strettamente relegata ai due nodi con il canale aperto. Conflitti attualmente non ne ho avuti   Ho invece sperimentato l'andare offline per poi tornare online con un nodo abbastanza conosciuto, Coingate. Posso dire che anche dopo 3-4 giorni di downtime mio, tornando online, il canale è rimasto li e non è stato chiuso, ma di fatto è una scelta di coingate, altri nodi possono fare altri tipi di scelte.Dopo questa premessa, arriviamo al punto: se anche andando offline è possibile tenere i canali aperti, perché bisognerebbe evitarlo?Punto primo, in una rete in mala fede, con nodi modificati, l'essere online è l'unica garanzia che il nostro nodo stia sorvegliando il corretto comportamento dell'altro, eventualmente dando un force close in caso veda comportamenti strani.Punto secondo, il più importante, anche in una rete in buona fede (per es. conosco Coingate e so che tendenzialmente non mi fregherà): se una delle due parti va offline per molto tempo (diciamo giorni e settimane), e quindi perdiamo le speranze che ritorni online, diventiamo NOI di fatto l'unico backup del canale, e se disgraziatamente dovessimo avere una corruzione dell'hard disk sul nostro hardware, rompendo l'unico nodo che era effettivamente rimasto \"vivo\", abbiamo perso l'opportunità di fare un force close e i BTC rimarranno in un limbo eterno, decisamente poco auspicabile. Anche tornando dopo online, uno static backup servirà a poco perché servirebbe contattare l'altra parte per fare il recovery e abbiamo già dato per assodato che dopo settimane offline non la rivedremo.Quindi, morale di tutto ciò, bisogna evitare gli zombie channels (ovvero, un canale dove una delle due parti è offline per molto tempo) il più possibile, perché sono un rischio per i fondi presenti sul canale",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

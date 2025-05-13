@@ -1,0 +1,109 @@
+{
+  "id": "topic_5437041",
+  "title": "Sanka555",
+  "author": "Sanka555",
+  "created_time": "January 27, 2023, 06:48:08 PMLast edit: January 27, 2023, 07:00:02 PM by Sanka555",
+  "content": "i write  JavaI can generate a  bip39 seedbut i need to make \"segwit seed\"such that I inserted it into the electrum and saw the \"segwit phrase type\" in the window.Can you please tell me what is the difference between them?I would be very, very grateful for a piece of Java code.Thank you very much in advance",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5437041",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 27, 2023, 07:00:21 PM",
+      "body": "I don't cross my arms, but I must have witnessed a similar topic about a Java library which included Electrum seed generation. I'm not sure if that's what you're searching for.Quote from: Sanka555 on January 27, 2023, 06:48:08 PMbut i need to make \"segwit seed\"A \"segwit seed\" is an Electrum seed, because that's the standard that differentiates seeds that correspond to SegWit and to non-SegWit. BIP39 doesn't, you can use the same phrase for SegWit and non-SegWit wallet. Quote from: Sanka555 on January 27, 2023, 06:48:08 PMCan you please tell me what is the difference between them?I think you can find your answers here: https://electrum.readthedocs.io/en/latest/seedphrase.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "January 27, 2023, 07:03:22 PM",
+      "body": "Quote from: Sanka555 on January 27, 2023, 06:48:08 PMI can generate a  bep39 seedThat's not bep39. That's BIP39. (BIP stands for Bitcoin Improvement Proposal) Quote from: Sanka555 on January 27, 2023, 06:48:08 PMCan you please tell me what is the difference between them?The difference between BIP39 and segwit?They are completely two different things. BIP39 is a standard algorithm for generating a HD wallet from a seed phrase. Segwit refers to your addresses type.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sanka555",
+      "created_time": "January 27, 2023, 07:06:57 PM",
+      "body": "Quote from: hosseinimr93 on January 27, 2023, 07:03:22 PMQuote from: Sanka555 on January 27, 2023, 06:48:08 PMI can generate a  bep39 seedThat's not bep39. That's BIP39. (BIP stands for Bitcoin Improvement Proposal) Quote from: Sanka555 on January 27, 2023, 06:48:08 PMCan you please tell me what is the difference between them?The difference between BIP39 and segwit?They are completely two different things. BIP39 is a standard algorithm for generating a HD wallet from a seed phrase. Segwit refers to your addresses type. thank you))) I understand it. I still don’t understand what needs to be changed in the seed creation algorithm in order to get such a seed that electrum calls “segwit”",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 27, 2023, 08:20:10 PM",
+      "body": "Quote from: Sanka555 on January 27, 2023, 07:06:57 PMI still don’t understand what needs to be changed in the seed creation algorithm in order to get such a seed that electrum calls “segwit”It needs to have a 0x100 version number, according to the documentation above. During seed phrase generation, the wallet software generates seeds until the hash of their seed phrase begins with the specified version number, in this case, 0x100. So, in order for your algorithm to be compatible with Electrum, it has to check the first two bytes of the hash of the seed phrase.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "January 28, 2023, 04:01:18 AM",
+      "body": "Quote from: Sanka555 on January 27, 2023, 06:48:08 PMbut i need to make \"segwit seed\"such that I inserted it into the electrum and saw the \"segwit phrase type\" in the window.-snip-I would be very, very grateful for a piece of Java code.I hope that it's not the insecure method of selecting words and computing the checksum...Anyways, try to check if \"Electrum V2\" from this repository has the right code for you: github.com/harningt/atomun-mnemonic (Java)I can't help you much with it since I don't know Java.For reference here's part of Electrum's code related to its seed generation: github.com/spesmilo/electrum/blob/master/electrum/mnemonic.py#L190-L222 (python)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sanka555",
+      "created_time": "January 28, 2023, 10:10:41 AM",
+      "body": "Quote from: BlackHatCoiner on January 27, 2023, 08:20:10 PMQuote from: Sanka555 on January 27, 2023, 07:06:57 PMI still don’t understand what needs to be changed in the seed creation algorithm in order to get such a seed that electrum calls “segwit”It needs to have a 0x100 version number, according to the documentation above. During seed phrase generation, the wallet software generates seeds until the hash of their seed phrase begins with the specified version number, in this case, 0x100. So, in order for your algorithm to be compatible with Electrum, it has to check the first two bytes of the hash of the seed phrase. thank you. this is the perfect choice for me. Here is the problem with the implementation.I generate BIP39then according to documentation https://electrum.readthedocs.io/en/latest/seedphrase.htmlneed to do  normalized = prepare_seed(seed_phrase)QuoteThe normalization function (prepare_seed) removes all but one space between words.what space to leave is not written anywhere (and only then (am I right?)Code:if(DigestUtils.sha512Hex(mnemonicPhrase).startsWith(\"100\")) {System.out.println(DigestUtils.sha512Hex(mnemonicPhrase));System.out.println(mnemonicPhrase);}I understand that I am trying to scratch my left ear with my heel and it will be correct to generate entropy and then get seed from it. But now I need to do exactly this kind of logic.Thank you in advance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 28, 2023, 12:08:23 PM",
+      "body": "Quote from: Sanka555 on January 28, 2023, 10:10:41 AMthank you. this is the perfect choice for me. Here is the problem with the implementation.I generate BIP39Why exactly are you trying to use a BIP39 seed phrase as an Electrum seed phrase? You are adding unnecessary confusion. Electrum checks that any seed phrases it generates aren't accidentally also valid BIP39 seed phrases, and discards them if they are.Quote from: Sanka555 on January 28, 2023, 10:10:41 AMneed to do  normalized = prepare_seed(seed_phrase)QuoteThe normalization function (prepare_seed) removes all but one space between words.what space to leave is not written anywhere (The normalize function is defined here: https://github.com/spesmilo/electrum/blob/6650e6bbae12a79e12667857ee039f1b1f30c7e3/electrum/mnemonic.py#L79",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sanka555",
+      "created_time": "January 28, 2023, 06:45:39 PM",
+      "body": "Quote from: o_e_l_e_o on January 28, 2023, 12:08:23 PMWhy exactly are you trying to use a BIP39 seed phrase as an Electrum seed phrase? You are adding unnecessary confusion. Electrum checks that any seed phrases it generates aren't accidentally also valid BIP39 seed phrases, and discards them if they are.because I'm not a programmer.And no one will write a complete program for generating a new version of the seed to me on the forum.I have a BIP39. everything works.It just needs to be filtered. It should be easy.)from this python example I took the lineQuote  seed = u''.join([seed for i in range(len(seed)) if not (seed in string. whitespace and is_CJK(seed[i-1]) and is_CJK(seed[i +1])))])as far as I understand - they just remove all(?) spaces.but still can't filterhope someone in java can help me",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 28, 2023, 07:46:30 PM",
+      "body": "Quote from: Sanka555 on January 28, 2023, 06:45:39 PMbecause I'm not a programmer.All the more reason you shouldn't be trying to make up your own seed generation system. You will almost certainly trip up somewhere and end up with something very insecure or very difficult to recover from.Quote from: Sanka555 on January 28, 2023, 06:45:39 PMAnd no one will write a complete program for generating a new version of the seed to me on the forum.There is already a complete program for securely generating Electrum seed phrases. It's called Electrum. Quote from: Sanka555 on January 28, 2023, 06:45:39 PMI have a BIP39. everything works.It just needs to be filtered. It should be easy.)Then use it as a BIP39 seed phrase. If you want an Electrum seed phrase, then use Electrum to generate one. Trying to convert one to the other will likely just end in disaster.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "January 28, 2023, 08:19:31 PM",
+      "body": "Quote from: Sanka555 on January 28, 2023, 06:45:39 PMbecause I'm not a programmer.And no one will write a complete program for generating a new version of the seed to me on the forum. Are you just coding curious and want to play around with seed derivations or do you actually have plans to use such a system that you create to store your coins? I think it's important to realize that you are creating a problem where one doesn't exist. If you want a BIP-39 compatible seed, then generate it with a wallet that creates such seeds. You can still use that seed in Electrum. If you want an Electrum-native seed, generate one with Electrum.  Electrum is trusted and open-source, and it's been around for years. You can even do everything in a completely offline environment, so your seed never touches a computer with internet connection.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sanka555",
+      "created_time": "January 29, 2023, 08:35:29 AM",
+      "body": "thanks. your advice is very valuable. But I just need a few filter lines in java. it's all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "February 08, 2023, 12:49:06 AMLast edit: February 08, 2023, 03:17:24 AM by Saint-loup",
+      "body": "I'm not sure I understood exactly what you were looking for, but BX a command-line tool can generate different Electrum seeds. https://github.com/libbitcoin/libbitcoin-explorer/wiki/bx-electrum-newSo you can maybe call it from your Java program and take what it can return.Otherwise you can use its C++ libraries, but afaik it's not easy at all in Java (with JNI).At least you can maybe try to convert/adapt the C++ code in Java, https://github.com/libbitcoin/libbitcoin-system/blob/master/src/wallet/mnemonics/electrum.cppQuote from: Sanka555 on January 28, 2023, 06:45:39 PMbecause I'm not a programmer.And no one will write a complete program for generating a new version of the seed to me on the forum.I have a BIP39. everything works.It just needs to be filtered. It should be easy.)from this python example I took the lineQuote  seed = u''.join([seed for i in range(len(seed)) if not (seed in string. whitespace and is_CJK(seed[i-1]) and is_CJK(seed[i +1])))])as far as I understand - they just remove all(?) spaces.but still can't filterhope someone in java can help meNo this instruction appends characters if they are not a whitespace between 2 CJK characters \"CJK CJK\" In other words this instruction trims single whitespaces between CJK characters. But if you don't use seeds in CJK characters you don't care of that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

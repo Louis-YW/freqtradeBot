@@ -1,0 +1,101 @@
+{
+  "id": "topic_5471099",
+  "title": "albert0bsd",
+  "author": "albert0bsd",
+  "created_time": "October 20, 2023, 11:15:19 PMLast edit: November 06, 2023, 11:33:03 AM by albert0bsd",
+  "content": "Muy buen dia dejare aqui una guia express para utilizar GPG, Aqui doy por entendido que ya lo tienen instalado en su sistema.Crear una llave paso por paso:Code:gpg --full-gen-key --expertCon este comando podremos crear una llave paso a paso, personalmente recomiendo una llave ed25519 ya que son llaves pequeñas, seguras para los estandadres modernos y muy rapidas de generar/firmar/cifrarPara generar una llave ed25519 hay que seleccionar las opciones:Code:ECC and ECCLuego Code:Curve 25519Y el detalle de la expieracion de la key se lo dejo al criterio de cada quien.NOTA IMPORTANTE, el proceso te va a pedir un password, Trata de que sea un password que recuerdes muy bien y de preferencia tenerlo respaldado, ya que si lo pierdes no habra manera de recuperar tu llave privada.Listar llaves privadasCode:gpg --list-secret-keysEsta es la llave que recien generamos solo con las llaves que aparecen en esta lista podremos firmar y cifrar documentosListar llaves publicasCode:gpg --list-keysEsta es una lista de todas las llaves publicas que estan guardardas, generalmente solo aparece nuestra llave publica, pero si ya hemos importado la llave publica de alguien mas, esta tambien aparecera listada.Importar llaves publicas de alguien masCode:gpg --import their_public_key.ascen el archivo their_public_key.asc (Que podria tener cualquier otro nombre) se encuentra la llave publica de otra persona y la podremos importar a nuestra lista para en el futuro poder cifrar mensajes que solo el destinatario pueda leer.Pudes tratar de impotar mi llave publica, guarda el siguiente texto en un archivo de texto y luego importarlo con el comando anterior:Mi llave publica es:Code:-----BEGIN PGP PUBLIC KEY BLOCK-----mDMEZSGE8hYJKwYBBAHaRw8BAQdAVaD+e9jobVYRJtg0hs/FOaED+2U3WRMoNmzUfVXrvaO0IWFsYmVydG9ic2QgPGFsYmVydG9ic2RAZ21haWwuY29tPoiQBBMWCAA4FiEEcPyyF88mxDTnyu++7UQ4Plx1G84FAmUhhPICGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQ7UQ4Plx1G87l+gD/QS6Pc9lafJIpl4v1sOJOG8nr5zg8/geplKx5evXvXMMBAOFupEvid0juHvIowTA090jophE49NNGuoJRw3FAGjgFuDgEZSGE8hIKKwYBBAGXVQEFAQEHQCthQ0Ma0WnygqMLe9zBU9TZ4Blc0/nbBPBWKHWcTjdLAwEIB4h4BBgWCAAgFiEEcPyyF88mxDTnyu++7UQ4Plx1G84FAmUhhPICGwwACgkQ7UQ4Plx1G87wHQEAi8xRkg0MgFdVXXzIxckSdblvb5HV0un96fmBPZo1WOwA/0XnjyqFAOn1bvQrgo3oxN7sOjfpsaKhUaupv7/yvNMM=GFvH-----END PGP PUBLIC KEY BLOCK-----Exportar tu llave publica o la de alguien masCode:gpg --export --armor \"Name or Email or KEY ID\" > public_key.ascCon este comando podras exportar tu llave publica o la de alguin mas (Previamente tu ya deberia de haberla importado).Nota que la salida es redirigida a un archivo de texto public_key.asc.Firmar un archivo de TextoCode:gpg --clearsign --local-user \"Name or Email or KEY ID\" -o signed_message.txt message.txtSi quieres firmar un archivo de texto para autenticar que tu lo generaste o demotrar que tu tienes el control de determinada llave privada utiliza el comando anterior.Al archivo a firmar es menssage.txt y el archivo resultando es signed_message.txtmenssage.txtCode:albert0bsd signing a message for bitcointalk post on Oct 7, 2023signed_message.txtCode:-----BEGIN PGP SIGNED MESSAGE-----Hash: SHA256albert0bsd signing a message for bitcointalk post on Oct 7, 2023-----BEGIN PGP SIGNATURE-----iHUEARYIAB0WIQRw/LIXzybENOfK777tRDg+XHUbzgUCZSGILAAKCRDtRDg+XHUbzhKvAQDLvqt3wEhiIK+P5umf5HJNqgPDchgndg8JRLHWsC5U2QD/fv8FEQZQr75K68BsHna/htaTBMOnfPOuZGYJzmr4WQE==1C8J-----END PGP SIGNATURE-----Verificar un mensaje de texto firmadoCode:gpg --verify signed_message.txtPuedes verificar mi mensaje firmado o el de alguien mas con el comando anteriorCode:gpg: Signature made Mon Oct  9 07:46:40 2023 CSTgpg:                using EDDSA key 70FCB217CF26C434E7CAEFBEED44383E5C751BCEgpg: Good signature from \"albertobsd <...>\" [unknown]gpg: WARNING: This key is not certified with a trusted signature!gpg:          There is no indication that the signature belongs to the owner.Primary key fingerprint: 70FC B217 CF26 C434 E7CA  EFBE ED44 383E 5C75 1BCEHaz caso omiso del warning lo que nos interesa es:Quotegpg: Signature made Mon Oct  9 07:46:40 2023 CSTgpg:                using EDDSA key 70FCB217CF26C434E7CAEFBEED44383E5C751BCEQuotePrimary key fingerprint: 70FC B217 CF26 C434 E7CA  EFBE ED44 383E 5C75 1BCESi la llave coincide con la llave esperada entonces la persona que firmo el mensaje tiene control sobre la llave privada ligada al mismo.Cifrar un mensaje para que solo pueda ser visto por un solo destinatarioCode:gpg --encrypt --recipient \"Recipient Name or Email or KEY ID\" --armor --local-user \"Recipient Name or Email or KEY ID\" -o encrypted_message.asc message.txtEl archivo de entrada es message.txt y el de salida es encrypted_message.ascAqui pueden cifrar un mensaje para mi y si lo puedo descifrar les mandarare un mensaje para que lo descifren ustedes, si hacen esto solo respondan a este mensaje con el mensaje cifrado, no se olviden de publicar su llave publica tambien, aqui o de preferencia en el siguiente hilo: https://foro.elhacker.net/criptografia/pgpgpg_public_key_database_guarda_tu_llave_publica_aqui-t518947.0.htmlDescifrar un mensaje Que te enviaronCode:gpg --decrypt encrypted_message.ascNo hay mucho que decir, si tu tienes la llave privada asociada a la llave publica que se utilizo como destinatario del mensaje cifrado, entonces tu seras capas de descifrar el mensaje.Y por ultimoRespaldar tu llave privadaCode:gpg --export-secret-keys \"Recipient Name or Email or KEY ID\" > backup-key.ascEs sumamente importante que respaldes tu llave privada en un archivo y este lo copies a una o dos unidades USB, el archivo backup tiene el mismo password que utilizaste la cuando lo creaste, asi que tambien es importante que respaldes este password ya que sin el PERDERAS el acceso a tu llave privada",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471099",
+  "comments": [
+    {
+      "author": "albert0bsd",
+      "created_time": "October 20, 2023, 11:16:00 PM",
+      "body": "Reservado",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DdmrDdmr",
+      "created_time": "October 21, 2023, 08:13:39 AM",
+      "body": "En su momento, usé Kleopatra para experimentar con el cifrado PGP, con algún paso en falso al errar con la clave en un primer intento tal y como describo en este hilo (lio precisamente con mi gestor de contraseñas):  PGP ¿Puedes enviar mensajes cifrados?. Veo que los comandos que citas van con el CMD sin problemas.Cabe recordar adicionalmente que también tiene una utilidad práctica en el foro para poder recuperar una cuenta en caso de pérdida de las claves de acceso, o para demostrar ser el propietario de la misma.QuoteFirmasA menudo, tendrás que demostrar que eres el propietario de la cuenta, mediante un PGP o forma de Bitcoin. Este procedimiento consta de dos pasos:1. Debes demostrar que la clave PGP o la dirección de Bitcoin está asociada a tu cuenta, por ejemplo, referenciando un post no editado en el cual hayas posteado la dirección.2. Debes firmar un mensaje adecuado con esa clave/dirección.Ver (ambos hilo cerrados): https://bitcointalk.org/index.php?topic=5089877https://bitcointalk.org/index.php?topic=5116875.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Porfirii",
+      "created_time": "October 21, 2023, 11:45:05 AM",
+      "body": "Gracias albert0bsd. En un foro sobre monedas criptográficas, a veces se echan en falta más hilos sobre este tema, aunque haberlos haylos como citaba Ddmr2.Personalmente me gustaría utilizar más estas herramientas, pero hay dos problemas fundamentales para no hacerlo:El primero es teórico, y consiste en que si cualquier día soy investigado por cualquier circunstancia (Dios no lo quiera), que exista un flujo de mensajes encriptados ya es un indicio de criminalidad y supondría invertir la carga de la prueba y tener yo que probar que su contenido no es ilegal, cosa que no podría hacer, por ejemplo, si pierdo la clave privada, por lo que es añadir una complicación innecesaria a mi ya de por sí complicada vida.El segundo es práctico, y es que prácticamente nadie conoce las herramientas de encriptado ni cómo se usan, con lo cual, a no ser que me busque contactos dudosos por la deep web, o me intercambie cartas de amor con Ddmr2, tampoco hay muchas más opciones para usar el cifrado en el día a día. Y tampoco me siento lo suficientemente capaz ni atraído por el tema como para sumergirme en un foro puramente sobre criptografía, que seguro que también los hay.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DdmrDdmr",
+      "created_time": "October 21, 2023, 02:06:37 PM",
+      "body": "Quote from: Porfirii on October 21, 2023, 11:45:05 AM<…>Hush-hush …Otra cosa relacionada que es interesante, y que no recuerdo apenas haber visto comentado, es el poder cifrar mensajes usando la clave pública de una dirección (ej/ la del destinatario del mensaje),  de manera que sólo el poseedor de correspondiente clave privada pudiese desencriptar el contenido:Quote from: pooya87 on November 16, 2020, 05:47:58 AMwe bitcoiners can encrypt messages with the tools we already have without installing additional software. it needs AES (which all wallets have) and HMAC-SHA function which all deterministic wallets have and a public key which we can fetch from our wallet or from the person we want to send the encrypted message to.i used OP's public key found on their profile (04e31f13f55c8bd626a32bf9ad93744e1cb3a4ec4b5efe1cce89e06687aa7bec7476ca4a343bdaf 9b5db1042966c0a8284a2e293ea7901d5284f4bd29cc6d26a40)Code:QklFMQIHp6o9MrhtkodROnsmHgk2KljsilF+LZN8SWyCcvpwcBV5C0eGV4wY5hU8n8YT/aSIXRdw6XpLHKbSlF/eSo1d0jNi5b3RBU0eGHItHWyoL5frJ29ffkjvPZYvIUk7KI0=the process is known as ECIES and Electrum already has an easy to use implementation of it to encrypt and decrypt messages.i realized that the example above can only be decrypted by OP (it needs private key) so here is an example with its private key revealed (on testnet):Code:private key: cR4X2irxZwFrPBY8Jz8SfjGMyAdsnvCSPjWe3GQjubEKK21v44Yepublic key: 037287e275b9b40bf8d528e215ad53f09f14cd0363125bea276e020ec6f851c310encrypted message: QklFMQNQd6jCL8MF8AIfJQ4Acn5yQ4UEFggIWQWhMP4r2eDbjY3jkfC5Oca6B1VYGb/qvJIWzxDLWyLKzgnAAx2CjEy+V9wvkC/yr8p6QKZ7OB+v+5QDyNKCPpU1dmJMqfQ3iPo=Lógicamente es menos genérico en alcance que el uso de PGP, pero para los más bitcoineros, parece una opción interesante. Por ejemplo, si no me he equivocado en el proceso, este debería ser un mensaje para el OP, usando la dirección pública de su perfil (al haber TXs asociadas, se puede obtener la clave pública asociadas, que es la que realmente necesitamos):Code:QklFMQNjNzI6VCCPhOpk2n9r33WeHw4/QrchxQkSvSKTRKBhr0BUL0eykVEJrkWG2aDWIT1vpNzd2bJZrsWe3nlhMGi8S5LLB9oeh9S4fifDKkOIOeW2I8XWNVcA36ChvqvDokE=Sólo lo debería poder descifrar él.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "October 21, 2023, 05:23:20 PM",
+      "body": "Quote from: DdmrDdmr on October 21, 2023, 02:06:37 PMLógicamente es menos genérico en alcance que el uso de PGP, pero para los más bitcoineros, parece una opción interesante. No sabia que Electrum tenia esa opcion, voy a tratar de utilizarla, respecto al mensaje que mandaste no he podido realizar el desencriptadoSeguramente estoy thaciendo algo mal, voy a tratar de utilizar el script que mencionan en la conversacion que citas.Quote from: Porfirii on October 21, 2023, 11:45:05 AMEl primero es teórico, y consiste en que si cualquier día soy investigado por cualquier circunstancia (Dios no lo quiera), que exista un flujo de mensajes encriptados ya es un indicio de criminalidadPor que tiene  que ser indicio de criminalidad?? Se supone que la privacidad es un derecho humano: https://www.ohchr.org/es/privacy-in-the-digital-age/international-standards-relating-digital-privacyClaro hay quienes dicen que si no se tiene nada que temer no se deberia de esconder nada, pero bueno eso ya es un debate entre los gobiernos y los activistas de los derechos humanos.Uno de los principales usos que le estoy dando hoy en dia es sobre almacenar tus contraseñas y claves privadas de forma segura mediante gpg y la herramienta password-storePassword Store - Un administrador de contraseñas de codigo abierto el cual me funciona muy bien en windows (WSL), linux y en Android (termux) asi ya he dejado de utilizar el gestor de contraseñas de google.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DdmrDdmr",
+      "created_time": "October 21, 2023, 06:11:07 PM",
+      "body": "Quote from: albert0bsd on October 21, 2023, 05:23:20 PM<…>  Seguramente estoy thaciendo algo mal, voy a tratar de utilizar el script que mencionan en la conversacion que citas. <…>En la imagen no veo la clave pública asociada a la dirección pública de tu perfil (bc1…7ky). No sé si no la has puesto, si la has omitido de la captura, o si me he colado yo. La clave pública tuya me da que es 02b…e79.Por si acaso me he equivocado, y usando la citada clave pública tuya nuevamente, este sería un segundo intento con un mensaje algo distinto al previo:Code:QklFMQNIC4RAIlasG4/YhaHS+5tCW/wxRWfCjg92FzAaEZEhcdEagliR8mNZ3ogLTauMoZNq4rw7hfiwNBonBuXXYeEY5sbTz2ufMwL8c3WTpYFVu6qW2j7ibELemLVxwl7Lkec/CIM+99QKGmp+Lm2bq205QpK+pXSpk7ZworH+jkdpBfOok9jZPy+/Ty4cGMYGE7ruPVI4nmw2MN18pNnW6wWn",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "October 21, 2023, 06:27:06 PM",
+      "body": "Listo, eso era lo que faltaba.Ya desencripte tus mensajes   ambos mensajes estan orden!Se necesitaba colocar la llave publica en el campo indicado, por alguna razon pense que electrum podria determinar cual llave publica utilizar si es que tenias la misma vinculada, pero no es asi, tienes que especificar la llave publica y ya con eso electrum utiliza la llave privada (Vinculada en tu wallet) para desencyptar el mensaje.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DdmrDdmr",
+      "created_time": "October 21, 2023, 06:43:11 PM",
+      "body": "Quote from: albert0bsd on October 21, 2023, 06:27:06 PM<…>Bueno, ya sabemos que el sistema funciona bien pues. El sistema me gusta, aunque tiene el matiz de aprovechar un mínimo de privacidad, al requerir que el que te envía el mensaje conozca tu clave pública. En el caso de los mensajes que he publicado, he aprovechado una clave pública que ya está en las TXs asociadas a la dirección pública, por lo que no resta nada más en términos de privacidad. Desde Electrum podríamos incluso obtener la clave pública de direcciones sin TX asociada, y enviar ésta a nuestro interlocutor para que nos responda usando ésta. Para otro momento quedaría poder comparar PGP con este sistema en términos de aspectos tales como la complejidad (teórica) para descifrarse por fuerza bruta; ambos lógicamente casi inabordables hoy por hoy. También conocer las alternativas a Electrum para este proceso.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "October 22, 2023, 02:43:41 PM",
+      "body": "Muy buen contenido colega, las llaves GPG son canasta básica hoy en día y es una herramienta que debería de usar todo aquel que se preocupe por su privacidad. Personalmente tengo amigos en UK que utilizan estas herramientas todo el tiempo debido a que el nivel de vigilancia ya está de locos por ese lado del globo.Y hay mucha gente que pensará, pero no es necesario encriptar mis correos, al fin, ¿quien podría interceptarlos? y no creerían la cantidad de entidades que lo hacen, desde gobiernos locales hasta agencias de inteligencia filtrando el puerto 25. Y recordemos que esta práctica desquició a los científicos del CERN y los llevó a crear su propio sistema de correo encriptado el cual llamaron Protonmail.También veo que Citas ese legendario foro de \"elhacker\", me impresiona ver que siga vivo ese sitio ya que otros foros de el estilo fueron Nukeados, hablo de \"dios de la red\" y \"underground\". Ambos eran de el estilo pero al ser foros de hackers la gente no se aburre de atacarlos.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "October 22, 2023, 03:29:55 PM",
+      "body": "Quote from: seoincorporation on October 22, 2023, 02:43:41 PMTambién veo que Citas ese legendario foro de \"elhacker\"Upps  se me paso cambiarlo, lo que pasa es que soy moderador de ese foro y tambien publique ese tutorial ahi y si, sigue vivo pero con muy poca actividad.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DdmrDdmr",
+      "created_time": "October 23, 2023, 07:27:13 AM",
+      "body": "Quote from: albert0bsd on October 22, 2023, 03:29:55 PM<…>Aquí sé que nos vamos un tanto ya del tema, pero es curioso ver otro foro SMF anclado en el pasado en términos de actualizaciones (v. 1.1.21 por v 1.1.19 de Bitcointalk), donde se pueden ver aspectos estadísticos que están deshabilitados por aquí.Por cierto, que es frecuente que veamos los términos \"gpg\" y \"pgp\" (ambos figuran por ejemplo en las secciones de código en el OP). Pensaba que eran errores de memorización, pero no, ambos existen y se originan en diferentes implementaciones:https://www.goanywhere.com/blog/pgp-vs-gpg-whats-the-differencePor lo que entiendo, ambos son compatibles entre sí, aunque no sé si hay matices.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

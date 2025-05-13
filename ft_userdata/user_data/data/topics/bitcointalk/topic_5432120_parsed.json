@@ -1,0 +1,141 @@
+{
+  "id": "topic_5432120",
+  "title": "krashfire",
+  "author": "krashfire",
+  "created_time": "December 28, 2022, 09:02:36 AM",
+  "content": "Is it even possible to recreate the R, S , Z(H) signatures from the public keys?  Example: an attacker has the public keys of a wallet and he recreate/reverse the procedure to get a new RSZ signatures? Maybe my question is illogical to some. Bear with me please. I'm still learning.  Thank you.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432120",
+  "comments": [
+    {
+      "author": "PawGo",
+      "created_time": "December 28, 2022, 09:22:32 AM",
+      "body": "RSZ thing is related to the signed transaction, it has nothing to do with the public key itself.What do you mean by \"public keys of the wallet\"? Do you talk about public keys derived from the one master private key using one of derivation path?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "December 28, 2022, 09:25:31 AM",
+      "body": "Quote from: PawGo on December 28, 2022, 09:22:32 AMRSZ thing is related to the signed transaction, it has nothing to do with the public key itself.What do you mean by \"public keys of the wallet\"? Do you talk about public keys derived from the one master private key using one of derivation path?I mean the public keys that's shown together with the signed transactions ..like in blockchain.com  so it's not possible to recreate the RSZ just from knowing the public keys right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 28, 2022, 12:50:56 PM",
+      "body": "Quote from: krashfire on December 28, 2022, 09:02:36 AMExample: an attacker has the public keys of a wallet and he recreate/reverse the procedure to get a new RSZ signatures? Yes, you can recreate a valid RSZ trio for any public key very easily. In fact some people used this method to attempt scamming others into believing they were the \"real Satoshi Nakamoto\". Keep in mind that Z is the hash of the message not the message and ECC does not work like that, you have to have a message (in bitcoin it is the transactions) not the hash (Z) alone.And no you won't be able to spend anybody else's bitcoins this way",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "December 28, 2022, 04:15:56 PM",
+      "body": "Quote from: pooya87 on December 28, 2022, 12:50:56 PMQuote from: krashfire on December 28, 2022, 09:02:36 AMExample: an attacker has the public keys of a wallet and he recreate/reverse the procedure to get a new RSZ signatures? Yes, you can recreate a valid RSZ trio for any public key very easily. In fact some people used this method to attempt scamming others into believing they were the \"real Satoshi Nakamoto\". Keep in mind that Z is the hash of the message not the message and ECC does not work like that, you have to have a message (in bitcoin it is the transactions) not the hash (Z) alone.And no you won't be able to spend anybody else's bitcoins this way Do you have a python or sage code I can look at? I'm a security researcher and I really need to see whether I can recreate a valid (not signed) RSZ.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "December 28, 2022, 07:49:57 PM",
+      "body": "QuoteDo you have a python or sage code I can look at? I'm a security researcher and I really need to see whether I can recreate a valid (not signed) RSZ.It is better to understand the math behind that. Then, you will write that code easily by yourself, and you will go beyond that example.So, a signature is a relation between some public key, and another \"signature public key\". You start from private key \"d\" and \"signature private key\" called \"nonce\" and often named as \"k\". You start from \"s=(z+rd)/k\" relation, rewrite it, and then convert from private to public keys. Then, if you understand it after such conversion, you know everything you need.Code:s=(z+rd)/ksk=z+rdsk-z=rdrd=sk-zd=(sk-z)/rd=(s/r)k-(z/r)Q=d*GR=k*GQ=(s/r)R-(z/r)Then, when you know \"Q\" on the left side, you can put anything you want on the right side. Just pick two numbers: \"s/r\" and \"z/r\". Then, you will get your \"R\", and \"r=R.x\" from that, and then \"s=(s/r)*r\" and \"z=(z/r)*r\", then you will have a valid (r,s,z) tuple for that public key.Also, you can go beyond that example, and convert it in another direction. So, by choosing some message, you can hash it, then you will get some z. Then, you can pick some (r,s) pair, and generate a valid Q from your (r,s,z) tuple. Then, you will reach some public key, with a valid signature, where you don't know the private key. It is called \"public key recovery\", and it is why you can type some address, and some signature, and no public key is needed, because it can be calculated. For example:QuoteCode:message=\"Hello World\"address=\"1psPJZYEJrjPtY6kw5Tqtj4mW2yXSSDuH\"signature=\"GwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=\"Here, nobody knows the private key for 1psPJZYEJrjPtY6kw5Tqtj4mW2yXSSDuH, it is a \"trap address\", but this signature is valid.So, to sum up: If you understand \"Q=(s/r)R-(z/r)\", then you know, that you can choose some Q, and get some matching (r,s,z) tuple, or vice versa: you can choose some (r,s,z) tuple, and find some Q by using public key recovery. Understanding this equation is all you need to go in both directions, and build other fake signatures beyond that. Also, for now it is only a nice mathematical trick, you cannot move any real coins with those tricks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 29, 2022, 06:08:44 AM",
+      "body": "Quote from: krashfire on December 28, 2022, 04:15:56 PM~Do you have a python or sage code I can look at? I'm a security researcher and I really need to see whether I can recreate a valid (not signed) RSZ.Read this: https://bitcoin.stackexchange.com/questions/81115/if-someone-wanted-to-pretend-to-be-satoshi-by-posting-a-fake-signature-to-defrau/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "December 30, 2022, 12:36:47 AM",
+      "body": "Quote from: garlonicon on December 28, 2022, 07:49:57 PMQuoteDo you have a python or sage code I can look at? I'm a security researcher and I really need to see whether I can recreate a valid (not signed) RSZ.It is better to understand the math behind that. Then, you will write that code easily by yourself, and you will go beyond that example.So, a signature is a relation between some public key, and another \"signature public key\". You start from private key \"d\" and \"signature private key\" called \"nonce\" and often named as \"k\". You start from \"s=(z+rd)/k\" relation, rewrite it, and then convert from private to public keys. Then, if you understand it after such conversion, you know everything you need.Code:s=(z+rd)/ksk=z+rdsk-z=rdrd=sk-zd=(sk-z)/rd=(s/r)k-(z/r)Q=d*GR=k*GQ=(s/r)R-(z/r)Then, when you know \"Q\" on the left side, you can put anything you want on the right side. Just pick two numbers: \"s/r\" and \"z/r\". Then, you will get your \"R\", and \"r=R.x\" from that, and then \"s=(s/r)*r\" and \"z=(z/r)*r\", then you will have a valid (r,s,z) tuple for that public key.Also, you can go beyond that example, and convert it in another direction. So, by choosing some message, you can hash it, then you will get some z. Then, you can pick some (r,s) pair, and generate a valid Q from your (r,s,z) tuple. Then, you will reach some public key, with a valid signature, where you don't know the private key. It is called \"public key recovery\", and it is why you can type some address, and some signature, and no public key is needed, because it can be calculated. For example:QuoteCode:message=\"Hello World\"address=\"1psPJZYEJrjPtY6kw5Tqtj4mW2yXSSDuH\"signature=\"GwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=\"Here, nobody knows the private key for 1psPJZYEJrjPtY6kw5Tqtj4mW2yXSSDuH, it is a \"trap address\", but this signature is valid.So, to sum up: If you understand \"Q=(s/r)R-(z/r)\", then you know, that you can choose some Q, and get some matching (r,s,z) tuple, or vice versa: you can choose some (r,s,z) tuple, and find some Q by using public key recovery. Understanding this equation is all you need to go in both directions, and build other fake signatures beyond that. Also, for now it is only a nice mathematical trick, you cannot move any real coins with those tricks.ahhh...very clear. Thank You So much.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "December 30, 2022, 12:41:52 AMLast edit: January 05, 2023, 05:30:07 PM by achow101",
+      "body": "Quote from: pooya87 on December 29, 2022, 06:08:44 AMQuote from: krashfire on December 28, 2022, 04:15:56 PM~Do you have a python or sage code I can look at? I'm a security researcher and I really need to see whether I can recreate a valid (not signed) RSZ.Read this: https://bitcoin.stackexchange.com/questions/81115/if-someone-wanted-to-pretend-to-be-satoshi-by-posting-a-fake-signature-to-defrau/ yeah..they gave the codes there as well. thank you pooya. appreciate it.what is the G and P inputs? is P the public keys input?QuoteF = FiniteField (0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F)C = EllipticCurve ([F (0), F (7)])G = C.lift_x(0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798)N = FiniteField (C.order())P = P=-C.lift_x(0x11db93e1dcdb8a016b49840f8c53bc1eb68a382e97b1482ecad7b148a6909a5c) # block 9 coinbase payout key.def forge(c, a=-1):  # Create a forged 'ECDSA'  (hashless) signature  # set a to something other than -1 to be less obvious  a = N(a)  R = c*G + int(a)*P  s = N(int(R.xy()[0]))/a  m = N(c)*N(int(R.xy()[0]))/a  print( 'hash1 = %d'%m)  print( 'r1 = %d'%(int(R.xy()[0])))  print( 's1 = %d'%s)for c in range(1,10):  forge(c)Mod note: Consecutive posts merged",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 30, 2022, 03:43:15 AMLast edit: December 31, 2022, 04:30:00 AM by pooya87",
+      "body": "Quote from: krashfire on December 30, 2022, 12:59:57 AMwhat is the G and P inputs? is P the public keys input?F is the prime constant defined for secp256k1 curve that is used by Bitcoin. P in this code is the public key and G is the generator point used by this curve to generate all points (public keys) in the group, more specifically this is the x coordinate of the generator point.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 31, 2022, 04:31:00 AM",
+      "body": "Quote from: krashfire on December 30, 2022, 08:10:19 AMSo if i were to give my public key x coordinate input, i should only change the G? And leave the rest as is. Ok thank you so much pooya. Sorry I made a small mistake, P in this code is actually the public key and you should change that if you want to use another key. F is the curve's prime and G is as I said the generator point and is a constant that shouldn't be changed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "December 31, 2022, 04:35:06 AM",
+      "body": "Quote from: pooya87 on December 31, 2022, 04:31:00 AMQuote from: krashfire on December 30, 2022, 08:10:19 AMSo if i were to give my public key x coordinate input, i should only change the G? And leave the rest as is. Ok thank you so much pooya. Sorry I made a small mistake, P in this code is actually the public key and you should change that if you want to use another key. F is the curve's prime and G is as I said the generator point and is a constant that shouldn't be changed. ok got it pooya. thank you so much.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 05, 2023, 05:15:21 AM",
+      "body": "i often read keyhunters are interested in public keys because it can speed up cracking process - true?let us look at puzzle-115:Quotepubkey: 0248d313b0398d4923cdca73b8cfa6532b91b96703902fc8b32fd438a3b7cd7f55address: 1NLbHuJebVwUZ1XqDjsAyfTRUPwDQbemfvif the attacker does not know the range of private key how realistic is it that he can crack the key?if the attacker does know the range of private key how long does take him to crack the key?what is most efficient cracking tool when you have pubkey - kangaroo or bsgs?let us say an attacker knows address public key plus a valid signaturedoes he have better chance now to crack the key?why all people try to hide public key although it should be public in this system to function?please explain",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 05, 2023, 09:55:28 AM",
+      "body": "Quote from: yoshimitsu777 on January 05, 2023, 05:15:21 AMif the attacker does not know the range of private key how realistic is it that he can crack the key?They can't. The best attack against a known public key with no further information requires in the order of 2128 operations, which is impossible.Quote from: yoshimitsu777 on January 05, 2023, 05:15:21 AMif the attacker does know the range of private key how long does take him to crack the key?Depends on how narrow a range they need to search.Quote from: yoshimitsu777 on January 05, 2023, 05:15:21 AMlet us say an attacker knows address public key plus a valid signaturedoes he have better chance now to crack the key?No, as long as that signature hasn't reused a known k value or some similar vulnerability. Indeed, the very basis of elliptic curve multiplication is that even if you know the public key and multiple signatures, then the private key still cannot be cracked. If it could, then there are multiple very rich addresses which have hundreds of thousands known valid signatures which would have been cracked long ago: https://mempool.space/address/bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3hQuote from: yoshimitsu777 on January 05, 2023, 05:15:21 AMwhy all people try to hide public key although it should be public in this system to function?Not revealing your public key provides theoretical security against quantum attacks which do not yet exist.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "January 05, 2023, 07:42:07 PM",
+      "body": "Quote from: yoshimitsu777 on January 05, 2023, 05:15:21 AMi often read keyhunters are interested in public keys because it can speed up cracking process - true?let us look at puzzle-115:Quotepubkey: 0248d313b0398d4923cdca73b8cfa6532b91b96703902fc8b32fd438a3b7cd7f55address: 1NLbHuJebVwUZ1XqDjsAyfTRUPwDQbemfvif the attacker does not know the range of private key how realistic is it that he can crack the key?if the attacker does know the range of private key how long does take him to crack the key?what is most efficient cracking tool when you have pubkey - kangaroo or bsgs?let us say an attacker knows address public key plus a valid signaturedoes he have better chance now to crack the key?why all people try to hide public key although it should be public in this system to function?please explain 1) yes. very much. 2) i dont need to know the range of the private key. mathematicians, programmers, they think that way. its important to them. for security researchers like myself, we tend to think differently. the range is not important but its how we can emulate the correct RSZ and K nonce to the public key is more important.. by knowing K, we alrdy are one step away from revealing the private key. 3) range not important to us. good,nice info but we usually shelve it. coz we know we just need to know the K value used. 4) the best tool i use so far and extremely efficient is the lattice attack script written by Antoine. You can download it at https://github.com/bitlogik/lattice-attack5) as i found out, nope. u need a little more than that. you got to get to K nonce. Then things are much easier.6) i am actually trying to prove to my government on why every bitcoin transaction or any other altcoin transaction should not display the public keys and rsz signatures. if we really want bitcoin or any other altcoins to continue to prosper or at least be relevant for another 8 decades, at least, we then need to give out less informations on every transaction. how can we claim, its anonymous or safe when all i need is for you to make 1 transaction and i know your pubkeys and RSZ? im beginning to understand the mathematics deeper..and as i delve further.. i seriously cannot fathom why showing the public keys are ok to most. as thats my first way in to a wallet. im answering you as a Cyber Security Researcher for 18 years. im trained to think and do my work like how a professional hacker would think and do their research. 11 months on ECDSA though. and this has been one of the best research i had done. my new found respect to Mathematicians. i actually enjoyed doing this research so much.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 05, 2023, 09:36:39 PM",
+      "body": "Quote from: krashfire on January 05, 2023, 07:42:07 PMthe range is not important but its how we can emulate the correct RSZ and K nonce to the public key is more important.. by knowing K, we alrdy are one step away from revealing the private key. If you have r, s, z and somehow know k, then you can work out the private key. You're one equation away in fact, not just one step.Quote from: krashfire on January 05, 2023, 07:42:07 PMi am actually trying to prove to my government on why every bitcoin transaction or any other altcoin transaction should not display the public keys and rsz signatures. Quote from: krashfire on January 05, 2023, 07:42:07 PMwe then need to give out less informations on every transaction. how can we claim, its anonymous or safe when all i need is for you to make 1 transaction and i know your pubkeys and RSZ?Lots of questions here.First of all why would you want to prove anything related to the underlying cryptography of bitcoin to your government? What's the problem with revealing r, s, z if you just keep k secret? Verifying the signature of a message requires the message (whose hash is z), the public key and the signature (which is [r, s]). Secondly, what relation does anonymity have with r, s, z? Each time you sign a message, k is generated pseudo-randomly, and so is r. Anonymity doesn't have to do with these values, but with inputs and outputs of Bitcoin transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lida93",
+      "created_time": "January 07, 2023, 01:33:27 PM",
+      "body": "Quote from: garlonicon on December 28, 2022, 07:49:57 PMQuoteDo you have a python or sage code I can look at? I'm a security researcher and I really need to see whether I can recreate a valid (not signed) RSZ.It is better to understand the math behind that. Then, you will write that code easily by yourself, and you will go beyond that example.So, a signature is a relation between some public key, and another \"signature public key\". You start from private key \"d\" and \"signature private key\" called \"nonce\" and often named as \"k\". You start from \"s=(z+rd)/k\" relation, rewrite it, and then convert from private to public keys. Then, if you understand it after such conversion, you know everything you need.Code:s=(z+rd)/ksk=z+rdsk-z=rdrd=sk-zd=(sk-z)/rd=(s/r)k-(z/r)Q=d*GR=k*GQ=(s/r)R-(z/r)Then, when you know \"Q\" on the left side, you can put anything you want on the right side. Just pick two numbers: \"s/r\" and \"z/r\". Then, you will get your \"R\", and \"r=R.x\" from that, and then \"s=(s/r)*r\" and \"z=(z/r)*r\", then you will have a valid (r,s,z) tuple for that public key.Also, you can go beyond that example, and convert it in another direction. So, by choosing some message, you can hash it, then you will get some z. Then, you can pick some (r,s) pair, and generate a valid Q from your (r,s,z) tuple. Then, you will reach some public key, with a valid signature, where you don't know the private key. It is called \"public key recovery\", and it is why you can type some address, and some signature, and no public key is needed, because it can be calculated. For example:QuoteCode:message=\"Hello World\"address=\"1psPJZYEJrjPtY6kw5Tqtj4mW2yXSSDuH\"signature=\"GwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=\"Here, nobody knows the private key for 1psPJZYEJrjPtY6kw5Tqtj4mW2yXSSDuH, it is a \"trap address\", but this signature is valid.So, to sum up: If you understand \"Q=(s/r)R-(z/r)\", then you know, that you can choose some Q, and get some matching (r,s,z) tuple, or vice versa: you can choose some (r,s,z) tuple, and find some Q by using public key recovery. Understanding this equation is all you need to go in both directions, and build other fake signatures beyond that. Also, for now it is only a nice mathematical trick, you cannot move any real coins with those tricks.@galonicon I was beginning to get tensed while reading your comment not until I got to the end of it \"that it's only a nice mathematical trick which can not move real coins\" lol  . I'll in my quiet time carefully practicalize this equation to see how veritable it is based on how you have just explained.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

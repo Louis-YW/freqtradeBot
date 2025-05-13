@@ -1,0 +1,157 @@
+{
+  "id": "topic_5470872",
+  "title": "LFC_Bitcoin",
+  "author": "LFC_Bitcoin",
+  "created_time": "October 19, 2023, 07:04:03 AM",
+  "content": "I upgraded my Bitcoin Core wallet from 0.18.0 to 25.0I am now fully synced but noticed I have 10 outgoing connections to the network. I’ve been running Bitcoin Core for nearly 10 years. I’ve previously only been able to get 8. Is this normal, 8 are Full Relay & 2 are Block Relay.I don’t run as a Full Node so 0 incoming connections, which I am content with.I’ve just never seen 10 outgoing connections previously.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5470872",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "October 19, 2023, 08:00:29 AM",
+      "body": "I've had 10 connections for as long as I can remember, so I guess it's normal",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Findingnemo",
+      "created_time": "October 19, 2023, 08:05:01 AM",
+      "body": "Quote from: LFC_Bitcoin on October 19, 2023, 07:04:03 AMIs this normal, 8 are Full Relay & 2 are Block Relay.Yes, it is the default outbound peers (8 full-relay connections and 2 block-relay-only ones)GitHub: https://github.com/bitcoin/bitcoin/blob/master/doc/reduce-traffic.mdTo decrease the numbers use Disable \"listening\" (-listen=0)10 outgoing connection doesn't cause for concern, as far as I know, it just ensures established connectivity to the bitcoin network and efficient data propagation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "October 19, 2023, 08:12:44 AM",
+      "body": "This is probably because the limit of outgoing connections was changed from 8 to 10 with version 22.0.0.You have the maximum number of connections for both, which means: the maximum number of full-relay connections is still 8, while block-relay connections are limited to 2 additional connections.This pull request describes it relatively well: https://github.com/bitcoin/bitcoin/pull/19315Because it obviously couldn't be implemented in 18.0.0, your connections were limited to 8 back then.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 19, 2023, 09:40:36 AM",
+      "body": "Quote from: LFC_Bitcoin on October 19, 2023, 07:04:03 AMI upgraded my Bitcoin Core wallet from 0.18.0 to 25.0-snip-I’ve previously only been able to get 8. Is this normal, 8 are Full Relay & 2 are Block Relay.Here's \"net.h\" in v0.18.0: https://github.com/bitcoin/bitcoin/blob/2472733a24a9364e4c6233ccd04166a26a68cc65/src/net.h#L58-L59It has this MAX_OUTBOUND_CONNECTIONS = 8; which is where the 8 maximum connections that you're getting in your non-listening node.And here's \"net.h\" in v25.0: https://github.com/bitcoin/bitcoin/blob/7da4ae1f78ab4f6c8b19c8ca89bd6b2a6c4836ea/src/net.h#L67-L72It now includes MAX_BLOCK_RELAY_ONLY_CONNECTIONS = 2; which raised your automatic outbound connections to 10.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 19, 2023, 10:28:21 AM",
+      "body": "Quote from: nc50lc on October 19, 2023, 09:40:36 AMQuote from: LFC_Bitcoin on October 19, 2023, 07:04:03 AMI upgraded my Bitcoin Core wallet from 0.18.0 to 25.0-snip-I’ve previously only been able to get 8. Is this normal, 8 are Full Relay & 2 are Block Relay.Here's \"net.h\" in v0.18.0: https://github.com/bitcoin/bitcoin/blob/2472733a24a9364e4c6233ccd04166a26a68cc65/src/net.h#L58-L59It has this MAX_OUTBOUND_CONNECTIONS = 8; which is where the 8 maximum connections that you're getting in your non-listening node.And here's \"net.h\" in v25.0: https://github.com/bitcoin/bitcoin/blob/7da4ae1f78ab4f6c8b19c8ca89bd6b2a6c4836ea/src/net.h#L67-L72It now includes MAX_BLOCK_RELAY_ONLY_CONNECTIONS = 2; which raised your automatic outbound connections to 10.Wouldn't it be possible to manually increase the MAX_OUTBOUND_CONNECTIONS and MAX_BLOCK_RELAY_ONLY_CONNECTIONS constants to larger values and not have the Bitcoin Core client spontaneously error out on initialization?It seems that having 10 outbound connections is a bit low to my liking compared to the 12x larger value for maximum incoming connections. So what gives?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 19, 2023, 11:30:57 AM",
+      "body": "Quote from: NotATether on October 19, 2023, 10:28:21 AM--snip--It seems that having 10 outbound connections is a bit low to my liking compared to the 12x larger value for maximum incoming connections. So what gives?That might be bad idea. With number of node which accept incoming connection which is quite less than number of all nodes (based on Luke's data), that would exhaust total incoming connection of node which accept incoming connection.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LFC_Bitcoin",
+      "created_time": "October 19, 2023, 11:50:44 AM",
+      "body": "I’ve made two transactions on 25.0 since upgrading (both receiving bitcoin - create new receiving addresses).Took 10 minutes or so each time for the funds to arrive in Bitcoin Core.I didn’t see pending balances, just straight to confirmed, very odd, not had that before.Funds were sent from blockchain.com (old test wallet). Bitcoin Core is fully synced so it’s not that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "October 19, 2023, 12:09:50 PM",
+      "body": "Quote from: LFC_Bitcoin on October 19, 2023, 11:50:44 AMI’ve made two transactions on 25.0 since upgrading (both receiving bitcoin - create new receiving addresses).Took 10 minutes or so each time for the funds to arrive in Bitcoin Core.I didn’t see pending balances, just straight to confirmed, very odd, not had that before.Funds were sent from blockchain.com (old test wallet). Bitcoin Core is fully synced so it’s not that.Hm, not really sure since they are showing up once they are confirmed. Did you rescan the blockchain data after ur old wallet was restored to the newest version? This often helps when the balance isnt updating correctly or is showing a different value. To do so: Close Bitcoin Core, open ur bitcoin.conf and add this line:Code:rescan=1then restart it.As I said, I dont know if it fixes this 'problem' but atleast its worth a try.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 19, 2023, 01:34:04 PM",
+      "body": "Quote from: Findingnemo on October 19, 2023, 08:05:01 AMTo decrease the numbers use Disable \"listening\" (-listen=0)Disabling listening only disables inbound connections (of which you can have up to 115 if you run default settings). It makes no difference to your 10 outbound connections.Quote from: LFC_Bitcoin on October 19, 2023, 11:50:44 AMI didn’t see pending balances, just straight to confirmed, very odd, not had that before.A bit strange, but this suggests that your node never received the unconfirmed transaction as part of its mempool, and only learned about the transaction when it was confirmed in a block. Given this, is it perhaps a problem with either your mempool settings or your mempool synchronization? Are you running any non-default mempool settings in your bitcoin.conf file? Try running getmempoolinfo and see if it shows anything abnormal.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LFC_Bitcoin",
+      "created_time": "October 19, 2023, 03:00:52 PMLast edit: October 19, 2023, 03:24:22 PM by LFC_Bitcoin",
+      "body": "Quote from: o_e_l_e_o on October 19, 2023, 01:34:04 PMA bit strange, but this suggests that your node never received the unconfirmed transaction as part of its mempool, and only learned about the transaction when it was confirmed in a block. Given this, is it perhaps a problem with either your mempool settings or your mempool synchronization?  Try running getmempoolinfo and see if it shows anything abnormal.Without doxing myself too muchQuote \"loaded\": false,{other seemingly normal stuff}Quote \"maxmempool\": 300000000,\"mempoolminfee\": 0.00001000,\"minrelaytxfee\": 0.00001000,\"incrementalrelayfee\": 0.00001000,\"unbroadcastcount\": 0,fullrbf: falseQuote from: o_e_l_e_o on October 19, 2023, 01:34:04 PMGiven this, is it perhaps a problem with either your mempool settings or your mempool synchronization? Are you running any non-default mempool settings in your bitcoin.conf file? I don’t believe so. It does keep stating Not Responding every now and again so maybe it’s non resonsive in the background at times and when it unglitches the transaction is noted. Just seems it’s a little coincidental after the 1st confirmation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 19, 2023, 03:32:57 PM",
+      "body": "Quote from: LFC_Bitcoin on October 19, 2023, 03:00:52 PM\"loaded\": false,So, your mempool is not fully loaded for some reason, which would explain why your node didn't see the unconfirmed transactions. When you use getmempoolinfo, do you have any transactions at all in your mempool (\"size\")? Are you running in blocks only mode (-blocksonly) by any chance?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LFC_Bitcoin",
+      "created_time": "October 19, 2023, 03:41:31 PMLast edit: October 19, 2023, 03:59:37 PM by LFC_Bitcoin",
+      "body": "Quote from: o_e_l_e_o on October 19, 2023, 03:32:57 PMSo, your mempool is not fully loaded for some reason, which would explain why your node didn't see the unconfirmed transactions. When you use getmempoolinfo, do you have any transactions at all in your mempool (\"size\")? Are you running in blocks only mode (-blocksonly) by any chance? OK, \"size\" 5101How do I know if I’m in -blocksonly & what would I do about that.If it’s similar to pruned mode then no, it’s a standard download.Sorry!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Findingnemo",
+      "created_time": "October 19, 2023, 04:25:04 PM",
+      "body": "Quote from: LFC_Bitcoin on October 19, 2023, 03:41:31 PMOK, \"size\" 5101How do I know if I’m in -blocksonly & what would I do about that.If it’s similar to pruned mode then no, it’s a standard download.Sorry!AFAIK, with \"size\" your mempool is aware of the unconfirmed transactions and it should relay the transactions to the network.'-blocksonly' is not a default option so unless you opted for it then I don't think that is not causing the issue.Off topic- ver 25.1 Releasedavailable: https://bitcoincore.org/bin/bitcoin-core-25.1/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LFC_Bitcoin",
+      "created_time": "October 19, 2023, 04:47:32 PM",
+      "body": "OK now it says “loaded” true",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 19, 2023, 05:03:48 PM",
+      "body": "Yeah, so it seems like it has finished loading your saved mempool from disk. I'm not 100% sure on the behavior of Core, but I would guess your mempool wouldn't update with new transactions while it was still loading from disk, which is why you didn't see your previous transactions until they confirmed. No idea why it took so long to finish loading in your case, though.If you run getmempoolinfo again, has the size of your mempool increased (and continues to increase between blocks)? That would be a good indication you are syncing unconfirmed transactions properly again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LFC_Bitcoin",
+      "created_time": "October 19, 2023, 05:08:51 PMLast edit: October 19, 2023, 05:19:43 PM by LFC_Bitcoin",
+      "body": "Quote from: o_e_l_e_o on October 19, 2023, 05:03:48 PMYeah, so it seems like it has finished loading your saved mempool from disk. I'm not 100% sure on the behavior of Core, but I would guess your mempool wouldn't update with new transactions while it was still loading from disk, which is why you didn't see your previous transactions until they confirmed. No idea why it took so long to finish loading in your case, though.If you run getmempoolinfo again, has the size of your mempool increased (and continues to increase between blocks)? That would be a good indication you are syncing unconfirmed transactions properly again.Hey buddy, it has increased yes, to over 15000 now.Edit - And now over 17000.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 19, 2023, 05:54:34 PM",
+      "body": "Seems like that was probably the issue then. Keep an eye the next time you make a transaction and check that it behaves as expected!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LFC_Bitcoin",
+      "created_time": "October 19, 2023, 06:00:44 PM",
+      "body": "Quote from: o_e_l_e_o on October 19, 2023, 05:54:34 PMSeems like that was probably the issue then. Keep an eye the next time you make a transaction and check that it behaves as expected!Thank you to yourself and everybody else who contributed to help me. This forum is invaluable, I’ve always said it.Going to lock the thread now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "id": "topic_5471518",
+  "title": "shelby0930",
+  "author": "shelby0930",
+  "created_time": "October 24, 2023, 08:41:29 PM",
+  "content": "i want to develop a way to measure distance between 2 public keys what i mean by distance  is the time it takes to reach from point B to point A lets say the private key of A is 50 and B is 100 lets assume that it takes about 2 minuets to go from B to A using point negation.. how do i get the estimate time it takes to go from B to A ?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471518",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "October 24, 2023, 09:14:59 PM",
+      "body": "What do you mean by \"point negation\"?And what is your purpose? \"time\" between points is an irrelevant metric and a bad proxy for the distance between two points. And if you're trying to see how far two arbitrary points are from each other, time is irrelevant because even if you had billions of the fastest computers on Earth that could go stepwise from A to B, it would still use more time than the lifetime of the universe to go between two arbitrary points in secp256k1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 24, 2023, 10:23:35 PM",
+      "body": "Here, repeat this script with the same points several times and compare each time result.Code:import timeimport gmpy2# Define function to convert SEC-encoded public key to coordinatesdef sec_to_public_pair(sec):    if sec[0] != 2 and sec[0] != 3:        raise ValueError(\"Invalid SEC format\")    x = gmpy2.mpz(int.from_bytes(sec[1:], 'big'))    y_squared = x**3 + 7    y = gmpy2.mpz(gmpy2.sqrt(y_squared))    if sec[0] == 3 and y % 2 == 0 or sec[0] == 2 and y % 2 == 1:        y = -y    return (x, y)# Public keys in hexadecimal formathex_pubkey1 = \"02b23790a42be63e1b251ad6c94fdef07271ec0aada31db6c3e8bd32043f8be384\"hex_pubkey2 = \"034a4a6dc97ac7c8b8ad795dbebcb9dcff7290b68a5ef74e56ab5edde01bced775\"# Convert public keys to coordinatespoint1 = sec_to_public_pair(bytes.fromhex(hex_pubkey1))point2 = sec_to_public_pair(bytes.fromhex(hex_pubkey2))# Measure execution timestart_time = time.time()# Compare the x-coordinates of the pointsif point1[0] == point2[0]:    print(\"The public keys are the same.\")else:    print(\"The public keys are different.\")end_time = time.time()execution_time = end_time - start_timeprint(f\"Execution time: {execution_time} seconds\")Calculating public keys take around the same amount of time, uncompressed public keys take double the time of compressed keys.As I told you before, the distance between 50 and 100 would take e.g, 25 seconds if your key rate is 2 keys/s.10keys/s = estimated time 5 seconds.50keys/s = around 1 second etc.Public key generation difficulty is not based on the distance between 2 points, because 1 point addition will always take the same time doesn't matter if you are adding 2+1 or 5000+2^250, it's not like a point representing a 256 bit key weighs more computationally and a point representing 1 bit key weighs less, no they all are the same computationally.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "October 24, 2023, 11:40:11 PM",
+      "body": "Quote from: shelby0930 on October 24, 2023, 08:41:29 PMi want to develop a way to measure distance between 2 public keysThere is no way to know the distance between 2 publickey that would break ECDSAQuote from: shelby0930 on October 24, 2023, 08:41:29 PMwhat i mean by distance  is the time it takes to reach from point B to point AWhat? that doesn't have sense, what you mean by time? running time of a program? or what? Number of steps?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hexan123",
+      "created_time": "October 25, 2023, 04:57:16 AM",
+      "body": "Quote from: digaran on October 24, 2023, 10:23:35 PMHere, repeat this script with the same points several times and compare each time result.# Public keys in hexadecimal formathex_pubkey1 = \"02b23790a42be63e1b251ad6c94fdef07271ec0aada31db6c3e8bd32043f8be384\"hex_pubkey2 = \"034a4a6dc97ac7c8b8ad795dbebcb9dcff7290b68a5ef74e56ab5edde01bced775\"privkey1 = 2^255privkey2 = 2^15easy i have table of 2^*  key",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 25, 2023, 05:17:28 PM",
+      "body": "Quote from: hexan123 on October 25, 2023, 04:57:16 AMQuote from: digaran on October 24, 2023, 10:23:35 PMHere, repeat this script with the same points several times and compare each time result.# Public keys in hexadecimal formathex_pubkey1 = \"02b23790a42be63e1b251ad6c94fdef07271ec0aada31db6c3e8bd32043f8be384\"hex_pubkey2 = \"034a4a6dc97ac7c8b8ad795dbebcb9dcff7290b68a5ef74e56ab5edde01bced775\"privkey1 = 2^255privkey2 = 2^15easy i have table of 2^*  key I hope you realize the script I posted is based on a script either posted by OP or someone else with the same question, the script doesn't do anything other than checking if the 2 keys are the same or not and just gives you the time it took to compare, as pointed out several times, knowing the time it takes to go from A to B, is easy, you just need to count each step, like 1=A, 50=B, then you count by 2, 3, 4 until you get to 50, the time depends on how fast you can count.Btw, how did you generate your table? I want to do that with different powers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "October 25, 2023, 07:51:28 PM",
+      "body": "QuoteBtw, how did you generate your table? I want to do that with different powers.You can try using different power than \"2\" in Sage:Code:p = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141K = GF(p)a = K(0x0000000000000000000000000000000000000000000000000000000000000000)b = K(0x0000000000000000000000000000000000000000000000000000000000000007)E = EllipticCurve(K, (a, b))G = E(0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798, 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8)E.set_order(n * 0x1)index = 0while(index<256):    private_key = 2^index % n    public_key = private_key * G    print(hex(index),hex(private_key),hex(public_key[0]),hex(public_key[1]))    index += 1Also note that you don't have to end with 2^255, you can go on ad infinitum, and after a lot of operations you will reach the base point again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

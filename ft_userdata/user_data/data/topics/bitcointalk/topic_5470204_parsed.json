@@ -1,0 +1,141 @@
+{
+  "id": "topic_5470204",
+  "title": "internetional",
+  "author": "internetional",
+  "created_time": "October 13, 2023, 12:40:07 PMLast edit: October 13, 2023, 04:02:53 PM by internetional",
+  "content": "10101 is an onchain and LN wallet which provides its users with a platform for trading inverse BTC/USD futures without requiring a custodial deposit. To participate in trading, users need to open a payment channel to the 10101’s LN node and fund the channel with an amount of sats needed to collateralize their open positions.When a position is opened, sats are locked in the channel until the position is closed. This locking mechanism applies to both the buyer and the seller of the futures contract. The allocation of locked sats upon closing the position depends on the difference between the opening and closing prices, with price data sourced from the BitMEX exchange through the Olivia oracle (https://github.com/LLFourn/olivia).Futures contracts on 10101 expire weekly (on Sunday at 15:00 UTC), but they can be extended indefinitely, effectively turning into perpetual swaps. Users can even use a short position as a form of synthetic stablecoin. If you open a short position with x1 leverage, the USD value of your assets remains constant regardless of any fluctuations of BTC/USD rate.The name of the 10101’s stablecoin is PEGZ, you can read more about it here: https://bolt.fun/story/pegz-how-far-have-we-got-1-lightning-stablecoin--1102 The platform acts as the counterparty for all trades. Users do not have direct DLCs with other users but instead have these contracts with 10101 itself, with the platform matching the trades in the background. This means that when Alice buys a futures contract and Bob sells it, Alice technically buys it from 10101, which, in turn, buys it from Bob. When Alice wants to sell, and there's a buy order from someone like Carol on the platform, Alice will sell to 10101, and 10101 will sell to Carol.This setup allows users to trade futures contracts in a manner similar to traditional exchanges, where the platform acts as an intermediary, ensuring that closing the position is possible even if you're not directly matched with the counterparty you opened the position with.The project is currently in a closed beta stage, you can request access via its website https://10101.financeLet me share my experience.1. Upon the first launch of the application, it requires entering an email address. I installed the application on two devices, using the same email address. However, the two wallets created in different instances of the application are not linked. They have different seed phrases, and depositing into one does not reflect in the other. Consequently, it's possible to create multiple 'accounts' with the same email address. It seems a little bit weird.2. A seed phrase is provided, but it works not the way I expected. The wallet has a 'Backup' button (which displays the seed phrase), but there is no 'Restore' button. The seed phrase can be used in other wallet software, albeit in a somewhat convoluted way. The reason is the use of non-standard derivation paths. So initially, one must convert the seed phrase into a different format using a specific utility (https://github.com/get10101/bip39-to-bip32). Afterward, access can be restored via another wallet (the support team suggests using Sparrow Wallet, which understands the required format).However, this method only recovers on-chain funds. Anything stored in the Lightning channel remains inaccessible. To make those funds accessible, one would have to request the support team to forcibly close the channel (with a substantial fee), allowing the funds to become available through another wallet software.The process of regaining access like this implies that calling 10101 entirely non-custodial isn't accurate. If one lose their phone with the app, their funds, particularly those in the channel, are unrecoverable without 10101's intervention.Additionally, the app lacks any features for managing channels. There's no channel backup option, and initiating force-close isn't available. There's only a cooperative closure option. Even in a scenario like the one described above or any other situation requiring 10101's initiative for channel closure, 10101 could broadcast an outdated channel state (e.g., one where no profit was made or even a loss occurred), and users wouldn't have any way to contest this. In the worst case, during a force-close, users could receive the minimal amount they ever had in their account history. If a force-close request is denied, they might not receive anything at all (though 10101 also wouldn't receive their funds left in the channel).3. To start trading, users may open one of three types of Lightning channels.- When opening a Small channel, you can deposit from 60K to 200K, and 10101 will add 100K from its side.- When opening a Medium channel, you can deposit from 385K to 1.5M, and 10101 will add 750K.- When opening a Large channel, you can deposit from 760K to 3M, and 10101 will add 1.5M. Opening fee is 1% of the deposited funds, min 10K sats.In other words, for a fee of 10K to 30K, one can obtain a channel with a capacity of up to 4.5M and incoming liquidity of up to 1.5M. Not bad.4. There is a limit on the maximum open position size. For Small channels, it is calculated as follows:min(100K*2; IL*2),where IL is the incoming liquidity in the channel at the current moment.For Medium channels, you should substitute 100K in the formula with 750K, and for Large channels, use 1.5M.It’s never explained in any docs. Only support team can explain it by request.5. Entering the size of the order is not the most convenient process. Users either need to input the position size in dollars or the margin size in sats, considering the chosen leverage. Please note that the calculations of the maximum position size provide the size in sats, while the app calculates the volume in dollars. I have found a trick to simplify the calculations for dollar size. For instance, if one wishes to open a long position for 10,000 sats, they can choose x1 leverage, input 10,000 in the Margin field, and the Quantity field will automatically display the required position size in dollars. Adjusting the leverage then only changes the margin size, keeping the position size in dollars constant. 6. On the trading platform, only market orders are available, and there is no order book. It appears that 10101 operates as a broker for some exchange, likely akin to BitMEX, as it appears to open a position on the exchange whenever users open a position on the app. Their revenue model seems to involve capturing the difference in fees. BitMEX charges a 0.0075% fee, while 10101 charges 0.3% for each trade. 7. It’s only allowed to have one open position at a time. If you need to change the position size, you'll have to close it completely and open a new position with the desired volume. This is both inconvenient and costly in terms of fees.However, everything is evolving. The project is currently in a closed beta phase, and using it makes sense primarily for testing purposes. Although, it's indeed unusual to conduct testing on the mainnet rather than a testnet.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5470204",
+  "comments": [
+    {
+      "author": "Kruw",
+      "created_time": "October 13, 2023, 03:22:28 PM",
+      "body": "Thank you for the review, I've been following this project since it was named \"Itchysats\", I'm excited to see it come to fruition.  The email address thing seems weird, are they aware of that issue?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "October 13, 2023, 04:36:08 PM",
+      "body": "It's too bad that backing up the wallet is such a tedious process, and that they didn't create a normal backup feature at least for the on-chain funds that haven't gone towards the funding of lightning channels. I don't know how recovering funds that are stuck in an LN channel works in other wallets, so I can't comment on this process of theirs, but something tells me it doesn't need the assistance from the wallet's development team.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "October 14, 2023, 07:56:54 AM",
+      "body": "Quote from: Kruw on October 13, 2023, 03:22:28 PMThe email address thing seems weird, are they aware of that issue?No, I haven’t reported it yet. There are some more important bugs, so let them fix urgent things first.One more problem I faced yesterday was a notification about futures prolongation. 48 hours before the expiration (on Friday, at 15:00 UTC), I received such a notification (something like “Rollover window for your position is open”). I tapped it, to check the conditions of the prolongation, but right after my tap, the position was prolonged without confirmation from my side. Now I don’t see any charges for the rollover in my wallet. So, if the rollover is free of charge, there is no problem for users with such prolongation. But it would be strange, because most of exchanges have a rollover fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "October 15, 2023, 08:03:31 AM",
+      "body": "I sent a link to this thread to 10101, and received their response:By the way, I contact them via - Nostr (npub1c40rwav67rtl4pmy56wa8vhh8cynlm0zvhr96mcnd5xat74ldxmsm8ttqy),- Twitter (https://twitter.com/get10101),- Telegram (https://t.me/get10101).They answer most promptly via Telegram.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 25, 2023, 07:17:19 AM",
+      "body": "I liked how they welcomed us all with a \"Hello Satoshi\" prompt. They say this:QuoteWe are currently starting with iOS testing.We are planning to expand our beta for Android, Web, Desktop users soon and we will keep you updated.So I guess we can't give it a try if we don't have an iOS device, correct?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "October 25, 2023, 09:29:55 AM",
+      "body": "Quote from: apogio on October 25, 2023, 07:17:19 AMSo I guess we can't give it a try if we don't have an iOS device, correct?I use 10101 on both Android and iOS devices. But I started a couple of weeks ago. They may have no slots for Android beta testers right now. By the way, yesterday I failed to close my long position. I contacted the devs. They found a bug. And they told me they can close my position from their side if I wish.I was surprised that they are able to close our positions unilaterally. It means that everyone who uses 10101’s “synthetic dollar” has to trust to its “issuer”, because 10101 can close at any time the short position by which the synthetic dollars are backed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 26, 2023, 01:52:28 PM",
+      "body": "Quote from: internetional on October 25, 2023, 09:29:55 AMBy the way, yesterday I failed to close my long position. I contacted the devs. They found a bug. And they told me they can close my position from their side if I wish.I was surprised that they are able to close our positions unilaterally. It means that everyone who uses 10101’s “synthetic dollar” has to trust to its “issuer”, because 10101 can close at any time the short position by which the synthetic dollars are backed. Sounds concerning, but it is  the same case with every trading platform. I believe the \"self-sovereign\" title only refers to the fact that you control your bitcoin keys and buy straight into your own wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "October 27, 2023, 09:36:18 AM",
+      "body": "Quote from: internetional on October 25, 2023, 09:29:55 AMQuote from: apogio on October 25, 2023, 07:17:19 AMSo I guess we can't give it a try if we don't have an iOS device, correct?I use 10101 on both Android and iOS devices. But I started a couple of weeks ago. They may have no slots for Android beta testers right now. I guess, everyone who want can try now. 10101 announced a new build 1.4.3 in their X (Twitter) channel, and the last words of the announcement are ‘Wanna try our CLOSED BETA app? Just say “Let me try” in the comments!’ https://x.com/get10101/status/1717818643428303336But be careful. There are bugs in the app yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "November 22, 2023, 05:55:04 PM",
+      "body": "Six days ago, the devs announced two innovations:- position size adjustment,- wallet recovery (including payment channel and open positions).Today, the update has finally appeared in the app stores (strangely, simultaneously in both the App Store and Google Play). I couldn't find the promised wallet recovery feature in it, but the ability to adjust position sizes is now available. Additionally, it's stated that this is a PUBLIC BETA. So, anyone interested can download the 10101 app and try trading futures in a non-custodial mode.But I have two warnings.1. The app still has many bugs. New bugs are discovered almost every day. The developers are doing a great job fixing everything quickly. Nevertheless, I recommend using 10101 only for testing purposes of their unique service.2. Note that, in terms of trading, this is not a DEX. Currently, 10101 is just a step towards a DEX. In all your transactions, the 10101 team will be the second party. All your payment channels will be open to their nodes. If their nodes go offline for any reason, you may lose all the bitcoins stored in your 10101 wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "December 25, 2023, 08:02:40 PM",
+      "body": "A number of users report they channels with 10101 have been force-closed. My channel has also been force-closed, with a trading position in it. In 10101’s telegram chat, the devs expressed their view of this issue:Quote from: https://t.me/get10101/1/3254force closing a channel will certainly always be possible as nobody has to trust the counterparty to collaborate. However collaboratively closing (if possible) is always preferable over force closing.This needs to be taken into account by everyone who uses 10101’s synthetic dollar. As I have already mentioned,Quote from: internetional on October 25, 2023, 09:29:55 AMeveryone who uses 10101’s “synthetic dollar” has to trust to its “issuer”, because 10101 can close at any time the short position by which the synthetic dollars are backed. Good news is that the DLC remains active until the expiration of the futures, so users have enough time to prepare re-opening their positions on another platform, or via another copy of 10101 wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "January 05, 2024, 01:16:53 PM",
+      "body": "10101 does not onboard new users at the moment. Existing users may not open new channels. It’s because of some bugs found in the platform. The devs promise to fix them as soon as possible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "January 28, 2024, 07:44:36 AM",
+      "body": "Since the version 1.8.3, 10101 is not an LN-wallet anymore. Now it’s an onchain wallet which allows non-custodial futures trading based on DLC.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "September 10, 2024, 06:54:51 AMLast edit: September 10, 2024, 01:27:32 PM by internetional",
+      "body": "The 10101 wallet will stop functioning on November 3, 2024:https://10101.finance/blog/10101-is-shutting-down/The developers are lamenting that non-custodial trading turned out to be unappealing to users, as they prefer traditional custodial services.I find this hard to believe. Anyone who has been trading seriously and for a long time knows the dangers of custodial platforms:- hacking and theft of client funds (MtGox),- seizure of assets by authorities (BTC-E, WEX, Bitzlato),- fraud by exchange management (FTX),- loss of exchange's keys to wallets holding client assets (QuadrigaCX),- inability to withdraw funds if a manager who holds keys is arrested (OKX),- funds being blocked by exchanges under the pretext of anti-money laundering (pretty much every exchange does this).Given these conditions, how can traders prefer custodial solutions when non-custodial options are available?I have two theories:1. Either there are very few serious, independent traders in the market, and the majority are just playing around with small amounts they don’t mind losing, thus neglecting the risks I mentioned.2. Or 10101 failed to offer a complete solution for non-custodial trading. When the maximum profit one can make is capped at 6 million satoshis and there's only one trading instrument — a weekly inverse futures contract — that’s unlikely to meet the needs of serious traders.Is there anyone here on the forum who saw this thread and was aware of the ability to trade futures non-custodially, but still preferred to trade on traditional exchanges? If so, why?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "September 10, 2024, 12:32:31 PM",
+      "body": "Quote from: internetional on September 10, 2024, 06:54:51 AMThe 10101 wallet will stop functioning on November 3, 2024:https://10101.finance/blog/10101-is-shutting-down/The developers are lamenting that non-custodial trading turned out to be unappealing to users, as they prefer traditional custodial services.I find this hard to believe. Anyone who has been trading seriously and for a long time knows the dangers of custodial platforms:- hacking and theft of client funds (MtGox),- seizure of assets by authorities (BTC-E, WEX, Bitzlato),- fraud by exchange management (FTX),- loss of exchange keys to wallets holding client assets (QuadrigaCX),- inability to withdraw funds if a manager who holds keys is arrested (OKX),- funds being blocked by exchanges under the pretext of anti-money laundering (pretty much every exchange does this).Given these conditions, how can traders prefer custodial solutions when non-custodial options are available? Most traders don't think of those dangers that you listed until they face them personally. To them, it happens far away, to some other people. They are happy to give up custody of their coins in exchange for ease of use, lower trading fees, and a faster trading experience. Security is neglected when you are given a chance to perform a trade within seconds and after two clicks of a button rather than depositing, waiting for confirmations, and finally moving the coins back into your custody.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "October 12, 2024, 09:53:16 PMLast edit: October 12, 2024, 10:45:08 PM by Saint-loup",
+      "body": "Quote from: internetional on September 10, 2024, 06:54:51 AMThe 10101 wallet will stop functioning on November 3, 2024:https://10101.finance/blog/10101-is-shutting-down/The developers are lamenting that non-custodial trading turned out to be unappealing to users, as they prefer traditional custodial services.I find this hard to believe. Anyone who has been trading seriously and for a long time knows the dangers of custodial platforms:- hacking and theft of client funds (MtGox),- seizure of assets by authorities (BTC-E, WEX, Bitzlato),- fraud by exchange management (FTX),- loss of exchange's keys to wallets holding client assets (QuadrigaCX),- inability to withdraw funds if a manager who holds keys is arrested (OKX),- funds being blocked by exchanges under the pretext of anti-money laundering (pretty much every exchange does this).Given these conditions, how can traders prefer custodial solutions when non-custodial options are available?I have two theories:1. Either there are very few serious, independent traders in the market, and the majority are just playing around with small amounts they don’t mind losing, thus neglecting the risks I mentioned.2. Or 10101 failed to offer a complete solution for non-custodial trading. When the maximum profit one can make is capped at 6 million satoshis and there's only one trading instrument — a weekly inverse futures contract — that’s unlikely to meet the needs of serious traders.Is there anyone here on the forum who saw this thread and was aware of the ability to trade futures non-custodially, but still preferred to trade on traditional exchanges? If so, why?I agree it's very sad actually. Non-custodial and fully decentralized services don't seem to attract many crypto users for now it seems. It's the same thing for casinos and sportsbooks, the ones trying to offer a fully decentralized and non custodial experience to the players, in order to avoid all the common scams and risks you've listed, thanks to Web3 technology or to other ways, don't get many players while confiscation of funds is an even more common practice among casinos than exchanges.Quote from: Pmalek on September 10, 2024, 12:32:31 PMSecurity is neglected when you are given a chance to perform a trade within seconds and after two clicks of a button rather than depositing, waiting for confirmations, and finally moving the coins back into your custody.Lightning Network and Layer2 technologies over other blockchains have been specifically created to enable such operations to be performed in just a few seconds, without waiting minutes long confirmations, precisely. I hope they will be adopted by users in the coming years at least.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "internetional",
+      "created_time": "November 09, 2024, 06:24:46 AM",
+      "body": "Quote from: Saint-loup on October 12, 2024, 09:53:16 PMNon-custodial and fully decentralized services don't seem to attract many crypto users for now it seems. The drawback of the 10101 platform was that they never released a fully decentralized and non-custodial solution.All transactions on the platform were conducted through a single coordinator. This isn’t decentralization.Additionally, it was impossible to unilaterally withdraw funds from a DLC channel. That’s not self-custody.I personally tried 10101 when it first launched. Decentralization isn’t as crucial for me, but having full access to my funds is. When I realized that I couldn’t withdraw my money without the 10101 team’s involvement, I decided to wait until they introduced this feature. Until then, there was no point for me in paying higher trading fees. In terms of user experience, BitMEX provides the same thing, only cheaper.In my view, the mistake 10101 made was releasing a public version of their product that didn’t include the most important promised features, expecting it would attract their target audience. But what could possibly attract users? Promises?I’m sure there’s a target audience for solutions like this. Many people are disillusioned with traditional futures trading platforms and would prefer a non-custodial solution. But it’s unreasonable to expect that this audience will use the platform and pay a premium until the platform includes the features they value.They should have first built a fully non-custodial platform and then assessed whether people would use it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

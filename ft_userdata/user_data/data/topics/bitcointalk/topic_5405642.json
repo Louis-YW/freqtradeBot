@@ -1,0 +1,93 @@
+{
+  "id": "topic_5405642",
+  "title": "btc_enigma",
+  "author": "btc_enigma",
+  "created_time": "July 08, 2022, 07:03:16 PM",
+  "content": "AboutOpen Source Wallet as a Service that provides easy to use REST API endpoints for sending/receiving bitcoinHow is this differentSupports automatic batching to minimize fee- Very useful when sending funds out in time of high network congestionGets up running instantly - No need to wait for days to sync blocks Is lightweight and can run on simple 5$ VPS - Unlike bitcoin core and similar disk / memory heavy daemons Github Sourcehttps://github.com/blockonomics/wallet_serviceFeel free to get back with suggestions or comments",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5405642",
+  "comments": [
+    {
+      "author": "ABCbits",
+      "created_time": "July 09, 2022, 12:05:14 PM",
+      "body": "Few thought and question,1. I see few API has wallet_password parameter and i couldn't find anything about HTTPS/secure connection. Is it right to assume developer must setup HTTPS by themselves (e.g. by using reverse proxy)?2. Does the software open/load all wallets all the time?3. Mentioning exact/tested version of Python library used would be great. Who knows if the library suddenly change their API.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "July 09, 2022, 07:07:29 PM",
+      "body": "Quote from: btc_enigma on July 08, 2022, 07:03:16 PMFeel free to get back with suggestions or commentsAre there any fees for this wallet service or is it completely free?It's not clear to me if I can use this wallet standalone or I need to use Blockonomics merchant page.I saw on Blockonomics website there is 1%, with first 20 payments being free, but I am not sure if that is for complete package or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btc_enigma",
+      "created_time": "July 09, 2022, 07:15:39 PMLast edit: July 22, 2022, 09:00:21 AM by mprep",
+      "body": "Quote from: ETFbitcoin on July 09, 2022, 12:05:14 PMFew thought and question,1. I see few API has wallet_password parameter and i couldn't find anything about HTTPS/secure connection. Is it right to assume developer must setup HTTPS by themselves (e.g. by using reverse proxy)?2. Does the software open/load all wallets all the time?3. Mentioning exact/tested version of Python library used would be great. Who knows if the library suddenly change their API.1. Yes the developer must use HTTPS by themselves. You can also use reverse proxy or just bind the service only to localhost so that only your webapp can access it2. The wallet is loaded only when API command is executed.3. It needs python3. As mentioned it internally uses Electrum-4.2.1 library so all dependencies of electrum apply. Thanks for the suggestion, we will mention that as well Quote from: dkbit98 on July 09, 2022, 07:07:29 PMQuote from: btc_enigma on July 08, 2022, 07:03:16 PMFeel free to get back with suggestions or commentsAre there any fees for this wallet service or is it completely free?It's not clear to me if I can use this wallet standalone or I need to use Blockonomics merchant page.I saw on Blockonomics website there is 1%, with first 20 payments being free, but I am not sure if that is for complete package or not.It is open source and completely free and you are in custody of the private keys. To clarify architecture, it is just a webapp service layer on top of electrum wallet. So you don't need to depend on anything else other than electrum. Note that electrum internally uses SPV servers to get blockchain dataBlockonomics can be optionally used to receive bitcoin to the same wallet (as blockonomics uses  wallet xpub to help you accept BTC). This is just for convenience and will give you more merchant analytics and web UI (for which you have to pay the 1% fee). But this not at all necessary.  This service itself  is completely independent. There is no link / call to blockonomics servers anywhere in the source code   [moderator's note: consecutive posts merged]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btc_enigma",
+      "created_time": "July 09, 2022, 07:58:26 PM",
+      "body": "Also added https://github.com/blockonomics/wallet_service#architecture-and-magic-sauce to make things more clear",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "amesia",
+      "created_time": "July 13, 2022, 10:53:29 AM",
+      "body": "Nice work, I modified the source code a bit for my needs.Could you implement a fee system?For example: User A wan'ts to make a TX to user B,the admin (user C) get's 5% of the sendet amount.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btc_enigma",
+      "created_time": "July 13, 2022, 01:14:55 PM",
+      "body": "Quote from: ETFbitcoin on July 10, 2022, 09:20:18 AMQuote from: btc_enigma on July 09, 2022, 07:15:39 PMQuote from: ETFbitcoin on July 09, 2022, 12:05:14 PM3. Mentioning exact/tested version of Python library used would be great. Who knows if the library suddenly change their API.3. It needs python3. As mentioned it internally uses Electrum-4.2.1 library so all dependencies of electrum apply. Thanks for the suggestion, we will mention that as well I can see it needs Python 3.8 and Electrum 4.2.1 from installation guide. But to be specific, i mean dependency of Wallet Service. For example,Code:pip install sqlalchemy==1.4.39 requests==2.28.1 ...Yes its inside the Installation sectionQuotepip install sqlalchemy requests sanic cryptocode",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btc_enigma",
+      "created_time": "July 13, 2022, 01:21:17 PM",
+      "body": "Quote from: amesia on July 13, 2022, 10:53:29 AMNice work, I modified the source code a bit for my needs.Could you implement a fee system?For example: User A wan'ts to make a TX to user B,the admin (user C) get's 5% of the sendet amount.Yes Fee system would be quite easy to implement. Feel free to create a pull request with configuration or create an Issue on the github repo. I am interested to know what is the use case of actually sending fee to admin user in each transaction vs just cutting  5% off the send amounts. Admin user can withdraw anytime as anyway he is having complete access to wallet. Note that if you create extra send output for each payment you are increasing the tx size which would result in higher tx fee as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "amesia",
+      "created_time": "July 14, 2022, 09:58:35 AMLast edit: July 14, 2022, 10:17:44 AM by amesia",
+      "body": "Quote from: btc_enigma on July 13, 2022, 01:21:17 PMI am interested to know what is the use case of actually sending fee to admin user in each transaction vs just cutting  5% off the send amounts. Admin user can withdraw anytime as anyway he is having complete access to wallet. Note that if you create extra send output for each payment you are increasing the tx size which would result in higher tx fee as well. Some services like a Bitcoin exchanges, mixers or marketplaces or shops could use this feature.If the A wan'ts to pay B 0.01 BTC, A needs to add 0.001 (for a fee) to the sendet amount.But is the fee just is 5%, the admin would make more income (bigger bitcoin amount = more fees income for the admin)and the A don't need to pay more than he has.Btw, could you add multisignature address support, so the admin can't access the funds.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 18, 2022, 08:36:27 PM",
+      "body": "Quote from: btc_enigma on July 08, 2022, 07:03:16 PMFeel free to get back with suggestions or commentsI'm a little bit confused about the name and scope of the project.Is it an SPV Bitcoin wallet that runs as a daemon and is interfaced through an HTTP API? (And has the extra feature of batched transactions)Is the API supposed to be user-facing or is it supposed to be used by yourself / an application you are developing (such as exchange, online casino, etc.)?Because 'as a service' usually suggests that it's hosted by one entity and accessible by many others (who are then using this service). These can in turn be developers as well, or end users.But if you host it for yourself / for your application or whatever, it doesn't really fit the classical SaaS definition.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btc_enigma",
+      "created_time": "July 28, 2022, 05:21:30 AM",
+      "body": "Quote from: n0nce on July 18, 2022, 08:36:27 PMQuote from: btc_enigma on July 08, 2022, 07:03:16 PMFeel free to get back with suggestions or commentsI'm a little bit confused about the name and scope of the project.Is it an SPV Bitcoin wallet that runs as a daemon and is interfaced through an HTTP API? (And has the extra feature of batched transactions)Is the API supposed to be user-facing or is it supposed to be used by yourself / an application you are developing (such as exchange, online casino, etc.)?Because 'as a service' usually suggests that it's hosted by one entity and accessible by many others (who are then using this service). These can in turn be developers as well, or end users.But if you host it for yourself / for your application or whatever, it doesn't really fit the classical SaaS definition.Yes it may not fit the classical Saas defintion. However, there is a big push towards self hosted services that provide API access. This is for independence and security reasons. Bitcoin Wallet services, there are similar other projects, feel free to have a look athttps://www.reddit.com/r/Bitcoin/comments/v7z40w/bitcoin_wallet_as_a_service_an_open_source_list/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

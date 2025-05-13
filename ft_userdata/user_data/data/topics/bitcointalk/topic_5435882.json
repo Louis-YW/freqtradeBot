@@ -1,0 +1,141 @@
+{
+  "id": "topic_5435882",
+  "title": "witcher_sense",
+  "author": "witcher_sense",
+  "created_time": "January 18, 2023, 11:12:58 AM",
+  "content": "Is there some tool (preferably an online web resource) that allows for the signing/verification of messages? I need it only for testing and educational purposes, which means I am only interested in reliability (it should yield a correct signature given a message and private key), not security (no concerns about potential private key leaks). All solutions that I found on the Internet offer only verification. Additionally, could someone point me to a source that would explain thoroughly and clearly the differences between the signing/verification of messages and the signing/verification of bitcoin transactions?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5435882",
+  "comments": [
+    {
+      "author": "Minase",
+      "created_time": "January 18, 2023, 11:48:20 AM",
+      "body": "you can use this tool, it's open sourcehttps://rawcdn.githack.com/nlitsme/bitcoinexplainer/aa50e86e8c72c04a7986f5f7c43bc2f98df94107/ecdsacrack.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "January 18, 2023, 02:32:24 PM",
+      "body": "Quote from: witcher_sense on January 18, 2023, 11:12:58 AMIs there some tool (preferably an online web resource) that allows for the signing/verification of messages? You can use Electrum wallet to sign and verify message, in same way like may members did it in forum to prove ownership of their addresses, but it can be used for anything.Something similar is available with hardware wallet Trezor with using of their app Trezor Suite, and that works with even with bc1 address type, unlike with Electrum.I think I saw few websites who are offering this online, but I much more prefer using open source software that can be downloaded and verified.Quote from: witcher_sense on January 18, 2023, 11:12:58 AMAdditionally, could someone point me to a source that would explain thoroughly and clearly the differences between the signing/verification of messages and the signing/verification of bitcoin transactions?You can't sign or verify bitcoin transactions, since they are confirmed by nodes, so it's impossible to compare that with signing/verification of messages.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HmmMAA",
+      "created_time": "January 18, 2023, 02:39:38 PM",
+      "body": "For verification , there are services like https://www.verifybitcoinmessage.com/ . For signing , I would suggest downloading a wallet and performing the signing from there , as the signing process requires the private key of your address ( it's not the best idea to share it with anyone , especially by adding it to a website ) . If you are familiar with Github, an alternative is https://github.com/anders94/public-private-key-demo.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "January 18, 2023, 02:47:50 PM",
+      "body": "Quote from: witcher_sense on January 18, 2023, 11:12:58 AMIs there some tool (preferably an online web resource) that allows for the signing/verification of messages? I need it only for testing and educational purposes,Since it's not done with sensitive data, you can really just google it and see what comes out.I don't know how good it is, but I've found now https://reinproject.org/bitcoin-signature-tool which, in theory, can sign, verify and also has git source too.Quote from: dkbit98 on January 18, 2023, 02:32:24 PMYou can't sign or verify bitcoin transactions, since they are confirmed by nodes, so it's impossible to compare that with signing/verification of messages.Well, when you send a transaction, you sign it first, don't you? While the wallet hides these operations from you it doesn't mean they are not done at your side.Plus, I am 99% sure it's the same process of signing and verifying in both cases.The process is described here too, but I didn't read it closely yet (I'm still scared of that elliptic curve).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 18, 2023, 03:43:24 PM",
+      "body": "Quote from: Minase on January 18, 2023, 11:48:20 AMyou can use this tool, it's open sourcehttps://rawcdn.githack.com/nlitsme/bitcoinexplainer/aa50e86e8c72c04a7986f5f7c43bc2f98df94107/ecdsacrack.htmlThank you for the link, but this tool too low-level, and I already implemented the logic that produces r and s values for a signature from private key and message hash. I followed this guide and it works as expected: https://learnmeabitcoin.com/technical/ecdsa#sign Now I want to go further to make my program to generate messages like that (it's from Mycellium wallet):Code:-----BEGIN BITCOIN SIGNED MESSAGE-----Messages-----BEGIN BITCOIN SIGNATURE-----Version: Bitcoin-qt (1.0)Address: 1CwyZx1qsVmyCMZuJ8dsauJ2jGzQuioSCqHzltDw7ksvwyDeInbgT8/sqUO8JYO+8jobvonXCIHUBOYtMxkyLaQrTTIOJbOoidoquVD6+21NQwA0MZiqvuw5U=-----END BITCOIN SIGNATURE-----Actually, I already found how to implement this logic as well, all steps are described here: https://en.bitcoin.it/wiki/Message_signing#Displaying_signed_messagesBut I need a tool that will allow me to create these signatures on the fly with arbitary private keys, which I hope will help me to implement this functionality. Naturally, some wallets like Electrum and Mycellium can both sign and verify messages, but not with arbitrary keys.Quote from: dkbit98 on January 18, 2023, 02:32:24 PMYou can't sign or verify bitcoin transactionsWhy not? If I can construct my transaction manually on a machine not connected to the Internet, I can also hash transaction data and put it in a 'sign' function to produce a correct signature to make nodes believe that I am actual owner of a private key. I just don't know how to do all that.Quote from: NeuroticFish on January 18, 2023, 02:47:50 PMSince it's not done with sensitive data, you can really just google it and see what comes out.I don't know how good it is, but I've found now https://reinproject.org/bitcoin-signature-tool which, in theory, can sign, verify and also has git source too.Unfortunately, it supports only Legacy addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 18, 2023, 04:21:44 PM",
+      "body": "Not sure if it would work for you but with bitcoin itself you can use RPC calls to sign and verify messages.You can import a private key with the don't rescan the blockchain option and then sign with it.That or I am totally missing the point of what you are looking for. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 19, 2023, 05:01:09 PM",
+      "body": "Quote from: DaveF on January 18, 2023, 04:21:44 PMNot sure if it would work for you but with bitcoin itself you can use RPC calls to sign and verify messages.You can import a private key with the don't rescan the blockchain option and then sign with it.That or I am totally missing the point of what you are looking for. -DaveIt's too heavy. Ideally, a signing/verification tool should support almost all existing address types such as Legacy (P2PKH), nested Segwit (P2WPKH-P2SH), native Segwit (P2WPKH) and offer some unusual functionality such as an additional field to specify nonce (K) to reproduce a signature for a given private key. I have spent the last 24 hours searching for the right algorithm and I finally managed to make a 'minimum viable product'. Surprisingly, the hardest part was to figure out how to prepare a message to calculate correct hash for base64 encoding.Here is demonstration:Code:>>> message = 'Hello World'>>> address = my_wallet.native_segwit_address>>> my_wallet.bitcoin_message(address, message)-----BEGIN BITCOIN SIGNED MESSAGE-----Hello World-----BEGIN BITCOIN SIGNATURE-----bc1q0xgv8nk93rxvkwttx5c69k3fyf9w48pckac5ldJ2P0cOVIEn+5tPIU8RC9vMXLTW2dLD1fW7ZK6egzhLwjBUIm1vIxBw0Hs4ezONbnUKliun5Ye2wFtLhTHOQg7bA=-----END BITCOIN SIGNATURE----->>> sig = 'J2P0cOVIEn+5tPIU8RC9vMXLTW2dLD1fW7ZK6egzhLwjBUIm1vIxBw0Hs4ezONbnUKliun5Ye2wFtLhTHOQg7bA='>>> my_wallet.verify_message(address, message, sig)True>>> Thank you guys for your valuable support!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 19, 2023, 05:30:50 PM",
+      "body": "Quote from: witcher_sense on January 19, 2023, 05:01:09 PM...I have spent the last 24 hours searching for the right algorithm and I finally managed to make a 'minimum viable product'. Surprisingly, the hardest part was to figure out how to prepare a message to calculate correct hash for base64 encoding....Cool. Are you going to open source it or keep it closed? I'm not one of those people who are going to scream at you that it should be free and open and out there since you made it, you can do what you want with it.Also is there place online we can check it out?-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 19, 2023, 06:01:53 PM",
+      "body": "Quote from: witcher_sense on January 18, 2023, 11:12:58 AMIs there some tool (preferably an online web resource) that allows for the signing/verification of messages?Brainwalletx does allow you to sign messages, given a private key in WIF. Note that it doesn't follow the RFC6979. You can quickly verify that by signing the same message twice (it gives different signature). It doesn't support SegWit, so I'd question the verification part for SegWit addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 20, 2023, 07:14:49 AM",
+      "body": "Quote from: DaveF on January 19, 2023, 05:30:50 PMCool. Are you going to open source it or keep it closed? I'm not one of those people who are going to scream at you that it should be free and open and out there since you made it, you can do what you want with it.Also is there place online we can check it out?-DaveIt's open-source. You can find all relevant information (excluding most recent commits) on my GitHub page: https://github.com/shadowy-pycoder/piewallet The reason I didn't mention it explicitly is that it is still a work in progress, and I am still unsure what functionality I need in my \"application.\" But contributions and suggestions are welcome.Quote from: BlackHatCoiner on January 19, 2023, 06:01:53 PMBrainwalletx does allow you to sign messages, given a private key in WIF. Note that it doesn't follow the RFC6979. You can quickly verify that by signing the same message twice (it gives different signature). It doesn't support SegWit, so I'd question the verification part for SegWit addresses. Honestly, this is the first time I hear about the RFC6979 standard and deterministic signatures, but in the course of my research, I've encountered both types of signing tools: those that produce the same signatures for the same addresses and messages and those that give you random signatures. My first thought was that the former tools somehow cache the information and reproduce it when I put in the same combinations. As I said, I am not familiar with deterministic signatures, but I think the only way you can reproduce a signature is by memorizing a k-value used to calculate r and s values. At first glance, it looks like a security vulnerability rather than a useful feature, but it depends on how strong this caching algorithm is.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 20, 2023, 09:05:50 AM",
+      "body": "Quote from: witcher_sense on January 20, 2023, 07:14:49 AMthose that produce the same signatures for the same addresses and messages and those that give you random signatures.There are two kind of algorithms. Those that follow the standard (and give you the same [r,s] for the same H and d), and those that generate a new random k value each time you generate a signature. So you probably have encountered both. Quote from: witcher_sense on January 20, 2023, 07:14:49 AMMy first thought was that the former tools somehow cache the information and reproduce it when I put in the same combinations.No, it doesn't. You can verify by signing the same message, using the same private key in two different devices. The signature will be the same. Electrum does follow that standard, so you can verify there. Quote from: witcher_sense on January 20, 2023, 07:14:49 AMAs I said, I am not familiar with deterministic signatures, but I think the only way you can reproduce a signature is by memorizing a k-value used to calculate r and s values. At first glance, it looks like a security vulnerability rather than a useful featureIt isn't vulnerable, because k value is determined by both H and d, which are what makes a signature unique. You can't sign from elsewhere, or sign a different message with the same private key, and get the same k value. It's useful feature, because you don't have to use an RNG for generating k values each time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "January 21, 2023, 07:44:38 PM",
+      "body": "Quote from: NeuroticFish on January 18, 2023, 02:47:50 PMWell, when you send a transaction, you sign it first, don't you? While the wallet hides these operations from you it doesn't mean they are not done at your side.You don't have to pay and transaction fees to send and verify message using any Bitcoin wallet, unlike regular transactions that obviously needs fees to be paid.Quote from: witcher_sense on January 18, 2023, 03:43:24 PMWhy not? If I can construct my transaction manually on a machine not connected to the Internet, I can also hash transaction data and put it in a 'sign' function to produce a correct signature to make nodes believe that I am actual owner of a private key. I just don't know how to do all that.I don't understand what you are saying and what you want to do?You can already send a message with Bitcoin transaction, but I don't understand why you would pay fees for that.There are bunch of hidden messages posted in bitcoin blockchain for years.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "January 22, 2023, 11:26:52 AM",
+      "body": "Quote from: dkbit98 on January 21, 2023, 07:44:38 PMQuote from: NeuroticFish on January 18, 2023, 02:47:50 PMWell, when you send a transaction, you sign it first, don't you? While the wallet hides these operations from you it doesn't mean they are not done at your side.You don't have to pay and transaction fees to send and verify message using any Bitcoin wallet, unlike regular transactions that obviously needs fees to be paid.Sorry, I don't understand what does the fee has to do with signing. Yes, in case of transactions the signing is part of a more complicated process; that doesn't stop it from being the same procedure.I will also add that you can sign a transaction and never broadcast it, hence you don't pay anything. But this is imho off-topic.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 22, 2023, 12:54:50 PM",
+      "body": "Quote from: witcher_sense on January 18, 2023, 11:12:58 AMAdditionally, could someone point me to a source that would explain thoroughly and clearly the differences between the signing/verification of messages and the signing/verification of bitcoin transactions?The actual process for signing is the same. The differences come in constructing the message hash and formatting the signature. A rough summary is given below.When you are signing a message rather than a transaction, your client will first prefix the message with the following prior to double hashing it for signing (https://github.com/bitcoin/bitcoin/blob/master/src/util/message.cpp#L25):Code:\\x18Bitcoin Signed Message:\\n\"\\x18\" is the length of that prefix string, and \"\\n\" signals a new line. The message itself is also prefixed with the length of that message.How the signature is displayed is also different. The signature for a signed message is 65 bytes. This is made up of a header byte, which contains information regarding the y coordinate and the r value, followed by the 32 byte r value then the 32 byte s value. The signature of a transaction, however, will be somewhere around 72 bytes, and will start with a string such as 0x4730440220 (which includes instructions needed for the software to correctly interpret the signature), have an additional 0x0220 string (or similar) before the s value, and will end with a byte signalling the sighash, usually a 0x01 byte for SIGHASH_ALL.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 23, 2023, 07:45:36 AMLast edit: January 23, 2023, 09:41:41 AM by witcher_sense",
+      "body": "Quote from: o_e_l_e_o on January 22, 2023, 12:54:50 PMCode:\\x18Bitcoin Signed Message:\\n\"\\x18\" is the length of that prefix string, and \"\\n\" signals a new line. The message itself is also prefixed with the length of that message.That's the trickiest part in my opinion. If the length of the message is below 253 (0xFD) characters, you just take a byte representation of message length and prepend it to message. But if a message is too lengthy (more than 1 byte), my script fails to verify the signature. I tried to use encoding format described here: https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer but it still doesnt work.Here is the code snippet, could someone tell what is wrong?Code:def varint(length: int):    # https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer    if length < 0xFD:        return length.to_bytes(1, 'little')    elif length <= 0xFFFF:        return b'\\0xFD' + length.to_bytes(2, 'little')    elif length <= 0xFFFFFFFF:        return b'\\0xFE' + length.to_bytes(4, 'little')    elif length <= 0xFFFFFFFFFFFFFFFF:        return b'\\0xFF' + length.to_bytes(8, 'little')    else:        raise MessageError(f'Message is too lengthy: {length}')def msg_magic(message: str) -> bytes:    return b'\\x18Bitcoin Signed Message:\\n' + varint(len(message)) + message.encode('utf-8')Edit:Spotted a bug: it should be b'\\xFD' instead of b'\\0xFD'Anyway, it seems that Mycellium wallet and https://www.verifybitcoinmessage.com/ use different algorithms for verification of segwit signatures.Mycellium adds the same headers for Legacy and SegWit addresses, which I guess is not a right thing? It simply doesn't recognize signatures  with 39-42 headers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 26, 2023, 10:06:14 AM",
+      "body": "Quote from: BlackHatCoiner on January 20, 2023, 09:05:50 AMQuote from: witcher_sense on January 20, 2023, 07:14:49 AMthose that produce the same signatures for the same addresses and messages and those that give you random signatures.There are two kind of algorithms. Those that follow the standard (and give you the same [r,s] for the same H and d), and those that generate a new random k value each time you generate a signature. So you probably have encountered both. The idea of implementing deterministic nonce-generation for ECDSA seemed very appealing to me, and here is my first take on the realization of the RFC6979 standard defined in the original paper:Code:import hmacfrom hashlib import sha256def bits_to_int(b: bytes, qlen: int):    # https://www.rfc-editor.org/rfc/rfc6979 section 2.3.2.    blen = len(b) * 8    b_int = int.from_bytes(b, 'big')    if blen > qlen:        b_int = b_int >> blen - qlen    return b_intdef int_to_oct(x: int, rolen: int) -> bytes:    # https://www.rfc-editor.org/rfc/rfc6979 section 2.3.3.    xolen = x.bit_length() >> 3    x_hex = f'{x:x}'    if xolen < rolen:        x_hex = f'{x:0>{rolen*2}x}'    elif xolen > rolen:        x_hex = x_hex[(xolen - rolen)*2:]    return bytes.fromhex(x_hex)def bits_to_oct(b: bytes, q: int, qlen: int, rolen: int) -> bytes:    # https://www.rfc-editor.org/rfc/rfc6979 section 2.3.4.    z1 = bits_to_int(b, qlen)    z2 = z1 - q    if z2 < 0:        z2 = z1    return int_to_oct(z2, rolen)# H(m) - hash of the messagedef rfc_sign(x: int, m: int, q: int):    qlen = q.bit_length()    qolen = qlen >> 3    rolen = qlen + 7 >> 3    h1 = m.to_bytes(32, 'big')    V = b'\\x01' * 32    K = b'\\x00' * 32    m1 = b'\\x00' + int_to_oct(x, rolen) + bits_to_oct(h1, q, qlen, rolen)    m2 = b'\\x01' + int_to_oct(x, rolen) + bits_to_oct(h1, q, qlen, rolen)    K = hmac.new(K, digestmod=sha256)    K.update(V + m1)    K = K.digest()    V = hmac.new(K, V, digestmod=sha256).digest()    K = hmac.new(K, digestmod=sha256)    K.update(V + m2)    K = K.digest()    V = hmac.new(K, V, digestmod=sha256).digest()    while True:        T = b''        while len(T) < qolen:            V = hmac.new(K, V, digestmod=sha256).digest()            T = T + V        k = bits_to_int(T, qlen)        if 0 < k < q:            return k        K = hmac.new(K, digestmod=sha256)        K.update(V + b'\\x00')        K = K.digest()        V = hmac.new(K, V, digestmod=sha256).digest()if __name__ == '__main__':    h1 = int(sha256(b'sample').hexdigest(), 16)    q = 0x4000000000000000000020108A2E0CC0D99F8A5EF    x = 0x09A4D6792295A7F730FC3F2B49CBC0F62E862272F    qlen = q.bit_length()    rolen = (qlen + 7) >> 3    rlen = rolen * 8    print(hex(rfc_sign(x, h1, q)))Source: https://github.com/shadowy-pycoder/piewallet/blob/master/src/piewallet/rfc6979.pyConsole session:Code:Python 3.10.6 (main, Nov 14 2022, 16:10:14) [GCC 11.3.0] on linuxType \"help\", \"copyright\", \"credits\" or \"license\" for more information.>>> from piewallet import PieWallet>>> my_wallet = PieWallet()>>> address = my_wallet.address>>> message = 'hello'>>> privkey = my_wallet.private_key>>> # non-deterministic signing>>> my_wallet.sign_message(address, message)'H7eHPZ0VELgy0uDdpT+QO5KZdGWmXskaQ5imO4Ur6oUoAyQYADCIEet59UoNUVnkBploYtBYoCzZiIeW2qf6zzk='>>> # one more time to show it produces a different signature>>> my_wallet.sign_message(address, message)'H6bcqqu2NV4IYfazxFs9MGRLu0NZZ0SKwTQrgxFFgknVIs0fTXiVJptnAndR5YNgaasO9Dt/jBCcduvv24dhCPU='>>> # deterministic signing>>> my_wallet.sign_message(address, message, deterministic=True)'IFAlCd4P86pKHtKdhyWGyOAi9oGx2fi4FEUK3IwgvtEgElZbE7IvdnpnrDRQ7tMAHzKCw2Lr24QflcUOYGA4dn0='>>> # one more time to show it produces the same signature>>> my_wallet.sign_message(address, message, deterministic=True)'IFAlCd4P86pKHtKdhyWGyOAi9oGx2fi4FEUK3IwgvtEgElZbE7IvdnpnrDRQ7tMAHzKCw2Lr24QflcUOYGA4dn0='Please note that this implementation is very basic and doesn't include any additional variants mentioned in section 3.6, but at least this allows testing the algorithm against the test vectors listed in the paper. It is also probably vulnerable to side-channel attacks because we use the same private key several times upon public key generation, and hackers have more time to analyze the information. The paper suggests taking additional \"defensive measures to avoid leaking the private key through a side channel.\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

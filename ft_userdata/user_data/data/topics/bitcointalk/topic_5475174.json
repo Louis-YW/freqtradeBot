@@ -1,0 +1,53 @@
+{
+  "id": "topic_5475174",
+  "title": "ABCbits",
+  "author": "ABCbits",
+  "created_time": "November 23, 2023, 10:07:40 AM",
+  "content": "Does anyone know existence of https://opcodeexplained.com/? I discovered this website from Bitcoin Ops mailing and i found this website is rather helpful. It has more info compared with other website such as  https://en.bitcoin.it/wiki/Script and https://developer.bitcoin.org/reference/transactions.html. It also mention Opcodes which disabled on Bitcoin network such as OP_CAT.P.S. I am NOT owner of this website.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5475174",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "November 24, 2023, 04:10:55 AM",
+      "body": "It is an interesting site but there are some weirdness in it too.For example they are categorizing/naming 0xbb to 0xfe as OP_RETURN_XXX which is a bit misleading. These are undefined OP codes meaning the interpreter fails if it reaches any of these bytes when reading/interpreting/executing the script stream. Even though in action this is performing the same task as OP_RETURN but it is not the same. Being \"undefined\" means they can be defined at some point. For example in witness version 1 when the interpreter reaches these OP codes it returns as a successful interpretation (since it reached OP_SUCCESS) not the way it treats OP_RETURN (0x6a) which is failing right away even in witness version 1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 24, 2023, 05:20:03 AM",
+      "body": "I also want to point out that it appears that the dictionary of opcodes is unfinished, although it is a pretty comprehensive list regardless. For example if you go to the pages for OP_EQUAL, OP_EQUALVERIFY, and even common stuff like OP_HASH160, they list those pages as under construction.We should probably help out and fill in the remaining ones.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "November 24, 2023, 10:32:51 AM",
+      "body": "Quote from: pooya87 on November 24, 2023, 04:10:55 AMIt is an interesting site but there are some weirdness in it too.For example they are categorizing/naming 0xbb to 0xfe as OP_RETURN_XXX which is a bit misleading. These are undefined OP codes meaning the interpreter fails if it reaches any of these bytes when reading/interpreting/executing the script stream. Even though in action this is performing the same task as OP_RETURN but it is not the same. Being \"undefined\" means they can be defined at some point. For example in witness version 1 when the interpreter reaches these OP codes it returns as a successful interpretation (since it reached OP_SUCCESS) not the way it treats OP_RETURN (0x6a) which is failing right away even in witness version 1.That's good point. Looking at explanation of OP_RETURN_XXX pages, it seems the author use name from library called rust-bitcoin[1] which IMO is weird decision.Quote from: NotATether on November 24, 2023, 05:20:03 AMWe should probably help out and fill in the remaining ones.And the author welcome such help[2].[1] https://opcodeexplained.com/opcodes/OP_RETURN_228.html[2] https://twitter.com/thunderB__/status/1722301073585475712",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "November 24, 2023, 10:59:20 AMLast edit: November 24, 2023, 03:36:32 PM by vjudeu",
+      "body": "QuoteIt is a synonym for OP_RETURN.This part is wrong. A better approximation is OP_RESERVED. If you have OP_RETURN, then the Script is invalid immediately. But in case of OP_RESERVED, it can be wrapped in some unexecuted OP_IF, and it will still remain valid.But in general, it would be even better to compare it into \"OP_FALSE OP_VERIFY\", because this is what was intended, when creating OP_RETURN.Edit: By the way, there were more pages like that in the past: https://en.bitcoin.it/ScriptSo, I wonder, if we need a new one. If so, then some information from the link above can be useful. But maybe it is easier to update the wiki instead?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coding Enthusiast",
+      "created_time": "November 25, 2023, 12:16:23 PM",
+      "body": "Quote from: vjudeu on November 24, 2023, 10:59:20 AMQuoteIt is a synonym for OP_RETURN.This part is wrong. A better approximation is OP_RESERVED. If you have OP_RETURN, then the Script is invalid immediately. But in case of OP_RESERVED, it can be wrapped in some unexecuted OP_IF, and it will still remain valid.This is one of those little details in Bitcoin that not that many people know.The only OP codes that would invalidate a script by just existing are these (like OP_CAT). However, OP codes like OP_RETURN need to be executed to invalidate a script, otherwise they can exist in an unexecuted branch for example and the script would still be valid.Example:https://blockstream.info/testnet/tx/95b3bccdd66d139f7f87a6c85bb704cb7278bfb8f8ff1859e3c9f99223c3bcc4?expandThe redeem script here is:Code:OP_IF  <push public key> OP_CheckSigOP_ELSE  OP_RETURNOP_ENDIFThe output was spent using the IF branchCode:<push signature>OP_TRUESince the OP_RETURN is never reached or executed, it does no invalidate the script or the transaction. As you can see the transaction I created was included in testnet block #2540377",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

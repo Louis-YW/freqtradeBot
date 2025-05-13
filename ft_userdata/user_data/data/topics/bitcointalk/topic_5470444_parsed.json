@@ -1,0 +1,165 @@
+{
+  "id": "topic_5470444",
+  "title": "apogio",
+  "author": "apogio",
+  "created_time": "October 15, 2023, 05:02:35 PM",
+  "content": "There are two options in my mind, now that I think about creating a new multisig wallet for personal usage. I will be the one to take care of the cosigners. I have been thinking a 2-of-3 or a 2-of-2 set up. I already own a 2-of-3 wallet and I need another one, but perhaps I could change the set up a little bit.Option A (2-of-3):Cosigners A, B, C (Seed A, Seed B, Seed C, XPUB A, XPUB B, XPUB C)Backup (each item in different locations):Seed A, XPUB BSeed B, XPUB CSeed C, XPUB AOption A (2-of-2):Cosigners A, B (Seed A, Seed B, XPUB A, XPUB B)Backup (each item in different locations):Seed A, XPUB BSeed A, XPUB BSeed B, XPUB ASeed B, XPUB AQuestions:1. Is it cheaper to have less total cosigners to define the wallet? In that case, would a 2-of-2 be cheaper than a 2-of-3?2. Is my backup set ups above optimal? 3. Any other thoughts?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5470444",
+  "comments": [
+    {
+      "author": "Findingnemo",
+      "created_time": "October 15, 2023, 05:19:38 PMLast edit: October 16, 2023, 12:41:32 AM by Findingnemo",
+      "body": "I would recommend 2 of 3 multi-sig for your case, so that will be possible to recover even if you lose one of your seeds for whatever reasons.questions:1. Is it cheaper to have less total cosigners to define the wallet? In that case, would a 2-of-2 be cheaper than a 2-of-3?2. Is my backup set ups above optimal?1. Yes, it is cheaper to have 2 of 2 over 2 of 3 because there will be an increase in the transaction size which will reflect in the fee when more cosigners needed, but if you are not going to use the wallet too often then it will be negligible.2. for 2 of 2, that much seems overkill.edit: Charles-Tim beat me due to my laziness. edit 2:",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "October 15, 2023, 05:23:44 PMLast edit: October 15, 2023, 05:33:52 PM by Charles-Tim",
+      "body": "Quote from: apogio on October 15, 2023, 05:02:35 PM1. Is it cheaper to have less total cosigners to define the wallet? In that case, would a 2-of-2 be cheaper than a 2-of-3?You mean while making transaction? The difference between 2-of-2 and 2-of-3 is the number of pubkeys needed which is 3 in 2-of-3 and that will make its transaction fee to be higher. Quote from: apogio on October 15, 2023, 05:02:35 PM2. Is my backup set ups above optimal?YesQuote from: apogio on October 15, 2023, 05:02:35 PM3. Any other thoughts?I prefer 2-of-3. Quote from: Findingnemo on October 15, 2023, 05:19:38 PM1. Yes, it is cheaper to have 2 of 2 over 2 of 3 because there will be an increase in the transaction size which will reflect in the fee when more cosigners needed, but if you are not going to use the wallet too often then it will be negligible.Yes, the more the cosigners, the more the fee. But 2-of-2 have the same cosigners as 2-of-3. Also the more the pubkeys, the more the transaction fee as the virtual size or the weight of the transaction will also increase.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 15, 2023, 05:42:52 PM",
+      "body": "Quote from: Charles-Tim on October 15, 2023, 05:23:44 PMYes, the more the cosigners, the more the fee. But 2-of-2 have the same cosigners as 2-of-3. Also the more the pubkeys, the more the transaction fee as the virtual size or the weight of the transaction will also increase.Quote from: Charles-Tim on October 15, 2023, 05:23:44 PMYou mean while making transaction? The difference between 2-of-2 and 2-of-3 is the number of pubkeys needed which is 3 in 2-of-3 and that will make its transaction fee to be higher. Thank you both. So according to what you say, both numbers n and m are important in fee calculation. I thought that perhaps since 2 cosigners are needed, then the fee would be the same. But, the fact that one wallet has 3 total signers (xpubs) makes a difference too.Quote from: apogio on October 15, 2023, 05:02:35 PM2. Is my backup set ups above optimal? Well, I will answer to myself here, but I have just realised that my backup in the second case is not optional. If an attacker steals one of my packets, they can spy on my wallet since they have a seed and the other xpub. However on the first scenario, if an attacker steals one packet, they can't spy on my wallet. As far as losing funds is concerned, then I am safe in both occasions if I lose one packet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 15, 2023, 06:49:12 PM",
+      "body": "Quote from: apogio on October 15, 2023, 05:42:52 PMSo according to what you say, both numbers n and m are important in fee calculation. I thought that perhaps since 2 cosigners are needed, then the fee would be the same. But, the fact that one wallet has 3 total signers (xpubs) makes a difference too.The unlocking script must include all the public keys which make up the multi-sig, so while both 2-of-2 and 2-of-3 will contain 2 signatures, the latter will contain one extra public key.Here's a transaction which pays from a 2-of-2 P2WSH multi-sig: https://mempool.space/tx/25cf07056425e639bcbd3897c86e80011b83530a5c07feefb579c855574667dcIf you click on \"Details\", you'll see the witness has three parts to it. The first two are the signatures, and the third is the script for the 2-of-2 multi-sig as follows:52   -   OP_221   -   Push 33 bytes03...34 - Public key 121   -   Push 33 bytes02...a6 - Public key 252   -   OP_2ae   -   OP_CHECKMULTISIGNow, here's a transaction which pays from a 2-of-3 P2WSH multi-sig: https://mempool.space/tx/87afd959dbdc95a3c052d49c8b0bd3795b8210f5644a0cc6640b2a76a5101938Again, if you click on \"Details\" you'll see three parts to the witness. The first two - the signatures - are the same size. The third one this time is bigger, since it is now a 2-of-3 script as follows:52   -   OP_221   -   Push 33 bytes02...f1 - Public key 121   -   Push 33 bytes03...02 - Public key 221   -   Push 33 bytes02...74 - Public key 353   -   OP_3ae   -   OP_CHECKMULTISIGSo the difference in size is 34 bytes (0x21 header byte followed by the 33 byte public key). But since those bytes are witness bytes, then the difference in size for any transaction is only 8.5 vbytes. So I wouldn't let that affect your choice too much, since the different is negligible unless you are consolidating hundreds of small inputs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 15, 2023, 06:57:33 PMLast edit: October 16, 2023, 03:14:06 PM by apogio",
+      "body": "Quote from: o_e_l_e_o on October 15, 2023, 06:49:12 PMSo the difference in size is 34 bytes (0x21 header byte followed by the 33 byte public key). But since those bytes are witness bytes, then the difference in size for any transaction is only 8.5 vbytes. So I wouldn't let that affect your choice too much, since the different is negligible unless you are consolidating hundreds of small inputs.To be honest, I don't like the fact I mentionned above. I realised that if an attacker steals my backup they will be able to spy my wallet. So I tend to go to a 2-of-3 once again. Or perhaps I will totally switch my mind and go for a proper singlesig+passphrase.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 15, 2023, 07:04:18 PM",
+      "body": "Quote from: apogio on October 15, 2023, 06:57:33 PMTo be honest, I don't like the fact I mentionned above. I realised that if an attacker steals my backup they will be able to spy my wallet.Well, not really.There is no need in your 2-of-2 proposal to back up the xpubs at all. xpub A can obviously be derived from seed A. If you have lost both seed A back ups, then having xpub A backed up alongside seed B isn't going to help you - your funds are lost at that point. In any scenario where you have recovered both seed A and seed B, then by definition you will also have access to xpub A and xpub B since you can derive them. And so if you simply back up the seed phrases on their own, then an attacker compromising one seed phrase cannot spy on your wallets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 15, 2023, 07:06:50 PM",
+      "body": "Quote from: o_e_l_e_o on October 15, 2023, 07:04:18 PMWell, not really.There is no need in your 2-of-2 proposal to back up the xpubs at all. xpub A can obviously be derived from seed A. If you have lost both seed A back ups, then having xpub A backed up alongside seed B isn't going to help you - your funds are lost at that point. In any scenario where you have recovered both seed A and seed B, then by definition you will also have access to xpub A and xpub B since you can derive them. And so if you simply back up the seed phrases on their own, then an attacker compromising one seed phrase cannot spy on your wallets.Correct, I was wrong. So, in your opinion, what would be the contributing factor that would make you choose one of them? The obvious difference is that 2-of-3 requires 3 safe locations, whereas the 2-of-2 requires 4.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 15, 2023, 07:19:03 PM",
+      "body": "I would normally recommend 2-of-3, because most people only create a single back up of each component, and therefore with a 2-of-2 you end up with two single points of failure. But if you are creating two back ups of each component in your 2-of-2, then you have removed that risk.At that point it probably becomes personal preference, assuming you have enough separate secure devices and separate secure locations to similarly create each multi-sig and store each back up. The only real benefit I can see of a 2-of-2 if you don't back up the xpubs as we've just discussed is that you could plausibly deny any one of your back ups has anything to do with a multi-sig at all, and could claim it is simply a seed phrase for a single sig wallet (and indeed, could put a small amount of coins on each individual seed phrase to corroborate this story). A seed phrase backed up alongside an xpub is pretty obviously part of a multi-sig to anyone who understands bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 15, 2023, 07:33:20 PM",
+      "body": "Quote from: o_e_l_e_o on October 15, 2023, 07:19:03 PMAt that point it probably becomes personal preference, assuming you have enough separate secure devices and separate secure locations to similarly create each multi-sig and store each back up. The only real benefit I can see of a 2-of-2 if you don't back up the xpubs as we've just discussed is that you could plausibly deny any one of your back ups has anything to do with a multi-sig at all, and could claim it is simply a seed phrase for a single sig wallet (and indeed, could put a small amount of coins on each individual seed phrase to corroborate this story). A seed phrase backed up alongside an xpub is pretty obviously part of a multi-sig to anyone who understands bitcoin.That's indeed a good advantage of the 2-of-2.About the text I put in red color, I want to say something. I generally tend to use my signing devices to maintain a \"non-persistent memory\". That said, none of my devices hold any keys and after I create a wallet and back it up properly, I perform factory reset on the device. If I need to sign, I have to manually import my seed phrase again, or scan a QR code if I have exported my seed in QR format. I was introduced to this technique by Seed Signer (https://github.com/SeedSigner/seedsigner#seedqr-printable-templates) and I kinda loved it. So, I don't backup my devices, but only the piece of paper where I have written my seed phrase (and my QR code).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 16, 2023, 03:16:41 PM",
+      "body": "Quote from: apogio on October 15, 2023, 07:33:20 PM-snip-My only concern with that technique is it sounds like you are using a single device for the entire process (although maybe you aren't). One of the key benefits of multi-sig is that it avoids a single point of failure, but this is only true if each seed phrase or set of private keys is generated and used on separate devices. If you have one device generate all three of your seed phrases, then if its entropy generation process is flawed then all your keys will be affected. If you import all your seed phrases to the same device, then if it has malware then all your keys are at risk, and so on.You have maybe largely mitigated against this by using an airgapped device which you are factory resetting in between each key, but personally I still like to use three different devices if I am using a 2-of-3 multi-sig.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 16, 2023, 03:21:11 PM",
+      "body": "Quote from: o_e_l_e_o on October 16, 2023, 03:16:41 PMMy only concern with that technique is it sounds like you are using a single device for the entire process (although maybe you aren't). One of the key benefits of multi-sig is that it avoids a single point of failure, but this is only true if each seed phrase or set of private keys is generated and used on separate devices. If you have one device generate all three of your seed phrases, then if its entropy generation process is flawed then all your keys will be affected. If you import all your seed phrases to the same device, then if it has malware then all your keys are at risk, and so on.You have maybe largely mitigated against this by using an airgapped device which you are factory resetting in between each key, but personally I still like to use three different devices if I am using a 2-of-3 multi-sig.I have thought about it a lot. I own 3 devices actually. A seed signer and a Jade and a trezor one.The trezor device needs to be plugged in so I kind of avoid it most of the time. It was my first hardware wallet.What devices do you use if you don't mind sharing?I could also use Electrum on an airgapped device, but I don't have a proper airgapped device to run electrum onto.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 16, 2023, 03:35:24 PM",
+      "body": "Quote from: apogio on October 16, 2023, 03:21:11 PMWhat devices do you use if you don't mind sharing?I have been pretty vocal about my use of (more than one) permanently airgapped computers, and also about Passport hardware wallets. I have several other hardware wallets I've used in the past and some I still use, all in various combinations, but I don't want to reveal absolutely everything about my set up. I would say that if you have a hardware wallet which requires being plugged in such as Trezor (although I no longer use my Trezor device for several other reasons), you can always only plug it in to a permanently airgapped computer to run it in an airgapped manner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 16, 2023, 03:55:15 PMLast edit: October 16, 2023, 05:21:04 PM by apogio",
+      "body": "Quote from: o_e_l_e_o on October 16, 2023, 03:35:24 PM but I don't want to reveal absolutely everything about my set upSure!I can't help but wonder whether a 2-of-2 multisig with 2 cosigners produced by 128bits entropy can be equivalent to a singlesig wallet where the signer is produced by 128bits entropy and has a strong passphrase upon it which is larger than 20 chars long and the dataset is lowercase, uppercase, numbers and symbols.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 16, 2023, 07:33:31 PM",
+      "body": "Quote from: apogio on October 16, 2023, 03:55:15 PMI can't help but wonder whether a 2-of-2 multisig with 2 cosigners produced by 128bits entropy can be equivalent to a singlesig wallet where the signer is produced by 128bits entropy and has a strong passphrase upon it which is larger than 20 chars long and the dataset is lowercase, uppercase, numbers and symbols.In terms of compromising of your back ups, then they are effectively the same, assuming your passphrase is randomly generated. Both would require an attacker to compromise two separate back ups. Both would require you to ideally have four back ups in total, with one back up from pair A and one back up from pair B required to recover your wallet.In terms of creating the wallets or spending the coins is where the difference comes. As I said above, one of the benefits of multi-sig is you can avoid a single point of failure. With a 2-of-2 multi-sig you can always keep your seed phrases on entirely separate devices, and never have one device which contains both seed phrases, either during the creation phase or during the signing a transaction phase. With a single sig plus passphrase wallet, that is not possible. You must bring both seed phrase and passphrase together on the same device when you create the wallet and when you want to sign any transactions, and so if that device is compromised your funds are lost.Whether or not that single point of failure concerns you is up to your specific threat model. Are you using a hot wallet? Very concerning. Are you using a permanently airgapped device running a live amnesic OS such as Tails? Far less concerning.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 16, 2023, 07:41:10 PM",
+      "body": "Quote from: o_e_l_e_o on October 16, 2023, 07:33:31 PM<~>I understand. However, I have one thought that leads me towards the multisig option. I can't really specify in what manner I could produce a \"random\" passphrase. What I mean is, a wallet would use entropy to produce a seed phrase. This entropy generator feels superior to any \"random\" passphrase I could generate using my mind.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 16, 2023, 08:35:22 PM",
+      "body": "Here's the one line code I use to generate random 128 bit passwords from /dev/urandom:Code:< /dev/urandom tr -cd \"[:print:]\" | head -c 20The first part calls /dev/urandom.tr is the translate command.-cd means complement and delete. It is essentially saying delete every character which is not in the following set.\"[:print:]\" is the set of 95 printable ASCII characters. If you wanted to leave out space, replace with \"[:graph:]\". If you wanted to leave out symbols altogether, replace with \"[:alnum:]\" Extend your number of characters appropriately.head -c 20 means print the first 20 characters. Adjust the number 20 as desired.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 16, 2023, 09:00:14 PM",
+      "body": "Quote from: o_e_l_e_o on October 16, 2023, 08:35:22 PMHere's the one line code I use to generate random 128 bit passwords from /dev/urandom:Code:< /dev/urandom tr -cd \"[:print:]\" | head -c 20The first part calls /dev/urandom.tr is the translate command.-cd means complement and delete. It is essentially saying delete every character which is not in the following set.\"[:print:]\" is the set of 95 printable ASCII characters. If you wanted to leave out space, replace with \"[:graph:]\". If you wanted to leave out symbols altogether, replace with \"[:alnum:]\" Extend your number of characters appropriately.head -c 20 means print the first 20 characters. Adjust the number 20 as desired.Brilliant answer mate. Thanks. I guess dev/urandom provides good entropy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 17, 2023, 12:57:51 PM",
+      "body": "Also if for whatever reason you want to use more than 3 signatures because maybe you want to stash more than 3 seed phrases in unique locations   then you can use a value of M that requires more than (emphasis on more than) 50% of the signatures, but allows for a certain of number of phrases to be lost - so somewhere around 60% - 75% of the phrases being required for recovery.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 18, 2023, 06:10:12 AM",
+      "body": "I think I am gonna go for the 2-of-2 option after all.Quote from: NotATether on October 17, 2023, 12:57:51 PMAlso if for whatever reason you want to use more than 3 signatures because maybe you want to stash more than 3 seed phrases in unique locations   then you can use a value of M that requires more than (emphasis on more than) 50% of the signatures, but allows for a certain of number of phrases to be lost - so somewhere around 60% - 75% of the phrases being required for recovery.You mean something like a 3-of-5 or a 4-of-7?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

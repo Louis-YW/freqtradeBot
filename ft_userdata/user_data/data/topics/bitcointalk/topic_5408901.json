@@ -1,0 +1,29 @@
+{
+  "id": "topic_5408901",
+  "title": "Accardo",
+  "author": "Accardo",
+  "created_time": "August 06, 2022, 07:55:41 AM",
+  "content": "Steganography has been in existence since the early days when kings embed data on a slaves head and wait for the hair to grow before he is sent to deliver the message to the receiver. Today, unlike cryptography that encrypts communication, Stenography hides the existence of a communication. I personally have a view of what is written about Stenography in this work and wants to learn more from tech members here.Some things I'll want to respond to are the key points the author made on the PDF.QuoteReview and Analysis of previous steganography schemes in blockchainUnder the section 3 of the PDF, the previous usage of steganography which was impractical due to its complexity was explained. Quotethe sender puts one bit of the data in the least significant bit(lsb) of the transaction address(the output address) and sends it to blockchain. This process repeats until embedding the all bits of the data. In order to ensure correct retrieval of information at the receiver side, the sender should be wait for each transaction to be placed in the blockchain and then he can send the next bit to the blockchain through the next transaction.Sending transactions bit by bit to ensure correct retrieval of information is time consuming and I see it as one reason it may not be practiced today. Under this section it was mentioned that it'll take 1 hour 20 minutes to send a byte of information through blockchain network using this strategy. If not for the time, one thing I like about this strategy is the Op-return command that prevents the data from being accessed by the miners. In this scheme no actual method of receiving the data is stated, the receiver is expected to check the network for every transaction that contains OP-return command, very stressful, but, they claim if he knows the algorithm It'll be easier to find the information. Under the high capacity embedding algorithm - Quotehe transaction input address must be created with the HDW algorithm to notify the receiver that a new message will be sent to the blockchain. Does this happen on the lightening network? How is the receiver notified? Unlike the normal transactions where I as a receiver will be notified through a different medium that bitcoin will be sent to me, here the HDW (Hierarchical Deterministic Wallets) algorithm notifies the receiver didn't understand it clearly. Anyone with such knowledge please share with me.SecurityQuoteThis means that no one is aware of the existence of hidden data. As stated in the proposed algorithms, the data is not embedded manually and the address containing the hidden data is indistinguishable from the address without hidden data.The security that steganography will provide to the blockchain network or transaction on the bitcoin hides data in a way that the attackers may not know the right address to attack since nothing was changed they all look alike but, one contains the information that the receiver needs. Share your response thanks.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408901",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "August 06, 2022, 08:09:45 AM",
+      "body": "Quote from: Accardo on August 06, 2022, 07:55:41 AMQuotethe sender puts one bit of the data in the least significant bit(lsb) of the transaction address(the output address) and sends it to blockchain. This process repeats until embedding the all bits of the data. In order to ensure correct retrieval of information at the receiver side, the sender should be wait for each transaction to be placed in the blockchain and then he can send the next bit to the blockchain through the next transaction.Sending transactions bit by bit to ensure correct retrieval of information is time consuming and I see it as one reason it may not be practiced today. Under this section it was mentioned that it'll take 1 hour 20 minutes to send a byte of information through blockchain network using this strategy.It's not only that, it's extremely expensive, even for very short messages, since you are encoding one bit inside each transaction only, not necessarily in the address (that would violate the checksum), but in other parameters such as nSequence or something like that. That's why nobody sends them like that and justs sends OP_RETURN data instead.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "August 06, 2022, 11:13:58 AM",
+      "body": "Well, the cost of storing data depends on what do you want to get. If you want to timestamp some data, then you can use \"OP_RETURN <anything>\" inside TapScript, then nobody would know that such TapBranch even exists. But if you want to store it on-chain, then you have to pay for every single byte. Assuming one satoshi per virtual byte, it would cost 0.01 BTC for each megabyte. In practice, you would reach that cost only in a perfectly designed format, because there are some mandatory fields, and you have to pay for them.To make it more efficient, you can mine your data. Mining 32 bits is reachable on CPUs. That means, you can use Silent Payments, and mine the real public key, then you can send a silent payment to such key. Also, you can hide your data in a relation between your public key and your signature:Code:s=(z+rd)/kk=secret*d+messagesk=z+rdk=(z+rd)/sk=(z/s)+(r/s)dmessage=(z/s)secret=(r/s)Of course, you have to find the right balance, because revealing more bits will make it cheaper, but will also reveal more bits of the private key. Unless you store it in your public key, but then you have to mine it by tweaking such key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

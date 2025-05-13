@@ -1,0 +1,69 @@
+{
+  "id": "topic_5400093",
+  "title": "nullama",
+  "author": "nullama",
+  "created_time": "May 25, 2022, 04:44:58 AM",
+  "content": "In the page where you can buy a Copper Membership it says:Quote from: https://bitcointalk.org/index.php?action=credit;promoteWe are commonly asked how we know that you sent a payment. The address above was newly generated just for you, so when any BTC is sent to it, we will know to credit it to your account. It is all automatic.I'm wondering if the code used to generate that address on the fly for the current user is open source(php code I guess?). It seems quite useful since it creates a new address per each user, and also apparently it executes some action whenever the payment is made. It seems to be a simple Bitcoin checkout, which could be great in certain use cases.It's fine if it's not open source, but it would be great to know if it is.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400093",
+  "comments": [
+    {
+      "author": "PX-Z",
+      "created_time": "May 25, 2022, 04:54:57 AM",
+      "body": "Bitcoin is open source, lots of address generator library using different programming language are open source too. Probably theymos uses open source software to do the address generation of every user, but since this forum is not open source, then there's no way theymos will make the code for the copper membership open source too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "May 25, 2022, 06:32:07 AM",
+      "body": "Quote from: PX-Z on May 25, 2022, 04:54:57 AMBitcoin is open source, lots of address generator library using different programming language are open source too. Probably theymos uses open source software to do the address generation of every user, but since this forum is not open source, then there's no way theymos will make the code for the copper membership open source too.This forum is open source though, it's based on Simple Machines Forums, which is released under BSD: https://www.simplemachines.org/about/license.phpThinking about it though, you're right, it would probably be easier to just use a library as you mention instead of trying to re-use this solution.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PX-Z",
+      "created_time": "May 25, 2022, 06:48:14 AM",
+      "body": "Quote from: nullama on May 25, 2022, 06:32:07 AMThis forum is open source though, it's based on Simple Machines Forums, which is released under BSD: https://www.simplemachines.org/about/license.phpThe simple machine, yes. But this forum was already customized and improved too many times like this forum is already different from the version released by the simple machines since those hacks happened.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hugeblack",
+      "created_time": "May 25, 2022, 09:27:23 AM",
+      "body": "According to this ---> https://bitcointalk.org/index.php?topic=2385104.msg24371150#msg24371150QuoteQuote from: theymos on November 10, 2017, 09:23:30 PMI wrote the system so that I can easily add additional paid memberships in the future, but I might not ever do so. Not sure.It looks like a modified library that was used to generate addresses but I think most of the modifications come from https://btcpayserver.org/ ?!In general, I think that the above project is open source and provides an option for everyone who does not want to strive to write code from scratch, and therefore @theymos is the one who can confirm the nature of the code.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "May 25, 2022, 01:55:10 PM",
+      "body": "Quote from: nullama on May 25, 2022, 04:44:58 AMI'm wondering if the code used to generate that address on the fly for the current user is open source(php code I guess?). It seems quite useful since it creates a new address per each user, and also apparently it executes some action whenever the payment is made. It seems to be a simple Bitcoin checkout, which could be great in certain use cases.You want to use this code for some other forum or what?I don't think this feature needs to be open source and inspected by everyone, even if forum software is open source it can probably use other extensions with closed source code.It's not like members are sending millions of Bitcoins every day for copper membership, it's more like symbolic amount, currently that is around 0.00080198 BTC or $24.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "May 25, 2022, 03:23:18 PM",
+      "body": "Quote from: dkbit98 on May 25, 2022, 01:55:10 PMQuote from: nullama on May 25, 2022, 04:44:58 AMI'm wondering if the code used to generate that address on the fly for the current user is open source(php code I guess?). It seems quite useful since it creates a new address per each user, and also apparently it executes some action whenever the payment is made. It seems to be a simple Bitcoin checkout, which could be great in certain use cases.You want to use this code for some other forum or what?I don't think this feature needs to be open source and inspected by everyone, even if forum software is open source it can probably use other extensions with closed source code.It's not like members are sending millions of Bitcoins every day for copper membership, it's more like symbolic amount, currently that is around 0.00080198 BTC or $24.I was just curious to see how it was made because it seemed like a nice lite Bitcoin checkout for websites. But as I mentioned before, it's probably tied with the forum so it would be better to use any other library.And also I agree with you, I think there's no need for this to be open sourced.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "theymos",
+      "created_time": "May 25, 2022, 08:28:07 PM",
+      "body": "There's nothing fancy going on. The Bitcoin-specific part of the payments handling code is only 94 lines, and most of this deals with interfacing with bitcointalk.org. It uses Bitcoin Core via JSON-RPC; specifically, the only two JSON-RPC commands bitcointalk.org uses are listreceivedbyaddress and getnewaddress.You could create a page which displays a user-unique address and says how much that address has received in like 10 lines of PHP if you use a JSON-RPC library. However, in reality you need to handle a large number of edge cases (eg. overpayment, underpayment, very-late payment, etc.), so I recommend using BTCPay Server, which tries to handle all such edge cases in reasonable ways.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

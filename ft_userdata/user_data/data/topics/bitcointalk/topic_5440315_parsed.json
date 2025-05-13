@@ -1,0 +1,93 @@
+{
+  "id": "topic_5440315",
+  "title": "RoxxR",
+  "author": "RoxxR",
+  "created_time": "February 18, 2023, 12:40:21 PM",
+  "content": "I'm trying to programmatically get the block height at certain given dates - for instance, first day of each month. I don't have access to a full node.Is there a block explorer or other platform with an API endpoint (or just a small dump of such data somewhere) that could be helpful?Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440315",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "February 18, 2023, 12:46:31 PM",
+      "body": "Can you do by just subtracting 144 from the block height per day you're looking?If not, I'd still recommend doing that and then looking up the api for a block explorer (like blockchain.com) and trying to programmatically go back (or forward) from there based on how many blocks would have come since. I remember blockchain.com's api indexing blocks based on height and hash (not sure how others do it but it's probably an easy enough place to start and get a json of data, and then checking the time the block was received or generated).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "paid2",
+      "created_time": "February 18, 2023, 12:58:00 PM",
+      "body": "The easiest way could be to take the list of the blocks mined by a big mining pool.For example, you can be 100% sure that Antpool does mine at least some blocks per day, so you will have an Block Height associated to a date.Example :  list of blocks mined by Antpool",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "February 18, 2023, 01:31:11 PM",
+      "body": "You can find this data very quickly using Blockchair. For example, here is a list of all the blocks mined yesterday: https://blockchair.com/bitcoin/blocks?s=id%28desc%29&q=time%282023-02-17%29. They have an API you can use, but there is a cost associated with its use.They do also have free data dumps of this information which you can download from here: https://gz.blockchair.com/bitcoin/blocks/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "February 19, 2023, 03:23:22 AM",
+      "body": "Here is another fun way of doing it which is a lot faster and cheaper to do:If you run a SPV client like Electrum on your computer you already have all the block headers saved up in a ~60 MB file called \"blockchain_headers\" which is a stream of bytes. All you have to do is to programatically read this file to get the raw bytes which should be a multiple of 80. Each 80 byte is a block header of a block in chronological order (so you have the block height this way too). Then start from the beginning (byte 0) and extract the time from each 80 byte chunk (ie. one header) knowing that 4th item in it is the timestamp. Code:version[4] + prev_hash[32] + merkle_root[32] + time[4] + target[4] + nonce[4]Here is a pseudocodeCode:stream = File.Read(\"blockchain_headers\")while(stream.HasBytesLeft)    stream.Skip(68)    timestamp = stream.Read(4).ConvertToTime_LittleEndian()    resultList.Add(timestamp)    stream.Skip(8)Now all you have to do is search in the list of timestamps to see when the day in the datetime you converted changes to get the last height of the day. The height is the index of the datetime inside the resultList/array.Keep in mind that timestamps are in UTC not your local time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RoxxR",
+      "created_time": "February 19, 2023, 06:01:21 AM",
+      "body": "Quote from: pooya87 on February 19, 2023, 03:23:22 AMHere is another fun way of doing it which is a lot faster and cheaper to do:If you run a SPV client like Electrum on your computer you already have all the block headers saved up in a ~60 MB file called \"blockchain_headers\" which is a stream of bytes. All you have to do is to programatically read this file to get the raw bytes which should be a multiple of 80. Each 80 byte is a block header of a block in chronological order (so you have the block height this way too). Then start from the beginning (byte 0) and extract the time from each 80 byte chunk (ie. one header) knowing that 4th item in it is the timestamp. Code:version[4] + prev_hash[32] + merkle_root[32] + time[4] + target[4] + nonce[4]Here is a pseudocodeCode:stream = File.Read(\"blockchain_headers\")while(stream.HasBytesLeft)    stream.Skip(68)    timestamp = stream.Read(4).ConvertToTime_LittleEndian()    resultList.Add(timestamp)    stream.Skip(8)Now all you have to do is search in the list of timestamps to see when the day in the datetime you converted changes to get the last height of the day. The height is the index of the datetime inside the resultList/array.Keep in mind that timestamps are in UTC not your local time.Thanks, this does sound like a fun and effective way. I'll give it a shot!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RoxxR",
+      "created_time": "February 19, 2023, 06:01:48 AM",
+      "body": "Thanks everyone for the various approaches!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "February 19, 2023, 11:58:49 AM",
+      "body": "Quote from: jackg on February 18, 2023, 12:46:31 PMCan you do by just subtracting 144 from the block height per day you're looking?This is wrong approach. Current all-time average block time is somewhere about 9.55 minutes.Quote from: jackg on February 18, 2023, 12:46:31 PMIf not, I'd still recommend doing that and then looking up the api for a block explorer (like blockchain.com) and trying to programmatically go back (or forward) from there based on how many blocks would have come since. I remember blockchain.com's api indexing blocks based on height and hash (not sure how others do it but it's probably an easy enough place to start and get a json of data, and then checking the time the block was received or generated). Unfortunately blockchain.com API doesn't have filter to choose block based on date.Quote from: pooya87 on February 19, 2023, 03:23:22 AMHere is another fun way of doing it which is a lot faster and cheaper to do:If you run a SPV client like Electrum on your computer you already have all the block headers saved up in a ~60 MB file called \"blockchain_headers\" which is a stream of bytes. All you have to do is to programatically read this file to get the raw bytes which should be a multiple of 80. Each 80 byte is a block header of a block in chronological order (so you have the block height this way too). Then start from the beginning (byte 0) and extract the time from each 80 byte chunk (ie. one header) knowing that 4th item in it is the timestamp. Code:version[4] + prev_hash[32] + merkle_root[32] + time[4] + target[4] + nonce[4]Here is a pseudocodeCode:stream = File.Read(\"blockchain_headers\")while(stream.HasBytesLeft)    stream.Skip(68)    timestamp = stream.Read(4).ConvertToTime_LittleEndian()    resultList.Add(timestamp)    stream.Skip(8)Now all you have to do is search in the list of timestamps to see when the day in the datetime you converted changes to get the last height of the day. The height is the index of the datetime inside the resultList/array.Keep in mind that timestamps are in UTC not your local time.Do you mind checking beginning of file blockchain_headers with hex editor/viewer? I tried on my device, but mostly it only contain zeroes. I suspect Electrum only request needed block header rather than all block header.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "February 19, 2023, 12:14:26 PM",
+      "body": "Quote from: RoxxR on February 19, 2023, 06:01:48 AMThanks everyone for the various approaches!Let me add my topic on block data: https://bitcointalk.org/index.php?topic=5246271.0In short, you're looking for https://loyce.club/blockdata/time.txt",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "February 19, 2023, 01:14:11 PMLast edit: February 19, 2023, 01:39:41 PM by pooya87",
+      "body": "Quote from: ETFbitcoin on February 19, 2023, 11:58:49 AMDo you mind checking beginning of file blockchain_headers with hex editor/viewer? I tried on my device, but mostly it only contain zeroes. I suspect Electrum only request needed block header rather than all block header.Yes, although I simply read the file as a byte stream not with hex editor, the file starts with the genesis block's header ie. 0x01 followed by 35 zeros (previous hash) then 0x3b (merkle root) and so on.I've had my Electrum for a very long time though. The file was created in 2019! Maybe they changed some stuff like after the introduction of checkpoint header.Edit: Yeap. They've changed things. Downloaded Electrum 4.3.4 on Ubuntu and let it sync, even deleted the blockchain_headers file and let it be downloaded again. In both cases the file contains all zeros up until block height 747936. Which is a waste of space if you ask me!!! This also means what I explained above won't work using newer version of Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "February 19, 2023, 01:57:43 PM",
+      "body": "Quote from: pooya87 on February 19, 2023, 01:14:11 PM--snip--Edit: Yeap. They've changed things. Downloaded Electrum 4.3.4 on Ubuntu and let it sync, even deleted the blockchain_headers file and let it be downloaded again. In both cases the file contains all zeros up until block height 747936. Which is a waste of space if you ask me!!! This also means what I explained above won't work using newer version of Electrum.That's what i suspect. I just found out Electrum protocol also have API call which can ask single block header[1] and block headers starting from specific height[2]. But those API call i mentioned could be used as alternative to obtain block headers.[1] https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-methods.html#blockchain-block-header[2] https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-methods.html#blockchain-block-headers",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

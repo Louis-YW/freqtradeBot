@@ -1,0 +1,77 @@
+{
+  "id": "topic_5447970",
+  "title": "LoyceV",
+  "author": "LoyceV",
+  "created_time": "April 07, 2023, 07:16:32 PM",
+  "content": "Short version: you have a signed transaction with lock time, and the private key of the address where the funds will be sent. To reduce the risk of foul play, you want to sweep the second address the moment the lock time expires.Is it possible to already create the transaction that sweeps the second address? That would make sweeping the funds faster, once the lock time expires.I posted this in another topic:Quote from: LoyceV on April 07, 2023, 11:37:27 AMI'm hoping you can create a transaction based on the (still unconfirmed) timelocked transaction.Let's test this:My (testnet) address on my made-up card is tb1qqngm2k9hpc4skrhxf5zl7m0p3m6tm9m0k3jv89. The private key is p2wpkh:cSSznAdAjUnBrL4EtkT1kPkygatqFhv8KrkiBUAY5j8iHcZW9uii.From address tb1q7cevguh0kvpux8y9x9fczfuz2gxtlxrzvetfx4, I create a time-locked transaction to tb1qqngm2k9hpc4skrhxf5zl7m0p3m6tm9m0k3jv89. LockTime is 2428815 (1000 blocks from now). I can't broadcast this transaction yet:Code:02000000000101e0837ed3bfb89e4491c5cbcedbeda8b5a5e46254c23ad17a0c0bca027a39100e0100000000feffffff01ba7313000000000016001404d1b558b70e2b0b0ee64d05ff6de18ef4bd976f02473044022014954d7969c9ec9a61de472920645e4eff766d4e1e564ee536680e973904943102204f0601b7acc8e4b58ba27fb355029d3a20b8245080699d123e65d3c4ca8d6004012103cf78237d0e6a8bbe2829535515a504721651d8d65d2c5ef8e6b483c77db896a68f0f2500With this information, I continue in an offline Electrum wallet, and import the private key (the one mentioned above).I was hoping it would allow me to use the signed transaction and build a second transaction from there, but it knows the block height isn't sufficient yet so it doesn't work.I tried again with Bitcoin Core, and I can create the raw transaction, but it doesn't let me sign it:Code:\"error\": \"Input not found or already spent\"I really thought this must be possible, but I can't figure out how  So never mind this plan I couldn't get it to work. Maybe I'm doing something wrong, or maybe it's really not possible.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5447970",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "April 08, 2023, 05:20:12 AM",
+      "body": "You can sign that transaction if you add the \"prevtxs\" argument when using signrawtransactionwithwallet or signrawtransactionwithkey command.Such thing happens if the transaction is created manually.For example in signrawtransactionwithwallet, it's the json array next to the raw transaction hex string:signrawtransactionwithwallet \"02000---RAW_TXN---00000\" \"[{\\\"txid\\\":\\\"TXID_OF_THE_TO_BE_SIGNED_INPUT\\\",\\\"vout\\\":N,\\\"scriptPubKey\\\":\\\"OF_THE_INPUT\\\",\\\"amount\\\":N}]\"To get those required data:use decoderawtransaction on the time locked signed raw transaction used as input.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "April 23, 2023, 03:03:37 PM",
+      "body": "Thanks @nc50lc!I found a different solution: Electrum 4.4.0 doesn't have the option to add a locktime anymore, but it allows to save a transaction to history. After that, I can use that transaction as input, and from there, I've created a transaction to send the funds. I'm currently waiting for the locktime to be reached, so I can test if it really works when I broadcast both transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 29, 2023, 01:36:22 PM",
+      "body": "Quote from: LoyceV on April 23, 2023, 03:03:37 PMElectrum 4.4.0 doesn't have the option to add a locktime anymore, but it allows to save a transaction to history. After that, I can use that transaction as input, and from there, I've created a transaction to send the funds.Update: I can confirm this works! I've broadcasted both transactions, and funds were sent as expected.I took a bit longer than necessary to get back to this test.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krogothmanhattan",
+      "created_time": "May 29, 2023, 02:31:29 PM",
+      "body": "Ok....so what exactly did you do?    Where wallet A is the timelock creating wallet   Wallet B is the receiving wallet  Did you take the raw hex from the timelock and reconfig to transmit before the locktime without having wallet (A)? Do not think that is possible at all.  Did you take the wallet (A) that you created time lock with and then boradcast whatever bitcoin was on it? That is possible as is the case with Scum Yogg.  Or did you take the receiving wallet (B) private key and created a code that once the timelock was broadcast it automatically swept the BTC being received from Wallet B from Wallet A? The BTC would have to be in wallet B already otherwise a transaction could not be created with an empty address   Kindly clarify and thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 29, 2023, 02:38:45 PM",
+      "body": "Quote from: krogothmanhattan on May 29, 2023, 02:31:29 PM  Or did you take the receiving wallet (B) private key and created a code that once the timelock was broadcast it automatically swept the BTC being received from Wallet B from Wallet A? The BTC would have to be in wallet B already otherwise a transaction could not be created with an empty addressThe idea was to be able to do this:Quote from: LoyceV on April 05, 2023, 06:36:32 AMI wouldn't mind creating a cronjob that tries to broadcast a bunch of transactions every minute. Once it's accepted by the network, bitcoind (which I have running anyway) will broadcast it.So, in yogg's time locked case: You already have a time locked transaction, which can't be broadcasted yet. You use this transaction to create a child transaction that sends the funds to your own wallet (this transaction also can't be broadcasted yet).Then, by trying to broadcast those transactions every minute, both will get broadcasted the moment it's possible and your funds are swept as fast as possible. And none of this is useful in cases where the scammer kept the private key which can bypass the time lock.If you still have a future time lock pending, let's try this for real",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krogothmanhattan",
+      "created_time": "May 29, 2023, 02:46:40 PM",
+      "body": "Quote from: LoyceV on May 29, 2023, 02:38:45 PMQuote from: krogothmanhattan on May 29, 2023, 02:31:29 PM  Or did you take the receiving wallet (B) private key and created a code that once the timelock was broadcast it automatically swept the BTC being received from Wallet B from Wallet A? The BTC would have to be in wallet B already otherwise a transaction could not be created with an empty addressThe idea was to be able to do this:Quote from: LoyceV on April 05, 2023, 06:36:32 AMI wouldn't mind creating a cronjob that tries to broadcast a bunch of transactions every minute. Once it's accepted by the network, bitcoind (which I have running anyway) will broadcast it.So, in yogg's time locked case: You already have a time locked transaction, which can't be broadcasted yet. You use this transaction to create a child transaction that sends the funds to your own wallet (this transaction also can't be broadcasted yet).Then, by trying to broadcast those transactions every minute, both will get broadcasted the moment it's possible and your funds are swept as fast as possible. And none of this is useful in cases where the scammer kept the private key which can bypass the time lock.If you still have a future time lock pending, let's try this for real     LOyce...thanks for the reply...that is interesting so from what I understand is this...    By using a child transaction you are increasing the fees to have it confirmed faster.?..but it still will end up going to the same private key of when it was forged  in the original timelock transaction....correct? Just faster as far as confirmations go.   But I have been able to rebroadcast bitcoin without any confirmations when sending from wallet to wallet.   But bottom line is, if a person just has a raw hex transaction....and no wallet A or Wallet B, then there is no way in hell that that can be altered.   Still its good to know you were able to do it if I understood correctly     P.S. is it also called a child pays for parent?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 29, 2023, 02:54:45 PM",
+      "body": "Quote from: krogothmanhattan on May 29, 2023, 02:46:40 PM    By using a child transaction you are increasing the fees to have it confirmed faster.?That's possible, but wasn't the main goal. The only tiny improvement it can make is beat a human attacker if the attacker kept the second private key and not the original. I know that's a small chance.Quote..but it still will end up going to the same private key of when it was forged  in the original timelock transaction....correct? Just faster as far as confirmations go.The original time locked transaction can't be changed.Quote   But bottom line is, if a person just has a raw hex transaction....and no wallet A or Wallet B, then there is no way in hell that that can be altered.Correct.Quote   Still its good to know you were able to do it if I understood correctly  That's not what I did. All it does is speed up the sweep time once the time lock expires.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krogothmanhattan",
+      "created_time": "May 29, 2023, 02:58:03 PM",
+      "body": "Quote from: LoyceV on May 29, 2023, 02:54:45 PMQuote   Still its good to know you were able to do it if I understood correctly  That's not what I did. All it does is speed up the sweep time once the time lock expires.   Thats exactly what I meant...speed it up to beat the other party who has access to the receiving private key.   Thanks for doing this Loyce...you deserve the merit I have rewarded ya!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

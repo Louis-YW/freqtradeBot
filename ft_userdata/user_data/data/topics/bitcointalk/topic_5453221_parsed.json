@@ -1,0 +1,53 @@
+{
+  "id": "topic_5453221",
+  "title": "TracaChang",
+  "author": "TracaChang",
+  "created_time": "May 18, 2023, 04:45:06 PMLast edit: May 18, 2023, 08:00:09 PM by TracaChang",
+  "content": "Hello,I do not understand how bitcoin core chooses the path for the \"change\" when creating a transaction.I've realized that since I do a have a bitcoin core watch wallet (created with bitcoin core offline wallet descriptors), I have received and send a few transactions with it and just imported the same descriptor to another wallets (I have tried with Sparrow and Electrum).Once imported, the balance displayed was not the same as in bitcoin core, so trying to figure out I found that it was one change address missing...checking that address I realized that it was in the path 84'/0'/0'/1/45 and since there is gap limit of 20 it did not show, so by increasing the gap I found the \"missing\" utxo. So in this wallet I have only used two change addresses one  which it is at path 84'/0'/0'/1/1 and the second at 84'/0'/0'/1/45.For what reason would not start from 0? (it started at 1) and from there jumped to 45?So what I try right now is that I create an usigned tx with the same input, output and fee with all the different wallets (Sparrow, Electrum and Bitcoin Core) and here are the results:Electrum sends the change to the address: 84'/0'/0'/1/0Sparrow send the change to the address: 84'/0'/0'/1/46Bitcoin Core to the address: 84'/0'/0'/1/103I close the wallets and I repeat all the steps and with Electrum and Sparrow it shows the same path for the change address (0 and 46) while in bitcoin core changes each time, now it shows 84'/0'/0'/1/105.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5453221",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "May 19, 2023, 03:09:09 PM",
+      "body": "If you imported those descriptors with specified \"range\" and \"next_index\" arguments, it'll use that address_index in your next transaction.I'm not sure how it selects change address if it isn't specified (I assume that it's the next address to the last generated, even if not used; CMIIAW)Have you been testing transaction-related commands recently?Anyways, you can see the current candidate change address in the \"next\" output of listdescriptors command.Sparrow works similarly but it selects the next address_index from the last change address that received bitcoins.So if you somehow used 'change address 45' without using the previous index, it'll select 46 in the next transaction.On the other hand, Electrum currently doesn't support descriptors and just selecting the change address of the lowest index that isn't used yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TracaChang",
+      "created_time": "May 19, 2023, 07:03:52 PM",
+      "body": "Quote from: nc50lc on May 19, 2023, 03:09:09 PMIf you imported those descriptors with specified \"range\" and \"next_index\" arguments, it'll use that address_index in your next transaction.It was imported from an empty wallet so range was [0,999] by default.Quote from: nc50lc on May 19, 2023, 03:09:09 PMHave you been testing transaction-related commands recently?No, did not do any testing commands, only thing I did was to simulate a send transaction, just go to send set an address to see which fees was advising and I've did a few times during this mempool crazy high fees period.Quote from: nc50lc on May 19, 2023, 03:09:09 PMAnyways, you can see the current candidate change address in the \"next\" output of listdescriptors command.Yeah, I've realized that, what I just did is to create a new empty wallet, import the same descriptor and the current candidate is 46 as in sparrow while the \"old watch only\" is at 110, so I was wondering if there's a way to manually select previous change for the future transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "May 20, 2023, 02:31:28 AM",
+      "body": "It goes sequentially, but there may be some situations and bugs that cause it to \"skip\" indexes. In those cases, it generally is that it \"reserved\" an address, but didn't end up using it, and failed to \"return\" it to let that address be used in future transactions. IIRC one such bug was recently fixed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TracaChang",
+      "created_time": "May 20, 2023, 08:01:12 AM",
+      "body": "Quote from: achow101 on May 20, 2023, 02:31:28 AMIt goes sequentially, but there may be some situations and bugs that cause it to \"skip\" indexes. In those cases, it generally is that it \"reserved\" an address, but didn't end up using it, and failed to \"return\" it to let that address be used in future transactions. IIRC one such bug was recently fixed.Appreciate your answer, taking my case as example, after being fixed how it is expected to work a wallet that gap? Since it will not fail to \"return\" the reserved addresses, it will use previous unused change address (from 2 to 44 ? or it will just continue sequentially from the last change address that has been used, in this case 46?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "May 21, 2023, 03:40:14 AM",
+      "body": "Quote from: TracaChang on May 20, 2023, 08:01:12 AMAppreciate your answer, taking my case as example, after being fixed how it is expected to work a wallet that gap? Since it will not fail to \"return\" the reserved addresses, it will use previous unused change address (from 2 to 44 ? or it will just continue sequentially from the last change address that has been used, in this case 46?It will continue from whatever was marked as the last used change address. There is no mechanism for detecting that previously \"used\" change addresses were actually used.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

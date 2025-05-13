@@ -1,0 +1,61 @@
+{
+  "id": "topic_5416435",
+  "title": "jnano",
+  "author": "jnano",
+  "created_time": "October 08, 2022, 09:29:55 PM",
+  "content": "In a multi-wallet file configuration, I executed \"reconsiderblock\".The console said \"Executing command using ... wallet\", making it appear only one is affected.I chose another wallet file and executed the same command again.Despite of what it says, does it only affect the single selected wallet or all of them?If just one, what are the implications?Background:This is on v0.18.Core crashed during catching up due to being out of space for the UTXO db. I fixed it and restarted.It recovered and continued syncing blocks for about a minute, then stalled doing nothing.The log revealed repeated \"ERROR: AcceptBlockHeader: block ... is marked invalid\" for the same block.I restarted, the same situation continued, so I executed \"reconsiderblock\".It seemed to resume okay.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5416435",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "October 08, 2022, 11:48:06 PM",
+      "body": "Quote from: jnano on October 08, 2022, 09:29:55 PMIn a multi-wallet file configuration, I executed \"reconsiderblock\".The console said \"Executing command using ... wallet\", making it appear only one is affected.I chose another wallet file and executed the same command again.Despite of what it says, does it only affect the single selected wallet or all of them?The block status (valid or not) shouldn't be tied to a specific wallet, no. I don't see why it should.Quote from: jnano on October 08, 2022, 09:29:55 PMIf just one, what are the implications?The implication of the command is that it marks a block as 'to be reconsidered', e.g. if it was marked invalid through violating a consensus rule. It will thus be checked again.Quote from: jnano on October 08, 2022, 09:29:55 PMCore crashed during catching up due to being out of space for the UTXO db. I fixed it and restarted.It recovered and continued syncing blocks for about a minute, then stalled doing nothing.The log revealed repeated \"ERROR: AcceptBlockHeader: block ... is marked invalid\" for the same block.I restarted, the same situation continued, so I executed \"reconsiderblock\".It seemed to resume okay.It's possible that a block was corrupted due to unexpected exit of Bitcoin Core. Does it run normally now? Or does the issue persist?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 09, 2022, 03:37:56 AM",
+      "body": "Quote from: jnano on October 08, 2022, 09:29:55 PMThe console said \"Executing command using ... wallet\", making it appear only one is affected.I chose another wallet file and executed the same command again.Despite of what it says, does it only affect the single selected wallet or all of them?The message will appear regardless if the command used is a wallet rpc or not, if you're using the GUI.That's just a note to mention which wallet is selected in the drop-down menu above it.But will only appear once until another wallet is selected.If \"(none)\" is selected, it will say \"Executing command without any wallet\" instead.Reference code: github.com/bitcoin/bitcoin/blob/master/src/qt/rpcconsole.cpp#L1031-L1038To see if a command is actually wallet-specific, enter help in the console;Those under == Wallet == are the commands that affects only the selected wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jnano",
+      "created_time": "October 09, 2022, 02:32:06 PMLast edit: October 18, 2022, 12:01:16 AM by jnano",
+      "body": "Thanks.Quote from: n0nce on October 08, 2022, 11:48:06 PMIt's possible that a block was corrupted due to unexpected exit of Bitcoin Core.While it quit automatically due to the abnormal condition, it's still a graceful exit as evident by having everything logged until the end. Yet it always happens when out of space, so evidently the cleanup isn't good.But it was on an older version. Maybe fixed in newer ones.QuoteDoes it run normally now? Or does the issue persist?After \"reconsiderblock\" it's fine as far as I can tell, but not without it.Quote from: nc50lc on October 09, 2022, 03:37:56 AMThat's just a note to mention which wallet is selected in the drop-down menu above it.So it's sort of a bug or anti-feature in the case of non-wallet commands.After a cursory look, it seems it may be possible to decide whether to show that \"current wallet\" console message based on CRPCCommand.category.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 10, 2022, 02:26:40 AM",
+      "body": "Quote from: jnano on October 09, 2022, 02:32:06 PMQuote from: nc50lc on October 09, 2022, 03:37:56 AMThat's just a note to mention which wallet is selected in the drop-down menu above it.So it's sort of a bug or anti-feature in the case of non-wallet commands.I think it's a way to show that the command executed in the console is equivalent to bitcoin-cli with --rpc-wallet arg.Because in bitcoin-cli, you can also add rpc-wallet regardless if the command is a wallet rpc or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 10, 2022, 12:09:49 PM",
+      "body": "Quote from: jnano on October 09, 2022, 02:32:06 PMThanks.Quote from: n0nce on October 08, 2022, 11:48:06 PMIt's possible that a block was corrupted due to unexpected exit of Bitcoin Core.While it quit automatically due to the abnormal condition, it's still a graceful exit as evident by having everything logged until the end. Yet it always happens when out of space, so evidently the cleanup isn't good.But it was on an older version. Maybe fixed in newer ones.I did quick search and few possible error/corruption due to out of storage space isn't fixed yet, https://github.com/bitcoin/bitcoin/issues/26112.Quote from: jnano on October 09, 2022, 02:32:06 PMQuote from: nc50lc on October 09, 2022, 03:37:56 AMThat's just a note to mention which wallet is selected in the drop-down menu above it.So it's sort of a bug or anti-feature in the case of non-wallet commands.I'd guess it's easier/faster to code function which show such message on all command.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jnano",
+      "created_time": "October 18, 2022, 12:01:36 AM",
+      "body": "Quote from: ETFbitcoin on October 10, 2022, 12:09:49 PMI'd guess it's easier/faster to code function which show such message on all command.Easier, but misleading.Quote from: ETFbitcoin on October 10, 2022, 12:09:49 PMI did quick search and few possible error/corruption due to out of storage space isn't fixed yet, https://github.com/bitcoin/bitcoin/issues/26112.Interesting that the reported out of space condition there is also on writing to the chainset.And also there reconsiderblock is reported as being good enough.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

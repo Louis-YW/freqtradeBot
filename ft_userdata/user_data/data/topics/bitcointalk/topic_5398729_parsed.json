@@ -1,0 +1,165 @@
+{
+  "id": "topic_5398729",
+  "title": "PawGo",
+  "author": "PawGo",
+  "created_time": "May 15, 2022, 08:23:06 AM",
+  "content": "So, things like that happens even today, when mempool is full:https://mempool.space/block/00000000000000000003ca025b0f616f3c78635f3b8f7f45f791b308661ee0a9Why like that? What happened? Accident or acting on purpose?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398729",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 15, 2022, 08:48:27 AM",
+      "body": "I suspect it's due to an accident. There might was something wrong with the mempool of the pool's node at that moment and during the in-between period they were trying to find out what's wrong, one of their miners solved the block. There's no reason to dump so much money otherwise.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "barrysty1e",
+      "created_time": "May 15, 2022, 09:06:49 AM",
+      "body": "Not an accident at all.There really isn't any incentive to include transactions in blocks.It's a modest amount of processing power required to test, pick and commit transactions to block (nearly a quarter of the bitcoin codebase is dedicated to this).On top of that, if the node is behind a slow WAN connection - the time to propogate the block across the network could very well mean it is beaten by a more responsive node.You could argue that the fees are the incentive to include them in a block, but when you are talking 6.25BTC ($184,000 USD) as the base - some aren't bothered by this.Another possibility is the stratum/pool mining software responsible for this block is not connected to a full node, rather a lite or SPV node. To build a valid block, you really only need to know the previous block hash, the height and the coinbase reward. Running a bitcoin node again, is quite resource intensive - and the disk space alone is 405Gb (standard, not txindex) - I can fully see a situation where some clever software simply listening to the headers could work.There are much more devious reasons as to why the block has no transactions, but will leave them to the readers imagination.The majority of it stopped around April last year (2021) *cough*.james",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 15, 2022, 10:55:14 AM",
+      "body": "Quote from: barrysty1e on May 15, 2022, 09:06:49 AMThere really isn't any incentive to include transactions in blocks.That sounds incorrect, pal.  Quote from: barrysty1e on May 15, 2022, 09:06:49 AMIt's a modest amount of processing power required to test, pick and commit transactions to block (nearly a quarter of the bitcoin codebase is dedicated to this).Creating merkle trees does require a little bit more of the processing power, but there's no way this will disincentivize the miners if they're going to get an extra fraction of a bitcoin, just because the block subsidy is greater than that.Quote from: barrysty1e on May 15, 2022, 09:06:49 AMYou could argue that the fees are the incentive to include them in a block, but when you are talking 6.25BTC ($184,000 USD) as the base - some aren't bothered by this.In the last 10 blocks, the average income from fees, alone, is 0.107 BTC. That's 1.712% of the block reward. I would bother to earn it, even with higher chance to be beaten by propagation, even if I had to compute merkle trees.Quote from: barrysty1e on May 15, 2022, 09:06:49 AMAnother possibility is the stratum/pool mining software responsible for this block is not connected to a full node, rather a lite or SPV node. To build a valid block, you really only need to know the previous block hash, the height and the coinbase reward. Running a bitcoin node again, is quite resource intensive - and the disk space alone is 405Gb (standard, not txindex) - I can fully see a situation where some clever software simply listening to the headers could work.But, running a full node is a necessity if you want to be accurate and sure. Listening to an SPV node increases your chances to be beaten in propagation as you receive the info later than the others. (And you're trusting an entity that can set you up)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 15, 2022, 11:04:35 AMLast edit: May 15, 2022, 03:19:12 PM by o_e_l_e_o",
+      "body": "Usually this happens when two blocks are mined within a few seconds of each other.Let's say you mine Block A and broadcast it. When I receive it, I need to verify it, verify all the transactions it contains, go through my mempool and remove all the transactions which are included in your block, and then go through my UTXO set and remove all the UTXOs which have just been spent in that block and update my set with all the new UTXOs created. I then need to pick a new set of unconfirmed transactions to place in to my candidate block which I am going to attempt to mine on top of Block A, and calculate the necessary Merkle tree. All that takes time - usually just a few seconds, but time nonetheless. In the meantime, do I just have all my miner sitting idle? No, that would be a waste of money. Instead I have them attempt to mine Block B, which builds on top of Block A, but only contains a coinbase transaction to myself. They will only attempt to mine this block for a few seconds, until I update them with a new candidate block which is filled with transactions, but very rarely they are successful and find a block within those few seconds.The timestamp of the block you have linked to is also quite interesting, since it is later than not just the next block, but also the block after that.Quote from: barrysty1e on May 15, 2022, 09:06:49 AMThe majority of it stopped around April last year (2021) *cough*.I count 208 empty blocks since April last year: https://blockchair.com/bitcoin/blocks?q=transaction_count%281%29%2Ctime%282021-04-01..%29",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 15, 2022, 11:33:12 AM",
+      "body": "Quote from: o_e_l_e_o on May 15, 2022, 11:04:35 AMThe timestamp of the block you have linked to is also quite interesting, since it is earlier than not just the next block, but also the block after that.Although unlikely, it could be faked, for some reason. I can't be sure it's 3 minutes unless I had some sort of node plugin installed that timestamps the block the moment it receives it. Anyway, it was probably an accident that occurred in the meantime.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 15, 2022, 12:09:29 PM",
+      "body": "It's also a failsafe.If you have 6 nodes dispersed around the world and one of them gets out of sync for a couple of minutes for some reason in terms of the mempool it is at that point better to mine an empty block and get it out and loose some rewards then mine an invalid block that will not be accepted.Could be something as simple as a piece of network equipment dropping a packets for a couple of seconds.If you are mining yourself to your own node you would never know. If you have multiple nodes and redundancy checks and one node sees TX \"A\" and the other node has no idea about it a brief check is in order. Think seconds at most. But, if that is when a miner sends you a valid block hash so be it. You send out a block with no TX.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "May 15, 2022, 01:19:21 PM",
+      "body": "Quote from: barrysty1e on May 15, 2022, 09:06:49 AMThere really isn't any incentive to include transactions in blocks.There are transaction fees. The miners have an incentive to maximize their immediate revenue because their equipment has a limited useful life. Including an additional transaction into a block does have a cost because the miner needs to validate the transaction is valid, and for each additional transaction included in a block, it will take an incremental additional amount of time for the block to get propagated to the rest of the network. Based on orphan rates of under 1%, and according to BlackHatCoiner above, a ~1.7% rate of total block rewards being made up of transaction fees, the theoretical maximum cost to include any transactions is below the revenue generated by including transactions. As such, including transactions is EV positive.It is difficult to know with certainty if the timestamps of the block in question and the prior block are accurate. Timestamps can be up to two hours off and blocks will still be accepted.To answer the OP's question, for whatever reason, the miner that found the block in question, ViaBTC, was unable to construct a block that includes transactions after they received and validated the prior block, prior to them finding the block they found.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 15, 2022, 03:21:39 PM",
+      "body": "Quote from: BlackHatCoiner on May 15, 2022, 11:33:12 AMAlthough unlikely, it could be faked, for some reason. I can't be sure it's 3 minutes unless I had some sort of node plugin installed that timestamps the block the moment it receives it. Anyway, it was probably an accident that occurred in the meantime.I wouldn't call it \"faked\" in the usual sense of the word, since there is very little incentive for a single miner to fake a timestamp, and actually no punishment for doing so within the consensus rules. What constitutes an acceptable block timestamp is actually quite broad - anywhere between the median time of the last 11 blocks (plus one second) and 2 hours in the future (based on adjusted network time). Most miners keep timestamps fairly accurate, but they are free to vary them within the (on average) 3 hour window these rules stipulate. Sometimes miners have latency issues (which might also explain why they are mining empty blocks), and some may vary the timestamp as an additional nonce field.It's not that uncommon to see a block with a later timestamp than a subsequent block, but it is a bit more rare to see a block with a later timestamp than the two subsequent blocks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "May 15, 2022, 03:30:47 PMLast edit: May 15, 2022, 03:42:11 PM by franky1",
+      "body": "Quote from: BlackHatCoiner on May 15, 2022, 08:48:27 AMI suspect it's due to an accident. There might was something wrong with the mempool of the pool's node at that moment and during the in-between period they were trying to find out what's wrong, one of their miners solved the block. nope. not an errorwhen a pool makes a blocksolve it knows it has a bit of time to quickly work on another block while the network is propagating its first block. so instead of wasting time collating transactions to make a new blockheader it just begins a 'empty block' and as the asics run through the first few rounds of their nonce/extranonce. the pool then starts adding transactions into a blocktemplate for the next header to send in the next round of hashing once then finished their attempts. you notice this happening most when an empty block is solved within 3 minutes of the same pool solving their previous block... AS IS THE CASE WITH THIS TOPICS BLOCK NUMBERoh and the '3 minutes' is not actual 3 physical minutes. its a use of the timestamp to add some extra 'nonce' possibility. usually they are lucky to get a solve in even less physical time, but they churned through enough nonce and extra nonce to appear as being 3 minutes. but usually its in reality less physical time between blocks, because they havnt had chance to add in the collated transactions yet ..if i could de-merit blackhatcoiner i would. but with that said o_e_l_e_o is spot on in this topicso ill throw him a bone +5",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 16, 2022, 02:48:34 AM",
+      "body": "Quote from: franky1 on May 15, 2022, 03:30:47 PMwhen a pool makes a blocksolve it knows it has a bit of time to quickly work on another block while the network is propagating its first block. so instead of wasting time collating transactions to make a new blockheader it just begins a 'empty block' and as the asics run through the first few rounds of their nonce/extranonce. the pool then starts adding transactions into a blocktemplate for the next header to send in the next round of hashing once then finished their attempts. Actually almost all the time it is another pool that miners the empty block because they are \"spy mining\" and get the successful header before the block is even propagates and start working on the next block right away. Otherwise if it is their own block they don't need to \"collect transactions\" since they already know what transactions were included in that previous block.This case could be the same too considering the coinbase string in the two blocks are slightly different (one has \"Mined by unp1\" and the other doesn't) that could mean 2 stand-alone servers.Quoteoh and the '3 minutes' is not actual 3 physical minutes. its a use of the timestamp to add some extra 'nonce' possibility. If the block is empty why would they change time, it is not like they have to compute merkle root hash by computing a thousand hashes?!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "barrysty1e",
+      "created_time": "May 16, 2022, 01:51:55 PMLast edit: May 17, 2022, 02:49:03 PM by achow101",
+      "body": "Quote from: pooya87 on May 16, 2022, 02:48:34 AMQuote from: franky1 on May 15, 2022, 03:30:47 PMwhen a pool makes a blocksolve it knows it has a bit of time to quickly work on another block while the network is propagating its first block. so instead of wasting time collating transactions to make a new blockheader it just begins a 'empty block' and as the asics run through the first few rounds of their nonce/extranonce. the pool then starts adding transactions into a blocktemplate for the next header to send in the next round of hashing once then finished their attempts. Actually almost all the time it is another pool that miners the empty block because they are \"spy mining\" and get the successful header before the block is even propagates and start working on the next block right away. Otherwise if it is their own block they don't need to \"collect transactions\" since they already know what transactions were included in that previous block.This case could be the same too considering the coinbase string in the two blocks are slightly different (one has \"Mined by unp1\" and the other doesn't) that could mean 2 stand-alone servers.Quoteoh and the '3 minutes' is not actual 3 physical minutes. its a use of the timestamp to add some extra 'nonce' possibility. If the block is empty why would they change time, it is not like they have to compute merkle root hash by computing a thousand hashes?!this is what i was alluding to.back in 2015 i personally watched antpool mine 4 blocks on top of each other without relaying the blocks to the network.this is possible by listening to their stratum.notify and watching prevhash change, while the network doesnt change.jamesworth mentioning as well, back in the day there would often be bitcoin mines setup with rigged power out in the expanse of china.. with the WAN link being an old 2g mobile phone.the max send rate on 2g being around about 0.05-0.1megabit/sec (so 5-10kilobytes/sec).with even a half megabyte block taking up to 1.5 minutes to get out onto the network, you can see why blocks with only the coinbase txn were mined.jamesQuoteQuote from: barrysty1e on May 15, 2022, 09:06:49 AMAnother possibility is the stratum/pool mining software responsible for this block is not connected to a full node, rather a lite or SPV node. To build a valid block, you really only need to know the previous block hash, the height and the coinbase reward. Running a bitcoin node again, is quite resource intensive - and the disk space alone is 405Gb (standard, not txindex) - I can fully see a situation where some clever software simply listening to the headers could work.But, running a full node is a necessity if you want to be accurate and sure. Listening to an SPV node increases your chances to be beaten in propagation as you receive the info later than the others. (And you're trusting an entity that can set you up)as long as you can produce correct nbits for the next block (15 lines of c++), validate the previous header hash (using openssl lib, 5 lines of c++), you can test to see whether the blockheader you received is indeed accurate. not including transactions (since you wouldnt know or be listening for txes) would actually improve your chances of nailing a block.james",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 16, 2022, 02:31:13 PM",
+      "body": "Quote from: barrysty1e on May 16, 2022, 02:05:29 PMas long as you can produce correct nbits for the next block (15 lines of c++), validate the previous header hash (using openssl lib, 5 lines of c++), you can test to see whether the blockheader you received is indeed accurate.I didn't mean this. Sure, you can write a program that checks the validity of the block header, but if you haven't verified the entire chain until that point, you can't know for sure what's the previous block hash or if a transaction double-spends etc. Quote from: barrysty1e on May 16, 2022, 02:05:29 PMnot including transactions (since you wouldnt know or be listening for txes) would actually improve your chances of nailing a block.Yes, but it's little matter when it comes to earning millions of sats in fees.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 16, 2022, 03:10:18 PM",
+      "body": "The timestamp difference is likely not 3 minutes, though that would be indicative of some sort of block withholding/selfish mining but I highly doubt so. It is far more likely for an inaccuracy between the timestamp. From my past experience, my node always received the blocks within ~1-5 seconds of each other which is congruent with the propagation time of the network. You can still use the timestamp as a variable if for some reason you need it though.The main problem with SPV mining (or mine now, validate at the same time) was the major fork back in 2015 by the various larger pools which has largely resulted in a huge income loss by the larger pools. If you read back on the issue and the topic at that time, they actually didn't really care if they validated the block or not which resulted in a total mess that the community had to deal with. The point at that time was that they wanted to gain an edge over the others, not because of bandwidth constraints. It simply made more sense to just get a server that does it for you or to just join a pool. The profits from the block transaction fee far outweighs the cost.I highly doubt that any farms would bother to not include transactions because those up/down speed would be okay for stratum, considering the fact that you can still cut down on unnecessary transmissions to the pool. It is still faster and more cost efficient to rely on an external server to compile and feed the data instead of pure SPV mining. With that in mind, most of the larger miners/pools used to use Bitcoin Relay Network or now known as FIBRE but I'm not sure if its still in use or replaced again. They actually do have an edge over the others by that alone though SPV mining was a prominent practice at that time. I think there was some proof that it actually didn't really made sense now with all the optimizations.Also, at some point in time, the empty blocks might've been due to covert ASICBoost but it isn't happening now that overt ASICBoost is so prominent.P.S. I don't think intentional sabotage is likely because that is quite expensive in the first place, only happened once accidentally.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "barrysty1e",
+      "created_time": "May 16, 2022, 04:35:30 PMLast edit: May 17, 2022, 02:48:20 PM by achow101",
+      "body": "Quote from: BlackHatCoiner on May 16, 2022, 02:31:13 PMQuote from: barrysty1e on May 16, 2022, 02:05:29 PMas long as you can produce correct nbits for the next block (15 lines of c++), validate the previous header hash (using openssl lib, 5 lines of c++), you can test to see whether the blockheader you received is indeed accurate.I didn't mean this. Sure, you can write a program that checks the validity of the block header, but if you haven't verified the entire chain until that point, you can't know for sure what's the previous block hash or if a transaction double-spends etc. Quote from: barrysty1e on May 16, 2022, 02:05:29 PMnot including transactions (since you wouldnt know or be listening for txes) would actually improve your chances of nailing a block.Yes, but it's little matter when it comes to earning millions of sats in fees. understood, sure.however given bitcoin's difficulty, it would be highly unlikely for some party to solve a blockheader where the contents were invalid (and you could easily test this).additionally, if you let a spv program run for a little while before starting your stratum up... it would be trivial to test if the 'blocks heard' did in fact form a legitimate chain.prevhash being the sha256d of the previous block.. easy to check(edit) in fact, the most difficult part would be determining the block height - this is indeed part of the coinbase tx (bip34).. but you dont have access to it if you are just listening to headers.. you'd have to have this info ahead of timejamesQuote from: ranochigo on May 16, 2022, 03:10:18 PMThe timestamp difference is likely not 3 minutes, though that would be indicative of some sort of block withholding/selfish mining but I highly doubt so. It is far more likely for an inaccuracy between the timestamp. From my past experience, my node always received the blocks within ~1-5 seconds of each other which is congruent with the propagation time of the network. You can still use the timestamp as a variable if for some reason you need it though.The main problem with SPV mining (or mine now, validate at the same time) was the major fork back in 2015 by the various larger pools which has largely resulted in a huge income loss by the larger pools. If you read back on the issue and the topic at that time, they actually didn't really care if they validated the block or not which resulted in a total mess that the community had to deal with. The point at that time was that they wanted to gain an edge over the others, not because of bandwidth constraints. It simply made more sense to just get a server that does it for you or to just join a pool. The profits from the block transaction fee far outweighs the cost.I highly doubt that any farms would bother to not include transactions because those up/down speed would be okay for stratum, considering the fact that you can still cut down on unnecessary transmissions to the pool. It is still faster and more cost efficient to rely on an external server to compile and feed the data instead of pure SPV mining. With that in mind, most of the larger miners/pools used to use Bitcoin Relay Network or now known as FIBRE but I'm not sure if its still in use or replaced again. They actually do have an edge over the others by that alone though SPV mining was a prominent practice at that time. I think there was some proof that it actually didn't really made sense now with all the optimizations.Also, at some point in time, the empty blocks might've been due to covert ASICBoost but it isn't happening now that overt ASICBoost is so prominent.P.S. I don't think intentional sabotage is likely because that is quite expensive in the first place, only happened once accidentally.do you have any links for the 2015 event?i dont recall this, but could be wrong.. bitcoin has always validated the block contents and transactions before accepting it.james",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 16, 2022, 04:38:11 PM",
+      "body": "Quote from: barrysty1e on May 16, 2022, 04:36:51 PMdo you have any links for the 2015 event?i dont recall this, but could be wrong.. bitcoin has always validated the block contents and transactions before accepting it.jamesIt doesn't affect full nodes which are upgraded.It is invalid by the newer version of nodes but valid by those older version/SPV nodes. https://bitcoin.org/en/alert/2015-07-04-spv-mining",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 16, 2022, 04:41:14 PM",
+      "body": "Quote from: barrysty1e on May 16, 2022, 04:35:30 PM[...]The problem is the double-spending. An SPV could set you up, if say, another miner paid them so.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 16, 2022, 04:58:15 PM",
+      "body": "Quote from: BlackHatCoiner on May 16, 2022, 04:41:14 PMThe problem is the double-spending. An SPV could set you up, if say, another miner paid them so.I don't really think it makes sense for this to happen. The premise of SPV mining and the security of which would assumed to be similar. It doesn't make sense for anyone to do so, simply because it is so expensive and serve little to no purpose other than a few minutes of wasted work, which is far less than the money you spent because most people don't generate a block every 10 minutes. You cannot possibly manage to trick and mislead the pool or miner for long enough, and if you do then the costs of which is far too much (>$190K per block). It is the same principle as an attack on an SPV client, unless your opponent is a small time miner that takes virtually no precautions, then the chances of success is not high at all. Any reasonable miner would be as well connected as possible with multiple redundancies.Just to reiterate, I don't think anyone is purely SPV mining without any validation but this attack would be as pointless as a 51% attack on the network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 16, 2022, 05:37:14 PMLast edit: May 16, 2022, 08:21:15 PM by BlackHatCoiner",
+      "body": "Quote from: ranochigo on May 16, 2022, 04:58:15 PMI don't really think it makes sense for this to happen.Neither do I, but I yet fail to understand why is running a full node such a difficult thing to do. I mean, you've put yourself into buying all those hardware, build a mining rig, make effort to ask questions/read answers, trying to do this as much efficiently and profitably as possible, and you can't just do the only verification that is vital in this system?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "May 16, 2022, 06:39:53 PMLast edit: May 16, 2022, 07:10:17 PM by franky1",
+      "body": "Quote from: pooya87 on May 16, 2022, 02:48:34 AMQuote from: franky1 on May 15, 2022, 03:30:47 PMwhen a pool makes a blocksolve it knows it has a bit of time to quickly work on another block while the network is propagating its first block. so instead of wasting time collating transactions to make a new blockheader it just begins a 'empty block' and as the asics run through the first few rounds of their nonce/extranonce. the pool then starts adding transactions into a blocktemplate for the next header to send in the next round of hashing once then finished their attempts. Actually almost all the time it is another pool that miners the empty block because they are \"spy mining\" and get the successful header before the block is even propagates and start working on the next block right away. Otherwise if it is their own block they don't need to \"collect transactions\" since they already know what transactions were included in that previous block.only true at the very second you win that current(first) block to know to base the next block on YOUR previous block, because obviously you dont know to build a second block based on a first, until you know you won the first.. obviously.. then you can use a template that includes transactions you might have picked for the next block while making the previous block. but the chances of winning 2 blocks in a row didnt warrant the inefficiency to be building 2 templetes(parent and child) simultaneouslyhowever. if you are not lucky to have made the current(first) block then you have to scrap that block(parent). and scrap your blocktemplate of what you hope to be the next block(child). because someone else solved the current(first) block before you.so most pools dont even bother pre-empting they will get 2 blocks in a row by having a second template filled with TX's ready. as thats more time consuming.especially when they have to have lots of different templates per asic to make sure all asics have different 'work' to churn throughmost pools dont SPV either. instead they know every X seconds is a round of nonce/extra nonce churning a bunch of asic go through, meaning new headers are needed to be sent every X seconds within the average 10min window..(many many rounds).in short. pools do/will correctly validate all the rules apply and all data apply to the rules. they dont avoid full validation. they just know each step takes time so they build on it as they go through the steps  by building whilst going through the rounds of extranonce changes to the templateso in the first few rounds. they start with empty block.. and start adding more transactions per round. (much more efficient this way to start with 0tx and add a few every extranonce round)its just lucky that they solved a second block quickly.. meaning because they solved it within the first few rounds of churning through extra nonce of XXX many rounds per ~10min. in those first rounds the transaction count was lacking. because they were lucky to get a block solve quick...i know you will try to suggest that a block solve of a second block found in the very first round of extranonce churn would be a 'spv' which is conversationally correct because that few milliseconds of the first round they probably have not done all the verification.. but these empty blocks are not solved in the very very first round(out of all empty blocks the chances of them being solved in milliseconds is super small). its normally a few rounds later.(long enough to do the checks but not long enough to purge the mempool and collate new transactions)..spv mining is not a large cost saving to just avoid doing all consensus checks on all the block data. nor time saving just to avoid validity checking all the block. but if they were to avoid checking completely, this can cause alot of reject risk if they blindly build ontop a block they dont check throughout their block solve attempt.. so with huge cost at risk vs negligible saving. they see no point in SPV mining, as the saving is not worth the risk.the real reason for empty block has nothing to do with spv mining. and everything to do with making a basic block template without transactions where the only variable they need to add is the previous solve hash. and then do checks and then purge confirmed transactions and then add new transactions to the next round of extranonce churn..i remember some time ago someone looked at all the blocks that appeared to be solved quickly after a previous block, and seen not only were there empty blocks but also partially filed blocks. whereby they could roughly guess how quick (in physical time) that second block was actually solved. based on how full the block was.it was not an exact science. but it did reveal some interesting things.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

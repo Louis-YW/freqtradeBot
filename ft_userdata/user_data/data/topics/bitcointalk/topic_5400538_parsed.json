@@ -1,0 +1,93 @@
+{
+  "id": "topic_5400538",
+  "title": "nicholas_mlad",
+  "author": "nicholas_mlad",
+  "created_time": "May 28, 2022, 05:27:43 PM",
+  "content": "Hello, I am creating an API that will connect to Bitcoin Core running on a server. The API would manage multiple wallets for a lot of users (up to 1000s)... Now I'm wondering how could I implement this to work as fast as possible. Is it possible to for example \"getbalance\" (\"http://USER:PASS@localhost:8332/wallet/WALLETNAME\") of a specific wallet without having it loaded? Because each loaded wallet takes about 10MB in memory.. And having 1000s of them loaded at the same time would take up a lot of ram and I am not sure how much stress it causes on the CPU for example, if anyone has any knowledge about this. Would it make sense for each API call to first load the wallet, execute the command and then unload the wallet? That would probably affect the performance. Any help is appreciated.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400538",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "May 28, 2022, 05:47:57 PM",
+      "body": "Quote from: nicholas_mlad on May 28, 2022, 05:27:43 PMAny help is appreciated.  Just another idea/direction: for only getting the balance of an address, maybe using a local block explorer (maybe also with its own DB), connected to the same Bitcoin Core daemon, would be more useful?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 29, 2022, 03:56:19 AM",
+      "body": "You don't want vanilla Bitcoin Core then. You have to mod it.For such small things as reading the balance, you should read the wallet file directly using a BDB 4.8 C++ driver and do such calculations as summining the amounts in each address on your own.In fact you should avoid loading wallets all together for your use-case, as it's not scalable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nicholas_mlad",
+      "created_time": "May 29, 2022, 10:13:58 AM",
+      "body": "Quote from: NotATether on May 29, 2022, 03:56:19 AMYou don't want vanilla Bitcoin Core then. You have to mod it.For such small things as reading the balance, you should read the wallet file directly using a BDB 4.8 C++ driver and do such calculations as summining the amounts in each address on your own.In fact you should avoid loading wallets all together for your use-case, as it's not scalable.Thanks for the reply. So how could I calculate the balance out of a wallet.dat file without having to search the addresses in a blockchain. I'm not trying to rely on a public API and the bitcoin core doesn't have a blockchain \"explorer\" as far as I know. So would I have to create a blockchain explorer first by storing the whole blockchain to a database? Are there any public projects that could give me an idea how its meant to be done...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nicholas_mlad",
+      "created_time": "May 29, 2022, 10:40:46 AM",
+      "body": "Quote from: NeuroticFish on May 28, 2022, 05:47:57 PMQuote from: nicholas_mlad on May 28, 2022, 05:27:43 PMAny help is appreciated.  Just another idea/direction: for only getting the balance of an address, maybe using a local block explorer (maybe also with its own DB), connected to the same Bitcoin Core daemon, would be more useful?Thanks for the reply. Yes I have thought of this but I couldn't find any blockchain explorer for Bitcoin Core... How would I create one by myself? Copy the whole blockchain to a database and how would I update/modify it with each transaction/change in the blockchain",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "May 29, 2022, 06:08:08 PM",
+      "body": "Quote from: nicholas_mlad on May 29, 2022, 10:13:58 AMQuote from: NotATether on May 29, 2022, 03:56:19 AMYou don't want vanilla Bitcoin Core then. You have to mod it.For such small things as reading the balance, you should read the wallet file directly using a BDB 4.8 C++ driver and do such calculations as summining the amounts in each address on your own.In fact you should avoid loading wallets all together for your use-case, as it's not scalable.Thanks for the reply. So how could I calculate the balance out of a wallet.dat file without having to search the addresses in a blockchain. I'm not trying to rely on a public API and the bitcoin core doesn't have a blockchain \"explorer\" as far as I know. So would I have to create a blockchain explorer first by storing the whole blockchain to a database? Are there any public projects that could give me an idea how its meant to be done...Bitcoin core already stores all block/transaction data in a database. There are a number of block explorers that you can run on top of bitcoin core. Here is a list of some of them. Another important thing to point out is that you do not want the \"balance\" of any given address, you are most likely going to want to know the unspent outputs associated with each address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 30, 2022, 03:04:10 AM",
+      "body": "Quote from: nicholas_mlad on May 28, 2022, 05:27:43 PM-snip- Because each loaded wallet takes about 10MB in memory.. Have you tried this with the new \"Descriptor Wallets\"?AFAIK, those are comparably lightweight compared to the old BDB wallet.dat counterparts.Although I haven't tested loading 100s of them at once.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "May 30, 2022, 03:40:02 AM",
+      "body": "I would not recommend doing that. Bitcoin Core is not well equipped to handle both large wallets, and a large number of wallets. Either it will perform very poorly or it will consume more memory than you have.It is not possible to get a wallet's balance without loading it. Loading a wallet can take a lot of time, and constantly loading and unloading wallets will waste a lot of time. When a wallet is loaded, it is entirely loaded into memory and the entire wallet is iterated at least once.What are you trying to do that you think requires having a wallet for each user?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alexeyneu",
+      "created_time": "June 06, 2022, 06:36:18 AM",
+      "body": "you can either host electrum-server and then use its explorer https://bitcointalk.org/index.php?topic=5393470.msg59788464#msg59788464or host(?) this stuff https://github.com/bcoin-org/bcoin they provide check balance",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alexeyneu",
+      "created_time": "June 06, 2022, 02:06:44 PM",
+      "body": "by manage he meant make a check and transfer funds from if any. so you have say postgres db with private key generated and address for each record. you write simple c++ app which grabs thing by libpq(c++ edition) , do check by electrs and then do signrawtransaction stuff. or you go with latter stuff in my post . didn't have used it but it's used by quicknode so it's commercial grade one",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 07, 2022, 04:27:09 AM",
+      "body": "Quote from: alexeyneu on June 06, 2022, 02:06:44 PMby manage he meant make a check and transfer funds from if any. so you have say postgres db with private key generated and address for each record. you write simple c++ app which grabs thing by libpq(c++ edition) , do check by electrs and then do signrawtransaction stuff. or you go with latter stuff in my post . didn't have used it but it's used by quicknode so it's commercial grade oneIt is probably NOT a good idea to put the private keys in the database, because an SQL injection attack would be able to swipe them.Yo can replace the private keys with IDs inside an offline (disconnected from internet) database, and then when somebody wants to make a transaction, you place an \"approval\" step that's merely just going to the offline PC, running a SELECT against the ID and private key, create and sign transaction, and then broadcast.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

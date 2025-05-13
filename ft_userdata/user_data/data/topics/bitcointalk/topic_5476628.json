@@ -1,0 +1,53 @@
+{
+  "id": "topic_5476628",
+  "title": "Talkist",
+  "author": "Talkist",
+  "created_time": "December 05, 2023, 01:46:26 PM",
+  "content": "I am trying to spend a P2WSH output. Here are the steps I have taken:I have created a P2WSH output via bitcoin-cli. These are the details of the P2WSH output:Code:TypeV0_P2WSHscriptPubKey (asm)OP_0 OP_PUSHBYTES_32 a2b95877500eb4180401640c5649c55ce578584f865e4f1609f9971ca19d6f40scriptPubKey (hex)0020a2b95877500eb4180401640c5649c55ce578584f865e4f1609f9971ca19d6f40Spending txUnspentYou can also view it here: https://blockstream.info/testnet/tx/3010534df31914f938014d34d0bd402ce1a741a46624b28abcfd2462126331a5?expandIn order to spend that output, I am first creating a transaction via bitcoin-cli as such:Code:bitcoin-cli createrawtransaction [{\\\"txid\\\":\\\"3010534df31914f938014d34d0bd402ce1a741a46624b28abcfd2462126331a5\\\",\\\"vout\\\":0}] [{\\\"tb1q77vr56qx6y5vs2zzt9qc85ge62j30r6vaccfxl\\\":0.0000007}]This outputs the following serialization:Code:0200000001a53163126224fdbc8ab22466a441a7e12c40bdd0344d0138f91419f34d5310300000000000fdffffff014600000000000000160014f7983a6806d128c82842594183d119d2a5178f4c00000000I now try to sign the message:Code:bitcoin-cli signrawtransactionwithwallet \"0200000001a53163126224fdbc8ab22466a441a7e12c40bdd0344d0138f91419f34d5310300000000000fdffffff014600000000000000160014f7983a6806d128c82842594183d119d2a5178f4c00000000\" [{\\\"txid\\\":\\\"3010534df31914f938014d34d0bd402ce1a741a46624b28abcfd2462126331a5\\\",\\\"vout\\\":0,\\\"scriptPubKey\\\":\\\"0020a2b95877500eb4180401640c5649c55ce578584f865e4f1609f9971ca19d6f40\\\",\\\"witnessScript\\\":\\\"4c02efef754c14f7983a6806d128c82842594183d119d2a5178f4cac\\\",\\\"amount\\\":0.0000007}]This does not work however, as I always get the following error:Code:{  \"hex\": \"0200000001a53163126224fdbc8ab22466a441a7e12c40bdd0344d0138f91419f34d5310300000000000fdffffff014600000000000000160014f7983a6806d128c82842594183d119d2a5178f4c00000000\",  \"complete\": false,  \"errors\": [    {      \"txid\": \"3010534df31914f938014d34d0bd402ce1a741a46624b28abcfd2462126331a5\",      \"vout\": 0,      \"witness\": [      ],      \"scriptSig\": \"\",      \"sequence\": 4294967293,      \"error\": \"Witness program was passed an empty witness\"    }  ]}I do not understand why I receive a Witness program was passed an empty witness error, as I am explicitly passing a witness script in the command line. Is there a bug or what am I missing?The witness script that was hashed is Code:OP_PUSHDATA1 EFEF OP_DROP OP_PUSHDATA1 f7983a6806d128c82842594183d119d2a5178f4c OP_CHECKSIG which serializes to Quote4c02EFEF754c14f7983a6806d128c82842594183d119d2a5178f4cacI have been told this transaction is non standart but I thought the (witness) redeem can be chosen freely?Thanks for any help.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5476628",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "December 05, 2023, 11:51:48 PM",
+      "body": "Bitcoin Core doesn't know how to sign non-standard scripts. Script is not easy to analyze, so Bitcoin Core sticks to specific templates and patterns that it can analyze. Your script does not follow any of those patterns, so it is unable to produce any valid signatures. Furthermore, since it doesn't recognize the script, it will not place it in the witness. Thus the transaction you get after using signrawtransactionwithwallet is completely unsigned, and in fact, identical to what you passed in.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 06, 2023, 06:48:35 AM",
+      "body": "Quote from: Talkist on December 05, 2023, 01:46:26 PMCode:OP_PUSHDATA1 EFEF OP_DROP OP_PUSHDATA1 f7983a6806d128c82842594183d119d2a5178f4c OP_CHECKSIG FWIW you don't need to push data smaller than 76 bytes using OP_PUSHDATA1 since it is wasteful. All you need to do is to use the size itself, which means using 0x02 and 0x14 instead of 0x4c02 and 0x4c14 respectively for the two data pushes which saves 2 bytes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Talkist",
+      "created_time": "December 06, 2023, 03:09:08 PM",
+      "body": "QuoteBitcoin Core doesn't know how to sign non-standard scripts. Script is not easy to analyze, so Bitcoin Core sticks to specific templates and patterns that it can analyze. Your script does not follow any of those patterns, so it is unable to produce any valid signatures. Furthermore, since it doesn't recognize the script, it will not place it in the witness. Thus the transaction you get after using signrawtransactionwithwallet is completely unsigned, and in fact, identical to what you passed in.Thanks, noted. Does this mean every unlocking script in a P2WSH transaction is non-standard? If yes, does this mean P2WSH redeem scripts are not broadcasted by every client that only broadcasts standard transactions?QuoteFWIW you don't need to push data smaller than 76 bytes using OP_PUSHDATA1 since it is wasteful. All you need to do is to use the size itself, which means using 0x02 and 0x14 instead of 0x4c02 and 0x4c14 respectively for the two data pushes which saves 2 bytes.Thanks for the tip. Noted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "December 06, 2023, 03:43:02 PM",
+      "body": "Quote from: Talkist on December 06, 2023, 03:09:08 PMQuoteBitcoin Core doesn't know how to sign non-standard scripts. Script is not easy to analyze, so Bitcoin Core sticks to specific templates and patterns that it can analyze. Your script does not follow any of those patterns, so it is unable to produce any valid signatures. Furthermore, since it doesn't recognize the script, it will not place it in the witness. Thus the transaction you get after using signrawtransactionwithwallet is completely unsigned, and in fact, identical to what you passed in.Thanks, noted. Does this mean every unlocking script in a P2WSH transaction is non-standard? If yes, does this mean P2WSH redeem scripts are not broadcasted by every client that only broadcasts standard transactions?No, nodes do not inspect the contents of redeem or witness scripts for standardness checks.Perhaps a better term would be \"well known script template\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Talkist",
+      "created_time": "December 14, 2023, 03:48:25 PM",
+      "body": "Thanks guys! Thanks to your direction I managed to sign it myself and now have my first transaction of the type indicatedthat I signed myself. I am happy!Without you I couldn't have done it!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "topic_5466660",
+  "title": "Accardo",
+  "author": "Accardo",
+  "created_time": "September 13, 2023, 01:14:37 PM",
+  "content": "Watchtower is an interesting or important tool/feature in the lightning network, which feature protects our funds from malicious peers. And penalize them, for breaching the channel, by adding the attacker's funds to the innocent client's balance. For a watchtower to successfully stop an attacker, it'll have to stay online always. Such watchtower takes no cut for saving your funds, it can be set up on a different location to watch on your main node. This thread contains the configuration settings, safety measures and few resources that helps with the configuration of a watchtower. Setting up a watchtower is simple provided that the user has LND recent version installed. Before configuring a watchtower the LND should be compile on the watchtowerrpc to enable watchtower accessed via grpc or incli. The command that activates a watchtower is Code:watchtower.active=1Then name the interfaces to listen on for watchtower clients. Attach one listening address per line. The default port for watchtower is 9911 and can be changed to any port with Code:watchtower.listen=0.0.0.0:PORT in the config file e.g:Code: watchtower.listen=0.0.0.0:9912Specify the external IP address for the watch tower, which can expose the URI of the watchtower via WatchtowerRPC.Getinfo or incli tower info. This setting doesn't make any changes to the behavior of your watchtower. It only fetch more info about the watchtower URIs; whether it's clearnet or TOR. E.g Code:$  lncli tower info        ...        \"uris\": [                \"03281d603b2c5e19b8893a484eb938d7377179a9ef1a6bca4c0bcbbfc291657b63@1.2.3.4:9911\"        ]This can be shared with watchtower clients or node to be monitored, so that they can connect to your watchtower. Giving out the URIs to people online can expose the exact location of your watchtower, for privacy purposes TOR is encouraged. Note: If you are using a watchtower, when the network is in a congested mempool state, it's recommended to set the \"wtclient.sweepfee-rate=\"(default is 10sats) in the lnd.conf.Watchtower has a hidden TOR service, that can be activated usingCode:$  lnd --tor.active --tor.v3 --watchtower.activeWhen Incli tower info is queried again, it'll fetch the tor URI like belowCode:$  lncli tower info...\"uris\": [        \"03281d603b2c5e19b8893a484eb938d7377179a9ef1a6bca4c0bcbbfc291657b63@bn2kxggzjysvsd5o3uqe4h7655u7v2ydhxzy7ea2fx26duaixlwuguad.onion:9911\"]NOTE: The tor URIs can only be accessed via Tor, unless a node is set to be hybrid; support both clear net and Tor connections, using Code:Tor.skip-proxy-for-clearnet-targets=1 read more about Tor configuration Configuring the tower's data directory is relevant for people that wants to move the database to a separate volume with more storage. This can be done using the watchtower.towerdir= configuration option. Additionally, the entire set of watch tower configuration option can be found using lnd -hSince it's a self custody watchtower, it's very crucial the watchtower follows these guides:Endeavor that your node is completely efficient to work as a watchtower, if it often goes offline, it'll cause more harm to your LNDIf your Tor network or connection is not efficient it's better to use a clearnetA watchtower with multiple downtime or bad Tor connect can cause enormous backlog in LND, heavily loading the memory, and keeps trying to connect. Sometimes a LND can malfunction or need restarting if the watchtower keeps going offline. What will be the essence of running a watchtower, if instead of watching over your node, you now watch over the LND checking for offline watchtower.  Useful resources: A sample of lnd.confhttps://github.com/lightningnetwork/lnd/blob/master/docs/watchtower.mdhttps://github.com/openoms/lightning-node-management/issues/4",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466660",
+  "comments": [
+    {
+      "author": "Medusah",
+      "created_time": "September 13, 2023, 07:56:31 PM",
+      "body": "Out of curiosity, do we have information on how often watchtowers are used or how often there occur cheating attempts in the lightning network?  And how much does one pay for a watchtower?  Is there a market?  I would not put much trust on someone who is running this altruistically.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Accardo",
+      "created_time": "September 13, 2023, 08:19:30 PM",
+      "body": "Quote from: Medusah on September 13, 2023, 07:56:31 PMOut of curiosity, do we have information on how often watchtowers are used or how often there occur cheating attempts in the lightning network?  And how much does one pay for a watchtower?  Is there a market?  I would not put much trust on someone who is running this altruistically. The altruistic watchtower doesn't require a person offering them to you, like the reward watchtower. Altruist watchtower can be configured privately for your personal usage. The recent LND version made provision for watchtower. So, you may not need to trust anybody, just follow the process above to set up one and aswell decide to share it with others if you wish.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

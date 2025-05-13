@@ -1,0 +1,69 @@
+{
+  "id": "topic_5409926",
+  "title": "Sunset78",
+  "author": "Sunset78",
+  "created_time": "August 15, 2022, 09:06:06 AM",
+  "content": "Hi!I ask for help with the import p2wpkh address from Electrum to Bitcoin core.I use the command importprivkey ********* , but I get an error in response This type of wallet does not support this command (code -4)I tried various options, but unfortunately it didn't work out to import. After spending a lot of time in Google, I realized that it was about some descriptors, but I do not know how to use and add them. And maybe it's not about them at all. Please help me.Ubuntu 22.04.1 LTSLinux 5.15.0-46-generic #49-UbuntuClient version: v23.0.0",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5409926",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "August 15, 2022, 09:17:37 AM",
+      "body": "Quote from: Sunset78 on August 15, 2022, 09:06:06 AMAfter spending a lot of time in Google, I realized that it was about some descriptorsI haven't used descriptor wallets yet, but achow101 on Stack Exchange gives this solution:QuoteThe migration tool has not been implemented yet, and it is not for manually importing keys. Rather it takes an existing wallet and migrates everything in that wallet.As the error message says, descriptor wallets do not support the importprivkey. You will have to use importdescriptors with the private key you want to import as part of the proper descriptor.For example, if you wanted to import the p2wpkh address for a private key, you would make a descriptor of the form wpkh(<privkey>). Then use getdescriptorinfo to get the checksum and create wpkh(<privkey>)#<checksum>, and then use importdescriptors to import that descriptorOr maybe you can still create a New Wallet and untick Descriptor Wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sunset78",
+      "created_time": "August 15, 2022, 09:25:56 AM",
+      "body": "Quote from: LoyceV on August 15, 2022, 09:17:37 AMQuote from: Sunset78 on August 15, 2022, 09:06:06 AMAfter spending a lot of time in Google, I realized that it was about some descriptorsI haven't used descriptor wallets yet, but achow101 on Stack Exchange gives this solution:QuoteThe migration tool has not been implemented yet, and it is not for manually importing keys. Rather it takes an existing wallet and migrates everything in that wallet.As the error message says, descriptor wallets do not support the importprivkey. You will have to use importdescriptors with the private key you want to import as part of the proper descriptor.For example, if you wanted to import the p2wpkh address for a private key, you would make a descriptor of the form wpkh(<privkey>). Then use getdescriptorinfo to get the checksum and create wpkh(<privkey>)#<checksum>, and then use importdescriptors to import that descriptorOr maybe you can still create a New Wallet and untick Descriptor Wallet.Unfortunately wpkh returns the error Method not found (code -32601)I have a seed phrase, can I somehow import it from electrum? Or convert to a suitable bitcoin core format",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sunset78",
+      "created_time": "August 15, 2022, 09:37:26 AM",
+      "body": "Quote from: LoyceV on August 15, 2022, 09:17:37 AMOr maybe you can still create a New Wallet and untick Descriptor Wallet.Solution:Creating new wallet without descriptions. It works!I am very grateful!Do I need to do rescan?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 15, 2022, 09:55:01 AM",
+      "body": "Quote from: Sunset78 on August 15, 2022, 09:25:56 AMI have a seed phrase, can I somehow import it from electrum?I don't think that's possible. You'll have to import all addresses separately.Quote from: Sunset78 on August 15, 2022, 09:37:26 AMDo I need to do rescan?If the address has a balance: yes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 15, 2022, 10:22:40 AM",
+      "body": "Quote from: Sunset78 on August 15, 2022, 09:37:26 AMSolution:Creating new wallet without descriptions. It works!I am very grateful!Do I need to do rescan?If you haven't added \"false\" flag after importprivkey, it should automatically do a rescan. If it didn't rescan, you need to since it's necessary to update the balance.Also, you can also use a blank wallet (non-descriptor) wallet if you do not want to have other private keys in your wallet.For descriptor wallet, you can try this (to import your whole Electrum wallet): https://bitcointalk.org/index.php?topic=5399337.msg60178631#msg60178631But instead of \"xpub\" key, import the \"xpriv\" key that you can get using the command in Electrum's console: getmasterprivate()Also, you must add \\\"active\\\": true, to the 'receiving' and 'change' descriptors to set those as the active descriptors.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mertliti",
+      "created_time": "October 23, 2022, 06:43:08 PM",
+      "body": "Quote from: nc50lc on August 15, 2022, 10:22:40 AMFor descriptor wallet, you can try this (to import your whole Electrum wallet): https://bitcointalk.org/index.php?topic=5399337.msg60178631#msg60178631But instead of \"xpub\" key, import the \"xpriv\" key that you can get using the command in Electrum's console: getmasterprivate()Also, you must add \\\"active\\\": true, to the 'receiving' and 'change' descriptors to set those as the active descriptors.Very helpful! Thank you.I removed the \\\"watching-only\\\": false, from the descriptors also.Would this work also on a non blank wallet? Or will it cause problems to have multiple active descriptors?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 24, 2022, 05:13:00 AM",
+      "body": "Quote from: mertliti on October 23, 2022, 06:43:08 PMWould this work also on a non blank wallet? Or will it cause problems to have multiple active descriptors?Since it's not a blank wallet, it will be pre-loaded with active descriptors for Legacy, P2SH-SegWit, Bech32 (SegWit) and Bech32m (Taproot), plus another set for change.If you set a new descriptor as active (the tutorial doesn't include active flags), it will deactivate the previous active descriptor of the same type,but your wallet can have multiple active descriptors as long as those are for different script types and for change (internal) or not.Importing more descriptors will work but only the active descriptors will be used when prompting for a new address/change.The non-active ones will still be scanned for transaction/balance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "id": "topic_5400975",
+  "title": "AverageGlabella",
+  "author": "AverageGlabella",
+  "created_time": "June 01, 2022, 12:49:37 PM",
+  "content": "Can I setup a time lock which will allow access to the coins in x amount of years but only allow access during that time if 2/3 other people sign it? I do not want to give these people access but my goal is to keep Bitcoin until a certain date 2030. I want to make sure that despite what happens with the btc price I do not withdraw. My solution is getting trusted friends and family to have a multisig setup which does not give them access to the coins but allows them to prevent any impulse withdrawing because of emotional attachment. I have never attempted to setup a multisig in this way and I am just trying to work it out. I want it to work like this: 1. 2/3 signatures needed during the time lock period2. Those in control of the multisig cannot get access to the funds without the master private key (owned by me) 3. Set a date of 2030 as a time where the wallet will unlock. Is this possible?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400975",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 01, 2022, 12:57:11 PM",
+      "body": "You can do this with 3-of-3 multi-sig, not 2-of-3. In the former, you need their approval to spend and so do they. In the latter, they can gain access to your coins and don't need your approval to spend, something you've said you don't want. You also can time lock money to yourself, to avoid messing with intermediaries, but that's once and for all; you can't reverse it, in contrast with multi-sig wherein you can convince your friends to get the money. An even better solution is to look after your emotions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "June 01, 2022, 12:57:55 PMLast edit: June 02, 2022, 03:22:22 AM by ranochigo",
+      "body": "Possible, but I'm not aware of any current implementations that does this for you.For 1 and 3, you can do it this way by making a P2SH with the following script:OP_2 PUBKEY_1 PUBKEY_2 PUBKEY_3 OP_3 OP_CheckMultisig TIME OP_CLTV OP_DropNot sure what you mean by 2. There is a way to only unlock if a certain signature of a key is present.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 01, 2022, 12:58:41 PM",
+      "body": "You can create a signed message that's valid only from a certain date in the future. I haven't tested it, but I assume that's possible with multisig too. That means you can broadcast the transaction once it becomes valid, or beat up your family members to get them to sign a transaction before that time.I'm kidding with the \"beat up\", but also trying to make a point: what do you think is going to happen if you come to them telling them you need to spend your Bitcoin, but they have to deny your request because you asked so in 2022?Quote from: AverageGlabella on June 01, 2022, 12:49:37 PMMy solution is getting trusted friends and family to have a multisig setup which does not give them access to the coins but allows them to prevent any impulse withdrawing because of emotional attachment.How about you drill a hole in your crawl space? Make it 10 meter deep, throw in your private key. If you ever need it, get a shovel. By the time you've reached a depth of 10 meters, your emotions have had enough time to reconsider I think the best answer is this:Quote from: BlackHatCoiner on June 01, 2022, 12:57:11 PMAn even better solution is to look after your emotions.Don't mix family and finances.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "June 01, 2022, 01:31:03 PM",
+      "body": "Quotebut my goal is to keep Bitcoin until a certain date 2030You have at least two options:1) creating any N-of-N multisig, where N>=2, and adding locktime to that2) using OP_CHECKLOCKTIMEVERIFY, then you only need a single keyQuoteI have never attempted to setup a multisig in this way and I am just trying to work it out.Use regtest first, then optionally repeat it on testnet with someone, just to make sure it works. And start with some shorter period, like a week, just to make sure your coins are spendable, and you can unlock them correctly. It is very easy to make a mistake and burn them.QuoteIs this possible?Not only it is possible, but also there are many options, because it can be done in many different ways.QuoteYou also can time lock money to yourself, to avoid messing with intermediaries, but that's once and for all; you can't reverse it, in contrast with multi-sig wherein you can convince your friends to get the money.Both options are possible. You can:1) lock coins, so they can be moved immediately when all people agree on that, or after a long time, if one person will do that (exactly in the same way as a closing channel transaction is made)2) lock coins in a way that even if you have all needed signatures, then you still have to waitAnd there is another option: lock them only to your key.Also another one: lock coins in time and nothing else, then it could be treated as a treasure for miners.QuotePossible, but I'm not aware of any current implementations that allow this.Bitcoin Core and console will allow you to write any transaction, and to broadcast a standard ones.QuoteOP_2 PUBKEY_1 PUBKEY_2 PUBKEY_3 OP_3 OP_CheckMultisig OP_CLTV TIME OP_DropWhy not Taproot? You can use three 2-of-2 multisig branches, it would be the same, and it could be cheaper and more private, because of Schnorr signatures.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AverageGlabella",
+      "created_time": "June 01, 2022, 02:08:18 PM",
+      "body": "Saying look after your emotions is easier said then done while I have currently I do not know what is to come in the next couple of years and I promised myself that I would keep my btc but if any emergencies come up to obviously use the stash. Quote from: LoyceV on June 01, 2022, 12:58:41 PMHow about you drill a hole in your crawl space? Make it 10 meter deep, throw in your private key. If you ever need it, get a shovel. By the time you've reached a depth of 10 meters, your emotions have had enough time to reconsider  I know this was a joke but that might be a good solution  Making it inconvenient enough not to panic when times are hard but still being able to access it if needed. I was just hoping there would be a way of doing it through software that would be secure without trusting on others. What do people think about 3 - 3 multi sig? Secure enough? Anyone that I trust with the signatures would not have motive to not sign but the only issue is if one of them were to die or forget their private key I would be locked out if any emergencies come up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "June 01, 2022, 02:22:43 PM",
+      "body": "Quote from: vjudeu on June 01, 2022, 01:31:03 PMBitcoin Core and console will allow you to write any transaction, and to broadcast a standard ones.I'm not sure if it'll work with CLTV? I'm talking about importing it, creating a transaction isn't a very big issue. I've encountered problems importing P2SH with importmulti though.Quote from: vjudeu on June 01, 2022, 01:31:03 PMWhy not Taproot? You can use three 2-of-2 multisig branches, it would be the same, and it could be cheaper and more private, because of Schnorr signatures.You can still do 2-of-3 with CLTV.Quote from: AverageGlabella on June 01, 2022, 02:08:18 PMWhat do people think about 3 - 3 multi sig? Secure enough? Anyone that I trust with the signatures would not have motive to not sign but the only issue is if one of them were to die or forget their private key I would be locked out if any emergencies come up.No. There is no redundancies in this case, the risk of any of the party being unwilling to sign or being unable to find their key is too high. I think CLTV with 2-of-3 is your best bet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "June 01, 2022, 02:32:56 PM",
+      "body": "QuoteYou can still do 2-of-3 with CLTV.Of course you can. But N-of-N multisig in Taproot has the same size as a single key with a single signature. So it is cheaper. And more private, because you only reveal one TapScript branch, all other branches are hidden behind some hashes, and there is always a chance that \"there was one more way to spend that coin that nobody knows, except the script creator\". Also, I think K-of-N could be done if one person would have more than one key, just by using a combination of keys, and doing N-of-N multisig on that. Another benefit is that if all people agree on everything, then there is always an option to spend-by-key and hide in the crowd of other users with just a single key per address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "June 01, 2022, 02:39:52 PM",
+      "body": "Quote from: AverageGlabella on June 01, 2022, 02:08:18 PMI know this was a joke but that might be a good solution  Making it inconvenient enough not to panic when times are hard but still being able to access it if neededPour it in concrete, put it under your floor boards, hammer it into your wall before you put wall paper on, hide your seed words in different continents....Or just make a very nice paper wallet that you really don't want to break open.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "June 01, 2022, 04:27:03 PM",
+      "body": "I would have to agree with BlackHatCoiner when he said control your emotions. If you don't want to spend your Bitcoin today, don't do it. Look at me now, not spending my Bitcoin. Fancy scripts and setups, although useful in some cases can just create more problems. There might be a life-changing event that happens before 2030 where you absolutely need access to your coins and now you need permission by others to spend them. Sickness and disease of you and your loved ones can change all your priorities. Natural disasters can strike and even remove those who hold the keys to your setup from your life. Families break, marriages break, brothers become enemies of one another. Be your own bank, right? But you be your own back, not others.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 01, 2022, 05:40:36 PM",
+      "body": "Quote from: ranochigo on June 01, 2022, 12:57:55 PMOP_2 PUBKEY_1 PUBKEY_2 PUBKEY_3 OP_3 OP_CheckMultisig OP_CLTV TIME OP_DropTime has to come before OP_CLV not after it since the OP code will have to fetch it from the stack.Also it's usual to move locktime stuff to the start, although it doesn't make a technical difference but it would reduce the burden on nodes for rejecting invalid transactions.Quote from: vjudeu on June 01, 2022, 01:31:03 PMWhy not Taproot?Wallets barely support uncommon scripts like the above, and they don't yet support regular Taproot scripts with a single key",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "OgNasty",
+      "created_time": "June 01, 2022, 07:07:19 PM",
+      "body": "Quote from: AverageGlabella on June 01, 2022, 02:08:18 PMI know this was a joke but that might be a good solution  Making it inconvenient enough not to panic when times are hard but still being able to access it if needed. This is why a lot of the collectors in the collectibles community managed to find themselves suddenly wealthy.  A lot of folks didn't want to part with their Casascius coins or other loaded memorabilia until it was life changing for them to do so.  I've seen many people say that they would have been better off buying BTC instead of a loaded collectible, but those that did mostly sold off their BTC on the way up.  Don't discount using your emotions against you to reach your goal.  Emotions are a powerful tool.  Learn to harness them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 03, 2022, 03:37:58 AM",
+      "body": "Instead of utilizing complex multisig, just create a Bitcoin Core wallet (so that there is no seed phrase) with complex password.Get a device that you almost never use but still works normally and put the password in a text file or note. Now lock up the device somewhere in a closet and don't forget where the key is.Has the same effect as making a 10-meter hole in your room but is more practical.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AverageGlabella",
+      "created_time": "June 03, 2022, 08:40:37 PM",
+      "body": "Quote from: NotATether on June 03, 2022, 03:37:58 AMInstead of utilizing complex multisig, just create a Bitcoin Core wallet (so that there is no seed phrase) with complex password.Get a device that you almost never use but still works normally and put the password in a text file or note. Now lock up the device somewhere in a closet and don't forget where the key is.Has the same effect as making a 10-meter hole in your room but is more practical.This is what I was doing except I stored the private key by writing it down because I thought storing it digitally could cause problems especially in 8 years time. I have a safe that I mangled the key and did not put batteries in it for the code setting. If I wanted to get in to it I would need to drill through the metal casing which would hopefully deter any emotional swings and would make me think why I was protecting against this. My only concern is if these safes are mass produced and the key is not unique. It is a cheap one and is not fire resistant I do not think and does not have any fancy features",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 04, 2022, 04:37:39 AM",
+      "body": "Quote from: AverageGlabella on June 03, 2022, 08:40:37 PMThis is what I was doing except I stored the private key by writing it down because I thought storing it digitally could cause problems especially in 8 years time. Well, how did you write the key? Because that can be a source of recovery problems later if it becomes illegible.Best to make all the letters monospace without any cursive, or not lifting up the pan/pencil when writing the next word, cross your z's and 7's so that they don't look like 2's (both can occur inside Base58), and so on.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "June 04, 2022, 09:23:26 AM",
+      "body": "Quote from: AverageGlabella on June 01, 2022, 12:49:37 PMCan I setup a time lock which will allow access to the coins in x amount of years but only allow access during that time if 2/3 other people sign it? I do not want to give these people access but my goal is to keep Bitcoin until a certain date 2030. I want to make sure that despite what happens with the btc price I do not withdraw. My solution is getting trusted friends and family to have a multisig setup which does not give them access to the coins but allows them to prevent any impulse withdrawing because of emotional attachment. I have never attempted to setup a multisig in this way and I am just trying to work it out. I want it to work like this: 1. 2/3 signatures needed during the time lock period2. Those in control of the multisig cannot get access to the funds without the master private key (owned by me) 3. Set a date of 2030 as a time where the wallet will unlock. Is this possible? Quote from: AverageGlabella on June 01, 2022, 02:08:18 PMWhat do people think about 3 - 3 multi sig? Secure enough? Anyone that I trust with the signatures would not have motive to not sign but the only issue is if one of them were to die or forget their private key I would be locked out if any emergencies come up.Based on these two posts, I would advise against trying to implement what you are proposing. There is no reason to force yourself to wait until an arbitrary date far into the future to sell your coin. There is a very real possibility that the price of bitcoin will be zero in 2030, and if you assume this to be what will happen, there is also a very real possibility that the price of bitcoin will be very high at some point in time before 2030. Based on how much coin you are holding, and your personal financial situation, there is a price point at which it no longer makes sense to continue holding if your long-term goal is to sell your coin, and you should have the ability to do that. From a technical perspective, what you are proposing is possible. You would need to implement a smart contract in which 2-of-2 signatures are required, with the second signature needing to be from 1-of-2 possible keys, and the other signature needing to be from your key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "June 21, 2022, 07:11:39 AM",
+      "body": "Quote from: AverageGlabella on June 03, 2022, 08:40:37 PMQuote from: NotATether on June 03, 2022, 03:37:58 AMInstead of utilizing complex multisig, just create a Bitcoin Core wallet (so that there is no seed phrase) with complex password.Get a device that you almost never use but still works normally and put the password in a text file or note. Now lock up the device somewhere in a closet and don't forget where the key is.Has the same effect as making a 10-meter hole in your room but is more practical.This is what I was doing except I stored the private key by writing it down because I thought storing it digitally could cause problems especially in 8 years time. Although if OP manages to hold for 4 years he will have no longer issues holding for 4 more, I also agree that storing digitally is screaming for troubles.I would store the seed. I would put it into an envelope, surrounded by some black or at least thick paper so you cannot see through. And laminate all that so you are not tempted to take a look too often.Also I'd do this at least twice to have a backup (that I store somewhere else) in case my house burns down.Since you want to see your precioussss money is still in place, keeping an xpub or the relevant addresses at hand should be good, then you can take a look now and then in Electrum or a block explorer that you're still fine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

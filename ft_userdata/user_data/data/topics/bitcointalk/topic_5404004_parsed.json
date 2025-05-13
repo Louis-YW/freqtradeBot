@@ -1,0 +1,77 @@
+{
+  "id": "topic_5404004",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "June 25, 2022, 09:11:26 AMLast edit: June 25, 2022, 10:07:06 PM by PowerGlove",
+  "content": "I'm new to Bitcoin and have been making a serious attempt to learn it by programming bits & pieces of it in Python.I recently learned about \"split\" keys and ran into something interesting that I thought I'd share here.As I understand it, \"split\" keys emerge from the following identity (pseudocode):Code:Public(PrivateA) + Public(PrivateB) = Public(PrivateA + PrivateB)This allows for surprising things like securely outsourcing vanity address generation or doing \"multisig\" with plain old P2PKH addresses.I was adding a test-case to my code to check that the above relationship is always true and instead found that it was only true about 50% of the time. That is, if I generated pairs of private keys at random only about half of them would pass this test.Now, obviously I was doing something wrong, but I couldn't figure out what. I was making sure to take the sum of the two private keys modulo the group order and I carefully checked my EC multiply logic and it passed all the tests I could dream up for it.The confusing thing was that if I just stuck to ordinary key generation (Private -> Public -> Address) then my implementation agreed with everything I compared it to (Electrum, bitaddress.org) but as soon as I tried to \"split\" the keys things went wrong, and even then, only about half the time.Anyway, I just fixed it and had a small epiphany at the same time!I'm not a mathematician, so I may bungle the terminology but here goes:For whatever reason, I had internalized the mathematics of address generation as essentially having two parts: A single finite field, and a group defined over that field.To represent this in my code I have a \"Scalar\" class for elements of the finite field and a \"Point\" class for elements of the group.Because I thought of private keys as belonging to the finite field I naturally made them \"Scalar\". What I failed to realize was that whenever I added them together and then applied the group order modulo operation I was actually applying a second modulo operation (the first being applied under the hood by the \"Scalar\" class). This double modulo, one with P (the field order) and then one with N (the group order) was what was causing all the trouble.This made me realize that there are actually two finite fields, FP and FN and that they should not be mixed up. FP should be used for point co-ordinates and FN should be used for private keys.So, now I model them in my code with a \"Scalar\" class (as before) a \"Point\" class (as before) and a new \"Secret\" class for elements of the other finite field.In summary, don't do math on private keys in the wrong field",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5404004",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "June 25, 2022, 02:09:48 PM",
+      "body": "You might want to read my thread Analysis of the \"split-key\" vanity address method: How does it work? for more information about split-keys and how they are created.In particular, I have a section at the bottom with implementations in JS (it's easily ported to Python).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "July 02, 2022, 01:29:28 PM",
+      "body": "Quote from: NotATether on June 25, 2022, 02:09:48 PMYou might want to read my thread Analysis of the \"split-key\" vanity address method: How does it work? for more information about split-keys and how they are created.In particular, I have a section at the bottom with implementations in JS (it's easily ported to Python).That's a nice post! I'm still not clear on how to multiply a point by another point, so can't yet appreciate how \"multiplicative\" split-keys would work. I obviously have some more reading to do. Thanks for the merit!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 02, 2022, 03:52:03 PMLast edit: July 02, 2022, 06:38:12 PM by garlonicon",
+      "body": "QuoteI was adding a test-case to my code to check that the above relationship is always true and instead found that it was only true about 50% of the time. That is, if I generated pairs of private keys at random only about half of them would pass this test.It is always true. Only half keys passed, because you probably skipped modulo \"n\". All operations are always modulo \"n\".Code:n=fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141d1=8b53639f152c8fc6ef30802fde462ba0be9cf085f7580dc69efd72e002abbb35d2=e788103ee15318fcd2af9b73b4ebbb33a903b020de7b307d71f5fed0f433e548Q1=02ECF185F85115C2BCD36D128B40B0576EF507890DA40D98C87FFD75EA9E4FF403Q2=02A4D26294D355931C62B6144689FBF74E5FFCF5E3415821A89D4B71BFFAD043DC Q1+Q2=0301FA88EADC1AC8D68A0C3141E48C6066F3BF26F28FBE1235F85BBD21742E0EE4d1+d2=8b53639f152c8fc6ef30802fde462ba0be9cf085f7580dc69efd72e002abbb35+e788103ee15318fcd2af9b73b4ebbb33a903b020de7b307d71f5fed0f433e548d1+d2=172db73ddf67fa8c3c1e01ba39331e6d467a0a0a6d5d33e4410f371b0f6dfa07dd1+d2=72db73ddf67fa8c3c1e01ba39331e6d5acf1c3c0268a9e085121132426a95f3cEdit: Quoteor doing \"multisig\" with plain old P2PKH addressesDoing multisig with addition is dangerous, always do that with multiplication. Or better: use homomorphic encryption, then you can make N-of-N multisig with raw public keys, so that means you can use it on all address types, you are not limited to Schnorr signatures.Edit: QuoteIn summary, don't do math on private keys in the wrong fieldIt is better than that: you can join sub-fields if you know how it works. For example, you have two public keys with the same x-value, and you have three public keys with the same y-value. That means, for a given public key, you always have six \"trivial\" points, forming some area. And you can do crazy stuff if you start dealing with such rectangles.Another interesting property is that because n is lower than p, then there are some points that are \"weak\". It is the case if you have some point, where n*Point is not zero. But there are only (p-n) such points, so they are hard to find, also because getting any of them could make secp256k1 weak enough to be broken.Code:  p=fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f  n=fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141p-n=000000000000000000000000000000014551231950b75fc4402da1722fc9baee //the number of \"weak\" pointsThose points are \"weak\", because in some protocols, you could give some user such point outside of secp256k1, and then reach something that is easier to break.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 03, 2022, 03:59:46 AMLast edit: July 10, 2022, 05:39:42 AM by NotATether",
+      "body": "Quote from: PowerGlove on July 02, 2022, 01:29:28 PMThat's a nice post! I'm still not clear on how to multiply a point by another point, so can't yet appreciate how \"multiplicative\" split-keys would work. I obviously have some more reading to do. Thanks for the merit!You don't multiply two points together, you multiply one of the points with a private key.Suppose you generate a public/private key pair that is secret. Then you can send the public key to any service, the service can also generate a second private key (not associated with any public key), share the private key with you, and multiply your public key by the second private key to get a third (product) public key. Similarly, you can multiply your two private keys together to get the corresponding private key for it.Basically, if A is your pubkey, a is its secret privkey, and b is some random privkey generated by the service and shared with you, then:Code:C = A*bc = (a*b)*G# because:c = (a*b)*G = (b*a)*G = b*(a*G) = b*A = A*bWhere G is the generator point of SECP256K1.Then you have the public/private keypair (C, c).How you could make a vanity address out of A and b? Well, you know that this makes another private key C, so just cycle through random values of b until you get an address hash that matches the prefix. And there will eventually be a collision becuase the number of keys (2^256) is bigger than the number of addresses (2^160) and is somewhat less than the number of addresses containing the alphanumerical prefix (or suffix) that you are trying to generate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "July 09, 2022, 01:25:52 PMLast edit: July 09, 2022, 10:58:53 PM by PowerGlove",
+      "body": "Quote from: NotATether on July 03, 2022, 03:59:46 AMYou don't multiply two points together, you multiply one of the points with a private key.I see, I was looking at the problem through a testing lens, and so was stuck at wondering how to check the following identity (pseudocode):Code:Public(PrivateA) * Public(PrivateB) = Public(PrivateA * PrivateB)It seemed to me, that to test if the above is true for randomly generated pairs of private keys (like I was doing for the additive case), that I would have to implement non-scalar point multiplication (the operation on the left).Now I see that because G (the generator point) acts like the number \"1\" (i.e. any point P multiplied by G is simply P), you can dodge the non-scalar point multiplication by simplifying the relationship to:Code:Public(PrivateA) * PrivateB = Public(PrivateA * PrivateB)Thanks @NotATether, I (think) I get it now!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "July 09, 2022, 03:03:56 PM",
+      "body": "Quote from: NotATether on July 03, 2022, 03:59:46 AMAnd there will eventually be a collision becuase the number of keys (2^256) is less than the number of addresses (2^160) and is somewhat less than the number of addresses containing the alphanumerical prefix (or suffix) that you are trying to generate.That cited sentence is ill-formed to me, you likely meant: ... the key space of 2^256 is bigger than the public address space of 2^160 ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 10, 2022, 05:41:13 AM",
+      "body": "Quote from: Cricktor on July 09, 2022, 03:03:56 PMQuote from: NotATether on July 03, 2022, 03:59:46 AMAnd there will eventually be a collision becuase the number of keys (2^256) is less than the number of addresses (2^160) and is somewhat less than the number of addresses containing the alphanumerical prefix (or suffix) that you are trying to generate.That cited sentence is ill-formed to me, you likely meant: ... the key space of 2^256 is bigger than the public address space of 2^160 ...Fixed (as well as in the linked thread), thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "July 28, 2022, 05:50:52 PM",
+      "body": "Quote from: garlonicon on July 02, 2022, 03:52:03 PMQuoteI was adding a test-case to my code to check that the above relationship is always true and instead found that it was only true about 50% of the time. That is, if I generated pairs of private keys at random only about half of them would pass this test.It is always true. Only half keys passed, because you probably skipped modulo \"n\". All operations are always modulo \"n\".That's a good guess, but in this case the problem was caused by applying the modulo operation too many times, not too few.Quote from: garlonicon on July 02, 2022, 03:52:03 PMQuoteIn summary, don't do math on private keys in the wrong fieldIt is better than that: you can join sub-fields if you know how it works. For example, you have two public keys with the same x-value, and you have three public keys with the same y-value. That means, for a given public key, you always have six \"trivial\" points, forming some area. And you can do crazy stuff if you start dealing with such rectangles.I've made a topic about this here, when you find the time I'd appreciate your input!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

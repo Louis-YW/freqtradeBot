@@ -1,0 +1,165 @@
+{
+  "id": "topic_5476046",
+  "title": "apogio",
+  "author": "apogio",
+  "created_time": "November 30, 2023, 10:25:01 AM",
+  "content": "There are too many topics about it, but I haven't found the answer I want. I would post on older topics but I got the warning that the topics were older than 120 days, so I started a new one.I have 2 nodes and I am currently setting up my 3rd node.The first 2 nodes were constructed between blocks 700,000 and 750,000 and the process went okay-ish. On the 3rd node, my IBD is very slow. Let me share my setup.Hardware:1. Raspberry Pi 4 Model B with 8GB RAM.2. Cat6 ethernet cable.3. 2TB SSD 2.5''.4. SATA (on the disk) to USB 3.0 (on the Rpi)Internet speed:Download: 200 MbpsUpload: 5 MbpsPing: 4 msSoftware:Raspbian OS Bitcoin Core 25.0My conf is:Code:datadir=...server=1daemon=1txindex=1After reaching block 790,000 the process slowed down a lot. I have spent 5 days until block 790,000 and 3 more days until 810,000 and there are still approximately 10,000 blocks left, which will take even more It's normal, I know! Because it scans and validates recursively.Does anyone know if -txindex=1 slows up the Initial Blockchain Download ?If so, is there a reason?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5476046",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "November 30, 2023, 10:35:38 AM",
+      "body": "txindex does slow down the IBD, but it shouldn't make it that slow. So I want to ask you, where did you configure the datadir? Because if you're going to make I/O go through the SATA connection to USB3, that's going to be quite slower than just writing on the SSD directly. USB3 standard is 10GB/s maximum, and the disk is probably doing much less.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 30, 2023, 10:51:34 AM",
+      "body": "Quote from: NotATether on November 30, 2023, 10:35:38 AMtxindex does slow down the IBD, but it shouldn't make it that slow. So I want to ask you, where did you configure the datadir? Because if you're going to make I/O go through the SATA connection to USB3, that's going to be quite slower than just writing on the SSD directly. USB3 standard is 10GB/s maximum, and the disk is probably doing much less.Not sure I understand this. The datadir is on the SSD. The SSD is external to the Raspberry. So essentially I run:Quotebitcoind --datadir=/media/.../...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 30, 2023, 10:59:47 AM",
+      "body": "Quote from: apogio on November 30, 2023, 10:25:01 AMI have 2 nodes and I am currently setting up my 3rd node.Why don't you just copy the blockchain from your existing nodes to the new node?QuoteAfter reaching block 790,000 the process slowed down a lot. I have spent 5 days until block 790,000 and 3 more days until 810,000 and there are still approximately 10,000 blocks left, which will take even more I guess that's around the time the Ordinal spam largely increased the number of transactions, and the size of chainstate. It currently takes 8.5 GB on disk, which won't fit your 8 GB RAM anymore. It looks like 16 GB is the new minimum for a fast IBD.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 30, 2023, 11:07:09 AM",
+      "body": "Quote from: LoyceV on November 30, 2023, 10:59:47 AMWhy don't you just copy the blockchain from your existing nodes to the new node?Ok you made me lough out loud. How can I be so silly?! It didn't even cross my mind. However, supposing I wanted to do it, would I need to copy the chainstate and blocks directories? Or all the items from the Bitcoin Core directory (.conf, .log etc) ?I won't stop the process now, since I am almost done, I guess.Quote from: LoyceV on November 30, 2023, 10:59:47 AMI guess that's around the time the Ordinal spam largely increased the number of transactions, and the size of chainstate. It currently takes 8.5 GB on disk, which won't fit your 8 GB RAM anymore. It looks like 16 GB is the new minimum for a fast IBD.Makes sense, but 16 GB is a lot for a cheap computer. RPi doesn't support 16GB anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 30, 2023, 11:15:23 AM",
+      "body": "Quote from: apogio on November 30, 2023, 11:07:09 AMsupposing I wanted to do it, would I need to copy the chainstate and blocks directories?I'd copy everything in ~/.bitcoin/ (after shutting down Bitcoin Core).QuoteMakes sense, but 16 GB is a lot for a cheap computer. RPi doesn't support 16GB anyway.Yep, it sucks  And the Bitcoin dust those Ordinal spammers create will remain unspent taking up space in chainstate forever.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 30, 2023, 11:15:23 AM",
+      "body": "Quote from: apogio on November 30, 2023, 10:25:01 AMSoftware:Raspbian OS Bitcoin Core 25.0-snip-After reaching block 790,000 the process slowed down a lot. Must be your RPi's CPU struggling on script verifications after v25.0's default \"assumevalid\" blocks which is before block height 784000.Here's for reference: github.com/bitcoin/bitcoin/blob/v25.0/src/kernel/chainparams.cpp#L107C128-L107C128It's not recommended but if you think it's necessary to speed up your node's IBD, you can set a custom assumevalid block by setting -assumevalid=<block_hash>.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 30, 2023, 11:22:27 AM",
+      "body": "Quote from: nc50lc on November 30, 2023, 11:15:23 AMMust be your RPi's CPU struggling on script verifications after v25.0's default \"assumevalid\" blocks which is before block height 784000.Here's for reference: github.com/bitcoin/bitcoin/blob/v25.0/src/kernel/chainparams.cpp#L107C128-L107C128It's not recommended but if you think it's necessary to speed up your node's IBD, you can set a custom assumevalid block by setting -assumevalid=<block_hash>.Thanks, I will see the reference because it is something I ignored until today.Wouldn't it be bad for security though? Is this why you say it is not recommended?Quote from: LoyceV on November 30, 2023, 11:15:23 AMI'd copy everything in ~/.bitcoin/ (after shutting down Bitcoin Core).Definetely gonna try it after the sync is finished. Quote from: LoyceV on November 30, 2023, 11:15:23 AMYep, it sucks  And the Bitcoin dust those Ordinal spammers create will remain unspent taking up space in chainstate forever.Unfortunately we have to live with it. Pruned nodes in the future will avoid the issue, I suppose.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "November 30, 2023, 11:27:18 AM",
+      "body": "Quote from: apogio on November 30, 2023, 10:25:01 AMMy conf is:Code:datadir=...server=1daemon=1txindex=1Is it your full configuration file or you removed line dbcache?Quote from: apogio on November 30, 2023, 11:22:27 AMQuote from: LoyceV on November 30, 2023, 11:15:23 AMYep, it sucks  And the Bitcoin dust those Ordinal spammers create will remain unspent taking up space in chainstate forever.Unfortunately we have to live with it. Pruned nodes in the future will avoid the issue, I suppose.Pruned node need full UTXO in order to verify new TX/block, so i doubt it's possible. At best, we'll see slightly more efficient UTXO representation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 30, 2023, 11:32:30 AM",
+      "body": "Quote from: ETFbitcoin on November 30, 2023, 11:27:18 AMIs it your full configuration file or you removed line dbcache?I have set my dbcache on the commandline runningCode:bitcoind -dbcache=4096 -conf=<path to bitcoin conf>The reason is that I want to run with default dbcache when IBD is finished.Doesn't it have the same result as adding dbcache=4096 on the conf file and then run:Code:bitcoind -conf=<path to bitcoin conf>Quote from: ETFbitcoin on November 30, 2023, 11:27:18 AMPruned node need full UTXO in order to verify new TX/block, so i doubt it's possible. At best, we'll see slightly more efficient UTXO representation.Yeap, you must be right.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 30, 2023, 11:38:38 AM",
+      "body": "Quote from: ETFbitcoin on November 30, 2023, 11:36:26 AMIt leads to same result, although i find it's unusual to see configuration on multiple places. And since your device has 8GB RAM, you could set higher value for dbcache (assuming you don't run other memory-intensive software on that device).Like how much? Perhaps all of it? 8192? I don't run anything else on this device. My plan, in general, is to run Bitcoin & Monero node on the same machine.EDIT:I set it to 7000 and let's see...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 30, 2023, 11:58:02 AM",
+      "body": "Quote from: apogio on November 30, 2023, 11:38:38 AMPerhaps all of it? 8192?That leaves nothing for other programs, so it's too much.QuoteI set it to 7000 and let's see...I'm curious if that helps. More dbcache also means less file cache for the OS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 30, 2023, 12:03:34 PM",
+      "body": "Quote from: apogio on November 30, 2023, 11:22:27 AMQuote from: nc50lc on November 30, 2023, 11:15:23 AM-snip-It's not recommended but if you think it's necessary to speed up your node's IBD, you can set a custom assumevalid block by setting -assumevalid=<block_hash>.Thanks, I will see the reference because it is something I ignored until today.Wouldn't it be bad for security though? Is this why you say it is not recommended?It's not necessary bad, security-wise, because it's just the script verifications that are skipped.Everything in the assumed valid blocks are still being verified by your node.The topic is quite famous after its implementation so you will find a lot of helpful related topics across the internet.For example: https://bitcoin.stackexchange.com/a/88666",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 30, 2023, 12:04:37 PM",
+      "body": "Quote from: LoyceV on November 30, 2023, 11:58:02 AMI'm curious if that helps. More dbcache also means less file cache for the OS.Exactly, but I haven't found any explanation online, so I thought perhaps one would know in this forum. Feels like above 4GB doesn't help too much. It's like there is a soft-cap and then the return you get is diminishing. Perhaps I am wrong though.Quote from: ETFbitcoin on November 30, 2023, 11:57:46 AMEdit: be careful with default linux swap behavior which perform some swap even though there are some free/unused RAM capacity.I am sorry I don't follow you on this. You mean perhaps I should add less than 7000 and go for 6000 for example?Quote from: nc50lc on November 30, 2023, 12:03:34 PMIt's not necessary bad, security-wise, because it's just the script verifications that are skipped.Everything in the assumed valid blocks are still being verified by your node.The topic is quite famous after its implementation so you may find a lot of helpful related topics across the internet.For example: https://bitcoin.stackexchange.com/a/88666Thanks mate, much appreciated!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 30, 2023, 01:21:00 PM",
+      "body": "Quote from: apogio on November 30, 2023, 12:04:37 PMI am sorry I don't follow you on this. You mean perhaps I should add less than 7000 and go for 6000 for example?Try 3/4ths of the total RAM. Your disk doesn't seem to be the problem I thought you had an internal SSD and externally-attached 2TB SSD... my bad.Also combine it with the assumevalid directive that nc50lc posted about, maybe set it to 800000 blocks, to really speed up things, as these things must have been verified thousands of times by now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 30, 2023, 01:43:46 PM",
+      "body": "Quote from: NotATether on November 30, 2023, 01:21:00 PMQuote from: apogio on November 30, 2023, 12:04:37 PMI am sorry I don't follow you on this. You mean perhaps I should add less than 7000 and go for 6000 for example?Try 3/4ths of the total RAM. Your disk doesn't seem to be the problem I thought you had an internal SSD and externally-attached 2TB SSD... my bad.Also combine it with the assumevalid directive that nc50lc posted about, maybe set it to 800000 blocks, to really speed up things, as these things must have been verified thousands of times by now.I will set it to 800,000 and also set dbache to 6000 and I will see if it makes a difference.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "November 30, 2023, 04:03:05 PM",
+      "body": "Have you done any checks on the SSD? I spent a couple of hours the other day trying to figure out why a PC was so slow and it turned out the almost new SSD was failing SMART checks. Was looking for malware, was checking running apps, etc. Till I finally ran crystaldisk and poof. But neither the PC or Windows put up a smart error.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 30, 2023, 05:24:41 PM",
+      "body": "Quote from: DaveF on November 30, 2023, 04:03:05 PMHave you done any checks on the SSD? I spent a couple of hours the other day trying to figure out why a PC was so slow and it turned out the almost new SSD was failing SMART checks. Was looking for malware, was checking running apps, etc. Till I finally ran crystaldisk and poof. But neither the PC or Windows put up a smart error.-DaveHi Dave, no I haven't checked the disk. I think it's an exFAT, but I am not sure. Also I run Raspbian and I am not aware of what crystal disk is. Is it a tool?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "November 30, 2023, 07:56:30 PM",
+      "body": "Quote from: apogio on November 30, 2023, 05:24:41 PMQuote from: DaveF on November 30, 2023, 04:03:05 PMHave you done any checks on the SSD? I spent a couple of hours the other day trying to figure out why a PC was so slow and it turned out the almost new SSD was failing SMART checks. Was looking for malware, was checking running apps, etc. Till I finally ran crystaldisk and poof. But neither the PC or Windows put up a smart error.-DaveHi Dave, no I haven't checked the disk. I think it's an exFAT, but I am not sure. Also I run Raspbian and I am not aware of what crystal disk is. Is it a tool?Crystaldiskinfo is a SMART https://en.wikipedia.org/wiki/Self-Monitoring,_Analysis_and_Reporting_Technology checker for drives for windows.I don't know of an equivalent for RPi, will have to look. But it does show what the drive thinks is going on it with it, not what Windows or what the PC itself thinks. They can for whatever reason hide / not report SMART issues.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "December 02, 2023, 09:09:14 AM",
+      "body": "Quote from: apogio on November 30, 2023, 12:04:37 PMQuote from: ETFbitcoin on November 30, 2023, 11:57:46 AMEdit: be careful with default linux swap behavior which perform some swap even though there are some free/unused RAM capacity.I am sorry I don't follow you on this. You mean perhaps I should add less than 7000 and go for 6000 for example?I was referring to swappiness value (each distro probably have different default value) which affect swap behavior. That means i suggest you to check that value and optionally reduce it. Here's an example guide, https://linuxize.com/post/how-to-change-the-swappiness-value-in-linux/.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

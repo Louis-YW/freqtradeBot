@@ -1,0 +1,117 @@
+{
+  "id": "topic_5464157",
+  "title": "Accardo",
+  "author": "Accardo",
+  "created_time": "August 22, 2023, 01:29:28 PM",
+  "content": "Thin clients run on a server and its performance depends completely on a network connection. With ports for different peripherals like SD Cards to enhance performance and it works with Raspberry Pi. Full nodes on desktop oriented systems also requires round the clock network connection to run effectively. Thin client being server oriented reduces load on the system, which saves power. And it's less cost effective to set up a full node with thin client. I've seen some advantages of using thin clients and disadvantages like server failure. Yet I've not seen much usage of such devices to run a full node or contents about it, does it pose plenty vulnerabilities? found just one thread on reddit that talks about running full node on a thin client device. What possible issues could arise with using such devices to run a full node? I'd want to try it myself.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464157",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "August 22, 2023, 01:45:48 PM",
+      "body": "Perfectly possible. Generally, you wouldn't want to run a Raspberry Pi as a production server because it is quite underpowered and the alternative isn't that much more expensive. There is no vulnerabilities with it, it is just another computer but smaller and cheaper.If you want to run a node on it, be prepared to use HDD instead of an SD card. The constant IO operations will stain your SD card and you would suffer from slow synchronization as well. You can synchronize it on another computer before copying it over. It is a pain in the ass to set it up on Raspberry Pi and it would probably be better to just get a used computer to run your node. The cost differential isn't too significant.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 22, 2023, 02:26:50 PM",
+      "body": "Take a look at:https://bitcointalk.org/index.php?topic=5399730Can you? Yes with a lot of tinkering.Should you? As a learning experience and geek project, why not.As a node you NEED to have up and running to transact. No. There are a lot of hardware devices that CAN run a node (and other things) should they is an entirely different discussion.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 24, 2023, 10:36:12 AM",
+      "body": "Quote from: ETFbitcoin on August 23, 2023, 10:01:14 AMQuote from: Accardo on August 22, 2023, 01:29:28 PMfound just one thread on reddit that talks about running full node on a thin client device. What possible issues could arise with using such devices to run a full node? I'd want to try it myself. With example you mentioned, 1GB RAM isn't enough. Even if you only use CLI, use tricks to reduce OS ram usage (e.g. recompile kernel with only bare minimum feature) and configure Bitcoin Core to use less RAM, it'll be very slow and you might face unexpected error. I wouldn't recommend you to use thin client which has less than 4GB RAM and 4 thread CPU to run full node, especially considering Bitcoin blockchain and UTXO count keep rising over time.For now, Bitcoin Core still works with 2GB of RAM and a single thread, as long as you're only using a terminal to connect and are not running anything else. You may have to reduce the mempool size and dbcache to get responsive performance, but that's about it. The kernel itself only uses about 256MB of memory, so there's not much to gain by recompiling it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 24, 2023, 01:26:12 PM",
+      "body": "Quote from: ETFbitcoin on August 24, 2023, 12:15:38 PMQuote from: NotATether on August 24, 2023, 10:36:12 AMThe kernel itself only uses about 256MB of memory, so there's not much to gain by recompiling it.That's not true. There are many ways reduce kernel size/RAM usage. For example Tiny Core Linux only have minimum 46MB RAM requirement[1].[1] https://docs.kernel.org/admin-guide/blockdev/zram.html[2] https://linuxgizmos.com/cutting-linux-down-to-size/[3]https://elinux.org/Kernel_Size_Tuning_Guide[4] http://tinycorelinux.net/faq.htmlThe 256MB number is based on my own observations of running Linux systems, but from Bitcoin Core's point of view, whether you save 50MB or 250MB by recompiling the kernel is negligible because Core makes use of half a gigabyte itself after initialization, which increases as additional blocks are verified and the dbcache is filled.Of course, Core will struggle with the minimum memory that I posted, but it will hang with less memory while using swap space.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 24, 2023, 04:53:04 PM",
+      "body": "Quote from: ETFbitcoin on August 23, 2023, 10:01:14 AMWith example you mentioned, 1GB RAM isn't enough. Even if you only use CLI, use tricks to reduce OS ram usage (e.g. recompile kernel with only bare minimum feature) and configure Bitcoin Core to use less RAM, it'll be very slow and you might face unexpected error. I wouldn't recommend you to use thin client which has less than 4GB RAM and 4 thread CPU to run full node, especially considering Bitcoin blockchain and UTXO count keep rising over time.If you disable wallet and stuff, it might be possible. I was running Bitcoin Core on a 1GB ram VPS at one point in time, though it was extremely, extremely optimized and it was definitely struggling with regards to IDB. However, CLI was perfectly responsive, and it didn't crash though you had to use your resources wisely.Anyhow, thread count doesn't matter as much as IPC. Raspberry Pi 4 isn't very good at synchronization even if you were to use multi-threading. It was constantly overheating and throttling itself. Unbearable to use.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 28, 2023, 02:46:09 PM",
+      "body": "Quote from: ranochigo on August 24, 2023, 04:53:04 PMAnyhow, thread count doesn't matter as much as IPC. Raspberry Pi 4 isn't very good at synchronization even if you were to use multi-threading. It was constantly overheating and throttling itself. Unbearable to use.I have had a few 'nodes in a box' over the years umbrel, mynode, raspiblitz, and although at times they did overheat and throttle it was USUALLY an external hardware issue.i.e. it was in a case and the fan died. Or in a case with internal fan and the case itself was a heatsink but it got covered so there was 0 air movement.But open with a finned heatsink on it never had an issue. The bigger problem that I kept running into was that even the 'name brand' power adapters were crap. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "August 28, 2023, 02:59:48 PM",
+      "body": "Quote from: ETFbitcoin on August 25, 2023, 10:11:29 AMAnd talking about VPS, you also need to more careful about being \"noisy neighbor\".I created a topic about a cheap pay by the hour VPS provider a couple months ago, and paid about half a dollar for a full IBD (with pruning). They're throttling CPU at that price, but it avoids being kicked off as a noisy neighbor. It just gets slower, unless you pay more.VPS prices have been dropping faster than the blockchain is growing, so I don't expect memory load to ever be a problem again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 28, 2023, 08:02:47 PM",
+      "body": "Quote from: ETFbitcoin on August 25, 2023, 10:11:29 AMI get your point. Although i expect there should be noticeable difference when Bitcoin Core is configured to use less RAM than default value. At very least, there would be more space for linux buffer/cache memory.Have you guys tried running Core in the bare minimum required RAM? I have been running Core under a 4 GB RAM, and it's painfully slow sometimes. When it does the consistent recent blocks check during startup, it can take up to half hour. I can't imagine someone running Core with a quarter of that amount of RAM, let alone one eighth of that (256 MB). In fact, 1 GB is at least required. Quote from: LoyceMobile on August 28, 2023, 02:59:48 PMI created a topic about a cheap pay by the hour VPS provider a couple months ago, and paid about half a dollar for a full IBD (with pruning).I'm curious if it's worth it to run Bitcoin projects on such VPSes. DigitalOcean might come a lot more expensive, but it's something to trust. I wouldn't deposit anything on an unknown VPS service. (You used that VPS just for bitcoin-cli RPC, right?)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "August 29, 2023, 09:01:57 AM",
+      "body": "Quote from: LoyceMobile on August 28, 2023, 02:59:48 PMQuote from: ETFbitcoin on August 25, 2023, 10:11:29 AMAnd talking about VPS, you also need to more careful about being \"noisy neighbor\".I created a topic about a cheap pay by the hour VPS provider a couple months ago, and paid about half a dollar for a full IBD (with pruning). They're throttling CPU at that price, but it avoids being kicked off as a noisy neighbor. It just gets slower, unless you pay more.I've seen your thread. While trotting CPU seems to be common outcome, i recall people mention few provider give warning about either upgrade to more expensive plan or switch to dedicated server with threat their VPS could be terminated if they don't do so.Quote from: LoyceMobile on August 28, 2023, 02:59:48 PMVPS prices have been dropping faster than the blockchain is growing, so I don't expect memory load to ever be a problem again.That's true. If people don't mind using unpopular provider, there are few provider who offer >= 500GB storage for less than $20/month.Quote from: BlackHatCoiner on August 28, 2023, 08:02:47 PMIn fact, 1 GB is at least required. Which is outdated. Since it mention 340GB blockchain size, it was probably last updated during middle of 2021[1]. Between that we see ~1.5x UTXO[2] and average block size[3] growth. I expect there would be noticeable performance difference with only 1GB of RAM.[1] https://blockchair.com/bitcoin/charts/blockchain-size[2] https://statoshi.info/d/000000009/unspent-transaction-output-set?orgId=1&from=1619827200000&to=now&viewPanel=6&refresh=5s[3] https://blockchair.com/bitcoin/charts/average-block-size",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 29, 2023, 09:11:19 AMLast edit: August 29, 2023, 01:06:40 PM by LoyceV",
+      "body": "Quote from: BlackHatCoiner on August 28, 2023, 08:02:47 PMHave you guys tried running Core in the bare minimum required RAM? I have been running Core under a 4 GB RAM, and it's painfully slow sometimes.I did, when I started with Bitcoin (8 years ago). I ran a backup-version of Bitcoin Core on a netbook with 2 GB RAM, but eventually gave up when it took too long to catch up downloading the blockchain every time I turned it on.Nowadays, I'm quite satisfied with 8 GB of RAM to run Bitcoin Core, although more is always better.QuoteWhen it does the consistent recent blocks check during startup, it can take up to half hour.Is that with chainstate on HDD or on SSD? That makes a huge difference.QuoteIn fact, 1 GB is at least required.That website also says you need 350 GB disk space. It's slightly outdated.Quote from: LoyceMobile on August 28, 2023, 02:59:48 PMI created a topic about a cheap pay by the hour VPS provider a couple months ago, and paid about half a dollar for a full IBD (with pruning).I'm curious if it's worth it to run Bitcoin projects on such VPSes. DigitalOcean might come a lot more expensive, but it's something to trust. I wouldn't deposit anything on an unknown VPS service. (You used that VPS just for bitcoin-cli RPC, right?)[/quote]DigitalOcean wants my credit card, so I won't use them.In my case, I only used the VPS to test how long it would take to sync. I wouldn't feel safe storing funds on a server. It would be cool though, to combine my campaign manager services with my post scraping archive: each qualifying post could be paid within 10 seconds!I only saw this post later:Quote from: ETFbitcoin on August 29, 2023, 09:01:57 AMWhile trotting CPU seems to be common outcome, i recall people mention few provider give warning about either upgrade to more expensive plan or switch to dedicated server with threat their VPS could be terminated if they don't do so.It depends on the host. I've also had success in doing my own \"throttling\" with cpulimit and cputool. If you're on a shared server, obviously you can't take all resources for too long. I've received a warning email too from another host before I learned about throttling.QuoteIf people don't mind using unpopular provider, there are few provider who offer >= 500GB storage for less than $20/month.I've seen much better deals (say 2 TB for $6 per month), but those aren't meant for active disk usage. And the low end servers tend to be less reliable: great for testing, but I wouldn't recommend using them as a production server.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 29, 2023, 12:11:20 PM",
+      "body": "Quote from: ETFbitcoin on August 29, 2023, 09:01:57 AMWhich is outdated. Since it mention 340GB blockchain size, it was probably last updated during middle of 2021[1]. Between that we see ~1.5x UTXO[2] and average block size[3] growth. I expect there would be noticeable performance difference with only 1GB of RAM.Take into account that this year, memory usage from unconfirmed transactions has reached an ATH. I don't have evidence, beyond the fact that we all were frustrated with Ordinals, and it lasted for months. Not just a week as in 2017. Even as we speak, memory used in my node is 300 / 300 MB, purging any transaction with < 3.02 sat/vb. (Do you guys remember the days we were paying 1 sat/vb and have it confirmed in 10-20 minutes? The nostalgia hits me hard.  )VPS prices may be dropping faster than blockchain's growth, but the overall performance will get worse overtime if you don't buy yourself something better. Quote from: LoyceV on August 29, 2023, 09:11:19 AMIs that with chainstate on HDD or on SSD? That makes a huge difference.HDD. Do we have comparisons with SSD so I can check?Quote from: LoyceV on August 29, 2023, 09:11:19 AMIn my case, I only used the VPS to test how long it would take to sync. I wouldn't feel safe storing funds on a server.If you ever deposited funds to ChipMixer, then you've stored funds on DigitalOcean[1]. But, my point is that you can't retain custody if you want to develop some big project, unless you turn your house into a data center.  [1] https://bitcointalk.org/index.php?topic=1935098.msg61930512#msg61930512",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 29, 2023, 01:04:25 PM",
+      "body": "Quote from: BlackHatCoiner on August 29, 2023, 12:11:20 PMHDD. Do we have comparisons with SSD so I can check?I've tested it in the past, and moving chainstate to SSD made all the difference. I haven't gone back, although I still have my blocks on HDD.Quote from: ETFbitcoin on August 29, 2023, 12:45:41 PMQuote from: LoyceV on August 29, 2023, 09:11:19 AMI've also had success in doing my own \"throttling\" with cpulimit and cputool.I didn't know there's tool to manually limit CPU usage for specific application. I always thought it needs to be done from host side which apply for whole VM. BY any chance, is there similar tool to limit I/O usage?I haven't tried it, but knowing Linux, there's probably a way to do it. You can start by using cputool, which can limit the system load for a process. So on a cheap VPS, set it up to keep the load under for instance 0.2. \"Load\" is caused by different things, and that includes disk I/O. So it may be a start.It didn't work on all VPSses though, I think it works on OpenVZ but doesn't work on KVM. Another way to reduce disk I/O is by installing enough RAM QuoteWith that kind of deals, i would say it's near unknown provider rather than unpopular provider.I've seen good hosts on Lowendtalk.com, and I've seen hosts disappear (after I paid for a year). So your milage may vary",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 29, 2023, 01:35:57 PM",
+      "body": "Quote from: ETFbitcoin on August 29, 2023, 01:27:52 PMThat's exactly what i fear, along with very old hardware.FWIW: my favourite for price/performance at the moment is Racknerd. It's a lot more expensive on their website, offers on Lowendtalk are much better. Ramnode seems to be much more solid, but it's a different price level. Both accept Bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

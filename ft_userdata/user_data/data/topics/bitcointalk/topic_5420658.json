@@ -1,0 +1,109 @@
+{
+  "id": "topic_5420658",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "November 12, 2022, 10:57:53 AM",
+  "content": "In terms of software development, what is the most efficient and performant way to generate the derived three bitcoin addresses ( uncompressed 3..., compressed 1..., segwit bc1q... ) from a private key? If you have only a handful of private keys, you can do it with all conceivable and available bitcoin tools out there. But if you have a million private keys, what is the fastest way to fulfill this task, what do you suggest? is there any python snippet you're aware of ? Thank you",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5420658",
+  "comments": [
+    {
+      "author": "ABCbits",
+      "created_time": "November 12, 2022, 12:26:04 PM",
+      "body": "Quote from: citb0in on November 12, 2022, 10:57:53 AMBut if you have a million private keys, what is the fastest way to fulfill this task, what do you suggest?If you have decent programming skill, i'd suggest to modify Bitcoin brute-force software which have GPU support.Quote from: citb0in on November 12, 2022, 10:57:53 AMis there any python snippet you're aware of ? Thank youPython library bit[1] claim it's 100x faster compared with other Bitcoin python library. I've tried it before, but it doesn't support Bech32 address. Anyway, i did quick dirty benchmark and here's the result with 100K hex private keys.Code:from bit import Keyhexfile = open('hex.txt')hexkey = [h.strip() for h in hexfile.readlines()]addressfile = open('address.txt', 'w')addresslist = ''for h in hexkey:  key = Key.from_hex(h)  addresslist += key.address + '\\n'addressfile.write(addresslist)It's much faster than i expected where the script generate 100K address in 6 seconds.Code:$ time python3 test.py real    0m6.019suser    0m5.958ssys     0m0.060sHere's snippet of hex.txt and address.txt.Code:$ tail -n 5 hex.txtfce2310a2552b9f0c0158b76906092d95a632bac6f1a11abbda7e6f75e377be85ea97bc3217960cf1362fcd45f92913c67ceb5a1ff7fefa0d34a91c5e947a0504dff5ded0ebeb30249e1889b5c70a7dabab5534bcd31825eea958c4eee324f50bb2829f52ca31ac02ec78f5adcdd811ccf4e01fc5bca763dd4b0aea970dc73c6515d224f7a057745bfeb1c008a5100fb179f22fbcbfcd3adbf37b31a3d5dc807$ tail -n 5 address.txt 1Fztpfxj3hhmugpv955ujQ9cfA8wq1WMcR1JibRW9P1Gz48bwLpyuVvxWsT3CLmuB5Ny1EMTU54Wk41pP8tZe1ZqFdSVwKDJDevJM417o7zC1KqqDCmvS5NzrZnrvYd18YrJm6Vj1742LWxemvT4rUvSKQb78tYUH2CzXWe9u4[1] https://github.com/ofek/bit",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 12, 2022, 03:54:15 PM",
+      "body": "Quote from: citb0in on November 12, 2022, 10:57:53 AMIn terms of software development, what is the most efficient and performant way to generate the derived three bitcoin addresses ( uncompressed 3..., compressed 1..., segwit bc1q... ) from a private key? Uncompressed 3... from a private key? AFAIK it's impossible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 12, 2022, 04:24:11 PM",
+      "body": "Quote from: igor72 on November 12, 2022, 03:54:15 PMUncompressed 3... from a private key? AFAIK it's impossible.You are right. That's not possible. When it comes to legacy addresses, there are two legacy addresses derived from a single private key. One is derived from the uncompressed private key and the other one is derived from the compressed private key. But there's only one nested segwit address and that's derived using the compressed private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 12, 2022, 05:43:43 PM",
+      "body": "Quote from: citb0in on November 12, 2022, 10:57:53 AMis there any python snippet you're aware of ?I used to use bitcoin-tool for this, and by the looks of it there's a segwit update now. Note that I don't trust the software, so keep it offline in a VM to be safe.Quote from: igor72 on November 12, 2022, 03:54:15 PMUncompressed 3... from a private key? AFAIK it's impossible.As far as I know, it is possible to create uncompressed Segwit addresses, but you'll have a hell of a time trying to spend the funds. So don't do it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "November 13, 2022, 09:38:56 AM",
+      "body": "Quote from: igor72 on November 12, 2022, 03:54:15 PMQuote from: citb0in on November 12, 2022, 10:57:53 AMIn terms of software development, what is the most efficient and performant way to generate the derived three bitcoin addresses ( uncompressed 3..., compressed 1..., segwit bc1q... ) from a private key? Uncompressed 3... from a private key? AFAIK it's impossible.It's fully possible to generate such address, after all it's just P2SH (Pay to script hash) address. But as @LoyceV said, spending it is very difficult to spend the coin since the transaction would be considered as non-standard and won't be relayed by most node. For reference, here are few past incident about using uncompressed public key on P2SH-P2WPKH or P2WPKH address,https://bitcointalk.org/index.php?topic=5192454.0https://bitcointalk.org/index.php?topic=5377781.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 13, 2022, 11:42:53 AMLast edit: November 13, 2022, 09:40:15 PM by citb0in",
+      "body": "Bit uses Bitcoin Core's heavily optimized C library libsecp256k1 for all elliptic curve operations.Code:$ python3 -m timeit -s \"from bit import Key;k=Key()\" \"k.address\"Quote5000000 loops, best of 5: 49.6 nsec per loopIndeed, it is really fast. Thanks for pointing to this great tool.EDIT: By default Bit will use the compressed version for all keys. With key.address I can get the compressed Bitcoin address (starting with 1...) and by key.segwit_address you can get the p2sh segwit address. Does anyone know if Bit is also able to generate the bitcoin segwit address starting with bc1q and but also the uncompressed bitcoin address (also starting with 1) ? How?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 14, 2022, 07:44:24 AM",
+      "body": "Really a pity, because otherwise bit would have been perfect. What alternative library could you recommend me, which is as fast as possible and also handles the mentioned address type? Quote from: ETFbitcoin on November 12, 2022, 12:26:04 PMIf you have decent programming skill, i'd suggest to modify Bitcoin brute-force software which have GPU support.that would be the best option of course, however I don't have any special programming skills to implement that myself.The goal is to generate e.g. 100,000 addresses from corresponding private keys. The addresses to be generated should contain all 4 types I mentioned before.ku from pycoin offers many functions and spits out everything you want to have, however I can't really work performant with the command-line tool \"ku\", it would take forever to generate e.g. 100,000 addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 14, 2022, 08:44:08 AM",
+      "body": "Quote from: citb0in on November 14, 2022, 07:44:24 AMReally a pity, because otherwise bit would have been perfect. What alternative library could you recommend me, which is as fast as possible and also handles the mentioned address type? I can't recommend any aside from what's already suggested by others, sorry.Note for my previous post: you can't generate uncompressed bitcoin addresses if you provided it compressed WIF,but it can if it's uncompressed WIF; otherwise you can follow their advanced tutorial: https://ofek.dev/bit/guide/advanced.html#bytes-to-wifSample:Code:import bitfrom bit import Keyfrom bit.format import bytes_to_wifsample_key1 = Key(\"L3jehoiRidHfM64deuJ9NynkyzUGYZoNVa1S3bChFapPPLUw1BsY\")sample_key1.addressprint(sample_key1.address)uncompressed_wif = bytes_to_wif(sample_key1.to_bytes(), compressed=False)sample_key2 = Key(uncompressed_wif)sample_key2.addressprint(sample_key2.address)Result:Code:'1L4U3Vk2Z8FqNp9JoSqcRhKVqX9V7BfQqC''1CxPaotuNY3LsniUbhMDmRQ6YgmLeoCRcq'",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "November 14, 2022, 11:44:34 AM",
+      "body": "Quote from: citb0in on November 14, 2022, 07:44:24 AMReally a pity, because otherwise bit would have been perfect. What alternative library could you recommend me, which is as fast as possible and also handles the mentioned address type? I checked other library i've tried in past and found out bitcoinlib[1] utilize library called fastecdsa. It sounds good, so i decide to run quick benchmark.Code:from bitcoinlib.keys import Keyhexfile = open('hex.txt')hexkey = [h.strip() for h in hexfile.readlines()]addressfile = open('address_bech32.txt', 'w')addresslist = ''for h in hexkey:  key = Key(h)  addresslist += key.address(encoding='bech32') + '\\n'addressfile.write(addresslist)Code:$ time python3 test2.pyreal    2m45.322suser    2m45.114ssys     0m0.272sIt's far slower than bit, but IMO it's still fast enough for you needs. And here's example of generated address.Code:$ tail -n 5 address_bech32.txtbc1q5jzt43ru860cmsd7sh6kdjhjxteslc4tltdrsubc1qcft76kmlkqhc250uap0slvg99xkshu28wpd9h2bc1qjfuqcwz8984d7gskja9tm9emkwut0zy7hn7ydgbc1qf2yms7y2d5us7lce24ylmcstfe8fdaph32f6g3bc1qgf33u39wrgupxw4x4s5crplcqe27uvf68l40d2[1] https://github.com/1200wd/bitcoinlib",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 14, 2022, 12:59:50 PMLast edit: November 14, 2022, 05:34:08 PM by citb0in",
+      "body": "@ETFbitcointhanks you for your effort. I ran some benchmark tests, too. Additionally I tried bitcoinaddress:All benchmarks involved a hex file which contains 100,000 private keys. Here are my results so far in ranking order from fastest to slowest:bitcoinlibCode:$ time ./benchmark_with_bitcoinlib.py Quotereal    1m27,629suser    1m27,779ssys     0m1,356sbitcoinaddressCode:#!/usr/bin/python3from bitcoinaddress import Wallethexfile = open('hex.100k')hexkey = [h.strip() for h in hexfile.readlines()]addressfile = open('bech32_addresses_with_bitcoinaddress.100k', 'w')addresslist = ''for h in hexkey:  wallet = Wallet(h)  addresslist += str(wallet.address.__dict__['mainnet'].__dict__['pubaddrbc1_P2WPKH']) + '\\n'addressfile.write(addresslist)Code:$ time ./benchmark_with_bitcoinaddress.py Quotereal    6m34,864suser    6m34,706ssys     0m0,129scross-checking each output...Code:$ diff -q bech32_addresses_with_bitcoinlib.100k bech32_addresses_with_bitcoinaddress.100kQuoteOutput file of all those benchmark tests were the same, no difference at all.I would like to see how pycoin would perform in this benchmark test with 100k addresses. Without using its command-line tool ku cause I think the command-line tool would be slow down things, correct me if I'm wrong. I didn't understand yet, how to utilize pycoin with network.parse to get the bech32 address of a key...EDIT:No matter how you slice it, these calculations are performed far too slowly on the CPU compared to a GPU. Even if you were to extend bit with bech32 functionality, I can't imagine that bit would be faster than GPU execution.Hence my question:Do you know any tool in this direction, which is multi-GPU capable and can generate addresses according to certain criteria ? VanitySearch won't work, because it uses for custom prefixes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 15, 2022, 11:12:07 AM",
+      "body": "I would generally be interested to know if it is at all possible to achieve such speeds in Python as we know from VanitySearch, BitCrack, etc. The mentioned tools are written in C++ and use CUDA for the immense and fast computing power. Without CUDA, this would not be possible. Is it possible to use CUDA in Python to achieve the same performance or is it simply technically impossible and we have to stick with CPU calculation in Python?The other question I'm wondering about: could we, for example, run VanitySearch in some kind of sub-process within a Python program, so that the full performance of VanitySearch would be applied, but the results would be processed by the Python program in the next step?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "December 17, 2022, 12:13:56 AMLast edit: December 17, 2022, 10:47:38 AM by mprep",
+      "body": "Quote from: ETFbitcoin on November 14, 2022, 11:44:34 AMI checked other library i've tried in past and found out bitcoinlib[1] utilize library called fastecdsa. It sounds good, so i decide to run quick benchmark.Code:$ time python3 test2.pyreal    2m45.322suser    2m45.114ssys     0m0.272sbenchmarks are kind of meaningless without knowing the system specs that they are being done with. like what type of cpu, ram, hard drive, os. or if you run a benchmark with alternatives then they can all be compared to get a relative comparison between the options. but just one single benchmark and no system specs doesn't really have any meaning at all. actually my bad, you did do a benchmark of bit earlier in the thread. QuoteIt's far slower than bit, but IMO it's still fast enough for you needs. And here's example of generated address.yeah it is. far slower. but i still am not sure how fast it would run on my machine because you didn't give any specs of your system. i imagine the more cores on the cpu, it's just multiplying the speed by that.Quote from: ETFbitcoin on November 12, 2022, 12:26:04 PMIt's much faster than i expected where the script generate 100K address in 6 seconds.that was a nice little script you shared so I tested it on my machine. about 95 seconds to generate 125k compressed and about 50 seconds to generate uncompressed. You must be on an intel i7 with at least 4 cores.here's my outputs:Code:Number of addresses processed: 125000Total conversion time: 94.19938802719116Number of addresses processed: 125000Compressed addresses:  FalseTotal conversion time: 49.93785619735718 QuoteHere's snippet of hex.txt and address.txt.Code:$ tail -n 5 hex.txtfce2310a2552b9f0c0158b76906092d95a632bac6f1a11abbda7e6f75e377be85ea97bc3217960cf1362fcd45f92913c67ceb5a1ff7fefa0d34a91c5e947a0504dff5ded0ebeb30249e1889b5c70a7dabab5534bcd31825eea958c4eee324f50bb2829f52ca31ac02ec78f5adcdd811ccf4e01fc5bca763dd4b0aea970dc73c6515d224f7a057745bfeb1c008a5100fb179f22fbcbfcd3adbf37b31a3d5dc807$ tail -n 5 address.txt 1Fztpfxj3hhmugpv955ujQ9cfA8wq1WMcR1JibRW9P1Gz48bwLpyuVvxWsT3CLmuB5Ny1EMTU54Wk41pP8tZe1ZqFdSVwKDJDevJM417o7zC1KqqDCmvS5NzrZnrvYd18YrJm6Vj1742LWxemvT4rUvSKQb78tYUH2CzXWe9u4yeah i mean it seems to compute accurate results but i'm not sure i like their documentation so much. they don't even seem to show how to get uncompressed addresses in their little getting started intro. had to find out a way to do that by looking at this: https://github.com/ofek/bit/issues/163 that was about as obvious as an electron 10 feet away... [moderator's note: consecutive posts merged]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "id": "topic_5412746",
+  "title": "privacycentricguy",
+  "author": "privacycentricguy",
+  "created_time": "September 07, 2022, 02:49:32 PM",
+  "content": "Mods, if this is not the right section please let know. Just trying to spread the word!I believe there have been intentional attack on Tornado Cash contracts. Although it was sanctioned, Tornado Cash frontend is still usable if you access via IPFS (tornadocash.eth) and use a different RPC node. It worked fine for me until I ran into this issue recently.I deposited into the 1 ETH tornado cash pool 3+ weeks ago and am now unable to withdraw my note. I believe there has been an attack on the 1 ETH pool that now prevents all users from withdrawing. It appears there have been no withdraws in the past 2 weeks from the 1 eth pool.I get the error \"Failed to fetch all deposit events from contract\" in the GUI, console further reveals an error \"Missing deposit event for deposit #51577\". When looking through the deposit events array, 51577 has failed the \"checkCommitments()\" call (https://github.com/tornadocash-community/tornado-classic-ui/blob/a83fae0772c8da084c0e76b3a756b456f5b9f5bb/utils/crypto.js#L93). This is because in this specific deposit the leafIndex variable does not match the position in the array. I am not sure how it was possible for this event to be emitted, possibly by error or malicious attack.See the following events on chain:Code:Deposit #51576:leafIndex=51576tx=\"0x5edd0931ce53ed5aafec9842d238fea7e222bfd37c3d81ce6e8fa1e0e3da61d8\"Code:Deposit #51577:leafIndex=51578 (double increment bug)tx=\"0x5468c98b5590dad45f6ae3929df644d7e29ec74272b44941234e26191cf78e16\"Because of this error, the signing algorithm no longer works to withdraw coins from the contract. I attempted to manually modify the RPC responses and correct the leafIndex in the events to be sequential but it did not work. I also tried removing the leafIndex check from the frontend source and that also did not work.Reward token: Code:tornado-eth-1-1-0x246528b30a8270c44d6f5317c37c0fbe893889f7b7c723575bb49cf224422505ce64b1f5f266500c92a2e3cbe0b7249dafb3f4708fe7bae1ff87ae823ce2If anyone can figure out how this attack was performed, and how to actually withdraw stuck funds, feel free to keep the 1 ETH reward attached to the note that I put above. The fact that this happened right after Tornado Cash was sanctioned makes me believe it could have been a nation state actor trying to brick the contract.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412746",
+  "comments": [
+    {
+      "author": "TryNinja",
+      "created_time": "September 08, 2022, 12:26:09 AM",
+      "body": "The deposit with a leafIndex of 51577 does exist: https://etherscan.io/tx/0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95That would be:Code:timestamp: 1661850816commitment: 0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4leafIndex: 51577blockNumber: 15433561transactionHash: 0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95You can probably manually add it into the buildTree function. Something like this:Code:const index = eventsData.events.findIndex((e) => e.leafIndex === 51576)eventsData.events.splice(index + 1, 0, {      timestamp: '1661850816',      commitment: '0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4',      leafIndex: 51577,      blockNumber: 15439539,      transactionHash: '0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95'})",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "privacycentricguy",
+      "created_time": "September 09, 2022, 03:56:22 PM",
+      "body": "Quote from: TryNinja on September 08, 2022, 12:26:09 AMThe deposit with a leafIndex of 51577 does exist: https://etherscan.io/tx/0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95That would be:Code:timestamp: 1661850816commitment: 0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4leafIndex: 51577blockNumber: 15433561transactionHash: 0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95You can probably manually add it into the buildTree function. Something like this:Code:const index = eventsData.events.findIndex((e) => e.leafIndex === 51576)eventsData.events.splice(index + 1, 0, {      timestamp: '1661850816',      commitment: '0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4',      leafIndex: 51577,      blockNumber: 15439539,      transactionHash: '0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95'})Wow thanks, this worked!why is this transaction not returned from the RPC though? Ive tried numerous RPCs, and no matter what, the list of transactions is always missing this one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "September 09, 2022, 04:09:31 PM",
+      "body": "Quote from: privacycentricguy on September 09, 2022, 03:56:22 PMWow thanks, this worked!why is this transaction not returned from the RPC though? Ive tried numerous RPCs, and no matter what, the list of transactions is always missing this one.It seems like it is, at least with the RPC I've tried (https://securerpc.com).getPastEvents with a fromBlock of 15439539 returns the event:Code:[  {    address: '0x47CE0C6eD5B0Ce3d3A51fdb1C52DC66a7c3c2936',    blockHash: '0xadf3c551f0b58b9b26a17eb8297a09101a5299f3716ab8c608183407cd89e8b4',    blockNumber: 15439539,    logIndex: 149,    removed: false,    transactionHash: '0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95',    transactionIndex: 91,    id: 'log_59b57b55',    returnValues: Result {      '0': '0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4',      '1': '51577',      '2': '1661850816',      commitment: '0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4',      leafIndex: '51577',      timestamp: '1661850816'    },    event: 'Deposit',    signature: '0xa945e51eec50ab98c161376f0db4cf2aeba3ec92755fe2fcd388bdbbb80ff196',    raw: {      data: '0x000000000000000000000000000000000000000000000000000000000000c97900000000000000000000000000000000000000000000000000000000630dd4c0',      topics: [Array]    }  }]I'm not sure where it went wrong, though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "privcat542",
+      "created_time": "September 19, 2022, 12:04:13 PM",
+      "body": "Quote from: TryNinja on September 08, 2022, 12:26:09 AMThe deposit with a leafIndex of 51577 does exist: https://etherscan.io/tx/0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95That would be:Code:timestamp: 1661850816commitment: 0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4leafIndex: 51577blockNumber: 15433561transactionHash: 0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95You can probably manually add it into the buildTree function. Something like this:Code:const index = eventsData.events.findIndex((e) => e.leafIndex === 51576)eventsData.events.splice(index + 1, 0, {      timestamp: '1661850816',      commitment: '0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4',      leafIndex: 51577,      blockNumber: 15439539,      transactionHash: '0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95'})Hi. I have the same problem \"Missing deposit event for deposit #51577\". Would you please help me understand the manual tree building? I collected the info needed (timestamp, blocknumbder, transaction hash, leafindex, commitment) for my deposit. Is it a matter of inserting the code block inside the buildtree function (https://github.com/tornadocash-community/tornado-classic-ui/blob/a83fae0772c8da084c0e76b3a756b456f5b9f5bb/store/application.js#L664)? Where should I insert it inside the body? Also, should I change the index+1 that is part of the eventsData.events.splice to index + difference between 51577 and my actual leafindex?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "September 20, 2022, 05:02:33 PM",
+      "body": "Quote from: privcat542 on September 19, 2022, 12:04:13 PMWhere should I insert it inside the body?Between the code block on line 674-677 and the line 679.Quote from: privcat542 on September 19, 2022, 12:04:13 PMAlso, should I change the index+1 that is part of the eventsData.events.splice to index + difference between 51577 and my actual leafindex?No. It's missing the deposit #51577 which is what's being inserted, not your actual deposit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ahmia39",
+      "created_time": "September 20, 2022, 06:49:31 PM",
+      "body": "yes totally agree with you.Tornadoes are a popular and important tool for cybercriminals and state-backed hacker groups",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "privcat542",
+      "created_time": "September 21, 2022, 08:35:32 PM",
+      "body": "That worked! Thank you so much.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "0x0x0x0x",
+      "created_time": "December 09, 2022, 11:38:45 PM",
+      "body": "this is something I have been dealing with for 3 months. Thank you @TryNinja the code to help rescue my deposit ^^^I suspect it very much depends on which RPC URL you are using (in the TornadoCash user settings area). I think a lot of previously-usable RPCs disappeared or were spooked by the USA sanctioning TornadoCash and somehow censor or filter the retrieval of smart-contract data related to TornadoCash. Of course it is possible that a nation-state level attacker partially broke the contract, but it seems to be running as normal when inspected through Etherscan. It seems to be a front-end / RPC-related issue to me, but I am interested to know if I am wrong. One possible solution is to run your own Ethereum node and to change the RPC URL in Tornado Cash (as described above) to localhost:8545 or whatever port you are running on. In a similar vein (usability of Tornado Cash), a lot of the front-ends have been taken down / blocked and unusable for months. As a result, I saw at least one instance of somebody registering a confusing ENS name (such as tomadocash.eth for example – \"m\" substituted for \"rn\") to lead people (in a reddit forum) to a fake TornadoCash front-end which would simply take the deposited money.The ENS domain tornadocash.eth (and its record section) is the best source of truth for website URLs related to TornadoCash front-ends. The extensions tornadocash.eth.link and tornadocash.eth.limo used to be reliable links to access the service easily, but cloudflare blocks them from resolving in the Brave browser, where it seems cloudflare is the default  IPFS \"gateway\" operator. It is likely possible to get around this by changing the IPFS \"gateway\" used in your browser, or to run an IPFS node locally (I have not done this but seems like it should work) or as a Firefox Extension.ENS Record for tornadocash.eth can be seen at: https://app.ens.domains/name/tornadocash.eth/detailsYou can see that the IPFS hash stored there (in the record/link section) is identical to the following hashes/links which are currently working for me (in Firefox, with the IPFS extension). https://bafybeicu2anhh7cxbeeakzqjfy3pisok2nakyiemm3jxd66ng35ib6y5ri.ipfs.dweb.link/https://ipfs.io/ipfs/bafybeicu2anhh7cxbeeakzqjfy3pisok2nakyiemm3jxd66ng35ib6y5ri/DO NOT TRUST THE ABOVE TORNADO CASH LINK WITHOUT VERIFICATION (I realize this is a new account). I work in Ethereum and just want to spread this information / good links for innocent people trying to withdraw from TornadoCash who google the error which led me here: \"Failed to fetch all deposit events from contract\"). Good luck all",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "anouarman",
+      "created_time": "January 13, 2023, 10:01:41 PM",
+      "body": "Hello,I am also struggling to withdraw my depost of 1ETH, I don't really understand where to put that code?Do I need to download and deploy the github repository ? If yes please can you guide me on what is the easiest way to do this? using github actions? or AWS?Thank you for your help",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "julienmartinlevrai",
+      "created_time": "November 02, 2023, 08:17:38 PM",
+      "body": "Quote from: anouarman on January 13, 2023, 10:01:41 PMHello,I am also struggling to withdraw my depost of 1ETH, I don't really understand where to put that code?Do I need to download and deploy the github repository ? If yes please can you guide me on what is the easiest way to do this? using github actions? or AWS?Thank you for your helpHello, I was just able to withdraw and so here is a detailed guide on how to do it. This assumes you have a working RPC endpoint.1. Build your own UI* Run the following commands:Code:git clone https://github.com/tornadocash-community/tornado-classic-uicd tornado-classic-ui/nvm useyarncp .env.example .envyarn generateyarn start2. Reproduce the error locally* On your browser, open `http://localhost:3000`* Add your custom RPC endpoint* Try to withdraw* You get \"Failed to fetch all deposit events from contract\" in the UI* You get \"Missing deposit event for deposit #51577\" in the console3. Add the aforementioned fix to your UI code* Stop the `yarn start` command you ran earlier* Open `store/application.js` with a text editor* Go to line `678`* Insert the following code in that line:Code:    // start custom code    // https://bitcointalk.org/index.php?topic=5412746.0    const index = eventsData.events.findIndex((e) => e.leafIndex === 51576)    eventsData.events.splice(index + 1, 0, {      timestamp: '1661850816',      commitment: '0x0327e815deb9e90c88860561147d661905b28853fd996f0add1769b00226d0d4',      leafIndex: 51577,      blockNumber: 15439539,      transactionHash: '0xd20351a0e2a9a3f40cb1f55236b30185184587b05551e5e4399c4dbf7aa3ca95'    })    // end* Save and close4. Withdraw* Run the following commands:Code:yarn generateyarn start* On your browser, open `http://localhost:3000`* Try to withdraw* Success !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "julienmartinlevrai",
+      "created_time": "November 22, 2023, 09:29:05 PM",
+      "body": "Update: I created a pull request. See https://github.com/tornadocash-community/tornado-classic-ui/pull/2",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "julienmartinlevrai",
+      "created_time": "March 05, 2024, 01:14:38 AM",
+      "body": "Update: the issue mentioned in this thread no longer seems to be happening. At least not on my side.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

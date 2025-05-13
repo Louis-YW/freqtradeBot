@@ -1,0 +1,29 @@
+{
+  "id": "topic_5421077",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "November 15, 2022, 08:40:17 AMLast edit: November 15, 2022, 08:14:57 PM by citb0in",
+  "content": "Hello everybody,can anyone run Keyhunt-Cuda in check mode and post his results, please? I just realized that the check outputs an error.Code:./KeyHunt -cQuoteKeyHunt-Cuda v1.08Checking... Secp256K1Check Generator :OKCheck Double :OKCheck Add :OKCheck GenKey :OKAdress : 15t3Nt1zyMETkHbjJTTshxLnqPzQvAtdCe OK!Adress : 1BoatSLRHtKNngkdXEeobR76b53LETtpyT OK!Adress : 1Test6BNjSJC5qwYXsjwKVLvz7DpfLehy OK!Adress : 16S5PAsGZ8VFM1CRGGLqm37XHrp46f6CTn OK!Adress : 1Tst2RwMxZn9cYY5mQhCdJic3JJrK7Fq7 OK!Adress : 3CyQYcByvcWK8BkYJabBS82yDLNWt6rWSx Failed !  16S5PAsGZ8VFM1CRGGLqm37XHrp46f6CTnAdress : 31to1KQe67YjoDfYnwFJThsGeQcFhVDM5Q Failed !  1CTVCniYaK1sxerz1mpVzwfm2HRWYLfeHVAdress : bc1q6tqytpg06uhmtnhn9s4f35gkt8yya5a24dptmn Failed !  1LDMEYi5HfGkZCJqEa4pmY3BXCirjCS5u3Check Calc PubKey (full) 1ViViGLEawN27xRzGrEhhYPQrZiTKvKLo :OKCheck Calc PubKey (odd) 18aPiLmTow7Xgu96msrDYvSSWweCvB9oBA:OKChecking... IntGetBase10() Results OKAdd() Results OK : 357.143 MegaAdd/secMult() Results OK : 30.395 MegaMult/secDiv() Results OK : 12.346 MegaDiv/secR1=1000003D1R2=1000007A2000E90A1Field characteristic size: 256bitsModInv()/ModExp() Results OKModInv() Edge cases Results OK.Avg = 6.13ModInv() Results OK : 701.034 KiloInv/secModInv() cycles : 3560.44ModSqrt() Results OK !IntGroup.ModInv() Results OK : 9.974 MegaInv/secModMulK1() Results OK : 41.672 MegaMult/secModSquareK1() Results OK : 42.508 MegaSqr/secModInv() Cost : 60.6 SModMulK1order() Results OK : 5.469 MegaMult/secI had discovered a similar issue with VanitySearch and we know that those tools build up on VanitySearch, if I'm not mistaken. Maybe there is a connection. In the VanitySearch thread I posted HERE my finding and how I mitigated the culprit be downgrading. In the next step I was able to pinpoint and eliminate the problem and finally use the latest version of VanitySearch. The problem was in the compiler, see HERE. The fix was to use g++-9 in the Makefile.I used the same procedure here on KeyHunt-Cuda, that means I am explicitly using g++-9 in its Makefile. But it doesn't help, I still get those errors in the check. Any clues how to fix this? It makes no sense to me using KeyHunt-Cuda without ensuring its working fine. Looking forward to any helpful comment. Thank you.EDIT:I'm playing around with keyhunt-cuda and trying to solve puzzle 25 but it doesn't work. Either I'm missing something, doing something wrong, or the program doesn't work reliably. Can someone of you please check this and post the result here?Puzzle #25QuoteAddress = 15JhYXn6Mx3oF4Y7PcTAv2wVVAuCFFQNiPhash160 = 2f396b29b27324300d0c59b17c3abc1835bd3dbbPubkey = 03057fbea3a2623382628dde556b2a0698e32428d3cd225f3bd034dca82dd7455aRange = 100000-200000PrivKey = 1FA5EE5I tried feeding keyhunt-cuda with all three possible files: address in clear-text, address as hash160 and address as hash160 in binary as converted by the supplied python script \"addresses_to_hash160.py\". I also tried using CPU only or GPU only. It makes no difference, keyhunt-cuda does NOT find the key for that puzzle, whatever I tried so far.Code:$ cat 25_addr.txt 15JhYXn6Mx3oF4Y7PcTAv2wVVAuCFFQNiP$ cat 25_addr_hash160.txt 2f396b29b27324300d0c59b17c3abc1835bd3dbb$ cat 25_addr_hash160.bin /9k)�s$0Y�|:�5�=�I tried following command variations:Code:./KeyHunt -t 0 -g --range 1000000:2000000 -m address -i 25_addr_hash160.binCode:./KeyHunt -t 0 -g --range 1000000:2000000 -m address -i 25_addr_hash160.txtCode:./KeyHunt -t 0 -g --range 1000000:2000000 -m address -i 25_addr.txtCode:./KeyHunt -t 4 --range 1000000:2000000 -m address -i 25_addr_hash160.binCode:./KeyHunt -t 0 -g --gpui 0 --gpux 256,256 --range 1000000:2000000 -m address -i 25_addr_hash160.binI even tried wider ranges, like ...Code:./KeyHunt -t 0 -g --range 10000:200000000 -m address -i 25_addr_hash160.binIt works only when provided with the address in the command line, e.g:Code:$ ./KeyHunt -t 0 -g --gpui 0 --gpux 256,256 -m address --coin BTC --range 1000000:2000000 15JhYXn6Mx3oF4Y7PcTAv2wVVAuCFFQNiPConclusion --> KeyHunt-Cuda in single address mode requires an address as input, it does not work with a hash160 no matter if its binary or not.However my first part of this post and the question \"Why does Keyhunt-Cuda check throws errors\", still remains.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5421077",
+  "comments": [
+    {
+      "author": "7isce",
+      "created_time": "November 16, 2022, 09:38:45 AM",
+      "body": "Its easy error See use \"-m address\" if use CPU with ONE thread only otherwise (GPU or CPU with more than one thread) use \"-m addresses\"Good luck hunting",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 16, 2022, 09:52:21 AM",
+      "body": "Seems like KeyHunt-Cuda only use -i in \"addresses\" mode not in \"address\" mode while it set the latter by default (if -m isn't provided).The workaround is force it to -m addresses instead.Here's some testsCommand1:Code:./keyhunt-Cuda -m addresses -i input.dat --range 1000000:2000000Found.txt:Code:15JhYXn6Mx3oF4Y7PcTAv2wVVAuCFFQNiP 0000000000000000000000000000000000000000000000000000000001FA5EE5 03057FBEA3A2623382628DDE556B2A0698E32428D3CD225F3BD034DCA82DD7455ACommand2:Code:./keyhunt-Cuda -m address -i input.dat --range 1000000:2000000Result:Code:Error: Wrong search mode provided for multiple addresses or xpointsFor the test failures, I think it's because it never supported P2SH nor Bech32.Looks like it's the same test designed for Vanitysearch (CMIIAW).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

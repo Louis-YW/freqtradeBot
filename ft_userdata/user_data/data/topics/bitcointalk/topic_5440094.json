@@ -1,0 +1,93 @@
+{
+  "id": "topic_5440094",
+  "title": "GldLnRjng",
+  "author": "GldLnRjng",
+  "created_time": "February 16, 2023, 06:44:21 PMLast edit: February 16, 2023, 07:27:10 PM by GldLnRjng",
+  "content": "Hi everyone,I downloaded BitcoinCore to run a full node. I'm already synchronized with the entire blockchain and followed the istructions (https://bitcoin.org/en/full-node#upgrading-bitcoin-core) to enable inbound connections but even after that I can't see any in the node window.I wanted to ask you some help to figure out where is the problem. I may have done some mistake during the procedure but I couldn't understand where.In this link there are the screenshots of the various step I made to allow inbound connctions https://imgur.com/a/pJkNsoOpic1: DHCP Reservationpic2: Port Forwardingpic3: current status of my firewall inbound connectionspic4 and pic5: creation of a new ruleThe IP address that I obscured is the same in pic 1, 2 and 5.The language is italian. I think you just need to know that \"Qualsiasi\" means \"any\" or \"all\". Also note that I had only two rules in the firewall at the beginning, but after some time (or something I made) it became two.Thanks for your time.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440094",
+  "comments": [
+    {
+      "author": "Quickfant",
+      "created_time": "February 17, 2023, 12:06:01 AM",
+      "body": "I cannot see your image hosted at imgur I think they are having problems. Can you provide what is on the image in text? I might be able to help I have had issues with setting up my own node and it was some udev rules that needed to be applied to get it to function.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "February 17, 2023, 04:13:38 AM",
+      "body": "Do you have any entries in your bitcoin.conf file or the GUI's settings?If there are, please show them (remove the sensitive parts like RPC credentials).Have you restarted the router and PC after setting port forwarding and static IP?Depending on the router, it may require a restart.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GldLnRjng",
+      "created_time": "February 17, 2023, 12:29:25 PM",
+      "body": "QuoteCan you provide what is on the image in text?DHCP Reservation: Name:   MyDesktopNameVendor:   Unknown VendorMAC Address:   MyMacAddress      IP Address (Reserved):   myIPaddressReserve IP:   EnabledPort Forwarding:Enable Rules:   EnableName:   BitcoinNodeInterface:   ATM_PPPoE_0_2Internal IP:   myIPaddress ()(Internal IP must be in the same network segment with LAN IP)Internal startport:   8333Internal endport:   18333External startport:   8333External endport:   18333Protocol Type:   TCPFirewall:step1protocol type: anylocal port: allremote port: allstep2:local IP to apply selection:myIPaddressQuoteDo you have any entries in your bitcoin.conf file or the GUI's settings?No entries. I just tried adding \"listen=1\" but then deleted it.QuoteHave you restarted the router and PC after setting port forwarding and static IP?I did it but didn't work.EDIT:My router also has UPnP enabled and I've tryed to check the \"map ports with UPnP\" in the GUI, on options, without any result.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "February 17, 2023, 09:37:04 PM",
+      "body": "Quote from: GldLnRjng on February 17, 2023, 12:29:25 PMNo entries. I just tried adding \"listen=1\" but then deleted it.EDIT:My router also has UPnP enabled and I've tryed to check the \"map ports with UPnP\" in the GUI, on options, without any resultWould you mind trying to put listen=1 again under bitcoin.conf file but this time after you save it reopen the bitcoin core and reboot the PC so that the config after restart will load properly.Also, if your router has anti-DDOS enabled I suggest disable it to try.Set up your PC network switch to static then add Cloudflare DNS to try.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "February 18, 2023, 04:19:02 AM",
+      "body": "Quote from: GldLnRjng on February 17, 2023, 12:29:25 PM-snip-EDIT:My router also has UPnP enabled and I've tryed to check the \"map ports with UPnP\" in the GUI, on options, without any result.So, router and node seem to be configured correctly; also, enabling UPnP usually works after restarting the node.I'm guessing that it may have something to do with your ISP.Check your \"debug.log\" file if there's any entry that hints of inbound connection attempts.It's in the data directory, open it as text.Quote from: GldLnRjng on February 17, 2023, 12:29:25 PMQuoteDo you have any entries in your bitcoin.conf file or the GUI's settings?No entries. I just tried adding \"listen=1\" but then deleted it.Yes, that'll only be necessary if you're connecting through Tor.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GldLnRjng",
+      "created_time": "March 02, 2023, 02:02:44 PM",
+      "body": "Thanks all for the replies. It seems like the problem solved by itself. Now the node test on Bitnodes shows green check and I've 5 inbound connections and 10 outbound. Wondering if I could have more in connections, but it seems like the number is still adjusting at the moment. Outbounds are stable on 10 while inbounds swing from 4 to 6 at the moment.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "March 02, 2023, 05:29:38 PM",
+      "body": "Have you tried to check the settings> of your Bitcoin core?You can find allow incoming connection enable it and restart the core. Let's see if the inbound connection increases. If not try to add this to your bitcoin.confCode:maxconnections=125The 125 value is the default value of max peer connections change it to higher then check for changes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GldLnRjng",
+      "created_time": "March 02, 2023, 08:04:46 PM",
+      "body": "I already enabled incoming connection and tried to add the maxconnections command to the conf file but none of the procedures worked. Could it be a matter of bandwidth of my interernet connection?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "March 03, 2023, 12:11:04 AM",
+      "body": "Quote from: GldLnRjng on March 02, 2023, 08:04:46 PMI already enabled incoming connection and tried to add the maxconnections command to the conf file but none of the procedures worked. Could it be a matter of bandwidth of my interernet connection?It takes hours or days before someone's nodes start to connect to you and it depends on the router's firewall. It is likely the same as torrent it takes a while before you can see more connections. And take note maxconnection is only for inbounds not for outbound I don't know if there is a command to increase outbound.And please read this Bitcoin by default will not make more than 8 outgoing connections",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GldLnRjng",
+      "created_time": "March 05, 2023, 03:15:00 AM",
+      "body": "Yes. I let it run a day and it's 29 so I guess I'll just wait. Thanks for the support",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

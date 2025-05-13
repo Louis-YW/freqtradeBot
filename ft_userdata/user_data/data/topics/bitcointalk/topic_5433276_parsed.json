@@ -1,0 +1,61 @@
+{
+  "id": "topic_5433276",
+  "title": "Pecheur",
+  "author": "Pecheur",
+  "created_time": "January 06, 2023, 05:38:55 PM",
+  "content": "Hello,I would like to build a mobile point-of-sale which supports lightning payments.Still a bitcoin/lightning newbie so I'm reading and experimenting to try and figure out the best architecture.Bitcoin allows to access its api through json-rpc natively.I don't really understand why this isn't true for Lightning.Here are a few questions I have related to lightning:-Why isn't there a BOLT standard requiring the same API interfacing for both c-lightning and LND?-For C-lightning there are plugins like cln-grpc and the rest API which can be configured to allow programmatic API access but...  Those plugins aren't installed and configured by default which means we loose the benefit of decentralisation.  If I want my app to use one of those plugins I will be limited to nodes which have the plugin installed?!What are my best options If I would use e.g Swift and would like to process payments from the app to the lightning network?Thanks,Martin",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5433276",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 06, 2023, 09:07:11 PM",
+      "body": "Quote from: Pecheur on January 06, 2023, 05:38:55 PMBitcoin allows to access its api through json-rpc natively.I don't really understand why this isn't true for Lightning.There is c-lightning-REST, if you haven't noticed, but I'm not sure if that's what you're asking for: https://github.com/Ride-The-Lightning/c-lightning-RESTQuote from: Pecheur on January 06, 2023, 05:38:55 PM-Why isn't there a BOLT standard requiring the same API interfacing for both c-lightning and LND?Because developers can choose to code their software however they wish, I suppose. BOLT stands for \"Basics of Lightning Technology\", and devs do follow that specification, but there shouldn't be specification to the manner they build their ecosystem.Quote from: Pecheur on January 06, 2023, 05:38:55 PMThose plugins aren't installed and configured by default which means we loose the benefit of decentralisation.Lost you here. What prevents each user from installing plugins individually, that would harm decentralization?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "January 07, 2023, 12:34:17 AM",
+      "body": "Quote from: Pecheur on January 06, 2023, 05:38:55 PMThose plugins aren't installed and configured by default which means we loose the benefit of decentralisation.  If I want my app to use one of those plugins I will be limited to nodes which have the plugin installed?!How's that? Would this mean that you believe decentralization relies on what's 'configured by default'? I.e. Bitcoin as a network is not decentralized because it's not preinstalled on Windows 10? This seems absurd.Every LN node can connect to any other LN node; no matter which plugins they have installed. Unless I guess they build a plugin that rejects connections from certain nodes or something like that, of course. But that's a constructed example.To answer your question: mobile open-source Lightning-based point-of-sale apps exists; it's built into Breez for instance.It is not written in Swift, though. But you can still read the code and get a feeling for what you need to replicate.In short, the only 'point of sale' specific stuff you will need to add to a mobile self-custodial LN node is a fiat-BTC currency conversion (one API call), then send the BTC amount to Core Lightning with the invoice RPC command to get back an invoice. Lastly, render it nicely (probably as a QR code) however you wish, with whatever graphical framework you're comfortable with, to display it to customers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pecheur",
+      "created_time": "January 07, 2023, 02:16:18 AMLast edit: January 08, 2023, 05:09:42 PM by mprep",
+      "body": "Hello!Thank you for your answers.Why would I need an LN node running on the mobile device with the app?  Or did I misunderstand your answer?  Why can't the mobile app make json-rpc calls remotely to any LN node available?  Preferably to a node which is closest to the mobile user's location or route?I don't talk about LN to LN communication but rather about a client (app) / server (LN node) setup.When you tell to use the invoice RPC command, this is exactly the part I want to do through an API remotely, not by using the lightning-cli command on an LN node.If I configure 1 LN node with a grpc plugin, then I'm only sure that that specific LN node is running that plugin.  This kind of forces me to only use that node or a cluster of nodes which I configured.  Although a cluster would help it still would reduce the decentralisation aspect by a lot.I thought the BOLTs were meant to keep standards for alternative lightning implementations such as c-lightning and LND, my bad.I will look into Breez, I didn't know about this.Quote from: n0nce on January 07, 2023, 12:34:17 AMQuote from: Pecheur on January 06, 2023, 05:38:55 PMThose plugins aren't installed and configured by default which means we loose the benefit of decentralisation.  If I want my app to use one of those plugins I will be limited to nodes which have the plugin installed?!How's that? Would this mean that you believe decentralization relies on what's 'configured by default'? I.e. Bitcoin as a network is not decentralized because it's not preinstalled on Windows 10? This seems absurd.I do believe Bitcoin and Lightning are decentralised.  But if only a part of the nodes support grpc calls through a plugin which needs to be installed by its admin, then the remaining part of the nodes become useless to apps requiring grpc.[moderator's note: consecutive posts merged]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 07, 2023, 06:10:39 PM",
+      "body": "Quote from: Pecheur on January 07, 2023, 02:16:18 AMWhy can't the mobile app make json-rpc calls remotely to any LN node available?  Preferably to a node which is closest to the mobile user's location or route?To any LN node, kinda not. You make RPC calls on computers you control. If you're searching for a mobile lightning wallet app that includes REST requests, check out Zap.Quote from: Pecheur on January 07, 2023, 02:16:18 AMWhen you tell to use the invoice RPC command, this is exactly the part I want to do through an API remotely, not by using the lightning-cli command on an LN node.This precise command can be executed remotely by the github repository I linked you above in my other post. Quote from: Pecheur on January 07, 2023, 02:16:18 AMIf I configure 1 LN node with a grpc plugin, then I'm only sure that that specific LN node is running that plugin.  This kind of forces me to only use that node or a cluster of nodes which I configured.Again, you can use commands such as invoice, pay, getinfo etc., on nodes you control of. You can't just force someone do this for you, you do it individually on your node(s). Just as you enable server in Bitcoin Core and use credentials to execute commands remotely. Quote from: Pecheur on January 07, 2023, 05:27:04 PMI do believe Bitcoin and Lightning are decentralised.  But if only a part of the nodes support grpc calls through a plugin which needs to be installed by its admin, then the remaining part of the nodes become useless to apps requiring grpc.Such as... which apps? Routing transactions and accomplishing payments does not require the installation of a plugin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "January 07, 2023, 07:24:34 PM",
+      "body": "Quote from: Pecheur on January 07, 2023, 02:16:18 AMWhy can't the mobile app make json-rpc calls remotely to any LN node available?  Preferably to a node which is closest to the mobile user's location or route?Because the node holds the funds. No node => no channels => no funds.Quote from: Pecheur on January 07, 2023, 02:16:18 AMI don't talk about LN to LN communication but rather about a client (app) / server (LN node) setup.A client-server setup works if users have their own servers (full LN nodes). They can't share an LN node without sharing a balance. If it makes sense?Quote from: Pecheur on January 07, 2023, 05:27:04 PMI do believe Bitcoin and Lightning are decentralised.  But if only a part of the nodes support grpc calls through a plugin which needs to be installed by its admin, then the remaining part of the nodes become useless to apps requiring grpc.That's not how they work though, as explained above. If you yourself run an app on your own node that requires GRPC, you install / configure GRPC, if you don't, you don't. Others can't use your node, anyway, so it doesn't matter to them what you do or do not install.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pecheur",
+      "created_time": "January 08, 2023, 12:39:09 AM",
+      "body": "thanks for your help!makes sense now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "id": "topic_5408003",
+  "title": "pbies",
+  "author": "pbies",
+  "created_time": "July 29, 2022, 06:37:30 AM",
+  "content": "I have wallet dump in text format and I need to take out from it all private keys that had movement (incoming/outgoing) as some of the keys are brain wallets and were not used.Not an option is going through each private key and exporting it from Bitcoin Core console.Simply there is too much keys (23643 lines=keys).How can I simply check each private key for any movement and then save it in other file?This is a task where I need to limit the wallet for keys that have been used and getting rid of unused.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408003",
+  "comments": [
+    {
+      "author": "stanner.austin",
+      "created_time": "July 29, 2022, 11:34:39 AM",
+      "body": "HelloYou can use python to process this in multithread.For example read file split each then process with Key to address with fast python lib (https://ofek.dev/bit/).Match with known funded address (both compressed & uncompressed) if match save his output WIF .This won't need internet i am unsure about process speed i tested myself 1000 line take less then 1min.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 29, 2022, 11:52:33 AM",
+      "body": "Quote from: ETFbitcoin on July 29, 2022, 11:41:48 AMBut if there's no list of known funded address, you either need to use blockexplorer API or list of all funded address (such as addresses.loyce.club).OP is looking for addresses that had movement (maybe to recover Forkcoins?), so he needs a much longer list: List of all Bitcoin addresses ever used.But that's only useful if you have the addresses with the private keys. If you only have private keys, you'll need to convert them into addresses first (with most likely 3 different address types per private key).If you have an address list it's quick:Quote from: LoyceV on August 01, 2020, 09:05:46 AMCode:comm -12 <(sort list.txt) addresses_sorted.txtThis outputs all Bitcoin addresses from \"list.txt\" that have ever been funded.Then all you need to do is match those addresses to their private keys again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "July 29, 2022, 01:10:26 PMLast edit: July 29, 2022, 02:04:59 PM by pbies",
+      "body": "Ok, got it!What have I done:- downloaded Bitcoin_addresses_LATEST.txt.gz and unpacked it- dumped wallet to a text file (I will need private addresses later), dumpwallet command- dumped all transactions (this gave me my public addresses), export in Bitcoin Core- removed unneeded data from files (headers, footers, blank lines)- awk -F \"\\\"*,\\\"*\" '{print $5}' pub-used.csv | sort -u > pub-used-addr-only.csv- sorted -u the addresses file (comm said it was not sorted)- comm -12 Bitcoin_addresses_LATEST-sorted.txt pub-used-addr-only.csv > result.txt- result.txt goes to other folder with name pub-my.txt; priv-pub.txt is dumped wallet without unneeded data-while IFS= read -r p; do        if grep -q \"$p\" priv-pub.txt; then                echo $p        fidone < \"pub-my.txt\"As a result I should receive public addresses that I have private key for them. I received 0 (zero). So wrong was selection of LATEST file (1-1,5 GiB), I should use whole all_Bitcoin_addresses_ever_used_sorted.txt.gz (22 GiB).EDIT:So later I've done:- put pub-user-addr-only.csv in other folder, also file with all addresses ever used - needed to sort it (also uniqed it)- comm -12 all_Bitcoin_addresses_ever_used_sorted-sorted.txt pub-used-addr-only.csv > result.txt- put files in even other folder: my wallet dump, pub-used.txt-while IFS= read -r p; do        grep \"$p\" priv-pub.txt | cut -d \" \" -f1 >> result.txtdone < \"pub-used.txt\"- in result.txt I've receive private keys for all used public addresses- sort -u result.txt > result-sort-uniq.txtAnd at last I receive all private keys (WIF) which are the only that had movement on the blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 29, 2022, 02:58:37 PM",
+      "body": "Quote from: pbies on July 29, 2022, 01:10:26 PMAnd at last I receive all private keys (WIF) which are the only that had movement on the blockchain.Glad it worked  I have only one thing to add: all_Bitcoin_addresses_ever_used_sorted.txt.gz was last updated 5 weeks ago (which reminds me to run an update now, but it takes a few hours). If that's okay for your data, you're good. If not, you may have to add a few recently used keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "July 29, 2022, 03:15:47 PM",
+      "body": "It is not that crucial. These are experiments.Additionally if anyone stumble upon this thread:If you want to get private/public keys/addresses from Bitcoin Core, make two things:1. export transactions2. dump walletAnd with the above work you are ready to get in effect used private keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "July 29, 2022, 08:14:27 PM",
+      "body": "first sort used big file of addresses , if you have already sorted, thats good2nd your dumped addresses from your wallet file3rd sort your dumped addressessimple command will let you get resultjoin your-dump-sorted-file.txt your full-big-sorted-list.txt >> result.txtextra note if you have latest addresses files from web, its look example1111111111111111111114oLvT2     28314777925111111111111111111112BEH2ro     10940111111111111111111112czxoHN     282440111111111111111111112xT3273     5945then extract addresses commandawk '{print $1}' addresses-list-18-gb.txt >> result-addresses.txtthen sort sort result-addresses.txt >> result-addresses-sorted.txtthen start from top",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "July 30, 2022, 03:03:01 AM",
+      "body": "Quote from: brainless on July 29, 2022, 08:14:27 PM...Will try some other day.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 30, 2022, 03:43:33 AM",
+      "body": "Quote from: pbies on July 30, 2022, 03:03:01 AMQuote from: brainless on July 29, 2022, 08:14:27 PM...Will try some other day.The Private Key list file is gigantic, about a few gigabytes large, so expect the sorting with 'awk' take a lot of memory, just to warn you (and that is if it doesn't run out of RAM first)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "July 30, 2022, 04:35:07 AM",
+      "body": "Quote from: NotATether on July 30, 2022, 03:43:33 AM...The Private Key list file is gigantic, about a few gigabytes large, so expect the sorting with 'awk' take a lot of memory, just to warn you (and that is if it doesn't run out of RAM first)That's a public addresses file.I sorted it in 20 min with WSL sort -u.16 GiB of RAM was enough, even pagefile didn't extended.And it was the larger file, not the latest smaller.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 30, 2022, 06:27:44 AM",
+      "body": "Quote from: pbies on July 30, 2022, 04:35:07 AM16 GiB of RAM was enough, even pagefile didn't extended.Linux sort by default uses /tmp for sorting files that don't fit it's RAM. I assume the WSL-version does something similar.But the file you've downloaded from me should have been sorted already.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "July 30, 2022, 10:46:39 AM",
+      "body": "Quote from: LoyceV on July 30, 2022, 06:27:44 AMBut the file you've downloaded from me should have been sorted already.Indeed I can see that the file is sorted, but different-case-sensitive than the expected by comm program.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 31, 2022, 10:20:00 AM",
+      "body": "Quote from: pbies on July 30, 2022, 10:46:39 AMQuote from: LoyceV on July 30, 2022, 06:27:44 AMBut the file you've downloaded from me should have been sorted already.Indeed I can see that the file is sorted, but different-case-sensitive than the expected by comm program.Can you share what you did exactly? I tested it, and comm didn't complain about the sorting order:Code:comm -12 all_Bitcoin_addresses_ever_used_sorted.txt test.txtI create all_Bitcoin_addresses_ever_used_sorted.txt.gz by piping all data through sort -u -S30%, so no additional sort should be necessary.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "July 31, 2022, 01:51:33 PM",
+      "body": "Quote from: LoyceV on July 31, 2022, 10:20:00 AMQuote from: pbies on July 30, 2022, 10:46:39 AMQuote from: LoyceV on July 30, 2022, 06:27:44 AMBut the file you've downloaded from me should have been sorted already.Indeed I can see that the file is sorted, but different-case-sensitive than the expected by comm program.Can you share what you did exactly? I tested it, and comm didn't complain about the sorting order:Code:comm -12 all_Bitcoin_addresses_ever_used_sorted.txt test.txtI create all_Bitcoin_addresses_ever_used_sorted.txt.gz by piping all data through sort -u -S30%, so no additional sort should be necessary.Don't use -u switch",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 31, 2022, 01:56:37 PM",
+      "body": "Quote from: brainless on July 31, 2022, 01:51:33 PMDon't use -u switchWhy?Code:sort --help  -u, --unique              with -c, check for strict ordering;                              without -c, output only the first of an equal runThis has the same result as sort | uniq, and gets the job done.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "July 31, 2022, 06:57:26 PM",
+      "body": "Quote from: LoyceV on July 31, 2022, 01:56:37 PMQuote from: brainless on July 31, 2022, 01:51:33 PMDon't use -u switchWhy?Code:sort --help  -u, --unique              with -c, check for strict ordering;                              without -c, output only the first of an equal runThis has the same result as sort | uniq, and gets the job done.-u, --unique  this mean you have more then same addresses at different lines, actually mean duplicate, btw you dont have duplicate as i see last year your fileswithout -u your sort will be right in order for duplicate remove you can use perl command for big files, no memory issue/errorperl -ne'print unless $_{$_}++' big-file.txt >> dup-remove.txtfor duplicate awk command will give errors, even you have big ram, but perl work bestsort -u will no right in order results, better use simple sort",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 01, 2022, 08:24:20 AM",
+      "body": "Quote from: brainless on July 31, 2022, 06:57:26 PM-u, --unique  this mean you have more then same addresses at different lines, actually mean duplicate, btw you dont have duplicate as i see last year your filesI don't have duplicates because I use \"sort -u\". The input data, which I use to create this file, contains every Bitcoin transaction every made, and many addresses have been reused.Quotewithout -u your sort will be right in order With \"-u\" too Quotefor duplicate remove you can use perl command for big files, no memory issue/errorperl -ne'print unless $_{$_}++' big-file.txt >> dup-remove.txtI tried to test the performance difference, but perl used up my 16 GB RAM:Code:    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND 1665014 loyce     20   0   11.8g  11.8g   4128 R  82.7  75.7   1:07.01 perlSo I'll stick to \"uniq\" for this.Quotefor duplicate awk command will give errors, even you have big ram, but perl work bestI'm not sure which awk command you mean: in another thread, I've mentioned removing duplicates while keeping addresses in their original order, and that indeed requires a lot of memory. But that's more complicated than simply removing duplicates.Quotesort -u will no right in order results, better use simple sortThat's incorrect: the command sorts the data, then removes duplicates. The output is sorted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "August 01, 2022, 09:42:44 AM",
+      "body": "Quote from: LoyceV on July 31, 2022, 10:20:00 AMCan you share what you did exactly? I tested it, and comm didn't complain about the sorting order:You have all the operations in this thread.I don't know why comm complained about your file not sorted, but it did.When I look into files, there is difference about case sensitivity, so lower case letters are after upper case - that's the difference.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

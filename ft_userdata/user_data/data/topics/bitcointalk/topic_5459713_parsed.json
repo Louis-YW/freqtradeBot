@@ -1,0 +1,109 @@
+{
+  "id": "topic_5459713",
+  "title": "RedApronPark",
+  "author": "RedApronPark",
+  "created_time": "July 13, 2023, 07:34:01 PM",
+  "content": "Hi, I'm pretty new to crypto, and am trying to understand some of the technical concepts. I think I get the concept of how miners run ASICs to find a PoW number that when SHA256 function is applied to the whole block with that number, it results in a working hash to make a valid block.But they also need to validate each of the transactions within the block, right? And this requires checking the entire history of each of the included users' past transactions to verify that they have enough BTC to make a payment? For up to 2400 transactions per block, that seems very time consuming? Am I misunderstanding how it works?I tried to scan various FAQs and videos, but haven't found the answer to this question.Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459713",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "July 13, 2023, 08:02:25 PM",
+      "body": "QuoteBut they also need to validate each of the transactions within the block, right?Miners? No. Nodes? Yes. Because currently, those groups are kind of separated. You have miners (ASIC operators) that compute 80-byte block headers (and usually nothing else). And you have nodes, where some of them are operated by mining pools, and the bare minimum is one full node per mining pool (they could use more for redundancy, to distribute traffic, or even have their own software to handle a lot of miners efficiently). So yes, full nodes have to validate everything. Others don't have to, and many people don't check everything, because they are not forced to do that.QuoteFor up to 2400 transactions per block, that seems very time consuming?Yes, of course. For me, setting up a new full node from scratch, takes something around one week. We have something around 500 GB of history, and each new full node has to download all of that, verify it, and potentially store, if its operator want to be the part of the network, that is responsible for bringing new full node operators (it is possible to enable pruning, and discard old blocks, then someone can store for example 8 GB of data, and keep only blocks from the last few days, but then that node cannot be used to make new ones, because it doesn't have history to share with a newly created nodes).QuoteAm I misunderstanding how it works?You understand it correctly. You can read more about bootstrapping new nodes by searching \"initial block download\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "July 13, 2023, 08:06:04 PMLast edit: July 13, 2023, 08:48:47 PM by satscraper",
+      "body": "Quote from: RedApronPark on July 13, 2023, 07:34:01 PMHi, I'm pretty new to crypto, and am trying to understand some of the technical concepts. I think I get the concept of how miners run ASICs to find a PoW number that when SHA256 function is applied to the whole block with that number, it results in a working hash to make a valid block.But they also need to validate each of the transactions within the block, right? And this requires checking the entire history of each of the included users' past transactions to verify that they have enough BTC to make a payment? For up to 2400 transactions per block, that seems very time consuming? Am I misunderstanding how it works?I tried to scan various FAQs and videos, but haven't found the answer to this question.Thanks!I'm not a miner, but as far as I know full nodes maintain so called  UTXOs set (which, for instance, in Bitcoin Core preserved using a customized variant of  LevelDB) which encompasses all UTXOs that are currently available in blockchain. Checking this set miners validate that UTXOs included into given transaction exist and are unspent. They also  check if the value of these UTXOs is greater than (or at least equal to)  value of transaction.The time to check the whole LevelDB for the given UTXOs is quite reasonable (matter of milliseconds or less)  due to the key-value structure of this database  though, sure, that time depends on efficiency of hardware and software used by miners.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "July 13, 2023, 08:17:09 PM",
+      "body": "Quote from: RedApronPark on July 13, 2023, 07:34:01 PM. . . miners run ASICs to find a PoW number . . .That number is generally called a \"nonce\".Quote from: RedApronPark on July 13, 2023, 07:34:01 PM. . . that when SHA256 function is applied to the whole block with that number, it results in a working hash to make a valid block. . .Technically, only the 80-byte block header is hashed via SHA256 with the nonce, not the entire block.  However, one of the values in the block header is the Merkle Root (which is a SHA256 hash generated from a Merkle Tree built from all the transactions in the block.Quote from: RedApronPark on July 13, 2023, 07:34:01 PMBut they also need to validate each of the transactions within the block, right?The individuals running ASIC do not need to do that.  They are presented with an 80-byte block header from the mining pool and simply need to search for the nonce.The mining pool will need to verify the transactions in order to build the Merkle Tree and generate the Merkle Root for the header.Quote from: RedApronPark on July 13, 2023, 07:34:01 PMAnd this requires checking the entire history of each of the included users' past transactions to verify that they have enough BTC to make a payment?The full nodes (which are also run by the mining pools) maintain a list of unspent transaction outputs (UTXO).  The transactions in the block spend those outputs. So for each transaction, the node simply needs to verify that the output being spent by the transaction exists in the UTXO and that the signatures match the requirements from the UTXO. This happens as each transaction is received. The node validates the transaction the moment it is received and then adds it to it's own MemPool (list of valid unconfirmed transactions).  That way, when its time to build a new block, the node can just grab transactions from the MemPool with the confidence that they've already been validated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "July 21, 2023, 06:18:49 PM",
+      "body": "Quote from: RedApronPark on July 13, 2023, 07:34:01 PMBut they also need to validate each of the transactions within the block, right? And this requires checking the entire history of each of the included users' past transactions to verify that they have enough BTC to make a payment? For up to 2400 transactions per block, that seems very time consuming? There is no need to check the entire history. The node maintains a list of confirmed transactions that have not yet been spent (the UTXO set) and checks that the inputs of new transactions are in that list.Once a transaction is confirmed, its inputs are removed from the list because they are now spent and can never be spent again, and its outputs are added to the list.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 22, 2023, 08:59:55 AM",
+      "body": "Quote from: satscraper on July 13, 2023, 08:06:04 PMChecking this set miners validate that UTXOs included into given transaction exist and are unspent.Nodes do this, not miners.Quote from: DannyHamilton on July 13, 2023, 08:17:09 PMTechnically, only the 80-byte block header is hashed via SHA256 with the nonce, not the entire block.I wouldn't say the block header is hashed \"with\" the nonce; rather, the nonce is already part of the block header. And of course the block header is actually hashed via SHA256 twice.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nakamura12",
+      "created_time": "July 22, 2023, 08:24:45 PM",
+      "body": "Miners validate transactions and the miners choose the transactions that they want to add in the block that will be validated. Each transactions the information of previous block that the BTC is sent to an address and there's a transaction where the same BTC is sent to another BTC that miners check each block to avoid double spending where the same BTC is sent to multiple addresses. So to avoid it from happening, the transactions that are in each blocks are stored which is called node where all the data are stored.Feel free to correct me as I may have explained it wrong and I would be glad if someone did.-nakamura12",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Upgrade00",
+      "created_time": "July 22, 2023, 08:50:28 PM",
+      "body": "Quote from: nakamura12 on July 22, 2023, 08:24:45 PMMiners validate transactions and the miners choose the transactions that they want to add in the block that will be validated. Miners confirm transactions, nodes validate the transactions and add them to their mempools from which miners add transactions to their candidate block.Quote from: nakamura12 on July 22, 2023, 08:24:45 PMSo to avoid it from happening, the transactions that are in each blocks are stored which is called node where all the data are stored.Nodes store validated transactions in their mempool which is short for memory pool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nakamura12",
+      "created_time": "July 22, 2023, 09:32:23 PM",
+      "body": "Quote from: Upgrade00 on July 22, 2023, 08:50:28 PMMiners confirm transactions, nodes validate the transactions and add them to their mempools from which miners add transactions to their candidate block.Thanks for the correction. So I had it backwards, instead of miners confirms transactions but I said, miners validate transactions. Anyway, I am correct about miners can choose to add unconfirmed transactions from the mempool that may may/will added to a block once it is validated right?. Quote from: Upgrade00 on July 22, 2023, 08:50:28 PMNodes store validated transactions in their mempool which is short for memory pool.Right, I forgot that the node allows developers to write JavaScript and memory pool or mempool are where the data is being stored. If I am correct then the mempool is the one who are running node right?, Since they downloaded the data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coyster",
+      "created_time": "July 22, 2023, 11:51:02 PM",
+      "body": "Quote from: nakamura12 on July 22, 2023, 09:32:23 PMAnyway, I am correct about miners can choose to add unconfirmed transactions from the mempool that may may/will added to a block once it is validated right?Miners add transactions that have been validated by nodes into their candidate block, all of the transactions that miners add into their candidate blocks are unconfirmed, they become confirmed if the miner adds that candidate block to the blockchain.Quote from: nakamura12 on July 22, 2023, 09:32:23 PMRight, I forgot that the node allows developers to write JavaScript and memory pool or mempool are where the data is being stored. If I am correct then the mempool is the one who are running node right?, Since they downloaded the data.I don't know if i understood you correctly, but every node has their own mempool, and this is where they store transactions that miners will add into their candidate block to try and mine it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "July 23, 2023, 01:53:39 AM",
+      "body": "Before anyone gets too confused by this hair-splitting of the difference between miners and nodes, let me explain.The function of a node is to receive transactions and blocks, validate them, and then propagate the valid transactions and blocks to other nodes. A node keeps a copy of the block chain and a list of transactions that are waiting to be added to it. The pending transactions are stored in a database called the mempool.Mining is the process of constructing blocks to add to the block chain. Hashing is a part of that process.Originally, mining was part of the node's functionality and miners and nodes were basically the same thing. However, the term \"miner\" has become ambiguous with the advent of mining pools and the separation of node software from mining software.In a mining pool, the components of the mining process are split between the pool and the members. The pool constructs blocks and broadcasts the found blocks, and the members hash the block headers. Members of mining pools call themselves miners even though all they do is the hashing. But, since that is the majority of the effort of constructing a block, perhaps the label is justified.Note that with the Stratum V2 and BetterHash mining protocols, the distinction between the roles of a pool and its members is now much fuzzier.Anyway, that is why there is ambiguity about what exactly is done by a miner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 23, 2023, 06:00:10 AM",
+      "body": "Quote from: nakamura12 on July 22, 2023, 09:32:23 PMAnyway, I am correct about miners can choose to add unconfirmed transactions from the mempool that may may/will added to a block once it is validated right?Generally speaking, yes, but as odolvlobo has explained above these days that process is usually performed by the mining pool coordinator, which then sends out block headers to the individual miners to be hashed. Also note, it's not a case of choosing which transactions will be added to a block once it is mined. Rather, the transactions are chosen first and the candidate block is assembled from these transactions before it is attempted to be mined. When a miner successfully mines a block, the transactions in it are already fixed. If you want to include different transactions, then you need to the mining pool coordinator to assemble a new candidate block.Quote from: nakamura12 on July 22, 2023, 09:32:23 PMRight, I forgot that the node allows developers to write JavaScript and memory pool or mempool are where the data is being stored. If I am correct then the mempool is the one who are running node right?, Since they downloaded the data.I'm not sure where you got Javascript from, but that has nothing to do with what's being discussed here. Individuals run nodes; nodes download and validate blocks and transactions, and nodes store a memory pool of unconfirmed transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jon_Hodl",
+      "created_time": "July 23, 2023, 06:46:25 PM",
+      "body": "It took me a while to understand this at first too but it starts with understanding the difference between a miner and a node. Nodes verify transactions and relay valid transaction to other nodes. Invalid transactions are instantly dropped/ignored. Only truth gets relayed. Miners confirm blocks of valid transactions if it's profitable enough.Here's how I explain it to new users.  Bitcoin nodes verify each and every transaction, add them to their own memory pool (commonly called the mempool), and then relay them to other nodes so they can verify it as well. If a node ever receives a transaction that doesn't have a valid signature, then it instantly drops the transaction and doesn't relay it to other nodes. Only transactions that are valid get relayed to other nodes. When a miner is building a block (called a candidate block), they will typically use the transactions that have paid the highest fee rate. In order to find the transactions with the highest fees, they have to ask a node mempool. To ensure they don't miss any high fees, they ask multiple nodes for transactions. When a miner finds valid hash the meets the requirements of the current difficulty, they have a winning block and want to get paid for their work so they relay the valid proof of work (hash) and the block to the nodes so the nodes can update their copy of the blockchain.Once a node has added a new block of transactions to their own copy of the blockchain, they tell other nodes that they have added a new block. The nodes then verify each and every transaction in that new block to make sure that everything is valid. If everything checks out, they add the new block to their own copy of the blockchain and then relay it along to more nodes. This process continues until every single node in the entire world has the EXACT same copy of the blockchain.There is a lot of relaying information between nodes and miners but ultimately nodes verify transactions and miners are building blocks of transactions that will make them the most money. When miners find a block, they tell the nodes so they can get paid. Nodes are ultimately the ones verifying everything while miners are primarily just systematically guessing hashes until they get one that meets the difficulty adjustment requirements and then they get the nodes to verify it. Like I said, it took me a while to fully understand but once you get it, you move further down the rabbit hole and on to a deeper understanding of how bitcoin works and why it is such an amazing system.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

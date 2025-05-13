@@ -1,0 +1,165 @@
+{
+  "id": "topic_5459401",
+  "title": "cedricfung",
+  "author": "cedricfung",
+  "created_time": "July 11, 2023, 09:48:48 AMLast edit: August 30, 2023, 10:45:50 AM by cedricfung",
+  "content": "I had the idea of making a easy to use Bitcoin multisig wallet with timelocked recovery key for a long time, and thanks to the recent development of miniscript in Bitcoin community, I'm able to produce a solution and product that allows the general public to use these advanced features in a very convenient way.TechnologyThe underline miniscript of the solution is discussed in another topic https://bitcointalk.org/index.php?topic=5441806.0Code:wsh(thresh(2,pk(OWNER),s:pk(MEMBERS),sj:and_v(v:pk(RECOVERY),n:older(12960))))The miniscript above produces a 2-of-3 multisig, with a 90 days timelock for the RECOVERY key.For any UTXO created within 90 days, both the OWNER and MEMBERS key must sign the transaction to spend the coins. But after 90 days, the RECOVERY key can step in to work together with either the OWNER or MEMBERS key to spend the coins.ProductBased on the miniscript technology above, we created a product, Mixin Safe, to make all those steps convenient for Bitcoin holders.Whenever a new Mixin Safe is created, the Bitcoin holder needs to provide the OWNER public key. To do this, a miniscript compatible wallet is required, we have tested Bitcoin Core and Ledger, and noticed upcoming miniscript support announcements from other hardware vendors, e.g.Coldcard https://github.com/Coldcard/firmware/pull/227BitBox02 https://twitter.com/_benma_/status/1670022585461907456SeedSigner https://twitter.com/pythcoiner/status/1670458117983805442Then the Bitcoin holder needs to use our another product Mixin Messenger to produce a MPC public key as the MEMBERS key. Although it's possible to generate this MEMBERS key only by yourself, we recommend to choose at least two Mixin Messenger devices, better with your partner, so the MPC key is generated as a 1-of-2 threshold ECDSA key.Mixin Messenger is an open source MPC wallet for 6 years https://github.com/MixinNetwork/android-app, and the MPC code we used is from https://github.com/taurusgroup/multi-party-sigFinally, we the Mixin Safe service maintainer holds the RECOVERY key for emergency recovery usage once the OWNER key is lost.SecurityThe solution is based on Bitcoin multisig script with timelock, and the recovery key timelock can be adjusted when the wallet is created. The OWNER key is managed by third party and popular bitcoin wallets,  can have a normal backup solution, and no need to worry about it's stolen or lost. Because nobody will be able to spend the coins with this only OWNER key, and the coins can be recovered even if the OWNER key is completely lost.The MEMBERS key is managed by open source MPC solution. If MEMBERS key is managed by a few people in 1-of-2 or 3-of-5 or even 5-of-10, it's almost impossible to lose the MEMBERS key.Try It!Now the product is generally available, it's a website which is designed to have intuitive interface to use.https://safe.mixin.one/Thank you, and welcome suggestions.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459401",
+  "comments": [
+    {
+      "author": "AB de Royse777",
+      "created_time": "July 11, 2023, 11:07:44 AM",
+      "body": "I am trying to understand, is it a bitcoin mixing service or you are talking about a wallet, perhaps an online wallet?Quote from: cedricfung on July 11, 2023, 09:48:48 AMFinally, we the Mixin Safe service maintainer holds the RECOVERY key for emergency recovery usage once the OWNER key is lost.In case it's a wallet then isn't it means there is this fake sense of decentralization? After all you hold the key and your clients are trusting you with their funds.Sorry, If I got the whole idea wrong.Quote from: cedricfung on July 11, 2023, 09:48:48 AMhttps://safe.mixin.zone/Thank you, the product is still in beta, and welcome suggestions.I would love to see the finished product first. Then you can start with a review campaign to see the response from the community. I can help you in that if you want.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 11, 2023, 11:30:16 AM",
+      "body": "Quote from: Royse777 on July 11, 2023, 11:07:44 AMI am trying to understand, is it a bitcoin mixing service or you are talking about a wallet, perhaps an online wallet?It is not a mixer, it's code for making a multisig transaction where some members cannot spend from it by signing using their keys until after a fixed time period.But this last link from the OP looks like it's a service that is trying to replace crypto custodials for companies (think Coinbase holding coins for Blackrock), not intended for the general public - I mean how can you say a timelocked multisig is more secure than a hardware wallet, for example?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 11, 2023, 11:42:30 AMLast edit: July 11, 2023, 02:28:26 PM by hilariousandco",
+      "body": "Quote from: Royse777 on July 11, 2023, 11:07:44 AMI am trying to understand, is it a bitcoin mixing service or you are talking about a wallet, perhaps an online wallet?Quote from: cedricfung on July 11, 2023, 09:48:48 AMFinally, we the Mixin Safe service maintainer holds the RECOVERY key for emergency recovery usage once the OWNER key is lost.In case it's a wallet then isn't it means there is this fake sense of decentralization? After all you hold the key and your clients are trusting you with their funds.Sorry, If I got the whole idea wrong.Quote from: cedricfung on July 11, 2023, 09:48:48 AMhttps://safe.mixin.zone/Thank you, the product is still in beta, and welcome suggestions.I would love to see the finished product first. Then you can start with a review campaign to see the response from the community. I can help you in that if you want.The link above is the beta product, you can already sign in and start using it. I know the Mixin name makes it sound like a mixer, but It's just a wallet. To start using the product, you need Mixin Messenger, which is an MPC wallet,  to make the Mixin Safe account. And thank you so much for helping. Sorry the website doesn't make it clear for people to understand the product, we are still polishing the website design and words.Quote from: NotATether on July 11, 2023, 11:30:16 AMQuote from: Royse777 on July 11, 2023, 11:07:44 AMI am trying to understand, is it a bitcoin mixing service or you are talking about a wallet, perhaps an online wallet?It is not a mixer, it's code for making a multisig transaction where some members cannot spend from it by signing using their keys until after a fixed time period.But this last link from the OP looks like it's a service that is trying to replace crypto custodials for companies (think Coinbase holding coins for Blackrock), not intended for the general public - I mean how can you say a timelocked multisig is more secure than a hardware wallet, for example?Hi, it's a wallet service. The wallet is provided as a website to make it easy to access from anywhere, but the website doesn't hold the private keys, it's just an interface to make it easy to do multisig.It's some kind of custodian services those companies will use, but it's built with general public in mind, the website interface is pretty easy to use, and pricing is transparent and cheap.For security, it's better to read the post instead of the website, the website is under development and missing some points. So Mixin Safe is a multisig wallet with three keys, OWNER, MEMBERS and RECOVERY. The OWNER key is managed by user's own hardware wallet, Ledger, BitBox02, etc.The MEMBERS key is also managed by user's wallets, the Mixin Messenger MPC wallet. The MEMBERS key can be managed by the user own or friends, make it difficult to lose.And the recovery key is timelocked, and can only be used when timelock expired and must be used together with OWNER or MEMBERS key.When I say this is more secure than a single hardware wallet, I mean hardware wallet is secure, but a single hardware wallet is easy to lose or broke, Mixin Safe uses hardware wallet, and try to eliminate single point of failure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "July 14, 2023, 09:15:22 PM",
+      "body": "Quote from: cedricfung on July 11, 2023, 11:42:30 AMTo start using the product, you need Mixin Messenger, which is an MPC wallet,  to make the Mixin Safe account. And thank you so much for helping. If I understand correctly this Mixing Messanger wallet is fork of Signal app, but is there any other way to register other than entering phone number.I tried registering with one phone number and I received data error, I also don't want to share my number for this purpose, even if app claims it won't share it with anyone. That indirectly means phone number could be shared privately with different companies, governments and/or individuals.Quote from: cedricfung on July 11, 2023, 11:42:30 AMWhen I say this is more secure than a single hardware wallet, I mean hardware wallet is secure, but a single hardware wallet is easy to lose or broke, Mixin Safe uses hardware wallet, and try to eliminate single point of failure.It's much easier and safer to use multisig setup and combine hardware wallet with another device or a wallet, than to download and install all Mixin stuff, and pay $100 or more every year.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Latviand",
+      "created_time": "July 15, 2023, 01:20:35 AM",
+      "body": "Can anyone do a TLDR for plebs like me? Cause I doubt that I understand this project correctly, from what I read and understand, this is a kind of wallet where there are two keys and you can't open the wallet with just one, is that correct? If so, then OP should probably change the name of the project because I don't see how mixing is a feature in this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 15, 2023, 04:42:18 AMLast edit: July 15, 2023, 06:19:56 AM by cedricfung",
+      "body": "Quote from: dkbit98 on July 14, 2023, 09:15:22 PMQuote from: cedricfung on July 11, 2023, 11:42:30 AMTo start using the product, you need Mixin Messenger, which is an MPC wallet,  to make the Mixin Safe account. And thank you so much for helping. If I understand correctly this Mixing Messanger wallet is fork of Signal app, but is there any other way to register other than entering phone number.I tried registering with one phone number and I received data error, I also don't want to share my number for this purpose, even if app claims it won't share it with anyone. That indirectly means phone number could be shared privately with different companies, governments and/or individuals.Quote from: cedricfung on July 11, 2023, 11:42:30 AMWhen I say this is more secure than a single hardware wallet, I mean hardware wallet is secure, but a single hardware wallet is easy to lose or broke, Mixin Safe uses hardware wallet, and try to eliminate single point of failure.It's much easier and safer to use multisig setup and combine hardware wallet with another device or a wallet, than to download and install all Mixin stuff, and pay $100 or more every year.A product is not for everyone. Most people use centralized exchanges or custodians for their easy to use and convenient feature. Mixin Safe is designed mainly for those people prefer convenience than understanding the tech stuff behind the scenes, but in a decentralized and secure way.And for the phone number thing, it's the same, phone number is just a phone number, we share nothing, we never do ads or analyze data. Anyway, you can choose to use anonymous number when get an account.Quote from: Latviand on July 15, 2023, 01:20:35 AMCan anyone do a TLDR for plebs like me? Cause I doubt that I understand this project correctly, from what I read and understand, this is a kind of wallet where there are two keys and you can't open the wallet with just one, is that correct? If so, then OP should probably change the name of the project because I don't see how mixing is a feature in this.The Mixin name is from the same brand under Mixin Network and Mixin Messenger. They do have some mixin features in a decentralized way. Mixin Safe is a product built on Mixin Messenger features, to provide a multisig+timelock Bitcoin wallet service. But with Mixin Safe, this mixin ability is reduced from the original Mixin Network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Latviand",
+      "created_time": "July 15, 2023, 04:51:11 AM",
+      "body": "Quote from: cedricfung on July 15, 2023, 04:45:00 AMQuote from: Latviand on July 15, 2023, 01:20:35 AM~The Mixin name is from the same brand under Mixin Network and Mixin Messenger. They do have some mixin features in a decentralized way. Mixin Safe is a product built on Mixin Messenger features, to provide a multisig+timelock Bitcoin wallet service. But with Mixin Safe, this mixin ability is reduced from the original Mixin Network.Ow, I totally misread the name, I thought it was Mixin' but hey, you learn new things. I noticed that there's an uncapitalized \"mixin\", is that bitcoin mixing or something? Now that I know the name, I get now what you're pitching.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 15, 2023, 05:07:22 AM",
+      "body": "Quote from: Latviand on July 15, 2023, 04:51:11 AMOw, I totally misread the name, I thought it was Mixin' but hey, you learn new things. I noticed that there's an uncapitalized \"mixin\", is that bitcoin mixing or something? Now that I know the name, I get now what you're pitching.Yes, Mixin products have the bitcoin mixing capabilities and work very well for 5 years already.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "God Of Thunder",
+      "created_time": "July 15, 2023, 05:41:07 AM",
+      "body": "I tried to sign up using my phone number within the Android app, and getting the code was impossible. I am unsure if it's a network issue from my sim card operator or maybe from the mixin. Each time I tap on resent message, it asks to verify the recaptcha. It seems recaptcha is currently under impossible-to-solve mode. Tried a couple of times to get the OTP but failed for now.  Quote from: cedricfung on July 15, 2023, 05:07:22 AMPlease do not post multiple replies in a row. Posting consecutive posts in a row is not allowed. You can edit your previous posts and add something if you want. Quote from: mprep on July 21, 2014, 05:27:51 PM32. Posting multiple posts in a row (excluding bumps and reserved posts by the thread starter) is not allowed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 15, 2023, 06:22:47 AM",
+      "body": "Quote from: Learn Bitcoin on July 15, 2023, 05:41:07 AMI tried to sign up using my phone number within the Android app, and getting the code was impossible. I am unsure if it's a network issue from my sim card operator or maybe from the mixin. Each time I tap on resent message, it asks to verify the recaptcha. It seems recaptcha is currently under impossible-to-solve mode. Tried a couple of times to get the OTP but failed for now.  May you tell the country of your sim card? We use Twilio to send out verification code, there may be some issues in some countries. Recaptcha should be easy to solve, will have a look.And thank you for the multiple posts warning, I have fixed that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "UmerIdrees",
+      "created_time": "July 15, 2023, 06:41:17 AM",
+      "body": "Quote from: cedricfung on July 11, 2023, 09:48:48 AMFinally, we the Mixin Safe service maintainer holds the RECOVERY key for emergency recovery usage once the OWNER key is lost.I am just trying to understand this. So Mixin Safe is a wallet where we have control over our funds as we have the private key but at the same time the Mixin Safe also stores our private key (Rename it to Onwer Key), so in case if we lose our private key, we can get help from Mixin Safe.This may or may not be acceptable as since the site has access to our keys, they can cause harm anytime if they want. This is similar to any centralized site but in this case, we access through the Keys and the site also can access our funds. Clear me if i am wrong  My other question is this wallet an open source or a closed source?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 15, 2023, 07:08:12 AM",
+      "body": "Quote from: UmerIdrees on July 15, 2023, 06:41:17 AMQuote from: cedricfung on July 11, 2023, 09:48:48 AMFinally, we the Mixin Safe service maintainer holds the RECOVERY key for emergency recovery usage once the OWNER key is lost.I am just trying to understand this. So Mixin Safe is a wallet where we have control over our funds as we have the private key but at the same time the Mixin Safe also stores our private key (Rename it to Onwer Key), so in case if we lose our private key, we can get help from Mixin Safe.This may or may not be acceptable as since the site has access to our keys, they can cause harm anytime if they want. This is similar to any centralized site but in this case, we access through the Keys and the site also can access our funds. Clear me if i am wrong  Hi, it's not like that we have your key.The wallet is 2-of-3 multisig, which means the wallet is controlled by 3 keys, owner, members and recovery. You have owner and members key. We have the recovery key, and the recovery key is timelocked by Bitcoin script, so that our key can only be used after your Bitcoin address is inactive for over 1 year.So if you possess your owner and members key, our recovery key will be useless. And just in case you lost your owner key or members key, our recovery key can be used, and it can only be used together with owner or members key.  That means, if you lost both owner and members key, then our recovery key is useless as well. Because the 2-of-3 wallet  can only be accessed by 2 keys together.Quote from: UmerIdrees on July 15, 2023, 06:41:17 AMMy other question is this wallet an open source or a closed source?All our code are open source here https://github.com/MixinNetwork",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "God Of Thunder",
+      "created_time": "July 15, 2023, 08:16:18 AM",
+      "body": "Quote from: cedricfung on July 15, 2023, 06:22:47 AMMay you tell the country of your sim card? We use Twilio to send out verification code, there may be some issues in some countries. Recaptcha should be easy to solve, will have a look. I am from Bangladesh and use a Grameen phone sim card. Sometimes SMS comes in delayed due to network problems. But I have checked again and confirmed that I did not receive any SMS yet. About recaptcha, I don't think it's from your end. Sometimes Recaptcha behaves likes that and I have faced this issue on various platforms before. QuoteAnd thank you for the multiple posts warning, I have fixed that. You're welcome.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "July 16, 2023, 11:20:36 PM",
+      "body": "Quote from: cedricfung on July 15, 2023, 04:42:18 AMAnd for the phone number thing, it's the same, phone number is just a phone number, we share nothing, we never do ads or analyze data. Signal third-party Twilio data breach exposed 1,900 phone numbers in 2022, and now we are supposed to trust you who are using app based on Signal and same third party Twilio?Sorry for saying this, but I am little suspicious whenever I have to send any of my personal data for any registration.If I had to choose between better security and convenience, I will always choose security.Quote from: cedricfung on July 15, 2023, 04:42:18 AMAnyway, you can choose to use anonymous number when get an account.I tried using anonymous number and it didn't work with Mixin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 17, 2023, 04:57:59 AM",
+      "body": "Quote from: dkbit98 on July 16, 2023, 11:20:36 PMSignal third-party Twilio data breach exposed 1,900 phone numbers in 2022, and now we are supposed to trust you who are using app based on Signal and same third party Twilio?Sorry for saying this, but I am little suspicious whenever I have to send any of my personal data for any registration.If I had to choose between better security and convenience, I will always choose security.I understand your choice. I'm not saying the product is perfect for anyone. Mixin Safe can be a much better solution for people who want a easy to use and decentralized solution to manage their coins, instead of using CEX.And Mixin Safe is designed to be used by family or team members together, it's important to make it convenient and obvious to understand. The goal is to make BTC accessible to everyone in the world, so everyone is confident about their BTC holdings without worrying about losing their coins.People are already using centralized banks, with all their personal information shared with the banks. Now Mixin Safe can be a decentralized bank, in a very similar approach but with BTC as the money. Mixin Safe can be a better bank for those who are already banked, and Mixin Safe is also a better alternative to CEX for those who choose CEX over walletsQuote from: dkbit98 on July 16, 2023, 11:20:36 PMI tried using anonymous number and it didn't work with Mixin.Anonymous number needs to be bought and connected to a private key at first, and are only for some invited testers for now. Will be open to public very soon.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yhiaali3",
+      "created_time": "July 18, 2023, 05:06:00 PM",
+      "body": "I tried as much as possible to understand this service, I think I got the point, but my question is what is the benefit of this service for ordinary users? I mean, what will make the average user leave the software wallet (free and easy) or the hardware wallet and go towards this type of service (which has some degree of centralization)?Quote from: cedricfung on July 11, 2023, 09:48:48 AMThen the Bitcoin holder needs to use our another product Mixin Messenger to produce a MPC public key as the MEMBERS key. Although it's possible to generate this MEMBERS key only by yourself, we recommend to choose at least two Mixin Messenger devices, better with your partner, so the MPC key is generated as a 1-of-2 threshold ECDSA key.This is another point as well, users must use your other product \"Mixin Messenger\", and this is something that many people may not want, because the user will need to download several applications and register on the site and all these things will seem annoying and make users feel that someone is sharing their sensitive data with them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cedricfung",
+      "created_time": "July 18, 2023, 06:42:37 PM",
+      "body": "Quote from: yhiaali3 on July 18, 2023, 05:06:00 PMI tried as much as possible to understand this service, I think I got the point, but my question is what is the benefit of this service for ordinary users? I mean, what will make the average user leave the software wallet (free and easy) or the hardware wallet and go towards this type of service (which has some degree of centralization)?This is another point as well, users must use your other product \"Mixin Messenger\", and this is something that many people may not want, because the user will need to download several applications and register on the site and all these things will seem annoying and make users feel that someone is sharing their sensitive data with them.I understand all your concerns, and know that we have a long way to do a good marketing. We are not a new team, and Mixin Messenger is an old product operating for already 6 years.But first of all, we need to make sure this is a good product, it must be secure, decentralized, and convenient. It's not a product for all, and it begins by serving the people need it well.Thank you",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "coupable",
+      "created_time": "July 18, 2023, 08:01:45 PM",
+      "body": "Quote from: yhiaali3 on July 18, 2023, 05:06:00 PMQuote from: cedricfung on July 11, 2023, 09:48:48 AMThen the Bitcoin holder needs to use our another product Mixin Messenger to produce a MPC public key as the MEMBERS key. Although it's possible to generate this MEMBERS key only by yourself, we recommend to choose at least two Mixin Messenger devices, better with your partner, so the MPC key is generated as a 1-of-2 threshold ECDSA key.This is another point as well, users must use your other product \"Mixin Messenger\", and this is something that many people may not want, because the user will need to download several applications and register on the site and all these things will seem annoying and make users feel that someone is sharing their sensitive data with them.You cannot know from the start that the product will not have users even if it is completely centralized and even if there are better alternatives.  It can be said that it is too early to admit this.  Almost all of us know that a small percentage of users care about privacy.  I believe that this will be concluded based on the review campaign that they intend to launch soon, by assigning 100 participants from Bitcointalk, as their evaluations will be of great benefit in assessing the project's effectiveness and profitability. Choosing bitcointalk + Royse services is a great decision to determine how much the service is efecient.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Latviand",
+      "created_time": "July 19, 2023, 02:46:09 AM",
+      "body": "Hello, I've checked your website, pretty sleek and elegantly simple which I like since it's refreshing to the eyes but I have to ask, do the reviewers have to pay when they create their wallet? Also, is Mornin Key the only available one for testers?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

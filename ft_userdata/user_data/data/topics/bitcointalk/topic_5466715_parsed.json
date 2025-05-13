@@ -1,0 +1,69 @@
+{
+  "id": "topic_5466715",
+  "title": "ecdsa123",
+  "author": "ecdsa123",
+  "created_time": "September 13, 2023, 07:58:37 PMLast edit: August 31, 2024, 02:45:39 PM by ecdsa123",
+  "content": "",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466715",
+  "comments": [
+    {
+      "author": "stwenhao",
+      "created_time": "September 13, 2023, 08:17:20 PM",
+      "body": "Just use Sage Cell Server, and pick \"Python\" instead of \"Sage\", then it will point you directly to all errors:Code:(0 : 1 : 0)---------------------------------------------------------------------------ZeroDivisionError                         Traceback (most recent call last)Cell In [1], line 1----> 1 exec(\"\"\"p = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f      2 n = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141      3       4 E = EllipticCurve(GF(p), [0, 7])      5       6 G = E.point( (0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8))   # Base point      7       8 def egcd(a, b):      9      10     if a == 0:     11      12         return (b, 0, 1)     13      14     else:     15      16         g, y, x = egcd(b % a, a)     17      18         return (g, x - (b // a) * y, y)     19 def modinv(a, m):     20      21     g, x, y = egcd(a, m)     22      23     if g != 1:     24      25         raise Exception('modular inverse does not exist')     26      27     else:     28      29         return x % m     30          31 def verify(r, s,z,public_key):     32     w = int(modinv(s, n))     33     u1 = int((z * w) % n)     34     u2 = int((r * w) % n)     35     D=u1*G + u2*public_key     36     print(D)     37     x,y=D.xy()     38     x=int(x)     39      40     if (r % n) == (x % n):     41         print( \\\"signature matches\\\")     42         return 1     43     else:     44         print(\\\"invalid signature\\\",r,x%n,hex(int(x%n)))     45         return -1      46      47      48 r= 62954891018019954459416693598720448029687590245972400008829669497225918091177     49 s= 93805659226466445992581382639747054957343960360429636701520966540504046012794     50 z= 42110502646696890819993970892170079655178794598857292674837771894242690992680     51 priv= 60730954188027216046258787068258904013610447813898304297373912116496774227312     52      53 pub=priv*G     54 print(verify(r,s,z,pub))     55 \"\"\")File <string>:54File <string>:37, in verify(r, s, z, public_key)File /home/sc_serv/sage/src/sage/schemes/elliptic_curves/ell_point.py:776, in EllipticCurvePoint_field.xy(self)    774     return self[0], self[1]    775 else:--> 776     return self[0]/self[2], self[1]/self[2]File /home/sc_serv/sage/src/sage/structure/element.pyx:1730, in sage.structure.element.Element.__truediv__()   1728 cdef int cl = classify_elements(left, right)   1729 if HAVE_SAME_PARENT(cl):-> 1730     return (<Element>left)._div_(right)   1731 if BOTH_ARE_ELEMENT(cl):   1732     return coercion_model.bin_op(left, right, truediv)File /home/sc_serv/sage/src/sage/rings/finite_rings/integer_mod.pyx:2248, in sage.rings.finite_rings.integer_mod.IntegerMod_gmp._div_()   2246         71428571429   2247     \"\"\"-> 2248     return self._mul_(~right)   2249    2250 def __int__(self):File /home/sc_serv/sage/src/sage/rings/finite_rings/integer_mod.pyx:2334, in sage.rings.finite_rings.integer_mod.IntegerMod_gmp.__invert__()   2332 \"\"\"   2333 if self.is_zero():-> 2334     raise ZeroDivisionError(f\"inverse of Mod(0, {self.__modulus.sageInteger}) does not exist\")   2335    2336 cdef IntegerMod_gmp xZeroDivisionError: inverse of Mod(0, 115792089237316195423570985008687907853269984665640564039457584007908834671663) does not exist",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stwenhao",
+      "created_time": "September 13, 2023, 08:30:17 PM",
+      "body": "Quotethe question was why the point is 0:1:0 as nonce for those privatekeyBecause you reached zero, and tried to apply inverse on that.Code:ZeroDivisionError: inverse of Mod(0, 115792089237316195423570985008687907853269984665640564039457584007908834671663) does not existAnd why you reached zero? I guess because you picked a single signature again, and tried to attack it. And then, you reached two different signatures, that were created from the same source, so you still have a single signature, but you assume you have two of them.So, probably you are still trying to find a hole in ECDSA in some place, where there is none. Because you will never have for example z=0. If you would, that would mean your hash function is totally broken. Also, for z=0, finding a matching ECDSA signature is trivial, but that kind of attack is useless, as long as you cannot break SHA-256.Quotein sage -> run as sageNote it can also run Python as well, if you pick it from the dropdown list.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stwenhao",
+      "created_time": "September 14, 2023, 06:22:34 AM",
+      "body": "QuoteAnd the questions is why the result is nocne = 0Well, I explored it further, and it seems that you are trying to add two points that will sum to zero.Code:r=             0x8b2f34a1cc88961f21f7bf26c20d57e822ae785d9e8e43a22c8fdf59bcc90fa9s=             0xcf641f21b891e22aa4e0238dfca22049476e6d7ec88d280c0ba2397d0ff0897az=             0x5d19b32a41b52787a825aeb35d26bd243becac82d1a260cd2102ddd592f80a28priv=          0x864480801d0c1559f2d18e00304cad8a3982d5e552a62ae3e09ccb4974546570pub=          04 AD36FAD55727EBF76F8AF96C7C2DF9A298DC21D6C15269FDEDFD47A70B327637 906D883CAD59E70568EA67ABE388A621A76F1056DD34A9E309A314DB8C61EF79verify(r,s,z,pub)w=             0x149e7f7624151ac888da9006b5c2af5ac1d08dc25dc1723b060b38215f8e66e4u1=            0xe53e7009a7a991c1725d610e5680224072c3155d60b2a3addd8725ce6ccffe23u2=            0xcb4915881038c93270b7c8dca61a4051e799e8f9d560e69f32de5cf09a6beca2u1*G=         04 4C02C3B02A8FC5DC621977E67D084EEE45B9571197BAF102E680F068ECC15E15 487B4FC7E0FC6FF09C0E893CB69AE85A2275388948AA8C711B5D8924ECD19664u2*public_key=04 4C02C3B02A8FC5DC621977E67D084EEE45B9571197BAF102E680F068ECC15E15 B784B0381F03900F63F176C3496517A5DD8AC776B755738EE4A276DA132E65CBD=            04 0000000000000000000000000000000000000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000000000000Why it is the case? Well, because (r,s) is as valid as a signature, as (r,-s). Which means, if you have r-value, you have those two options:Code:r=  0x8b2f34a1cc88961f21f7bf26c20d57e822ae785d9e8e43a22c8fdf59bcc90fa9R1=04 8B2F34A1CC88961F21F7BF26C20D57E822AE785D9E8E43A22C8FDF59BCC90FA9 BBA72B3BD19EABC7E102B40F944C7C5C834A092D5EEE60211729F622246CB70AR2=04 8B2F34A1CC88961F21F7BF26C20D57E822AE785D9E8E43A22C8FDF59BCC90FA9 4458D4C42E6154381EFD4BF06BB383A37CB5F6D2A1119FDEE8D609DCDB934525And you cannot take only R1 or only R2. Your solution should be resistant to that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 14, 2023, 07:35:55 AM",
+      "body": "Your public key is (0,1,0)? That's three numbers. Are you using Jacobian points instead of elliptic points?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 14, 2023, 11:34:04 AM",
+      "body": "Quote from: ecdsa123 on September 14, 2023, 08:27:20 AMQuote from: NotATether on September 14, 2023, 07:35:55 AMYour public key is (0,1,0)? That's three numbers. Are you using Jacobian points instead of elliptic points?No . 0:1:0 means Infinity point IT is sagemathHmmm... OK, I don't know Sagemath, but (presumably) you know that operations on the infinity point are not valid in the first place, so what exactly are you trying to accomplish with this code?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 14, 2023, 03:05:31 PM",
+      "body": "Quoteso what exactly are you trying to accomplish with this code?Verifying signature I guess. But stwenhao pointed the error: R-value can have 02 or 03 prefix. And if you add those two points, then you will reach zero. So, what should be done instead, is calculating points on two sides, and comparing only x-values.Code:s=(z+rd)/ksk=z+rdsk-z=rd(s/r)k-(z/r)=d(s/r)R-(z/r)=QQ+(z/r)=(s/r)R(Q+(z/r))*(r/s)=RQ*(r/s)+(z/s)=RThat means, you should take your public key Q, multiply it by (r/s), then add (z/s), and then take x-value of that result, and compare it with r-value. If it is identical, then the signature is valid.And if you compare it to the script used by OP, it is almost correct:Code:w=1/su1=z/su2=r/sD=(z/s)+(r/s)QAnd then, we have D=(0,0). So, what should be done then? Of course, in that case, the whole signature should be marked as invalid. Not to mention that it should not pass malleability check, because s-value is in the upper half, so it should be rejected from the start, unless there are additional bytes, informing about the sign of each component, as it is for example in Bitcoin Message.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 14, 2023, 04:14:01 PMLast edit: September 14, 2023, 04:25:12 PM by vjudeu",
+      "body": "Quotebut not understanding what we can do with it?1. Check if s-value is in the lower half. If it is not, mark signature as invalid.2. Mark signature as invalid if you reach zero point anywhere.Edit: https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm#Signature_verification_algorithmQuote5. Calculate the curve point (x1,y1)=u1*G+u2*Q. If (x1,y1)=O then the signature is invalid.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

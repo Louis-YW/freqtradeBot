@@ -1,0 +1,69 @@
+{
+  "id": "topic_5459125",
+  "title": "NonFungibleUser",
+  "author": "NonFungibleUser",
+  "created_time": "July 09, 2023, 07:56:00 AM",
+  "content": "I just learned that Mike Hearn created a Bitcoin Puzzle transaction where the first person to solve its scriptPubKey, could claim that transaction's amount as a reward.The thing is... Aren't all the transactions forced to have a destination address? So, even if the winner solves the scriptPubKey, how can then he/she divert the funds to another destination address?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459125",
+  "comments": [
+    {
+      "author": "digaran",
+      "created_time": "July 09, 2023, 08:36:42 AM",
+      "body": "Quote from: NonFungibleUser on July 09, 2023, 07:56:00 AMI just learned that Mike Hearn created a Bitcoin Puzzle transaction where the first person to solve its scriptPubKey, could claim that transaction's amount as a reward.The thing is... Aren't all the transactions forced to have a destination address? So, even if the winner solves the scriptPubKey, how can then he/she divert the funds to another destination address?First delete your other 3 identical threads on the same subject, then do some more reading on the same topic you learned about that puzzle. This is one of the features of block chain technology, smart contracts etc.In short, the solver sends his address with the answer of the puzzle, that's the destination, if your coins sit on your private key, do they need a destination? You will be the one giving them one, so the answer of the puzzle is like the private key for those puzzle addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 09, 2023, 10:51:02 AM",
+      "body": "You should add some destination to where the funds will go after you complete the puzzle, correct. Quote from: NonFungibleUser on July 09, 2023, 07:56:00 AMSo, even if the winner solves the scriptPubKey, how can then he/she divert the funds to another destination address?They will just construct a transaction which includes an input that satisfies the conditions specified by the script. It would look like this:Code:Input:- Previous Transaction Output: Puzzle Transaction Output- ScriptSig: <puzzle_solution>Output:- Destination Address: XYZabc...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "July 13, 2023, 08:50:34 PM",
+      "body": "Quote from: NonFungibleUser on July 09, 2023, 07:56:00 AMAren't all the transactions forced to have a destination address?No. Not at all. This is a very common misconception about how Bitcoin works.Technically, in the blockchain, there are no addresses at all.Addresses are just an abstraction that we humans use to make it easier to discuss the concept of modifying control over value.What ACTUALLY exists in a transaction is a transaction output script.  That output script creates requirements that must be met in order to be allowed to broadcast a new transaction that uses that existing output as an input.The most common transaction types have scripts that create a requirement to provide a public key that hashes to a given value and a digital signature of the new transaction that matches that public key.However, while it is very fast and easy for computer software to create and validate these scripts, it would be awkward and error-prone if I were to tell you to please create a transaction that has an output which requires both a public key that hashes to (some 256 bit number) and a digital signature of the transaction that spends the output which can be verified with that public key.So, instead, we all agree that we will represent that set of instructions with a single value (such as a 1, or a 3, or a set of characters such as bc1), and that we will then join that to the hash of the public key, and add on a checksum to prevent typo and miscommunication errors.  Once we've smooshed all that together, we call the result a \"bitcoin address\".  Our wallet software knows when it sees the address how to pull it apart and generate the proper transaction output script.In this case that you've mentioned, a transaction has been created that has an output that does NOT translate into an address.  It didn't use any of the standard address scripts, so wallet software doesn't know how to build the transaction, nor does it know how to spend it. Instead, this transaction output is a script that sets up a puzzle.  You can satisfy the requirements of the puzzle if you provide the puzzle solution in the input of a transaction that you create.  Since wallet software doesn't know how to translate that script, it's something that you'd either have to do by heand, or write your own software to do.Then, once you've created the proper transaction input with the solution, you would create a transaction output for your transaction that uses one of the standard \"address\" scripts.  In this way, you would assign the bitcoins to the control of a wallet that you have access to. So, even if the winner solves the scriptPubKey, how can then he/she divert the funds to another destination address?[/quote]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 14, 2023, 11:17:01 AM",
+      "body": "DannyHamilton is spot on. Basically, transaction outputs do not have addresses hardcoded to them, (unlike in ETH), but a \"script\" (that looks like assembly language) that hashes a \"script input\" to an address and asserts that it equals to the one also placed inside the script.*script inputs are provided by your wallet to the script when you create a transaction using the unspent output. The script is similar to a BASH script in that it will either exit with success or failure.This \"script\" can be replaced by something totally different that does a cryptographic problem instead of hashing to an address. When you see people using this kind of crazy problem script in a P2SH (3) address, that is actually what happens. It's not actually associated with the address (but it's still attached to the private/public keys) and usually it's just a block explorer filling it in.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flexystar",
+      "created_time": "July 28, 2023, 10:47:34 AM",
+      "body": "Quote from: NotATether on July 14, 2023, 11:17:01 AMDannyHamilton is spot on. Basically, transaction outputs do not have addresses hardcoded to them, (unlike in ETH), but a \"script\" (that looks like assembly language) that hashes a \"script input\" to an address and asserts that it equals to the one also placed inside the script.*script inputs are provided by your wallet to the script when you create a transaction using the unspent output. The script is similar to a BASH script in that it will either exit with success or failure.This \"script\" can be replaced by something totally different that does a cryptographic problem instead of hashing to an address. When you see people using this kind of crazy problem script in a P2SH (3) address, that is actually what happens. It's not actually associated with the address (but it's still attached to the private/public keys) and usually it's just a block explorer filling it in.I think to understand this one needs to understand how the input and output workflow works. I mean as given in the second post, does it mean I would be solving the puzzle manually and then I have to add the solution manually over the blockchain? I am so not close to understanding the math here or whatever this puzzle solving thing is?Where do I find this puzzle, a link or some sort of destination would be amazing.QuoteThis \"script\" can be replaced by something totally different that does a cryptographic problem instead of hashing to an address. When you see people using this kind of crazy problem script in a P2SH (3) address, that is actually what happens. It's not actually associated with the address (but it's still attached to the private/public keys) and usually it's just a block explorer filling it in.Is this entirely associated with the miners OR non miner person can also get involved with this? What does it mean to solve this sort of puzzle? A math problem that a mining equipment is not able to solve?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "July 28, 2023, 10:55:44 PM",
+      "body": "Quote from: Flexystar on July 28, 2023, 10:47:34 AMI think to understand this one needs to understand how the input and output workflow works.Correct. If you don't understand how transactions ACTUALLY work, then you won't be able to solve the puzzle without some help from someone that does understand.Quote from: Flexystar on July 28, 2023, 10:47:34 AMI mean as given in the second post, does it mean I would be solving the puzzle manually and then I have to add the solution manuallyThat's certainly one way that you could do it. Another option would be to write your own computer program that solves the puzzle and creates the transaction.Quote from: Flexystar on July 28, 2023, 10:47:34 AMIs this entirely associated with the miners OR non miner person can also get involved with this?Transactions are all publically stored on the blockchain.  Anyone that wants to can learn how to access them and then can find the puzzles.Quote from: Flexystar on July 28, 2023, 10:47:34 AMWhat does it mean to solve this sort of puzzle?It means figuring out what data needs to be supplied in a transaction input to satisfy the requirements of the puzzle transaction output. Then, create a transaction that uses that input and sends the bitcoins to whatever address you like.Quote from: Flexystar on July 28, 2023, 10:47:34 AMA math problem that a mining equipment is not able to solve?Bitcoin mining equipment doesn't solve math problems.  It simply hashes 80 bytes, checks to see if the result is small enough, and if not, tries a different 80 bytes, until it happens to get lucky and stumble on 80 bytes that hash to a low enough value.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 29, 2023, 02:58:01 AM",
+      "body": "Quote from: Flexystar on July 28, 2023, 10:47:34 AMWhere do I find this puzzle, a link or some sort of destination would be amazing.The closest thing I can think of is the collision reward scripts that created by another core dev Peter Todd (not Mike Hearn) and can be found on bitcointalk in this topic.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

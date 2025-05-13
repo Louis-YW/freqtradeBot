@@ -1,0 +1,93 @@
+{
+  "id": "topic_5407215",
+  "title": "Coding Enthusiast",
+  "author": "Coding Enthusiast",
+  "created_time": "July 22, 2022, 04:55:10 AM",
+  "content": "Is there a reason why secp256k1_fe_set_int method is enforcing the integer to be this small considering the first limbs (least significant) the can have at most 26 bits (0x03ffffff) and 52 bits (0x0fffffffffffff) respectively?https://github.com/bitcoin-core/secp256k1/blob/1253a27756540d2ca526b2061d98d54868e9177c/src/field_5x52_impl.h#L251-L252https://github.com/bitcoin-core/secp256k1/blob/1253a27756540d2ca526b2061d98d54868e9177c/src/field_10x26_impl.h#L295-L296",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5407215",
+  "comments": [
+    {
+      "author": "PawGo",
+      "created_time": "July 22, 2022, 06:36:14 AM",
+      "body": "Quote from: Coding Enthusiast on July 22, 2022, 04:55:10 AMIs there a reason why secp256k1_fe_set_int method is enforcing the integer to be this small considering the first limbs (least significant) the can have at most 26 bits (0x03ffffff) and 52 bits (0x0fffffffffffff) respectively?https://github.com/bitcoin-core/secp256k1/blob/1253a27756540d2ca526b2061d98d54868e9177c/src/field_5x52_impl.h#L251-L252https://github.com/bitcoin-core/secp256k1/blob/1253a27756540d2ca526b2061d98d54868e9177c/src/field_10x26_impl.h#L295-L296I think the idea is to (potentially) set only the \"first\" cell of secp256k1_fe, which depending in architecture could have 64 or 32 bits.On the other hand, the usages of secp256k1_fe_set_int  are quite simple, it is just a setting value 0 or 1, as I see in the code.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 22, 2022, 03:03:02 PM",
+      "body": "My guess is that someone was planning to make an assembly-tuned implementation of secp256k1_fe_set_int that required 16-bit words for full optimization. But I couldn't find any assembly version of the function anywhere in the library, so maybe they never came around to doing it.Quote from: PawGo on July 22, 2022, 06:36:14 AMOn the other hand, the usages of secp256k1_fe_set_int  are quite simple, it is just a setting value 0 or 1, as I see in the code.No, it's only setting the rest of the limbs to 0, and the normalized flag to 1 (if it is indeed compiled with VERIFY, which I don't suspect they do for speed purposes). The smallest [first] limb is being set to a.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "July 22, 2022, 03:06:15 PM",
+      "body": "Quote from: NotATether on July 22, 2022, 03:03:02 PMQuote from: PawGo on July 22, 2022, 06:36:14 AMOn the other hand, the usages of secp256k1_fe_set_int  are quite simple, it is just a setting value 0 or 1, as I see in the code.No, it's only setting the rest of the limbs to 0, and the normalized flag to 1 (if it is indeed compiled with VERIFY, which I don't suspect they do for speed purposes). The smallest [first] limb is being set to a.I know what that function is doing internally, I was talking about the way how it is used. What is passed as a \"a\" is 1 or 0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 22, 2022, 04:24:15 PM",
+      "body": "Quote from: PawGo on July 22, 2022, 03:06:15 PMI know what that function is doing internally, I was talking about the way how it is used. What is passed as a \"a\" is 1 or 0.Oh OK. But that means that the limit makes even less sense. There is already a function for zeroing the finite element, so why not just make one that sets it to 1, and use those instead?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pieter Wuille",
+      "created_time": "July 23, 2022, 03:43:07 PM",
+      "body": "Interesting question!The reason for the restriction is simply to keep secp256k1_fe_set_int simple. Field elements are represented as 10 26-bit or 5 52-bit limbs internally, so restricting the function to only accept inputs that can be represented by a single limb means the function can just set all limbs to 0 and set the bottom one to the provided value.Now in retrospect, it does seem that this function is rather pointless. It's currently only used for setting values to 0 or to 1 anymore. That used to be different; early on we e.g. didn't have a mechanism for constructing compile-time constants, and e.g. the B constant in the curve equation (y^2 = x^3 + B, with B=7 for secp256k1 proper) didn't exist until fairly recently.I'm now considering adding a constant secp256k1_fe for 0 (a constant for 1 already exists), and removing the function. Thanks for the observation!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 23, 2022, 04:49:49 PM",
+      "body": "Quote from: Pieter Wuille on July 23, 2022, 03:43:07 PMInteresting question!The reason for the restriction is simply to keep secp256k1_fe_set_int simple. Field elements are represented as 10 26-bit or 5 52-bit limbs internally, so restricting the function to only accept inputs that can be represented by a single limb means the function can just set all limbs to 0 and set the bottom one to the provided value.While you're here, I'd like to ask a question about this format: On an initial inspection of the field_*_impl.h headers, I see that a single limb (depending on the field used), except for the biggest one, can represent up to 2^26 or 2^52 numbers respectively. @Coding Enthusiast actually mentioned that in the topic. There is also a magnitude for scaling the finite element up.I'm certainly not asking for code to be modified for this, but I am just wondering - with these two facts, won't it be possible to set a larger range of numbers in only the bottom limb - while zeroing out the rest? Maybe it's because the representation is quite strange to me, and that I don't quite get how it represents 2^256 numbers with the limbs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coding Enthusiast",
+      "created_time": "July 23, 2022, 06:42:24 PM",
+      "body": "Quote from: NotATether on July 23, 2022, 04:49:49 PMMaybe it's because the representation is quite strange to me, and that I don't quite get how it represents 2^256 numbers with the limbs.When representing a big number we have to split them into smaller limbs that can fit in registers like using 4 64-bit integers (a0, a1, a2, a3) for a 256-bit integer. This is called radix 264 representation.This works fine but the problem is that each time you perform any operations on the numbers you can get an overflow. For example to add A + B you have to do add A.a0 + B.a0 which can overflow and that has to carry to the next step.Code:R.a0 = A.a0 + B.a0if(overflowed) => carry = 1 else 0R.a1 = A.a1 + B.a1 + carryif(overflowed) => carry = 1 else 0R.a2 = A.a2 + B.a2 + carryif(overflowed) => carry = 1 else 0R.a3 = A.a3 + B.a3 + carryAnd this is just addition, when adding x and y each having n base b digits the result will have at most n+1 base b digits. It is also easy since your carry is either 0 or 1 (it is as simple as if R.a0 > A.a0 => carry = 1 else carry = 0).When multiplying x with y each having n base b digits the result will have at most 2n digits and your carry is bigger and has to be computed and stored correctly.To solve this problem the simplest way is to use a smaller integer that can hold that overflow like using 32-bit limbs (UInt32), cast them to 64-bit and compute A.a0 + B.a0, etc. but now you have to add 8 limbs instead of 4. So this can't be the most efficient solution.But what if we could keep track of the overflow while maximizing the efficiency? The solution is to leave only a little space empty on each limb. To do that we use a different representation like using 5 52-bit integers which is called radix 252 (each limb now has 52 bits instead of 64 except the last one).Now you have an empty room to work with ergo you don't have to constantly worry about the overflow. You also don't have a lot of limbs to increase the code size. Not only this simplifies your algorithm, it also lets you perform more operations at once before you need to reduce the result. For example you can compute A+B+C+D like this which is very simple and efficient since the overflow is not lost:Code:R.a0 = A.a0 + B.a0 + C.a0 + D.a0R.a1 = A.a1 + B.a1 + C.a1 + D.a1R.a2 = A.a2 + B.a2 + C.a2 + D.a2R.a3 = A.a3 + B.a3 + C.a3 + D.a3In the end you can perform the reduction only once and reduction algorithms are usually pretty fast with prime numbers.To answer your question, we shouldn't place any value in any of the limbs like the least significant limb that is bigger than 252 because that would make them not-normalized and any operations on such values could lead to lost data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pieter Wuille",
+      "created_time": "July 23, 2022, 09:53:54 PM",
+      "body": "Oh, I had missed part of the question. I don't recall why the documentation limits to 0x7FFF; either it was just to be conservative and not \"leak\" a constraint from either of the field implementations into the interface, or it was so an int on platforms with 16-bit int could be used.Regarding the ranges of permitted magnitudes: indeed, the point is to avoid carries in additions. By having even just a few slack bits in every limb, it's possible to have field elements with a temporarily \"denormalized\" representation (where the individual limb values exceed 2^26 or 2^52). The restrictions on how much they permit exceeding that 2^26 or 2^52 depends mostly on the multiplication code, with is optimized to take advantage of these limits.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 24, 2022, 05:05:45 AM",
+      "body": "Guys, is there some kind of paper on Arxiv I can read for the field multuplication algo, so I can study it for myself? And in particular, understand how right-shifting values in bracket notation is supposed to optimize the multiplication.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pieter Wuille",
+      "created_time": "July 25, 2022, 05:39:48 PM",
+      "body": "I'm not sure about papers. Some of the low-level field arithmetic in libsecp256k1 was inspired by techniques used in certain curve25519/ed25519 implementations, but it has certainly evolved from there, with many optimizations by several contributors.I came up with the bracket notation, and it isn't an optimization; just a concise way of of writing down the data flow to allow (humans) to reason about the correctness of the algorithm.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "topic_5460766",
+  "title": "garlonicon",
+  "author": "garlonicon",
+  "created_time": "July 23, 2023, 10:44:45 AM",
+  "content": "Many people wonder, why we cannot multiply point by point in ECDSA. We can add points, subtract them, multiply point by some number, or divide it (by using inversion). The main reason for that, is this operation requires a hidden argument, that is often missed: the base point.Many times, people think about things like \"halving a point\" in a similar way, as how we can do that on integers in many programming languages: if we have 9/10, it gives us zero as the result. In ECDSA world, this is not the case.To better explore, how point by point multiplication could be defined, we can take an elliptic curve you can see in my avatar: \"p=79,n=67,base=(1,18),bits=7\". It is quite simple, every coordinate takes only one byte, and it can be fully explored, without applying any optimizations, and just by brute forcing everything.So, we start with our p=79. We can easily check if it is prime, and then find the nearest point, meeting famous equation: y^2=x^3+7. All numbers are small enough, so we can even easily create some 79x79 black bitmap, and set pixel color to white, if for a given (x,y) pair, our left and right side is equal modulo 79. We can even try this for some bigger values, then we could get a nice picture for our desktop background, similar to the stars on the sky at night.In this way, we can easily grab the nearest point, being (1,18) in this case. Also, we can count all dots, and note that we have 66 points, and the 67th value is just (0,0), point at infinity, which we can reach later, after trying to add the first, and the last point.So, let's start from the base point, and create the full list of points:Code:d= 1, x= 1, y=18d= 2, x=60, y=10d= 3, x=15, y= 8d= 4, x=49, y= 5d= 5, x=42, y=54d= 6, x=59, y=12d= 7, x=61, y=10d= 8, x=43, y=35d= 9, x=37, y=69d=10, x=26, y=19d=11, x=18, y=54d=12, x=12, y=47d=13, x=39, y=47d=14, x= 9, y= 5d=15, x=63, y=63d=16, x=19, y=25d=17, x=75, y=41d=18, x=21, y=74d=19, x=68, y=63d=20, x=29, y= 8d=21, x= 6, y=12d=22, x=45, y=19d=23, x=35, y=71d=24, x=66, y=41d=25, x=28, y=32d=26, x=17, y=41d=27, x=14, y=67d=28, x=74, y=35d=29, x=23, y=18d=30, x=55, y=61d=31, x=41, y=35d=32, x= 8, y=60d=33, x=27, y=63d=34, x=27, y=16d=35, x= 8, y=19d=36, x=41, y=44d=37, x=55, y=18d=38, x=23, y=61d=39, x=74, y=44d=40, x=14, y=12d=41, x=17, y=38d=42, x=28, y=47d=43, x=66, y=38d=44, x=35, y= 8d=45, x=45, y=60d=46, x= 6, y=67d=47, x=29, y=71d=48, x=68, y=16d=49, x=21, y= 5d=50, x=75, y=38d=51, x=19, y=54d=52, x=63, y=16d=53, x= 9, y=74d=54, x=39, y=32d=55, x=12, y=32d=56, x=18, y=25d=57, x=26, y=60d=58, x=37, y=10d=59, x=43, y=44d=60, x=61, y=69d=61, x=59, y=67d=62, x=42, y=25d=63, x=49, y=74d=64, x=15, y=71d=65, x=60, y=69d=66, x= 1, y=61d=67, x= 0, y= 0d=68, x= 1, y=18After handling corner cases, we can convert any private key \"d\" to \"(x,y)\" pair, representing our public key, and make it rolling ad infinitum:Code:(1,18)+(1,61)=(0,0)(1,18)+(0,0)=(1,18)As we can see, we started from p=79, and y^2=x^3+7, nothing else. We reached n=67, and now we can be 100% sure that it is not just some result we picked. It is the only valid result, that makes things tick, and meets our criteria, being as close to secp256k1 as possible, and using smaller numbers to demonstrate things. By going into bigger numbers, we can get even more convinced, that \"n\" was not arbitrarily chosen: it was just calculated, by using very well optimized code.Now, we have everything we need to see, why we cannot multiply point by point. Let's write some multiplications with private keys, and then convert them to corresponding public keys:Code: 2* 3= 6 5* 7=3511*13=35 (mod 67)(60,10)*(15, 8)=(59,12)(42,54)*(61,10)=( 8,19)(18,54)*(39,47)=( 8,19)And now, let's assume we want to use a different base point, for example (75,41), instead of (1,18). Let's generate the full list of points again, and see, how everything was suddenly changed:Code:d= 1, x=75, y=41d= 2, x=27, y=16d= 3, x=19, y=54d= 4, x= 1, y=18d= 5, x=21, y=74d= 6, x= 8, y=19d= 7, x=63, y=16d= 8, x=60, y=10d= 9, x=68, y=63d=10, x=41, y=44d=11, x= 9, y=74d=12, x=15, y= 8d=13, x=29, y= 8d=14, x=55, y=18d=15, x=39, y=32d=16, x=49, y= 5d=17, x= 6, y=12d=18, x=23, y=61d=19, x=12, y=32d=20, x=42, y=54d=21, x=45, y=19d=22, x=74, y=44d=23, x=18, y=25d=24, x=59, y=12d=25, x=35, y=71d=26, x=14, y=12d=27, x=26, y=60d=28, x=61, y=10d=29, x=66, y=41d=30, x=17, y=38d=31, x=37, y=10d=32, x=43, y=35d=33, x=28, y=32d=34, x=28, y=47d=35, x=43, y=44d=36, x=37, y=69d=37, x=17, y=41d=38, x=66, y=38d=39, x=61, y=69d=40, x=26, y=19d=41, x=14, y=67d=42, x=35, y= 8d=43, x=59, y=67d=44, x=18, y=54d=45, x=74, y=35d=46, x=45, y=60d=47, x=42, y=25d=48, x=12, y=47d=49, x=23, y=18d=50, x= 6, y=67d=51, x=49, y=74d=52, x=39, y=47d=53, x=55, y=61d=54, x=29, y=71d=55, x=15, y=71d=56, x= 9, y= 5d=57, x=41, y=35d=58, x=68, y=16d=59, x=60, y=69d=60, x=63, y=63d=61, x= 8, y=60d=62, x=21, y= 5d=63, x= 1, y=61d=64, x=19, y=25d=65, x=27, y=63d=66, x=75, y=38d=67, x= 0, y= 0d=68, x=75, y=41Then, let's write the same multiplications again:Code: 2* 3= 6 5* 7=3511*13=35 (mod 67)(27,16)*(19,54)=( 8,19)(21,74)*(63,16)=(43,44)( 9,74)*(29, 8)=(43,44)See? Everything is completely different. Everything was changed. We can even take our old points, and see, what private keys are hidden behind them, when we calculate it under our new base point:Code:(60,10)*(15, 8)=(59,12)(42,54)*(61,10)=( 8,19)(18,54)*(39,47)=( 8,19)8*12=2420*28=644*52=6See? Point by point multiplication leads to completely wrong results, if it is done directly, based on two points, without calculating things relatively to the base point. I hope this topic will help to better understand, why some operations cannot be done in ECDSA, and how implicit things like base point can change everything, if we forget to consider them in our calculations.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5460766",
+  "comments": [
+    {
+      "author": "digaran",
+      "created_time": "August 02, 2023, 02:56:38 AMLast edit: August 02, 2023, 03:54:27 AM by digaran",
+      "body": "So this is the reason when I multiply G by itself I can't figure out what is the result! I wonder if there is a way to find the result private key?🤔Edit, Ok, I admit that I didn't spend enough time to figure it out, after posting this I went out to find out G * G is what?Here it is  public key :Code:0353854510f675922eb4d1ed3fd044c54d161c85852be5bf8074a8a8b1f2ee5273Private key :Code:79be667ef9dcbbac55a06295ce870b098d3e430dcf3ce861da4dc441768b9516I hope by multiplying point by point, you meant public keys by public keys? if I misunderstood and this is off topic, apology.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "August 02, 2023, 04:25:59 AM",
+      "body": "QuoteI wonder if there is a way to find the result private key?Only if you know all of them upfront, or you know all relations between all of your public keys. In other cases, not really, because your private key is always relative to your base point. Let's assume you have some (x,y) point, and you start changing your base point. What could happen?Code:1*1=1 //if you use the same point as a base point2*2=4 //if you use half of that point as a base pointAnd then, if you have only (x,y) coordinates, then without a base point, you don't know if after multiplication by itself, you should get the same point, or some different point. That means, if you want to write any point-by-point multiplication, this is not enough:Code:Point multiply(Point first,Point second);What you need, is something like that:Code:Point multiply(Point first,Point second,Point base);Quoteafter posting this I went out to find out G * G is what?In general, if you multiply one by one, you should get one. That means, squaring base point should not change anything, and return the same point. That also means point addition is different than point multiplication, because if you add two points, then you don't have to know the base point.QuoteI hope by multiplying point by point, you meant public keys by public keys?Yes, of course. If you have private keys, it is perfectly defined operation. The same is true if you combine some public key with some private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "August 02, 2023, 04:47:45 AM",
+      "body": "O fu-k !!!You get a real point in result:How you get (8,19) ?What filormula for multiplication ?(27,16)*(19,54)=( 8,19)(21,74)*(63,16)=(43,44)( 9,74)*(29, =(43,44)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "August 02, 2023, 07:23:53 AM",
+      "body": "https://www.coindesk.com/markets/2014/10/19/the-math-behind-the-bitcoin-protocol/QuotePoint addition of p + q to find r is defined component-wise as follows:c = (qy - py) / (qx - px)rx = c2 - px - qxry = c (px - rx) - pyAnd point doubling of to find r is as follows:c = (3px2 + a) / 2pyrx = c2 - 2pxry = c (px - rx) - py",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "August 02, 2023, 12:35:35 PM",
+      "body": "Quote from: garlonicon on August 02, 2023, 07:23:53 AMhttps://www.coindesk.com/markets/2014/10/19/the-math-behind-the-bitcoin-protocol/QuotePoint addition of p + q to find r is defined component-wise as follows:c = (qy - py) / (qx - px)rx = c2 - px - qxry = c (px - rx) - pyAnd point doubling of to find r is as follows:c = (3px2 + a) / 2pyrx = c2 - 2pxry = c (px - rx) - pyBro, can you show calculation on this example:(27,16)*(19,54)=( 8,19)?I NOT UNDERSTAND FORMULA'S WHAT YOU PROVIDETHX",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "August 02, 2023, 06:22:38 PM",
+      "body": "Quote from: garlonicon on August 02, 2023, 07:23:53 AMhttps://www.coindesk.com/markets/2014/10/19/the-math-behind-the-bitcoin-protocol/QuotePoint addition of p + q to find r is defined component-wise as follows:c = (qy - py) / (qx - px)rx = c2 - px - qxry = c (px - rx) - pyAnd point doubling of to find r is as follows:c = (3px2 + a) / 2pyrx = c2 - 2pxry = c (px - rx) - pyBro, what formula you use for multiply one point to enother point ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "casinotester0001",
+      "created_time": "August 02, 2023, 07:28:22 PM",
+      "body": "Quote from: garlonicon on August 02, 2023, 04:25:59 AMWhat you need, is something like that:Code:Point multiply(Point first,Point second,Point base);Very interesting. Maybe we should ask user ranochigo. He could know if this is possible. [I will DM him]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "August 02, 2023, 08:46:45 PM",
+      "body": "Quote from: garlonicon on August 02, 2023, 07:23:53 AMhttps://www.coindesk.com/markets/2014/10/19/the-math-behind-the-bitcoin-protocol/QuotePoint addition of p + q to find r is defined component-wise as follows:c = (qy - py) / (qx - px)rx = c2 - px - qxry = c (px - rx) - pyAnd point doubling of to find r is as follows:c = (3px2 + a) / 2pyrx = c2 - 2pxry = c (px - rx) - pyCan show point's multiplication example ? Multiplication is not classic double and add....",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "August 02, 2023, 10:24:17 PM",
+      "body": "Quote from: COBRAS on August 02, 2023, 08:46:45 PMQuote from: garlonicon on August 02, 2023, 07:23:53 AMhttps://www.coindesk.com/markets/2014/10/19/the-math-behind-the-bitcoin-protocol/QuotePoint addition of p + q to find r is defined component-wise as follows:c = (qy - py) / (qx - px)rx = c2 - px - qxry = c (px - rx) - pyAnd point doubling of to find r is as follows:c = (3px2 + a) / 2pyrx = c2 - 2pxry = c (px - rx) - pyCan show point's multiplication example ? Multiplication is not classic double and add....There is no such a thing as multiplying 2 public keys to have a valid result, you can't multiply public key 3 with 2 to have the public key of private key 6. So why are you asking for something that doesn't exist?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "August 02, 2023, 10:34:39 PM",
+      "body": "Quote from: digaran on August 02, 2023, 10:24:17 PMQuote from: COBRAS on August 02, 2023, 08:46:45 PMQuote from: garlonicon on August 02, 2023, 07:23:53 AMhttps://www.coindesk.com/markets/2014/10/19/the-math-behind-the-bitcoin-protocol/QuotePoint addition of p + q to find r is defined component-wise as follows:c = (qy - py) / (qx - px)rx = c2 - px - qxry = c (px - rx) - pyAnd point doubling of to find r is as follows:c = (3px2 + a) / 2pyrx = c2 - 2pxry = c (px - rx) - pyCan show point's multiplication example ? Multiplication is not classic double and add....There is no such a thing as multiplying 2 public keys to have a valid result, you can't multiply public key 3 with 2 to have the public key of private key 6. So why are you asking for something that doesn't exist?How you calculate this ? (27,16)*(19,54)=( 8,19) ??",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "August 03, 2023, 04:19:20 AM",
+      "body": "QuoteHow you calculate this ? (27,16)*(19,54)=( 8,19) ??Simple, I just used private keys first, and then converted everything to public keys, just to show, why multiplication is undefined. If you take (27,16) and multiply it by (19,54), then you can get (8,19), but only if your base point is (75,41), and only if you know all points, or all relations between private and public keys. If you change your base point, you will reach something different. That means, by having two public keys alone, you don't know, what is the result.Addition: you change your base point, everything stays the sameMultiplication: you change your base point, your results are now differentThat's why you cannot multiply two public keys directly. Also note that in my examples, I can convert any public key to private key, but this is true only because there are only 67 points on this small curve, and I can easily just check all of them, which is obviously not the case in secp256k1. But after converting it back when using a different base point, you can easily see, why those results are wrong.Edit: QuoteMultiplication is not classic double and add....Of course it is. And you have all examples in the linked article, also with signatures, and their verification.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

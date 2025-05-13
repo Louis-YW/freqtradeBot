@@ -1,0 +1,53 @@
+{
+  "id": "topic_5419587",
+  "title": "SamYezi",
+  "author": "SamYezi",
+  "created_time": "November 06, 2022, 08:57:29 AM",
+  "content": "I have an infinite loop Python function for measuring how fast are SECP256K1 public Keys are generated.The script:Code:from time import time        a = 0    b = 7    n = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141    gx = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798    gy = 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8    prime = 2**256 - 2**32 - 977        def addition(currentX, currentY, gx, gy, a, b, prime):        if gy == 0:            return (None, None)        elif currentX is None and currentY is None:            return (gx, gy)        elif currentX == gx and currentY != gy:            return (None, None)        elif currentX == gx and currentY == gy and currentY == 0:            return (None, None)        elif currentX == gx and currentY == gy:            s1 = (3 * pow(gx, 2, prime) + a) % prime            s2 = (gy * 2) % prime            s = (s1 * pow(s2, (prime - 2), prime)) % prime            currentX = (s ** 2 - 2 * gx) % prime            currentY = (s * (gx - currentX) - gy) % prime        elif currentX != gx:            s1 = (currentY - gy)            s2 = (currentX - gx)            s = (s1 * pow(s2, (prime - 2), prime)) % prime            currentX = ((s ** 2) - gx - currentX) % prime            currentY = ((s * (gx - currentX)) - gy) % prime            return (currentX, currentY)        def secp256k1BinaryExpansion(privateKey, gx, gy, a, b, prime):        #if pow(gy, 2, prime) != (pow(gx, 3, prime) + a * gx + b) % prime:            #return \"The point is not on the curve\"        coef = privateKey        currentX, currentY = gx, gy        resultX, resultY = None, None        while coef:            if coef & 1:                resultX, resultY = addition(resultX, resultY, currentX, currentY, a, b, prime)            currentX, currentY = addition(currentX, currentY, currentX, currentY, a, b, prime)            coef >>= 1        return (resultX, resultY)        def testLoop(gx, gy, a, b, prime):        count = 1 #Count is the number of all calculations        counter = 0 #Counter is for measuring the speed of the function        timeOne = time()        pubX, pubY = None, None        while True:            pubX, pubY = secp256k1BinaryExpansion(count, gx, gy, a, b, prime)            #print(\"Case \", count,\":\", pubX,pubY)            count += 1            counter += 1            timeTwo = time()            if (timeTwo - timeOne) >= 10:                print(\"The speed is: \", counter / (timeTwo - timeOne), \"c/s\")                timeOne = time()                counter = 0        testLoop(gx, gy, a, b, prime)Whenever I am launching the script on Pycharm, it outputs aroud 100 c/s on Windows and 300 c/s on Ubuntu.When it happens, on both os, only 1 core out ouf 4 gets loaded with this task for 100%, hence only 25% of CPU power is allocated to this. The CPU: intel core i5-4440 cpu @ 3.10ghzI'd like to allocate 2-3 cores to the task, so it gets loaded like: 50-75%.The truth is I've read documentation and watched tutorials on Python Parallelism/Multithreading and it's confusing.Not really sure how to allocate a single job across the cores.May be you could help out?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5419587",
+  "comments": [
+    {
+      "author": "ABCbits",
+      "created_time": "November 06, 2022, 09:50:22 AM",
+      "body": "Simple multiporcessing pool should do the job, although i don't know if it's good approach for multithread programming. Here's an exampleCode:from multiprocessing import Pooldef func(*datas):  print('Data:', datas)p = Pool(2)  # thread useddata = [  [1,2,3,4,5],  [2,4,6,8,10]]p.map(func, data)Code:$ python3 example,py('Data:', ([1, 2, 3, 4, 5],))('Data:', ([2, 4, 6, 8, 10],)You just need to replace 2 with total thread/core you want to use and parameter inside p.map with your own function/data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alexeyneu",
+      "created_time": "November 06, 2022, 05:47:08 PM",
+      "body": "best approach to python multithreading is to use c++ instead. that's from my secp toolCode:void brough(unsigned long long f);int main(){    std::vector<unsigned long long> a{2, 4, 6, 8, 10, 12, 16};    std::cout << std::endl;    std::thread h[7];    for(auto f : a)    {        h[f == 16 ? 6 : f/2 - 1] = std::thread(&brough, f);    }    h[0].join();    h[1].join();    h[2].join();    h[3].join();    h[4].join();    h[5].join();    h[6].join();    return 0;}https://github.com/alexeyneu/secp256k1-cxx/blob/master/main.cpp#L33-L54",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 07, 2022, 05:31:48 PM",
+      "body": "Quote from: alexeyneu on November 06, 2022, 05:47:08 PMbest approach to python multithreading is to use c++ instead.Exactly what I was going to say!I wrote a secp256k1 python tool for my friend - it was dog-slow so he asked me to rewrite it in C++. Python was never really made for parallel computing anyway, that's why all the python packages that do all the scientific heavy-lifting such as numpy are written in C.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "SamYezi",
+      "created_time": "November 12, 2022, 06:49:16 PM",
+      "body": "Quote from: alexeyneu on November 06, 2022, 05:47:08 PMbest approach to python multithreading is to use c++ instead. that's from my secp toolCode:void brough(unsigned long long f);int main(){    std::vector<unsigned long long> a{2, 4, 6, 8, 10, 12, 16};    std::cout << std::endl;    std::thread h[7];    for(auto f : a)    {        h[f == 16 ? 6 : f/2 - 1] = std::thread(&brough, f);    }    h[0].join();    h[1].join();    h[2].join();    h[3].join();    h[4].join();    h[5].join();    h[6].join();    return 0;}https[Suspicious link removed]yneu/secp256k1-cxx/blob/master/main.cpp#L33-L54I see your tool over here: https[Suspicious link removed]yneu/secp256k1-cxxUnfortunatelly, there's a question, how do you compile that?You just need to have Visual Studio with Cmake and Boost installed and hit the \"debug/release\" button on main.cpp?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 12, 2022, 07:38:47 PM",
+      "body": "Quote from: alexeyneu on November 06, 2022, 05:47:08 PMCode:void brough(unsigned long long f);int main(){    std::vector<unsigned long long> a{2, 4, 6, 8, 10, 12, 16};    std::cout << std::endl;    std::thread h[7];    for(auto f : a)    {        h[f == 16 ? 6 : f/2 - 1] = std::thread(&brough, f);    }    h[0].join();    h[1].join();    h[2].join();    h[3].join();    h[4].join();    h[5].join();    h[6].join();    return 0;}https://github.com/alexeyneu/secp256k1-cxx/blob/master/main.cpp#L33-L54Just wondering, does your repo support private key modular inverse? It seems to be lacking in libsecp256k1, which is a shame... breaks many applications.I'm busy making an EGCD algorithm with my shiny new brass, but it would be nice if a 256-bit implementation was available as it would be *much* faster.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

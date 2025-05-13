@@ -1,0 +1,29 @@
+{
+  "id": "topic_5476754",
+  "title": "apogio",
+  "author": "apogio",
+  "created_time": "December 06, 2023, 11:20:10 AMLast edit: January 09, 2024, 01:59:01 PM by apogio",
+  "content": "Links to other tutorials from the series:[BitcoinTalk Node Tutorial #2] Installing Electrs from source https://bitcointalk.org/index.php?topic=5477339.0[BitcoinTalk Node Tutorial #3] Sparrow terminal / infinite Whirlpool mixes https://bitcointalk.org/index.php?topic=5470024.0[BitcoinTalk Node Tutorial #4] Connecting BISQ to our node https://bitcointalk.org/index.php?topic=5478756.0[BitcoinTalk Node Tutorial #5] Hosting a Monero node on the same machine https://bitcointalk.org/index.php?topic=5480371.0Size required on disk:Code:$ sudo du -sh /media/apogio/BTC/bitcoincore627G /media/apogio/BTC/bitcoincoreI will create a series of posts (at my own slow pace).In this series, I will create a custom Bitcoin Node on a GUI-less OS.I will add various features on this node.I encourage all of you to share your thoughts and suggestions. In fact, some decisions will be determined by your suggestions.Hardware / Software used in the seriesComputerRaspberry Pi 4b 8GB RAMSoftwareRaspberry Pi OS Lite (64-bit)Storage2TB external SSDInstalling and running Bitcoin Core on Raspbian LiteDownloading Bitcoin CoreFirstly, we create a directory on the home path, where we will download the necessary packages, let's say we create it inside the Downloads directory:Code:mkdir -p ~/Downloads/Corecd ~/Downloads/CoreNow, the latest version is 25.1, so the following command will download the core software and the checksum in our directory:Code:wget https://bitcoincore.org/bin/bitcoin-core-25.1/bitcoin-25.1-aarch64-linux-gnu.tar.gzwget https://bitcoincore.org/bin/bitcoin-core-25.1/SHA256SUMSLet's check whether the checksum is correct:Code:sha256sum --ignore-missing --check SHA256SUMSSo, now we must extract the installer from the tarball:Code:tar -xvf bitcoin-25.1-aarch64-linux-gnu.tar.gzPersonally, I install my binaries in /usr/local/bin, so I will use the following command:Code:sudo install -m 0755 -o root -g root -t /usr/local/bin bitcoin-25.1/bin/*We must be done, let's check:Code:bitcoind --versionWe should receive a prompt that the version is 25.1.Let's delete the directory we created to download the stuff we needed. It's no longer necessary:Code:cd ~;rm -rf ~/Downloads/CoreRunning Bitcoin CoreMost of the time, when the external storage is connected, it mounts to a specific filesystem location. Let's check where it is:Code:lsblkThis will return something like:Code:NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS...sdb           8:16   0  1.9T  0 disk`-sdb1      8:17   0  1.9T  0 part /media/apogio/BTC...From this, we can see that the external drive is mounted on /media/apogio/BTC. This will be our home directory for Bitcoin Core.Let's create a configuration file and start Bitcoin Core:Code:cd /media/apogio/BTCmkdir bitcoincorenano bitcoin.confThis will open up nano and create a file called bitcoin.conf inside the directory /media/apogio/BTC/bitcoincore.The following lines are ok for the moment:Code:datadir=/media/apogio/BTC/bitcoincoredbcache=5000 daemon=1server=1Now we are ready to go.Let's run Bitcoin Core and wait until the IBD is finished:Code:bitcoind -conf=/media/apogio/BTC/bitcoincore/bitcoin.confThis will take some days. So relax and let it work.If at any time you wish to stop the daemon, just run:Code:bitcoin-cli --datadir=/media/apogio/BTC/bitcoincore stopThe IBD is finished, I will stop Bitcoin Core, and I will refresh my bitcoin.conf file as follows:Code:# basic directivesdatadir=/media/apogio/BTC/bitcoincore# bitcoin daemondaemon=1server=1listen=1# torproxy=127.0.0.1:9050bind=127.0.0.1# networkrpcuser=<my user>rpcpassword=<my pass>[main]rpcbind=127.0.0.1rpcbind=<the local ip of my RPi>rpcallowip=127.0.0.1rpcallowip=192.168.0.0/16# optimimizationsmaxconnections=30",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5476754",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "December 12, 2023, 09:58:59 AM",
+      "body": "Quote from: apogio on December 06, 2023, 11:20:10 AMCode:cd ~/Downloads; mkdir Core;cd Core;There's no need to end a line with a semi colon. That's only needed to separate commands on the same line.In case there is no \"Downloads\" directory yet:Code:mkdir -p ~/Downloads/Corecd ~/Downloads/Core",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "December 12, 2023, 10:02:23 AM",
+      "body": "Quote from: LoyceV on December 12, 2023, 09:58:59 AMThere's no need to end a line with a semi colon. That's only needed to separate commands on the same line.Sure, it's just a habit from programming in Java  Quote from: LoyceV on December 12, 2023, 09:58:59 AMIn case there is no \"Downloads\" directory yet:Code:mkdir -p ~/Downloads/Corecd ~/Downloads/CoreGood catch. Adding it now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "topic_5417145",
+  "title": "BTCapsule",
+  "author": "BTCapsule",
+  "created_time": "October 14, 2022, 08:07:13 PM",
+  "content": "I’m installing Bitcoin Core to a 32Gb thumb drive. These are the steps I took:1. Choose my thumb drive “D:\\” as the installer location2. Refuse to let Bitcoin Core start automatically after setup3. Create a shortcut and set “Target” to “D:\\Bitcoin\\bitcoin-qt.exe -datadir=D:\\Bitcoin”4. Open Bitcoin Core from shortcut and choose Settings>Options>Open Configuration File 5.bitcoin.conf:Quoteserver=1 rpcallowip=127.0.0.1 rpcuser=user rpcpassword=pass prune=550When I closed Bitcoin Core, my debug.log file would say it’s checking D:\\Bitcoin, but “bitcoin.conf not found, (skipping)”. Now my debug.log doesn’t offer any clues. It just shows the different blocks.If I choose Settings>Options in Bitcoin Core Shortcut, it shows that prune is set to prune=550, so it must see the bitcoin.conf file.However, my thumb drive has now used about 20Gb of storage and continues to fill up.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417145",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "October 14, 2022, 08:15:21 PM",
+      "body": "Quote from: BTCapsule on October 14, 2022, 08:07:13 PM3. Create a shortcut and set “Target” to “D:\\Bitcoin\\bitcoin-qt.exe -datadir=D:\\Bitcoin”Why don't you add -prune=550 to the command line?Code:  -prune=<n>       blocks. This allows the pruneblockchain RPC to be called to       manual pruning via RPC, >=550 = automatically prune block files       ipc, leveldb, libevent, mempool, mempoolrej, net, proxy, prune,",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "October 14, 2022, 10:23:02 PM",
+      "body": "Quote from: LoyceV on October 14, 2022, 08:15:21 PMQuote from: BTCapsule on October 14, 2022, 08:07:13 PM3. Create a shortcut and set “Target” to “D:\\Bitcoin\\bitcoin-qt.exe -datadir=D:\\Bitcoin”Why don't you add -prune=550 to the command line?Code:  -prune=<n>       blocks. This allows the pruneblockchain RPC to be called to       manual pruning via RPC, >=550 = automatically prune block files       ipc, leveldb, libevent, mempool, mempoolrej, net, proxy, prune,Thank you. I added -prune=500, restarted Bitcoin Core, and I’ve been waiting to see what happens. It fluctuates, but I’ve lost about 4Gb of storage, so it doesn’t appear to be working. So far it’s taking about 20Gb of storage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "October 14, 2022, 11:30:25 PM",
+      "body": "I never heard of someone's success in using a Bitcoin core in a USB flash drive.If your purpose is to use a Bitcoin core wallet for making transactions send and receive when needed then you need to make a bootable USB with OS and install bitcoin core there.Or you can switch to Electrum portable one and put them into your USB thumb drive it's a lightweight wallet that doesn't need to download the blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "October 15, 2022, 01:37:04 AM",
+      "body": "Quote from: BitMaxz on October 14, 2022, 11:30:25 PMI never heard of someone's success in using a Bitcoin core in a USB flash drive.If your purpose is to use a Bitcoin core wallet for making transactions send and receive when needed then you need to make a bootable USB with OS and install bitcoin core there.Or you can switch to Electrum portable one and put them into your USB thumb drive it's a lightweight wallet that doesn't need to download the blockchain.Actually I’m just needing the smallest updated Bitcoin blockchain I can install for data and building applications. I intend to periodically plug in the USB and update the blockchain. Everything else works fine. It has to see my bitcoin.conf file because the username and password work for bitcoinrpc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "October 15, 2022, 03:46:44 AM",
+      "body": "Quote from: BTCapsule on October 14, 2022, 10:23:02 PMThank you. I added -prune=500, restarted Bitcoin Core, and I’ve been waiting to see what happens. It fluctuates, but I’ve lost about 4Gb of storage, so it doesn’t appear to be working. So far it’s taking about 20Gb of storage.Afaik pruning just removes old blocks after it's enabled, your chainstate directory will not be pruned and will continue to grow as the chain syncs (though it might not grow at the same rate as it already has). You should be able to confirm if this is the case by checking the size of both your blocks and chainstate folder on the USB drive. It's possible to split the data directory across multiple drives if you need too but if you want the speed of USB 3.0+ then you're probably going to need a bigger USB stick (I can't find accurate figures of how big both are at the moment though).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 15, 2022, 04:47:03 AM",
+      "body": "Quote from: BTCapsule on October 14, 2022, 10:23:02 PMQuote from: LoyceV on October 14, 2022, 08:15:21 PM-snip-I added -prune=500, restarted Bitcoin Core, and I’ve been waiting to see what happens. It fluctuates, but I’ve lost about 4Gb of storage, so it doesn’t appear to be working. So far it’s taking about 20Gb of storage.Bitcoin Core shouldn't launch with that parameter since it's below the minimum size, are you sure that you're using the correct shortcut?At least set it to the minimum which is what you've originally set in your bitcoin.conf file.BTW, it's already in effect if it says -prune=n under \"Options set in this dialogue are overridden by the command line or in the configuration file:\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 15, 2022, 07:29:36 AM",
+      "body": "Quote from: BitMaxz on October 14, 2022, 11:30:25 PMI never heard of someone's success in using a Bitcoin core in a USB flash drive.It shouldn't be a problem, I've seen many people use an external hard drive for their blockchain. It works as long as the USB port can provide enough power and doesn't accidentally gets unplugged.I've successfully downloaded a pruned Bitcoin Core to /dev/shm, which has less space than most USB sticks.Quote from: jackg on October 15, 2022, 03:46:44 AMyour chainstate directory will not be pruned and will continue to grow as the chain syncs ~(I can't find accurate figures of how big both are at the moment though).My chainstate directly is currently 4.8 GB.Quote from: nc50lc on October 15, 2022, 04:47:03 AMBitcoin Core shouldn't launch with that parameter since it's below the minimum size, are you sure that you're using the correct shortcut?I checked, and it doesn't just ignore the setting:Code:Error: Prune configured below the minimum of 550 MiB.  Please use a higher number.On Linux, this works just as expected:Code:bitcoin-qt -datadir=/tmp/bitcoin -prune=550I'm not a Windows user, so I can't really tell you what goes wrong. I'm curious though: why use a USB stick instead of just normal storage on your system? Pruning to local storage is going to be a lot faster than a USB stick.All you need is 6 GB of storage, preferrably on SSD.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 15, 2022, 07:52:38 AM",
+      "body": "Quote from: LoyceV on October 15, 2022, 07:29:36 AMQuote from: nc50lc on October 15, 2022, 04:47:03 AMBitcoin Core shouldn't launch with that parameter since it's below the minimum size, are you sure that you're using the correct shortcut?I checked, and it doesn't just ignore the setting:Code:Error: Prune configured below the minimum of 550 MiB.  Please use a higher number.On Linux, this works just as expected:Code:bitcoin-qt -datadir=/tmp/bitcoin -prune=550I'm not a Windows user, so I can't really tell you what goes wrong.It's not because of the OS but the size set in prune setting.In Linux you set 550MiB which is the minimum, in the first reply, it's only 500MiB which is below the minimum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 15, 2022, 08:10:50 AM",
+      "body": "Quote from: nc50lc on October 15, 2022, 07:52:38 AMIt's not because of the OS but the size set in prune setting.In Linux you set 550MiB which is the minimum, in the first reply, it's only 500MiB which is below the minimum.I assumed OP made a mistake typing 500 here, because his data directory kept growing so he didn't get an error.It doesn't make sense the -prune=550 setting gets ignored though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "October 15, 2022, 12:19:23 PM",
+      "body": "Quote from: LoyceV on October 15, 2022, 08:10:50 AMQuote from: nc50lc on October 15, 2022, 07:52:38 AMIt's not because of the OS but the size set in prune setting.In Linux you set 550MiB which is the minimum, in the first reply, it's only 500MiB which is below the minimum.I assumed OP made a mistake typing 500 here, because his data directory kept growing so he didn't get an error.It doesn't make sense the -prune=550 setting gets ignored though.Yes, that was a mistake I made here, but my settings on the shortcut are correct. I’m wondering if the problem is my thumb drive is formatted to exFAT. I would have to delete everything and reformat the drive to see, but at this point, I think it would be easier to just install Bitcoin Core on the machine. The reason I’m doing this is because it makes my program easier to use, but a little more difficult to setup. However, I think I might be introducing user and compatibility errors that are unnecessary, so I’m going to reevaluate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "October 16, 2022, 11:39:18 PM",
+      "body": "Quote from: ETFbitcoin on October 16, 2022, 11:39:15 AMQuote from: BTCapsule on October 15, 2022, 12:19:23 PMQuote from: LoyceV on October 15, 2022, 08:10:50 AM--snip--Yes, that was a mistake I made here, but my settings on the shortcut are correct. I’m wondering if the problem is my thumb drive is formatted to exFAT. I would have to delete everything and reformat the drive to see, but at this point, I think it would be easier to just install Bitcoin Core on the machine.Bitcoin Core don't care about file system, so i doubt exFAT is the problem here. I've seen some people use FAT32 or exFAT on their external drive to store Bitcoin Core files without problem.Quote from: BTCapsule on October 15, 2022, 12:19:23 PMThe reason I’m doing this is because it makes my program easier to use, but a little more difficult to setup. However, I think I might be introducing user and compatibility errors that are unnecessary, so I’m going to reevaluate.Have you consider you might fell into XY problem? For example, if you just need to get recent block and your user don't care about privacy, you could just use few free API offered by block explorer rather than obtaining data from pruned Bitcoin Core.I wanted Bitcoin Core to be stored on a USB with BTCapsule, but I changed my mind. It wouldn’t make sense to have an old version of the software, and it was causing way more problems than it solved. I don’t think asking someone to install Bitcoin Core themselves and add a few lines to the bitcoin.conf file is too complicated. Hopefully it will lead to more people running a full node. This is what I’ve been working on:https://bitcointalk.org/index.php?topic=5417348.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

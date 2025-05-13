@@ -1,0 +1,165 @@
+{
+  "id": "topic_5416941",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "October 13, 2022, 06:54:43 AMLast edit: October 22, 2022, 11:18:44 AM by PowerGlove",
+  "content": "Hey, everybody! Last month, I did the patch that added the \"(OP)\" thing to the forum (topic is here), this month I thought I'd try my luck a second time and see if I can get theymos to merge a slightly bigger patch (fingers crossed).So, ajaxtempest was the member that suggested the OP identification thing, and later in that same thread they had a second idea:Quote from: ajaxtempest on July 15, 2022, 08:07:22 AMI have another idea!. Have a down arrow next to a person reply which states\"jump to next post of the user\". An up arrow can also be used to see the users previous post in the same thread.The idea was merited (by vapourminer and LoyceV) and a few members made positive comments about it (LoyceV, Mr.right85, FatFork and nakamura12). After ajaxtempest noticed that their first idea actually got implemented, they came over to my thread to thank me (appreciated), cheekily point out that I hadn't properly listened to them (not so appreciated) and then reminded me about their second idea; unfortunately I didn't have good news for them:Quote from: PowerGlove on September 20, 2022, 11:31:25 AMQuote from: ajaxtempest on September 17, 2022, 04:43:10 AMalso i had suggested another feature where you would click a down or up arrow in the post message to jump to next post of the specific user in that thread.Yep, I've seen that one. I've only considered it superficially but knowing what I now know about SMF (which is not all that much, I'm still learning the codebase), implementing this feature would be technically quite \"ugly\" as it'll involve running a new SQL query for each post, each time it's rendered. I'm not sure if this suggestion is useful enough to warrant the additional DB load it'll cause. I guess if there are more than a few long-time members that chime in with support for this idea, I'll look into it more deeply and see if I can find a way to implement it elegantly.After that, nobody else brought it up again, so I didn't think much more about the problem, but as time went on I was surprised to find that I kept wishing that the forum had that feature! Especially when you disagree with someone, it's only really possible to understand their position once you've read all of their posts in a given thread (and even then, maybe not). Trying to glean too much information from a single post is a recipe for miscommunication, but it's a real hassle at the moment (depending on the length of the thread) to go through each of someone's posts in a given topic. It's also very useful for skipping around megathreads (like WO) or just for when you're wondering if a specific poster had anything more to say in a specific thread.So, once I saw the value in the feature, I started to think seriously about how to implement it without running into the problem that I had told ajaxtempest about: Right now, whenever a page of posts is returned by the server a small number of SQL queries are involved and there are no SQL queries that are issued per-post; that's good design and I didn't want to add code to SMF that would change that. After thinking about the problem for a bit, I realized that the database lookups don't actually have to be done during the page render, but can be postponed until the next/previous button is actually clicked on by hiding the SQL query behind an HTTP redirect. That way, this new feature adds zero additional database load when it's not being used.Unfortunately, this \"deferred\" approach has a small usability flaw, and that is that because the information about the next/previous post is unavailable at render time, the buttons are not \"smart\", and they appear whether there is a post to skip to or not. In cases where you're already on the first post (no previous post to skip to) or already on the last post (no next post to skip to), clicking on the respective button will simply take you to where you already are. I don't think this is a big deal, and like I said above, I don't think that the additional database load it would take to avoid it can be justified, so my position is that I'd much rather have this feature with this small flaw than not have it at all. If it turns out to be a deal-breaker and theymos thinks that additional database load can be justified, then I'll rework the patch accordingly.Anyway, now that I've bored you all to tears, here's what the final result looks like (buttons are next to \"Report to moderator\"):If you hover over the buttons a tooltip appears that explains what they do, here's what each of them says:Last time I did a patch, ajaxtempest wasn't entirely happy with my work:Quote from: ajaxtempest on September 17, 2022, 04:43:10 AMThanks for implementing my suggestion. However by making it in BOLD it would have been more easier when skimming through the thread just to see only OP posts.So, this time around, in anticipation of them saying: \"Thanks, but I wanted UP and DOWN arrows.\", I'll just say: If you want things just so, then make them just so.  [I added some context to this sentiment here]I realize that people are likely to have many different opinions about where the buttons should go and what they should look like, and I experimented with lots of alternatives. The buttons are represented with Unicode symbols, and I've been careful to base my selection on characters that are likely to be widely available. Right now, the buttons are represented by ◁ and ▷ (U+25C1 and U+25B7). Another good choice might be the solid version of the same arrows: ◀ and ▶ (U+25C0 and U+25B6). Regarding positioning, I think the bottom-right is a good place for them to go (it's also quite a natural location for them to be in terms of source code, right before the signature gets rendered). I could also see them working in the top-right and maybe the bottom-left.It's common for people to suggest that any given thing should \"stand out\" more, but this line of thinking tends to lead to noisy UIs with too many things competing for your visual attention, so I think the understated approach works fine for a feature that's intended to be used only once in a while.Luckily, the way this patch is structured, messing with the \"presentation layer\" (piece 3, below) doesn't affect any of the logic, so theymos can pick whatever arrows he likes, and place them wherever he feels they should go.Okay, so what follows is the actual patch (in three pieces).I had some text, explaining what each piece does, but it felt silly to include, because theymos knows what's up and will be able to make sense of it all easily.Piece 1Code:<?php//  This file (Sources/Skip.php) implements the action (?action=skip) that's used when jumping to the next/previous post by the same author in a given topic.//  There's not much to it; after checking its request parameters, it queries the database for the appropriate destination message and then redirects there.//  Written by: PowerGlove [2022/10/10, 2022/10/21]//  Note: I'm intentionally not making use of the $topic global, because I don't know SMF well enough yet to feel comfortable reasoning out SQL injections by having to consider more than the code in this file.if (!defined('SMF')) die('Hacking attempt...');function Skip() {    global $db_prefix;    if (isset($_GET['topic']) && isset($_GET['u']) && isset($_GET['msg']) && isset($_GET['prev_next'])) {        $param_topic = (int)$_GET['topic'];        $param_user = (int)$_GET['u'];        $param_message = (int)$_GET['msg'];        $param_prev_next = $_GET['prev_next'];        if ($param_topic >= 1 && $param_user >= 1 && $param_message >= 1 && ($param_prev_next == 'prev' || $param_prev_next == 'next')) {            $ascending = $param_prev_next == 'next';            $gt_lt = $ascending ? '>' : '<';            $direction = $ascending ? '' : 'DESC';            $request = db_query(\"SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = $param_topic AND ID_MEMBER = $param_user AND ID_MSG $gt_lt $param_message ORDER BY ID_MSG $direction LIMIT 1\", __FILE__, __LINE__);            $row = mysql_fetch_row($request);            $destination_message = mysql_num_rows($request) == 1 ? $row[0] : $param_message;            mysql_free_result($request);            redirectexit('topic=' . $param_topic . '.msg' . $destination_message . '#msg' . $destination_message);        } else fatal_error('Skip: bad parameter(s).', false);    } else fatal_error('Skip: missing parameter(s).', false);}?>Piece 2Code:--- /var/www/baseline/index.php 2013-10-21 15:01:11.000000000 -0400+++ /var/www/modified/index.php 2022-10-12 04:48:08.000000000 -0400@@ -311,6 +311,7 @@   'sendtopic' => array('SendTopic.php', 'SendTopic'),   'serversettings' => array('ManageServer.php', 'ModifySettings'),   'serversettings2' => array('ManageServer.php', 'ModifySettings2'),+  'skip' => array('Skip.php', 'Skip'),   'smileys' => array('ManageSmileys.php', 'ManageSmileys'),   'smstats' => array('Stats.php', 'SMStats'),   'spellcheck' => array('Subs-Post.php', 'SpellCheck'),Piece 3Code:--- /var/www/baseline/Themes/default/Display.template.php 2010-10-21 21:38:35.000000000 -0400+++ /var/www/modified/Themes/default/Display.template.php 2022-10-21 16:13:11.000000000 -0400@@ -489,16 +489,24 @@   elseif (!$context['user']['is_guest'])    echo '          <a href=\"', $scripturl, '?action=helpadmin;help=see_member_ip\" onclick=\"return reqWin(this.href);\" class=\"help\">', $txt[511], '</a>';   // Otherwise, you see NOTHING!   else    echo '          ', $txt[511]; +  // Show the skip-by-author controls?+  // - The first condition (not a guest post) is because although it could be made to work, skipping between guest posts doesn't make much sense, and so the \"skip\" action expects that u > 0.+  // - The second condition (not in \";all\" mode) is to prevent user confusion because (out of sympathy for the server) the \"skip\" action doesn't collect and propagate \";all\" mode.+  if (!$message['member']['is_guest'] && !isset($_REQUEST['all']))+   echo '+         <a href=\"', $scripturl, '?action=skip;topic=', $context['current_topic'], ';u=', $message['member']['id'], ';msg=', $message['id'], ';prev_next=prev', '\" title=\"Skip to the previous post in this topic by the same author (if any)\">&#x25c1</a>+         <a href=\"', $scripturl, '?action=skip;topic=', $context['current_topic'], ';u=', $message['member']['id'], ';msg=', $message['id'], ';prev_next=next', '\" title=\"Skip to the next post in this topic by the same author (if any)\">&#x25b7</a>';+   echo '         </td>        </tr></table>';    // Show the member's signature?   if (!empty($message['member']['signature']) && empty($options['show_no_signatures']))    echo '        <hr width=\"100%\" size=\"1\" class=\"hrcolor\" />",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5416941",
+  "comments": [
+    {
+      "author": "Little Mouse",
+      "created_time": "October 13, 2022, 07:16:52 AM",
+      "body": "I'm really not sure how this can be useful in a thread. When I read a thread, I don't or barely look at the poster/username. What I only check is the content but yes, after reading the post if I found it good quality, I'm definitely looking at the author. While in the case of shitpost, I just click on ignore (rarely use this though). If I read one single author's reply in a thread, it means I'm not in the discussion anymore.Personally, I don't see it as very much useful according to my forum browsing habit but maybe for others, it can be very useful.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 13, 2022, 07:35:31 AM",
+      "body": "The buttons are very hard to see on mobile. I think you should at least use solid glyphs instead of outlined glyphs.But I don't really see how this would be helpful, when author post history can already be accessed in chronological order.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 13, 2022, 10:20:59 AM",
+      "body": "Quote from: PowerGlove on October 13, 2022, 06:54:43 AMin anticipation of them saying: \"Thanks, but I wanted UP and DOWN arrows.\"This is exactly what I was going to say. Now it looks like it's going to the next page instead of the next post.What I mean to say is of course: good work! I like those small improvements better than a big change with mythical new forum software.Quote from: Little Mouse on October 13, 2022, 07:16:52 AMPersonally, I don't see it as very much useful according to my forum browsing habit but maybe for others, it can be very useful.I often use \"CTRL-F username\", and this would be easier. To search for a user's posts, I use \"show All\" to search more pages at once, but that's not possible for very large topics.Quote from: NotATether on October 13, 2022, 07:35:31 AMBut I don't really see how this would be helpful, when author post history can already be accessed in chronological order.The user's post history includes other topics he posted in (try to find my last 4 posts in the WO-thread).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "October 13, 2022, 11:39:31 AM",
+      "body": "I find the idea interesting, although I think that for a forum it is not a relevant option, because the idea is to follow a line of debate, and this tool would create a jump of intermediate information. But in some situations it could even be useful, despite not finding it relevant.But I think it would be better if you have it in another place, for example next to the \"qoute\" button.And the characters used are (or equivalent):🡅 (U+1F845)🡇 (U+1F847)Do you know another idea that would be useful to everyone on the forum (I think)?It was to have a \"Top Button\" on every page, so that the person who has just read a topic, can go back to the top quickly without having to use the scroll.Don't you think it would be useful?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 13, 2022, 12:53:28 PM",
+      "body": "Quote from: joker_josue on October 13, 2022, 11:39:31 AMIt was to have a \"Top Button\" on every page, so that the person who has just read a topic, can go back to the top quickly without having to use the scroll.It's on your keyboard: CTRL-HOME (CTRL-END works too).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 13, 2022, 01:00:23 PM",
+      "body": "Quote from: LoyceV on October 13, 2022, 10:20:59 AMQuote from: PowerGlove on October 13, 2022, 06:54:43 AMin anticipation of them saying: \"Thanks, but I wanted UP and DOWN arrows.\"This is exactly what I was going to say.Well, if you want up/down arrows, that's a different story! Quote from: LoyceV on October 13, 2022, 10:20:59 AMNow it looks like it's going to the next page instead of the next post.Yeah, I get what you're saying. It's worth pointing out though, that frequently it does take you to the next page (although I'm sure you already knew that).If I'm honest, horizontal arrows required less thinking, no CSS and less testing, so that's why I reached for them; not because I believe they make much more sense, or anything.I trust your judgment, so if you feel strongly about it, I'll experiment with some vertical options (arrows will likely have to move to the top-right, where there's a little more breathing room).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 13, 2022, 01:07:02 PM",
+      "body": "Quote from: PowerGlove on October 13, 2022, 01:00:23 PMIf I'm honest, horizontal arrows required less thinking, no CSS and less testing, so that's why I reached for them; not because I believe they make much more sense, or anything.I was thinking of a very simple △▽, but now that I see it, it looks more like a diagonal arrow in both directions than 2 individual up and down arrows.QuoteI trust your judgmentBad idea, it didn't work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 13, 2022, 01:37:15 PM",
+      "body": "Quote from: LoyceV on October 13, 2022, 01:07:02 PMI was thinking of a very simple △▽, but now that I see it, it looks more like a diagonal arrow in both directions than 2 individual up and down arrows.Okay, I see. I didn't try up/down arrows laid out horizontally, and now that I see them; I agree with you, they do look a little confusing.Quote from: LoyceV on October 13, 2022, 01:07:02 PMQuoteI trust your judgmentBad idea, it didn't work.I think it worked just fine. I asked you if you felt strongly about it and you double-checked your thinking before saying that you do, so good judgment fully intact, IMO.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "October 13, 2022, 01:43:34 PM",
+      "body": "Quote from: LoyceV on October 13, 2022, 12:53:28 PMQuote from: joker_josue on October 13, 2022, 11:39:31 AMIt was to have a \"Top Button\" on every page, so that the person who has just read a topic, can go back to the top quickly without having to use the scroll.It's on your keyboard: CTRL-HOME (CTRL-END works too).This is true, on PC it is always at hand, or at your fingertips.  But when using a cell phone we don't have that.But ready. Here are the tips, useful.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "October 13, 2022, 01:56:34 PM",
+      "body": "Quote from: PowerGlove on October 13, 2022, 01:37:15 PMQuote from: LoyceV on October 13, 2022, 01:07:02 PMI was thinking of a very simple △▽, but now that I see it, it looks more like a diagonal arrow in both directions than 2 individual up and down arrows.Okay, I see. I didn't try up/down arrows laid out horizontally, and now that I see them; I agree with you, they do look a little confusing.Would it take more than a line break in the \"report to moderator\" button (so it stays at the very bottom) and one in those two buttons to make it vertical though?<br> works for HTML, I'm not sure if there's something for it on php or if this would be too much adapting for the stylesheet.Quote from: Little Mouse on October 13, 2022, 07:16:52 AMI'm really not sure how this can be useful in a thread. When I read a thread, I don't or barely look at the poster/username. What I only check is the content but yes, after reading the post if I found it good quality, I'm definitely looking at the author. For some very long discussion threads on certain topics I could see it being useful to determine whether the op has changed their decision since making the thread (and not updated the op as often happens). It might also be an interesting idea for checking what users have posted before on a certain thread too (perhaps if someone makes an interesting post on the wall observer, you could jump between what their last ones were without having to search through 10 or 20 pages). This is something that can already be done with he search function (but search does weird things sometimes).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "October 13, 2022, 02:11:05 PMLast edit: October 14, 2022, 01:33:26 PM by PawGo",
+      "body": "Quote from: PowerGlove on October 13, 2022, 06:54:43 AMCode:<?php    $request = db_query(\"SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = $param_topic AND ID_MEMBER = $param_user AND ID_MSG $gt_lt $param_message ORDER BY ID_MSG $direction LIMIT 1\", __FILE__, __LINE__);?>Oh WoW! Do not tell me the rest of DB queries looks like that. Can't wait to have that feature implemented that way to delete all the messages from DB...https://www.drupal.org/docs/7/security/writing-secure-code/database-accesshttps://www.php.net/manual/en/security.database.sql-injection.php",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AB de Royse777",
+      "created_time": "October 13, 2022, 02:34:05 PM",
+      "body": "Quote from: joker_josue on October 13, 2022, 11:39:31 AMIt was to have a \"Top Button\" on every page, so that the person who has just read a topic, can go back to the top quickly without having to use the scroll.Don't you think it would be useful? Since PowerGlove has real interested doing this patchs, I have vote for this \"Top\" button thing. It's helpful when you are at \"All\" page of a topic, it's also useful when a topic is really long and you need to keep scrolling to go up.Quote from: LoyceV on October 13, 2022, 12:53:28 PMIt's on your keyboard: CTRL-HOME (CTRL-END works too).Not many knows about it. Even I was not too. I just learnt it :-)Having a floating icon / button at the bottom right corner will be nice.Quote from: PawGo on October 13, 2022, 02:11:05 PMCan't wait to have that feature implemented that way to delete all the messages from DB...Can you please write English LOL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 13, 2022, 02:37:39 PM",
+      "body": "Quote from: PawGo on October 13, 2022, 02:11:05 PMOh WoW! Do not tell me the rest of DB queries looks like that. Can't wait to have that feature implemented that way to delete all the messages from DB...https://www.drupal.org/docs/7/security/writing-secure-code/database-accesshttps://www.php.net/manual/en/security.database.sql-injection.phpI'm pretty sure I've already taken care of that. I mean, the things in that query that are user-provided ($param_topic, $param_user and $param_message) or are derived from something user-provided ($gt_lt and $direction) have all been properly sanitized. There's even a comment at the top of the script about SQL injections. Did I miss something?$param_topic, $param_user and $param_message are all forced to integer values, $gt_lt can only be '>' or '<', $direction can only be 'DESC' or empty. If you can see something that I can't, then please point it out, I would appreciate it!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "October 13, 2022, 03:00:39 PM",
+      "body": "Quote from: PowerGlove on October 13, 2022, 06:54:43 AMAnyway, now that I've bored you all to tears, here's what the final result looks like (buttons are next to \"Report to moderator\")This sounds interesting and I would use this, not all the time but sometimes for sure, and your SMF patch would certainly be a big simplification for me.What I am doing now is that I visit ninjastic website archive of specific post, than I click on Users tab, and select user with all his post in that topic.I am not sure if theymos will accept this patch update quickly as he did your previous contribution, but I don't see any obstacles if there is no impact on forum security.PSI don't know if this is possible, but one suggestion I would add is filling inside of both arrows (left and right) with some darker color to be more visible, or make them thicker.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "October 13, 2022, 03:37:13 PM",
+      "body": "Quote from: Royse777 on October 13, 2022, 02:34:05 PMQuote from: PawGo on October 13, 2022, 02:11:05 PMCan't wait to have that feature implemented that way to delete all the messages from DB...Can you please write English LOLNo worries. You need to understand only „sql injection” phrase.Apart of obvious issue of not using parameters, isn’t there any cache on db level (I did not use php for ages), to benefit from prepared statements?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shahzadafzal",
+      "created_time": "October 13, 2022, 03:47:24 PM",
+      "body": "Quote from: PowerGlove on October 13, 2022, 06:54:43 AMHey, everybody! ….Wow I would love to have this feature and I’m sure all those who have been to WO they will love this the most. Currently I’m doing this somehow manually like going to the profile of the user and finding his individual posts. But you know it can be hard when your targeted user is like LoyceV then good luck finding the next post.Maybe it’s too much to ask but do you have any working sample or demo on the actual SMF version? Maybe it will help theymos to decide faster and give us a better opportunity to support the feature.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 13, 2022, 04:33:38 PMLast edit: October 13, 2022, 06:50:18 PM by PowerGlove",
+      "body": "Quote from: dkbit98 on October 13, 2022, 03:00:39 PMThis sounds interesting and I would use this, not all the time but sometimes for sure, and your SMF patch would certainly be a big simplification for me.Yup, it's not a feature that I would reach for all the time, either. But it's very useful when it's needed, and it's much less tedious than the alternative (which for me, involves either clicking on \"All\" or clicking on each page, and then doing a CTRL+F).Quote from: dkbit98 on October 13, 2022, 03:00:39 PMWhat I am doing now is that I visit ninjastic website archive of specific post, than I click on Users tab, and select user with all his post in that topic.That's pretty clever! Quote from: dkbit98 on October 13, 2022, 03:00:39 PMI am not sure if theymos will accept this patch update quickly as he did your previous contribution, but I don't see any obstacles if there is no impact on forum security.Yeah, I'm also guessing theymos will need a bit of time with this one. I don't believe there will be any impact on forum security (see post 14).Quote from: dkbit98 on October 13, 2022, 03:00:39 PMI don't know if this is possible, but one suggestion I would add is filling inside of both arrows (left and right) with some darker color to be more visible, or make them thicker.I slightly prefer the hollow arrows, but I can definitely see the appeal of darker ones, too. You're not the first person to mention that, so the second set of arrows that I left in the initial post (◀ and ▶, U+25C0 and U+25B6) might end up being the ones that get used (it's easy for theymos to change them, and I'm sure he'll consider everyone's feedback before merging).Quote from: NotATether on October 13, 2022, 07:35:31 AMBut I don't really see how this would be helpful, when author post history can already be accessed in chronological order.I just realized that the topic title is a bit misleading and was probably the reason for this comment.So, I've changed it to: Skipping to the next/previous post within a topic by the same author (SMF patch)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Igebotz",
+      "created_time": "October 13, 2022, 08:53:12 PM",
+      "body": "This is a fantastic addition that I would love to see. It would be more useful to bounty sections because the manager would be able to easily track weekly reports because you only need to be on the user's first comment to navigate to the last page without having to scroll the entire page.Quote from: PowerGlove on October 13, 2022, 06:54:43 AMUnfortunately, this \"deferred\" approach has a small usability flaw, and that is that because the information about the next/previous post is unavailable at render time, the buttons are not \"smart\", and they appear whether there is a post to skip to or not. In cases where you're already on the first post (no previous post to skip to) or already on the last post (no next post to skip to), clicking on the respective button will simply take you to where you already are. I don't think this is a big deal,  it queries the database for the appropriate destination message and then redirects there.Adding numbers between the two arrows (Next and Prev) to easily see the number of posts by the user will easily solve this and allow the user to easily refer to his previous post. For example, (as I mentioned in my 2 (second) post that......) this is just my 0.004 cent.Is it possible to do a local board SMF patch?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "libert19",
+      "created_time": "October 14, 2022, 04:13:40 AM",
+      "body": "Am I to do something to enable this? 'OP' patch was directly shown without doing anything on my part. Is it cause I'm on mobile? As previously pointed, 'it's hard to see on mobile' but I don't see anything next to report to moderator at  all",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

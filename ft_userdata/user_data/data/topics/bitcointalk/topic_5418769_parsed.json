@@ -1,0 +1,29 @@
+{
+  "id": "topic_5418769",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "October 29, 2022, 07:51:09 PM",
+  "content": "I was just testing a clean machine and realized this; why does a syncing node have a mempool? A node that hasn't reached the chain tip can't know if the received unconfirmed transactions are valid or not. I don't know if it propagates them too (haven't made any github search), but since it receives them, and keeps them in memory (confirmed it with a getmempoolinfo), I presume that it's reasonable to propagate them as well. But, since it hasn't reached the chain tip, the conclusion is that it receives (and propagates) transactions whose validity hasn't been checked (by consensus rules' enforcement). Is this true? If yes, why? Can't there be an attack established on non-synced nodes who'll propagate invalid transactions and have their IP blacklisted?I'm confident that there's always an answer for everything in Bitcoin Core. Edit: I misinterpreted getmempoolinfo. With a getrawmempool, it returns an empty array. So... no mempool for non-synced nodes?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5418769",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "October 30, 2022, 04:19:52 AMLast edit: October 30, 2022, 04:35:22 AM by pooya87",
+      "body": "There are two ways to send mempool transactions. One is through a tx message which is rejected right away if it is received by a node that is currently syncing (Initial Block Download)https://github.com/bitcoin/bitcoin/blob/4f270d2b63913b86c4366756031c5003837075d6/src/net_processing.cpp#L3977Another way (the main way) is through an inv message which is rejected only if the txrelay returns false. Although I can't figure out whether there is a connection with IBD and if this line returns false if the node is during IBD.https://github.com/bitcoin/bitcoin/blob/4f270d2b63913b86c4366756031c5003837075d6/src/net_processing.cpp#L1062-L1063",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 30, 2022, 04:28:49 AM",
+      "body": "Quote from: BlackHatCoiner on October 29, 2022, 07:51:09 PMEdit: I misinterpreted getmempoolinfo. With a getrawmempool, it returns an empty array. So... no mempool for non-synced nodes?getmempoolinfo should also return with empty \"size\" if it's empty.This is a wild guess but I think you've used getmemoryinfo instead of getmempoolinfo the first time you tried.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

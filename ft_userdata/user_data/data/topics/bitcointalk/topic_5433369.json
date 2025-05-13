@@ -1,0 +1,101 @@
+{
+  "id": "topic_5433369",
+  "title": "Pmalek",
+  "author": "Pmalek",
+  "created_time": "January 07, 2023, 03:00:03 PM",
+  "content": "I know this forum is blessed with some very knowledgeable individuals, and maybe some of them can help me with what I am searching for. Let's say I am reading the Bitcoin whitepaper or a thread on the forum with plenty of text. I need a piece of software that can automatically find and highlight a list of words of my choosing. This is quite easy to do with the CTRL + F option if it's just one word, but if I need the same thing for 40 or 50 words, what are my options? I don't want to manually check each one.I have found some suggestions to use Word macros, but I am not comfortable downloading and installing things like that from random people from the internet. Still, if that's the only way to do it, I will have to reconsider it.Any of you statistics and data fans know of any other options?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5433369",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "January 07, 2023, 05:28:21 PM",
+      "body": "Does MS Word not still do this? It used to highlight EVERY word when you used the find function but it'd highlight the first word it selected differently. If you're just after highlighting every word that might be what you need but it used to be a popup window (it might be called \"find and replace\").",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "January 08, 2023, 07:26:08 AM",
+      "body": "Quote from: jackg on January 07, 2023, 05:28:21 PM<Snip> MS Word has a search and find & replace function, but they both work with just one word at a time. I have never heard anyone being able to use it with a list of words. Imagine going through a document of dozens of pages where you need a way to single out 50 different words? MS Word won't be much of a help with that particular function. Maybe with a macro as I mentioned in the OP. But some macros have, unfortunately, known to be malware carriers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dzungmobile",
+      "created_time": "January 08, 2023, 07:36:49 AM",
+      "body": "You have to use Macro in MS Word or Visual Basic Editor.www.techrepublic.com/article/macro-trick-how-to-highlight-multiple-search-strings-in-a-word-documentEvermap for PDF.https://evermap.com/Tutorial_ABM_HighlightTextViaTextSearch.aspHighlighter add-ons on web pages.https://addons.mozilla.org/vi/firefox/addon/highlighter-notes/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "January 08, 2023, 10:17:40 AM",
+      "body": "Quote from: Pmalek on January 07, 2023, 03:00:03 PMThis is quite easy to do with the CTRL + F option if it's just one word, but if I need the same thing for 40 or 50 words, what are my options?   If the software you're using supports finding by regex, then you might use a search pattern like:\\b(Word1|Word2|Word3)\\bSyntax will vary by implementation, but most good text editors can do some variant of the above (Sublime Text is excellent, if you're in the market for a modern, but sensibly-engineered text editor).There are also browser extensions that let you do this, but I wouldn't risk messing with them.Finally, it looks like Word (which I haven't touched in a long time) has some kind of regex implementation hiding behind the \"Use wildcards\" option, so you may be able to find the right expression for that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "January 08, 2023, 11:46:28 AM",
+      "body": "Quote from: dzungmobile on January 08, 2023, 07:36:49 AMYou have to use Macro in MS Word or Visual Basic Editor.www.techrepublic.com/article/macro-trick-how-to-highlight-multiple-search-strings-in-a-word-document I have come across this during my research. It remains one of the options unless I find something better. Quote from: dzungmobile on January 08, 2023, 07:36:49 AMEvermap for PDF.https://evermap.com/Tutorial_ABM_HighlightTextViaTextSearch.asp Never heard of this.Quote from: dzungmobile on January 08, 2023, 07:36:49 AMHighlighter add-ons on web pages.https://addons.mozilla.org/vi/firefox/addon/highlighter-notes/ This looks interesting. I don't like that it's an extension that hasn't been updated since 2020 and doesn't have many users. But if it can highlight dozens of words at once, I can try it out on one of my old laptops. I have some instructions that explain how to do that with Notepad++. Since I had used this software in the past, I am going to try with that first.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RickDeckard",
+      "created_time": "January 08, 2023, 01:08:38 PM",
+      "body": "Assuming that you need to run the software in Firefox, you can try {find+}[1], which is an FOSS[2] extension for both Chrome and Firefox that allows you to search the whole page by using regular expressions as PowerGlove suggested. The excellent thing about regular expressions is that you can basically look for anything provided you have some knowledge regarding building queries.As for using Macros in Microsoft Word, I've found a simple code[3] that's easy to change depending on your needs:Code:Sub HighlightMultipleWords()Dim sArr() As StringDim rTmp As RangeDim x As LongsArr = Split(\"highlight specific words\") ' your listOptions.DefaultHighlightColorIndex = wdYellowFor x = 0 To UBound(sArr)Set rTmp = ActiveDocument.Range    With rTmp.Find                .Text = sArr(x)                .Replacement.Text = sArr(x)                .Replacement.Highlight = True                .Execute Replace:=wdReplaceAll    End WithNextEnd SubJust change the sArr variable (between () ) with the words that you're looking to find and run the macro. You'll need to have the Developer tab  activated in MS Word, which you can do by going to File -> Options -> Customize Ribbon -> On the right column scroll down to Developer and tick.  Now you just need to press Alt+F11 and you'll be able to enter the previous code. The benefit of this solution is that you don't need to use regex expressions to look for your word list.I've tested the previous code and it does the job well but let us know if you find yourself struggling with something.[1]https://addons.mozilla.org/en-US/firefox/addon/brandon1024-find/[2]https://github.com/brandon1024/find/[3]https://stackoverflow.com/questions/69633517/how-do-i-search-and-highlight-multiple-terms-in-microsoft-word",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "January 08, 2023, 01:55:37 PMLast edit: November 12, 2023, 09:32:38 AM by Pmalek",
+      "body": "Thanks for the suggestions RickDeckard.I actually found what I was looking for with Notepad++. It can be done through the Search>Find>Mark commands. It works well with single words as well as whole phrases. The command is:Code:(word1|word12|word3|) You can add as many terms as you want.Here is an example of how it looks like for PowerGlove's post above.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 12, 2023, 06:03:14 PM",
+      "body": "Ask ChatGPT to write some JS that can search the browser DOM for some text. No I'm serious, you can even ask it to create a manifest file for that JS file, which you can bundle together in a zip file to form a Chrome extension. Similar can be done for Firefox extensions with different steps.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Synchronice",
+      "created_time": "January 12, 2023, 07:15:09 PM",
+      "body": "Quote from: Pmalek on January 08, 2023, 01:55:37 PMI actually found what I was looking for with Notepad++. It can be done through the Search>Find>Mark commands. It works well with single words as well as whole phrases. The command is:If I were you, I would place this question on the answers.microsoft.com forum.One indirect way to solve this problem in microsoft office word, would be to form an exclusion dictionary with the words that you have to find and highlight. Have a look at this - How to Create an Exclusion Dictionary in Microsoft Word",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Welsh",
+      "created_time": "January 13, 2023, 12:37:54 AM",
+      "body": "Quote from: Pmalek on January 08, 2023, 01:55:37 PMI actually found what I was looking for with Notepad++. It can be done through the Search>Find>Mark commands. It works well with single words as well as whole phrases. The command is:Code:(word1|word12|word3|) You can add as many terms as you want.Any half decent text editor will be able to do this. At least one with a graphical interface. I believe it can be done on vim, and nano, but it's not as easy to do. You can also generally use regex on text editors to get more complex results, like filtering out certain patterns. Just search up \"your text editor + regex commands\" on a search engine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "January 13, 2023, 07:44:05 AM",
+      "body": "Quote from: NotATether on January 12, 2023, 06:03:14 PMAsk ChatGPT to write some JS that can search the browser DOM for some text.  I have to spend some more time playing around with this AI because the possibilities are endless. Did a quick test and asked it to create me a script. It did so in Python with instructions on how to insert the words and phrases I need. I asked it to create something else. The second thing I got was a Microsoft Word macro code. No idea if the code works or not. I didn't test it because the method with Notepad++ I mentioned above works just fine and I am happy with it. Quote from: Synchronice on January 12, 2023, 07:15:09 PMOne indirect way to solve this problem in microsoft office word, would be to form an exclusion dictionary with the words that you have to find and highlight. No, that's not what I was looking for. Although it would put emphasize on the words and phrases I want to find, I don't want them to be marked as incorrectly spelled all the time and in situations where I am not working or actively searching for those terms.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

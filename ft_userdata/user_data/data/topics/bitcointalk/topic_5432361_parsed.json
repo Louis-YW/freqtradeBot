@@ -1,0 +1,37 @@
+{
+  "id": "topic_5432361",
+  "title": "Peter88",
+  "author": "Peter88",
+  "created_time": "December 30, 2022, 09:23:47 AM",
+  "content": "For address 1G4TqNcKTRRuQ3brQSv85Fohf3jQiaGAbL, there are 2 transactions with signatures using the same R:- 47faedac99c414f103d7f81f409382d19a0e3b98064096f4c446dceadfff689c vout 0- 01653d5194cde351de1e1c23f3fa5fde25b98cb0068bc5a0c749f8dfccdc4ac1 vout 0I extract the R, S, Z values as follows:TX1:     R: 615e47355ff14f5b00af8943813db16d69c8421ef1145029fd164b29db2c286b     S: 00861e1477082d4c7443146fcb42741ee6798437a5d44437c7e33d863e730bb426     Z: c67381a96fcc81ee9d69e252dd112b084871b23a23a8341cc7dbee6d48d8e2c6TX2:     R: 615e47355ff14f5b00af8943813db16d69c8421ef1145029fd164b29db2c286b     S: 008dc69f90f6d94040dc4cd51f297d3d518d04622dcc65f3489804175b681b5b38     Z: f98bcd3057809e67641b57d51a2d492aa0a49395edbffd58cc819b6e6d844c29From here I should be able to calculate the private key with the formula(z2*s1 - z1*s2) * inverse(r*(s2-s1),p) % pThis however results in the raw key 72716422e10951e92990260d905e1006587d162b06fbd890f4105783d88aa26 which translates to the WIF equivalents of 17c3rHrHLSZBnwu3n9JdmjVBPviyGFTxse / 1PWZNyvQmk9GZnivcgboRdWS6me1SkzGje.This method seems to work for other examples but with this one the resulting key is wrong. What could be the cause?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432361",
+  "comments": [
+    {
+      "author": "Peter88",
+      "created_time": "December 30, 2022, 09:47:28 AM",
+      "body": "nevermind, calculated key is correct it was just the encoding to wif that was not handled correctly",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 02, 2023, 09:17:38 AM",
+      "body": "how did you find such a transaction that was using same R?is there a tool available for the calculcation which takes those values as input argument and output the resulting private key?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stanner.austin",
+      "created_time": "January 02, 2023, 09:53:21 AM",
+      "body": "Quote from: yoshimitsu777 on January 02, 2023, 09:17:38 AMhow did you find such a transaction that was using same R?is there a tool available for the calculcation which takes those values as input argument and output the resulting private key?Hello You can use Same R cracker utility at following link.offline https://github.com/nlitsme/bitcoinexplaineronline https://rawcdn.githack.com/nlitsme/bitcoinexplainer/aa50e86e8c72c04a7986f5f7c43bc2f98df94107/ecdsacrack.htmlI have tested this work stable no bug.Also possible in python Code:def Crack_K_Same_R(R,S1,S2,H1,H2): t1 = pow((S1-S2), N-2, N) TestK = 0 TestK = ((H1-H2) * t1) % N if ((TestK*G).x.num == R):  print(\"!!!Winner!!! %064X \" % TestK );  exit(); print(\"Not valid. %064X \" % t1)Once you have K = nonce you can extract private key X",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

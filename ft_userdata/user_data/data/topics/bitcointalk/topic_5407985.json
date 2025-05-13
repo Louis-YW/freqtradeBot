@@ -1,0 +1,109 @@
+{
+  "id": "topic_5407985",
+  "title": "vfCM",
+  "author": "vfCM",
+  "created_time": "July 29, 2022, 01:25:37 AM",
+  "content": "I posted previously about the possibility of integrating Bitcoin payments into network protocols, even low-level protocols like IP. I think this ability could make the Internet more dynamic, less prone to the distortions of advertising as a business model, etc.I've continued pondering whether this could be accomplished using the Lightning Network, but the obvious difficulty of having the bottom network layers depend on an overlay network I have yet to find a way around.However, it occurred to me that the Lightning Network is essential for maintaining a connection to the no-double-spends rules of Bitcoin. But if the no-double-spends rules could be relaxed, so could the connection to the Blockchain.As I envision it, each Bitcoin address could issue claims on its value simply by signing a claim with its private key. Claims could have restrictions on who could claim it, under what conditions, etc. (Much of this machinery already exists in Bitcoin's script language, if I understand correctly.) Of course, this is essentially what the Lightning Network does.But the claim would be handled differently in an IOU system. A new on-chain transaction would simply allow the bearer of a claim to transfer the value to a destination if sufficient funds exist.If there are insufficient funds, the transfer does not occur, and the failed claim remains on the blockchain as a blackmark on the address's record.Of course, the public nature of the claims would allow addresses to be assessed for their credit-worthiness, so to speak, in a purely empirical fashion. Perhaps a side-service would develop---a public \"credit clearinghouse\" where claims are disclosed. (And rewards posted for proof of an address's insolvency?)Anyway, it seems like a simple mechanism that could be quite fruitful. Surely there's some prior art on this I'm not aware of, though?Appreciate any thoughts.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5407985",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "July 29, 2022, 02:06:18 AM",
+      "body": "The original release of bitcoin core had a pay to IP function. Satoshi themselves removed it afaik because nodes don't use encrypted connections so it was susceptible to a man in the middle attack (someone altering the data being sent).This vulnerability would still exist imo and would have to be thought through. The lightning network has an identification string at the front of it for this though afaik.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 30, 2022, 03:51:46 AM",
+      "body": "There are already multiple ways to emulate an IOU:- Just send an unconfirmed transaction with a low fee- Send the coins to a script with OP_CHECKTIMELOCKVERIFY set to an nLockTime that's in the future.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stwenhao",
+      "created_time": "July 30, 2022, 04:19:57 AM",
+      "body": "QuoteAs I envision it, each Bitcoin address could issue claims on its value simply by signing a claim with its private key.Yes, you can always do that. You can use Bitcoin Message, or you can sign things in the signet way, by signing a transaction that is invalid on the main network, using BIP-322.QuoteClaims could have restrictions on who could claim it, under what conditions, etc. (Much of this machinery already exists in Bitcoin's script language, if I understand correctly.)Exactly. For that reason, Bitcoin Message is not enough, and you should have an ability to sign any scripts. You can do that by signing transactions, that would be valid only in your network.QuoteOf course, this is essentially what the Lightning Network does.Yes, you could get a sidechain-like system, just by collecting Lightning Network transactions, and putting them on your own chain. Then, some problems are solved, for example then you don't need any watchtower, and you can batch transactions, by observing the network, and by signing cut-through transactions, simplifying A->B->C on-chain chains into A->C transactions, when all parties agree, and when all penalty transactions are prepared (and automatically unlocked, if any old state will be broadcasted, so all honest nodes will act as a one huge watchtower, active 24/7).QuoteIf there are insufficient funds, the transfer does not occur, and the failed claim remains on the blockchain as a blackmark on the address's record.Yes, there are many options. You can release a penalty transaction, or you can just blacklist some output in a publicly known way, by sending some signed transaction to everyone as a proof that something bad happened. It is up to you, how you will handle cheating in your network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "July 30, 2022, 05:28:03 AM",
+      "body": "Quote from: NotATether on July 30, 2022, 03:51:46 AMThere are already multiple ways to emulate an IOU:- Just send an unconfirmed transaction with a low fee- Send the coins to a script with OP_CHECKTIMELOCKVERIFY set to an nLockTime that's in the future.Neither of these would work. An IOU means the debtor doesn’t currently have the money to pay, otherwise they would just make the payment. Using LN, the borrower could ping the creditor for a LN invoice, or the creditor could give the borrower a LN invoice that expires far into the future. Alternatively, a creditor could give a borrower a xPubKey to pay to — this would result in a sufficient number of payments to repay their debt in ~all lending situations. The “creditworthiness” of an address should not be assessed because doing so encourages address reuse, which reduces everyone’s privacy, and because it is trivial for someone to create an arbitrary number of addresses.  None of the above would allow for the selling of a loan. The Mercury protocol, or something similar may be what you are looking for. I think there would need to be trust in that a particular claim is worth a certain amount.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 30, 2022, 12:40:15 PM",
+      "body": "Quote from: PrimeNumber7 on July 30, 2022, 05:28:03 AMAn IOU means the debtor doesnt currently have the money to pay, otherwise they would just make the payment. Then why on earth would the community want to have a feature where you can sell crypto-debt to another user? Isn't this what the govt. financial systems are already doing?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "aliashraf",
+      "created_time": "July 30, 2022, 07:59:57 PMLast edit: July 30, 2022, 08:12:52 PM by aliashraf",
+      "body": "Quote from: vfCM on July 29, 2022, 01:25:37 AM the obvious difficulty of having the bottom network layers depend on an overlay network I have yet to find a way around.Bitcoin P2P network is perfectly fine for overlaying a networking protocol (IP like), on top of it. One could simply consider it as a virtual link layer ready for deploying routers for switching messages according to a specific addressing scheme. In the current situation, messages are either irrelevant, (then dropped) or are relevant for ALL the participants. In a separate research, I've been examining topologies where nodes do not follow such a monotonic structure and there are reasons for nodes not being interested in some messages, yet they may find it useful to dispatch them to their interested peers if any. For such a behavior to be thoroughly supported, routing tables and addressing schemes should be implemented, because the source of the message is typically aware of its receiver(s) and should express it by means of an address/mask, otherwise the payload should be decoded by each peer to decide about the forwarding policy, a design flaw, because it is not consistent with 'I'm not interested' clause. Such an IP like addressing and routing scheme is consistent with current monotonic p2p network, because it is easily emulated as a SEND_TO_ALL address convention just like IP, again the sender is aware of the behavior. It is both good and bad news that we have p2p tightly integrated with application layer in the current implementation. The positive side being that it provides instant and vigorous anti-spam measures by detecting misbehavior by examining the payload in place, to punish bad actors while the negative side is obviously breach of best practices and standards that are not void unlike what junior hackers think, they are established for practical reasons, like what we are discussing now: using the network for new applications which are considered to be good for bitcoin, after all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vfCM",
+      "created_time": "July 30, 2022, 10:47:09 PM",
+      "body": "QuoteNeither of these would work. An IOU means the debtor doesn’t currently have the money to pay, otherwise they would just make the payment.That's not necessarily true: in the world of Bitcoin, an IOU might be desirable because it avoids on-chain transactions, or at least defers them to a more opportune moment. And sometimes the IOU is issued for convenience and security.In the sense I was using (or abusing) the term, an IOU just represents a claim on the debtor's assets. It is similar to a check in a standard checking account, except that there is no bank's solvency to worry about, only the debtor's. Bitcoin works well as a \"savings\" account, but perhaps we could enable it for \"checking\" as well. And with additional terms like interest, this could function as a more general lending system.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 31, 2022, 02:37:30 AM",
+      "body": "Quote from: vfCM on July 30, 2022, 10:47:09 PMQuoteNeither of these would work. An IOU means the debtor doesn’t currently have the money to pay, otherwise they would just make the payment.That's not necessarily true: in the world of Bitcoin, an IOU might be desirable because it avoids on-chain transactions, or at least defers them to a more opportune moment. And sometimes the IOU is issued for convenience and security.There is technically no difference between having the money and making a promise to pay and not having the money and making the same promise, simply because as long as there is no on-chain transaction those coins could be spent elsewhere.A good example of IOUs are the tokens on other blockchains that use the name \"bitcoin\" and pretend there is a peg like Wrapped Bitcoins. When you receive such tokens there is no guarantee of payment, only a false faith in a broken and shady system.I don't see any convenience or security in this though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "July 31, 2022, 06:41:56 AM",
+      "body": "Quote from: NotATether on July 30, 2022, 12:40:15 PMQuote from: PrimeNumber7 on July 30, 2022, 05:28:03 AMAn IOU means the debtor doesnt currently have the money to pay, otherwise they would just make the payment. Then why on earth would the community want to have a feature where you can sell crypto-debt to another user? Isn't this what the govt. financial systems are already doing?There are some P2P lending platforms, such as prosper that do something similar to what I believe the OP is doing, but with fiat. These platforms generally will lend money to a borrower and issue special debt to the lender that is solely backed by the Promissory Note the borrower signed. I think there may have been a few similar platforms that lent out crypto. I don't think any of this is done on-chain. I also don't see any particular benefit to this being done on-chain, as you are needig to trust the platform.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 02, 2022, 12:12:51 AM",
+      "body": "Quote from: vfCM on July 29, 2022, 01:25:37 AMI posted previously about the possibility of integrating Bitcoin payments into network protocols, even low-level protocols like IP. I think this ability could make the Internet more dynamic, less prone to the distortions of advertising as a business model, etc.On a fundamental level, are you still trying to integrate Bitcoin payments into a low-level network protocol or are you trying to build an overlay network on top of Bitcoin, Lightning or Bitcoin sidechains that transfers data together with payments (such as aliashraf mentioned)?If I understand it correctly, your motivation for 'Bitcoin IOUs' is that you need something that opposed to LN channel state updates, can be sent 'unidirectionally' and is small and lightweight (like a Bitcoin transaction) so it can be attached to a network packet.I guess that since you're ready for reduced security anyway, a Bitcoin sidechain could work. On a high level, it appears like https://bolt12.org/ might work, but while it appears unidirectional and static, a real Lightning invoice actually needs to be fetched from the receiving node.PS: I'm still not convinced about the concept as a whole. I don't see a problem with the way Bitcoin transactions are propagated right now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 02, 2022, 11:30:22 AM",
+      "body": "The point of this thread isn't clear. Lightning and sidechains should not be correlated with IOU-based money, because their purpose is to eliminate trust. If you want to create a bitcoin IOU, grab a pen and write it down. \"I, vfCM, owe one point five (1.5) bitcoin to BlackHatCoiner\". If you want to prove liquidity, just sign the messages from a bitcoin address that does own that amount.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 02, 2022, 02:08:05 PM",
+      "body": "Quote from: BlackHatCoiner on August 02, 2022, 11:30:22 AMThe point of this thread isn't clear. Lightning and sidechains should not be correlated with IOU-based money, because their purpose is to eliminate trust. If you want to create a bitcoin IOU, grab a pen and write it down. \"I, vfCM, owe one point five (1.5) bitcoin to BlackHatCoiner\". If you want to prove liquidity, just sign the messages from a bitcoin address that does own that amount.I'm pretty sure their idea is being able to attach a Bitcoin payment to a network packet, e.g. for paying for the data you are requesting, such as video streaming (or they just want to save internet bandwidth; not sure). The idea is to embed a payment into the IPv4 header.Since Bitcoin payments need on average 10 minutes to get one confirmation though, it would mean (to stick to the video streaming example) that after your browser sends out a request to the video server, it might take 10 or more minutes to actually start playing your video.Therefore, this user is looking for a way to attach a Bitcoin payment to low-level network packets in a light weight fashion, while being able to instantly serve whatever content was paid for.I suggested sidechains, but forget about that. Why not just do 0-conf Bitcoin transactions? Maybe they need to do a lot of little ones, another issue with L1-Bitcoin transactions; in general there's way too much ambiguity in the question and I don't think we can sufficiently help without additional information.All of this shows us: this is a massive X/Y problem. https://xyproblem.info/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

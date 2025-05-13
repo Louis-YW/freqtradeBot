@@ -1,0 +1,37 @@
+{
+  "id": "topic_5416426",
+  "title": "linz",
+  "author": "linz",
+  "created_time": "October 08, 2022, 05:24:48 PMLast edit: October 11, 2022, 05:23:51 PM by linz",
+  "content": "hello i try to access bitcoin rpc from laravel app.here is env fileCode:### 上記省略 ###BITCOIN_RPC_USERNAME=coinuserBITCOIN_RPC_PASSWORD=coinpasswordBITCOIN_RPC_HOST=127.0.0.1# regtest default portBITCOIN_RPC_PORT=8332my bitcoin.conf isCode:rpcuser=coinuser   rpcpassword=coinpassword   rpcallowip=127.0.0.1    daemon=1my laravel config file isCode:<?phpreturn [    'bitcoin_rpc_username' => env('BITCOIN_RPC_USERNAME', 'coinuser'),    'bitcoin_rpc_password' => env('BITCOIN_RPC_PASSWORD', 'coinpassword'),    'bitcoin_rpc_host' => env('BITCOIN_RPC_HOST', '127.0.0.1'),    # mainnet default port    'bitcoin_rpc_port' => env('BITCOIN_RPC_PORT', '8332'),];my routesCode:Route::get('/btc', [App\\Http\\Controllers\\IndexController::class, 'index']);i have easybitcoin.php in app/Libs folder as name Bitcoin.phpi namespace it as```namespace App\\Libs;```i have controllerCode:<?phpnamespace App\\Http\\Controllers;use Illuminate\\Http\\Request;use Config;# &#20808;&#12411;&#12393;&#12480;&#12454;&#12531;&#12525;&#12540;&#12489;&#12375;&#12383;&#12521;&#12452;&#12502;&#12521;&#12522;&#12434;use&#12377;&#12427;use App\\Libs\\Bitcoin;class IndexController extends Controller{    public function index()    {        $bitcoin = new Bitcoin(            # rpc username            Config::get('bitcoin.rpc_username'),            # rpc password            Config::get('bitcoin.rpc_password'),            # host            Config::get('bitcoin.rpc_host'),            # regtest port            Config::get('bitcoin.rpc_port')        );              print_r($bitcoin->getrawtransaction());    }}my ubuntu ip addresss is```54.196.177.134```i already run bitcoind in serverwhen i run routes ```http://myip/btc```show error```Trying to access array offset on value of type null```why this error happen .bitcoin API call are different now?here client.cpp that has api callhttps://github.com/bitcoin/bitcoin/blob/master/src/rpc/client.cpphow should i get bitcoin call correctly ?do I need to use my ubuntu ip address as rpcallowip and BITCOIN_RPC_HOST .what am i wrong please help me",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5416426",
+  "comments": [
+    {
+      "author": "serhack",
+      "created_time": "October 10, 2022, 03:14:42 PM",
+      "body": "Quotefwrite(): Write of 2123 bytes failed with errno=28 No space left on device You should not have exposed your IP to internet",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 10, 2022, 07:10:46 PM",
+      "body": "Quote from: serhack on October 10, 2022, 03:14:42 PMQuotefwrite(): Write of 2123 bytes failed with errno=28 No space left on device You should not have exposed your IP to internetThey could (should) try getting a new one from their ISP; usually not a problem. But good that you guys pointed it out!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "newnft",
+      "created_time": "October 10, 2022, 07:12:25 PM",
+      "body": "fwrite(): Write of 2123 bytes failed with errno=28 No space left on deviceyou dont have more space...try : rm -rf /var/logsand rm -rf /tmp/*then try again",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

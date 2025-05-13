@@ -1,0 +1,21 @@
+{
+  "id": "topic_5440452",
+  "title": "Kostelooscoin",
+  "author": "Kostelooscoin",
+  "created_time": "February 19, 2023, 04:56:45 PM",
+  "content": "hiCode:from ecdsa import SigningKey, SECP256k1from random import shuffleimport datetimeimport timeimport mysql.connectorimport sys, osfrom binascii import unhexlifyimport hashlibfrom base58 import b58encodet0 = datetime.datetime.now()script_dir = os.path.dirname( __file__ )mymodule_dir = os.path.join( script_dir, '..' )sys.path.append( mymodule_dir )def CompressedPublicKeyComputation(x, y):    if int(y, 16) % 2 == 0:        publicKey = '02' + str(x)    else:        publicKey = '03' + str(x)    return publicKeywith open(\"Luck.txt\", \"a\") as f:    print(t0, file=f)def BitcoinClassicAddressComputation(publicKey):    public_key_bytes = unhexlify(publicKey)    sha256 = hashlib.sha256()    sha256.update(public_key_bytes)    hash_temp = sha256.digest()    ripemd160 = hashlib.new('Ripemd160')    ripemd160.update(hash_temp)    hash2_temp = ripemd160.hexdigest()    hash3_temp = '00' + hash2_temp    checksum = checksum_computation(hash3_temp)    hash_final = hash3_temp + str(checksum)    hash_final_bytes = unhexlify(hash_final)    address = b58encode(hash_final_bytes).decode(\"utf-8\")    return addressdef checksum_computation(string: str) -> hex:    cs = hashlib.sha256(hashlib.sha256(unhexlify(string)).digest()).hexdigest()    checksum = cs[:8]    return checksum    mydb = mysql.connector.connect(    host=\"localhost\",    user=\"root\",    password=\"\",    database=\"bitcoin\")g = 0priv = list(range(1,10000))shuffle(priv)while priv:    private1 = priv.pop()    k = int(str(private1), 16).to_bytes(32, \"big\")    k = SigningKey.from_string(k, curve=SECP256k1)    K = k.get_verifying_key().to_string()    h = (str(g) + ')\\t' + str(private1) + '\\t' + K.hex()[0:64] + '\\t' + K.hex()[64:128] + '\\n')    chunks = h.split('\\t')    public_key = CompressedPublicKeyComputation(chunks[2], chunks[3])    public_key = public_key.split('\\n')    private_key = chunks[1]    pub = BitcoinClassicAddressComputation(public_key[0])    print(private_key,pub)    mycursor = mydb.cursor()    sql = \"SELECT * FROM btc WHERE address='\" + pub + \"';\"    mycursor.execute(sql)    myresult = mycursor.fetchone()        if myresult:        body = 'Private key= {pkwif}  \\r\\n Address = {address} \\r\\n -----------------------'        Message = body.format(pkwif=private_key, address=pub)        fichier =  open(\"Luck.txt\", \"a\")        fichier.write(private_key + '   ' + pub + '\\n')result : Code:6108 1Ls1B3xCBFPRogcCVNSd9UT5LnorLutXhf6108 is secret exponent but I would like my results in hexpriv = list(range(1,10000)) to hex not possible",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440452",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "February 19, 2023, 06:35:55 PM",
+      "body": "don't get what the issue is here, just use fichier.write(hex(private_key) + '   ' + pub + '\\n')",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

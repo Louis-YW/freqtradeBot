@@ -1,0 +1,61 @@
+{
+  "id": "topic_5415146",
+  "title": "n0nce",
+  "author": "n0nce",
+  "created_time": "September 27, 2022, 09:55:08 PM",
+  "content": "I recently shared an idea I've been pondering about for a while.. I'd be very interested to hear your thoughts about this!Quote from: n0nce on September 26, 2022, 03:17:05 PMI've been pondering about a wallet idea that is easy to use for newbies and still gives privacy with regards to change.The idea would be to have a built-in Lightning wallet and automatically submarine-swap any change to the LN wallet.This has the nice side-effect that you will always have some LN balance and some on-chain balance. If one of either becomes too much or you want to move all your Lightning funds back on-chain, there could be 2 simple GUI buttons to manually initiate submarine swaps from LN to on-chain or the other way round.By aggregating change in a LN wallet and then moving the balance back on-chain in a single transaction (or multiples, but of different values), you break the ability of blockchain analysis to link payments by amounts.Basically, the LN wallet would act like an off-chain 'storage' of change, not much unlike ChipMixer chips. By being able to privately aggregate, split and spend them, by the point you convert them back to private keys / on-chain funds, there will be no way to link them back to the original transaction that created this change.If you're not too familiar with submarine swaps: they allow to trustlessly exchange on-chain funds for off-chain Lightning funds.https://medium.com/boltzhq/submarine-swaps-c509ce0fb1db",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415146",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 28, 2022, 01:01:52 PM",
+      "body": "That's an interesting concept certainly. Two questions spring to mind in the first instance:How would you ensure privacy from the third party submarine swap service? Receiving repeated payments from the same entity to the same channel compromises privacy and would allow this third party to link your on-chain transactions together. Rendezvous routing? Route blinding?What kind of fees will the third party charge, and do they have a lower limit on the the smallest amount of change they will accept?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 28, 2022, 01:34:24 PM",
+      "body": "Quote from: o_e_l_e_o on September 28, 2022, 01:01:52 PMThat's an interesting concept certainly. Two questions spring to mind in the first instance:How would you ensure privacy from the third party submarine swap service? Receiving repeated payments from the same entity to the same channel compromises privacy and would allow this third party to link your on-chain transactions together. Rendezvous routing? Route blinding?Very good questions, indeed. Receiving a payment through Lightning is assumed to be anonymous in this model.The wallet shouldn't create a channel directly with the swap service, but rather with someone else (or multiple parties), such that the service doesn't know the destination of the Lighting payments. You could even create a channel with this service, it just needs to remain ambiguous whether you're always the last hop or not (because Lightning itself doesn't reveal that).Quote from: o_e_l_e_o on September 28, 2022, 01:01:52 PMWhat kind of fees will the third party charge, and do they have a lower limit on the the smallest amount of change they will accept? Swap providers' lower limit will probably be the Achilles' heel of this idea. I know that https://boltz.exchange/ has a lower limit of 0.0005 BTC, and I do understand that change is often smaller than that. I don't really have a solution for this right now.Potentially, consolidating smaller change manually may be a tradeoff; at least it would be better than a wallet which doesn't have such ability at all and consolidates all change always, right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 28, 2022, 03:05:46 PM",
+      "body": "Quote from: n0nce on September 28, 2022, 01:34:24 PMYou could even create a channel with this service, it just needs to remain ambiguous whether you're always the last hop or not (because Lightning itself doesn't reveal that).You can do this. Just utilize onion routing. The service can't know if you're the last hop or not. Even if you have no other channels, there's still ambiguity, because you might have private channels. The service should make no essential conclusion if you send them the bitcoin. Quote from: n0nce on September 28, 2022, 01:34:24 PMSwap providers' lower limit will probably be the Achilles' heel of this idea.That, and the cost to make the submarine. ChipMixer (that you used as example) doesn't charge anything, but their Achilles' heel is the round amounts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 28, 2022, 04:56:42 PM",
+      "body": "Quote from: BlackHatCoiner on September 28, 2022, 03:05:46 PMQuote from: n0nce on September 28, 2022, 01:34:24 PMYou could even create a channel with this service, it just needs to remain ambiguous whether you're always the last hop or not (because Lightning itself doesn't reveal that).You can do this. Just utilize onion routing. The service can't know if you're the last hop or not. Even if you have no other channels, there's still ambiguity, because you might have private channels. The service should make no essential conclusion if you send them the bitcoin.Exactly. However, if someone were to implement this wallet idea and by default, would always open direct channels with a specific swap provider, they may notice this activity and guesstimate that all these new channels have been opened from users of this new wallet. They could then proceed to track the balance in these channels more closely to connect the dots to on-chain data and de-anonymize the users.Quote from: BlackHatCoiner on September 28, 2022, 03:05:46 PMQuote from: n0nce on September 28, 2022, 01:34:24 PMSwap providers' lower limit will probably be the Achilles' heel of this idea.That, and the cost to make the submarine. ChipMixer (that you used as example) doesn't charge anything, but their Achilles' heel is the round amounts. True. Though it may be reduced by economy of scale. Also do keep in mind that when doing a manual submarine swap (on-chain > LN), you need to pay a mining fee. However, when doing this with change and sending the change directly to the swap provider's deposit address, there is no extra on-chain transaction to pay. Just the 'service fee'.My idea is that whenever a user initiates a Bitcoin transaction, the wallet initiates a submarine swap, gets a deposit address and builds the transaction such that the change goes automatically to the swap's deposit address.Wallets with built-in swap services already exist, like https://breez.technology/, which use https://boltz.exchange/ for receiving and sending to on-chain addresses.I feel like adding a dedicated on-chain wallet inside the application, with automatic 'swapping' of any change should be doable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "September 28, 2022, 08:44:03 PM",
+      "body": "Quote from: n0nce on September 27, 2022, 09:55:08 PMBasically, the LN wallet would act like an off-chain 'storage' of change, not much unlike ChipMixer chips. By being able to privately aggregate, split and spend them, by the point you convert them back to private keys / on-chain funds, there will be no way to link them back to the original transaction that created this change.If you're not too familiar with submarine swaps: they allow to trustlessly exchange on-chain funds for off-chain Lightning funds.https://medium.com/boltzhq/submarine-swaps-c509ce0fb1dbThere is a wallet which works with submarine swaps as well. It is muun wallet. You might be interested.https://muun.com/https://blog.muun.com/a-closer-look-at-submarine-swaps-in-the-lightning-network/I have installed this wallet but didn't use any funds In it yet. However,  this wallet has some problems.The first of them is that this wallet do not use a seed. They use a different way to back up private keys and you even need to give your email to them.The other problem is that this wallet source code is not reproducible,  according to wallet scrutiny https://walletscrutiny.com/android/io.muun.apollo/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 28, 2022, 11:09:30 PM",
+      "body": "Quote from: bitmover on September 28, 2022, 08:44:03 PMThere is a wallet which works with submarine swaps as well. It is muun wallet. You might be interested.https://muun.com/https://blog.muun.com/a-closer-look-at-submarine-swaps-in-the-lightning-network/Thanks for bringing it up! I've actually tried it once and was really disappointed. This is not a Muun review, but a few points.1) No control. Whatsoever. No coin control, no UTXO view, not even the ability to view what amount of your 'Bitcoin balance' is on-chain or off-chain.2) No ability to manage your own Lightning channels.3) No ability to change the Electrum or Lightning server it connects to.4) I moved a relatively small amount of BTC to it over Lightning, and a few hours later I couldn't get it back out through Lightning. Well, I could, but the extremely high fee (compared to the LN transfer I used to fund it) indicated that they moved almost all of my funds (like, except a few sats) to an on-chain address and to get it back out through LN, I had to pay for a submarine swap. This was super annoying, as I assumed to be able to quickly deposit and withdraw some funds from it at almost no cost, just to quickly test the application.Anyhow, the wallet I envision, is very different from Muun. I just want to make this clear:You should get a clear and complete view and control of your (separate!) Lightning and on-chain balances, as well as a view of your UTXOs.You should be able to 'move' a single UTXO (in full - to avoid jumbling UTXOs together) to the Lightning balance (e.g. to top up the LN wallet) manually.You should be able to 'move' Lightning funds back to the Bitcoin wallet, resulting in new, unlinked UTXOs.You should be able to spend Bitcoin from the on-chain wallet and receive the change in your Lightning wallet automatically. [(this is the main feature)]Quote from: bitmover on September 28, 2022, 08:44:03 PMThe first of them is that this wallet do not use a seed. They use a different way to back up private keys and you even need to give your email to them.That's a limitation of Lightning; there are not just seed phrases, but also channel state databases that need to be backed up (all the time). Muun's system helps with this continuous backup duty, but it makes the whole thing more complicated than backing up and restoring a regular Bitcoin wallet.Quote from: bitmover on September 28, 2022, 08:44:03 PMThe other problem is that this wallet source code is not reproducible,  according to wallet scrutiny https://walletscrutiny.com/android/io.muun.apollo/That's good to know! Thanks for checking.  I appreciate seeing more WalletScrutiny usage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "topic_5433218",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "January 06, 2023, 05:52:37 AMLast edit: January 06, 2023, 06:17:59 AM by NotATether",
+  "content": "I have a really strange problem going on with my node (Core 24.0, Ubuntu 22.04).I am getting (dozens of) inbound peers, but Bitnodes cannot find a node running on my IP address and port, and wallets such as Sparrow cannot connect to it either. How do I rectify this issue?My bitcoin.conf:Code:rpcuser=*****rpcpassword=*****wallet=0daemon=1peerbloomfilters=1mempoolfullrbf=1# Try to lower excessive Bitcoin Core memory usagedbcache=64",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5433218",
+  "comments": [
+    {
+      "author": "Edwardard",
+      "created_time": "January 06, 2023, 06:08:34 AM",
+      "body": "Did you try this?-Shutdown your node (cli stop && shutdown)-Restart your router (usually unplug, wait a minute, replug and wait a few minutes)-Restart node.Ref: https://bitcoin.stackexchange.com/questions/80108/my-node-is-not-showing-on-bitnodes",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 06, 2023, 06:17:21 AM",
+      "body": "Quote from: Edwardard on January 06, 2023, 06:08:34 AMDid you try this?-Shutdown your node (cli stop && shutdown)-Restart your router (usually unplug, wait a minute, replug and wait a few minutes)-Restart node.Ref: https://bitcoin.stackexchange.com/questions/80108/my-node-is-not-showing-on-bitnodesIt's on a dedicated server, and nmap says that port 8333 is open (and yes it's listening for connections on that port). Also there is no firewall running on the server, so I really don't see how Bitnodes cannot connect. Unless it's because I already maxed out my incoming peers.If that's the case, then I will echo the comment you linked to: Is there a way to always connect to certain IP addresses regardless of the inbound connection limit?EDIT: Bisq can also connect to my node, though I suspect it's using the local RPC port and not the P2P port that is the question here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 06, 2023, 11:43:51 AM",
+      "body": "1) Can you from home or wherever else connect to it?2) As far as I know, and I could be wrong on this Bitnodes is just an on and off connection it connects asks for info and leaves so it should not be eating into your peer count.2a) Did you check your banlist for the Bitnodes IP addresses 88.99.167.175, 88.99.167.186, 2a01:4f8:10a:37ee::23) Did you test if you can connect to bitnodes using the addnode?3a) If no, can you do a traceroute to the bitnodes IPs to see if they are reachable in general through to internet form your server.With Sparrow remember you have to tell your node what IP sparrow is coming in from. Even if it's on your local machine you STILL have to allow 127.0.0.1See the docs: https://sparrowwallet.com/docs/connect-node.html-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 06, 2023, 12:01:50 PM",
+      "body": "Quote from: DaveF on January 06, 2023, 11:43:51 AM1) Can you from home or wherever else connect to it?2) As far as I know, and I could be wrong on this Bitnodes is just an on and off connection it connects asks for info and leaves so it should not be eating into your peer count.2a) Did you check your banlist for the Bitnodes IP addresses 88.99.167.175, 88.99.167.186, 2a01:4f8:10a:37ee::23) Did you test if you can connect to bitnodes using the addnode?3a) If no, can you do a traceroute to the bitnodes IPs to see if they are reachable in general through to internet form your server.With Sparrow remember you have to tell your node what IP sparrow is coming in from. Even if it's on your local machine you STILL have to allow 127.0.0.1See the docs: https://sparrowwallet.com/docs/connect-node.html-DaveIt appears that my node has banned the Bitnodes IPv4 addresses. As soon as I finish exchanging funds and whatever on Bisq, I'm going to remove those entries and restart my node, and see if that helps.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 08, 2023, 01:36:29 PM",
+      "body": "Did you get anywhere with this? You may want to check the debug.log file to see why those IPs were banned. I put it as an off the top of my head suggestion but if your node banned them for some reason it might be banning other nodes that are legitimate too.Also you said 24.0, although minor, the released version is 24.0.1 not important for these issues but there were 3 other bug fixes in it.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 08, 2023, 05:40:34 PM",
+      "body": "Quote from: DaveF on January 08, 2023, 01:36:29 PMDid you get anywhere with this? You may want to check the debug.log file to see why those IPs were banned. I put it as an off the top of my head suggestion but if your node banned them for some reason it might be banning other nodes that are legitimate too.Also you said 24.0, although minor, the released version is 24.0.1 not important for these issues but there were 3 other bug fixes in it.-DaveI managed to find a way to unban the Bitnodes nodes without restarting Core, using bitcoin-cli setban:bitcoin-cli setban 88.99.167.175/32 removebitcoin-cli setban 88.99.167.186/32 removeAnd that did the trick.How would I reference the IPV6 address though? With a /128 subnet? Not that it was banned in the first place though, but I never pinged Bitnodes' test with my node's IPV6 address so maybe that's how it avoided a ban.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 08, 2023, 10:21:22 PM",
+      "body": "/128 is the 1 IP so it should do the trick. But unless the way it works has changed it's not proactive. So if you unban it now it can still get banned later since it has not been banned yet.Guessing, since you did not restart the node you have not done testing with the Sparrow configuration changes yet.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

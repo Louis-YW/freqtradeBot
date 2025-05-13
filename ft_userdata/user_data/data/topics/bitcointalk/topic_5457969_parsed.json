@@ -1,0 +1,53 @@
+{
+  "id": "topic_5457969",
+  "title": "akechwalcahnpac",
+  "author": "akechwalcahnpac",
+  "created_time": "June 29, 2023, 06:21:27 AMLast edit: June 29, 2023, 06:40:18 AM by akechwalcahnpac",
+  "content": "The last 3 days, I tried to setup a Mempool.Space Production (https://github.com/mempool/mempool/tree/master/production) Server and failed. The autoinstall is not working, neither for FreeBSD 13 nor for Debian. Because this was not working, I have decided to set it up all by myself step by step. Blockstream/electrs is fully working (and synced) for bitcoin (all variants) and elements (all variants). The Documentation is a bit shitty, thats why you have to find things on your own. For example the testnet will not start (syncing) if you run the node with config. You have to start mainnet, then testnet and then stagenet on their own.Till the bisq step everything is now set up and working fine. Bisq is always running into some weird memory issues. As soon as I start, it runs fine for 30min and then runs into the issue, that it takes more memory than it should and shuts down.All the mempool-config.*.json have in common that there is an error. You can either use \"REST_API_URL\" or \"UNIX_SOCKET_PATH\" in the config. Not both!(For Debian the Database socket is wrong! it has to be: /var/run/mysqld/mysqld.sock)After everything set up and all backends are running and connecting frontend with backend I am getting this error:Error loading address data.(<!DOCTYPE html> <html lang=\"en\"> <head> <meta charset=\"utf-8\"> <title>Error</title> </head> <body> <pre>Cannot GET /api/v1/address/SOMEWALLET</pre> </body> </html> )When changing from esplora to electrum, then the wallet is shown, but only the Balance. The informations about sent or received are not shown.Does anybody tried to setup the Production Server on their own?Server specs areCPU AMD EPYC 7401PRAM: 128GBSSD: 2 x 1.92 TB Datacenter SSD in Software Raid 1",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5457969",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "June 29, 2023, 06:28:20 AM",
+      "body": "The Bisq installation is using too much memory when there's 128GB of memory installed? How did that happen? It must've been a very monstrous memory leak.Sometimes I see Bisq using 4-6GB of RAM, but it's a Java application so it's supposed to have a command line option like -Xmx or something that limits the maximum heap memory it can use.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "akechwalcahnpac",
+      "created_time": "June 29, 2023, 07:15:39 AM",
+      "body": "For everyone who get stuck the solution is fairly easy and took me a while. You have to adjust the API settings in nginx:        location /api/ {                set $new_request_uri $request_uri;                            if ($request_uri ~ ^/api/(.+)$) {                                        set $new_request_uri $1;                                }                proxy_pass http://127.0.0.1:5000/$new_request_uri;        }This solution is only for mainnet!Quote from: NotATether on June 29, 2023, 06:28:20 AMThe Bisq installation is using too much memory when there's 128GB of memory installed? How did that happen? It must've been a very monstrous memory leak.Sometimes I see Bisq using 4-6GB of RAM, but it's a Java application so it's supposed to have a command line option like -Xmx or something that limits the maximum heap memory it can use.The bisq is limited to 8gb RAM on my system. It recognize by itself, when it is using to much RAM (80% of 8gb RAM) and then shuts down itself.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 29, 2023, 04:53:52 PM",
+      "body": "Quote from: akechwalcahnpac on June 29, 2023, 06:21:27 AMThe Documentation is a bit shitty, thats why you have to find things on your own.I recently just did exactly this and can attest that the documentation is quite poor. There is little to no explanation of what the available config options are nor what they even do.Quote from: akechwalcahnpac on June 29, 2023, 06:21:27 AMAfter everything set up and all backends are running and connecting frontend with backend I am getting this error:Error loading address data.(<!DOCTYPE html> <html lang=\"en\"> <head> <meta charset=\"utf-8\"> <title>Error</title> </head> <body> <pre>Cannot GET /api/v1/address/SOMEWALLET</pre> </body> </html> )Fought with this same issue for a while.It turns out when you use the esplora mode, mempool.space itself will not serve the apis that are also served by electrs. Those apis are everything at the /api endpoint, whereas electrs uses /api/v1. The example nginx config essentially passes through /api to /api/v1, but that's incorrect for electrs.Your config probably hasCode:location /api/ { proxy_pass http://127.0.0.1:8999/api/v1/;}Change that toCode:location /api/ { rewrite ^/api/(.*) /$1 break; proxy_pass http://127.0.0.1:3000/;}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "June 30, 2023, 02:24:49 PM",
+      "body": "I know mempool.space looks nice, but may I ask why did you decide to use that server and not btc-rpc-explorer (https://github.com/janoside/btc-rpc-explorer)?Do you plan to expose your server to the world or is it purely for private use?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "akechwalcahnpac",
+      "created_time": "November 09, 2023, 08:13:18 AM",
+      "body": "A small hint for everyone experience crashing on the mempool.space backend here is a small solution:Edit backend/package.json    \"start\": \"node --max-old-space-size=8192 dist/index.js\",    \"start-production\": \"node --max-old-space-size=16384 dist/index.js\",And increase the default \"2048\" to whatever you want/need",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

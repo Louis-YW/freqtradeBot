@@ -1,0 +1,53 @@
+{
+  "id": "topic_5426785",
+  "title": "coinesel",
+  "author": "coinesel",
+  "created_time": "December 08, 2022, 06:57:27 AM",
+  "content": "Hi there,usually I see that lock script: \"OP_DUP OP_HASH160 <key> OP_EQUALVERIFY OP_CHECKSIG\" and the type of the transaction is \"pubkeyhash\"Now I have this lock script: \"OP_HASH160 <key> OP_EQUAL\" and the transaction type is \"scripthash\".How is it possible to spend this UTXO?Thanks a lot!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5426785",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "December 08, 2022, 08:16:24 AM",
+      "body": "Quote from: coinesel on December 08, 2022, 06:57:27 AMusually I see that lock script: \"OP_DUP OP_HASH160 <key> OP_EQUALVERIFY OP_CHECKSIG\" and the type of the transaction is \"pubkeyhash\"It is not a \"key\" in that script it is a hash or more specifically a 160-bit hash. It is also called pay to pubkey hash or P2PKH for short.QuoteNow I have this lock script: \"OP_HASH160 <key> OP_EQUAL\" and the transaction type is \"scripthash\".Same as above it is a hash not a key and it is called pay to script hash or P2SH for short.QuoteHow is it possible to spend this UTXO?P2SH scripts are a special case that were added many years ago through a soft fork that is explained in BIP-16[1]. The way these scripts are evaluated is a two step process. First step is what is normally done in any other script (run signature script then run pubkey script) but a copy of the top stack element before running the pubkey (or locking) script is stored for next step.Second step is evaluating that item we duplicated before (the top stack element) as a script called Redeem Script. Then run that script too using the existing items in the stack the rest is the same (eg. push some data to the stack, pop data, run CheckSig ops, etc.).Keep in mind that the Redeem Script can be anything from a simple OP_TRUE to complex nested conditionals with locktimes and the common multi-sig scripts with multiple public keys inside.[1] https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "baro77",
+      "created_time": "December 08, 2022, 11:04:31 AM",
+      "body": "Quote from: coinesel on December 08, 2022, 06:57:27 AMHow is it possible to spend this UTXO?Thanks a lot!Check if this infographic about simplest locking/unlocking script can help you:https://github.com/baro77/btcUnlockingLockingScriptCS/raw/master/(Un)lockingScriptsCheatsheet20190911.pdf",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "coinesel",
+      "created_time": "December 08, 2022, 12:59:40 PM",
+      "body": "Great! That was very helpful. Thanks a lot!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 08, 2022, 05:53:30 PM",
+      "body": "Quote from: coinesel on December 08, 2022, 06:57:27 AMNow I have this lock script: \"OP_HASH160 <key> OP_EQUAL\" and the transaction type is \"scripthash\".How is it possible to spend this UTXO?You would have to put the public key in the stack and the hash of that key in the script at the part that says <key>.It's the same as the first, conventional script you posted, but it doesn't verify the signature, which is a bad idea.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "December 08, 2022, 11:56:51 PM",
+      "body": "Quote from: NotATether on December 08, 2022, 05:53:30 PMIt's the same as the first, conventional script you posted, but it doesn't verify the signature, which is a bad idea.That doesn't sound right.  Isn't this a P2SH output?If it is P2SH, then both the locking script AND the unlocking script are provided by the spender at the time that the output is spent.  While it is possible that the locking script might not require a signature (it's impossible to know just from the hash, you'd have to see the actual script to know), it's FAR more common that the locking script will be a typical signature-requiring script (most often segWit).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "topic_5475569",
+  "title": "Coding Enthusiast",
+  "author": "Coding Enthusiast",
+  "created_time": "November 26, 2023, 01:36:41 PMLast edit: January 12, 2024, 05:50:47 AM by Coding Enthusiast",
+  "content": "I'm going through libsecp256k1 and noticed a new change which is strange.secp256k1_fe_set_b32_mod method name and comment suggest that it reduces the value mod p and the result is supposed to be r ≡ a (mod p)https://github.com/bitcoin-core/secp256k1/blob/c1b4966410a81162bf9404ec84e69a85e1e23469/src/field.h#L192But looking at the implementations they don't actually perform any reduction. It's just a simple conversion from byte[] to uint[] in radix 26 or 52.For example:https://github.com/bitcoin-core/secp256k1/blob/c1b4966410a81162bf9404ec84e69a85e1e23469/src/field_10x26_impl.h#L293How the method is called(?):https://github.com/bitcoin-core/secp256k1/blob/c1b4966410a81162bf9404ec84e69a85e1e23469/src/field_impl.h#L258After this commit the library seems to still use the old method (secp256k1_fe_set_b32_limit method so I don't think anything is changed there) except herehttps://github.com/bitcoin-core/secp256k1/commit/5b32602295ff7ad9e1973f96b8ee8344b82f4af0#diff-6f71b0372be086d45b4f2740508c03a21835d87008840032fbb767f419fd988aAnd this \"assumption\" that the secp256k1_fe_set_b32_mod reduces the result is new.Am I missing something or is this a mistake?Edit: fixed in https://github.com/bitcoin-core/secp256k1/commit/77af1da9f631fa622fb5b5895fd27be431432368",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5475569",
+  "comments": [
+    {
+      "author": "runeks",
+      "created_time": "December 05, 2023, 07:44:43 PM",
+      "body": "I suggest you open an issue here: https://github.com/bitcoin-core/secp256k1/issues. Regardless of whether or not you’ve found a bug, I think you’ll get much better feedback there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

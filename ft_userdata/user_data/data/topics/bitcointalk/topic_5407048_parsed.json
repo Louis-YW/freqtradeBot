@@ -1,0 +1,149 @@
+{
+  "id": "topic_5407048",
+  "title": "l3pox",
+  "author": "l3pox",
+  "created_time": "July 20, 2022, 05:52:24 PM",
+  "content": "Está rolando um golpe com muita frequência para quem tem NFTsenganar os users de forma que eles assinem uma transação \"set approval for all\" na rede da ethereum e dessa forma permitam que o hacker transfira nfts para fora de suas carteirasé assim que a maioria das vítimas perdem seus nfts, só muda a roupagemalguns camuflam a transação através de trojans ou sites de marketplace falsos (por exemplo opensee ou invés de opensea, sei lá, variações de nome)o último da vez foi o premint, famoso site de cadastro em allow list para novos drops.Sempre bom ficar ligado e acompanhar as tendências, inclusive dos golpes.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5407048",
+  "comments": [
+    {
+      "author": "TryNinja",
+      "created_time": "July 20, 2022, 06:44:30 PM",
+      "body": "Boa. Vou comentar sobre a parte tecnica do código para os curiosos. Esse é o código do contrato padrão ERC721, utilizado pela gigante maioria dos NFTs: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.solUma de suas funções é a transferFrom (linha 149). Ela aceita 3 parâmetros bem nomeados:- from = um endereço, de quem transferir o token.- to = um endereço, para quem transferir o token.- tokenId = o id do token NFT.Code:    function transferFrom(        address from,        address to,        uint256 tokenId    ) public virtual override {        require(_isApprovedOrOwner(_msgSender(), tokenId), \"ERC721: caller is not token owner nor approved\");        _transfer(from, to, tokenId);    }Podemos ver que ela contém um require (requer um retorno igual a \"true\") que chama a função _isApprovedOrOwner passando o endereço de quem está chamando a função e o tokenId como parâmetros.A função _isApprovedOrOwner recebe 2 parâmetros, spender (de quem enviar o token) e tokenId, e retorna uma boleana (true ou false).Code:    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {        address owner = ERC721.ownerOf(tokenId);        return (spender == owner || isApprovedForAll(owner, spender) || getApproved(tokenId) == spender);    }E ela retorna true caso pelo menos UMA das três seguintes afirmações forem verdadeiras:1. spender é igual a constante owner.2. o retorno de isApprovedForAll, passando a constante owner e spender, é true.3. o retorno de getApproved, passando o token Id, é igual a spender.[spender = quem está chamando a função; owner = quem detém do token]A função isApprovedForAll, do número 2, é a seguinte:Code:    function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {        return _operatorApprovals[owner][operator];    }Ela retorna o conteúdo (uma boleana) do mapping _operatorApprovals com o index owner e seu subsequente index operator.Esse mapping é modificado na função citada pelo @lucasgabd, _setApprovalForAll:Code:  function _setApprovalForAll(        address owner,        address operator,        bool approved    ) internal virtual {        require(owner != operator, \"ERC721: approve to caller\");        _operatorApprovals[owner][operator] = approved;        emit ApprovalForAll(owner, operator, approved);    }Que apenas define o index citado acima como true ou false.O site malicioso vai pedir que você assine uma tx chamando a tal função:_setApprovalForAll(você, hacker, true)Que vai definir: _operatorApprovals[você][hacker] = trueFazendo com que isApprovedForAll(você, hacker) retorne true, liberando a transação.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "July 20, 2022, 06:53:18 PM",
+      "body": "É sempre bom estar-se atento em que site se regista a nossa conta NFT. Claro que o valor de NFT é muito subjetivo e variável, mas perder um é sempre dinheiro que se perde.Por isso todos os alertas são bem vindos.Seria bom, sempre que alguém descobre algum desses sites estranho, partilha-se aqui no fórum, para todos poderem analisar e conhecer o que de scam se faz.@TryNinja grande explicação, muitos parabéns! Uma visão técnica sobre o assunto, ajuda muito a perceber como facilmente se pode cair num desses esquemas, sem se aperceber.Acredito que muitos que montam sites desses, só começam a roubar NFT quando já tem um bom numero de utilizadores e dessa forma disfarçar muito bem as coisas.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "July 21, 2022, 01:16:34 AM",
+      "body": "Quote from: Lucasgabd on July 20, 2022, 05:52:24 PMEstá rolando um golpe com muita frequência para quem tem NFTsenganar os users de forma que eles assinem uma transação \"set approval for all\" na rede da ethereum e dessa forma permitam que o hacker transfira nfts para fora de suas carteirasA primeira coisa que eu pensei foi: Por que alguem iria pagar uma transação de uns 5 a 20 usd, para fazer uma parada chamada  \"set approval for all\" sem receber nada em troca? Só um phising muito espertoQuoteo último da vez foi o premint, famoso site de cadastro em allow list para novos drops.E aí está a resposta. Gente atrás de free money...Não dá pra proteger as pessoas delas mesmas.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "July 21, 2022, 10:09:22 AM",
+      "body": "Quote from: bitmover on July 21, 2022, 01:16:34 AMA primeira coisa que eu pensei foi: Por que alguem iria pagar uma transação de uns 5 a 20 usd, para fazer uma parada chamada  \"set approval for all\" sem receber nada em troca? Só um phising muito esperto1. A maioria das pessoas só sai aprovando o que aparece em sites \"confiáveis\", pois pensa ser algo (inocente e) necessário para continuar lá, fazendo mints/trades.2. A maioria das wallets não deixa evidente qual função você está chamando. Por isso uso a Rabby, que mostra esse detalhe.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "l3pox",
+      "created_time": "July 25, 2022, 11:00:42 AM",
+      "body": "arrasou na explicação técnica TryNinjaJoker, para fazermos uma lista de todos os sites de phishing vamos precisar ficar o dia todo focando só nisso hahaha são muitos e eles costumam ser descartáveis, não ficam no ar por muito tempoa chave é entender os princípios.Quote from: TryNinja on July 21, 2022, 10:09:22 AMQuote from: bitmover on July 21, 2022, 01:16:34 AMA primeira coisa que eu pensei foi: Por que alguem iria pagar uma transação de uns 5 a 20 usd, para fazer uma parada chamada  \"set approval for all\" sem receber nada em troca? Só um phising muito esperto1. A maioria das pessoas só sai aprovando o que aparece em sites \"confiáveis\", pois pensa ser algo (inocente e) necessário para continuar lá, fazendo mints/trades.2. A maioria das wallets não deixa evidente qual função você está chamando. Por isso uso a Rabby, que mostra esse detalhe.somando: é bem comum ter que fazer set approval for all para vender um NFTtodo marketplace vai pedir isso @bitmoverafinal, se alguém comprar o NFT ele precisa ser transferido para a carteira do comprador e essa aprovação tem que ser na hora e automática então nada melhor que um smart contract para executá-laa maioria desses ataques vai seguir alguma dessas linhas:- fake de um site famoso, você acha que está no marketplace oficial mas seta o approval para um hacker mal intencionado que criou uma cópia do marketplace- mints que te induzem ao FOMO, agir rápido sem pensar para participar de um lançamento, você acha que está assinando uma transação com a função mint mas na verdade está assinando um setapprovalforall- sites que te induzem a assinar um SetApprovalForAll on-chain quando você só precisaria assinar uma transação off-chain para logar (não precisaria pagar gas), esse foi o caso do premint.- golpes mais elaborados de engenharia social e spear phishing, desde um time fake de suporte te enganando por chamada do discord até alguém que escreveu uma transação customizada para você, camuflou um virus pelo google docs, vc clicou no email e esse virus substituiu seu metamask por um metamask fake.sobre o ponto 2 Tryninjao próprio metamask que é a carteira mais usada hoje em dia avisa o que a pessoa está assinando, mas pra usuários leigos parece que uma função \"mint', uma função \"SetApprovalForAll\" e até um transação off-chain (só um sign) são a mesma coisa, já vi algumas sugestões de mudarem a UI para incluir um aviso de que essa transação é potencialmente perigosa.talvez ajudaria um pouco.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "July 25, 2022, 12:42:52 PM",
+      "body": "Quote from: Lucasgabd on July 25, 2022, 11:00:42 AMsobre o ponto 2 Tryninjao próprio metamask que é a carteira mais usada hoje em dia avisa o que a pessoa está assinando, mas pra usuários leigos parece que uma função \"mint', uma função \"SetApprovalForAll\" e até um transação off-chain (só um sign) são a mesma coisa, já vi algumas sugestões de mudarem a UI para incluir um aviso de que essa transação é potencialmente perigosa.Legal, não sabia que tinham implementado isso.Isso me lembrou aquele ataque da BadgerDAO que fez a Celsius perder alguns milhões ao assinar uma tx maliciosa no front end hackeado, lembra?Quote from: TryNinja on December 03, 2021, 04:22:43 PMPara quem tem dinheiro na Celsius, atenção...Parece que eles perderam $50 milhões no hack do frontend da BadgerDAO. Ou seja, está confirmado que eles colocam partes do seu portfolio para farmar no DeFi.https://twitter.com/DegenCryptoInfo/status/1466400489143255042Esse é um valor relativamente pequeno para o quanto eles tem de portfolio, mas eu já começaria a ficar com um pé atrás quanto a deixar dinheiro lá.Sempre que eu vou assinar uma tx, eu verifico o endereço do contrato e a função que ela vai chamar. Pode parecer chato e/ou desnecessário, mas é com esse hábito que você evita cair nesse golpe quando ele acontece.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "rdluffy",
+      "created_time": "July 25, 2022, 04:59:28 PM",
+      "body": "Eu lembro quando utilizava bastante a rede da Polygon para os DeFis da vida, e entrei em vários, fazia bastante transações, depois que me aprofundei mais, e li umas notícias semelhantes, que alguns sites estavam fazendo o contrato dessa forma para aprovar todas transações, me deu um medo enorme de perder tudoO que me ajudou bastante foi esse site: https://debank.com/Eu consegui ver todos os endereços que eu tinha aceitado algo e fui removendo as aprovações, mas não perdi nada.Imagina o tanto de usuários passíveis de tomar essa golpe, porque a maioria das pessoas, assim como eu não tem conhecimento para ler realmente o código, nós confiamos em pessoas que sabem e ajudam a comunidade falando se está tudo certo ou não",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "July 25, 2022, 07:25:52 PM",
+      "body": "Quote from: Lucasgabd on July 25, 2022, 11:00:42 AMJoker, para fazermos uma lista de todos os sites de phishing vamos precisar ficar o dia todo focando só nisso hahaha são muitos e eles costumam ser descartáveis, não ficam no ar por muito tempoa chave é entender os princípios.Mas essa era a ideia! Não era fazer tipo uma lista de sites que são fake.A ideia é partilhar o que é fake e como ele esta a ser feito. O site em si é indiferente, porque como dizes e muito bem, é altamente descartável e podem existir centenas iguais.Na pratica, a ideia que eu lancei, é sempre que algum de nós depara-se com um site desse género (que devido a nossa experiencia, já são poucos os casos que nos surpreendem), dar-mos a conhecer como esta a ser usada novas técnicas. Porque se até para nós ficamos surpreendidos com a técnica usada, e já conhecemos muitas, é sinal que essa técnica é pouco conhecida e mais facilmente vai apanhar os mais distraídos ou com menos conhecimentos.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "July 25, 2022, 08:05:24 PM",
+      "body": "Quote from: joker_josue on July 25, 2022, 07:25:52 PMMas essa era a ideia! Não era fazer tipo uma lista de sites que são fake.A ideia é partilhar o que é fake e como ele esta a ser feito. O site em si é indiferente, porque como dizes e muito bem, é altamente descartável e podem existir centenas iguais.No final das contas, a única diferença vai ser o domínio, pois copias perfeitas 1:1 SEMPRE vão existir por serem extremamente fáceis de serem criadas.Você só precisa:1. Verificar o domínio.2. Verificar o que está assinando (qual função e de qual endereço).E a chance de cair em um desses vai ser quase nula.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "l3pox",
+      "created_time": "July 26, 2022, 06:54:22 PM",
+      "body": "Quote from: TryNinja on July 25, 2022, 12:42:52 PMQuote from: Lucasgabd on July 25, 2022, 11:00:42 AM<...><...>Isso me lembrou aquele ataque da BadgerDAO que fez a Celsius perder alguns milhões ao assinar uma tx maliciosa no front end hackeado, lembra?<...>lembro desse ataque sim! inclusive aconteceu um outro parecido, com um dos fundadores de outro projeto, não to lembrando o nome agora mas acho que postei por aqui, tinham uma grana absurda do projeto controlada por uma pessoa só ao invés de uma multi sig, ele abriu um google docs customizado e bau bau, transação customizada deu approval pro hacker, já era.Quote from: rdluffy on July 25, 2022, 04:59:28 PMEu lembro quando utilizava bastante a rede da Polygon para os DeFis da vida, e entrei em vários, fazia bastante transações, depois que me aprofundei mais, e li umas notícias semelhantes, que alguns sites estavam fazendo o contrato dessa forma para aprovar todas transações, me deu um medo enorme de perder tudoO que me ajudou bastante foi esse site: https://debank.com/Eu consegui ver todos os endereços que eu tinha aceitado algo e fui removendo as aprovações, mas não perdi nada.Imagina o tanto de usuários passíveis de tomar essa golpe, porque a maioria das pessoas, assim como eu não tem conhecimento para ler realmente o código, nós confiamos em pessoas que sabem e ajudam a comunidade falando se está tudo certo ou nãooutro site no mesmo estilo que recomendam bastante é o revoke.cashQuote from: joker_josue on July 25, 2022, 07:25:52 PMQuote from: Lucasgabd on July 25, 2022, 11:00:42 AMJoker, para fazermos uma lista de todos os sites de phishing vamos precisar ficar o dia todo focando só nisso hahaha são muitos e eles costumam ser descartáveis, não ficam no ar por muito tempoa chave é entender os princípios.Mas essa era a ideia! Não era fazer tipo uma lista de sites que são fake.A ideia é partilhar o que é fake e como ele esta a ser feito. O site em si é indiferente, porque como dizes e muito bem, é altamente descartável e podem existir centenas iguais.Na pratica, a ideia que eu lancei, é sempre que algum de nós depara-se com um site desse género (que devido a nossa experiencia, já são poucos os casos que nos surpreendem), dar-mos a conhecer como esta a ser usada novas técnicas. Porque se até para nós ficamos surpreendidos com a técnica usada, e já conhecemos muitas, é sinal que essa técnica é pouco conhecida e mais facilmente vai apanhar os mais distraídos ou com menos conhecimentos.boa! isso é legal mesmouma database de estilos de scam comuns",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alegotardo",
+      "created_time": "July 27, 2022, 11:34:22 PM",
+      "body": "Quote from: TryNinja on July 25, 2022, 08:05:24 PMQuote from: joker_josue on July 25, 2022, 07:25:52 PMMas essa era a ideia! Não era fazer tipo uma lista de sites que são fake.A ideia é partilhar o que é fake e como ele esta a ser feito. O site em si é indiferente, porque como dizes e muito bem, é altamente descartável e podem existir centenas iguais.No final das contas, a única diferença vai ser o domínio, pois copias perfeitas 1:1 SEMPRE vão existir por serem extremamente fáceis de serem criadas.Você só precisa:1. Verificar o domínio.2. Verificar o que está assinando (qual função e de qual endereço).E a chance de cair em um desses vai ser quase nula.Olha, me perdoe, mas o item dois é um tanto quanto BASTANTE complicado para a maioria das pessoas (creio eu) que mexem com pripto.Uma vez eu já falei de um amigo que possui Bitcoin na exchange pela comodidade de enviar-receber em 3 cliques, oque você acha se porventura uma pessoa assim transferir uns ETH pra uma wallet configurada na extensão do navegador e se deparar com uma mensagem \"sinistra\" em um site pedindo aprovação para continuar?Vai acontecer o mesmo com que já ocorre com os milhares de \"aceito\" naquela mensagem de \"você aceita os cookies?\"Galera sai apertando em SIM sem ao ler, isso é fato.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 09, 2022, 08:44:14 PM",
+      "body": "Olha aí mais um... o frontend da Curve, um dos pilares do DeFi, foi hackeado e está requisitando que seus usuários assinem transações de approval.Quote from: https://twitter.com/samczsun/status/1557100692518473728🚨🚨🚨@CurveFinance frontend is compromised, do not use it until further notice!Mais de $500k já foram roubados: https://etherscan.io/address/0x50f9202e0f1c1577822BD67193960B213CD2f331",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "l3pox",
+      "created_time": "August 09, 2022, 10:05:03 PM",
+      "body": "Quote from: alegotardo on July 27, 2022, 11:34:22 PM<...>Vai acontecer o mesmo com que já ocorre com os milhares de \"aceito\" naquela mensagem de \"você aceita os cookies?\"Galera sai apertando em SIM sem ao ler, isso é fato.por isso o processo é educar os usuáriosno fim talvez as leis de GDPR/LGPD tenham prejudicado ainda mais a segurança dos usuários por ensiná-los a clicar \"aceito todos os cookies\" sem nem ler, só pra tirar aqueles banners malditos da frente dos sites.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "August 10, 2022, 06:54:20 AM",
+      "body": "Quote from: Lucasgabd on August 09, 2022, 10:05:03 PMpor isso o processo é educar os usuáriosno fim talvez as leis de GDPR/LGPD tenham prejudicado ainda mais a segurança dos usuários por ensiná-los a clicar \"aceito todos os cookies\" sem nem ler, só pra tirar aqueles banners malditos da frente dos sites.Nisso estou totalmente de acordo. A forma como as leis de GDPR foram criadas, só acabam por dar aos sites e afins aceitação por parte dos visitantes - mesmo que involuntária, para poderem usar os seus dados como quiserem.Acho que todas as regras, que dão direito a uma das partes, de escrever um contrato e o utilizador não poder ter voto na matéria, sendo quase assinar ou não tem acesso, só protegem um lado.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 17, 2022, 11:28:56 PM",
+      "body": "E mais um...Quote from: https://twitter.com/CelerNetwork/status/1560022871564775424📢📢📢We are seeing reports that reflects potential DNS hijacking of cbridge frontend. We are investigating at the moment and please do not use the frontend for bridging at the moment.Como sempre, pediram a aprovação para gastar os tokens presentes na bridge:Quote from: https://twitter.com/CelerNetwork/status/1560042754050506752If you recently used cBridge, please revoke approval for all the following:BSC: 0x5895da888Cbf3656D8f51E5Df9FD26E8E131e7CFFantom: 0x458f4d7ef4fb1a0e56b36bf7a403df830cfdf972Polygon: 0x9c8b72f0d43ba23b96b878f1c1f75edc2beec9f9Avalanche: 0x9c8B72f0D43BA23B96B878F1c1F75EdC2Beec9F9Arbitrum: 0x9c8B72f0D43BA23B96B878F1c1F75EdC2Beec9F9Astar: 0x9c8B72f0D43BA23B96B878F1c1F75EdC2Beec9F9Aurora: 0x9c8b72f0d43ba23b96b878f1c1f75edc2beec9f9These contracts are related to a potential UI hijack to redirect users to interact with the above addresses. The cBridge frontend UI is currently offline to be safe and we are doing further investigation.Eu era um usuário ativo da cBridge quando o DeFi estava em alta. Mostra como ter cuidado NUNCA é demais.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "August 18, 2022, 06:47:09 AM",
+      "body": "Quote from: TryNinja on August 17, 2022, 11:28:56 PMEu era um usuário ativo da cBridge quando o DeFi estava em alta. Mostra como ter cuidado NUNCA é demais.Que situação... Quantos mais haverá por ai, que ainda não foram descobertos?O ponto agora é: como é que a maioria dos utilizadores sabe se deve dar autorização ou não!? Não é fácil.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 19, 2022, 11:58:52 PM",
+      "body": "Quote from: joker_josue on August 18, 2022, 06:47:09 AMQuote from: TryNinja on August 17, 2022, 11:28:56 PMEu era um usuário ativo da cBridge quando o DeFi estava em alta. Mostra como ter cuidado NUNCA é demais.Que situação... Quantos mais haverá por ai, que ainda não foram descobertos?O ponto agora é: como é que a maioria dos utilizadores sabe se deve dar autorização ou não!? Não é fácil.Geralmente é algo que acontece em questão de horas. Mas podem haver sim alguns sites comprometidos que ficam, intermitentemente, pedindo transações maliciosas com o intuito de afetar o maior número possível de usuários de uma vez.Aliás, não so de txs maliciosas vivem os hackers. Também tem como você perder suas moedas ao assinar uma mensagem malicios de “permit”, que passa muito mais em branco do que uma tx logo de cara.Se liga nesse thread: https://twitter.com/korpi87/status/1560416631678910464?s=21&t=_VvMH3-mGVzN0mo_MXyoeg",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

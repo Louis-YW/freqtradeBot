@@ -1,0 +1,29 @@
+{
+  "id": "topic_5439409",
+  "title": "lisa6336",
+  "author": "lisa6336",
+  "created_time": "February 11, 2023, 01:28:11 AM",
+  "content": "Hi friends,i really need helpI am looking for this checksum 9ed6e860 as an answer for my wallet 1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7I tried with my script but it does not give me the same thing at all tell me where is the problem and help me modify the script in question,import hashlibdef get_btc_checksum(address):    \"\"\"    Compute the checksum of a Bitcoin address.    Args:    - address (str): The Bitcoin address.    Returns:    - str: The checksum of the Bitcoin address.    \"\"\"    address = address.lower().encode('utf-8')    sha256_hash = hashlib.sha256(address).hexdigest()    ripe160_hash = hashlib.new('ripemd160', sha256_hash.encode('utf-8')).hexdigest()    checksum = ''    for i in range(len(ripe160_hash)):        if ripe160_hash in '123456789abcdef':            checksum += ripe160_hash        else:            checksum += str(ord(ripe160_hash))    return checksumbtc_address = '1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7'print('The checksum of the address', btc_address, 'is:', get_btc_checksum(btc_address))",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5439409",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "February 13, 2023, 07:20:55 AM",
+      "body": "If the input is the address, all you have to do is to decode it with base58 and then get the last 4 Bytes.Address: 1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7Decoded: 00b05fea8c3768f8fbb48f9c778bb36b91334cf7a169e65f22Last 4 Bytes: 69e65f22 (which is the correct checksum)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "February 13, 2023, 07:53:25 AM",
+      "body": "Before implementing any algorithm you should consult the documentation that describes this algorithm, otherwise you are risking to never find a solution to the problem the crux of which you don't fully understand. Address is simply an encoded version of some other data. In order to determine what data was taken to calculate an address, you should decode it back. Legacy addresses use Base58 encoding algorithm, which is case sensitive. When you convert it to lowercase like that:Code:address = address.lower().encode('utf-8')... you break things and get a wrong result. But it is not the only problem in your code, all other steps are wrong too.Read this articles before asking questions:1) https://en.bitcoin.it/wiki/Base58Check_encoding2) https://en.bitcoin.it/wiki/Technical_background_of_version_1_Bitcoin_addressesOne-line solution with base58 module:Code:import base58checksum = base58.b58decode(address)[-4:].hex()",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

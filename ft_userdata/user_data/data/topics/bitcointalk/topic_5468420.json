@@ -1,0 +1,165 @@
+{
+  "id": "topic_5468420",
+  "title": "Dave1",
+  "author": "Dave1",
+  "created_time": "September 28, 2023, 12:26:06 PM",
+  "content": "https://twitter.com/MarathonDH/status/1707067548661928108Not sure what kind of experiments that they are running, but it good that the network rejected it. According to them they are doing some experiments to optimized their operations.But still though, you don't messed the network or the blockchain and it just shows that bitcoin's network architecture is so strong that it can withstand this kind of experiments and then continue to run 99.99% of the time without breaking.What are your thoughts on this one? Do you agree that they can simple run a experiment, what if they succeed here? what will be the repercussions?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468420",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 28, 2023, 12:33:35 PMLast edit: September 28, 2023, 05:00:09 PM by o_e_l_e_o",
+      "body": "Here's the raw code of the invalid block: https://farside.co.uk/blocks/809478invalid.txtThe issue is that they included lots of transactions in the wrong order.When a parent and child transaction are both confirmed in the same block at the same time, then the parent transaction must come earlier in the block than the child. Now look up the following string in the link I shared above, which is the first example of them messing up:Code:7d18f0eefce0497b5d0c9b61fdf816b7744587c7e5e57acc53de71d1dae59725You'll see one of the first transactions in the block (the sixth transaction) uses an input from that transaction, but that transaction itself doesn't actually appear until about a third of the way through the block (as the 1,454th transaction). They included the child before the parent, meaning the child transaction tried to spend a UTXO which did not yet exist. And so the block was invalid.Another few examples:Code:16f573a372f9950f1c57df642ecac64860be22482d424d35c084746b1066b02cc0d322bd830bbbc429121f7766a6cdf0438c7e316187c4f1d45663893c7d51cda04e35d002d97e2be8fd8b99564bbab3746dc090029b4c0284ae4705de942647So for some reason their sorting algorithm totally messed up and didn't include transactions in the order necessary for the block to be valid.Quote from: Dave1 on September 28, 2023, 12:26:06 PMWhat are your thoughts on this one? Do you agree that they can simple run a experiment, what if they succeed here? what will be the repercussions?There will be no repercussions. The nodes they tried to broadcast this block to all rejected it since it was invalid, and bitcoin continue to run as if nothing had happened. This is exactly what is supposed to happen. The real story here is why MARA are testing things on mainnet and not on testnet, but I wouldn't expect any level of competence from the same mining pool which is in cahoots with the US government and OFAC.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "September 28, 2023, 12:33:58 PM",
+      "body": "Quote from: Dave1 on September 28, 2023, 12:26:06 PMNot sure what kind of experiments that they are running, but it good that the network rejected it. According to them they are doing some experiments to optimized their operations.According to their assertion, the error was not intentional, and if it was intentional, you can think of it as a double attack from a mining pool that does not own more than 51%. Therefore, the block will be rejected and he will lose 6.25 Bitcoin + the transaction fees that were included. Some transactions that were confirmed within the block may be re-confirmed. The biggest loser is the mining pool, so it is difficult to believe that they did this intentionally because they are achieving anything here and it is not proof of anything.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "September 28, 2023, 01:30:48 PM",
+      "body": "Quote from: Yamane_Keto on September 28, 2023, 12:33:58 PMQuote from: Dave1 on September 28, 2023, 12:26:06 PMNot sure what kind of experiments that they are running, but it good that the network rejected it. According to them they are doing some experiments to optimized their operations.According to their assertion, the error was not intentional, and if it was intentional, you can think of it as a double attack from a mining pool that does not own more than 51%. Therefore, the block will be rejected and he will lose 6.25 Bitcoin + the transaction fees that were included. Some transactions that were confirmed within the block may be re-confirmed. The biggest loser is the mining pool, so it is difficult to believe that they did this intentionally because they are achieving anything here and it is not proof of anything.In the race to get that last little bit of performance out of the network and the last satoshi out of every block I can see them trying to figure out a way to get that one extra transaction in by ordering things slightly differently and well it didn't work.Not a big deal for a company the size of Marathon but still a reminder that no matter how much you test code things don't always work.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 28, 2023, 02:14:57 PM",
+      "body": "Quote from: DaveF on September 28, 2023, 01:30:48 PMIn the race to get that last little bit of performance out of the network and the last satoshi out of every block I can see them trying to figure out a way to get that one extra transaction in by ordering things slightly differently and well it didn't work.Which makes no sense. It does not matter what order you put the transactions in, the space they occupy remains unchanged.Looking a bit more closely, the transactions in the invalid block are simply ordered in terms of absolute fee paid, from lowest to highest, which is why they are all out of order. Most (or even all?) miners usually order transactions from highest fee rate to lowest fee rate, with the caveat I explained above regarding parent and child transactions being packaged together as one. But the invalid block also contains a number of CPFP transactions, as I've outlined above. So at some point they picked a perfectly valid block template in the usual way, considering parent and child transactions as packages, but then prior to attempting to mine it resorted the whole block in to an invalid order. Makes no sense, and makes even less sense that they are experimenting with this kind of thing on mainnet and not testnet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "September 28, 2023, 03:04:15 PM",
+      "body": "Quote from: o_e_l_e_o on September 28, 2023, 02:14:57 PMMakes no sense, and makes even less sense that they are experimenting with this kind of thing on mainnet and not testnet.Actually it's a bug, @0xB10C on Twitter noticed on Sep 26, 2023 that there was Frequent invalid blocks being relayed on testnet in the last hours so we can say that they have MARAPool had a transaction ordering issuetweet source https://twitter.com/0xB10C/status/1706695449598402868So I think they were testing something on testnet and they did it again on mainnet",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "September 28, 2023, 03:57:34 PM",
+      "body": "Quote from: o_e_l_e_o on September 28, 2023, 02:14:57 PMQuote from: DaveF on September 28, 2023, 01:30:48 PMIn the race to get that last little bit of performance out of the network and the last satoshi out of every block I can see them trying to figure out a way to get that one extra transaction in by ordering things slightly differently and well it didn't work.Which makes no sense. It does not matter what order you put the transactions in, the space they occupy remains unchanged.Looking a bit more closely, the transactions in the invalid block are simply ordered in terms of absolute fee paid, from lowest to highest, which is why they are all out of order. Most (or even all?) miners usually order transactions from highest fee rate to lowest fee rate, with the caveat I explained above regarding parent and child transactions being packaged together as one. But the invalid block also contains a number of CPFP transactions, as I've outlined above. So at some point they picked a perfectly valid block template in the usual way, considering parent and child transactions as packages, but then prior to attempting to mine it resorted the whole block in to an invalid order. Makes no sense, and makes even less sense that they are experimenting with this kind of thing on mainnet and not testnet.Did not express what I was trying to put down clearly. If  B needs A you have to add the fee of B+A  and then the size of B + A to figure out what you get in terms of size vs fee. C + D might work better or even E all by itself. All the while new transactions with their own fees are streaming in.The Devil is in the details, and as I said I can see them trying to optimize it to the point where it sent out a block as they did with the transactions in the wrong order.Programming whoops though the years:https://www.youtube.com/watch?v=qC_ioJQpv4E-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Ucy",
+      "created_time": "September 28, 2023, 04:03:36 PM",
+      "body": "What experiment? A real experiment isn't supposed to be done that way, on a real Network. It should have been done on a testnet or something, in a controlled or less risky manner.Anyway, the so called experiment failed mainly due to Network consensus and rules. If he/they understood Bitcoin, they wouldn't have bordered with the so called experiment as the network is always monitored by its participants who are spread across the globe to ensure that rules are followed and things done right. If he had done that on a centralized financial system by hijacking its database which represent the node, the attack would have been successful as zero to few eyes are monitoring it. The Bitcoin model is so secure because of decentralization",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "OgNasty",
+      "created_time": "September 28, 2023, 04:34:48 PM",
+      "body": "It is good that these experiments are being done and that Bitcoin is apparently still ahead of the curve. It shows that these companies with all their investment are beginning to dive deep into the technical aspects of Bitcoin to see if they can break something. They won’t be able to, because Bitcoin has been tested for a while, but it’s still a great thing they’re experimenting.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "The Sceptical Chymist",
+      "created_time": "September 28, 2023, 04:54:24 PM",
+      "body": "I always read press releases with a huge grain of salt, so when Marathon says their boo-boo was the result of some failed experiment that was ultimately a good thing that showcases how robust bitcoin's security is, or whatever blah blah blah, the cynical devil on my shoulder immediately thinks they fucked something up internally and are trying to spin it to their advantage.But assuming you can accept what they said at face value, MARA is a publicly-traded company that derives their income from bitcoin-related activities (which are primarily mining operations if I'm not mistaken).  It's doubtful they were up to anything malicious with respect to bitcoin, and they'd be stupid to try anything of the sort.  I'm not naive enough to think that companies don't do backhanded things to boost their quarterly profits, because I've seen enough examples of that to know damn well it happens.  But in MARA's case, it's not like they're a group of unsupervised hackers doing whatever the hell they want.  They've got a corporate structure that's probably more hierarchical than Microstrategy, so I'd not be surprised if this was a screw-up that cost someone their job.Who knows, though.  Publicly-traded companies aren't as transparent as they ought to be, not even to their shareholders.  And their stock is up 8.5% today, so I guess that press release did its job.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "September 28, 2023, 04:56:05 PM",
+      "body": "an obvious attempt to try efficiency optimising by just throwing transactions into a a block without checking on ordering of transactionsbut over all its just another rejected block. nothing significant in the scheme of things. they happen and no one bats an eyelid because people only care about blocks that do get confirmed",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "October 03, 2023, 09:15:20 AM",
+      "body": "Quote from: o_e_l_e_o on September 28, 2023, 12:33:35 PM... The real story here is why MARA are testing things on mainnet and not on testnet, but I wouldn't expect any level of competence from the same mining pool which is in cahoots with the US government and OFAC.Actually they did some prior testing on Testnet as @Yamane_Keto pointed out in his post:Quote from: Yamane_Keto on September 28, 2023, 03:04:15 PM...The very puzzling thing is why they didn't learn from the issues they produced on Testnet. Maybe they did some changes after all the invalid blocks on Testnet but apparently they didn't fix their \"new\" candidate block logic properly and with a sufficient outcome. It certainly was an expensive bug and I would like to say, they deserved it for being reckless enough to go on Mainnet with their flawed software.Quote from: franky1 on September 28, 2023, 04:56:05 PM...Truely invalid blocks are pretty rare and expensive software bugs. The last invalid ones my nodes are aware of were blocks 783426, 784121 (both F2pool fails) and the one we're talking about here 809478. You're probably right that most people don't care because it doesn't affect them, except for the miners involved and some blockchain nerds discussing such events. It's buggy software that looses the affected miners time, energy and money and should be avoidable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 03, 2023, 10:59:34 AM",
+      "body": "QuoteIn no way was this experiment an attempt to alter Bitcoin Core in any way.Is it just me or this statement is super weird? Why \"bitcoin core\" and not \"bitcoin\" or \"bitcoin blockchain\"? Are they so incompetent and unfamiliar with the Bitcoin protocol and don't understand the difference? LOLQuote from: Dave1 on September 28, 2023, 12:26:06 PMNot sure what kind of experiments that they are running, but it good that the network rejected it. According to them they are doing some experiments to optimized their operations.It is not a big deal though, it was a very simple invalid block and got rejected. It was not even some super secret and very little known consensus rule that led to its rejection...My guess on the experiment is that they could have been trying to optimize merkle root hash computation process. That's the only reason I can think of for bothering with transactions and their order in the block you are trying to mine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 03, 2023, 11:19:02 AMLast edit: October 03, 2023, 01:10:12 PM by o_e_l_e_o",
+      "body": "Quote from: Cricktor on October 03, 2023, 09:15:20 AMThe very puzzling thing is why they didn't learn from the issues they produced on Testnet.Yup. The same thing on testnet, and then just deployed their flawed software to production without actually addressing the fact it was creating multiple invalid blocks. Super smart! Quote from: pooya87 on October 03, 2023, 10:59:34 AMAre they so incompetent and unfamiliar with the Bitcoin protocol and don't understand the difference? LOLGiven they coded a bug on their testnet software, it threw off multiple invalid blocks, and then they ported it across to mainnet without addressing the invalid blocks - yes, probably. This is also the same mining pool who wanted to censor the entire network by only mining OFAC compliant blocks, before abandoning the whole idea a few weeks later when they finally realized it would never work. I wouldn't expect much in the way of competence.Quote from: pooya87 on October 03, 2023, 10:59:34 AMMy guess on the experiment is that they could have been trying to optimize merkle root hash computation process. That's the only reason I can think of for bothering with transactions and their order in the block you are trying to mine.It makes no sense. Their sorting algorithm is simply lowest to highest absolute fee. If they were picking transaction from the mempool based on absolute fee, then many of the transaction in their invalid block wouldn't have been included at all. These low fee transactions were included precisely because they had a higher fee paying child, and some of their transactions with low absolute fees paid high fee rates. So they've followed the usual Bitcoin Core method of grouping parent and child transactions together in to packages, ordering all transactions/packages by fee rate, and selecting the highest rate paying transactions. And then after using the normal method to construct their candidate block, they've then resorted all the transactions for no reason.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "October 03, 2023, 11:36:47 AM",
+      "body": "Quote from: Cricktor on October 03, 2023, 09:15:20 AMTruely invalid blocks are pretty rare and expensive software bugs. not expensive at allminers mine every block attempt.. every minute cost the miners the same thing whether they help to make a solved/first seen valid block or not.. it is not extra cost.. its just the standard daily costs day in day out... being first to get a valid block is partly luck.. making a bad block is just bad luck and a mistake.. not an expense. for all you know marathon could then have gone and solved more then average blocks on a different day. miners mine without knowing when they will next be part of a pools solved block. it might be in the next 10minutes. it might be in many hours time, pools and miners are not guaranteed a certain rate of blocks. its luck. based on random numbers, and its part of the cost risk of mining. yep i said it a pool could have a set of miners working for hours and not solve a block",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "October 03, 2023, 12:48:32 PMLast edit: October 03, 2023, 12:59:16 PM by Cricktor",
+      "body": "Quote from: o_e_l_e_o on October 03, 2023, 11:19:02 AMQuote from: Cricktor on October 03, 2023, 09:15:20 AMMy guess on the experiment is that they could have been trying to optimize merkle root hash computation process. That's the only reason I can think of for bothering with transactions and their order in the block you are trying to mine.You got the citation wrong, that's pooya87's words, not mine. I'd appreciate if you correct your posted citation.Quote from: franky1 on October 03, 2023, 11:36:47 AMnot expensive at all...I think I understand how mining works good enough. MARA pool threw away their lucky chance of finding a \"valid\" blockheader hash by using flawed and not well enough tested candidate block assembly solftware. I know that finding a valid blockheader hash is a random process. The amount of hashpower you utilize compared to the sum of all hashpower of the network just gives you some statistical chance of finding a valid hash until someone else competing with you finds one. There's no garantee to find a valid blockheader hash with your set of (ever changing) parameters.Still they lost their opportunity to get 6.25+fees BTC for a block with the statistical chance they had with their percentage of hashpower. I'm pretty shure affected miners don't share your opinion of it not being expensive at all. Whatever, YMMV.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 03, 2023, 01:06:12 PM",
+      "body": "Quote from: o_e_l_e_o on October 03, 2023, 11:19:02 AMthey've then resorted all the transactions for no reason.That's the weird part specially when they claim they were \"optimizing\" stuff. I can't think of any other relationship between order of transactions and optimization than merkle root hash.Quote from: franky1 on October 03, 2023, 11:36:47 AMQuote from: Cricktor on October 03, 2023, 09:15:20 AMTruely invalid blocks are pretty rare and expensive software bugs. not expensive at all~Why do you overcomplicate everything? A bug that leads to missing out on $160k+ revenue is an expensive bug.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DapanasFruit",
+      "created_time": "October 03, 2023, 01:09:02 PM",
+      "body": "Though nobody can be sure what Marathon Digital Holdings can be testing and whether it can be detrimental to Bitcoin if they succeeded, the most important thing is they failed and the robustness of the Bitcoin infrastructure is tested and is found to be safe and sound. In fact, am not against experiments that will be testing the whole of Bitcoin so we can know its possible weaknesses, if there are ones.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 03, 2023, 01:09:36 PM",
+      "body": "Quote from: Ucy on September 28, 2023, 04:03:36 PMWhat experiment? A real experiment isn't supposed to be done that way, on a real Network. It should have been done on a testnet or something, in a controlled or less risky manner.I'm not sure how reliable Testnet3 is for doing this kind of stuff, especially since you can't shape the hashrate into something suitable for an experiment on the fly (let's not forget that testnet3 coins are worthless).Regtest is also not a good solution for this, because you'd need to somehow inflate the mining difficulty somehow.I don't mind that Marathon is wasting their own hash rate on experiments, since their invalid blocks cannot affect the rest of the Bitcoin network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 03, 2023, 01:17:25 PM",
+      "body": "Quote from: Cricktor on October 03, 2023, 12:48:32 PMYou got the citation wrong, that's pooya87's words, not mine.Apologies. Fixed.Quote from: pooya87 on October 03, 2023, 01:06:12 PMThat's the weird part specially when they claim they were \"optimizing\" stuff. I can't think of any other relationship between order of transactions and optimization than merkle root hash.Perhaps some kind of system which would minimize the work involved in swapping lower fee transactions out of the candidate block and replacing them with newer higher fee transactions? But even then, splitting up packages or sorting by absolute fee instead of fee rate still doesn't make sense.Quote from: NotATether on October 03, 2023, 01:09:36 PMI'm not sure how reliable Testnet3 is for doing this kind of stuff, especially since you can't shape the hashrate into something suitable for an experiment on the fly (let's not forget that testnet3 coins are worthless).This \"experiment\" of theirs was an experiment on how they construct their candidate blocks. The hashrate is irrelevant. As long as there are transaction to order, this could be done on testnet. (And indeed, it was done on testnet. They just either didn't notice they were mining invalid blocks, or they couldn't figure out what was going wrong so deployed it to mainnet to have other people tell them why their block was invalid.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

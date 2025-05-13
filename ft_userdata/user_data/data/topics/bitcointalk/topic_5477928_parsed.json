@@ -1,0 +1,77 @@
+{
+  "id": "topic_5477928",
+  "title": "pbies",
+  "author": "pbies",
+  "created_time": "December 14, 2023, 07:56:29 PM",
+  "content": "Hi guys,can you tell me how in Python (>=3.0) to convert mnemonic (12 english words) to hex seed (128 hex digits or 64 bytes) and then to Bitcoin WIF (first one for that seed = /0/0)?I have scripts already but doubt they are working properly...",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5477928",
+  "comments": [
+    {
+      "author": "BTCapsule",
+      "created_time": "December 14, 2023, 10:52:00 PMLast edit: December 14, 2023, 11:07:51 PM by BTCapsule",
+      "body": "Are you trying to import it into Bitcoin Core?If so, you can try the Python code at the bottom of this post:https://www.reddit.com/r/Bitcoin/comments/r5g0ws/howto_ways_to_use_12_word_seeds_bip39_in_bitcoin/I’ll warn you that Bitcoin Core WIF uses 128 bits and mnemonics are 512 bits. The best I’ve been able to do is create individual addresses from the mnemonic and importing the private key into Core. https://github.com/BTCapsule/soverynode",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "December 15, 2023, 04:14:10 AMLast edit: December 15, 2023, 05:08:54 AM by pbies",
+      "body": "I got two scripts:First:Code:#!/usr/bin/env python3from mnemonic import Mnemonicfrom tqdm import tqdmimport binasciiimport bip32utilsimport mnemonicimport pprintmnemo = Mnemonic(\"english\")def bip39(seed): bip32_root_key_obj = bip32utils.BIP32Key.fromEntropy(bytes.fromhex(seed)) bip32_child_key_obj = bip32_root_key_obj.ChildKey(  84 + bip32utils.BIP32_HARDEN ).ChildKey(  0 + bip32utils.BIP32_HARDEN ).ChildKey(  0 + bip32utils.BIP32_HARDEN ).ChildKey(0).ChildKey(0) return bip32_child_key_obj.WalletImportFormat()with open(\"input.txt\",\"r\") as f: lines = f.readlines()lines = [x.strip() for x in lines]cnt=len(lines)o=open(\"output.txt\",\"w\")for line in tqdm(lines,total=cnt): try:  seed=mnemo.to_seed(line).hex()  wif=bip39(seed)  o.write(wif+' 0\\n')  o.flush() except:  continueSecond:Code:#!/usr/bin/env python3from tqdm import tqdmimport base58import bech32import binasciiimport bip32import ecdsaimport hashlibimport hdwalletsimport mnemonic# pip3 install ecdsa==0.14DEFAULT_BECH32_HRP = \"cro\"path   = \"m/44'/0'/0'/0/0\"def privkey_to_pubkey(privkey: bytes) -> bytes:    privkey_obj = ecdsa.SigningKey.from_string(privkey, curve=ecdsa.SECP256k1)    pubkey_obj = privkey_obj.get_verifying_key()    return pubkey_obj.to_string(\"compressed\")def pubkey_to_address(pubkey: bytes, *, hrp: str = DEFAULT_BECH32_HRP) -> str:    s = hashlib.new(\"sha256\", pubkey).digest()    r = hashlib.new(\"ripemd160\", s).digest()    five_bit_r = bech32.convertbits(r, 8, 5)    assert five_bit_r is not None, \"Unsuccessful bech32.convertbits call\"    return bech32.bech32_encode(hrp, five_bit_r)def privkey_to_address(privkey: bytes, *, hrp: str = DEFAULT_BECH32_HRP) -> str:    pubkey = privkey_to_pubkey(privkey)    return pubkey_to_address(pubkey, hrp=hrp)def pvk_to_wif(z): private_key_static = z extended_key = \"80\"+private_key_static first_sha256 = hashlib.sha256(binascii.unhexlify(extended_key)).hexdigest() second_sha256 = hashlib.sha256(binascii.unhexlify(first_sha256)).hexdigest() final_key = extended_key+second_sha256[:8] return base58.b58encode(binascii.unhexlify(final_key))cnt=sum(1 for line in open('input.txt'))i=open('input.txt','r')o=open('output.txt','w')for line in tqdm(i,total=cnt): mnemo  = line.strip('\\n') seed_bytes = mnemonic.Mnemonic.to_seed(mnemo) hd_wallet = hdwallets.BIP32.from_seed(seed_bytes) pvk = hd_wallet.get_privkey_from_path([44,0,0]) wif = pvk_to_wif(pvk.hex()) o.write(wif.decode('ascii')+' 0\\n') o.flush()o.close()",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 15, 2023, 04:32:00 AM",
+      "body": "The proposal itself has a reference implementation and two of them are in python that you can use[1].You can also always check out popular wallets that support BIP-39 algorithm and use their code or just use the wallet itself (ie. import mnemonic and just extract the single child key you are looking for). Electrum is a good option that does support BIP-39[2] and is written in python.[1] https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#reference-implementation[2] https://github.com/spesmilo/electrum/blob/2d954bb55439ff7d0d84b2c45b43b2c47c0d73b7/electrum/keystore.py#L975-L1018",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "December 15, 2023, 05:08:04 AM",
+      "body": "Quote from: pooya87 on December 15, 2023, 04:32:00 AMThe proposal itself has a reference implementation and two of them are in python that you can use[1].You can also always check out popular wallets that support BIP-39 algorithm and use their code or just use the wallet itself (ie. import mnemonic and just extract the single child key you are looking for). Electrum is a good option that does support BIP-39[2] and is written in python.[1] https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#reference-implementation[2] https://github.com/spesmilo/electrum/blob/2d954bb55439ff7d0d84b2c45b43b2c47c0d73b7/electrum/keystore.py#L975-L1018These are mnemo to seed, need more about seed to WIF...Does not help...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 15, 2023, 03:23:30 PM",
+      "body": "Quote from: pbies on December 15, 2023, 05:08:04 AMThese are mnemo to seed, need more about seed to WIF...Does not help...To derive child keys (seed to WIF) you need to use the BIP-32 algorithm [1]. Electrum also has the implementation for that[2]. Method names like CKD_priv are according to the documentation so it's a good idea to read that first.[1] https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki[2] https://github.com/spesmilo/electrum/blob/2d954bb55439ff7d0d84b2c45b43b2c47c0d73b7/electrum/bip32.py",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Greg Tonoski",
+      "created_time": "December 18, 2023, 03:06:05 PM",
+      "body": "Quote from: pbies on December 14, 2023, 07:56:29 PM(...) and then to Bitcoin WIF?For the conversion from HEX to WIF you could use: \"https://gist.github.com/GregTonoski/438992249df6e4bd613f9758421ff38a\". It works in bash (which can be called from Python or used without Python).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "December 18, 2023, 06:11:07 PMLast edit: December 19, 2023, 12:29:59 AM by pbies",
+      "body": "Quote from: Greg Tonoski on December 18, 2023, 03:06:05 PMQuote from: pbies on December 14, 2023, 07:56:29 PM(...) and then to Bitcoin WIF?For the conversion from HEX to WIF you could use: \"https://gist.github.com/GregTonoski/438992249df6e4bd613f9758421ff38a\". It works in bash (which can be called from Python or used without Python).O, witam kolegę! Pisałem do ciebie maile ale trafiłem na beton.Greg, you didn't understood the process, it is not private key to WIF but seed to WIF. Your script is useless in this case.I already have at least dozen of scripts that convert priv key to WIF.Another thing is that I've made python script for verifying mnemonics:Code:#!/usr/bin/env python3import hashlibdef bip39_is_checksum_valid(mnemonic: str) -> bool: words = mnemonic words_len = len(words) with open('english.txt') as f:  wordlist = [line.strip() for line in f] n = len(wordlist) i = 0 words.reverse() while words:  w = words.pop()  try:   k = wordlist.index(w)  except ValueError:   return False, False  i = i*n + k if words_len not in [12, 15, 18, 21, 24]:  return False checksum_length = 11 * words_len // 33  # num bits entropy_length = 32 * checksum_length  # num bits entropy = i >> checksum_length checksum = i % 2**checksum_length entropy_bytes = int.to_bytes(entropy, length=entropy_length//8, byteorder=\"big\") sha=hashlib.sha256() sha.update(entropy_bytes) hash=sha.digest() hashed = int.from_bytes(hash, byteorder=\"big\") calculated_checksum = hashed >> (256 - checksum_length) return checksum == calculated_checksumimport sysm=sys.argv[1:]if bip39_is_checksum_valid(m)==True: print('Valid!') exit(0)else: print('Invalid!') exit(1)It is based on pooya87's links.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Greg Tonoski",
+      "created_time": "December 28, 2023, 08:22:44 AM",
+      "body": "Quote from: pbies on December 14, 2023, 07:56:29 PMHi guys,can you tell me how in Python (>=3.0) to convert mnemonic (12 english words) to hex seed (128 hex digits or 64 bytes) and then to Bitcoin WIF (first one for that seed = /0/0)?I have scripts already but doubt they are working properly...There is the implemetation in Python: https://github.com/mcdallas/cryptotools",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

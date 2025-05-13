@@ -1,0 +1,69 @@
+{
+  "id": "topic_5450904",
+  "title": "Sarah Azhari",
+  "author": "Sarah Azhari",
+  "created_time": "May 02, 2023, 01:19:19 AM",
+  "content": "Tutorial ini pernah ku bahas dan tulis di board beginner dan help yang tujuan utamanya untuk memudahkan pengguna untuk ngecek harga bitcoin. Tapi yang terpenting di sini, kalian juga bisa ngecek harga bitcoin dari tahun ke tahun di mana nantinya berguna untuk bahan riset atau belajar cara mengkalkulasikan harga bitcoin.1. Buka dulu google spreadsheet lalu ketika perintah di bawah ini: Code:=GOOGLEFINANCE(\"CURRENCY:BTCIDR\", \"price\", DATE(2023,1,1), DATE(2023,5,1), \"DAILY\")dimana info mengenai itu =GOOGLEFINANCE(ticker, [attribute], [start_date], [end_date|num_days], [interval])Tapi menurutku tidak begitu penting, asal cocok dan presisi titik koma dan waktunya, kalian hanya ubah interval waktu di code tersebut, misal DATE(2017,12,1), DATE(2020,5,1) atau mengubah BTCIDR jadi BTCUSD, atau BTCEURO, dllBerikut contoh gambar pada contoh code yang kushare di atas:Ada sekitar 121 kolom dimana pada interval waktunya kuambil dalam rentan waktu 4 bulan. Jadi kalau semakin lama dan panjang rentan waktu yang dibuat, maka kolom tersebut juga semakin panjang mengikuti interval waktu.Selamat mencoba kawan-kawan, semoga thread ini bermanfaat untuk kalian semua dalam hal menghitung dan mengkalkulasikan harga bitcoin ke depan.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5450904",
+  "comments": [
+    {
+      "author": "Husna QA",
+      "created_time": "May 02, 2023, 03:55:02 AMLast edit: May 16, 2023, 01:07:43 PM by Husna QA",
+      "body": "Quote from: Sarah Azhari on May 02, 2023, 01:19:19 AM-snip-Code:=GOOGLEFINANCE(\"CURRENCY:BTCIDR\", \"price\", DATE(2023,1,1), DATE(2023,5,1), \"DAILY\")-snip- semoga thread ini bermanfaat untuk kalian semua dalam hal menghitung dan mengkalkulasikan harga bitcoin ke depan.Data yang berasal dari Google Finance tersebut merupakan data yang sudah terrekam konversi harga BTC-nya (saya belum mencari tahu data Google tersebut mulai merekam harga BTC sejak tanggal berapa); Dengan kata lain, ketika input DATE nya kita isi dengan tanggal yang belum dilalui/belum ada datanya di Google maka data tidak akan muncul, karena memang yang dimunculkan adalah data yang real terjadi bukan data prediksi.Nah untuk mengkalkulasi harga BTC kedepannya menggunakan data pada Spreadsheet tersebut, menurut saya (yang masih amatir dalam analisa harga) akan rada sulit, dan akan lebih mudah ketika analisa teknikalnya menggunakan semacam tool indikator, contoh di Trading view (https://id.tradingview.com/chart/?symbol=BITSTAMP%3ABTCUSD) atau sejenisnya.Btw, semakin banyak rentang tanggal yang di-input dan apalagi jika memilih DAILY, proses loading Google spreadsheet-nya jadi lebih lambat.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "masulum",
+      "created_time": "May 02, 2023, 04:10:51 AMLast edit: May 02, 2023, 06:06:20 AM by masulum",
+      "body": "Quote from: Husna QA on May 02, 2023, 03:55:02 AMData yang berasal dari Google Finance tersebut merupakan data yang sudah terrekam konversi harga BTC-nya (saya belum mencari tahu data Google tersebut mulai merekam harga BTC sejak tanggal berapa); Dengan kata lain, ketika input DATE nya kita isi dengan tanggal yang belum dilalui/belum ada datanya di Google maka data tidak akan muncul, karena memang yang dimunculkan adalah data yang real terjadi bukan data prediksi.Saya pikir maksud kata yang Anda quote itu bukan untuk prediksi masa depan, tetapi untuk mengetahui history harga dari waktu ke waktu. Kadang seseorang melakukan analisa membutuhkan history tersebut, atau untuk kemudahan membandingkan harga dan perubahannya dikomparasikan satu tahun ke belakang atau komparasi tiap bulannya. Atau mungkin ada yang kerjaannya sebagai jurnalis/penulis yang butuh referensi harga bisa ini dipake kalau malas buka tradingview.___BTW, tadi saya mencoba dengan kode yang disematkan ternyata error, jadi saya coba melakukan perubahan pada formula dari koma ke titik komaCode:=GOOGLEFINANCE(\"CURRENCY:BTCIDR\"; \"price\"; DATE(2023;4;1); DATE(2023;5;1); \"DAILY\")jika member lain ada yang mengalami hal serupa bisa dicoba dengan formula ini. FYI, formula ini hanya berlaku untuk daily sama weeklymengenai pemisah, tinggal format cell aja.Buat @OP ini sekalian saya tambahkan cara untuk cek harga secara realtime atau kita bisa memiliki list semua harga sama seperti yang ada pada Coingecko.buat sheet baru dan namakan sheet dengan Coingecko:Kemudian buatlah formula ini dan taruh di A1Code:=IMPORTHTML(\"https://www.coingecko.com/\";\"table\";1)Hasilnya seperti ini:Untuk warna silakan tambahkan format cell, dengan menu:Format > format bersyaratjika berisi kurang dari 0 maka = warna merah, jika lebih dari 0 maka = warna hijau.Ini sebenarnya sudah selesai, tapi masih belum bisa refresh, jadi kita perlu sedikit tambahan, dengan membuat Makro, dengan skrip.Pilih menu ekstensi > Makro > Buat Makro baru (disini makronya saya kasih nama TestPrice dan nama Sheet Coingecko selanjutnya copy skrip berikut:Code:function TestPrice() {var spreadsheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(\"Coingecko\");var range = spreadsheet.getRange('A1');range.clearContent();SpreadsheetApp.flush();range.setFormula('=IMPORTHTML(\"https://www.coingecko.com/\";\"table\";1)');};Kemudian, lanjutkan untuk trigger refresh, silahkan pilih menu Pemicu (dihalaman yang sama saat buat Makro). Pengaturannya seperti ini:kemudian klik tiga titik, dan pilih eksekusi. selesai, sheet akan otomatis refresh setiap 1 menit. Ini adalah waktu terkecil, tidak bisa set di bawah 1 menit. jadi, harga realtime tetapi terjadi jeda 1 menit.Selesai.Mungkin akan lebih simple jika lihat langsung ke web, tapi di sini mumpung ada edukasi ringan yang relevan, jadi saya tambahkan tutorial ini. jadi, kalau malas ke web, bisa ini digunakan, bebas iklan",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Husna QA",
+      "created_time": "May 02, 2023, 02:25:08 PMLast edit: May 16, 2023, 01:07:36 PM by Husna QA",
+      "body": "Quote from: masulum on May 02, 2023, 04:10:51 AMSaya pikir maksud kata yang Anda quote itu bukan untuk prediksi masa depan, tetapi untuk mengetahui history harga dari waktu ke waktu. Kadang seseorang melakukan analisa membutuhkan history tersebut, atau untuk kemudahan membandingkan harga dan perubahannya dikomparasikan satu tahun ke belakang atau komparasi tiap bulannya. Terima kasih atas penjelasannya.Quote from: masulum on May 02, 2023, 04:10:51 AMini sekalian saya tambahkan cara untuk cek harga secara realtime atau kita bisa memiliki list semua harga sama seperti yang ada pada Coingecko.Barusan saya coba praktekkan tutorialnya, berikut ini hasilnya:Quote from: masulum on May 02, 2023, 04:10:51 AMUntuk warna silakan tambahkan format cell, dengan menu:Format > format bersyaratjika berisi kurang dari 0 maka = warna merah, jika lebih dari 0 maka = warna hijau.Oh ya, sedikit pertanyaan tentang input syarat format diatas, jika lebih dari 0 maka berwarna hijau, namun kenapa pada screenshot agan di atas pada angka 0.8 seperti contoh pada XRP warnanya merah, apakah saat meng-screenshot format syaratnya lain?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "masulum",
+      "created_time": "May 02, 2023, 02:59:14 PMLast edit: May 02, 2023, 03:17:08 PM by masulum",
+      "body": "Quote from: Husna QA on May 02, 2023, 02:25:08 PMOh ya, sedikit pertanyaan tentang input syarat format diatas, jika lebih dari 0 maka berwarna hijau, namun kenapa pada screenshot agan di atas pada angka 0.8 seperti contoh pada XRP warnanya merah, apakah saat meng-screenshot format syaratnya lain?Terima kasih atas koreksinya, sebenarnya tidak ada yang beda, saya juga menerapkan format yang sama, tidak tahu kenapa fungsinya dibawah 1 jadi merah, padahal sudah set 0, harusnya 0.xx sudah jadi hijau seperti yang Anda bagikan. Saat ini saya masih mencari faktor kesalahan pada spreadsheet tersebut, mungkin nanti ada member yang nyoba dan mengalami masalah yang sama bisa diatasi. --Solusi jika format lebih dari 0, terdeteksi merah, kita bisa menggantinya dengan 0.1,",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dansus021",
+      "created_time": "June 13, 2023, 12:22:17 AM",
+      "body": "wah makasih gan ane tadi juga cari cari begini tapi buat konversi USD to idr tapi di end of page google ngomong gini =\"Quotes are not sourced from all markets and may be delayed up to 20 minutes. Information is provided 'as is' and solely for informational purposes, not for trading purposes or advice.Disclaimer\" berarti ini paling enak buat acuan aja ya soalnya bisa ke delay sampe 20 menit jadi emang gak buat trading",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sarah Azhari",
+      "created_time": "June 25, 2023, 02:41:10 AM",
+      "body": "Quote from: dansus021 on June 13, 2023, 12:22:17 AMberarti ini paling enak buat acuan aja ya soalnya bisa ke delay sampe 20 menit jadi emang gak buat trading  Aku pernah juga delay sekitar beberapa menit, namun selanjutnya gak delay lagi, sekali klik langsung tampil. Ini memang sebenarnya cocok buat uji data atau analisa langsung dalam hal mencari selisih harga buat penelitian misalnya. jadi hanya rubah rentan waktu kapan mau dicek.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Siti Mariam Abdullah",
+      "created_time": "September 26, 2024, 01:43:32 PM",
+      "body": "Ada ga yah video tutorial nya mas? mau coba praktek buat cek harga bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

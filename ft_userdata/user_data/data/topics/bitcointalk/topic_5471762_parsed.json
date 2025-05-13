@@ -1,0 +1,53 @@
+{
+  "id": "topic_5471762",
+  "title": "ecdsa123",
+  "author": "ecdsa123",
+  "created_time": "October 26, 2023, 04:24:29 PMLast edit: August 31, 2024, 02:29:28 PM by ecdsa123",
+  "content": "",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471762",
+  "comments": [
+    {
+      "author": "witcher_sense",
+      "created_time": "November 03, 2023, 05:02:34 AM",
+      "body": "Quote from: ecdsa123 on October 26, 2023, 04:24:29 PMHi I have implement by myself my own function signing the transaction the code is in SAGEMATHI have by few months checking is the code have some vulns. In my testing no.But I would like to ask for crypto experts for veryfy.before ask : please analyse the code.Code:import randomimport sysp = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141E = EllipticCurve(GF(p), [0, 7])G = E.point( (0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8))   # Base pointdef egcd(a, b):    if a == 0:        return (b, 0, 1)    else:        g, y, x = egcd(b % a, a)        return (g, x - (b // a) * y, y)def modinv(a, m):    g, x, y = egcd(a, m)    if g != 1:        raise Exception('modular inverse does not exist')    else:        return x % m    def verify(r, s,z,public_key):    w = int(modinv(s, n))    u1 = int((z * w) % n)    u2 = int((r * w) % n)    D=u1*G + u2*public_key    x,y=D.xy()    x=int(x)    if (r % n) == (x % n):        print( \"signature matches\")        return 1    else:        print(\"invalid signature\",r,x%n,hex(int(x%n)))        return -1    def decom(e):    e_arr = []    for i in range(256):        e_arr.append(e % 2**1)        e = e >> 1    e_arr.reverse()    return e_arrdef create_table(t):    table_i_0={}    table_i_1={}        for i in range(0,t):        a1=random.randrange(1,n)        a2=random.randrange(1,n)        table_i_0[i]=(G*a1,a1)        table_i_1[i]=(G*a2,a2)    return table_i_0,table_i_1def make_r_of_hash(hash_values,tableG_0,tableG_1,t):    decomp_hash=decom(hash_values)    e1=decomp_hash[0]    #Round 1    G10,k10=tableG_0[0]    G11,k11=tableG_1[0]    #Round 2    R=(1-e1)*G10+e1*G11    k=((1-e1)*k10+e1*k11)%n    for i in range(1,t):        Gi0,k1i=tableG_0[i]        G1i,ki1=tableG_1[i]        ei= decomp_hash[i]        R=R+(1-ei)*Gi0+ei*G1i        k=(k+(1-ei)*k1i+ei*ki1)%n    return R,k    def sign_transaction(privkey,message,rounds):    z=message    tableG_i_0,tableG_i_1=create_table(rounds)        R,nonce=make_r_of_hash(z,tableG_i_0,tableG_i_1,rounds)    r=R.xy()[0]    r=int(r)    s=(z+int(r)*privkey)*modinv(nonce,n)%n    return int(r), int(s), int(z),nonce  pr=100message= random.randrange(1,n)rounds=10r,s,z,nonce=sign_transaction(pr,message,rounds)verify(r,s,z,pr*G)print(\"trans #1\")print(\"nonce=\",nonce)print(\"r=\",r)print(\"s=\",s)print(\"z=\",z)pr=100message= random.randrange(1,n)rounds=4r,s,z,nonce=sign_transaction(pr,message,rounds)verify(r,s,z,pr*G)print()print(\"trans #2\")print(\"nonce=\",nonce)print(\"r=\",r)print(\"s=\",s)print(\"z=\",z)Your code is not trivial to analyze because it contains zero comments and docstrings, which makes it impossible to understand the purpose of some functions in a reasonable amount of time. On the other hand, if your code works as expected and you haven't found serious vulnerabilities after a couple of months of extensive testing, the only thing that remains is to congratulate you on such an achievement. I have two questions, though.1) What is the sacred meaning of raising a number to the first power?Code:e_arr.append(e % 2**1)2) What is the reason you are using a pseudorandom number generator in such a sensitive function as 'sign_transaction'? From the security point of view, isn't it wiser to employ something more random like os.urandom() or secrets module?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "November 03, 2023, 06:16:58 PM",
+      "body": "I have absolutely no coding skills and can't read or understand a word of your code. I don't possess the skills to comment on it.By browsing through it, I did find the phrase random.randrange that got me thinking of urandom that has often been mentioned on the forum as secure. A quick Google search on \"is random.randrange secure\" got this as the first result > https://stackoverflow.com/questions/42905980/random-randint-to-generate-cryptographically-secure-keys.It talks about randint. Again, since I have no idea what it all means and if it's the same thing, I can only write what I found. Those who have commented say that randint isn't secure enough for cryptography and key generation. Do with the information whatever you want and feel free to laugh if it's complete bullshit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "November 03, 2023, 07:22:56 PM",
+      "body": "Quote from: ecdsa123 on November 03, 2023, 07:11:39 PMbetter? No idea my friend. I can still see the string random.randrange in the code. Can you tell a coding degen like myself what that does exactly and how it relates to key generation and cryptographic security of the keys? Also, in what way is the second version better than the first one?I am sure someone knowledgeable in these topics will drop by to offer useful comments.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "November 04, 2023, 03:56:24 AM",
+      "body": "HiThanks for sharing your ECDSA variant. It's interesting to see how the nonce  k is derived using the message hash and how the precomputed tables contribute to the signature generation process too.I understand that the random.randrange function is used for creating new tables every time a transaction is signed, introducing an element of non-determinism in the signatures. This means that the same message and private key can yield different signatures though, which might be undesirable in certain contexts.Offline signing( not even using the node at all) is a good approach anyway, so it's  already pretty secure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 04, 2023, 05:28:35 AM",
+      "body": "Why even use random? Signing operations haven't used random key for ages, the ephemeral key used in signing is created deterministically that would eliminate all the concerns other users raised. The right way of doing it is using RFC6979 which is also used in Bitcoin in ECDSA. If you don't want to implement that and if your goal for implementing this is just testing stuff then at least use a simple KDF or at least a simple HMAC to derive the ephemeral key using the (message hash + private key).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

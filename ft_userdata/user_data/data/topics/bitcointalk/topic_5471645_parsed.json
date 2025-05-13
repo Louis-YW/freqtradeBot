@@ -1,0 +1,165 @@
+{
+  "id": "topic_5471645",
+  "title": "Kruw",
+  "author": "Kruw",
+  "created_time": "October 25, 2023, 04:46:08 PMLast edit: October 25, 2023, 09:08:24 PM by Kruw",
+  "content": "While doing research, I ran across two bugs taking place in Samourai's Whirlpool coinjoin protocol that could be spotted with the naked eye.  On October 25th, I opened two Gitlab issues describing the bug with links to the addresses and transactions the behavior occurred under. Within hours, both bug reports were deleted without comment. Since Samourai does not want to comment on their existence, I am publicly disclosing them:https://web.archive.org/web/20231025112756/https://code.samourai.io/wallet/samourai-wallet-android/-/issues/461https://web.archive.org/web/20231025112815/https://code.samourai.io/wallet/samourai-wallet-android/-/issues/462Issue 461 is the most straightforward: You are spending 305 sats to yourself and paying 369 sats in mining fees to do it. There is no privacy benefit from creating this output since it is known to belong to the same owner as the inputs of the transaction.Issue 462 appears even more straightforward at first but is actually more nuanced: The coinjoin coordinator is reusing addresses to collect its fees, with one receiving up to 36 incoming payments. While this might seem like an obvious privacy leak that can be fixed with a debug, it's not effective just to rotate the receive address. It would actually require an upgrade to the coinjoin protocol itself to hide the amount paid the coordinator (and save block space) with participant paying their fee directly in a coinjoin and the coordinator mimicking the participants' output size.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471645",
+  "comments": [
+    {
+      "author": "Medusah",
+      "created_time": "October 25, 2023, 05:10:34 PM",
+      "body": "Quote from: Kruw on October 25, 2023, 04:46:08 PMIssue 461 is the most straightforward: You are spending 305 satoshis to yourself and paying 369 sats mining in fees to do it. There is no privacy benefit from creating this output since it is known to belong to the same owner as the inputs of the transaction.This does not seem like a whirlpool transaction.  What software did you use to produce it?Quote from: Kruw on October 25, 2023, 04:46:08 PMIssue 462 appears even more straightforward at first but is actually more nuanced: The coinjoin coordinator is reusing addresses to collect its fees, with one receiving up to 36 incoming payments. While this might seem like an obvious privacy leak that can be fixed with a debug, it's not effective just to rotate the receive address. It would actually require an upgrade to the coinjoin protocol itself to hide the amount paid the coordinator (and save block space) with participant paying their fee directly in a coinjoin and the coordinator mimicking the participants' output size.They use pools (pool size coinjoins).  How can you pay their fee without creating a new UTXO?  I did not understand.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "October 25, 2023, 05:16:43 PMLast edit: November 04, 2023, 05:41:56 PM by Kruw",
+      "body": "Quote from: Medusah on October 25, 2023, 05:10:34 PMThis does not seem like a whirlpool transaction.  What software did you use to produce it?Whirlpool coinjoins consist of two transactions.  The traceable change is created from the tx0 premix transaction.  While tx0 is already a huge waste of block space on its own, the change output created here is especially wasteful because it cost the user more in mining fees to create it than it is worth.Quote from: Medusah on October 25, 2023, 05:10:34 PMHow can you pay their fee without creating a new UTXO?  I did not understand. A coinjoin contains inputs from multiple users.  In Whirlpool, each user pays the coordinator fee in the tx0 transaction, then coinjoins with other peers in the following transaction.  Since all peers are paying their fees to the same coordinator, they would save block space by pooling their payments into the creation of one output for the entire group as opposed to each participant creating an individual output.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 04, 2023, 12:16:12 PM",
+      "body": "Transaction fees are as high as 70 sats/vbyte, watch out for bug #1 today, don't lose your sats!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 04, 2023, 03:51:24 PM",
+      "body": "Thank you for report the bugs, i am going to try to check them.Quote from: Kruw on November 04, 2023, 12:16:12 PMTransaction fees are as high as 70 sats/vbyte, watch out for bug #1 today, don't lose your sats!We can use Testnet to try to reproduce what you just said, with testnet we don't waste any real coin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Medusah",
+      "created_time": "November 05, 2023, 04:24:45 PM",
+      "body": "Quote from: Kruw on October 25, 2023, 05:16:43 PMWhirlpool coinjoins consist of two transactions.  The traceable change is created from the tx0 premix transaction.  While tx0 is already a huge waste of block space on its own, the change output created here is especially wasteful because it cost the user more in mining fees to create it than it is worth.But what software did you use that produced this?  I have never created a dust output like that, but have used whirlpool from sparrow multiple times.Quote from: Kruw on October 25, 2023, 05:16:43 PMA coinjoin contains inputs from multiple users.  In Whirlpool, each user pays the coordinator fee in the tx0 transaction, then coinjoins with other peers in the following transaction.  Since all peers are paying their fees to the same coordinator, they would save block space by pooling their payments into the creation of one output for the entire group as opposed to each participant creating an individual output.As I understand it, participants pay during their entry.  They cannot pay all together, because each one enters in a different time.  It can happen in theory, but it would need to change their entire protocol.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 05, 2023, 10:22:59 PMLast edit: November 06, 2023, 03:45:53 AM by Kruw",
+      "body": "Quote from: Medusah on November 05, 2023, 04:24:45 PMBut what software did you use that produced this?  I have never created a dust output like that, but have used whirlpool from sparrow multiple times.I just used the mempool.space block explorer to find it. Here is another Whirlpool tx0 that created negative value dust 2 days ago, an unmixable change output for 933 sats was created at a cost of 1233 sats - https://mempool.space/tx/caf8893b7d76027e9839d803197781505a4137020a55db742b87e86ccdb899dfQuote from: Medusah on November 05, 2023, 04:24:45 PMAs I understand it, participants pay during their entry.  They cannot pay all together, because each one enters in a different time.  It can happen in theory, but it would need to change their entire protocol. Yes, they should change their entire protocol.  Tx0 is a massive waste of block space.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 07, 2023, 04:09:58 AMLast edit: November 08, 2023, 05:02:42 AM by pooya87",
+      "body": "Quote from: Kruw on October 25, 2023, 04:46:08 PMWithin hours, both bug reports were deleted without comment. Since Samourai does not want to comment on their existenceHave you tried opening similar issues with a different account since it could be possible that Samourai team is removing anything you post specifically because you are a well known Wasabi shill. Quote from: Kruw on November 07, 2023, 01:01:12 PMFeel free to report the bug yourself I'm not a user of this tool nor am I familiar with the code and/or how it works to bother with it...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 07, 2023, 01:01:12 PM",
+      "body": "Quote from: pooya87 on November 07, 2023, 04:09:58 AMHave you tried opening similar issues with a different account since it could be possible that Samourai team is removing anything you post specifically because you are a well known Wasabi shill. Feel free to report the bug yourself if you think that my privacy expertise is the reason my peer review was targeted for deletion by Samourai.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 07, 2023, 03:39:52 PM",
+      "body": "Probably deleted since OP is a recurrent concern troll - https://nitter.cz/PavelTheCoder/status/1647970679805947910#mThese are both non issues.1 - Both Samourai and Sparrow tell you the size of your change output prior to signing and broadcasting Tx0. If you don't want to create a change output of this size, then you go and edit your transaction. This is the expected behavior of any good wallet.2 - Tx0 clearly pays the coordinator, and this output is easily identified. The privacy of Whirlpool coinjoins does not depend on this fee payment being secret. It does not matter if you and I both pay to the same coordinator address - there is zero loss of privacy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 07, 2023, 04:50:33 PMLast edit: November 08, 2023, 03:24:13 AM by Kruw",
+      "body": "Quote from: o_e_l_e_o on November 07, 2023, 03:39:52 PMProbably deleted since OP is a recurrent concern troll - https://nitter.cz/PavelTheCoder/status/1647970679805947910#mIn this thread you linked, disgraced Samourai developer 'PavelTheCoder' (who also was caught lying exactly like you were about WabiSabi coinjoins being traceable) calls the issue I opened for enabling \"absolutely vital\" privacy features by default on Samourai wallet \"a retarded change\".Quote from: o_e_l_e_o on June 03, 2023, 04:55:03 PMWhirlpool does use a central coordinator, so it is absolutely vital that you use it with your own node and Tor to keep your privacy from the central coordinator. Samourai acts as a surveillance app, sending everyone's financial history to their servers. You claimed that it's \"absolutely vital\" to keep your privacy by connecting to your full node and using Tor, and yet this \"absolutely vital\" privacy improvement was DELETED from Samourai's Gitlab repository: https://web.archive.org/web/20230417145554/https://code.samourai.io/wallet/samourai-wallet-android/-/issues/458Quote from: o_e_l_e_o on November 07, 2023, 03:39:52 PM1 - Both Samourai and Sparrow tell you the size of your change output prior to signing and broadcasting Tx0. If you don't want to create a change output of this size, then you go and edit your transaction. This is the expected behavior of any good wallet.Tell me why you would you ever want to send an output to yourself that costs more in sats to create than it is worth. Any good wallet would prevent you from taking this unnecessary loss.Quote from: o_e_l_e_o on November 07, 2023, 03:39:52 PM2 - Tx0 clearly pays the coordinator, and this output is easily identified. The privacy of Whirlpool coinjoins does not depend on this fee payment being secret. It does not matter if you and I both pay to the same coordinator address - there is zero loss of privacy. Apparently you are not aware of Samourai's statements regarding reuse of coordinator fee addresses: https://stephanlivera.com/episode/150/QuoteStephan Livera: Also. So recently there’s been this whole debacle around Wasabi wallet getting flagged. So essentially some users, so the two recent examples, which to my knowledge, are the third and fourth cases that I know of. So there was Catxolotl from Binance Singapore. And then the other guy was RonaldMcHodled. RonaldMcHodled was withdrawing from Paxos. And so it’s sparked up this whole debate about basically how easy is it to flag CoinJoin transactions. My perspective on it was, look, these are like an unforced error. Wasabi should not have had a fixed fee address. And in fairness to Wasabi they are now changing that, after a lot of debate and a lot of time on this topic.Samourai Wallet: It doesn’t matter now though. The impact has already been made. There’s no going back from more than a year of address reuse. It’s tied into the architecture of the mixes now. So it’s very good that they finally changed that. But it really isn’t going to do all that much.If this is so important to Samourai that coordinator fee addresses are not reused in Wasabi, why would they delete an issue from their Gitlab repo proving that the coordinator fee address is reused in Samourai?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 09, 2023, 05:22:01 PM",
+      "body": "Ouch, this non private toxic change output created by Whirlpool's tx0 was even larger than the 0.001 pool denomination itself: https://mempool.space/address/bc1qmgnthpjk4ecgmq4hlne6h79q7ykaf4w8n9jzkvEven worse, that traceable coin was then consumed as an unnecessary input, wasting block space and linking the two transactions together: https://mempool.space/tx/8b63b69e91a5c5ebd840a0dcb8bda38f12e3812485ab263291ab3cfe3819cd06It's like they don't even know there's a cost or limit involved with block space",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Medusah",
+      "created_time": "November 09, 2023, 06:47:02 PM",
+      "body": "Quote from: Kruw on November 07, 2023, 04:50:33 PMTell me why you would you ever want to send an output to yourself that costs more in sats to create than it is worth. Any good wallet would prevent you from taking this unnecessary loss.No.  Good wallets give you the freedom to do as you like.  There are infinite ways for the user to mess things up if they choose to do so, the wallet cannot prevent you from every.  For example, paying unnecessarily high fees is (and should be) allowed. Quote from: Kruw on November 07, 2023, 04:50:33 PMSamourai acts as a surveillance app, sending everyone's financial history to their servers.I have not used that samourai software, but don't they warn you that if you do not run your own node you rely on someone else's?  What else should they say?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 09, 2023, 07:09:37 PM",
+      "body": "Quote from: Medusah on November 09, 2023, 06:47:02 PMNo.  Good wallets give you the freedom to do as you like.  There are infinite ways for the user to mess things up if they choose to do so, the wallet cannot prevent you from every.  For example, paying unnecessarily high fees is (and should be) allowed. I guess I can't argue against someone who takes the stance \"Wasting your Bitcoin and ruining your privacy should be allowed.\"Quote from: Medusah on November 09, 2023, 06:47:02 PMI have not used that samourai software, but don't they warn you that if you do not run your own node you rely on someone else's?  What else should they say?No, they do not provide any warning to users before collecting their data from them.  @walletguy closed the issue and said \"Feel free to submit a PR if you so desire, but it will not be merged. Your proposed warning text makes no sense and claims made in said text are not true in the slightest.\" - https://web.archive.org/web/20230417145554/https://code.samourai.io/wallet/samourai-wallet-android/-/issues/458",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Medusah",
+      "created_time": "November 09, 2023, 07:17:27 PM",
+      "body": "Quote from: Kruw on November 09, 2023, 07:09:37 PMI guess I can't argue against someone who takes the stance \"Wasting your Bitcoin and ruining your privacy should be allowed.\"Wasting your money and your privacy in real life are allowed, I do not understand why here should be otherwise.  If you are reckless, you are going to regret it.  I do not propose to not warn someone for their bad actions, but if despite the warning they still will want to do it, who am I to stop them?Quote from: Kruw on November 09, 2023, 07:09:37 PMNo, they do not provide any warning to users before collecting their data from them.  @walletguy closed the issue and said \"Feel free to submit a PR if you so desire, but it will not be merged. Your proposed warning text makes no sense and claims made in said text are not true in the slightest.\" - https://web.archive.org/web/20230417145554/https://code.samourai.io/wallet/samourai-wallet-android/-/issues/458And they are correct.  Your absolute claim that you \"negate the potential gained privacy\" is false, because it is absolute.  It is the same as saying that mixers provide no privacy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 09, 2023, 08:30:01 PM",
+      "body": "Quote from: Medusah on November 09, 2023, 07:17:27 PMAnd they are correct.  Your absolute claim that you \"negate the potential gained privacy\" is false, because it is absolute.  It is the same as saying that mixers provide no privacy.I guess o_e_l_e_o and I are just going to have to disagree with you on this one:Quote from: o_e_l_e_o on June 03, 2023, 04:55:03 PMWhirlpool does use a central coordinator, so it is absolutely vital that you use it with your own node and Tor to keep your privacy from the central coordinator.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 10, 2023, 07:52:30 AM",
+      "body": "Quote from: Medusah on November 09, 2023, 07:17:27 PMWasting your money and your privacy in real life are allowed, I do not understand why here should be otherwise.  If you are reckless, you are going to regret it.As has been explained to Kruw dozens of times, the change output from Tx0s are sent to a separate account and deliberately segregated from your other UTXOs. There is no way to accidentally include them in a transaction. Any user consolidating their change output as has been done in the transaction he has linked to above is doing so deliberately. I understand that Kruw gets angry when people spend their bitcoin in ways that he personally doesn't approve of, but there is no bug here, just Kruw either being deliberately misleading or simply not understanding what is happening.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 10, 2023, 10:05:47 AMLast edit: November 10, 2023, 11:46:43 AM by Kruw",
+      "body": "Quote from: o_e_l_e_o on November 10, 2023, 07:52:30 AMAs has been explained to Kruw dozens of times, the change output from Tx0s are sent to a separate account and deliberately segregated from your other UTXOs. There is no way to accidentally include them in a transaction. Any user consolidating their change output as has been done in the transaction he has linked to above is doing so deliberately. I understand that Kruw gets angry when people spend their bitcoin in ways that he personally doesn't approve of, but there is no bug here, just Kruw either being deliberately misleading or simply not understanding what is happening.\"Explained to Kruw dozens of times\"?... You never gave even a single example of why someone would ever want to deliberately create a transaction that causes them to lose their BTC and their privacy:Quote from: Kruw on November 07, 2023, 04:50:33 PMQuote from: o_e_l_e_o on November 07, 2023, 03:39:52 PM1 - Both Samourai and Sparrow tell you the size of your change output prior to signing and broadcasting Tx0. If you don't want to create a change output of this size, then you go and edit your transaction. This is the expected behavior of any good wallet.Tell me why you would you ever want to send an output to yourself that costs more in sats to create than it is worth. Any good wallet would prevent you from taking this unnecessary loss.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 10, 2023, 10:26:05 AM",
+      "body": "Quote from: Kruw on November 10, 2023, 10:05:47 AM\"Explaned to Kruw dozens of times\"?Once again: https://bitcointalk.org/index.php?topic=5457560.msg63102560#msg63102560",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 10, 2023, 11:57:14 AMLast edit: November 10, 2023, 12:10:51 PM by Kruw",
+      "body": "Quote from: o_e_l_e_o on November 10, 2023, 10:26:05 AMOnce again: https://bitcointalk.org/index.php?topic=5457560.msg63102560#msg63102560Stay on topic and stop evading the question - Tell me why anyone would ever lose their sats deliberately by creating these traceable Whirlpool dust outputs:https://mempool.space/address/bc1qp25y8kfywz88myuh7ed3dmx3vv2z2dwuxhjnlvValue of output: 305 satsMining fee paid to create output: 369 satsMining fee paid to spend input: 1,776 satsNet loss from dust bug: 1,840 satsNew transactions clustered: 5 txshttps://mempool.space/address/bc1q83sfgfefwupz8w3faawxjr5v8uf03ttjclrkdaValue of output: 933 satsMining fee paid to create output: 1,234 satsMining fee paid to spend input: 4,333 satsNet loss from dust bug: 4,634 satsNew transactions clustered: 12 txs",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

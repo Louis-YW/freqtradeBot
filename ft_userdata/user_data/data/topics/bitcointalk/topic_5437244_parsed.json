@@ -1,0 +1,77 @@
+{
+  "id": "topic_5437244",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "January 29, 2023, 04:57:48 PM",
+  "content": "I stumbled across this discussion in lightning-dev lists: Do we really want users to solve an NP-hard problem when they wish to find a cheap way of paying each other on the Lightning Network?, and it was interesting. The TL;DR is: Lightning's fee function is f(x) = rx + b, with r being the fee rate and b being the base fee. But this function isn't linear (in a linear algebra sense) unless b=0. The conclusion is that without a base fee, the system would work more efficiently.Lightning implements a variation of the Dijkstra algorithm, which in the worst case scenario with Fibonacci heap, it has a time complexity of Θ(E + V*log(V)), where E is the number of edges and V the number of nodes. My computer science question is how the fee function takes place and rises the time complexity by orders of magnitude if b is non-zero.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5437244",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "January 29, 2023, 07:10:25 PM",
+      "body": "Is your question essentially why b isn't constant?The base fee is determined by the intermediate nodes for your transaction (the channels it goes to from your node to the end). These look like they're set a constants for each channel but it's the route that changes and thus the base fee for each channel can change too. It looks like the fee rate changes based on: 1) liquidity, 2) liquidity impact (how much liquidity you take) which might also be why it's non- linear and non- constant (if you spend more, your fee rate increases but not by a linear multiple).Most places I can find seem to also state that sometimes base fees can go negative if they want extra liquidity in one direction so that might be another reason the formula isn't linear..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 29, 2023, 07:46:03 PM",
+      "body": "Quote from: jackg on January 29, 2023, 07:10:25 PMIs your question essentially why b isn't constant?No, not at all. My question is: how does the base_fee affect the complexity of the Dijkstra algorithm?My guess is that if b is non-zero, the algorithm must take into account an extra parameter, that is the base_fee, and therefore increase the time complexity by orders of magnitude, because nodes need to consider not only the lowest fee rate when determining the cheapest path, but the best fee_rate : base_fee ratio. If the network expanded by a lot, this could perhaps make it infeasible for fast payments. I don't know, I'm not sure, I just assume. Can an either Bitcoin or Lightning Core developer help me here?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "January 29, 2023, 09:33:41 PMLast edit: January 29, 2023, 10:28:18 PM by garlonicon",
+      "body": "Well, Bitcoin mining by itself, without Lightning Network, is NP hard: https://freedom-to-tinker.com/2014/10/27/bitcoin-mining-is-np-hard/QuoteThe conclusion is that without a base fee, the system would work more efficiently.It depends how you will construct your algorithm, but it is generally true. Transaction selection is NP hard (see: knapsack problem), however, if you sort them by \"satoshi per byte\" or something similar, you can simply select your transactions based on that, and reach quite good results in practice, even if your solution will not be always the best one.For that reason, we have block weight, calculated with a single formula for witness and non-witness data. If we would have two different rules for 1 MB non-witness data, and 3 MB witness data, it would be worse, when it comes to checking, which transaction is more profitable to include. So, \"satoshi per virtual byte\" is easier to compute than \"satoshi per byte + satoshi per witness byte\".QuoteMy computer science question is how the fee function takes place and rises the time complexity by orders of magnitude if b is non-zero.It depends, what is your goal. If you want to always pick the best existing solution, then yes, it is more complex. But if your goal is to have some approximation that works \"good enough\" in typical scenarios, then you can simplify it, and then your algorithm has lower complexity.So, in Bitcoin, we use simplified solutions that you can see in typical implementations. But because of that \"NP hardness\", you can find some cases, where you will check some blocks, and notice that it was possible to pick some better set of transactions, and get higher fees. Or you can observe in LN that someone picked a route that was not the best one available at that time, and some node could route the same transaction cheaper than it did.QuoteMy guess is that if b is non-zero, the algorithm must take into account an extra parameter, that is the base_fee, and therefore increase the time complexity by orders of magnitude, because nodes need to consider not only the lowest fee rate when determining the cheapest path, but the best fee_rate : base_fee ratio.Also, there is one more thing: imagine that \"b\" is always zero. Problem solved? Not really, because there is always an option to do the same transaction on-chain. And that constant cannot be eliminated, because you can always close your channel, and send your coins directly to the recipient, or even use those coins to open another channel, while closing the previous one.Edit: some example for the knapsack problem (transaction selection problem), see: https://en.wikipedia.org/wiki/Knapsack_problemYou have that Wikipedia example, and you can see, how it turns out, when you apply \"satoshi per byte\" as a \"dollar per kilogram\", to pack that 15kg knapsack:Code:$10    4 kg   2.50 $/kg   1 $2    1 kg   2.00 $/kg   2 $1    1 kg   1.00 $/kg   3 $2    2 kg   1.00 $/kg   4 $4   12 kg   0.33 $/kg   (excluded)And you can check all combinations to see the best solution (in practice brute forcing won't help, but for five \"transactions\" we can do that).Code:11111   $19   20kg   (bad)11011   $18   19kg   (bad)11101   $17   18kg   (bad)10111   $17   19kg   (bad)11001   $16   17kg   (bad)10011   $16   18kg   (bad)11110   $15    8kg   (the best solution)10101   $15   17kg   (bad)11010   $14    7kg10001   $14   16kg   (bad)11100   $13    6kg10110   $13    7kg11000   $12    5kg10010   $12    6kg10100   $11    5kg10000   $10    4kg01111    $9   16kg   (bad)01011    $8   15kg01101    $7   14kg00111    $7   15kg01001    $6   13kg00011    $6   14kg01110    $5    4kg00101    $5   13kg01010    $4    3kg00001    $4   12kg01100    $3    2kg00110    $3    3kg00010    $2    2kg01000    $2    1kg00100    $1    1kg00000    $0    0kgThen, you can see that we reached $15 items with 8kg weight. But, what would happen if there would be one more item worth $16 with 12 kg weight? It would have 1.33 $/kg, so it would be still included after the first two items (with 2.50 $/kg and 2.00 $/kg). And because those two items have 5 kg weight, adding 12 kg would exceed the 15 kg limit, so that item won't be picked.So, as you can see, our transaction selection algorithm is \"good enough\". There is no guarantee that the total fee for a given block is the highest possible fee that a miner could take at a given time, having a given mempool. But in practice, our \"good enough\" solution is sufficient. The same for LN fees: finding the best route is NP hard. But we have simplified solutions that are sufficient.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 30, 2023, 07:42:23 AM",
+      "body": "Quote from: garlonicon on January 29, 2023, 09:33:41 PMWell, Bitcoin mining by itself, without Lightning Network, is NP hard: https://freedom-to-tinker.com/2014/10/27/bitcoin-mining-is-np-hard/Yes, but mining isn't meant for usage from regular users. Only from those with the necessary specialized hardware. Oh I see the problem now. Quote from: garlonicon on January 29, 2023, 09:33:41 PMBut if your goal is to have some approximation that works \"good enough\" in typical scenarios, then you can simplify it, and then your algorithm has lower complexity.So, I believe that I search until I find a rational fee for the transaction to pass? How's the sufficiency decided? What's the less complex algorithm, which introduces that tradeoff?Quote from: garlonicon on January 29, 2023, 09:33:41 PMProblem solved? Not really, because there is always an option to do the same transaction on-chain.True, sending coins on-chain should also be taken into account, because sometimes it's cheaper to settle things on-chain (e.g., when you're moving 1m sat). Isn't that making the algorithm very little more complex, though? Once you're done with searching the cheapest path, you're one condition away. (ln_fee > chain_fee)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "January 30, 2023, 02:55:14 PM",
+      "body": "Quote from: BlackHatCoiner on January 29, 2023, 07:46:03 PMQuote from: jackg on January 29, 2023, 07:10:25 PMIs your question essentially why b isn't constant?No, not at all. My question is: how does the base_fee affect the complexity of the Dijkstra algorithm?My guess is that if b is non-zero, the algorithm must take into account an extra parameter, that is the base_fee, and therefore increase the time complexity by orders of magnitude, because nodes need to consider not only the lowest fee rate when determining the cheapest path, but the best fee_rate : base_fee ratio.it's possible to set the rate to zero and the base fee to >0, right? that should make path finding using such nodes even less complexalso, Dijkstra has been described by lightning devs as a stop-gap, it's not optimized for Lightning, just a reasonable (and well studied) generic path finding algorithm. Which path-finding strategy dominates in the end is anybody's guess at this point in time.also, path-finding is not part of the spec/protocol, and ought not to be. It's quite possible that one of the node implementations already has an alternative algo (or even just tweaked Dijkstra). You can be sure that adventurous node operators have also already tried something different",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HeRetiK",
+      "created_time": "January 30, 2023, 03:37:47 PM",
+      "body": "Quote from: Carlton Banks on January 30, 2023, 02:55:14 PMit's possible to set the rate to zero and the base fee to >0, right? that should make path finding using such nodes even less complex[...]The problem with that is that it would be disproportionally more expensive for smaller transactions, which arguably are the main selling point for LN. That is, while e.g. a base fee of 10 sats would only be 0.01% for a transaction of 1 mBTC it would be a fee of 10% for a transaction of 100 sats. Large transactions are also harder on a channel's liquidity so undercharging large transactions relative to small transactions is not in a node operator's interest. Accordingly if the choice is between setting the percentual fee rate or the base fee to zero, setting the latter to zero is much more viable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "January 30, 2023, 04:06:18 PM",
+      "body": "QuoteSo, I believe that I search until I find a rational fee for the transaction to pass?Yes.QuoteHow's the sufficiency decided?There are some default fees, but they can be also adjusted by users. In general, it is about signing some transaction, or refusing to sign for whatever reason. Going offline is the same as refusing some too high fee, it is just a case when another side will not get all needed signatures.QuoteWhat's the less complex algorithm, which introduces that tradeoff?The least complex way is finding paths on-the-fly, sorting them, and leaving that choice to the user. And then, as soon as that user clicks \"confirm\", the whole payment is created, and there is no need to search for another route.Also, whatever method is used, there is one important thing: the whole network is changing constantly. Even if you have the best possible route, you cannot wait too long, because someone else can make a payment in the meantime, and then your payment will fail, for example if some channel will be unbalanced.So, the basic case is just \"route it using any path, just below this fee\". Because the most annoying case is when you can see FAILURE_REASON_NO_ROUTE without any instructions, what to do to solve it. Was that route too expensive? Or maybe there is no connection to the network at all? Or just LNURL failed, because of some server? I don't know, but I often saw that kind of messages. And that part is probably the most annoying part of LN: that a payment could simply fail.QuoteAccordingly if the choice is between setting the percentual fee rate or the base fee to zero, setting the latter to zero is much more viable.Yes, but it is also important to monitor routed amounts correctly. Because if it is simply \"amount/1000\", then it may turn out that sending 999 millisatoshis many times will allow routing some payment for free.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HeRetiK",
+      "created_time": "January 30, 2023, 04:46:45 PM",
+      "body": "Quote from: garlonicon on January 30, 2023, 04:06:18 PMQuoteAccordingly if the choice is between setting the percentual fee rate or the base fee to zero, setting the latter to zero is much more viable.Yes, but it is also important to monitor routed amounts correctly. Because if it is simply \"amount/1000\", then it may turn out that sending 999 millisatoshis many times will allow routing some payment for free.Min HTLC can be used to prevent that and I've seen it set to >= 1 sat for almost every channel these days; presumably in part for this very reason. While this limits the routing of millisatoshis, allowing for even smaller amounts to be kept as transactions fees should be comparably easy to solve by the time that denomination becomes of practical relevance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

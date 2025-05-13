@@ -1,0 +1,61 @@
+{
+  "id": "topic_5449444",
+  "title": "THLO",
+  "author": "THLO",
+  "created_time": "April 19, 2023, 01:36:23 PM",
+  "content": "Hey everyone,I'd like to understand how Bitcoin nodes behave when receiving retransmitted transactions using the replace-by-fee mechanism. Specifiically, I have the following questions:What happens if the transaction is resubmitted (following an initial transaction with the RBF flag set) with identical inputs and outputs but with recomputed signatures, changing the transaction ID? Is this considered a different transaction, violating the rule that the fee must increase by a specific amount? Or would the transaction be accepted and added to the mempool? Obviously, only one of the two transactions would ever be added to a block.Assuming that this modified transaction is not accepted, would the original transaction be evicted from the mempool as well?Assuming that this modified transaction is not accepted, is it still correct that the transaction would be silently dropped without affecting the sending peer's banscore?Thanks in advance for any insightful reply!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5449444",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "April 19, 2023, 01:46:36 PM",
+      "body": "If you use RBF and you pump the fee, the txid will change. You can not use RBF with the same fee, you have to increase the fee before the transaction would be replaced or be double-spent using RBF. Bitcoin unconfirmed transaction will remain valid and not dropped from the mempool except:1. If the mempool become congested and low fee transactions are getting replaced by high fee transactions which would be dropped from mempool. This happens if the mempool is full.2. Another reason for a transaction to be dropped from mempool is when the transaction is 14 days old and nodes drop it and not routing it to other nodes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "April 19, 2023, 02:05:18 PM",
+      "body": "You can do that and submit another transaction with the same fee when it's RBF enabled but the problem is the first transaction that you made will be the first to receive confirmation and the 2nd one will be rejected.But most of the wallets out there do not allow you to pay the same or less unlike rebuilding the transaction manually through Coinb.in.If the 2nd transaction with the bump fee is rejected then the original transaction should be rejected too. However, I never heard that there is a bump transaction that was rejected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "April 19, 2023, 02:17:44 PM",
+      "body": "Quote from: BitMaxz on April 19, 2023, 02:05:18 PMYou can do that and submit another transaction with the same fee when it's RBF enabled but the problem is the first transaction that you made will be the first to receive confirmation and the 2nd one will be rejected.Then what is the point of using RBF when the fees are the same?Maybe this is pertaining to Electrum, I wanted to reduce the fee and also use the same fee, but it did not work and stated the reason that only higher fee can be used.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "April 19, 2023, 03:02:23 PM",
+      "body": "The point of RBF is generally to increase the fee, in cases where the mempool is huge and your transaction is far back at the queue because you specified a too low fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 19, 2023, 05:38:51 PM",
+      "body": "Quote from: THLO on April 19, 2023, 01:36:23 PMWhat happens if the transaction is resubmitted (following an initial transaction with the RBF flag set) with identical inputs and outputs but with recomputed signatures, changing the transaction ID? Almost all wallets calculate the k value deterministically, so a transaction with identical inputs and outputs will almost always have the same signature.In the rare case that someone used transaction malleability to change the TXID, then nodes would reject this new transaction since it does not meet the criteria for the increased fee as per BIP125. The original transaction would remain in the mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "THLO",
+      "created_time": "April 20, 2023, 11:15:06 AM",
+      "body": "QuoteIn the rare case that someone used transaction malleability to change the TXID, then nodes would reject this new transaction since it does not meet the criteria for the increased fee as per BIP125. The original transaction would remain in the mempool.Thanks a lot for the information! That answers my main question.And thanks as well to everybody else who contributed to this discussion!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

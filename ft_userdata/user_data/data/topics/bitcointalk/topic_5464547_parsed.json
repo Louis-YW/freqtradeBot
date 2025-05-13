@@ -1,0 +1,53 @@
+{
+  "id": "topic_5464547",
+  "title": "almqq",
+  "author": "almqq",
+  "created_time": "August 25, 2023, 11:05:40 AM",
+  "content": "Hi, I am trying to get paytomany working, using the command line. I tried this:Code:electrum paytomany bc1qnp7d483d79j6pcx6rfc9yw46xrevplcxtuurhq 0.0001 bc1qt6enaefhrhue9q4hyszx4kn9zvqvucktruvh2q 0.0001and got this errorCode:electrum paytomany: error: argument outputs: invalid <lambda> value: 'bc1qnp7d483d79j6pcx6rfc9yw46xrevplcxtuurhq'What am I doing wrong?PS: \"electrum payto ...\" works, but not \"electrum paytomany ...\"",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464547",
+  "comments": [
+    {
+      "author": "Knight Hider",
+      "created_time": "August 25, 2023, 11:26:36 AM",
+      "body": "Quote from: almqq on August 25, 2023, 11:05:40 AMHi, I am trying to get paytomany working, using the command line. I tried this:Code:electrum paytomany bc1qnp7d483d79j6pcx6rfc9yw46xrevplcxtuurhq 0.0001 bc1qt6enaefhrhue9q4hyszx4kn9zvqvucktruvh2q 0.0001Use this (from stackexchange):Code:electrum paytomany \"[[\\\"bc1qnp7d483d79j6pcx6rfc9yw46xrevplcxtuurhq\\\", 0.0001], [\\\"bc1qt6enaefhrhue9q4hyszx4kn9zvqvucktruvh2q\\\", 0.0001]]\"I tested it myself:Code:electrum --testnet -w $wallet paytomany \"[[\\\"tb1q8gyrph2e8fxv523zlajrfahm5vswsg4ccw90zu\\\", 0.001], [\\\"tb1qx52vxtymu4t6asm24s2h50tz0pqs88alx8w5vz\\\", 0.0002]]\"02000000000101b2dac704d87285da38ff6bed65dcf73c6f12c73d66641bb7cdcf333ee10429870000000000fdffffff03204e0000000000001600143514c32c9be557aec36aac157a3d627841039fbfa0860100000000001600143a0830dd593a4cca2a22ff6434f6fba320e822b8fc2e020000000000160014f0e691d48c49b0bc85e1365d82aea8f61cc5fcad024730440220379bb9b1be007b324047d8c8809233b023ae5c69299f270fbfab23e9863af31302203173e4f3b608ec738be630b8826e19dfd0fe60c88f054bbbf60c674f041b9346012103a1e21244b4d983ebdcb5ec074a5c0d4103bc69b794369f15f65f644b4538ae152bc32500--Knight Hider",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "almqq",
+      "created_time": "August 25, 2023, 11:46:11 AM",
+      "body": "I managed. The answer is this format:electrum paytomany '[[\"bc1qnp7d483d79j6pcx6rfc9yw46xrevplcxtuurhq\",0.0001], [\"bc1qt6enaefhrhue9q4hyszx4kn9zvqvucktruvh2q\",0.0001]]'",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Knight Hider",
+      "created_time": "August 26, 2023, 09:01:02 AM",
+      "body": "Quote from: almqq on August 25, 2023, 11:46:11 AMI managed. The answer is this format:electrum paytomany '[[\"bc1qnp7d483d79j6pcx6rfc9yw46xrevplcxtuurhq\",0.0001], [\"bc1qt6enaefhrhue9q4hyszx4kn9zvqvucktruvh2q\",0.0001]]'The single quotes won't allow for variable substitution. But it is easier than escaping double quotes.--Knight Hider",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 27, 2023, 05:30:48 AM",
+      "body": "For cases like this, it is best and easiest to use some JSON library that would create the string itself instead of trying to hardcode it yourself. In that case you just create your \"array\" with the addresses and amounts and simply call the ToString method to get the result you want to pass to the commandline. That should take care of all the quotes, brackets, etc. needed for a correct value.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "August 27, 2023, 01:08:25 PM",
+      "body": "Quote from: almqq on August 25, 2023, 11:46:11 AMI managed. The answer is this format:electrum paytomany '[[\"bc1qnp7d483d79j6pcx6rfc9yw46xrevplcxtuurhq\",0.0001], [\"bc1qt6enaefhrhue9q4hyszx4kn9zvqvucktruvh2q\",0.0001]]'this actually how json.dumps works and used in electrum code I find that trying to write it manually may cause some problems, so the easiest solution is to create a CSV file with the address, amount, and let's name this file P2M.csv, then write this codeCode:import csvinput_file = csv.DictReader(open(\"/full/path/to/your/P2M.csv\"))// Full pathoutputs = []for row in input_file:    tup = (row[\"address\"], float(row[\"amount\"]))    outputs.append(tup)print outputs    transaction = paytomany(outputs, 0.0004)    print transaction0.0004 is mining fee you can change it or add raw_input to check transaction before sending itTo see more codes or code details above https://github.com/ramuta/electrum-script-tutorialQuote from: almqq on August 25, 2023, 11:05:40 AMWhat am I doing wrong?The error was in duplicating the code, the syntax you used is not correct, this is the explanation of the codeCode:    @command('wp')    async def paytomany(self, outputs, fee=None, feerate=None, from_addr=None, from_coins=None, change_addr=None,                        nocheck=False, unsigned=False, rbf=True, password=None, locktime=None, addtransaction=False, wallet: Abstract_Wallet = None):https://github.com/spesmilo/electrum/blob/master/electrum/commands.py",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "topic_5424566",
+  "title": "bkelly13",
+  "author": "bkelly13",
+  "created_time": "November 30, 2022, 03:56:32 AM",
+  "content": "This web page: https://en.bitcoin.it/wiki/Private_key states that private keys can have values between 0x1 and 0xFFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFE BAAE DCE6 AF48 A03B BFD2 5E8C D036 4140.That is a lot of numbers that cannot be used.  Small compared to the total count, but still many values.  But not the question I have.  Nothing in the article mentions enforcement of this restriction.The site: https://komodoplatform.com/en/academy/bitcoin-private-key/ States that one may flip a coin 256 times to create a key.  So does the book “Mastering Bitcoin.”  That key could violate the noted restriction.Suppose I pick a private key within the forbidden range and generate an address from that key.  I strongly suspect that an analysis of the generated address cannot be used to detect the invalid range.Why does this limit exist?  How is it enforced?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5424566",
+  "comments": [
+    {
+      "author": "odolvlobo",
+      "created_time": "November 30, 2022, 08:28:33 AM",
+      "body": "Quote from: bkelly13 on November 30, 2022, 03:56:32 AMThis web page: https://en.bitcoin.it/wiki/Private_key states that private keys can have values between 0x1 and 0xFFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFE BAAE DCE6 AF48 A03B BFD2 5E8C D036 4140.That is a lot of numbers that cannot be used.  Small compared to the total count, but still many values. It is not just small compared to the total. It is infinitesimally small. The probability of generating an invalid number is so small that it is not practical to worry about it if you are doing it by hand. Software that does it will check just to avoid having to deal with it later.Quote from: bkelly13 on November 30, 2022, 03:56:32 AMSuppose I pick a private key within the forbidden range and generate an address from that key.  I strongly suspect that an analysis of the generated address cannot be used to detect the invalid range.The software that computes the public key and address should tell you that the private key is invalid, but it may also automatically move the private key into the valid range using modulus (unless it is 0). Regardless, your suspicion is moot since the private key associated with an address cannot be determined from the address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "November 30, 2022, 09:33:15 AM",
+      "body": "Quote from: bkelly13 on November 30, 2022, 03:56:32 AMThis web page: https://en.bitcoin.it/wiki/Private_key states that private keys can have values between 0x1 and 0xFFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFE BAAE DCE6 AF48 A03B BFD2 5E8C D036 4140.That is a lot of numbers that cannot be used.  Small compared to the total count, but still many values.  But not the question I have.  Nothing in the article mentions enforcement of this restriction.It's really small, where the chance to generate key outside the range is roughly 3.7344E-39.Code:(2^256 - 0xFFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFE BAAE DCE6 AF48 A03B BFD2 5E8C D036 4140)/(2^256)Quote from: bkelly13 on November 30, 2022, 03:56:32 AMWhy does this limit exist?I don't know why, but you probably have to read ECDSA paper/documentation to find the reason.Quote from: bkelly13 on November 30, 2022, 03:56:32 AMHow is it enforced?Decent wallet software will check whether generated private key is in the range.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 30, 2022, 12:15:31 PM",
+      "body": "Quote from: bkelly13 on November 30, 2022, 03:56:32 AMStates that one may flip a coin 256 times to create a key.  So does the book “Mastering Bitcoin.”  That key could violate the noted restriction.To be beyond this upper limit by flipping a coin 256 times, your first 127 flips would have to be either all heads or all tails, depending on which face you assigned to \"1\". 127 consecutive identical flips with a fair coin is incredibly unlikely to happen.But even so, generating private keys the most common way, i.e. by a piece of wallet software deriving them from a seed phrase, could still result in you generating a number which is above this upper limit. Deriving keys from a seed phrase simply uses the left 256 bits of a SHA512 output as the private key, which could equally as likely be above this limit. All good wallet software will have a procedure in place to deal with this.Quote from: bkelly13 on November 30, 2022, 03:56:32 AMSuppose I pick a private key within the forbidden range and generate an address from that key.  I strongly suspect that an analysis of the generated address cannot be used to detect the invalid range.You are right in saying you can infer nothing about the private key from knowledge of only the address. Generating an address from such an invalid private key would have one of two outcomes - either your software would return an error, or it would calculate a new private key modulo n and use that instead.Quote from: bkelly13 on November 30, 2022, 03:56:32 AMWhy does this limit exist?It is an inherent property of the curve bitcoin uses and the generator point of that curve. The curve order n is such that when multiplied by the generator point G, you get the point at infinity. It is the limit to how many distinct points there are on the curve.Start with G. Add G to get 2G. Add G again to get 3G. Repeat. Once you've added G a total of n times, you hit the point at infinity. This means there are n-1 distinct points on the curve.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "December 01, 2022, 06:42:06 PM",
+      "body": "Quote from: odolvlobo on November 30, 2022, 08:28:33 AM[...] but it may also automatically move the private key into the valid range using modulus (unless it is 0). [...]Small nitpick: if you rely on a modulo operation to bring the private key into range (i.e. greater than 0 and less than n), then (in addition to 0) you also have to consider the case where the value is n.An even easier one to miss is that if you're using a wider-than-256-bit data type (e.g. like Python's int type), then you also have to consider multiples of n.And finally, even though this one seems a little obvious/silly to point out, negative values will do weird things modulo n (depending on the language/implementation, they'll either stay negative, or become positive, but additively inverted).To any programmers out there: don't get clever/tricky when dealing with private keys, just do an explicit range check and produce an error message if it fails.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 01, 2022, 07:09:44 PM",
+      "body": "Quote from: PowerGlove on December 01, 2022, 06:42:06 PMTo any programmers out there: don't get clever/tricky when dealing with private keys, just do an explicit range check and produce an error message if it fails.Even the explicit range check is unnecessary. ECC guarantees that all curve operations will be done with private keys modulo n, and public keys with point coordinates modulo P. So even if you use the full 256-bit range (which I believe is how some wallets generate 256-bit keys), there is only a slight disruption in uniformity but you will have an equivalent key to one that is in-range.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mynonce",
+      "created_time": "December 01, 2022, 07:38:46 PM",
+      "body": "If you generate a random private key in the range 1 - 2^256 the odds that you will get a value that is not in the valid range 0x1 - 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140 is 1 in 267776665566007192515705986938822075896 ... nearly impossible",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "December 01, 2022, 08:24:56 PM",
+      "body": "Quote from: NotATether on December 01, 2022, 07:09:44 PMEven the explicit range check is unnecessary.I don't agree with that, not in general. But, maybe in the specific case you have in mind.Quote from: NotATether on December 01, 2022, 07:09:44 PMECC guarantees that all curve operations will be done with private keys modulo n, and public keys with point coordinates modulo P. [...]Sure, but then you're just relying on the range checking/enforcement happening later (inside your/some secp256k1 library, and still potentially in a way that silently — and sometimes incorrectly — \"fixes\" invalid private keys).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bkelly13",
+      "created_time": "December 03, 2022, 02:36:29 AM",
+      "body": "Quote from: odolvlobo on November 30, 2022, 08:28:33 AMQuote from: bkelly13 on November 30, 2022, 03:56:32 AMThis web page: https://en.bitcoin.it/wiki/Private_key states that private keys can have values between 0x1 and 0xFFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFE BAAE DCE6 AF48 A03B BFD2 5E8C D036 4140.That is a lot of numbers that cannot be used.  Small compared to the total count, but still many values. It is not just small compared to the total. It is infinitesimally small. The probability of generating an invalid number is so small that it is not practical to worry about it if you are doing it by hand. Software that does it will check just to avoid having to deal with it later....I did not think long enough.  Its not infinitesimally small, not literally, but effectively it is.   Yeah 123 coin flips all the same is extremely unlikely.But thanks for your patience and your replies.  Its nice to know a bit more.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

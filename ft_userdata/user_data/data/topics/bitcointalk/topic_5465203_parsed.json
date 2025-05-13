@@ -1,0 +1,165 @@
+{
+  "id": "topic_5465203",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "August 31, 2023, 03:31:07 PM",
+  "content": "I have come to the realization that what's stopping me from running lightning projects, as the one I'd proposed last year, is custody of the coins. I don't want to leave custody to some server I don't have physical access, and even if services like DigitalOcean have quite the best reviews when it comes to security, I don't want to buy their expensive services for just starting my project; if it's working towards success, I may migrate to them, but not at start.As far as I've seen, there is no other way to establish a lightning service if you don't do one of the following:Run a lightning node in that VPS.Give your home-running node's macaroon access file.Both of which give the VPS provider the authority to sign payments. (Reminder that to have a properly running node, you need some good financial capacity)Is there a way to have the VPS communicating over my home node via Tor, at least without forfeiting custody nor payment authority?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5465203",
+  "comments": [
+    {
+      "author": "Knight Hider",
+      "created_time": "August 31, 2023, 06:44:30 PM",
+      "body": "Quote from: BlackHatCoiner on August 31, 2023, 03:31:07 PMIs there a way to have the VPS communicating over my home node via Tor, at least without forfeiting custody nor payment authority?If the VPS provider can access your server, and the server can communicate with your home node, doesn't that still give the VPS provider the authority to sign payments? It makes it more complicated, but doesn't negate the risk.--Knight Hider",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 01, 2023, 11:46:53 AM",
+      "body": "Quote from: Knight Hider on August 31, 2023, 06:44:30 PMIf the VPS provider can access your server, and the server can communicate with your home node, doesn't that still give the VPS provider the authority to sign payments?Quote from: ETFbitcoin on September 01, 2023, 11:18:46 AMHow can you be sure data send from VPS to your home device is genuine (e.g. not tempered by VPS provider or employee to steal coin)?The answer to both, is, indeed. The provider can be a MITM attacker. I'm just trying to figure out how can I mitigate as much trust as possible. Leaving all my lightning coins to a server I have no physical access just doesn't seem right. Leaving the macaroon file, which gives them the access to pay invoices over my home node is neither a safe choice. It's still trivial for an employee to locate the file and do non-authorized executions. And the worst part is that I can't know from my mysql database if it's a user withdrawing funds, or an employee stealing from the users' money by messing with mysql queries. How do large lightning node operators run commercial websites? I don't believe they're doing port forward from home on port 80/443.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Knight Hider",
+      "created_time": "September 01, 2023, 02:35:40 PM",
+      "body": "Quote from: BlackHatCoiner on September 01, 2023, 11:46:53 AMLeaving all my lightning coins to a server I have no physical access just doesn't seem right.Run a client on the server, connect to your home node, and only give the client access to limited coins in a hot wallet.--Knight Hider",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "September 01, 2023, 03:10:32 PM",
+      "body": "Quote from: ETFbitcoin on September 01, 2023, 12:26:54 PMQuote from: BlackHatCoiner on September 01, 2023, 11:46:53 AMQuote from: Knight Hider on August 31, 2023, 06:44:30 PMIf the VPS provider can access your server, and the server can communicate with your home node, doesn't that still give the VPS provider the authority to sign payments?Quote from: ETFbitcoin on September 01, 2023, 11:18:46 AMHow can you be sure data send from VPS to your home device is genuine (e.g. not tempered by VPS provider or employee to steal coin)?The answer to both, is, indeed. The provider can be a MITM attacker. I'm just trying to figure out how can I mitigate as much trust as possible. Leaving all my lightning coins to a server I have no physical access just doesn't seem right. Leaving the macaroon file, which gives them the access to pay invoices over my home node is neither a safe choice. It's still trivial for an employee to locate the file and do non-authorized executions. And the worst part is that I can't know from my mysql database if it's a user withdrawing funds, or an employee stealing from the users' money by messing with mysql queries.In such case, full disk encryption would make attempt to tamper with your data become non trivial. They need to dump RAM, make copy of your VPS storage and find cryptography key from RAM dump.Actually since you don't know how many layers deep you are that is just about impossible. If your VM is running under another VM then anything you do on your VM is much easier to dig though.Unless you are getting remote KVM access to the bare metal hardware you can only ASSUME that they they are legit and not recording everything you do. Even then there is a layer of trust. BUT, unless you are talking about millions of dollars, it's probably not a worry. Since, if it was ever found out that they were deep monitoring clients their business would implode. Dave looks at AWS....or not.Quote from: ETFbitcoin on September 01, 2023, 12:26:54 PMQuote from: BlackHatCoiner on September 01, 2023, 11:46:53 AMHow do large lightning node operators run commercial websites? I don't believe they're doing port forward from home on port 80/443. Good question, i also curious how commercial company do that. Although i expect some of them simply use 3rd party.If done properly through multiple discrete private networks and limited communications though firewalls. i.e. my node on 192.168.1.100 / 24 can only talk to the node on 192.168.2.100 /24 using gateway 192.168.1.50.192.168.2.100 since it is a LN / BTC node and has to communicate with the outside world has a 2nd network card with a 10.0.0.100 / 24 address and it's own gateway.Obviously this is very simplified, but it's all through things like that.Keep in mind, you can also setup virtual NICs in VM servers that only allow internal communication so you can also do some things that way.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WillyAp",
+      "created_time": "September 01, 2023, 04:21:24 PM",
+      "body": "A VPS is a partition of sorts. That means that the owner of the harddrive has probably access.  If you want full control you need a dedicated server at a data center. And a reliable one. Even there the datacenter could get access. Make a server yourself, get an IP and host the server at home.For dedicated server try Hetzner server market.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 01, 2023, 05:32:53 PM",
+      "body": "Quote from: DaveF on September 01, 2023, 03:10:32 PMif it was ever found out that they were deep monitoring clients their business would implode. Dave looks at AWS....or not.Here's a good question though: can you prove you're being monitored? If your wallet is emptied, can you prove it was them, and not your fault? You can't. This is why I'm being really skeptic about handing over that kind of authority to a server provider. Quote from: WillyAp on September 01, 2023, 04:21:24 PMIf you want full control you need a dedicated server at a data center. And a reliable one. Even there the datacenter could get access.I don't see how's that helping the situation. Since I won't have full control, and there will be employees who can authorize my payments without my permission, then how's dedicated server any different from a regular VPS?In Bitcoin, this problem isn't so big, because in the worst case, you can just leave an address and have an instance of a VPS monitoring its funding. In lightning, you need to give permission to, at least, execute some command which will check if an invoice is paid. Technically, it's possible to limit what it can execute, and do the \"important stuff\" (like the pay command) manually, at the end of the day from your home node. But I see no one doing that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "September 01, 2023, 05:51:04 PM",
+      "body": "Quote from: BlackHatCoiner on September 01, 2023, 05:32:53 PMQuote from: DaveF on September 01, 2023, 03:10:32 PMif it was ever found out that they were deep monitoring clients their business would implode. Dave looks at AWS....or not.Here's a good question though: can you prove you're being monitored? If your wallet is emptied, can you prove it was them, and not your fault? You can't. This is why I'm being really skeptic about handing over that kind of authority to a server provider. No you can't. This is why if you want to do it you have to spend the $ on co-locating your own hardware and making sure you have full OOB management running and available through your own hardware VPN.But once again, it really comes down to the amount of money involved. If you are taking about $1000 you have a different plan then with $10000 which is a different plan then with $100000Goes back to what I say about having a closed source multicoin wallet on my cellphone. The phone is worth more then the coins in it. And I buy cheaper phones.The stuff that needs to be secured is secured.So long as you go in with a plan, then you should be good. Using any numbers you want, but lets say $5000 / $400If you can take a $5000 hit then getting a platform up and running that is not fully secure is fine if it can generate $400 in profit a month. So long as you have a plan for when you need to bump that to $15000 to generate $1200 a month in profit and so on. Starting at $5000 and then seeing that you now have $100000 in there and have no strategy to make it more secure is not a good thing even if you are clearing $8000 a month in profit.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 01, 2023, 08:33:17 PM",
+      "body": "Quote from: DaveF on September 01, 2023, 05:51:04 PMThis is why if you want to do it you have to spend the $ on co-locating your own hardware and making sure you have full OOB management running and available through your own hardware VPN.Do you happen to know any good services which let you build a tunnel from your device to the WWW? There's port forward, I know, but I don't want to publicly reveal my IP address as it's then trivial to de-anonymize myself. I'm looking for something like openport.io, but more Bitcoin friendly. Quote from: DaveF on September 01, 2023, 05:51:04 PMIf you can take a $5000 hit then getting a platform up and running that is not fully secure is fine if it can generate $400 in profit a month.I'm not trying to make money out of this, so no, it's not worth that risk.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Accardo",
+      "created_time": "September 02, 2023, 05:05:30 AM",
+      "body": "Quote from: BlackHatCoiner on August 31, 2023, 03:31:07 PMRun a lightning node in that VPS.Give your home-running node's macaroon access file.Both of which give the VPS provider the authority to sign payments. (Reminder that to have a properly running node, you need some good financial capacity)Is there a way to have the VPS communicating over my home node via Tor, at least without forfeiting custody nor payment authority?If you're giving custody to any VPS, you just have to keep it stealth or colocate your own box with secured SSH access and an encrypted disk. Aside that, Voltage cloud is a good option, Voltage cloud integrated the Stateless-init feature that doesn't allow the Macaroon file written to disk. It returns the admin.macaroon to the API response when you initiate your node. The feature won't allow them access to your macaroon, as it'll be encrypted with the password you set for your node and sent to their API for backup. Here is a repo on Github for stateless-init  read more about Voltage cloud if it's what you want. https://voltage.cloud/blog/lightning-infrastructure-providers/how-voltage-works/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "September 03, 2023, 09:27:31 AM",
+      "body": "Quote from: ETFbitcoin on September 02, 2023, 10:57:24 AMQuote from: WillyAp on September 01, 2023, 04:21:24 PMFor dedicated server try Hetzner server market.  Your advice is harmful. Hetzner explictly forbid cryptocurrency application on their server[1-2].[1] https://www.coindesk.com/business/2022/08/26/ethereum-could-get-kicked-off-cloud-host-that-powers-10-of-crypto-network/[2] https://www.reddit.com/r/hetzner/comments/wucxs4/comment/ilfoj8u/Hetzner's ToS and above cited comment on Reddit are a bit vague and I read it that they disallow anything related to mining and maybe Ethereum in particular because of the Tornado Cash turmoil. I don't see issues with running a Bitcoin or Lightning node on Hetzner, though. To be clear, I'm not affiliated in any way with Hetzner.A non-trivial number of Lightning nodes seems to be hosted at Hetzner according to figures at e.g. https://mempool.space/graphs/lightning/nodes-per-isp.Quote from: https://www.hetzner.com/legal/terms-and-conditions8.3. The transmission of spam mail is prohibited. This includes in particular the sending of unauthorized, unsolicited advertising to third parties. When sending emails, it is also prohibited to provide false sender data or to disguise the identity of the sender in any other way. The operation of applications for mining cryptocurrencies remains prohibited. These include, but are not limited to, mining, farming and plotting of cryptocurrencies. We are entitled to lock the Customer’s access to their Hetzner services or account in the event of non-compliance.Quote from: https://www.hetzner.com/legal/terms-and-conditions4. Published Content.We are not obligated to review your content. It is your responsibility to identify the content as your own or as third-party content. You are not allowed to publish content that may violate the rights of third parties or otherwise violate the federal or any state law of the US. You are not allowed to publish content that may violate the rights of individuals or groups of people, or that insults or denigrates these people.You are not allowed to publish any content that infringes upon the rights of third parties or otherwise violates the law. This includes, in particular, but is not limited to, pornographic or obscene material, extremist content or content that offends common decency, gambling, and material that could seriously endanger the morals of children or young people; this also includes the publication of defamatory content, insults or disparagement of persons or groups of persons. Furthermore, the operation of applications for mining cryptocurrencies is prohibited. This includes, but is not limited to, mining, farming and plotting of cryptocurrencies.In the case of non-compliance, we are entitled to lock your access to the Service and/or to your account. Quote from: https://www.hetzner.com/legal/dedicated-serverDedicated Server Service AgreementWe strive to keep our networks operating at the highest possible level, so all of our clients benefit from it. Therefore the following actions are prohibited: Operating applications that are used to mine crypto currencies The scanning of foreign networks or foreign IP addresses Manually changing the hardware address (MAC) The use of fake source IPs.The same \"operation of applications for mining crypto currencies is prohibited\" is repeated at a few more spots at Hetzner's legal statements. I interpret this that you can ignore this in the context of operating a Lighning node in particular.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "September 03, 2023, 10:05:04 AM",
+      "body": "Quote from: Cricktor on September 03, 2023, 09:27:31 AMQuote from: ETFbitcoin on September 02, 2023, 10:57:24 AMQuote from: WillyAp on September 01, 2023, 04:21:24 PMFor dedicated server try Hetzner server market.  Your advice is harmful. Hetzner explictly forbid cryptocurrency application on their server[1-2].[1] https://www.coindesk.com/business/2022/08/26/ethereum-could-get-kicked-off-cloud-host-that-powers-10-of-crypto-network/[2] https://www.reddit.com/r/hetzner/comments/wucxs4/comment/ilfoj8u/Hetzner's ToS and above cited comment on Reddit are a bit vague and I read it that they disallow anything related to mining and maybe Ethereum in particular because of the Tornado Cash turmoil. I don't see issues with running a Bitcoin or Lightning node on Hetzner, though. To be clear, I'm not affiliated in any way with Hetzner.But if you visit reddit link i mentioned and click either \"Single comment thread \" or \"See full discussion\", you'll see that Hetzner respoding to someone who ask following question,Quote from: https://www.reddit.com/r/hetzner/comments/wucxs4/comment/il9c8mk/Would be great to get an official comment.. I want to run 1 or maybe 2 nodes and thats it. No mining, etc. So i'd say it's rather very risky action.Quote from: Cricktor on September 03, 2023, 09:27:31 AMA non-trivial number of Lightning nodes seems to be hosted at Hetzner according to figures at e.g. https://mempool.space/graphs/lightning/nodes-per-isp.I'm aware of such fact. And IMO it's rather risky if people who do that are doing business which accept LN as payment.Quote from: Cricktor on September 03, 2023, 09:27:31 AM--snip Hetzner ToS--The same \"operation of applications for mining crypto currencies is prohibited\" is repeated at a few more spots at Hetzner's legal statements. I interpret this that you can ignore this in the context of operating a Lighning node in particular.I get your point. But someone also report it's simply not stated explicitly on their ToS. Check https://stacker.news/items/72128.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "September 03, 2023, 11:23:59 AM",
+      "body": "Quote from: ETFbitcoin on September 03, 2023, 10:05:04 AM...I did follow and read both linked sources and particularly the Reddit thread, maybe skipped or didn't see there everything. The comment by the Reddit user Hetzner_OL isn't legal precise enough though, that's why I wrote \"vague\" before. It sounds a bit like Hetzner doesn't want to deal with cryptocurrency stuff at all, someone got wet pants, but frankly that's not what their ToS says. And Reddit is not the official legal source for their ToS, I'd rather look around at https://www.hetzner.com/legal/, which I did...Should Hetzner's ban hammer hit you, though, you've some hassle and trouble which nobody wants to deal with. Having to fear that isn't an ideal situation, I admit.Anyway, if you're not comfort with Hetzner, stay away from them. In the Reddit thread at least one other presumably more cryptocurrency friendly company chimed in and was happy to take customers. I'm not advertising for them...Quote from: ETFbitcoin on September 03, 2023, 10:05:04 AMI get your point. But someone also report it's simply not stated explicitly on their ToS. Check https://stacker.news/items/72128.Yeah, seen this and in particular https://twitter.com/sethforprivacy/status/1572196300673765377. Whatever is true here, I wouldn't want to deal with a company that doesn't state clearly what's not OK in their ToS or has hidden and enforced policies. If the statement cited in the Twitter post were true, then what's the purpose to have incomplete and ambiguous ToS (rhetorical question)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 03, 2023, 02:02:08 PM",
+      "body": "Quote from: Accardo on September 02, 2023, 05:05:30 AMIf you're giving custody to any VPS, you just have to keep it stealth or colocate your own box with secured SSH access and an encrypted disk. Aside that, Voltage cloud is a good option, Voltage cloud integrated the Stateless-init feature that doesn't allow the Macaroon file written to disk.If I'm giving custody to the VPS, why would I care about access to macaroon? That would be concern if I retained custody. Quote from: ETFbitcoin on September 03, 2023, 10:05:04 AMI get your point. But someone also report it's simply not stated explicitly on their ToS. Check https://stacker.news/items/72128.Can't say I'm surprised to be honest. There's hostility from most popular providers towards cryptocurrencies, because it's an overhead and they might face trouble with regulations. But at least clarify it. You can't be against without specifying it in the ToS.But why are there such fuss with mining? What's bad with that? If I'm renting a virtual server, I want to be able to use maximum of its resources if I need it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WillyAp",
+      "created_time": "September 03, 2023, 02:51:14 PM",
+      "body": "Quote from: ETFbitcoin on September 02, 2023, 10:57:24 AMYour advice is harmful. Hetzner explictly forbid cryptocurrency application on their server[1-2].Specially when taking out of context.  I said that using VPS or Dedicated is risky, Hetzner or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "September 03, 2023, 03:27:49 PM",
+      "body": "Quote from: BlackHatCoiner on September 01, 2023, 08:33:17 PMQuote from: DaveF on September 01, 2023, 05:51:04 PMThis is why if you want to do it you have to spend the $ on co-locating your own hardware and making sure you have full OOB management running and available through your own hardware VPN.Do you happen to know any good services which let you build a tunnel from your device to the WWW? There's port forward, I know, but I don't want to publicly reveal my IP address as it's then trivial to de-anonymize myself. I'm looking for something like openport.io, but more Bitcoin friendly. No, but there is always OnionCat https://www.onioncat.org/ The front end that the world sees can be anywhere and it's talking to the back end that can also be anywhere but since it's talking though a ToR VPN there really is no way to figure out where the back end is. With a whole lot of tinkering and late nights screaming 'why isn't this working' you could probably run the entire thing someplace and then just have an nginx reverse proxy sitting on a public IP to talk to the rest of the world while everything else is on the other side of the VPN. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WillyAp",
+      "created_time": "September 04, 2023, 03:22:32 PM",
+      "body": "Quote from: ETFbitcoin on September 04, 2023, 09:28:14 AMI'm sure it's not taking out of context when you didn't mention risk of getting kicked for running crytocurrency activity.do I have to spell it out? Quote from: WillyAp on September 01, 2023, 04:21:24 PMA VPS is a partition of sorts. That means that the owner of the harddrive has probably access.  If you want full control you need a dedicated server at a data center. And a reliable one. Even there the datacenter could get access. Make a server yourself, get an IP and host the server at home.For dedicated server try Hetzner server market.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 05, 2023, 06:31:18 AM",
+      "body": "Quote from: BlackHatCoiner on August 31, 2023, 03:31:07 PMGive your home-running node's macaroon access file.What's a \"macaroon access file\"? Quote from: BlackHatCoiner on August 31, 2023, 03:31:07 PMIs there a way to have the VPS communicating over my home node via Tor, at least without forfeiting custody nor payment authority?For starters, you should try to use a distro that offers you the chance to configure full-disk encryption, at least on the /home folder. That way the VPS provider can't meddle inside without your password.You're going to have to write a simple wrapper script running on the server that has all c-lightning (or lnd or whatever you use) URLs but just passes them to the real RPC port on the server. Also this one will be listening for traffic using a Tor port and sending the traffic back similarly.A second script that runs inside your home will be in charge of receiving the traffic from the lightning services you want to run, via a different host/port that you configure, but it just passes the HTTP request via a Tor port to the server script.Fortunately, this is something that ChatGPT can do with a little assistance.Quote from: Cricktor on September 03, 2023, 09:27:31 AMHetzner's ToS and above cited comment on Reddit are a bit vague and I read it that they disallow anything related to mining and maybe Ethereum in particular because of the Tornado Cash turmoil. I don't see issues with running a Bitcoin or Lightning node on Hetzner, though. To be clear, I'm not affiliated in any way with Hetzner.A non-trivial number of Lightning nodes seems to be hosted at Hetzner according to figures at e.g. https://mempool.space/graphs/lightning/nodes-per-isp.Quote from: https://www.hetzner.com/legal/terms-and-conditions8.3. The transmission of spam mail is prohibited. This includes in particular the sending of unauthorized, unsolicited advertising to third parties. When sending emails, it is also prohibited to provide false sender data or to disguise the identity of the sender in any other way. The operation of applications for mining cryptocurrencies remains prohibited. These include, but are not limited to, mining, farming and plotting of cryptocurrencies. We are entitled to lock the Customer’s access to their Hetzner services or account in the event of non-compliance.That just means no Bitcoin miners and no staking and/or validator ETH nodes. It has nothing to do with running a service which communicates with other Lightning nodes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tech30338",
+      "created_time": "September 06, 2023, 01:13:51 AM",
+      "body": "Get VPS on a well known provider, at the same time, you will be the one to choose on what you need, when i purchase  VPS they only given me ip address and email and password, VPS provider never steal your information, yes they have the power to access it, but once you are in the VPS, you are the one who will have the power to allow who and when to access it, I also run nodes on VPS and they have never touch anything on it, since there will be logs on the system, and administrators never touch anything which they don't have any rights, only when you request but barely will touch anything because its yours, mostly VPS are straight forward and tutorials are already there, so yes in short VPS are safe, but always look on reviews for downtime and uptime of their VPS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "September 07, 2023, 05:58:42 PM",
+      "body": "Quote from: tech30338 on September 06, 2023, 01:13:51 AM<snip>I have to assume you have no idea what is possible in virtualized environments. Storage of a VPS is usually virtualized, I (as an admin) can take a snapshot, mount the snapshot on a completely independend from the VPS running system and inspect the snapshot's filesystem easily. This is not detectable by the VPS whatsoever. It's another thing that VPS management environment should have some decent logging, too, which the management users shouldn't be able to modify. As a VPS user you can hope for this, but you don't know how well the infrastructure is setup.Then you have the issues like Downfall which can leak data over VPS boundaries if not remedied properly and this is particularly a problem on VPS systems where as a VPS user you don't have any control what's running on other VPS instances on your VPS' host machine.Sure, by rule VPS admins are likely not allowed to sneak into your VPS, but technically there are no limits and you have no control over what kind of people work at your VPS provider as admin or technical staff.Be careful with your bold claims, we don't live in an ideal world.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

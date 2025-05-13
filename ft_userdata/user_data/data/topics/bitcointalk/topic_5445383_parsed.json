@@ -1,0 +1,117 @@
+{
+  "id": "topic_5445383",
+  "title": "DaveF",
+  "author": "DaveF",
+  "created_time": "March 18, 2023, 12:17:30 PM",
+  "content": "https://protos.com/bitcoin-core-developer-proposes-new-type-of-pruned-node/QuoteRather than the status quo — setting a number of blocks and compressing historical blocks prior to that milestone — O’Beirne’s assumeUTXO is an experimental way for new Bitcoin full nodes to delay their need to verify historical transactions until the user receives recent transactions.AssumeUTXO-compatible node clients would contain a hard-coded hash of the conditions necessary to spend all bitcoin (the UTXO set) as of a safe, recent point in time (O’Beirne’s variant of the popular Bitcoin Core client, Bitcoin Core #25740, supports assumeUTXO).I'm not going to post the full article here. BUT WHY, JUST WHY.There are a lot of things to be spending time and effort developing, this should be so far on the bottom of the list that we can't even see it.It is only going to make things worse for people as they try to run more and more on less capable hardware. It's a 3 step process.1) Install OS2) Install core3) Wait a couple of days for it to sync.ORUse a lite wallet. If you are running a node to secure the network, do it properly with enough hardware and time to do it. Sorry, this is just becoming an annoyance of mine. Used low hour 1TB drives are cheap / free from people getting rid of them new are just about free, 8 year old PCs that can run a full node with no issues are cheap / free.  <--Yes this is a US / EU thing I can't speak to the rest of the world but still. -Dave",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5445383",
+  "comments": [
+    {
+      "author": "digaran",
+      "created_time": "March 18, 2023, 01:54:18 PM",
+      "body": "So you have a problem if there are more software to use for bitcoin? We shouldn't expect too much from them if we are not paying them for the job they do. Honestly I can't see the issue, maybe you know something I don't.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "March 18, 2023, 02:14:15 PM",
+      "body": "Quote from: digaran on March 18, 2023, 01:54:18 PMSo you have a problem if there are more software to use for bitcoin? We shouldn't expect too much from them if we are not paying them for the job they do. Honestly I can't see the issue, maybe you know something I don't.Apparently I know a lot that you don't.Spend some time in the support area here and in other online BTC discussions. People are continually coming around asking for help trying to run core on hardware that can't handle it. Or they are running some pruned node and wonder why they can't import some old private keys. And so on.Not saying that this should not be worked on, just that there are a lot of other things that cause people issues and this looks to be something that will cause more issues then it solves.Not saying there is never a reason to run a pruned node, just that there are very very few good ones.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "March 18, 2023, 05:20:55 PM",
+      "body": "Didn't read the article, but from the snippet you've posted, it's simply incorrect.Assumeutxo is neither a new type of node, nor a pruning. It's about making the software usable without having to wait multiple days for it to sync. It doesn't reduce the hardware requirements to run, in fact, using assumeutxo probably requires more resources than without it.Assumeutxo allows a node to start with a preset UTXO set (provided by the user, and does not necessarily correspond to a hardcoded hash in the binary, this detail has not been worked out yet). This UTXO set is the state of the chain at a particular block hash and height. The node can then begin syncing from that particular block. The idea is that the block will be recent, so the node will be caught up to tip very quickly, thus allowing the user to make and receive transactions way faster than if they had to wait for the entire blockchain to sync.The point is to make the software usable much faster. A major complaint that we've heard from users is that it takes ages to sync. Users often don't have the patience to wait and will start giving out addresses. Then they panic when they don't see incoming coins because they haven't synced yet and they come into this forum, or github, or reddit freaking out about losing money, all just because they haven't waited for the node to sync. Assumeutxo reduces that because it \"syncs\" faster.Obviously there's a trust requirement in this - users have to trust that the UTXO set that they are using is correct. Assumeutxo mitigates this by actually syncing the full blockchain in the background. While the user is using the state provided by the UTXO set and the chain state extended from it, a second chain state is built in the background from syncing and validating the blockchain. Once that background validation reaches the preset UTXO set's height, it checks that the two states are the same (same UTXOs, same blocks), and will kill the software and give the user an error if they are not.This is, in fact, not pruning, and unrelated to pruning. Of course, it should be possible to do it with pruning, but I don't know if that's been implemented yet. Furthermore, two chain states are being maintained in memory and on disk while the background validation is going. This means that the resource usage is actually higher, not lower.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "March 18, 2023, 06:02:03 PM",
+      "body": "Quote from: achow101 on March 18, 2023, 05:20:55 PMDidn't read the article, but from the snippet you've posted, it's simply incorrect.Assumeutxo is neither a new type of node, nor a pruning. It's about making the software usable without having to wait multiple days for it to sync. It doesn't reduce the hardware requirements to run, in fact, using assumeutxo probably requires more resources than without it.Assumeutxo allows a node to start with a preset UTXO set (provided by the user, and does not necessarily correspond to a hardcoded hash in the binary, this detail has not been worked out yet). This UTXO set is the state of the chain at a particular block hash and height. The node can then begin syncing from that particular block. The idea is that the block will be recent, so the node will be caught up to tip very quickly, thus allowing the user to make and receive transactions way faster than if they had to wait for the entire blockchain to sync.The point is to make the software usable much faster. A major complaint that we've heard from users is that it takes ages to sync. Users often don't have the patience to wait and will start giving out addresses. Then they panic when they don't see incoming coins because they haven't synced yet and they come into this forum, or github, or reddit freaking out about losing money, all just because they haven't waited for the node to sync. Assumeutxo reduces that because it \"syncs\" faster.Obviously there's a trust requirement in this - users have to trust that the UTXO set that they are using is correct. Assumeutxo mitigates this by actually syncing the full blockchain in the background. While the user is using the state provided by the UTXO set and the chain state extended from it, a second chain state is built in the background from syncing and validating the blockchain. Once that background validation reaches the preset UTXO set's height, it checks that the two states are the same (same UTXOs, same blocks), and will kill the software and give the user an error if they are not.This is, in fact, not pruning, and unrelated to pruning. Of course, it should be possible to do it with pruning, but I don't know if that's been implemented yet. Furthermore, two chain states are being maintained in memory and on disk while the background validation is going. This means that the resource usage is actually higher, not lower.Agree 100%.I have got to start pre-writing a lot of this stuff before posting and making an ass of myself because I left out a bunch.Anyway...What I wanted to start with, is although good in theory (still using the pruned node term. Is why do we want to have people use their nodes sooner. This is where the 3 step process I put in my post was about. Which was then supposed to comment on how people will start it with HW that can't handle it but it will work till it does not (extra memory and RAM) and will cause issues.What you can't read my mind about what I was thinking about posting. Tablet while remote accessing a PC to post here makes dave look dumb.Even now you can install and try to donload the blockchain on too small a drive, it has the pruned check box on by default but does not even mention what may happen if you un-check it.YES you can still do that now by installing on a 512 GB drive and running out of space, this just seems to encourage it. Once again IMO.If I go to an amusement park signs are posted that you must be this tall to get on some rides. Other software will not let you install on some systems that cannot support it. Core, says nah go ahead and put it on a 1st gen i3 with 2GB RAM and a 128 GB drive. This causes people grief, we have seen it here and on reddit and other places. Is it that hard to say NO don't do this?-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "March 18, 2023, 06:09:23 PM",
+      "body": "synching is slow.but used dell hp lenovo tiny pcs abound on the cheap.https://www.ebay.com/itm/Dell-7040-Micro-Tiny-PC-i5-6500T-Quad-Core-8G-Ram-256GB-SSD-Win10-Wifi/354260980620?add a 1tb ssdbump the ram.run linux or windows.200 maybe 250 and a quality node with a decent pc.clone the drive and you are backed up.When I read people that want a shitty rasp pi and a 1 tb hdd to do this it hurts.I also recommend fast internet this is a big issue as 200 down with 30 up speed is not worldwide.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "March 18, 2023, 06:34:54 PM",
+      "body": "Quote from: DaveF on March 18, 2023, 06:02:03 PMIs why do we want to have people use their nodes sooner.It provides a better user experience. We know that people will install the software and immediately start trying to use it. We know that user education is never a good solution. We need to design the software such that uneducated users still have a good experience, and part of that is making the software usable without having to wait a long time. We want to make software that doesn't result in unnecessary complaints and support requests.Quote from: DaveF on March 18, 2023, 06:02:03 PMEven now you can install and try to donload the blockchain on too small a drive, it has the pruned check box on by default It only checks it by default when the free space check determines that the drive doesn't have enough free space for the full blockchain.Quote from: DaveF on March 18, 2023, 06:02:03 PMbut does not even mention what may happen if you un-check it.When you uncheck it, it shows a warning that says the entire blockchain will be redownloaded. This isn't \"no mention of what may happen\".Quote from: DaveF on March 18, 2023, 06:02:03 PMYES you can still do that now by installing on a 512 GB drive and running out of space, this just seems to encourage it. Once again IMO.How does assumeutxo encourage running on low spec hardware? The same system requirements checks are being run regardless.Regardless, making software that can run on low spec hardware is never a bad thing. Something that can run okay with little resources is something that can run fast on decent hardware. Optimizing is never bad.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "March 18, 2023, 08:50:46 PM",
+      "body": "Quote from: achow101 on March 18, 2023, 06:34:54 PMQuote from: DaveF on March 18, 2023, 06:02:03 PMEven now you can install and try to donload the blockchain on too small a drive, it has the pruned check box on by default It only checks it by default when the free space check determines that the drive doesn't have enough free space for the full blockchain.Quote from: DaveF on March 18, 2023, 06:02:03 PMbut does not even mention what may happen if you un-check it.When you uncheck it, it shows a warning that says the entire blockchain will be redownloaded. This isn't \"no mention of what may happen\".How about a warning that says that it will not work. That you cannot fit a 500+GB blockchain in 400GB free space and that more then likely things are going to go poorly.I run a lot of things on very marginal hardware, but I know what I am getting into.It's not your job as a developer to hold peoples hand and stop them from doing something they should not. BUT a bit more warning is also not a bad thing.And unless you do this properly it's going to be worse. Now the user can start using his wallet sooner, and then BAM no more drive space.That is the point I have been (poorly) trying to make.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "March 19, 2023, 01:02:45 AM",
+      "body": "Quote from: DaveF on March 18, 2023, 08:50:46 PMHow about a warning that says that it will not work. That you cannot fit a 500+GB blockchain in 400GB free space and that more then likely things are going to go poorly.In the initial startup dialog, it does show that. If you don't have enough free space, there will be red warning text saying that there isn't enough free space.Also, in master, there will be a warning dialog on first start if the disk the datadir is on doesn't have enough free space.Quote from: DaveF on March 18, 2023, 08:50:46 PMThat is the point I have been (poorly) trying to make.Then this is probably the wrong topic to be making it in. It's basically unrelated to assumeutxo entirely, especially given that users can't even use this feature yet at all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "March 21, 2023, 09:17:01 PM",
+      "body": "i slightly understand this post, in that this is not the best point in time to add such a featurebut imagine some future point, when all possible optimizations to verifying old types (i.e. the types we use now) of tx's have been made, and that the new tx types are orders of magnitude faster to verify/dlthen you have this annoying wait for hours/days to sync upto, say the year 2033 (when the imaginary new tx type becomes dominant in blocks), meanwhile you're waiting for the secp256k1 slug to complete.in a world where Bitcoin is universally used, getting \"the\" 2033 UTXO snapshot from someone you trust would be an incredibly common way to handle this.tl;dr the first n years of Bitcoin blockchain is permanent, and will ~always (barring some kind of magic) be slow to verify, why not leapfrog it when you're in a hurry",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "March 24, 2023, 01:26:14 AM",
+      "body": "It'd make a lot more sense to just sync backwards than have \"assumeutxo\" (it makes more sense than it but doesn't mean it's a good idea either way) - if you got headers in advance then it might be possible to sync backwards and still verify you're in the right chain while allowing for better usability (but that'd be a fix when the chain is several TB in size imo and not now).Quote from: Carlton Banks on March 21, 2023, 09:17:01 PMtl;dr the first n years of Bitcoin blockchain is permanent, and will ~always (barring some kind of magic) be slow to verify, why not leapfrog it when you're in a hurryI think the sharding upgrades on alt chains like harmony could be worked into something like this too (it might already be a thing easily implementable to separate out different parts of the chain when the time comes based on how many blocks proceed it and you can determine how \"full\" you want your history).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "March 24, 2023, 02:16:47 AM",
+      "body": "In general, it makes sense for businesses to run multiple full nodes for redundancy, and to prevent various attacks. If a business wants to run 5 full nodes, under the status quo, they will have to download the blockchain 5 times. From my understanding of the proposal in the OP, a business could potentially download the blockchain once, and transfer the current UTXO set to the other 4 nodes using a trivial amount of resources. As acho101 pointed out, assumeutxo requires trust in the entity that provides the current UTXO set as of x block. In theory, some of this required trust could be reduced via means that are done to provide trust to light wallet users, such as electrum users.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "March 24, 2023, 03:06:01 AM",
+      "body": "Quote from: PrimeNumber7 on March 24, 2023, 02:16:47 AMIn general, it makes sense for businesses to run multiple full nodes for redundancy, and to prevent various attacks. If a business wants to run 5 full nodes, under the status quo, they will have to download the blockchain 5 times. From my understanding of the proposal in the OP, a business could potentially download the blockchain once, and transfer the current UTXO set to the other 4 nodes using a trivial amount of resources. As acho101 pointed out, assumeutxo requires trust in the entity that provides the current UTXO set as of x block. In theory, some of this required trust could be reduced via means that are done to provide trust to light wallet users, such as electrum users. You can do that now, you can copy & paste the blockchain data between machines. If it's all part of the same company you have to assume that you are going to trust the other data. And these days any business that would want 5 copies of core running is going to have sufficient backbone bandwidth that moving 500GB or even 1TB across the netowrk should be no issue. And if that is not possible external drives. I frequently do this when spinning up things that I want to test on main net instead of testnet.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "March 24, 2023, 03:37:59 AM",
+      "body": "Quote from: DaveF on March 24, 2023, 03:06:01 AMQuote from: PrimeNumber7 on March 24, 2023, 02:16:47 AMIn general, it makes sense for businesses to run multiple full nodes for redundancy, and to prevent various attacks. If a business wants to run 5 full nodes, under the status quo, they will have to download the blockchain 5 times. From my understanding of the proposal in the OP, a business could potentially download the blockchain once, and transfer the current UTXO set to the other 4 nodes using a trivial amount of resources. As acho101 pointed out, assumeutxo requires trust in the entity that provides the current UTXO set as of x block. In theory, some of this required trust could be reduced via means that are done to provide trust to light wallet users, such as electrum users. You can do that now, you can copy & paste the blockchain data between machines. If it's all part of the same company you have to assume that you are going to trust the other data. And these days any business that would want 5 copies of core running is going to have sufficient backbone bandwidth that moving 500GB or even 1TB across the netowrk should be no issue. And if that is not possible external drives. I frequently do this when spinning up things that I want to test on main net instead of testnet.-DaveIf you have multiple nodes, it will make little sense to have the nodes in the same general location. Transferring data to different servers will cost money. The idea would be that you would fully download the blockchain on a \"traditional\" pruned node, then use assumeutxo to transfer a trivial amount of data to the 4 other nodes (assuming 5 nodes in total).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

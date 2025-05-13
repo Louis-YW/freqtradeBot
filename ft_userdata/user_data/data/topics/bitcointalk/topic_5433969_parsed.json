@@ -1,0 +1,45 @@
+{
+  "id": "topic_5433969",
+  "title": "EnvrinGroup",
+  "author": "EnvrinGroup",
+  "created_time": "January 10, 2023, 06:55:43 PM",
+  "content": "I've noticed maybe 5% of the time, walletnotify setting within bitcoin.conf will fire off duplicate messages, or at least dupes that my software can't pick up.Ieven went as far that when a notification comes in, system immediately checks redis for a dupe.  If txid is not in redis, adds it, and processes the deposit.That doesn't even work though, as sometimes dupes will make it into the system.  Apparently the notifications are so quick in succession, a quik connection to and check in redis takes too long.How can I resolve this?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5433969",
+  "comments": [
+    {
+      "author": "EnvrinGroup",
+      "created_time": "January 11, 2023, 07:25:27 PM",
+      "body": "Hmmm... nobody?  I just modified the system to restrict people from allowing zero conf transactions, then upon processing new blocks and confirming txs, it'll quickly do a dupe clean up.Seems to work fine, but still weird it sometimes sends dupes such as that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lionheart78",
+      "created_time": "January 13, 2023, 02:11:25 PM",
+      "body": "You can also try the following:QuoteYou can use local database instead of Redis to store the transaction ID since local database is faster in terms of read/write speed, which can help to filter duplicates.You can also use a lock to prevent multiple checks of redis at the same time which helps prevent race condition where multiple notifications are processed at the same time leading to duplicates.Increase the minimum transaction fee required for a transaction to be considered valid. This can help prevent spam transactions, which may be causing the duplicate notifications.You can also include sleep command to adjust the walletnotify for a few milliseconds before each Redis check.  This will give more time for the transaction ID to be added before the next check.You can als use a different type of notification system that is less prone to duplicates, such as the -walletnotify command, which allows you to specify a command to be executed when a new transaction is detected.You can also look into the transaction confirmation time, if the confirmation time is low then it increases the chances of duplicate transaction. So you can increase the confirmation time for the transaction to make sure you are notified after the transaction is confirmed.That is the collective suggestion I found searching the internet, you can try it and I hope it helps even a little. Though it is said that the best solution depends on the requirement of the application and the available resources you have.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "January 14, 2023, 12:09:36 PM",
+      "body": "Quote from: lionheart78 on January 13, 2023, 02:11:25 PMYou can also try the following:QuoteYou can use local database instead of Redis to store the transaction ID since local database is faster in terms of read/write speed, which can help to filter duplicates.--snip--CMIIW, but doesn't Redis has faster performance/response time compared to local database since Redis store the data/index on RAM?QuoteIncrease the minimum transaction fee required for a transaction to be considered valid. This can help prevent spam transactions, which may be causing the duplicate notifications.It can be done by changing value of minrelaytxfee parameter, but OP's system will not see incoming transaction until it's included on the block. It has some trade-off if OP running a service where the customer want to know the system already detect their transaction.QuoteYou can als use a different type of notification system that is less prone to duplicates, such as the -walletnotify command, which allows you to specify a command to be executed when a new transaction is detected.Did you mistype something? OP already use walletnotify. The only other relevant notification option on Bitcoin Core is blocknotify.QuoteYou can also look into the transaction confirmation time, if the confirmation time is low then it increases the chances of duplicate transaction. So you can increase the confirmation time for the transaction to make sure you are notified after the transaction is confirmed.This doesn't make sesnse since walletnotify make notification when the transaction is on mempool (has 0 block confirmation) and included on block (has 1 block confirmation). And time when node receive the transaction or timestamp on block isn't very reliable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lionheart78",
+      "created_time": "January 15, 2023, 04:09:48 AM",
+      "body": "Quote from: ETFbitcoin on January 14, 2023, 12:09:36 PMQuote from: lionheart78 on January 13, 2023, 02:11:25 PMYou can also try the following:QuoteYou can use local database instead of Redis to store the transaction ID since local database is faster in terms of read/write speed, which can help to filter duplicates.--snip--CMIIW, but doesn't Redis has faster performance/response time compared to local database since Redis store the data/index on RAM?It looks like I missed the condition of in case of a high number of lookups..I agree that Redis has faster performance/response because it is stored in data/index on Ram however it was said that Redis is not designed to handle a very high number of lookups or writes per second, especially if the keys are not distributed uniformly across the available RAM, and the suggestion of using local database  MySQL or PostgreSQL instead of Redis can be an effective way to filter out duplicate transactions in the application since these databases are optimized for fast read and write operation and at the same time can handle a high number of concurrent connections. QuoteIncrease the minimum transaction fee required for a transaction to be considered valid. This can help prevent spam transactions, which may be causing the duplicate notifications.Quote from: ETFbitcoin on January 14, 2023, 12:09:36 PMIt can be done by changing value of minrelaytxfee parameter, but OP's system will not see incoming transaction until it's included on the block. It has some trade-off if OP running a service where the customer want to know the system already detect their transaction.You are right, I agree that this is a better option since this gives a delay which is probably needed to avoid duplicate transaction.QuoteYou can als use a different type of notification system that is less prone to duplicates, such as the -walletnotify command, which allows you to specify a command to be executed when a new transaction is detected.Quote from: ETFbitcoin on January 14, 2023, 12:09:36 PMDid you mistype something? OP already use walletnotify. The only other relevant notification option on Bitcoin Core is blocknotify.Yeah sorry for that Quote from: ETFbitcoin on January 14, 2023, 12:09:36 PMQuoteYou can also look into the transaction confirmation time, if the confirmation time is low then it increases the chances of duplicate transaction. So you can increase the confirmation time for the transaction to make sure you are notified after the transaction is confirmed.This doesn't make sesnse since walletnotify make notification when the transaction is on mempool (has 0 block confirmation) and included on block (has 1 block confirmation). And time when node receive the transaction or timestamp on block isn't very reliable.Indeed happen to verify it, my bad for getting some bad sources though I am glad we have you guys to fix things for us  Quotewalletnotify is a feature of the Bitcoin Core software that sends a notification to a specified script or program when a new transaction is detected on the network. It sends notifications when a transaction is first seen on the mempool and then again when it is included in a block. So, it is not possible to increase the confirmation time for walletnotify as it is just a notification mechanism and doesn't have any control over the confirmation time of the transactions.With regard to duplicate, is it a possible solution to use a message queue to buffer incoming notifications and filter duplicates?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

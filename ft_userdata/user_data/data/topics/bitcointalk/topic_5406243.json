@@ -1,0 +1,61 @@
+{
+  "id": "topic_5406243",
+  "title": "lordbelford",
+  "author": "lordbelford",
+  "created_time": "July 14, 2022, 10:28:05 AM",
+  "content": "I'm trying to understand transaction malleability in Bitcoin (before SegWit solved it).Every explanation of it reads the same and basically says \"Bob alters the signature of Alice's transaction before it gets confirmed, thus producing a new transaction ID\".But what does changing a transaction actually mean? How do I approach that? Saying you grab a transaction from the mempool and flipping its bits really does not provide the explanation for me.Looking forwards to your replies",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5406243",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "July 14, 2022, 11:02:50 AM",
+      "body": "You can't practically perform any of the cases and create a duplicate valid transaction simply because all of the possible cases that are outlined in BIP62 are prohibited through the enforcement of standard rules. What SegWit did was to enforce some of those rules as part of the consensus rules.In simple terms when you broadcast the modified transaction, any full node receiving it will reject it as non-standard.Quote from: lordbelford on July 14, 2022, 10:28:05 AMSaying you grab a transaction from the mempool and flipping its bits really does not provide the explanation for me.What exactly are you looking for, a walkthrough or an example?The simplest way would to take a transaction spending a P2PKH output and injecting an arbitrary message at the beginning of its signature script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lordbelford",
+      "created_time": "July 14, 2022, 11:24:50 AM",
+      "body": "Quote from: pooya87 on July 14, 2022, 11:02:50 AMWhat exactly are you looking for, a walkthrough or an example?The simplest way would to take a transaction spending a P2PKH output and injecting an arbitrary message at the beginning of its signature script.Just a technical explanation. I don't get how you would \"take a transaction\". In my understanding, an unconfirmed transaction exists on a multitude of miners working to find a new block. So that only works for me if we are the miner ourselves and also successful in finding the block that ultimately prevails in the blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 14, 2022, 12:08:55 PM",
+      "body": "Quote from: lordbelford on July 14, 2022, 11:24:50 AMJust a technical explanation. I don't get how you would \"take a transaction\". In my understanding, an unconfirmed transaction exists on a multitude of miners working to find a new block. So that only works for me if we are the miner ourselves and also successful in finding the block that ultimately prevails in the blockchain.Transactions are relayed through the network and eventually reach the node that the miner uses (in other words you don't directly send your transaction to the miner, you send it to node A that sends it to node B that sends it to ... and eventually sends it to Node X that the miner connects to). So anybody in this process is getting the transaction and can modify it before relaying it to the other node.Obviously as you may have already guessed, only one of these transactions could be confirmed. One problem could have been if the sender was watching the transaction ID of the first tx they'd sent themselves but was replaced by a modified tx with a different ID when it reached the miner. If the second tx confirmed the first one never would so the sender could be fooled into thinking that the receiver hasn't received the funds and send them again.This is simply solved if the sender watches the mempool and sees the modified tx or their own inputs/balance and obviously solved by the fact that the modified transaction is non-standard and won't propagate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 14, 2022, 02:06:11 PM",
+      "body": "Quote from: lordbelford on July 14, 2022, 10:28:05 AMEvery explanation of it reads the same and basically says \"Bob alters the signature of Alice's transaction before it gets confirmed, thus producing a new transaction ID\".Altering the signature (specifically replacing the high s value with the low s value) is just one way of changing the transaction ID without invaliding the transaction. You can check other ways in: https://en.bitcoin.it/wiki/BIP_0062#Motivation.The key to understanding transaction malleability is that:OP_CHECKSIG doesn't take into account the entire scriptSig, as it only expects two values; public key & signature.ECDSA is itself malleable, even if you are not the sender.Sender can create unlimited valid signatures for the same message.Note that being non-standard (that is said above) doesn't mean that the transaction is invalid. Full nodes just choose to not relay it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 14, 2022, 11:44:49 PM",
+      "body": "Quote from: pooya87 on July 14, 2022, 11:02:50 AMYou can't practically perform any of the cases and create a duplicate valid transaction simply because all of the possible cases that are outlined in BIP62 are prohibited through the enforcement of standard rules. What SegWit did was to enforce some of those rules as part of the consensus rules.In simple terms when you broadcast the modified transaction, any full node receiving it will reject it as non-standard.Quote from: BlackHatCoiner on July 14, 2022, 02:06:11 PMNote that being non-standard (that is said above) doesn't mean that the transaction is invalid. Full nodes just choose to not relay it.Both are correct, but fail to mention that it is possible to practically perform this, in the rare occasion that you're a big solo miner and / or a mining pool operator that builds block candidates.While full nodes wouldn't relay such transactions, such large miners could perform this 'attack', altering transactions before attempting to mine them into a block, resulting in correct blocks. However, software monitoring the transaction through its ID would fail to pick up that it was mined.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "July 15, 2022, 06:05:45 AM",
+      "body": "Quote from: lordbelford on July 14, 2022, 10:28:05 AMEvery explanation of it reads the same and basically says \"Bob alters the signature of Alice's transaction before it gets confirmed, thus producing a new transaction ID\".In short, it is possible to make valid copy of a transaction by modifying a signature in a certain way, and the copy has a different transaction ID. Now, that is not a problem for Bitcoin because only one of the copies will make it into the block chain and the others will be forgotten. The problem occurs in software that monitors transactions using the transaction ID.For example, suppose a customer of an exchange wants to withdraw some bitcoins. The exchange creates a transaction and records the transaction ID. Normally, the exchange debits the customer's account when it sees the transaction ID in a block. However, if a copy of the transaction with a different transaction ID is included in the block instead, then the exchange doesn't know that the bitcoins were received and it won't debit the account as it should.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

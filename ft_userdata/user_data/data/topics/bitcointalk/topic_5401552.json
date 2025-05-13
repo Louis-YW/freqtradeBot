@@ -1,0 +1,149 @@
+{
+  "id": "topic_5401552",
+  "title": "bitcoin_universe_234",
+  "author": "bitcoin_universe_234",
+  "created_time": "June 06, 2022, 09:33:36 AMLast edit: June 06, 2022, 03:01:24 PM by bitcoin_universe_234",
+  "content": "I'm trying to sweep some funds from an old wallet.I'm using the latest version of Electrum 4.2.2I have successfully sweeped them from the P2PKH address of the wallet however one of my change addresses (starts with 3) I can't manage to sweep it. If I try to just sweep it then it will give the no inputs error.If I try to put the prefix in front of it (p2wpkh-p2sh:) (or any variations with this) the sweep button stays greyed out. If I remove the prefix it will let me sweep (but gives no inputs), I tried the other prefixes as well but no success.Any idea how I can sweep this change address?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5401552",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 06, 2022, 09:47:01 AMLast edit: June 06, 2022, 10:18:57 AM by o_e_l_e_o",
+      "body": "Sounds like you might have the wrong type of private key. Uncompressed WIF keys, which start with a 5, are generally only used to generate P2PKH (legacy) addresses. Compressed WIF keys, which start with a K or L, are used to generate any of three address types in Electrum. If you put the P2WPKH-P2SH: prefix in front of an uncompressed WIF key, it won't let you proceed, as you have just experienced.What does the public private key for your \"3\" address start with? Which wallet software did this private key/address originally come from?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "June 06, 2022, 09:55:51 AM",
+      "body": "I'd get that you were careful and didn't add by mistake some unnecessary spaces there. However, a double check would not hurt.Also, if nothing else works, I would try to create a completely new Electrum wallet from the private key and send the funds from there. Maybe this direction gives an idea of what you may have been doing wrong at first.Imho it doesn't matter at all it's a change address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitcoin_universe_234",
+      "created_time": "June 06, 2022, 10:06:44 AM",
+      "body": "Quote from: o_e_l_e_o on June 06, 2022, 09:47:01 AMSounds like you might have the wrong type of private key. Uncompressed WIF keys, which start with a 5, are generally only used to generate P2PKH (legacy) addresses. Compressed WIF keys, which start with a K or L, are used to generate any of three address types in Electrum. If you put the P2WPKH-P2SH: prefix in front of an uncompressed WIF key, it won't let you proceed, as you have just experienced.What does the public key for your \"3\" address start with? Which wallet software did this private key/address originally come from?Thanks for the reply.This is originally from an Armory wallet.The public key X (BE) starts with a4cfb3e3the public key Y (BE) starts with 7970a2ccIn the key information there is the hex or base58 format (base58 starts with the 5, and that's the one I assume I have to use).Screenshot from the armory wallet section to show: https://i.imgur.com/idK8mVB.png",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "June 06, 2022, 10:09:49 AM",
+      "body": "Have your tried what NeuroticFish posted? It is also a good idea, to just know the validity of your private key, or if you can run bitaddress html on an airgapped device and check the private key wallet details which would let you know if it is also a valid private key or not. But using Electrum would be good and you will not also be able to import it if the private key is invalid as the next button will grey out.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 06, 2022, 10:14:53 AM",
+      "body": "Quote from: bitcoin_universe_234 on June 06, 2022, 10:06:44 AMThanks for the reply.This is originally from an Armory wallet.The public key X (BE) starts with a4cfb3e3the public key Y (BE) starts with 7970a2ccSorry, my mistake - I meant what does the private key start with, but you've already answered that it starts with 5, meaning it is an uncompressed WIF and therefore cannot be used to recover a \"3\" address in Electrum.Quote from: bitcoin_universe_234 on June 06, 2022, 10:06:44 AMIn the key information there is the hex or base58 format (base58 starts with the 5, and that's the one I assume I have to use).Screenshot from the armory wallet section to show: https://i.imgur.com/idK8mVB.pngSo, note that this script from Armory - P2SH-P2PK - is not the same as \"nested segwit\" or the P2WPKH-P2SH script that Electrum uses. As far as I am aware, Armory is the only wallet which uses this script type. By far the easiest way to recover these coins is going to be to use Armory to send the coins over to your new Electrum wallet.Quote from: Charles-Tim on June 06, 2022, 10:09:49 AMHave your tried what NeuroticFish posted? It is also a good idea, to just know the validity of your private key, or if you can run bitaddress html on an airgapped device and check the private key wallet details which would let you know if it is also a valid private key or not. But using Electrum would be good and you will not also be able to import it if the private key is invalid as the next button will grey out.This is unnecessary. We already know the WIF is valid since OP can use it to recover an empty legacy address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitcoin_universe_234",
+      "created_time": "June 06, 2022, 10:22:54 AM",
+      "body": "Quote from: o_e_l_e_o on June 06, 2022, 10:14:53 AMQuote from: bitcoin_universe_234 on June 06, 2022, 10:06:44 AMThanks for the reply.This is originally from an Armory wallet.The public key X (BE) starts with a4cfb3e3the public key Y (BE) starts with 7970a2ccSorry, my mistake - I meant what does the private key start with, but you've already answered that it starts with 5, meaning it is an uncompressed WIF and therefore cannot be used to recover a \"3\" address in Electrum.Quote from: bitcoin_universe_234 on June 06, 2022, 10:06:44 AMIn the key information there is the hex or base58 format (base58 starts with the 5, and that's the one I assume I have to use).Screenshot from the armory wallet section to show: https://i.imgur.com/idK8mVB.pngSo, note that this script from armory - P2SH-P2PK - is not the same as \"nested segwit\" or the P2WPKH-P2SH script that Electrum uses. As far as I am aware, Armory is the only wallet which uses this script type. By far the easiest way to recover these coins is going to be to use Armory to send the coins over to your new Electrum wallet.Quote from: Charles-Tim on June 06, 2022, 10:09:49 AMHave your tried what NeuroticFish posted? It is also a good idea, to just know the validity of your private key, or if you can run bitaddress html on an airgapped device and check the private key wallet details which would let you know if it is also a valid private key or not. But using Electrum would be good and you will not also be able to import it if the private key is invalid as the next button will grey out.This is unnecessary. We already know the WIF is valid since OP can use it to recover an empty legacy address.Thanks for your quick reply.The main problem I have is that my armory refuses to send out any coins. Whenever I try to send any coins I get this error:https://i.imgur.com/I3eUAVg.pngHowever, the transaction fee is most definitely high enough. (I put it at 120 sat/B and then later even at 200 sat/B to make sure that wasn't the problem). (I have completely rebuild and rescanned armory a few times, which in the past would sometimes solve this issue but now it hasn't.)So I am unable to send these coins from my armory, which is what I initially tried to do (I guess I could go to the armory subsection but I thought there was no longer any support for it). Because I'm unable to send any coins from Armory I was trying to just sweep it from those addresses into my electrum wallet, which works fine for some addresses but not for this one. I would also be happy if there is a way to get Armory working again, but for the last few years it's not been easy to work with and keeps giving me errors.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 06, 2022, 10:29:30 AM",
+      "body": "There's certainly a far less active community than for a wallet like Electrum, for example, but you might still find enough help to solve your issue. As I said above, you will not be able to import this address in to Electrum regardless of what you do, so trying to get Armory working is probably the logical next step. If that fails, you could try to build the P2SH-P2PK transaction from scratch, but it is not a very common script type so you might run in to even more problems trying to do this.I would export and share the log file as that pop up box suggests, and we can try going from there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitcoin_universe_234",
+      "created_time": "June 06, 2022, 10:56:00 AMLast edit: June 06, 2022, 03:58:00 PM by bitcoin_universe_234",
+      "body": "Hmm well that is unfortunate.I am a bit hesitant to share the entire log, because I don't really understand a lot of it and it's for a decent amount of money (at least for me) but here are some of the important parts of where it goes wrong:The general setup of the system.Quote2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     datadir         : DEFAULT2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     clearMempool    : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     offline         : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     armoryDBDir     : DEFAULT2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     armorydb_port   : 90012022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     satoshiPort     : DEFAULT2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     useTorSettings  : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     netlog          : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     keypool         : 1002022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     coverageInclude : None2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     forceOnline     : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     redownload      : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     rpcBindAddr     : 127.0.0.12022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     armorydb_ip     : 127.0.0.12022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     multisigFile    : DEFAULT2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     ram_usage       : -12022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     mtdebug         : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     logDisable      : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     settingsPath    : C:\\Users\\USER\\AppData\\Roaming\\Armory\\ArmorySettings.txt2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     language        : en2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     db_type         : DB_FULL2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     doDebug         : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     enableDetSign   : True2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     disableConfPermis: False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     testnet         : False2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     rpcport         : DEFAULT2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     satoshiHome     : DEFAULT2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     satoshiRpcport  : DEFAULT2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     logFile         : C:\\Users\\USER\\AppData\\Roaming\\Armory\\ArmoryQt.exe.log.txt2022-06-06 09:55 (INFO) -- ArmoryUtils.pyc:1285 -     verbosity       : NoneThen the part where the transaction fails.Quote2022-06-06 09:59 (INFO) -- (PPRINT from ArmoryQt.py:3089)Transaction:   TxHash:    REMOVED(BE)   Version:   1   nInputs:   1   nOutputs:  2   LockTime:  712290   Inputs:       PyTxIn:         PrevTxHash: REMOVED(BE)         TxOutIndex: 1         Script:     (REMOVED)         Sender:     REMOVED         Seq:        4294967295   Outputs:       TxOut:         Value:   509710000 (5.0971)         Script:  OP_DUP OP_HASH160 (REMOVED) OP_EQUALVERIFY OP_CHECKSIG      TxOut:         Value:   600000000 (6.0)         Script:  OP_DUP OP_HASH160 (REMOVED) OP_EQUALVERIFY OP_CHECKSIG2022-06-06 09:59 (INFO) -- ArmoryQt.py:3094 - Sending Tx, REMOVED2022-06-06 10:00 (ERROR) -- ArmoryQt.py:3108 - Transaction was not accepted by the Satoshi client2022-06-06 10:00 (ERROR) -- ArmoryQt.py:3109 - Raw transaction:2022-06-06 10:00 (ERROR) -- (PPRINT from ArmoryQt.py:3110)'bunch of numbers' 2022-06-06 10:00 (ERROR) -- ArmoryQt.py:3111 - Transaction details2022-06-06 10:00 (ERROR) -- (PPRINT from ArmoryQt.py:3112)Transaction:   TxHash:    REMOVED(BE)   Version:   1   nInputs:   1   nOutputs:  2   LockTime:  712290   Inputs:       PyTxIn:         PrevTxHash: REMOVED(BE)         TxOutIndex: 1         Script:     (REMOVED)         Sender:     REMOVED         Seq:        4294967295   Outputs:       TxOut:         Value:   509710000 (5.0971)         Script:  OP_DUP OP_HASH160 (REMOVED) OP_EQUALVERIFY OP_CHECKSIG      TxOut:         Value:   600000000 (6.0)         Script:  OP_DUP OP_HASH160 (REMOVED) OP_EQUALVERIFY OP_CHECKSIG2022-06-06 10:00 (ERROR) -- ArmoryQt.py:3113 - Failure message: tx broadcast timed out (send)2022-06-06 10:54 (INFO) -- ArmoryQt.py:5400 - BDM is safe for clean shutdown2022-06-06 10:54 (INFO) -- SDM.pyc:457 - Called stopBitcoind2022-06-06 10:54 (INFO) -- ArmoryQt.py:5414 - Attempting to close the main window!I really appreciate the help and I hope you're understanding of my reluctance to post the entire log file. Edit: So in the armory client it says it's connected, however I did sweep another address earlier today and that has not been updated by the armory client/wallet despite me rebuilding + rescanning the Armory database.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 06, 2022, 12:08:32 PMLast edit: June 06, 2022, 12:27:42 PM by LoyceV",
+      "body": "Quote from: bitcoin_universe_234 on June 06, 2022, 10:22:54 AMThe main problem I have is that my armory refuses to send out any coins. Whenever I try to send any coins I get this error:To ask the obvious: what fee are you using?Does Armory allow you to copy the raw (signed) transaction? If it does, try Electrum > Tools > Load transaction > From text.Quote from: bitcoin_universe_234 on June 06, 2022, 10:56:00 AMEdit: So in the armory client it says it's connected, however I did sweep another address earlier today and that has not been updated by the armory client/wallet despite me rebuilding + rescanning the Armory database.How old is your Armory version? From your screenshot, I see the address was funded just over a year ago. I've never used Armory, but I'd guess a year old version shouldn't be the problem.Considering the amount you're dealing with, may I suggest a safer approach than Electrum connected to the internet? I wrote this a while back, although not entire applicable to your situation.I got curious, and followed your transaction upchain a bit: you may own some money in Forkcoins. Don't do anything with them before getting all your Bitcoins out.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 06, 2022, 12:16:09 PM",
+      "body": "So looking at the transaction details Armory has given you, the fee you have paid is certainly high enough, so that's not the issue. Your input hasn't already been spent, and no problems with LockTime.The script Armory has shown there looks incomplete to me. 0x47 at the start means push 71 bytes, but then it only displays 31 bytes. The string \"3044\" which follows indicates that it is pushing a signature of 68 bytes, and \"0220\" after that indicates the R value is 32 bytes. But then it only displays 27 bytes of the R value, and doesn't display the S value at all. Not sure if this is where the problem lies or it is just the way Armory has displayed things.The bit where you say \"'bunch of numbers\" I suspect is the raw transaction hex. It should start with \"0100000001ec016e\" and end in \"62de0a00\" based on what you've copied above. Try copying that in to a transaction broadcaster such as this one: https://mempool.space/tx/pushIf it broadcasts, great. If it doesn't, then you know it's a problem with how Armory is signing that transaction rather than Armory not connecting properly.Quote from: bitcoin_universe_234 on June 06, 2022, 10:56:00 AMI really appreciate the help and I hope you're understanding of my reluctance to post the entire log file.Absolutely. The log file reveals your addresses and transactions, but it shouldn't contain your private keys which could lead to loss of your funds. I'm happy to try and assist privately if you prefer, although I would obviously caution against taking private advice from a random internet stranger (myself included).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitcoin_universe_234",
+      "created_time": "June 06, 2022, 01:15:42 PM",
+      "body": "Quote from: o_e_l_e_o on June 06, 2022, 12:16:09 PMSo looking at the transaction details Armory has given you, the fee you have paid is certainly high enough, so that's not the issue. Your input hasn't already been spent, and no problems with LockTime.The script Armory has shown there looks incomplete to me. 0x47 at the start means push 71 bytes, but then it only displays 31 bytes. The string \"3044\" which follows indicates that it is pushing a signature of 68 bytes, and \"0220\" after that indicates the R value is 32 bytes. But then it only displays 27 bytes of the R value, and doesn't display the S value at all. Not sure if this is where the problem lies or it is just the way Armory has displayed things.The bit where you say \"'bunch of numbers\" I suspect is the raw transaction hex. It should start with \"0100000001ec016e\" and end in \"62de0a00\" based on what you've copied above. Try copying that in to a transaction broadcaster such as this one: https://mempool.space/tx/pushIf it broadcasts, great. If it doesn't, then you know it's a problem with how Armory is signing that transactionWhen I tried to push on that website it gives the following error:https://i.imgur.com/21AKwmp.pngIt does indeed start with \"0100000001ec016e\" So somewhere the TX decode fails it seems.I will try to do a factory reset of Armory and perhaps that will solve the problem.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 06, 2022, 01:17:51 PM",
+      "body": "Try removing the spaces and line breaks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitcoin_universe_234",
+      "created_time": "June 06, 2022, 01:30:23 PM",
+      "body": "Quote from: o_e_l_e_o on June 06, 2022, 01:17:51 PMTry removing the spaces and line breaks.Awesome, that seems to have done the trick! Well at least I now have a way again to send transactions using armory even if it's a bit of a convoluted one!  Really appreciate it. Quote from: LoyceV on June 06, 2022, 12:08:32 PMI got curious, and followed your transaction upchain a bit: you may own some money in Forkcoins. Don't do anything with them before getting all your Bitcoins out.Thanks! Yes I'm aware I still have some fork money laying around at places. Eventually will have to go pick all that up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 06, 2022, 01:33:34 PM",
+      "body": "Yup, I can confirm that I can see your transaction broadcasted. So it seems the underlying problem was simply Armory not connecting/broadcasting properly. Happy to be of help! As Loyce has said above though, keeping such amounts of bitcoin on a hot wallet, be that Armory or Electrum, is not a great idea. My next suggestion would be to investigate either a hardware wallet or a cold storage set up.Glad you managed to recover your coins.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "June 06, 2022, 03:22:22 PM",
+      "body": "Quote from: bitcoin_universe_234 on June 06, 2022, 01:15:42 PMI will try to do a factory reset of Armory and perhaps that will solve the problem.Kind of a mute point now, but that's an interesting error you were getting.  You mentioned the version of Electrum you are using, are you using the latest release of Armory?  I haven't used Armory wallet in quite some time, and don't plan to but I would be interested to know if you are able to figure this out.Kudos to our resident fixer, o_e_l_e_o for figuring it out.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitcoin_universe_234",
+      "created_time": "June 06, 2022, 04:01:59 PM",
+      "body": "Quote from: DireWolfM14 on June 06, 2022, 03:22:22 PMQuote from: bitcoin_universe_234 on June 06, 2022, 01:15:42 PMI will try to do a factory reset of Armory and perhaps that will solve the problem.Kind of a mute point now, but that's an interesting error you were getting.  You mentioned the version of Electrum you are using, are you using the latest release of Armory?  I haven't used Armory wallet in quite some time, and don't plan to but I would be interested to know if you are able to figure this out.Kudos to our resident fixer, o_e_l_e_o for figuring it out.I'm running Armory Version 0.96-betaI haven't tried to see if I still get the error after doing a factory reset. However, I did need to do a few more database rescans before the transactions showed up properly in Armory (which they do now). Have not tried to do another transaction afterwards. I will do that later to see if the error remains.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitcoin_universe_234",
+      "created_time": "June 06, 2022, 06:59:35 PM",
+      "body": "Well it seems that either the factory reset or something has solved the problem. Armory seems to be functioning again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

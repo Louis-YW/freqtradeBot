@@ -1,0 +1,93 @@
+{
+  "id": "topic_5398682",
+  "title": "NdaMk",
+  "author": "NdaMk",
+  "created_time": "May 14, 2022, 05:18:19 PM",
+  "content": "Transactions in a block are compressed and verified as one in a Bitcoin by Merkle tree. The tree is created by repeatedly hashing of nodes to form a single one. This kind of tree is produced upside down ( not like the natural tree). The technique is similar to the process of hashing twice the SHA256. The tree can be constructed from multiple transactions but still has same top root of 32-bytes data. The Merkle tree efficiency increases proportionally with the increase in scale. SPV nodes are verified by Merkle paths without having to download the full Bitcoin blocks. Merkle paths connect transactions to the block Merkle root.1. Would Merkle tree solves the problem of Collision sometimes encountered with SHA256?2. How secure is this more than the normal linear hash and what's the difference?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398682",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 14, 2022, 05:28:14 PM",
+      "body": "Quote from: NdaMk on May 14, 2022, 05:18:19 PM1. Would Merkle tree solves the problem of Collision sometimes encountered with SHA256?What do you mean? There's never been a collision with SHA-256.Quote from: NdaMk on May 14, 2022, 05:18:19 PM2. How secure is this more than the normal linear hash and what's the difference?How secure is what? The hash function? The process where we construct hash trees has to do with the efficiency of verification.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NdaMk",
+      "created_time": "May 14, 2022, 06:28:03 PM",
+      "body": "Quote from: BlackHatCoiner on May 14, 2022, 05:28:14 PMQuote from: NdaMk on May 14, 2022, 05:18:19 PM1. Would Merkle tree solves the problem of Collision sometimes encountered with SHA256?What do you mean? There's never been a collision with SHA-256.Collision of data ( senerio where by same result is generated when hashing) sometimes happens in hashing with SHA256 although proportional almost impossible. So my question is can Merkle tree solve it entirely",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 14, 2022, 07:09:54 PM",
+      "body": "Quote from: NdaMk on May 14, 2022, 06:28:03 PMCollision of data ( senerio where by same result is generated when hashing) sometimes happens in hashing with SHA256 although proportional almost impossible.I wouldn't say \"sometimes\" - it has never knowingly happened.Quote from: NdaMk on May 14, 2022, 06:28:03 PMSo my question is can Merkle tree solve it entirelyBitcoin's Merkle tree is just a large branching series of SHA256 hashes. If you think SHA256 is broken (it isn't), then simply repeating it over and over doesn't make it secure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 15, 2022, 03:54:11 AM",
+      "body": "A Merkle tree is when you repeatedly has together two values, using something like sha256 to get a single \"branch\" value.As you can see, it actualy uses SHA256 (I believe Bitcoin's merkle trees hash with SHA512 which is no more secure than SHA256) inside, so it is not a substitute for a direct SHA256 hash.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 15, 2022, 04:57:46 AM",
+      "body": "QuoteWould Merkle tree solves the problem of Collision sometimes encountered with SHA256?No. You can make a collision, so that the left branch and the right branch is the same, and their concatenation after hashing is also the same. Then, you can put some node in an endless merkle branch downloading loop. You only need one collision for that: \"SHA-256d(hash||hash)==hash\". Also, you should probably be careful about endianness, but yes, it is possible to create a merkle branch, that looks like this:Code:     hash    /    \\hash      hashQuoteHow secure is this more than the normal linear hash and what's the difference?We have double SHA-256 and not single SHA-256, because of length extension attacks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NdaMk",
+      "created_time": "May 15, 2022, 09:04:30 AM",
+      "body": "Quote from: garlonicon on May 15, 2022, 04:57:46 AMQuoteWould Merkle tree solves the problem of Collision sometimes encountered with SHA256?No. You can make a collision, so that the left branch and the right branch is the same, and their concatenation after hashing is also the same. Then, you can put some node in an endless merkle branch downloading loop. You only need one collision for that: \"SHA-256d(hash||hash)==hash\". Also, you should probably be careful about endianness, but yes, it is possible to create a merkle branch, that looks like this:Code:     hash    /    \\hash      hashMy question isn't about making Collision but can collision (process whereby hashing of two or more different keys gives the same hashing value or result) be totally eradicated with this method of Merkle tree",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 15, 2022, 10:29:43 AM",
+      "body": "Quote from: NotATether on May 15, 2022, 03:54:11 AMAs you can see, it actualy uses SHA256 (I believe Bitcoin's merkle trees hash with SHA512 which is no more secure than SHA256) inside, so it is not a substitute for a direct SHA256 hash.Bitcoin uses double SHA256, not SHA512, for its Merkle trees. So combining transaction A and B to the next node up would be SHA256(SHA256(A+B)).Quote from: NdaMk on May 15, 2022, 09:04:30 AMcan collision (process whereby hashing of two or more different keys gives the same hashing value or result) be totally eradicated with this method of Merkle treeNo, it can't. Given that there are 2(264)-1 possible inputs to SHA256, but \"only\" 2256 possible outputs, there is always the chance that two completely unrelated inputs will give the same output.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "May 15, 2022, 01:45:52 PM",
+      "body": "Quote from: NdaMk on May 15, 2022, 09:04:30 AMMy question isn't about making Collision but can collision (process whereby hashing of two or more different keys gives the same hashing value or result) be totally eradicated with this method of Merkle treeIt is impossible to entirely eradicate the potential for a collusion when using a hashing algorithm. Otherwise, you would just be dealing with raw data. Given the limited number of blocks, and the algorithm currently being used, the chances of a collusion is effectively zero under the status quo.Quote from: BlackHatCoiner on May 14, 2022, 05:28:14 PMQuote from: NdaMk on May 14, 2022, 05:18:19 PM1. Would Merkle tree solves the problem of Collision sometimes encountered with SHA256?What do you mean? There's never been a collision with SHA-256.There are 2256 possible outcomes when hashing a piece of data using SHA-256. There is an infinite number of data that can potentially be hashed, therefore, there is an infinite number of data points that will produce collisions when hashing each of the data points using SHA-256. With that being said, actually finding any of those collisions is a different story, and it is unlikely that someone will ever encounter a SHA-256 collusion without breaking SHA-256.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 15, 2022, 03:13:03 PMLast edit: May 16, 2022, 08:18:16 AM by o_e_l_e_o",
+      "body": "Quote from: PrimeNumber7 on May 15, 2022, 01:45:52 PMThere is an infinite number of data that can potentially be hashedThere isn't, although practical speaking the limit is irrelevant. As I stated above, there are 2(264)-1 possible inputs in to SHA256.If you look at page 18 of the Secure Hash Standard document from NIST:Quote from: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf#page=18Then append the 64-bit block that is equal to the number l expressed using a binary representation.This means that for any input in to SHA256, you must first express the length of that input as a 64 bit number and append that 64 bit number to the input. This places an upper limit on the length of any input of 264-1 bits, meaning 2(264)-1 possible inputs.For reference, a length of 264-1 bits is equivalent to 2 million terabytes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "May 15, 2022, 10:01:34 PM",
+      "body": "Quote from: NdaMk on May 14, 2022, 05:18:19 PM1. Would Merkle tree solves the problem of Collision sometimes encountered with SHA256?2. How secure is this more than the normal linear hash and what's the difference?I assume that you are proposing to use a merkle tree root as the hash for a message instead of a simply computing the hash of the message directly. That will have no effect on the probability of a collision because both are single SHA-256 hashes in the end. The only way to reduce the probability of a collision is to increase the size of the hash (assuming that there are no flaws in the hash algorithm).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

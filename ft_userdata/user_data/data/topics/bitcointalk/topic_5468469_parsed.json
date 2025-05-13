@@ -1,0 +1,85 @@
+{
+  "id": "topic_5468469",
+  "title": "cygan",
+  "author": "cygan",
+  "created_time": "September 28, 2023, 05:57:05 PM",
+  "content": "today i would like to introduce you to the 'compact block relay' 4 slides and encourage you with this thread to discuss.compact block relay, also found under bip152, was released and implemented by Matt Corallo in april 2016. its a method of reducing the amount of bandwidth used to propagate new blocks to full nodes.full node users who want to forward transactions but have limited internet bandwidth and the network as a whole benefit from compact blocks.QuoteBIP: 152  Layer: Peer Services  Title: Compact Block Relay  Author: Matt Corallo <bip152@bluematt.me>  Comments-Summary: Unanimously Recommended for implementation  Comments-URI: https://github.com/bitcoin/bips/wiki/Comments:BIP-0152  Status: Final  Type: Standards Track  Created: 2016-04-27  License: PDhttps://github.com/bitcoin/bips/blob/master/bip-0152.mediawikireference implementation: https://github.com/bitcoin/bitcoin/pull/8068  https://twitter.com/BTCillustrated",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468469",
+  "comments": [
+    {
+      "author": "philipma1957",
+      "created_time": "September 28, 2023, 06:35:32 PM",
+      "body": "So are these being done a lot at the moment? Or is this a future oriented idea?Seems like it works fairly well I don't see any flaws in the concept.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "September 29, 2023, 10:57:26 AM",
+      "body": "Quote from: philipma1957 on September 28, 2023, 06:35:32 PMSo are these being done a lot at the moment? Or is this a future oriented idea?Seems like it works fairly well I don't see any flaws in the concept.Already implemented by Bitcoin Core since 2016, see https://bitcoincore.org/en/2016/06/07/compact-blocks-faq/. I also except most/all pool already support it since it allow their mined block propagated faster.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "September 29, 2023, 12:24:42 PM",
+      "body": "Isn't it true, that the majority of nodes already have the majority of the next block's transactions in their mempool? Do we have an estimate or approximation of how many transactions already exist in the mempools and how many don't exist? Is it last second's transactions (in their majority)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 29, 2023, 03:36:14 PM",
+      "body": "That is brand new information for me. Kudos to cygan. There's just always something you don't know about Bitcoin. Quote from: apogio on September 29, 2023, 12:24:42 PMIsn't it true, that the majority of nodes already have the majority of the next block's transactions in their mempool?I believe so, but there aren't any public data to verify that claim. It could be verified though. If you spin up a full node and recursively attempt to send compact blocks to the nodes that request it, similar as to getaddr by bitnodes.io, you can analyze their transaction requests and approach what is each node's mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "September 29, 2023, 04:28:40 PM",
+      "body": "Quote from: BlackHatCoiner on September 29, 2023, 03:36:14 PMI believe so, but there aren't any public data to verify that claim. It could be verified though. If you spin up a full node and recursively attempt to send compact blocks to the nodes that request it, similar as to getaddr by bitnodes.io, you can analyze their transaction requests and approach what is each node's mempool. Hi. I still don't understand how it works to be honest. So the miner creates a block assigning transactions to it. Then the block is broadcasted to the nodes. Then the nodes check how many transactions exist in their mempool (say 9 out of 10). What happens next? This is where I miss the point.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 29, 2023, 05:34:55 PM",
+      "body": "Quote from: apogio on September 29, 2023, 04:28:40 PMSo the miner creates a block assigning transactions to it. Then the block is broadcasted to the nodes. Then the nodes check how many transactions exist in their mempool (say 9 out of 10). What happens next? This is where I miss the point. These are the steps, as I understand them.Node has 900 out of the 1000 transactions of a block.Mining pool, which runs a regular node, sends block announcements (via cmpctblock). These types of messages include a list of structures, containing the compacted block, like short transactions IDs and other useful info.When the node receives the compacted block, it requests via getblocktxn to get the 100 missing transactions from the other peer.Mining pool responds back with those transactions.Node verifies that the new transactions are indeed included in the block, by constructing and verifying the block using information from step 2.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "September 29, 2023, 05:38:09 PM",
+      "body": "Quote from: ETFbitcoin on September 29, 2023, 10:57:26 AMQuote from: philipma1957 on September 28, 2023, 06:35:32 PMSo are these being done a lot at the moment? Or is this a future oriented idea?Seems like it works fairly well I don't see any flaws in the concept.Already implemented by Bitcoin Core since 2016, see https://bitcoincore.org/en/2016/06/07/compact-blocks-faq/. I also except most/all pool already support it since it allow their mined block propagated faster.I would love to know the traffic volume of these vs the older style methods.It appears that this method would be in more use then the original methods.I did not know they were using this short cut.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "September 30, 2023, 08:13:26 AM",
+      "body": "@philipma1957 this process of sending information piecemeal and padding the information in the validated blocks with local data allows for a dramatic reduction in the size of network messages. it can be thought of as sending small signals that can be completely rebuilt. this is possible because you have the elements from which these signals are built. also, thanks to cryptography, you can be sure that your reconstructed message is identical to the original.the need for network bandwidth to transmit information to all nodes is significantly reduced. in fact, network data consumption now reaches an average of 1.4tb of data (instead of an average of 1.58tb per day, with a data size of ~1mb per block). this represents a reduction of more than 90% in the data consumption of the entire network. in total, these minimal blocks take up a maximum of 20kb of data. it enables faster data transfer over the network. in fact, it takes about 15 seconds for all nodes of the network to receive the information about a new blockhere is also a very interesting link with an also very interesting explanation on this topic, which was also designed (in november 2019) by @gmaxwell, Pieter Wuille and 3 other authors from the university of british columbia:Erlay: Efficient Transaction Relay for Bitcoin",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "September 30, 2023, 09:23:46 AM",
+      "body": "Erlay is something different, dealing with the duplication of relaying transaction invs to/from multiple peers.Each node receives each block once.  So in aggregate compact blocks reduces block related network bandwidth usage to roughly half (it would be half if it were perfectly efficient, taking zero bytes per txn). The 1/2 bandwidth itself isn't very important but it made people more confident that the increased effective block size limit from segwit would not make things much worse than they had been. (Also, block related bandwidth is only a small part of a nodes usage: as the erlay writeup notes: nodes spend a lot of bandwidth on INV messages, because unlike blocks and transaction bodies they need to be exchanged between each peer instead of received only once)There isn't really any complexity in figuring out the exact bandwidth savings for you, the debug logging for compact blocks is sufficient to figure it out.  In practice it's pretty close to the size of the block minus the marginal size of the compact block (6 bytes per transaction).The bigger effect however is on latency: The latency to relay a block is the time it takes to transfer it plus processing.  The transmission serialization delay goes from two megabytes to ~13kb, which is a substantial speedup.  The fact that the information needed to relay a block is made so small allows nodes to request a limited number of peers send them new blocks without asking if the already have it first, resulting in a bit of waste but eliminating a half round trip time.Block transmission latency is important because delays in transmission create an advantage for higher hashpower miners over lower hashpower miners, a source of centralization pressure.The reduced size also allows getting the block from multiple peers concurrently without waiting for a long timeout, which improves robustness to some attacks.Even when BIP152 was created we knew how to reduce the size much further, e.g. the original writeup that lead to BIP152 https://nt4tn.net/tech-notes/201512.efficient.block.xfer.txt (and the related https://nt4tn.net/tech-notes/201512.lowlatency.block.xfer.txt) describe additional techniques that bring sizes down much further (the writeup says <2kb, but subsequent prototyping( showed under 900 bytes is realistic-- though getting to that size requires miners to construct blocks in a predictable order, which they usually do).  But these extra steps come at considerable code and computational complexity, and might not even reduce latency much except on the fastest computers because of the extra cpu time needed to decode.(those techniques showed up as part of erlay, for transaction relay, which isn't latency-limited so the fact that they can be slow to decode doesn't obviate their benefits)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

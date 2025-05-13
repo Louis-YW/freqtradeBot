@@ -1,0 +1,125 @@
+{
+  "id": "topic_5465099",
+  "title": "Sidney986",
+  "author": "Sidney986",
+  "created_time": "August 30, 2023, 02:59:01 PM",
+  "content": "Concerned about small amount of btc left on electrum addresses as the mining fee costs rise in the long run.Am I correct in thinking that if I spend more than the amount on the small funded address so it also comes of the larger funded address that the mining fee will still stay low.I'm assuming that Electrum spends fund from the smallest funded addresses first.  Is that correct.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5465099",
+  "comments": [
+    {
+      "author": "God Of Thunder",
+      "created_time": "August 30, 2023, 03:00:37 PMLast edit: August 30, 2023, 03:11:37 PM by Learn Bitcoin",
+      "body": "Quote from: Sidney986 on August 30, 2023, 02:59:01 PMI'm assuming that Electrum spends fund from the smallest funded addresses first.  Is that correct.You can actually select from which address you want to spend your coins. If you want to spend from some specific address, right-click on the address and click on \"Add to coin control\". After that, you will see the status \"Coin control active\" and other information about this specific address. See the image below.If I am not wrong, The fee depends on how many input and output a transaction has (More input and output consume more size).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "August 30, 2023, 03:27:14 PMLast edit: August 30, 2023, 03:46:43 PM by hosseinimr93",
+      "body": "You can use coin control and spend any UTXO you want. By default, electrum tries to minimize the transaction fee with the limitation that if there are multiple UTXOs in the same address, it either uses all of them or none of them.Let's say you have 2 UTXOs in two different addresses. One of them is worth 1 BTC and the other one is worth 2 BTC. Whether you spend 0.5 BTC or 1.5 BTC, your transaction would include 1 input and the fee would be the same. If you spend more than 2 BTC, electrum has to use both UTXOs. This is the default behavior of electrum and as said, you can use coin control to select any of UTXOs you want.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Findingnemo",
+      "created_time": "August 30, 2023, 04:15:41 PM",
+      "body": "Quote from: Sidney986 on August 30, 2023, 02:59:01 PMI'm assuming that Electrum spends fund from the smallest funded addresses first.  Is that correct.Quote from: hosseinimr93 on August 30, 2023, 03:27:14 PMBy default, electrum tries to minimize the transaction fee with the limitation that if there are multiple UTXOs in the same address, it either uses all of them or none of them.Nope, Electrum uses random addresses to maximize your privacy if UTXOs are in different addresses that is the case with OP if I am not wrong which is the default behaviour in Electrum.Electrum source code Code:class CoinChooserPrivacy(CoinChooserRandom):    \"\"\"Attempts to better preserve user privacy.    First, if any coin is spent from a user address, all coins are.    Compared to spending from other addresses to make up an amount, this reduces    information leakage about sender holdings.  It also helps to    reduce blockchain UTXO bloat, and reduce future privacy loss that    would come from reusing that address' remaining UTXOs.    Second, it penalizes change that is quite different to the sent amount.    Third, it penalizes change that is too big.    \"\"\"which will increase the size of the transaction more so if you want to reduce the use coin control feature as mentioned by the above users.OP, you need to consolidate your smaller inputs from time to time if you are worried about spending more in the fees than the actual transaction amount, maybe this guide by LoyceV will be helpful : [Aug 2023] Fees are low, use this opportunity to Consolidate your small inputs!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sidney986",
+      "created_time": "August 30, 2023, 04:39:44 PM",
+      "body": "@Findingnemo,Yes, consolidate my smaller inputs whilst keeping my privacy.  Will check the link you gave.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "August 30, 2023, 08:51:23 PM",
+      "body": "Quote from: Findingnemo on August 30, 2023, 04:15:41 PMQuote from: hosseinimr93 on August 30, 2023, 03:27:14 PMBy default, electrum tries to minimize the transaction fee with the limitation that if there are multiple UTXOs in the same address, it either uses all of them or none of them.Nope, Electrum uses random addresses to maximize your privacy if UTXOs are in different addresses that is the case with OP if I am not wrong which is the default behaviour in Electrum.You are right that electrum tries to maximize the privacy, but what do you mean by random?Let's say you have two UTXOs. One of them is worth 0.02 BTC and the other one is worth 0.03 BTC and they have received in different addresses. Now you want to spend 0.01 BTC without using coin control feature. Are you saying both of your UTXOs have the chance to be used by electrum? If so, no. That's not how electrum select UTXOs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 31, 2023, 05:24:20 AM",
+      "body": "Quote from: hosseinimr93 on August 30, 2023, 08:51:23 PMQuote from: Findingnemo on August 30, 2023, 04:15:41 PMQuote from: hosseinimr93 on August 30, 2023, 03:27:14 PMBy default, electrum tries to minimize the transaction fee with the limitation that if there are multiple UTXOs in the same address, it either uses all of them or none of them.Nope, Electrum uses random addresses to maximize your privacy if UTXOs are in different addresses that is the case with OP if I am not wrong which is the default behaviour in Electrum.You are right that electrum tries to maximize the privacy, but what do you mean by random?Let's say you have two UTXOs. One of them is worth 0.02 BTC and the other one is worth 0.03 BTC and they have received in different addresses. Now you want to spend 0.01 BTC without using coin control feature. Are you saying both of your UTXOs have the chance to be used by electrum? If so, no. That's not how electrum select UTXOs. The coin selection in Electrum is both deterministic and random but with some conditions. You have to look at the source code for the details but generally speaking Electrum creates \"buckets\" from your UTXOs from each address and tries to deterministically choose a \"bucket\" that can produce the best transaction that has the amount you want to pay and produces less blockchain bloat.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sidney986",
+      "created_time": "September 02, 2023, 02:37:03 PM",
+      "body": "How would I consolidate small funded addresses on Android Electrum?  I don't see an option to select and spend from 2 or more addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 02, 2023, 02:46:04 PM",
+      "body": "Quote from: Sidney986 on September 02, 2023, 02:37:03 PMHow would I consolidate small funded addresses on Android Electrum?  I don't see an option to select and spend from 2 or more addresses.There is no \"Coin Control\" in android version of electrum. But it's possible to freeze addresses and that may be helpful to you. To freeze addresses, tap on your wallet name at top left corner of the screen and go to addresses. Tap on any of addresses you want and then tap on \"Freeze address\".With freezing an address, you tell electrum that you don't want to spend any fund from that address. As there is no coin control on the android version of electrum, if there are multiple UTXOs received in the same address, there is no way to tell electum which of those UTXOs you want to be used and which you don't want to be used.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Z-tight",
+      "created_time": "September 02, 2023, 08:55:10 PM",
+      "body": "Quote from: Sidney986 on September 02, 2023, 02:37:03 PMHow would I consolidate small funded addresses on Android Electrum?  I don't see an option to select and spend from 2 or more addresses.Take note that Electrum on Android lacks a lot of basic features, like coin control, customizing fees, signing BTC message, etc, if you want to use the coin control feature on Electrum, use it on the desktop version.Quote from: Sidney986 on August 30, 2023, 04:39:44 PMYes, consolidate my smaller inputs whilst keeping my privacy.One of the trade-offs of consolidating many inputs is privacy, while you save up on future fees to be paid, you are linking many UTXO's in one tx which is bad for privacy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "virasog",
+      "created_time": "September 03, 2023, 05:14:14 AM",
+      "body": "Quote from: Sidney986 on August 30, 2023, 04:39:44 PM@Findingnemo,Yes, consolidate my smaller inputs whilst keeping my privacy.  Will check the link you gave.When consolidating your inputs, make sure you use a fee that gets confirmed. As you said, mining fees are increasing, usually a very low fee can keep your transaction unconfirmed for a long long period, so be aware of what exactly you want to do.Just to give you an idea, if you put 8 sat/byte, it will take more than 1000 blocks to confirm, so if you put 7 or 6 sat/byte as the fee, you may have to wait a lot longer.https://buybitcoinworldwide.com/fee-calculator/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 03, 2023, 05:51:19 AM",
+      "body": "Quote from: virasog on September 03, 2023, 05:14:14 AMJust to give you an idea, if you put 8 sat/byte, it will take more than 1000 blocks to confirm, so if you put 7 or 6 sat/byte as the fee, you may have to wait a lot longer.According to mempool.space, the purging fee rate for the nodes that use the default setting is now around 6.8 sat/vbyte. This means that if you make a transaction with the fee rate of 6 sat/vbyte now, your transaction will be probably rejected by most nodes and it won't enter their mempool at all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Z-tight",
+      "created_time": "September 03, 2023, 10:18:17 AM",
+      "body": "Quote from: virasog on September 03, 2023, 05:14:14 AMWhen consolidating your inputs, make sure you use a fee that gets confirmed. As you said, mining fees are increasing, usually a very low fee can keep your transaction unconfirmed for a long long period, so be aware of what exactly you want to do.When consolidating many small inputs you should not mind waiting, because you'll also want to save fees in that transaction, consolidation includes many inputs and as such a larger tx size. 1 sat/vbyte is the best fee rate for consolidating many inputs, and you then have to be patient and just wait for the tx to be confirmed.Due to Ordinals spam, tx's cannot get confirmed with 1 sat/vbye anymore and the fee rate for purging is <6.42 as i type this, so right now may not be a good time for someone to consolidate their many inputs, except they are in a hurry, but if they are not; they can wait until tx fee rate is down to around 1-2 sats/vbye.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zaguru12",
+      "created_time": "September 03, 2023, 02:15:24 PM",
+      "body": "Quote from: Z-tight on September 02, 2023, 08:55:10 PMQuote from: Sidney986 on September 02, 2023, 02:37:03 PMHow would I consolidate small funded addresses on Android Electrum?  I don't see an option to select and spend from 2 or more addresses.Take note that Electrum on Android lacks a lot of basic features, like coin control, customizing fees, signing BTC message, etc, if you want to use the coin control feature on Electrum, use it on the desktop version.The mobile wallet for this features you listed is BlueWallet it also supports coin control and the other features mentioned. And not like just the regular Bip39 wallets BlueWallet supports the importation of seeds from electrum wallet. With most features lacking in Mobile electrum I will advise Sidney986 to stick to Electrum Desktop and then compliment it with a Mobile BlueWallet if he wishes to have his wallet on his mobile device. Quote from: Z-tight on September 03, 2023, 10:18:17 AMWhen consolidating many small inputs you should not mind waiting, because you'll also want to save fees in that transaction, consolidation includes many inputs and as such a larger tx size. 1 sat/vbyte is the best fee rate for consolidating many inputs, and you then have to be patient and just wait for the tx to be confirmed.I wouldn’t advice the act of the act of waiting probably too long for confirmation when consolidating fees, the mempool could easily get more congested while waiting and at this period of time if he needs to make a transaction then he would have to bump the fees which is paying more and that defeats the purpose of coin consolidation or wait without having access to your coins it it’s confirmed or dropped (if mempool congestion doesn’t drops). The best thing is to use a transaction fee that is considerably low and also top priority base on mempool to get them consolidated fast. If the transaction fee  for high priority or medium priority confirmation is not suitable to you then I would say don’t initiate the consolidation yet but wait till then.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "virasog",
+      "created_time": "September 07, 2023, 01:27:10 AM",
+      "body": "Quote from: Z-tight on September 03, 2023, 10:18:17 AMQuote from: virasog on September 03, 2023, 05:14:14 AMWhen consolidating your inputs, make sure you use a fee that gets confirmed. As you said, mining fees are increasing, usually a very low fee can keep your transaction unconfirmed for a long long period, so be aware of what exactly you want to do.When consolidating many small inputs you should not mind waiting, because you'll also want to save fees in that transaction, consolidation includes many inputs and as such a larger tx size. 1 sat/vbyte is the best fee rate for consolidating many inputs, and you then have to be patient and just wait for the tx to be confirmed.Due to Ordinals spam, tx's cannot get confirmed with 1 sat/vbye anymore and the fee rate for purging is <6.42 as i type this, so right now may not be a good time for someone to consolidate their many inputs, except they are in a hurry, but if they are not; they can wait until tx fee rate is down to around 1-2 sats/vbye.Well the problem is that we are not going to see 1-2 sat/vbyte anytime soon. Right now you can see that in order to get your transaction confirmed, you need to have above 14+ sat/vbyte and this may increase as we move closer to the Bitcoin halving.So, if any want to spend from his wallet, he would have to pay this high fee, So it is better to consolidate the inputs during the weekends as i noticed that in the last weekend the transaction fee fell as low as 7 sat/vbyte.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

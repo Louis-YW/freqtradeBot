@@ -1,0 +1,165 @@
+{
+  "id": "topic_5411599",
+  "title": "TryNinja",
+  "author": "TryNinja",
+  "created_time": "August 29, 2022, 12:46:51 PMLast edit: May 14, 2023, 02:17:31 AM by TryNinja",
+  "content": "This was originally posted here.It adds a note field on each user's profile and posts. You can click the note itself to remove or change it.P.S: Notes are only stored LOCALLY and will be lost if you uninstall the extension. Only you can see your notes. You can import/export your notes by clicking the \"User Notes\" button next to the forum's Logout button.Installation- Install Tampermonkey (Chrome, Brave...) or Greasemonkey (Firefox). Or even better, Violentmonkey (open source alternative)- Add a new script and paste the code:Code:// ==UserScript==// @name         BitcoinTalk User Notes// @version      0.3.1// @description  Adds an note field to each user on BitcoinTalk// @author       TryNinja// @match        https://bitcointalk.org/*// @icon         https://www.google.com/s2/favicons?sz=64&domain=bitcointalk.org// @grant GM.setValue// @grant GM.getValue// @grant GM_setValue// @grant GM_getValue// ==/UserScript==const enableModal = 1;(async function() {    'use strict';    const addStyle = (css) => {        const style = document.getElementById(\"GM_addStyleBy8626\") || (() => {        const style = document.createElement('style');        style.id = \"GM_addStyleBy8626\";        document.head.appendChild(style);        return style;        })();        const sheet = style.sheet;        sheet.insertRule(css, (sheet.rules || sheet.cssRules || []).length);    }    if (enableModal) {        addStyle(`.modal {            position: fixed;            width: 100vw;            height: 100vh;            top: 0;            left: 0;            display: flex;            align-items: center;            justify-content: center;        }`);        addStyle(`.modal-bg {            position: absolute;            width: 100%;            height: 100%;        }`);        addStyle(`.modal-container {            min-width: 30vh;            border-radius: 10px;            background: #fff;            position: relative;            padding: 10px;        }`);        addStyle(`.modal-close {            position: absolute;            right: 15px;            top: 15px;            outline: none;            appearance: none;            color: red;            background: none;            border: 0px;            font-weight: bold;            cursor: pointer;        }`);    };    const getValue = typeof GM_getValue === 'undefined' ? GM.getValue : GM_getValue;    const setValue = typeof GM_setValue === 'undefined' ? GM.setValue : GM_setValue;    const getParentNodeNth = (element, num) => {        let parent = element;        for (let i = 0; i < num; i++) {            if (parent.parentNode) {                parent = parent.parentNode;            }        }        return parent;    };    const getNotes = async () => {        let notes;        try {            notes = JSON.parse(await getValue('notes') ?? '{}');        } catch (error) {            notes = {};        };        return notes;    };    const setNotes = async notes => {        if (typeof notes === 'string') {            try {                JSON.parse(notes);                await setValue('notes', notes);            } catch (error) {                console.error('Notes value is an invalid JSON format')            };        } else if (typeof notes === 'object') {            await setValue('notes', JSON.stringify(notes ?? {}));        };    };    const getUserNote = async user => {        const notes = await getNotes();        if (!notes) {            return null;        }        return notes[user];    };    const setUserNote = async (user, note) => {        const notes = await getNotes();        notes[user] = note;        await setNotes(notes)    };    const texts = {        addNote: '<a style=\"cursor: pointer; font-weight: bold\" href=\"javascript:;\">ðŸ“œ Add Note</a>',        withNote: note => `<a style=\"cursor: pointer; font-weight: bold\" href=\"javascript:;\"><b>ðŸ“œ</b> ${note}</a>`    };    const addNote = async (user, element) => {        const note = prompt('Input the note (empty to remove):');        if (note) {            element.innerHTML = texts.withNote(note);            await setUserNote(user, note);        } else if (note !== null) {            element.innerHTML = texts.addNote;            await setUserNote(user, note);        }    };    const exportNotesToInput = async () => {        const notesInput = document.querySelector('#notesInput');        const notesImportExportDiv = document.querySelector('#notesImportExportDiv');        const doneImportButton = document.querySelector('#doneImportButton');        const notes = await getNotes();        const notesJsonString = JSON.stringify(Object.keys(notes)            .filter(user => notes[user]).reduce((obj, user) => ({...obj, [user]: notes[user]}), {}));        notesInput.value = notesJsonString;        notesImportExportDiv.querySelector('span').innerText = 'Export (copy the code)';        notesImportExportDiv.style.display = 'flex';        doneImportButton.style.display = 'none';    };    const importNotesFromInput = async () => {        const notesInput = document.querySelector('#notesInput');        const notesImportExportDiv = document.querySelector('#notesImportExportDiv');        const doneImportButton = document.querySelector('#doneImportButton');        notesInput.value = '';        notesImportExportDiv.querySelector('span').innerText = 'Import (paste the code)';        notesImportExportDiv.style.display = 'flex';        doneImportButton.style.display = 'inline-block';    };    const importNotesFromInputDone = async () => {        const notesInput = document.querySelector('#notesInput');        const confirmImport = confirm('Are you sure you want to override your local notes?');        if (confirmImport && notesInput.value) {            setNotes(notesInput.value);            loadUserNotesList();        }    };    const insertNotesModal = async () => {        let notesModal = document.querySelector('#userNotesModal');        if (!notesModal) {            const moreMenuBtn = document.querySelector('body');            notesModal = document.createElement('div');            notesModal.innerHTML = `                <div class=\"modal\" id=\"modal-one\">                    <div class=\"modal-bg modal-exit\"></div>                    <div class=\"modal-container\">                        <div style=\"margin-bottom: 5px;\">                            <b style=\"font-size: 2rem;\">User Notes</b>                            <button class=\"modal-close modal-exit\">X</button>                        </div>                        <div style=\"display: flex; align-items: center; margin-bottom: 5px;\">                            <button id=\"exportUserNotes\">Export</button>                            <button id=\"importUserNotes\">Import</button>                        </div>                        <div>                            <div style=\"display: none; flex-direction: column;\" id=\"notesImportExportDiv\">                                <span id=\"notesInputText\"></span>                                <input id=\"notesInput\" />                                <button id=\"doneImportButton\" style=\"display: none;\">Done</button>                            </div>                        </div>                        <div id=\"userNotesList\" />                    </div>                </div>`;            notesModal.classList.add('modal');            notesModal.style.visibility = 'hidden';            notesModal.setAttribute('id', 'userNotesModal');            moreMenuBtn.after(notesModal);            const exportButton = document.querySelector('#exportUserNotes');            const importButton = document.querySelector('#importUserNotes');            const doneImportButton = document.querySelector('#doneImportButton');            exportButton.addEventListener('click', () => exportNotesToInput());            importButton.addEventListener('click', () => importNotesFromInput());            doneImportButton.addEventListener('click', () => importNotesFromInputDone());        };        return notesModal;    };    const loadUserNotesList = async () => {        const userNotesList = document.querySelector('#userNotesList');        const notes = await getNotes();        if (Object.keys(notes).length) {            userNotesList.innerHTML = Object.keys(notes)            .filter(user => notes[user])            .map((user) => `<a href=\"https://bitcointalk.org/index.php?action=profile;u=${user}\" target=\"_blank\">${user}</a>: ${notes[user]}`).join('<br/>');        } else {            userNotesList.innerHTML = 'No notes...';        };    };    const insertUserNotesMenuButton = async () => {        let notesBtn = document.querySelector('#userNotesMenuBtn');        const modal = await insertNotesModal();        const modalExit = modal.querySelectorAll('.modal-exit');        if (!notesBtn) {            const moreMenuBtn = document.querySelector(`a[href='/more.php']`).parentNode;            notesBtn = document.createElement('td');            notesBtn.innerHTML = '<td><a href=\"javascript:;\" id=\"openUserNotes\">User Notes</a></td>';            notesBtn.classList.add('maintab_back');            notesBtn.setAttribute('id', 'userNotesMenuBtn');            moreMenuBtn.after(notesBtn);            const openUserNotes = document.querySelector('#openUserNotes')            const notesImportExportDiv = document.querySelector('#notesImportExportDiv');            const notesInput = document.querySelector('#notesInput');            openUserNotes.addEventListener('click', () => {                modal.style.visibility = 'visible';                modal.style.opacity = 1;                notesImportExportDiv.style.display = 'none';                notesInput.value = '';                loadUserNotesList();            });            modalExit.forEach(el => el.addEventListener('click', () => {                modal.style.visibility = 'hidden';                modal.style.opacity = 0;            }));        }        return notesBtn;    };    if (enableModal) {        insertNotesModal();        insertUserNotesMenuButton();    };    if (window.location.href.match(/topic=\\d+/)) {        const targets = [...document.querySelectorAll('td.poster_info div a:last-child')]        .filter(e => window.getComputedStyle(getParentNodeNth(e, 11)).display !== 'none');        targets.map(async target => {            const [_, userId] = [...target.parentNode.parentNode.childNodes].find(childNode => childNode.innerHTML).innerHTML.match(/u=(\\d+)/);            const noteDiv = document.createElement('div');            const note = await getUserNote(userId);            if (!note) {                noteDiv.innerHTML = texts.addNote;            } else {                noteDiv.innerHTML = texts.withNote(note);            }            target.before(noteDiv);            noteDiv.addEventListener('click', () => addNote(userId, noteDiv), false);        });    } else if (window.location.href.match(/profile;u=\\d+$/)) {        const [_, userId] = window.location.href.match(/u=(\\d+)/);        const target = getParentNodeNth(document.querySelector('#bodyarea table tr td tbody tr:nth-child(2) tr:last-child').parentNode, 1);        const noteDiv = document.createElement('div');        const note = await getUserNote(userId);        if (!note) {            noteDiv.innerHTML = texts.addNote;        } else {            noteDiv.innerHTML = texts.withNote(note);        }        target.before(noteDiv);        noteDiv.addEventListener('click', () => addNote(userId, noteDiv), false);    }})();",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5411599",
+  "comments": [
+    {
+      "author": "dkbit98",
+      "created_time": "August 29, 2022, 02:56:03 PM",
+      "body": "Quote from: TryNinja on August 29, 2022, 12:46:51 PMInstall Tampermonkey (Chrome, Brave...) or Greasymonkey (Firefox).I can confirm that Tempermonkey extension is available for Firefox (and Librewolf) browser as well, and Bitcointalk UserNotes works just fine with that.Greasemonkey was not updated for years and I am not sure if anyone works on it anymore, while Tampermonkey was updated few months ago, but I think it's closed source.I have only one request if possible, can you somehow enable easy option to export and import notes with member usernames?Thanks again for great work!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 29, 2022, 05:19:35 PM",
+      "body": "Quote from: TryNinja on August 29, 2022, 12:46:51 PMP.S: Notes are only stored LOCALLY and will be lost if you uninstall the extension.Crazy idea: would it be possible to encrypt notes (from the browser) and upload it to your server?If so, I can think of cool things to do:You can give each user a unique IDEach user can choose their own passwordID and password is enough to restore all Notes, also on multiple devicesUsers could optionally tick a Note as \"public\" (those won't be encrypted)Users can ignore other IDs if the ID sends spam",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "_BlackStar",
+      "created_time": "August 29, 2022, 05:49:12 PM",
+      "body": "Quote from: dkbit98 on August 29, 2022, 02:56:03 PMwhile Tampermonkey was updated few months ago, but I think it's closed source.Then please answer my question, Is it safe to use?People seem inclined to like things from open source, but since Tampermonkey is from closed sources then security questions regarding privacy or such seem worth asking. Instead of blabbering, I'm just telling you I haven't tried it.But I really appreciate your work @Tryninja.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "OgNasty",
+      "created_time": "August 29, 2022, 08:05:57 PM",
+      "body": "This is a good idea.  Back when I was dealing with dozens of people per day it was impossible to try and keep personal relationships straight.  I often found myself forgetting information about people or deals we had made that were important to them.  Being able to note things on the site would have definitely been beneficial for me and probably would have made me seem much more friendly.  Would love to see this implemented beyond a user script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 30, 2022, 01:05:49 AM",
+      "body": "Quote from: LoyceV on August 29, 2022, 05:19:35 PMCrazy idea: would it be possible to encrypt notes (from the browser) and upload it to your server?Doable, I just need to find a way to encrypt them without the need to import an entire lib for that (i.e crypto-js). I want to keep the script as simple and clean as possible (no jquery, etc...). I'll probably add a local import/export as json soon.Quote from: _BlackStar on August 29, 2022, 05:49:12 PMThen please answer my question, Is it safe to use?People seem inclined to like things from open source, but since Tampermonkey is from closed sources then security questions regarding privacy or such seem worth asking. Instead of blabbering, I'm just telling you I haven't tried it.I have been using Tampermonkey for years. AFAIK, it is safe as long as you know which scripts you're importing. It's just easier than creating an extension for every script I use (I currently have 3 for the forum - enhanced merits, this one, and to quote posts on locked threads).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "_BlackStar",
+      "created_time": "August 30, 2022, 04:24:44 PM",
+      "body": "Quote from: TryNinja on August 30, 2022, 01:05:49 AMI have been using Tampermonkey for years. AFAIK, it is safe as long as you know which scripts you're importing. It's just easier than creating an extension for every script I use (I currently have 3 for the forum - enhanced merits, this one, and to quote posts on locked threads).Unfortunately I'm not as familiar with technical stuff like coding and scripting as you're talking about, that's not my basic in the real world so I really have trouble with technical stuff like that. LOLAbout of extensions, it looks like I've installed quite a few extensions at the moment like BPIP as well as a quick report to the mod. I haven't tried more, but it might be worth trying if in the future I need it. The extension has changed some of my current views when using forum. By the way, thanks for convincing me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sandra_hakeem",
+      "created_time": "August 30, 2022, 06:25:15 PM",
+      "body": "Wow,  This is infact, a mind blowing brilliance!! I'd give alot of merit if I had Smerit. This will remind anyone of who a user is and whatever deals you both had Mmmm  , but I was thinkingthat it hasn't,in anyway gone contrary (rule-wise) So I'll begin to know a handful of peeps and the deal we had just by looking at their profile; satisfactory I'd say .Maybe we'll have to save up some shit posters as  shit-head or something??Kudos @TryninjaSandra",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "August 30, 2022, 08:43:30 PM",
+      "body": "Quote from: _BlackStar on August 29, 2022, 05:49:12 PMThen please answer my question, Is it safe to use?I don't know, do your own research about this.I prefer using open source as much as possible, but outdated software with any license can also be problematic sometimes. Quote from: LoyceV on August 29, 2022, 05:19:35 PMCrazy idea: would it be possible to encrypt notes (from the browser) and upload it to your server?Or simple export/import/backup feature in local files.Any time you uninstall extension or use different browser, you just import backup files and it's all done, similar like with bookmarks.No need for cloud (someone else's computer).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Welsh",
+      "created_time": "August 30, 2022, 10:09:41 PM",
+      "body": "Thanks for sharing. I actually made something like this a while ago for personal use, didn't think too many users would find a use for it, but it comes in handy with moderation, especially when it comes to repeat offenders. However, mine stopped working, and I never really sat down long enough to figure it out, and therefore just got rid of it. Quote from: _BlackStar on August 29, 2022, 05:49:12 PMThen please answer my question, Is it safe to use?People seem inclined to like things from open source, but since Tampermonkey is from closed sources then security questions regarding privacy or such seem worth asking. Instead of blabbering, I'm just telling you I haven't tried it.But I really appreciate your work @Tryninja.It's used by a lot of people, but that doesn't mean it's safe. You shouldn't be relying on others when it comes to verifying the source or if you do, make sure it's someone that doesn't have any motives, and you trust. Short answer is, it's trusted by thousands of others, but there's nothing stopping this from becoming malicious at any point, especially if you have auto updates enabled for extensions (browser specific).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "examplens",
+      "created_time": "August 30, 2022, 10:21:29 PM",
+      "body": "Quote from: TryNinja on August 29, 2022, 12:46:51 PMIt adds a note field on each user's profile and posts. You can click the note itself to remove or change it.P.S: Notes are only stored LOCALLY and will be lost if you uninstall the extension. Only you can see your notes.Wow, this is a great thing, I am thinking about it for some time. Many times I asked for the possibility to have internal feedback for some users, but I didn't want to leave it public.it would really be ideal if there was an export/import option because I use BTT on two devices.following this thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TheBeardedBaby",
+      "created_time": "August 30, 2022, 10:37:16 PM",
+      "body": "I remember asking for such tool some years ago, I should dig up my post maybe. Thank you Off topic: @TryNinja looking at your post history (last posts of the user) I noticed that you quoted a link of an image which is just ridiculously long line without a break.It ruined the arrangement of the last posts, is there any solution for this issue?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 31, 2022, 03:31:22 AM",
+      "body": "Version 0.3- I added an \"User Notes\" menu (next to the logout button).- You can view, export and import your notes (WIP! needs more polishing and a better UI/UX).You can disable the new menu by changing enableModal from 1 to 0 at the top of the script.The updated code can be found in the OP.Quote from: TheBeardedBaby on August 30, 2022, 10:37:16 PMOff topic: @TryNinja looking at your post history (last posts of the user) I noticed that you quoted a link of an image which is just ridiculously long line without a break.It ruined the arrangement of the last posts, is there any solution for this issue? Lol, this is an issue the forum css has with long strings inside the code tag. I had to \"censor\" the code to fix the page. Maybe a script for that?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "September 01, 2022, 06:51:31 AM",
+      "body": "Congratulations TryNinja for your excellent work, in the search to improve the experience of using the forum.I believe that this script can be useful for many users.Keep up the good work, thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "The Sceptical Chymist",
+      "created_time": "September 01, 2022, 07:23:34 AM",
+      "body": "Oh wow, this is the first I'm seeing this thread and I absolutely love this!  There are so many members here that I'd love to stick a note tag to, right on their forehead if it were in real life, to remind me that they're a potential cheat, a total bastard, lack ears, etc.Now I'm just going to have to see if I can deal with all that code within my browser.  I know you all are on the ball when it comes to what must seem like simple crap like this, but I have a bad feeling that I could seriously screw something up and leave myself vulnerable to a home invasion, possibly with me being made to do degrading things with or to some hacker.  Those fuckers are crazy.Despite my fear of losing my chastity I believe I'm going to give this a shot, because the benefits are well worth it.  Thanks, TryNinja!Edit:Aw, man.Does anyone have any soothing words of comfort and/or reassurance that those aren't too many permissions to give an add-on like this?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 01, 2022, 08:04:27 AM",
+      "body": "Quote from: The Pharmacist on September 01, 2022, 07:23:34 AMDoes anyone have any soothing words of comfortNo soothing words here, I'm paranoid when it comes to these things Clipboard access: can't that be disabled?Modify browser's download history: is that necessary?Display notifications: that's the point Access tabs: that's the point Store unlimited client-side data: makes sense, it stores anything you type.Access browser activity: I guess that's necessary to show the notificationsAccess data for all websites: can't that be limited to only Bitcointalk.org?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "The Sceptical Chymist",
+      "created_time": "September 01, 2022, 08:53:53 AM",
+      "body": "Quote from: LoyceV on September 01, 2022, 08:04:27 AMNo soothing words here, I'm paranoid when it comes to these things You might be as or more paranoid than I am about stuff like this, but at least you know about it; I'm a complete nincompoop when presented with a menu of possible ways I can be fucked and it's written in a language I can't read.But this is why I rely on the experts here.  Sometimes I'm not sure if I'm just being an idiot or if that feeling in my gut is telling me something.Quote from: LoyceV on September 01, 2022, 08:04:27 AMAccess data for all websites: can't that be limited to only Bitcointalk.org?Seriously!  I just don't get it.  Do any of you get it?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "September 01, 2022, 09:27:41 AM",
+      "body": "Quote from: The Pharmacist on September 01, 2022, 08:53:53 AMQuote from: LoyceV on September 01, 2022, 08:04:27 AMAccess data for all websites: can't that be limited to only Bitcointalk.org?Seriously!  I just don't get it.  Do any of you get it?Of these requested permissions, I think the worst is access to the clipboard. And look, I'm not that \"paranoid\" about these issues.But yes it is possible to limit the add-on only to Bitcointalk.In chrome, follow the instructions here:QuoteManage your extensionsOn your computer, open Chrome.At the top right, click More More and then More tools and then Extensions.Make your changes:Turn on/off: Turn the extension on or off.Allow incognito: On the extension, click Details. Turn on Allow in incognito.Fix corruptions: Find a corrupted extension and click Repair. Confirm by clicking Repair extension.Allow site access: On the extension, click Details. Next to “Allow this extension to read and change all your data on websites you visit,” change the extension’s site access to On click, On specific sites, or On all sites.https://support.google.com/chrome_webstore/answer/2664769?hl=en",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "September 02, 2022, 01:30:57 AM",
+      "body": "Quote from: LoyceV on September 01, 2022, 08:04:27 AMClipboard access: can't that be disabled?Modify browser's download history: is that necessary?Display notifications: that's the point Access tabs: that's the point Store unlimited client-side data: makes sense, it stores anything you type.Access browser activity: I guess that's necessary to show the notificationsAccess data for all websites: can't that be limited to only Bitcointalk.org?As I understand it, TryNinja's hands are tied on this issue. The script host (Greasemonkey/Tampermonkey) needs broad enough permissions to cover any conceivable user script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Welsh",
+      "created_time": "September 02, 2022, 10:58:59 AM",
+      "body": "Quote from: The Pharmacist on September 01, 2022, 07:23:34 AMDoes anyone have any soothing words of comfort and/or reassurance that those aren't too many permissions to give an add-on like this?There's open source alternatives so you could potentially review the code, it would still require these permissions though, as mentioned above since it needs to cover a very broad spectrum of scripts. However, it's worth mentioning that the open source alternatives aren't as popular, and therefore haven't had as much development put into them, and therefore they're either lacking the UX/UI or they're missing some functionality that other closed sourced alternatives have. Generally, most addons/extensions are terribly invasive with the permissions they require, even more so for a script manager that needs to cover a whole lot of angles for the maximum amount of compatibility with userscripts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

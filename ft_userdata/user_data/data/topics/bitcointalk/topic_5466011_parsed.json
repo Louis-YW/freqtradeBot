@@ -1,0 +1,53 @@
+{
+  "id": "topic_5466011",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "September 07, 2023, 03:26:56 PM",
+  "content": "There was a recent Meta thread about the auto-linker sometimes failing to properly recognize URLs, and my name came up, so I decided to poke around and see if I could make sense of this bug.As a recap, the auto-linker can sometimes be confused by leading spaces (particularly after a post has been edited, or quoted). For example, if you post the following (a sequence of URLs with an increasing amount of leading space, meant to showcase the problem):Code:www.thefarside.com www.thefarside.com  www.thefarside.com   www.thefarside.com    www.thefarside.com     www.thefarside.com      www.thefarside.com       www.thefarside.comThen it'll (initially) render correctly, like this:But after an edit (even one that doesn't change anything), it'll render incorrectly, like this (i.e. links with 2/4/6 leading spaces no longer recognized):If the original post is quoted, then it'll render like this (i.e. links with 3/5/7 leading spaces no longer recognized):(And if the quoted post were edited, it would revert to links with 2/4/6 leading spaces no longer being recognized.)Pretty weird, huh?Now, I know there are a few places in SMF where whitespace conversions happen (that's part of the reason I did the [nbsp] patch, so that non-breaking spaces could be used in a way that wouldn't be undone by those conversions). So, I don't find this bug that perplexing (though, I was surprised that the bug persisted even after bypassing preparsecode() and un_preparsecode(); I had figured that something in one of those two functions was behind spacing not \"round-tripping\" correctly on SMF).Anyway, regardless of the ultimate source(s) of spacing getting silently messed with when you edit (or quote) a post, this particular bug is caused by the URL regexes in the auto-linker not properly taking this state of affairs into account (which is odd, because the e-mail regexes do). Specifically, the positive lookbehind assertions aren't aware of non-breaking spaces (and the second regex, the one for schemeless URLs, needs an additional tweak in order to prevent this bug from sometimes presenting during post preview).Here's the diff for @theymos:Code:--- baseline/Sources/Subs.php 2011-09-17 21:59:55.000000000 +0000+++ modified/Sources/Subs.php 2023-09-07 15:04:45.000000000 +0000@@ -1820,36 +1820,39 @@      // Don't go backwards.     //!!! Don't think is the real solution....     $lastAutoPos = isset($lastAutoPos) ? $lastAutoPos : 0;     if ($pos < $lastAutoPos)      $no_autolink_area = true;     $lastAutoPos = $pos;      if (!$no_autolink_area)     {      // Parse any URLs.... have to get rid of the @ problems some things cause... stupid email addresses.      if (!isset($disabled['url']) && (strpos($data, '://') !== false || strpos($data, 'www.') !== false))      {       // Switch out quotes really quick because they can cause problems.       $data = strtr($data, array('&#039;' => '\\'', '&nbsp;' => $context['utf8'] ? \"\\xC2\\xA0\" : \"\\xA0\", '&quot;' => '>\">', '\"' => '<\"<', '&lt;' => '<lt<')); +      // Can't make use of $non_breaking_space in the URL regexes (that definition won't work without the \"u\" modifier).+      $nbsp = $context['utf8'] ? '\\xc2\\xa0' : '\\xa0';+       // Only do this if the preg survives.       if (is_string($result = preg_replace(array(-       '~(?<=[\\s>\\.(;\\'\"]|^)((?:http|https|ftp|ftps)://[\\w\\-_%@:|]+(?:\\.[\\w\\-_%]+)*(?::\\d+)?(?:/[\\w\\-_\\~%\\.@,\\?&;=#(){}+:\\'\\\\\\\\]*)*[/\\w\\-_\\~%@\\?;=#}\\\\\\\\])~i', -       '~(?<=[\\s>(\\'<]|^)(www(?:\\.[\\w\\-_]+)+(?::\\d+)?(?:/[\\w\\-_\\~%\\.@,\\?&;=#(){}+:\\'\\\\\\\\]*)*[/\\w\\-_\\~%@\\?;=#}\\\\\\\\])~i'+       '~(?<=[\\s>\\.(;\\'\"]|' . $nbsp . '|^)((?:http|https|ftp|ftps)://[\\w\\-_%@:|]+(?:\\.[\\w\\-_%]+)*(?::\\d+)?(?:/[\\w\\-_\\~%\\.@,\\?&;=#(){}+:\\'\\\\\\\\]*)*[/\\w\\-_\\~%@\\?;=#}\\\\\\\\])~i', +       '~(?<=[\\s>(;\\'<]|' . $nbsp . '|^)(www(?:\\.[\\w\\-_]+)+(?::\\d+)?(?:/[\\w\\-_\\~%\\.@,\\?&;=#(){}+:\\'\\\\\\\\]*)*[/\\w\\-_\\~%@\\?;=#}\\\\\\\\])~i'       ), array(        '[url]$1[/url]',        '[url=http://$1]$1[/url]'       ), $data)))        $data = $result;        $data = strtr($data, array('\\'' => '&#039;', $context['utf8'] ? \"\\xC2\\xA0\" : \"\\xA0\" => '&nbsp;', '>\">' => '&quot;', '<\"<' => '\"', '<lt<' => '&lt;'));      }       // Next, emails...      if (!isset($disabled['email']) && strpos($data, '@') !== false)      {       $data = preg_replace('~(?<=[\\?\\s' . $non_breaking_space . '\\[\\]()*\\\\\\;>]|^)([\\w\\-\\.]{1,80}@[\\w\\-]+\\.[\\w\\-\\.]+[\\w\\-])(?=[?,\\s' . $non_breaking_space . '\\[\\]()*\\\\\\]|$|<br />|&nbsp;|&gt;|&lt;|&quot;|&#039;|\\.(?:\\.|;|&nbsp;|\\s|$|<br />))~' . ($context['utf8'] ? 'u' : ''), '[email]$1[/email]', $data);       $data = preg_replace('~(?<=<br />)([\\w\\-\\.]{1,80}@[\\w\\-]+\\.[\\w\\-\\.]+[\\w\\-])(?=[?\\.,;\\s' . $non_breaking_space . '\\[\\]()*\\\\\\]|$|<br />|&nbsp;|&gt;|&lt;|&quot;|&#039;)~' . ($context['utf8'] ? 'u' : ''), '[email]$1[/email]', $data);      }     }(Because this patch amounts to adjusting a pair of regexes in the BBCode parser, it will both fix this bug moving forward, and retroactively fix old posts that have unclickable links in them due to this issue, like this one.)",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466011",
+  "comments": [
+    {
+      "author": "theymos",
+      "created_time": "September 08, 2023, 07:48:01 PM",
+      "body": "Done, thanks! What a monstrous regex...I'm 95% sure that this change is correct, but if anyone notices this breaking any posts, let me know.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "September 09, 2023, 08:57:43 AM",
+      "body": "I am the one who opened that thread in Meta you are talking about OP. For testing purposes, I am going to link to it here with different spaces before the link to see if the bug has been fixed. I will also edit my post once without making any changes and then a second time with just a minor change to see if that affects anything.Edit 2:Testing if the bug is gone https://bitcointalk.org/index.php?topic=5465210.0Testing if the bug is gone  https://bitcointalk.org/index.php?topic=5465210.0Testing if the bug is gone   https://bitcointalk.org/index.php?topic=5465210.0Testing if the bug is gone    https://bitcointalk.org/index.php?topic=5465210.0Edit 3 and 4: It works",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cafter",
+      "created_time": "September 09, 2023, 09:56:04 AM",
+      "body": "I come cross this bug from this thread after reading some replies i replied to this thread in bitcoin discussion board and the url is non clickable.is this issue got not resolved yet?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "September 09, 2023, 01:33:47 PM",
+      "body": "Another great job @PowerGlove. Thanks!Quote from: cafter on September 09, 2023, 09:56:04 AMI come cross this bug from this thread after reading some replies i replied to this thread in bitcoin discussion board and the url is non clickable.is this issue got not resolved yet?This is not a code issue or bug. The forum only recognizes links that start with http:// or www.That is, if I write bitcointalk.org it does not create a link. But, if you write https://bitcointalk.org or www.bitcointalk.org it creates the link.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cafter",
+      "created_time": "September 09, 2023, 01:41:38 PM",
+      "body": "Quote from: joker_josue on September 09, 2023, 01:33:47 PM<snip>Now i added \"www.\" in beginning of the link and it became a nice clickable link. it was so confusing to understand what the exact problem was and what powerglove solved because i am not a coder or don't know much about technical things. thanks for clearing up the solution",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "id": "topic_5413977",
+  "title": "SamYezi",
+  "author": "SamYezi",
+  "created_time": "September 18, 2022, 12:20:12 PM",
+  "content": "The question is somewhat complex and directed to clearing thing out.Suppose that n is the order of the cyclic group, n - 1 is the number of all private keys possibleCode:n = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141 We also know that every private and public key has its modular inverse. To get a modular inverse of a private key, we need to subtract the private key from n.Code:n - privKeyTo get a modular inverse of a public key, we'll have to multiply its y coordinate by -1 and modulo by the p - order of the finite field.Code:x,y = x, -y % p A modular inversed public key has the same x coordinate as original public key, but different y coordinate, and the y coordinate is always different in its polarity. If the original y was odd, in a modular inversed key it will be even, and vice versa.If a compressed public key has \"02\" index at the biggining then it has even y. If it is \"03\" then it is odd.The question is, if the ycoordinate of a public key is even, does it mean that the corresponding private key is less than n/2 by its value? If the y is odd, the private key is more than n/2?Is there any relationship between the eveness/oddness of the y (or x) coordinate and the value of the corresponding private key?Is there any way to know that the private key is more or less than n/2 while not knowing the private key itself?Is there a way to find out the public key of an address that never sent Bitcoin but only received it?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5413977",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 18, 2022, 02:28:09 PMLast edit: September 19, 2022, 05:02:05 AM by o_e_l_e_o",
+      "body": "Quote from: SamYezi on September 18, 2022, 12:20:12 PMThe question is, if the ycoordinate of a public key is even, does it mean that the corresponding private key is less than n/2 by its value? If the y is odd, the private key is more than n/2?Is there any relationship between the eveness/oddness of the y (or x) coordinate and the value of the corresponding private key?No, there isn't. You cannot infer anything about the private key from knowledge of only the public key. A quick example. Private key 4 gives the following public key:Code:x = E493DBF1C10D80F3581E4904930B1404CC6C13900EE0758474FA94ABE8C4CD13y = 51ED993EA0D455B75642E2098EA51448D967AE33BFBDFE40CFE97BDC47739922Private key 6 gives the following public key:Code:x = FFF97BD5755EEEA420453A14355235D382F6472F8568A18B2F057A1460297556y = AE12777AACFBB620F3BE96017F45C560DE80F0F6518FE4A03C870C36B075F297As you can see, both x coordinates and both y coordinates have opposite parity.Quote from: SamYezi on September 18, 2022, 12:20:12 PMIs there any way to know that the private key is more or less than n/2 while not knowing the private key itself?Again, no.Quote from: SamYezi on September 18, 2022, 12:20:12 PMIs there a way to find out the public key of an address that never sent Bitcoin but only received it?Depends on the address. If the address is a hash of the public key, such as in P2PKH or P2WPKH, then no. If the address is not a hash of the public key, such as in P2PK or P2TR, then yes.The other option is if the public key has been revealed via another means, such as a signing a message, openly being shared, or being leaked.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 18, 2022, 03:37:32 PM",
+      "body": "Quote from: o_e_l_e_o on September 18, 2022, 02:28:09 PMQuote from: SamYezi on September 18, 2022, 12:20:12 PMIs there any way to know that the private key is more or less than n/2 while not knowing the private key itself?Again, no.Quote from: SamYezi on September 18, 2022, 12:20:12 PMIs there a way to find out the public key of an address that never sent Bitcoin but only received it?Depends on the address. If the address is a hash of the public key, such as in P2PKH or P2WPKH, then no. If the address is not a hash of the public key, such as in P2PK or P2TR, then yes.I think if a Taproot spending path is used, then only that path will be revealed in the BIP141 (the witness program BIP)-style witness, not the public key since it would be excluded in this case, right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 18, 2022, 03:40:39 PM",
+      "body": "If from the public key, you could reach to any conclusion about the private key, other than it's a number between 1 and n-1, then ECDLP would be broken. Public-key cryptography lies on the assumption that you don't have a better method for finding the private key other than trying at random.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 18, 2022, 04:50:46 PM",
+      "body": "Quote from: NotATether on September 18, 2022, 03:37:32 PMI think if a Taproot spending path is used, then only that path will be revealed in the BIP141 (the witness program BIP)-style witness, not the public key since it would be excluded in this case, right?The tweaked public key is exposed in the taproot address itself. Spending and witness data is not necessary. A taproot address is simply a native segwit output with version number 1 instead of 0, followed by the 32 byte tweaked public key. If you spend from a taproot output using script path, then the internal public key is also revealed as part of the control block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "September 18, 2022, 05:03:55 PM",
+      "body": "this is less:const char *EC_constant_N = \"b0d0ee25d5359133\" ;const char *EC_constant_P =  \"b0d0ee25d5359133\";const ch./calculatefromkey 2 privatekey: 0000000000000000000000000000000000000000000000000000000000000002                        publickey compressed: 030000000000000000000000000000000000000000000000003085a112a0f295a3public address compressed 1PSrqxAQSZaMbMYcazopsLEVwEoqfSAgxcpublickey uncompressed: 040000000000000000000000000000000000000000000000003085a112a0f295a30000000000000 00000000000000000000000000000000000659c184e1ed96e03public address uncompressed 17GZTfKNmSPRgfh8QCeNvh2Zj2LBvK2kpE",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "SamYezi",
+      "created_time": "September 18, 2022, 06:29:25 PM",
+      "body": "Quote from: o_e_l_e_o on September 18, 2022, 02:28:09 PMQuote from: SamYezi on September 18, 2022, 12:20:12 PMThe question is, if the ycoordinate of a public key is even, does it mean that the corresponding private key is less than n/2 by its value? If the y is odd, the private key is more than n/2?Is there any relationship between the eveness/oddness of the y (or x) coordinate and the value of the corresponding private key?No, there isn't. You cannot infer anything about the private key from knowledge of only the public key. A quick example. Private key 4 gives the following public key:Code:x = E493DBF1C10D80F3581E4904930B1404CC6C13900EE0758474FA94ABE8C4CD13y = 51ED993EA0D455B75642E2098EA51448D967AE33BFBDFE40CFE97BDC47739922Private key 6 gives the following public key:Code:x = FFF97BD5755EEEA420453A14355235D382F6472F8568A18B2F057A1460297556y = AE12777AACFBB620F3BE96017F45C560DE80F0F6518FE4A03C870C36B075F297As you can see, both x coordinates and both y coordinates have opposite signs.Quote from: SamYezi on September 18, 2022, 12:20:12 PMIs there any way to know that the private key is more or less than n/2 while not knowing the private key itself?Again, no.Quote from: SamYezi on September 18, 2022, 12:20:12 PMIs there a way to find out the public key of an address that never sent Bitcoin but only received it?Depends on the address. If the address is a hash of the public key, such as in P2PKH or P2WPKH, then no. If the address is not a hash of the public key, such as in P2PK or P2TR, then yes.The other option is if the public key has been revealed via another means, such as a signing a message, openly being shared, or being leaked.I got a few more questions. Suppose that we have a Public Key that is generated by an \"odd\" private key like 113*G.What will happen if we try to \"half\" this public key using these methods?https://crypto.stackexchange.com/questions/59972/half-of-any-bitcoin-crypto-public-key-public-key-half-is-possiblehttps://bitcointalk.org/index.php?topic=4455904.0Does \"halving\" an even Public Key makes any difference?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 18, 2022, 08:09:42 PM",
+      "body": "Quote from: SamYezi on September 18, 2022, 06:29:25 PMWhat will happen if we try to \"half\" this public key using these methods?You cannot divide in the normal way when working with elliptic curves. Instead you use something known as the multiplicative inverse.The multiplicative inverse (x) of a number (y) on an elliptic curve with order n, is such that x*y mod n = 1. That is to say, the when a number is multiplied be its multiplicative inverse modulo the curve order, the answer is 1. So on a curve modulo 7, then the multiplicative inverse of 2 would be 4, since 2*4 = 8, mod 7 = 1. On a curve modulo 37, then the multiplicative inverse of 2 would be 19, since 2*19 = 38, mod 37 = 1.To divide a number by 2, you can also multiply it by 1/2. So to divide a number by 2 on an elliptic curve, you instead multiply it by its multiplicative inverse. So on a curve modulo 37, half of 15 is 26, since 15*19 = 285, mod 37 is 26. And the reverse is also true: 26*2 = 52, mod 37 = 15.In bitcoin, the curve order n is:Code:115792089237316195423570985008687907852837564279074904382605163141518161494337This means that the multiplicative inverse is:Code:57896044618658097711785492504343953926418782139537452191302581570759080747169This is because:Code:57896044618658097711785492504343953926418782139537452191302581570759080747169 * 2 mod 115792089237316195423570985008687907852837564279074904382605163141518161494337 = 1So, to half a public key, you multiply it by the multiplicative inverse given above, and take the result modulo n.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "September 18, 2022, 11:41:43 PM",
+      "body": "I use ecctools for this shit../md 8 / 3Result: 55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c3./md 2 / 3Result: 55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c1then you bruteforce in range from 55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c1to 55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c3you need only 2 step to get55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c3 = then brute you get  .... c1, ...c2,... c3 only 2 3 step instaed of 8 then you brute from 1 to 8this is one of most used ideas of this shit. Shit this is real shit what is too hard or imposible use in real cracking / bruting world.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "September 25, 2022, 07:00:09 PM",
+      "body": "Quote from: SamYezi on September 18, 2022, 12:20:12 PMThe question is somewhat complex and directed to clearing thing out.Suppose that n is the order of the cyclic group, n - 1 is the number of all private keys possibleCode:n = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141 We also know that every private and public key has its modular inverse. To get a modular inverse of a private key, we need to subtract the private key from n.Code:n - privKeyTo get a modular inverse of a public key, we'll have to multiply its y coordinate by -1 and modulo by the p - order of the finite field.Code:x,y = x, -y % p A modular inversed public key has the same x coordinate as original public key, but different y coordinate, and the y coordinate is always different in its polarity. If the original y was odd, in a modular inversed key it will be even, and vice versa.If a compressed public key has \"02\" index at the biggining then it has even y. If it is \"03\" then it is odd.The question is, if the ycoordinate of a public key is even, does it mean that the corresponding private key is less than n/2 by its value? If the y is odd, the private key is more than n/2?Is there any relationship between the eveness/oddness of the y (or x) coordinate and the value of the corresponding private key?Is there any way to know that the private key is more or less than n/2 while not knowing the private key itself?Is there a way to find out the public key of an address that never sent Bitcoin but only received it?Tsi is about 1/2************* of N yes? coll yee ?const char *EC_constant_N = \"b0d0ee25d5359133\" ;/$const char *EC_constant_P =  \"b0d0ee25d5359133\"; $./calculatefromkey 8 privatekey: 0000000000000000000000000000000000000000000000000000000000000008publickey compressed: 020000000000000000000000000000000000000000000000005845e9bd763c77d3public address compressed 192GE4d69h7hTtppJB1UrNqTNNjykjVQUCpublickey uncompressed: 040000000000000000000000000000000000000000000000005845e9bd763c77d30000000000000 000000000000000000000000000000000004a91d9db8323b056public address uncompressed 1FZ4ptaUs6WPHuPXyUJT5TpYtZCBzQJLfx",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "SamYezi",
+      "created_time": "October 02, 2022, 05:21:19 PM",
+      "body": "Quote from: COBRAS on September 18, 2022, 11:41:43 PMI use ecctools for this shit../md 8 / 3Result: 55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c3./md 2 / 3Result: 55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c1then you bruteforce in range from 55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c1to 55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c3you need only 2 step to get55555555555555555555555555555554e8e4f44ce51835693ff0ca2ef01215c3 = then brute you get  .... c1, ...c2,... c3 only 2 3 step instaed of 8 then you brute from 1 to 8this is one of most used ideas of this shit. Shit this is real shit what is too hard or imposible use in real cracking / bruting world.Are you saying that this is one of the methods of finding out a public key of an address that never revealed its public key, but we know a range of its private keys (Although it is still almost impossible to brute force the private key itself)?Suppose that there is an address:Code:13zb1hQbWVsc2S7ZTZnP2G4undNNpdh5soThe range of its private keys is:Starting key:Code:0000000000000000000000000000000000000000000000020000000000000000let's call it priv1Which is (36893488147419103232). Which is also exactly equal to 2^65.Ending key:Code:000000000000000000000000000000000000000000000003fffffffffffffffflets call it priv2Which is (73786976294838206463). Which is also exactly equal to 2^66.Using ecctools we would have to:Code:./md 36893488147419103232 / 66andCode:./md 73786976294838206463 / 66In this case we would get 2 numbers 66 numbers apart from each other.Meaning that we have 66 numbers (combinations) at our disposal.In this scenario, What would the numbers represent? What are they? Private keys? Public keys? Something else?Why would they be valuable for brute forcing a specific public key (or may be a private key)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

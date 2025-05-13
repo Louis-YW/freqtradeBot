@@ -1,0 +1,165 @@
+{
+  "id": "topic_5459153",
+  "title": "garlonicon",
+  "author": "garlonicon",
+  "created_time": "July 09, 2023, 11:20:50 AM",
+  "content": "How to get the full list of the elliptic curves, that could fit on N bits, based on secp256k1 used in Bitcoin? Now I can brute force some of the smaller ones, but I wonder, how to get some bigger values, and generate for example some 128-bit, 64-bit, or even 32-bit curves, without going through all points.My current algorithm is something like that:1. Pick some prime value \"p\".2. Generate table of inverse values.3. Starting from (1,1), find the nearest point, where y^2=x^3+7, and make it your base point.4. Go through all points to calculate \"n\", it will be reached after trying to add (baseX,-baseY) to the (baseX,baseY).5. Check if \"n\" is prime.6. Make sure that \"n\" is different than \"p\".7. Validate that if you pick \"n\" as the starting prime, and go through all steps, you will reach \"p\".8. If there are many N-bit curves, pick the one where \"p\" is closest to 2^N-1, and \"n<p\".After some bruteforcing, I reached those smaller curves. The question is: how to generate them faster, without going through all points, and reach the full list of elliptic curves, from 15-bit to 255-bit, based on secp256k1?Code:p=   79, n=   67, base=(1,  18)    7-bitp=  967, n=  907, base=(1,  88)   10-bitp= 1303, n= 1249, base=(1, 201)   11-bitp= 3853, n= 3739, base=(3, 534)   12-bitp= 7537, n= 7369, base=(1,3725)   13-bitp=14071, n=13933, base=(1,3660)   14-bit",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459153",
+  "comments": [
+    {
+      "author": "tromp",
+      "created_time": "July 09, 2023, 02:36:31 PM",
+      "body": "Quote from: garlonicon on July 09, 2023, 11:20:50 AM6. Make sure that \"n\" is different than \"p\".7. Validate that if you pick \"n\" as the starting prime, and go through all steps, you will reach \"p\".You didn't explain why you want these properties of 2 curves forming a 2-cycle.Is it just because this is the case for secp256k1, as noted for example (together with other interesting properties) in [1] ?[1] https://hackmd.io/@dJO3Nbl4RTirkR2uDM6eOA/Bk0NvC8Vo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ripemdhash",
+      "created_time": "July 09, 2023, 03:14:00 PM",
+      "body": "it looks like the same what ecdsa123 has wrote in https://bitcointalk.org/index.php?topic=5453079.msg62280944#msg62280944",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "July 14, 2023, 07:35:26 PM",
+      "body": "Quote2. Generate table of inverse values.Don't do that. If for each prime \"p\" you are trying to generate the full table of all inverse values, from 1 to p-1, then this is one of your bottlenecks. Just use the extended Euclidean algorithm, and calculate all values on-the-fly, when they are needed.Quote3. Starting from (1,1), find the nearest point, where y^2=x^3+7, and make it your base point.How do you find that point? If by brute force, then it could be optimized. For example, if you guess that x=1, then you need to calculate just sqrt(8), which means raising 8 to the power of 0.5. If you replace 0.5 by the right number, depending on \"p\", then you could do it faster than by checking every point. Also, when raising numbers to powers, you don't have to go through all of them, but you can use modular exponentiation algorithms.Quote4. Go through all points to calculate \"n\", it will be reached after trying to add (baseX,-baseY) to the (baseX,baseY).You don't have to go through all points. Imagine checking 115792089237316195423570985008687907852837564279074904382605163141518161494337 points in secp256k1. That means, your current program can only show you curves you can fully break. Better use Hasse's theorem. Even if you start from \"p=n\", and then jump between \"p+value\" and \"p-value\" for consecutive values, like 0, 1, 2, then you will get there much faster than by checking every point (but of course, for secp256k1, that would still mean checking around 2^128 possible values, so for bigger curves, you still have to implement Hasse's theorem properly, as mentioned in the previous link).Quote5. Check if \"n\" is prime.How do you check if some number is prime? If you check every single number, odd or even, then it could be also optimized. For those 2-cycle curves, you can start from some odd prime, and check every sixth value, because in all cases you need only primes of the form \"p=6k+1\", and \"n=6m+1\". Also, you can check numbers only to the point, where the square is less or equal than your potential prime. For bigger curves like secp256k1, even that is not enough, and there are more estimations. For example, if you want to find 256-bit \"p\", then you pick a range between 2^256-2^32-2^10, and 2^256-2^32. Then, you find prime numbers only in this range, so you will get only a few possible values, where 115792089237316195423570985008687907853269984665640564039457584007908834671663 is the biggest prime, that is less than 2^256-2^32.QuoteThe question is: how to generate them faster, without going through all points, and reach the full list of elliptic curves, from 15-bit to 255-bit, based on secp256k1?The short answer is: you have to estimate more, and brute force less. For example, if you have \"p\" and \"n\" in secp256k1, then you don't have 100% guarantee that both values are prime. They probably are, but it is based on estimation, and not on some hard, mathematical proof, because that would require checking 2^128 values, and that would mean breaking the curve. If you want to make safe curves, and not break them at the same time, then you have to estimate things, not compute them exactly, for all cases, all points, all inverse values, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 15, 2023, 10:54:01 AM",
+      "body": "Quote from: GR Sasa on July 09, 2023, 01:26:33 PMI dont understand anything here lol...How could this be useful for you or us?The bitcoin cryptographic curve has two constants P and N.P is the number of points on the curve and N is the number of private keys on the curve. Naturally, P is larger than N, which means those points don't have private keys.OP is trying to find smaller values of P and N that work for this curve equation x^2 = y^3 + 7 used in Bitcoin, because it uses enormous P and N values.Quote from: vjudeu on July 14, 2023, 07:35:26 PMQuote5. Check if \"n\" is prime.How do you check if some number is prime? If you check every single number, odd or even, then it could be also optimized. For those 2-cycle curves, you can start from some odd prime, and check every sixth value, because in all cases you need only primes of the form \"p=6k+1\", and \"n=6m+1\". Also, you can check numbers only to the point, where the square is less or equal than your potential prime. For bigger curves like secp256k1, even that is not enough, and there are more estimations. For example, if you want to find 256-bit \"p\", then you pick a range between 2^256-2^32-2^10, and 2^256-2^32. Then, you find prime numbers only in this range, so you will get only a few possible values, where 115792089237316195423570985008687907853269984665640564039457584007908834671663 is the biggest prime, that is less than 2^256-2^32.Prime factorization is your friend, and I'm sure all those people running Prime95 over the past 2 decades have a table of prime numbers stored somewhere (all less than 2^256).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ripemdhash",
+      "created_time": "July 15, 2023, 10:57:52 AM",
+      "body": "Quote from: NotATether on July 15, 2023, 10:54:01 AMQuote from: GR Sasa on July 09, 2023, 01:26:33 PMI dont understand anything here lol...How could this be useful for you or us?The bitcoin cryptographic curve has two constants P and N.P is the number of points on the curve and N is the number of private keys on the curve. Naturally, P is larger than N, which means those points don't have private keys.OP is trying to find smaller values of P and N that work for this curve equation x^2 = y^3 + 7 used in Bitcoin, because it uses enormous P and N values.can you explain : Naturally, P is larger than N, which means those points don't have private keys.if P is how much points are on curve, N -> max privkeys , so There are d=P-N , points without privatekeys? can you show that point?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 15, 2023, 02:14:54 PM",
+      "body": "Quote from: ripemdhash on July 15, 2023, 10:57:52 AMcan you explain : Naturally, P is larger than N, which means those points don't have private keys.if P is how much points are on curve, N -> max privkeys , so There are d=P-N , points without privatekeys? can you show that point?There's a reason why you can't take an arbitrary public key and find the private key for it (let's assume you do not know the range at all), as the values are practically unknown.It just hit me, that those subset of P-N points have two distinct (R,s) pairs* when making a signature from that private key [well technically, they have twice that amount, but the other two are from taking the negative of S which is non-standard and not allowed by Bitcoin anyway].So you since those points are generated extremely rarely and there are almost no instances of them in the wild, you can say, for practical purposes, that their private keys are virtually non-existent.*it all starts with the R value, which is calculated by R = G*x coord of the public key. So P-N of these keys have another public key point somewhere in secp256k1 that you can form by calculation but not necessarily from the standard EC point generation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ertil",
+      "created_time": "July 15, 2023, 04:21:31 PM",
+      "body": "QuoteP is the number of points on the curve and N is the number of private keys on the curve. Naturally, P is larger than N, which means those points don't have private keys.Definitely not. P is the range of acceptable values for (x,y) coordinates. If you have the simplest case, p=79, n=67, then it doesn't mean you have 79 points. That only means if you take any (x,y) point, then they all can be placed on a 79x79 square monochromatic bitmap, with (0,0) point in the top left corner, and all other points somewhere in the middle.Quoteif P is how much points are on curve, N -> max privkeys , so There are d=P-N , points without privatekeys? can you show that point?He cannot, because there are no such points. For all of those smaller curves, listed by garlonicon, you can just compute all points, count them, and see that \"n\" properly reflects the number of points for any given \"p\". If you have p=79, and you start from any valid point, where y^2=x^3+7, then if you start incrementing it, you will reach only 67 points, not 79. You always start from some prime \"p\", and then you reach your \"n\" by checking that if you multiply it by your base point, then you will reach (0,0) as your result.Also note that if you picked some \"p\", then you cannot use some arbitrary \"n\". You should calculate it. For p=79, the only valid result is n=67. And for p=67, you will reach only n=79 (that also can show you, why P is not the number of points, as you cannot have 67 points with 79 private keys, and you can check that such elliptic curve is valid).QuoteIt just hit me, that those subset of P-N points have two distinct (R,s) pairs* when making a signature from that private key [well technically, they have twice that amount, but the other two are from taking the negative of S which is non-standard and not allowed by Bitcoin anyway].The only reason for that is modulo bias, introduced by \"r=(k*G).x\", where x-value has range from 1 to p-1, but r-value should be between 1 and n-1. It is true for all curves, where p!=n. However, it doesn't mean we have less keys, it only means some of them will wrap around, exactly in the same way as any hash between \"n\" and 2^256 will be wrapped into the proper range, when you calculate your z-value, used in signatures.QuoteYou didn't explain why you want these properties of 2 curves forming a 2-cycle.It is more difficult to handle other cases properly. Only for those pairs, you can safely assume, that h=1, exactly as in secp256k1. Of course, you can use for example \"p=109, n=43, base=(2,48)\", but then \"h=1\" is probably not the right choice.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 20, 2023, 09:50:32 PMLast edit: July 22, 2023, 08:44:04 AM by garlonicon",
+      "body": "I implemented some optimizations, and I can now get more values. Thank you all for your hints, more improvements are ongoing:Code:p=     0x4f, n=     0x43, base=(0x1,    0x12)    7-bitp=    0x3c7, n=    0x38b, base=(0x1,    0x58)   10-bitp=    0x517, n=    0x4e1, base=(0x1,    0xc9)   11-bitp=    0xf0d, n=    0xe9b, base=(0x3,   0x216)   12-bitp=   0x1d71, n=   0x1cc9, base=(0x1,   0xe8d)   13-bitp=   0x36f7, n=   0x366d, base=(0x1,   0xe4c)   14-bitp=   0x77ad, n=   0x7705, base=(0x3,  0x1951)   15-bitp=   0xfb2f, n=   0xf937, base=(0x1,  0x41ff)   16-bitp=  0x1fce7, n=  0x1fc87, base=(0x1,  0xa864)   17-bitp=  0x3fa27, n=  0x3f62b, base=(0x1, 0x11a34)   18-bitp=  0x7ffbd, n=  0x7fad1, base=(0x2, 0x2c4b9)   19-bitp=  0xfdec7, n=  0xfd9e7, base=(0x1, 0x7d8f1)   20-bitp= 0x1fc3d5, n= 0x1fbc49, base=(0x2, 0x2e59b)   21-bitp= 0x3fff97, n= 0x3fefd7, base=(0x1, 0x1160c)   22-bitp= 0x7fff63, n= 0x7ff58b, base=(0x3, 0x9de68)   23-bitp= 0xfff373, n= 0xffd3f3, base=(0x2,0x667b92)   24-bitp=0x1fff837, n=0x1ffdfd7, base=(0x1,0x41077d)   25-bitEdit: QuoteYou didn't explain why you want these properties of 2 curves forming a 2-cycle.Because I want to recreate the whole generation procedure for secp256k1. And to do that, I think it is important to learn things gradually, starting from the smallest elliptic curves, and then applying more and more optimizations, to finally reach the same results as in secp256k1.QuoteIs it just because this is the case for secp256k1Yes, but by doing it in this way, it can also reveal the procedure for smaller elliptic curves, for example secp160k1, secp192k1, and secp224k1. It is also about solving the mystery behind the half of the base point: QuoteCode:u1=        48ce563f89a0ed9414f5aa28ad0d96d6795f9c62 (160-bit)u2=0554123b78ce563f89a0ed9414f5aa28ad0d96d6795f9c66 (192-bit)u3=      3b78ce563f89a0ed9414f5aa28ad0d96d6795f9c63 (224-bit)u4=      3b78ce563f89a0ed9414f5aa28ad0d96d6795f9c63 (256-bit)Few months ago, I thought x-value is some kind of hash, potentially having more than 160 bits (for example 192 bits). However, when I tried to implement everything by myself from scratch, I discovered more interesting things. For smaller values, the whole procedure of generating a curve does not involve hashing at all! It is not needed. It is described in PDFs, but if you want to generate any curve with certain properties, you don't have to implement any hash function. So, I wonder if that was the case in secp256k1. Maybe the creator didn't implement any hashing, and all values we can see, are just produced by taking modulo square roots, modulo cube roots, counting \"n\" based on \"p\", and things like that?Some example: you pick some \"p\", as in secp256k1. Then you calculate the only valid \"n\" for that \"p\". And then, if you observe the last 128 bits of \"n\", and take only that, then you cannot see, if it was some result of some 128-bit hash function or not.Code:p=ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe fffffc2fn=ffffffff ffffffff ffffffff fffffffe baaedce6 af48a03b bfd25e8c d0364141                              n%2^128=baaedce6 af48a03b bfd25e8c d0364141Then, by seeing only \"baaedce6 af48a03b bfd25e8c d0364141\" you could think \"hey, someone just used 128-bit hash function here\". But what if this was not the case? Another interesting thing is that according to PDFs, the base point is picked after calculating \"n\". However, in my code, it is now done the other way around: first I pick some base point, and then I can reach \"n\". So, I still have to learn, how it is possible to calculate \"n\" without touching any points (because if you touch some of them, then why not make it a base point? Unless the creator thought that picking x=1 was unsafe, and getting temporary points, and then discarding them, is needed anyway).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "July 23, 2023, 02:04:47 AM",
+      "body": "You seem to be interested in these stuff, so I thought maybe you could figure out which key belongs to the following public keys?Code:0200000000000000000000000000000000fc86e7e6d4f8be0f638ac81b54025a4e027fffffffffffffffffffffffffffffffa621a9a5d362f1d2bc8c089d43e28141037fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0And I just found out that if we multiply n/2 by 3 Code:0300000000000000000000003b78ce563f89a0ed9414f5aa28ad0d96d6795f9c63 You will get half+1, or 0.5 plus 1 which is n/2+1 =Code:7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a2😉Ps, G divided by 2 is not actually n/2, it just happens that since G is odd, aka 0x1 dividing it by 2 would divide n-1 by 2, I'm waiting to  see the secret behind G revealed, so chop chop crypto experts, and thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 27, 2023, 08:32:57 PMLast edit: July 29, 2023, 09:38:18 AM by garlonicon",
+      "body": "QuoteYou seem to be interested in these stuff, so I thought maybe you could figure out which key belongs to the following public keys?I don't know. But those points seems to be generated, based on public key coordinates alone. And if this is true, then probably nobody knows the private key.After more optimizations, I noticed \"p\" and \"n\" values can be above or below some N-bit number. In this way, getting valid curves is faster, and it seems other curves were generated in a similar way, for example, for secp160k1, p-value is less than 2^160, but n-value is bigger:Code:p=  0xfffffffffffffffffffffffffffffffeffffac73n=0x0100000000000000000001b8fa16dfab9aca16b6b3That means, to reproduce secp256k1 more accurately, I adjusted my code, to jump above and below 2^N, and reached those results:Code:p=     0x3c7, n=     0x38b, base=(0x1,     0x58)   10-bitp=     0x517, n=     0x4e1, base=(0x1,     0xc9)   11-bitp=     0xf0d, n=     0xe9b, base=(0x3,    0x216)   12-bitp=    0x1d71, n=    0x1cc9, base=(0x1,    0xe8d)   13-bitp=    0x36f7, n=    0x366d, base=(0x1,    0xe4c)   14-bitp=    0x7ef7, n=    0x8047, base=(0x1,    0x1dd)   15-bit   n>pp=    0xfe95, n=   0x1006f, base=(0x3,    0x754)   16-bit   n>pp=   0x1fe13, n=   0x200b3, base=(0x5,   0xd08c)   17-bit   n>pp=   0x3f7cf, n=   0x3f493, base=(0x1,  0x15df3)   18-bitp=   0x7ffbd, n=   0x7fad1, base=(0x2,  0x2c4b9)   19-bitp=   0xfdec7, n=   0xfd9e7, base=(0x1,  0x7d8f1)   20-bitp=  0x1ffed3, n=  0x200467, base=(0x3,  0xf3ac1)   21-bit   n>pp=  0x3fff97, n=  0x3fefd7, base=(0x1,  0x1160c)   22-bitp=  0x7fff63, n=  0x7ff58b, base=(0x3,  0x9de68)   23-bitp=  0xfff373, n=  0xffd3f3, base=(0x2, 0x667b92)   24-bitp= 0x1fff837, n= 0x1ffdfd7, base=(0x1, 0x41077d)   25-bitp= 0x3ffff91, n= 0x40006c9, base=(0x1,0x16a2a43)   26-bit   n>pp= 0x7fff411, n= 0x80039a1, base=(0x1,0x19ca16e)   27-bit   n>pp= 0xfffde4f, n=0x1000112b, base=(0x1,0x48b772c)   28-bit   n>pp=0x1fffff87, n=0x20009e03, base=(0x1,0xba2ffd4)   29-bit   n>pEdit: Wow, that was fast, I didn't expect it. After optimizing finding base point, and applying Hasse to find \"n\" based on \"p\", I quickly reached next curves:Code:p=  0x3ffff667, n=  0x4000c14d, base=(0x1,  0x1d02cd83)   30-bit   n>pp=  0x7ffffc27, n=  0x8000b693, base=(0x1,  0x3c609f95)   31-bit   n>pp=  0xfffff9af, n=  0xfffe390b, base=(0x1,  0x3cad5d2d)   32-bitp= 0x1fffffcdb, n= 0x200024263, base=(0x2,  0x8f2bfea7)   33-bit   n>pp= 0x3fffffaab, n= 0x3fffc2d67, base=(0x5,  0x380e7bb2)   34-bitp= 0x7ffffc3ff, n= 0x80003f317, base=(0x1,  0xf1920375)   35-bit   n>pp= 0xffffffbfb, n= 0xffff821fb, base=(0x2, 0x6b7dd7925)   36-bitp=0x1ffffff543, n=0x1ffff4cdd3, base=(0x2, 0xdd63ca1e7)   37-bitp=0x3fffffb06b, n=0x3fffff8e9f, base=(0x3,0x174b7bc7bb)   38-bitp=0x7fffff8397, n=0x800015bd47, base=(0x1,0x10c68c0112)   39-bit   n>p",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "September 01, 2023, 09:54:56 AM",
+      "body": "Do you happen to have a script for EC operations where we could change p, n, and G?  Set target for +, - , *, /?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "September 01, 2023, 02:19:35 PM",
+      "body": "Up to 39-bit curves? Sure, but it is not yet public. For 40-bit curves and bigger? Not really, because it works on uint64, so you need uint128, uint256, or BigInteger implementation to cover that. But if you want some basic implementation, then you can cover small curves quite easily, because then you don't need any optimizations, and you can for example use brute force to calculate inversions, and it will work fine for the smallest ones.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "September 09, 2023, 12:07:50 PM",
+      "body": "Could u pls post script for calculate base point from P and NThanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "September 09, 2023, 12:56:32 PM",
+      "body": "QuoteCould u pls post script for calculate base point from P and NYou don't need \"N\" to do that. You only need \"P\".Code:p=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fassert((p%4)==3) //this is important, and can simplify our calculationsmodulo_root=(p+1)/4modulo_root=0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0cx=1 //start from x=1, and then increment it, while your point is not on curvex_cube=x*x*x mod px_cube=1y_square=(x_cube+7) mod py_square=8y=(y_square^modulo_root) mod py=(8^0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0c) mod 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fy=0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7eebase=(x,y)base=(1,0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7ee)//this point is on curve, so we stop here//if this is not the case, then we check x=2, then x=3, and so onOf course, this is not the original algorithm. I simply start from x=1, and then reach the nearest point. But in secp256k1, and with many other curves, it was done in a different way. The small x-value is just a hint for me to explore point generation later, and to have some starting point, to calculate n-value, based on that.Also note, that in my code, I don't use n-value to calculate my base point. I can do that, based on p-value, and the curve equation, nothing else is needed to find any matching point. And then, by having that point, I use it to calculate n-value.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "September 11, 2023, 09:26:55 AM",
+      "body": "Quote from: garlonicon on September 09, 2023, 12:56:32 PMQuoteCould u pls post script for calculate base point from P and NYou don't need \"N\" to do that. You only need \"P\".Code:p=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fassert((p%4)==3) //this is important, and can simplify our calculationsmodulo_root=(p+1)/4modulo_root=0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0cx=1 //start from x=1, and then increment it, while your point is not on curvex_cube=x*x*x mod px_cube=1y_square=(x_cube+7) mod py_square=8y=(y_square^modulo_root) mod py=(8^0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0c) mod 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fy=0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7eebase=(x,y)base=(1,0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7ee)//this point is on curve, so we stop here//if this is not the case, then we check x=2, then x=3, and so onOf course, this is not the original algorithm. I simply start from x=1, and then reach the nearest point. But in secp256k1, and with many other curves, it was done in a different way. The small x-value is just a hint for me to explore point generation later, and to have some starting point, to calculate n-value, based on that.Also note, that in my code, I don't use n-value to calculate my base point. I can do that, based on p-value, and the curve equation, nothing else is needed to find any matching point. And then, by having that point, I use it to calculate n-value.For fing G point from P or N, have u script ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "September 11, 2023, 09:28:51 PM",
+      "body": "Quote from: brainless on September 11, 2023, 09:26:55 AMQuote from: garlonicon on September 09, 2023, 12:56:32 PMQuoteCould u pls post script for calculate base point from P and NYou don't need \"N\" to do that. You only need \"P\".Code:p=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fassert((p%4)==3) //this is important, and can simplify our calculationsmodulo_root=(p+1)/4modulo_root=0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0cx=1 //start from x=1, and then increment it, while your point is not on curvex_cube=x*x*x mod px_cube=1y_square=(x_cube+7) mod py_square=8y=(y_square^modulo_root) mod py=(8^0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0c) mod 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fy=0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7eebase=(x,y)base=(1,0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7ee)//this point is on curve, so we stop here//if this is not the case, then we check x=2, then x=3, and so onOf course, this is not the original algorithm. I simply start from x=1, and then reach the nearest point. But in secp256k1, and with many other curves, it was done in a different way. The small x-value is just a hint for me to explore point generation later, and to have some starting point, to calculate n-value, based on that.Also note, that in my code, I don't use n-value to calculate my base point. I can do that, based on p-value, and the curve equation, nothing else is needed to find any matching point. And then, by having that point, I use it to calculate n-value.For fing G point from P or N, have u script ?any point of orger G is same. N and P is a order of point G  and curve. Find base point for curvevand order is easy...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CrunchyF",
+      "created_time": "September 11, 2023, 09:57:39 PMLast edit: September 12, 2023, 06:31:26 AM by CrunchyF",
+      "body": "Quote from: tromp on July 09, 2023, 02:36:31 PMQuote from: garlonicon on July 09, 2023, 11:20:50 AM6. Make sure that \"n\" is different than \"p\".7. Validate that if you pick \"n\" as the starting prime, and go through all steps, you will reach \"p\".You didn't explain why you want these properties of 2 curves forming a 2-cycle.Is it just because this is the case for secp256k1, as noted for example (together with other interesting properties) in [1] ?[1] https://hackmd.io/@dJO3Nbl4RTirkR2uDM6eOA/Bk0NvC8VoTromp could u explain more what sort of coincidence you speak about on your link [1]This sage script doesn't find that it is rare to have the property of the post linked when P and N are primes...:Code:ROUNDS=10000for i in range(ROUNDS):    P=randint(1,2**256)    P=next_prime(P)    F=FiniteField(P)    C = EllipticCurve([F(0), F(7)])        N=C.order()    if is_prime(N):        print('P:',P)        print('N:',N)        N1=EllipticCurve(GF(P), [0, 1]).order()        N2=EllipticCurve(GF(N), [0, 1]).order()        print('N1:',N1)        print('N2:',N2)        print(N1==N2)        print('')",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "September 12, 2023, 12:27:28 PM",
+      "body": "QuoteFor fing G point from P or N, have u script ?But the code I gave you is almost identical, if you want to use for example Sage Cell Server:Code:p=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fmodulo_root=(p+1)/4x=1is_on_curve=Falsewhile not is_on_curve:    x_cube=(x*x*x)%p    y_square=(x_cube+7)%p    y=y_square.powermod(modulo_root,p)    is_on_curve=(y.powermod(2,p)==y_square)    print(is_on_curve,hex(x),hex(y))    if not is_on_curve:        x+=1Which means, you need more detailed version only if you want to implement each part from scratch. But that is also easy, for example if you want to implement \"powermod\", then this is a good starting point: https://en.wikipedia.org/wiki/Modular_exponentiation",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "November 20, 2023, 08:55:48 AM",
+      "body": "Just to let you know: I created a list of 256-bit curves, with p-values, b-values, and n-values, as close to secp256k1, as I could. Also, in this case, secp160k1, secp192k1, and secp224k1 were reached with the same algorithm, so I hope it is correct. Feel free to grab it, and experiment with those curves: https://github.com/vjudeu/curves1000/blob/master/bits/bits256.txtStill trying to create a generator, but I guess it will take some time, to explore the algorithm, which was used in the standardized curves. Also note that there is some anomaly nearby 32-bit curve, because of Solinas primes, but I guess everything up to 64-bit curve will be broken fast anyway, so the rest of the list should be good enough. In the puzzle, people are working on 130-bit, so I guess this list could be useful for 128-bit and above, or maybe even 160-bit and above (because the challenge ends on 160-bit public key, which means, breaking the whole challenge will probably make secp160k1 obsolete).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

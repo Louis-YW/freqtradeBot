@@ -1,0 +1,165 @@
+{
+  "id": "topic_5417004",
+  "title": "octavonce",
+  "author": "octavonce",
+  "created_time": "October 13, 2022, 05:06:09 PMLast edit: June 13, 2023, 05:43:17 PM by octavonce",
+  "content": "Purplecoin: The first stateless sharded cryptocurrency and blockchainWith the advent of Bitcoin, decentralised ledgers have sprung into existence. While revolutionary for its time, Bitcoin could not satisfy the needs of the masses due to its inability to scale to global needs. No other blockchain protocol has managed to achieve this, at least not without sacrificing the one thing that made Bitcoin as powerful as it is: being tamper-proof, even against state actors. We believe we have managed to achieve what Bitcoin couldn't. We will now present the first stateless cryptocurrency.What is a stateless Blockchain/Ledger/Cryptocurrency?To put it simply, a stateless blockchain allows full-nodes to validate transactions without storing past blocks or unspent transaction outputs. This is done by employing an incredible cryptographic construct known as a cryptographic accumulator. While Bitcoin can theoretically scale by increasing the block size, it would eliminate the ability of regular folks to run a node. This improvement basically allows big blocks sizes while still allowing regular folks to run a node. This also means several things:The initial sync to the network is more or less instant, regardless of the chain size. Further syncs are an order of magnitude faster, taking possibly seconds at most. We still have to test this but it seems really fast.Transaction validation first and foremost becomes more efficient because we don't need to search the disk for UTXOs as we only check the accumulator, which lives in memory. Memory is orders of magnitude faster than disk, which is the main bottleneck in Bitcoin.Users are responsible for storing their own UTXOs in their wallet. Besides these, a full validating node can run while storing only a few kilobytes of data. This means a full-node does not in fact need a disk to run at all.Scalability through sharded Proof of WorkThere are 16 chains, called sector chains, each representing a group of 16 shards, with a total of 256 shards. Each shard is an independent blockchain and can be processed separately along with the respective sector chain. Transactions are only possible within the same shard. The XPU token is mined therefore on different, independently running chains. As such the tps is equal to the sum of the tps of all chains. Our calculations at a block size of 380kb resulted in 14222 transactions per second assuming they are simple transfers and not complex transactions. As Purplecoin is stateless, the storage size of full-nodes doesn't increase and only relevant assets are kept. More details about the consensus algorithm: https://github.com/purpleprotocol/purplecoin/blob/main/doc/consensus.mdMining algorithm which consumes 50% less energyWe are using the Green PoW consensus model which elapses in epochs. Each epoch has 2 rounds. In the first round, every miner participates and has the potential to mine a block. The miner who finds the solution in the first round is not entitled to participate in the second round. Then, the rest of the miners continue mining the block in the first round. When at least 15 miners manage to mine the block, the second round begins. These miners are called runner-ups. Only runner-ups are entitled to mine the block in the second round. Once one of the runner-ups mines the second round block, the next epoch begins. This mechanism brings energy efficiency to mining (up to 50% compared to if it wasn't employed) and secures shard sectors against 51% attacks. More details around this can be found in the Whitepaper. Now, every epoch will use a different algorithm. Half of the epochs will be mined exclusively with GhostRider, in order to prevent ASICs from mining a longer chain while allowing CPU/GPU mining. The other half of the epochs will be mined with an ASIC friendly algorithm, chosen randomly every epoch. This is in order to balance GhostRider, as fully ASIC resistant algorithms are subject to hashpower marketplace attacks, while ASIC algorithms are less likely to be subject to these attacks. Example:Epoch 1: GhostRiderEpoch 2: Sha256Epoch 3: GhostRiderEpoch 4: FugueThe following are the current proposed ASIC friendly algorithms:Blake2s256Blake2b512Sha256Keccak256JHFugueFind out more about mining: https://github.com/purpleprotocol/purplecoin/blob/main/doc/mining.mdTokenomics and crowdsaleFind more info here:Crowdsale info: https://github.com/purpleprotocol/purplecoin/blob/main/doc/crowdsale.mdTokenomics: https://github.com/purpleprotocol/purplecoin/blob/main/doc/tokenomics.mdLinksWhitepaper: https://github.com/purpleprotocol/purplecoin_whitepaper/blob/main/whitepaper.pdfVision: https://github.com/purpleprotocol/purplecoin/blob/main/doc/vision.mdCrowdsale website: https://sale.purplecoin.ioREADME: https://github.com/purpleprotocol/purplecoin/blob/main/README.mdTechnical Roadmap: https://github.com/purpleprotocol/purplecoin-core/blob/main/ROADMAP.mdContributing: https://github.com/purpleprotocol/purplecoin/blob/main/doc/contributing.mdWebsite: https://purplecoin.ioSale: https://sale.purplecoin.ioGithub: https://github.com/purpleprotocolDiscord: https://discord.gg/5ZVZnKdReddit: https://www.reddit.com/r/purplecoinTwitter: https://twitter.com/xpu_officialMedium: https://medium.com/@octavianonceTelegram: https://t.me/purplecoin_ioMerch: https://merch.purplecoin.io/",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417004",
+  "comments": [
+    {
+      "author": "r_victory",
+      "created_time": "October 13, 2022, 05:29:53 PM",
+      "body": "14222 transactions per second, that's more than half of VISA's TPS. Has this been tested and confirmed? Or is it just a prediction of what might be?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "October 13, 2022, 05:44:15 PM",
+      "body": "Quote from: r_victory on October 13, 2022, 05:29:53 PM14222 transactions per second, that's more than half of VISA's TPS. Has this been tested and confirmed? Or is it just a prediction of what might be?It is based on the calculations we have on the chosen parameters such as block size and shard numbers. We have indeed tested the architecture, but not on a live network. While the number can vary as custom transactions can be bigger, it gives a rough estimate when the bulk of transactions are the default format, which from what we can see with other networks seems to be the case 98% of the time.Block size is actually smaller than Bitcoin, at 750kb. Sharding multiplies that by the number of shards which stands at 256. Nodes can listen to all shards or individual shards, depending on bandwidth. A full-node is also able to run as a cluster, with individual nodes listening to individual shards, this is useful for archival nodes, being able to scale bandwidth and storage. SPV nodes are able to sync all shards a few times per day, without requiring to download the whole backlog of transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "October 15, 2022, 07:49:10 PM",
+      "body": "Update: Thanks to @noventrun#2672 from our Discord channel, we have chosen to change Whirlpool and Groestl to Fugue and JH as the former are vulnerable to Rebound attacks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "December 13, 2022, 12:31:31 PM",
+      "body": "Update: I have just published the source code along with the technical roadmap. As such, the project is officially open to external contributors.These can both be found on our Github page:Roadmap: https://github.com/purpleprotocol/purplecoin-core/blob/main/ROADMAP.mdSource Code: https://github.com/purpleprotocol/purplecoin-core",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yydnyjg",
+      "created_time": "December 13, 2022, 04:03:42 PM",
+      "body": "CryptoNight should not be forgotten",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoozyTalking",
+      "created_time": "December 14, 2022, 01:05:46 PM",
+      "body": "When we can mine it?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "symplink",
+      "created_time": "December 14, 2022, 09:42:36 PM",
+      "body": "Yes, Criptonight could be a good solution, too",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "December 15, 2022, 04:24:52 PM",
+      "body": "Quote from: BoozyTalking on December 14, 2022, 01:05:46 PMWhen we can mine it?We are still pre-testnet at this point. Mining will be first available on the testnet and on the mainnet once we release.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chpendi",
+      "created_time": "December 16, 2022, 08:24:26 AM",
+      "body": "can you please explain how to compile to test",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chpendi",
+      "created_time": "December 16, 2022, 08:38:55 AM",
+      "body": "or a link to...how to build.story that this kind of \"paranormal and extraterrestrial\" thing is open to everyone, even to beginners... thank you.I feel like I'm trying to decipher Egyptian hieroglyphics...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "December 16, 2022, 06:38:22 PM",
+      "body": "Quote from: chpendi on December 16, 2022, 08:24:26 AMcan you please explain how to compile to testYou need nightly Rust installed and clang/llvm on linux and on Windows this has to be compiled with msys.Quote from: chpendi on December 16, 2022, 08:38:55 AMor a link to...how to build.story that this kind of \"paranormal and extraterrestrial\" thing is open to everyone, even to beginners... thank you.I feel like I'm trying to decipher Egyptian hieroglyphics...    We will post a guide soon with detailed instructions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "janwarming",
+      "created_time": "December 19, 2022, 11:04:37 PM",
+      "body": "Looks very promising. When will it be ready for mining?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "December 20, 2022, 03:30:38 PM",
+      "body": "Quote from: janwarming on December 19, 2022, 11:04:37 PMLooks very promising. When will it be ready for mining?We are still pre-testnet at this point. Mining will be first available on the testnet and once we are confident in the security and performance of the network, we will release the mainnet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "December 30, 2022, 04:52:20 PM",
+      "body": "Update: I have just posted a document detailing the tokenomics of Purplecoin: https://github.com/purpleprotocol/purplecoin/blob/main/doc/tokenomics.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "December 31, 2022, 02:11:09 PM",
+      "body": "As we have been getting a lot of questions about our choice of tokenomics, which is dependant on Purplecoin's architecture. I have posted two other documents detailing the consensus mechanism and mining procedure. This should bring more understanding both to how Purplecoin works and our choice of tokenomics:* Mining: https://github.com/purpleprotocol/purplecoin/blob/main/doc/mining.md* Consensus: https://github.com/purpleprotocol/purplecoin/blob/main/doc/consensus.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "January 12, 2023, 07:39:16 PM",
+      "body": "Just published another doc with information about our state model and more explanations on what a stateless blockchain is: https://github.com/purpleprotocol/purplecoin/blob/main/doc/state.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "January 24, 2023, 12:59:29 AM",
+      "body": "We have been working hard for the past weeks to get the crowdsale website up and running and we would like to announce that the Purplecoin crowdsale officially starts now. In order to participate, visit one of the following links:* Sale website: https://sale.purplecoin.io/* Sale details: https://github.com/purpleprotocol/purplecoin/blob/main/doc/crowdsale.md* Sale Agreement: https://purplecoin.io/tsa",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "octavonce",
+      "created_time": "January 26, 2023, 08:08:23 PM",
+      "body": "Quote from: 0xYar on January 24, 2023, 05:48:59 AMPink-coin-style guys  I've never heard of Pink-coin",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "wam_fr",
+      "created_time": "January 27, 2023, 06:47:04 AM",
+      "body": "Quote from: 0xYar on January 24, 2023, 05:48:59 AMPink-coin-style guys  Definitely not the pink coin team.But I said the same on their discord -> they have to rebrand now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

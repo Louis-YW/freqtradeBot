@@ -1,0 +1,61 @@
+{
+  "id": "topic_5463906",
+  "title": "Dzwaafu11",
+  "author": "Dzwaafu11",
+  "created_time": "August 20, 2023, 10:35:36 AM",
+  "content": "I am currently learning about SegWit and trying to understand what it is used for. It is clear to me that it was primarily introduced to overcome txid malleability, but if it’s overcoming txid malleability, as the main reason why SegWit was introduced, is no longer the main advantage of SegWit (since it can also be overcome without SegWit), what is? And what are the other advantages and purposes of SegWit in general? I just came across it, and I want to know more about it, so any explanation is welcome.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5463906",
+  "comments": [
+    {
+      "author": "Zaguru12",
+      "created_time": "August 20, 2023, 10:40:35 AM",
+      "body": "The main aim of segwit was to actually increase the transaction speed as this was caused by the block size which was actually just 1mb. So as bitcoin began to get more popularity the block size began to fill up easily with transactions there by slowing the speed of transactions. Then a soft fork was introduced which is the Segwit we have today to separate the witness which is the signature meant to verify the transaction from the block and this resulted in creating more space in the block. Read more here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "August 20, 2023, 11:00:49 AM",
+      "body": "Quote from: Dzwaafu11 on August 20, 2023, 10:35:36 AMAnd what are the other advantages and purposes of SegWit in general? I just came across it, and I want to know more about it, so any explanation is welcome.In short,1. Lower transaction fee.2. Higher block size limit, assuming there are SegWit transaction on the block.Quote from: fexkomin on August 20, 2023, 10:42:07 AMBlock Size Increase: While SegWit doesn't directly increase the block size, it allows for more transaction data to be included in each block by removing the signature data from the block size calculation. This effectively increases the block's capacity without requiring a hard fork.Wrong. Nothing is removed from calculation, it's just witness data is calculated differently.Quote from: fexkomin on August 20, 2023, 10:42:07 AMLightning Network Support: SegWit lays the foundation for the implementation of the Lightning Network, a second-layer scaling solution that enables faster and cheaper off-chain transactions.Theoretically LN is possible without SegWit. But since SegWit fix transaction malleability, it makes LN development easier.Quote from: fexkomin on August 20, 2023, 10:42:07 AMFee Reduction: By optimizing the way transaction data is stored in blocks, SegWit transactions can require less space, resulting in potentially lower transaction fees.Inaccurate information. SegWit transaction doesn't always have lower size (in bytes unit), lower tx fee is achieved since witness data is calculated differently.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 20, 2023, 11:46:00 AM",
+      "body": "Quote from: ETFbitcoin on August 20, 2023, 11:00:49 AMIn short,1. Lower transaction fee.2. Higher block size limit, assuming there are SegWit transaction on the block.yeah, that's the \"take home\" part, i.e. the noticeable effects to the userQuote from: ETFbitcoin on August 20, 2023, 11:00:49 AMQuote from: fexkomin on August 20, 2023, 10:42:07 AMFee Reduction: By optimizing the way transaction data is stored in blocks, SegWit transactions can require less space, resulting in potentially lower transaction fees.Inaccurate information. SegWit transaction doesn't always have lower size (in bytes unit), lower tx fee is achieved since witness data is calculated differently.are you sure about this? from what I remember, the hash-wrapped version of segwit and the bech32 encoded version (i.e. native) have different sizes as inputs and as outputs when compared to each other, as well as those measurements being different to those of the previous standard (compressed-key P2PKH), and that's also in terms of literal bytes, not just the witness-discounted (i.e. \"virtual\") bytes.I'd also make a further point:a bug existed in the design of P2PKH outputs (the old pre-segwit standard) that could cause an exponential blowup in verification time for full nodesthis had already been exploited in reality before segwit: someone sent a transaction on the main bitcoin network that despite being valid caused nodes to verify it very slowly (taking minutes where it would normally take sub-second lengths of time). Increasing the blocksize while not fixing that bug risked an effective DOS vector against the bitcoin node network. AFAIR, even today the bug is fixed only for segwit transactions, not for older utxo types, and so the 4MB max block size is only possible in a block full of segwit inputs. Therefore every utxo without a segregated witness decreases the possible max size of a given block, otherwise a malicious actor could craft 4MB full of the slow-verifying P2PKH tx's to attack the networkit's possible things changed since then, but it's difficult to see how P2PKH could be made safe at bigger blocksizes, as it's already a standard@achow101 maybe this belongs in dev&tech?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 20, 2023, 03:20:22 PM",
+      "body": "Quote from: Zaguru12 on August 20, 2023, 10:40:35 AMThe main aim of segwit was to actually increase the transaction speedTechnically transaction confirmation speed depends on the block intervals which is not changed by SegWit. What you meant to say is that SegWit increased the block capacity which then helped reduce mempool congestion hence emptying up the mempool helping txs not get stuck for long waiting for confirmation.Quote from: Carlton Banks on August 20, 2023, 11:46:00 AM~are you sure about this? from what I remember, the hash-wrapped version of segwit and the bech32 encoded version (i.e. native) have different sizes as inputs and as outputs when compared to each other, as well as those measurements being different to those of the previous standard (compressed-key P2PKH), and that's also in terms of literal bytes, not just the witness-discounted (i.e. \"virtual\") bytes.In raw bytes the SegWit transactions have the potential to be slightly bigger because we are adding extra bytes to the transactions containing witnesses. If we compare a transaction spending P2PKH with P2WPKH the later has 3 extra bytes (assuming signature and public key sizes are the same):- 2 bytes for the flag (0x0001) - 1 byte for the witness count (0x02)If we compare P2PKH with P2SH-P2WPKH (wrapped) then there is another additional size which is the redeem script and it is extra 22 bytes (25 bytes bigger in total).If we only compare outputs, then a P2PKH output script is 25 bytes while P2WPKH is 22 bytes.This means the net total size of creating P2WPKH and spending them (3 bytes less output, 3 extra input bytes) is zero.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DifDrama",
+      "created_time": "August 21, 2023, 06:42:41 AM",
+      "body": "SegWit transactions enhance the security of the Bitcoin network by enforcing signature checks before any other checks.  This prevents certain types of attacks and makes the network more resistant to vulnerabilities that exploit transaction malleability. Besides, SegWit's introduction was a soft fork, meaning that it did not require a majority consensus of miners to activate.  This made the upgrade process smoother and allowed for a more gradual transition.And here is a link for beginner to learn Segwit, hope it will be helpful.https://blockgeeks.com/guides/what-is-segwit/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 21, 2023, 12:58:13 PM",
+      "body": "Quote from: DifDrama on August 21, 2023, 06:42:41 AMSegWit transactions enhance the security of the Bitcoin network by enforcing signature checks before any other checks.  This prevents certain types of attacks and makes the network more resistant to vulnerabilities that exploit transaction malleability. Besides, SegWit's introduction was a soft fork, meaning that it did not require a majority consensus of miners to activate.  This made the upgrade process smoother and allowed for a more gradual transition.And here is a link for beginner to learn Segwit, hope it will be helpful.https://blockgeeks.com/guides/what-is-segwit/The transaction malleability wasn't due to the failure of checking for signatures, but it segregated the signature from the actual transaction itself. This prevents the signature from being modified and thus being malleable.It was anything but smooth. It was totally unnecessary for it to be dragged on for longer than it did. Segwit's activation requires miners to signal support for it as well and it definitely required a super majority of the miners to signal support for it to be activated. In fact, most if not all soft forks work in this manner. USAF was not materialized and it was definitely not activated by user signalling. Any forks should have consensus and majority support.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

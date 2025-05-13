@@ -1,0 +1,77 @@
+{
+  "id": "topic_5430588",
+  "title": "Jlh74",
+  "author": "Jlh74",
+  "created_time": "December 20, 2022, 04:37:08 PM",
+  "content": "I'm trying to upgrade from 22.0 - 24.0.1 but cannot copy over qt like bitcoincore.org says. When I do this and run executable I get an error. \"Error while loading shared libraries libxcb-xinerama....\"I also cannot find bitcoin in usr/local/bin or usr/bin to copy over old binaries with new.I have bitcoin installed on my extra drive. 22 runs fine. I'm missing something in the upgrade process, any suggestions/solutions appreciated.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5430588",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "December 20, 2022, 04:46:27 PM",
+      "body": "On what OS did you get this error?I hope that you can post the whole error not just the partial.Would you mind trying to install libxcb-xinerama0 if your OS is Linux then use this command below?Code:$ sudo apt-get install libxcb-xinerama0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 20, 2022, 05:18:17 PM",
+      "body": "Try out unpacking from tar.gz and compiling it yourself. I presume you've at least imported one public key from the repository. I also presume you're at Linux.From raspibolt:Code:wget https://bitcoincore.org/bin/bitcoin-core-24.0.1/bitcoin-24.0.1-aarch64-linux-gnu.tar.gzwget https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMSwget https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMS.ascwget https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMS.otssha256sum --ignore-missing --check SHA256SUMSIf signature is verified, move on.Code:tar -xvf bitcoin-24.0.1-aarch64-linux-gnu.tar.gzsudo install -m 0755 -o root -g root -t /usr/local/bin bitcoin-24.0.1/bin/*Check it out with bitcoind --version. It must return:Code:> Bitcoin Core version v24.0.1",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jlh74",
+      "created_time": "December 20, 2022, 10:11:41 PM",
+      "body": "Thx for both replies. I'm afk for a few hours, I will post full error on return. Im using popOS. Confused as to why tthere's no binaries for bitcoin in usr/bin or local/bin as well. Does compiling from tarball work for qt as well? I'm newish to lint as well for popos/Ubuntu? Seeing arch in the command, just curious",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "December 21, 2022, 03:08:24 AM",
+      "body": "Sounds like the dynamic loader issue. What is the result of ldd bitcoin-qt?Quote from: Jlh74 on December 20, 2022, 10:11:41 PMConfused as to why tthere's no binaries for bitcoin in usr/bin or local/bin as well.Depending on how you installed it, it may be in a different location. Presumably it is on your PATH as you can run it, so try doing which bitcoin-qt to figure out where it lives.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 21, 2022, 11:53:40 AM",
+      "body": "Quote from: achow101 on December 21, 2022, 03:08:24 AMSounds like the dynamic loader issue. What is the result of ldd bitcoin-qt?Quote from: Jlh74 on December 20, 2022, 10:11:41 PMConfused as to why tthere's no binaries for bitcoin in usr/bin or local/bin as well.Depending on how you installed it, it may be in a different location. Presumably it is on your PATH as you can run it, so try doing which bitcoin-qt to figure out where it lives.The file most likely does not exist and has to be installed from PopOS repos. Perhaps Qt is not installed by default? This is especially likely if GNOME or some gnome-based environment such as XFCE or MATE was the first (or only) desktop that was installed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jlh74",
+      "created_time": "December 22, 2022, 10:24:10 PM",
+      "body": "OK interesting. I installed libxcb-xinerama0 and ran my script. Qt popped up and then error stating conflict saying it couldn't run with listen 0 and listenonion 1. Changed both to 0 and now its updating blocks since shutdown 2 days ago. Didn't realize I didn't restart. 308 blocks left proper version 24.0.1.   It ran that way before, should both be 1 for for?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "December 22, 2022, 11:36:57 PMLast edit: December 22, 2022, 11:49:51 PM by BitMaxz",
+      "body": "Quote from: Jlh74 on December 22, 2022, 10:24:10 PMOK interesting. I installed libxcb-xinerama0 and ran my script. Qt popped up and then error stating conflict saying it couldn't run with listen 0 and listenonion 1. Changed both to 0 and now its updating blocks since shutdown 2 days ago. Didn't realize I didn't restart. 308 blocks left proper version 24.0.1.   It ran that way before, should both be 1 for for?  It seems its related to this error \"Unable to open bitcoin-qt when incoming connections disabled in settings\"Are these listen 0 and listenonion 1 are in your Bitcoin core config? I think both of them are enabled by default but would you mind trying to remove them from your bitcoin core config or just setting up both of them into 1 to enable them?But if your current settings are running fine just leave it like other users they having the same issue but the others with the same settings they don't get this error.Or if you just want to use it as normal try the suggestion from GitHub to run bitcoin-qt -resetguisettings to reset the settingsAdding this if you are planning to run your core with TOR then check this discussion here \"Bitcoin node over TOR\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jlh74",
+      "created_time": "December 23, 2022, 12:18:09 AM",
+      "body": "Setting both to 1 works. Thanks everyone for the assist-)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

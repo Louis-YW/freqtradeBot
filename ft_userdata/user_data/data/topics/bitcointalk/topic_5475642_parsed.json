@@ -1,0 +1,77 @@
+{
+  "id": "topic_5475642",
+  "title": "vjudeu",
+  "author": "vjudeu",
+  "created_time": "November 27, 2023, 08:31:29 AM",
+  "content": "It is quite easy to encounter this specific point on many different elliptic curves. Do you have any idea, why it is the case?I tried to generate some curves of the form: y^2=x^3+b. And then, if I put x=1 and y=2, it can be calculated as: 2^2=1^3+b, which means 4=1+b, so b=3.I guess in case of b=5 and b=7, there are also some formulas for small numbers, but I didn't reach them yet.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5475642",
+  "comments": [
+    {
+      "author": "digaran",
+      "created_time": "November 27, 2023, 11:00:01 AMLast edit: November 29, 2023, 12:28:06 AM by digaran",
+      "body": "So just now a question popped to my mind after thinking  about it by looking at small numbers, what if we could reverse the equation exactly the same way it is calculated mod p? We'd still need to find the G's mystery to see if reversing it could be possible, correct?Edit: when we use 0x1 as x and 0x2 as y for secp256k1, only the even private keys generate a valid x for the actual secp256k1 but y coordinates are all invalid of course, I just tried with pvk 3, 5, 7, 9, all invalid x, but 2, 4, 6, 8 as well as lambda, all valid. Second edit: did you know if we select x= 7 and y= 8 then using lambda as private key we can get invalid x but y would be 8? I tried different y's and the results were not the same as y = 8 resulting in y = 8 when x is 7 and y is 8.Also note that I used the first character of Gx, and last character of Gy which is x= 7, y= 8.Third edit:If we set x and y asCode:x = 0x5c61e72fc664317304bdf556b56d72634a92023384b6c3184891f51e1b1318f5   y = 0x8We'd get this Code:x = 0xa39e18d0399bce8cfb420aa94a928d9cb56dfdcc7b493ce7b76e0ae0e4ece333  y = 0x8Now if we set the above x and y as G, we get x = 0x7, y = 0x8  this is the power of lambda that creates a triangle, but it is interesting how it affected the x coordinates since y will always be 0x8.What if there was a way to find our k by reverse engineering The G? Too wishful I know.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaCryptoRaccoon",
+      "created_time": "November 30, 2023, 05:32:53 AM",
+      "body": "The recurrence of points like (1, 2) on various elliptic curves is due to their structure and properties. As elliptic curves are typically defined over fields like the real numbers or finite fields and their equation generally follows the form : y^2 = x^3 + ax + b. For a point (1, 2) to satisfy multiple curves, the coefficients a and b must align accordingly.For curves of the form y^2 = x^3 + b, substituting x = 1 and y = 2 gives us 2^2 = 1^3 + b, leading to b = 3. This process can be repeated for any value of b to check if a particular point lies on the curve.Python Script for Analyzing Points on Elliptic Curves:Code:import matplotlib.pyplot as pltimport numpy as npdef is_on_curve(x, y, b):    return y**2 == x**3 + bdef plot_elliptic_curves(b_values, points, x_range):    fig, ax = plt.subplots(figsize=(12, 8))    x = np.linspace(x_range[0], x_range[1], 400)    for b in b_values:        y_squared = x**3 + b        y_positive = np.sqrt(y_squared)        y_negative = -y_positive        ax.plot(x, y_positive, label=f\"y² = x³ + {b}\")        ax.plot(x, y_negative, label=f\"_\")        for point in points:            if is_on_curve(point[0], point[1], b):                ax.plot(point[0], point[1], 'ro')    ax.set_xlabel(\"x\")    ax.set_ylabel(\"y\")    ax.set_title(\"Elliptic Curves and Points\")    ax.legend()    plt.grid(True)    plt.show()b_values = range(1, 11)points_to_test = [(1, 2), (1, 3), (2, 3), (2, 4)]x_range = (-2, 3)plot_elliptic_curves(b_values, points_to_test, x_range)This script can be expanded to test a larger set of points and a broader range of b values.Results :For b = 1, the point (2, 3) lies on the curve y^2 = x^3 + 1.For b = 3, the point (1, 2) lies on y^2 = x^3 + 3, as in your example.For b = 8, the points (1, 3) and (2, 4) lie on y^2 = x^3 + 8.No points tested lie on the curves for b = 2, 4, 5, 6, 7, 9, 10.This script can be expanded to test a larger set of points and a broader range of b values.Your observation about even private keys generating valid x coordinates but invalid y coordinates for secp256k1 is interesting. It suggests a possible pattern or property of the curve that might be worth exploringThe use of a specific value like lambda to create a triangle and the effects on the x coordinates is a part of exploring the geometrical properties of elliptic curves. The invariant y coordinate in your experiments is peculiar and might be an artifact of the specific curve and values you're using.While it's theoretically possible to reverse-engineer k from P and G, the computational power required makes it impractical I believe. Magic.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WhyFhy",
+      "created_time": "December 01, 2023, 12:10:56 AM",
+      "body": "QuoteWhile it's theoretically possible to reverse-engineer k from P and G, the computational power required makes it impractical I believe. Magic.Doesn't hurt to try! I wonder if IBM and these other quantum creators are playing with shores algo behind closed doors? Doubt we are to that point yet.Your explanation was thorough and well stated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaCryptoRaccoon",
+      "created_time": "December 13, 2023, 04:27:31 AM",
+      "body": "The generation of the base point G in ECC, especially for curves like secp256k1, is typically shrouded in some mystery. The \"nothing up my sleeve\" number is often used in creating these curves to ensure that the base point wasn't chosen to weaken the encryption.Using x = 0x1 and Different Values of kYour observation here is aligned with the properties of elliptic curves where scalar multiplication can lead to different points on the curve, depending on your chosen scalar (k).Your experiments demonstrate intriguing behaviors when you vary k. This aligns with the cyclic nature of elliptic curves over finite fields.The behavior you noted when using different primes (p) and modifying the curve shows how these parameters significantly affect the curve's properties.Code:def ecc_add(p1, p2, p):    # Elliptic curve addition    if p1 == (0, 0):        return p2    if p2 == (0, 0):        return p1    if p1[0] == p2[0] and p1[1] != p2[1]:        return (0, 0)    if p1 != p2:        m = (p2[1] - p1[1]) * pow(p2[0] - p1[0], -1, p) % p    else:        m = (3 * p1[0]**2 + 7) * pow(2 * p1[1], -1, p) % p    x3 = (m**2 - p1[0] - p2[0]) % p    y3 = (m * (p1[0] - x3) - p1[1]) % p    return (x3, y3)def ecc_mul(point, k, p):    # Elliptic curve scalar multiplication    result = (0, 0)    addend = point    while k:        if k & 1:            result = ecc_add(result, addend, p)        addend = ecc_add(addend, addend, p)        k >>= 1    return result# Define curve parameters for secp256k1p = 2**256 - 2**32 - 977  # Prime for the finite fieldx = 0x1y = 0x4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7ee# usagek = 2  # Scalar to multiplypoint = (x, y)result = ecc_mul(point, k, p)print(f\"Resulting Point: {result}\")Code:Resulting Point: (14474011154664524427946373126085988481658748083205070504932198000988604333959, 72704176545891799367084825159033606358294843509675418738294063466241294077822)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "December 13, 2023, 06:57:57 PM",
+      "body": "QuoteDo you have any idea, why it is the case?You know the answer:Quoteit can be calculated as: 2^2=1^3+b, which means 4=1+b, so b=3Which means, it is always the case. Simply put, if b=3, then point (1;2) is always on curve.QuoteI guess in case of b=5 and b=7, there are also some formulas for small numbers, but I didn't reach them yet.You have to go beyond unsigned integers to reach them.For b=5, it is simply (-1;2). And yes, I know, that \"-1\" is just \"p-1\", which means, it has different value for different p-values, but it doesn't matter: you can express points in any notation you want. They are the same.For b=7, it is more complicated, and you need complex numbers (literally). Which means, the point (-2;i) is always there. In general, if you express all coordinates on a complex plane, you will see more patterns. But of course, reaching imaginary unit \"i\", that is defined as \"sqrt(-1)\", can be sometimes undefined on a given curve. But if you dig deeper, you will probably reach some rational number. If you want universal solution for every curve, then well, complex numbers is the way to go (also because if you have any valid square root, then you always have two solutions, and if you have any valid cube root, then there are always three of them).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tread93",
+      "created_time": "December 23, 2023, 05:44:39 PM",
+      "body": "You know I had a funny thought last night when I was adding up some of my transactions and it led me to believe that algebra just prepared all of us for adding a ton of really long numbers with tons of decimal places and just prepared us for adding and subtracting sats in our head and on the calc lmao. Too funny. This post just made me think of it again. Kind of makes me think of a the relationship with x and y and how it relates to BTC",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jvanname",
+      "created_time": "December 24, 2023, 11:51:36 AMLast edit: December 24, 2023, 01:27:10 PM by jvanname",
+      "body": "Quote from: vjudeu on November 27, 2023, 08:31:29 AMIt is quite easy to encounter this specific point on many different elliptic curves. Do you have any idea, why it is the case?I tried to generate some curves of the form: y^2=x^3+b. And then, if I put x=1 and y=2, it can be calculated as: 2^2=1^3+b, which means 4=1+b, so b=3.I guess in case of b=5 and b=7, there are also some formulas for small numbers, but I didn't reach them yet.This question makes absolutely no sense. The point (1,2) is on the curve y^2=x^3+b only when b=3 (and by 3, I mean 1+1+1; the element 3 is definable in any field). When b=5, the point (1,2) is not on your elliptic curve except when 3=5 (which is the case precisely when the characteristic is 2). And if b=7, then the point (1,2) is not on your elliptic curve except when 3=7 (which is the case when the characteristic is 2). You should probably go take or retake a college algebra course to learn a thing or two about solving equations. And don't even bother with finite fields. Just use the real numbers.It is really sad that people can become hero members on this site without knowing basic algebra. But then again, Bitcoin has a mining algorithm that was never designed to advance science, so Bitcoin does not attract the best people.Quote from: garlonicon on December 13, 2023, 06:57:57 PMQuoteDo you have any idea, why it is the case?You know the answer:Quoteit can be calculated as: 2^2=1^3+b, which means 4=1+b, so b=3Which means, it is always the case. Simply put, if b=3, then point (1;2) is always on curve.QuoteI guess in case of b=5 and b=7, there are also some formulas for small numbers, but I didn't reach them yet.You have to go beyond unsigned integers to reach them.For b=5, it is simply (-1;2). And yes, I know, that \"-1\" is just \"p-1\", which means, it has different value for different p-values, but it doesn't matter: you can express points in any notation you want. They are the same.For b=7, it is more complicated, and you need complex numbers (literally). Which means, the point (-2;i) is always there. In general, if you express all coordinates on a complex plane, you will see more patterns. But of course, reaching imaginary unit \"i\", that is defined as \"sqrt(-1)\", can be sometimes undefined on a given curve. But if you dig deeper, you will probably reach some rational number. If you want universal solution for every curve, then well, complex numbers is the way to go (also because if you have any valid square root, then you always have two solutions, and if you have any valid cube root, then there are always three of them).(1,2) is not equal to (-1,2). (1,2) is not equal to (-2,i). Please go take an algebra course. The people on this site merit such garbage like this because the people on this site have extremely low levels of intelligence. On the other hand, Bitcoin has a mining algorithm that was never designed to advance science, so Bitcoin attracts entities with very low levels of intelligence.P.S. If you are working with elliptic curves over a field with characteristic 2 or characteristic 3, then the equation y^2=x^3+ax+b is not the general equation for elliptic curves; one must use a different equation for these characteristics.Merry Christmas,-Joseph Van Name Ph.D.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ertil",
+      "created_time": "February 09, 2024, 05:26:17 AM",
+      "body": "QuoteI guess in case of b=5 and b=7, there are also some formulas for small numbers, but I didn't reach them yet.For b=7, there are no integer points, see: https://www.youtube.com/watch?v=3RFioHYlUjc",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

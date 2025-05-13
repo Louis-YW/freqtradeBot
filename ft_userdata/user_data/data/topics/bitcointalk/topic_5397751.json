@@ -1,0 +1,109 @@
+{
+  "id": "topic_5397751",
+  "title": "nosferatu8701",
+  "author": "nosferatu8701",
+  "created_time": "May 08, 2022, 08:52:00 AM",
+  "content": "I am currently using a multi-sig setup for my bitcoin wallet (Sparrow wallet).Does using a multi-sig wallet protect me from random private key guessing attacks?I read a thread on reddit that said \"Multisigs exist in the same pool of 2^256 keys. The resulting key size isn't bigger just because it's multisig. You can find a non-multisig that is the same as your resulting key from a multisig wallet.\"Is the above true? If an attacker were to randomly come across my private key, he can move the funds without requiring the origin keys that resulted in the multi sig?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5397751",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 08, 2022, 09:26:05 AMLast edit: May 08, 2022, 01:41:05 PM by BlackHatCoiner",
+      "body": "Not sure if that's what you're asking but: It's true. In fact it's easier to find collision of a multi-sig address rather than a single-sig's, because of the birthday paradox. For a 256-bit P2WSH, there's one in 2^128 chances to find a colliding script while in a 160-bit single-sig P2SH, it's 1 in 2^160. For instance, you and the attacker might decide to do business together and share your keys to form a P2SH multi-sig (160 bits). You give him a public key and wait until he gives you his public key. The attacker now constantly tries out two different scripts; a P2SH where he can spend money all by himself and a P2SH which will form your multi-sig. At some point, after about 2^80 tries, he'll find a collision. Quote from: nosferatu8701 on May 08, 2022, 08:52:00 AMIs the above true? If an attacker were to randomly come across my private key, he can move the funds without requiring the origin keys that resulted in the multi sig?But, that's true for everything. If the attacker randomly comes across your private key, he's also the owner of that public key. Multi-sig or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nosferatu8701",
+      "created_time": "May 08, 2022, 10:15:04 AM",
+      "body": "> But, that's true for everything. If the attacker randomly comes across your private key, he's also the owner of that public key. Multi-sig or not.I used to think that multi sig is enforced on chain and the chain would require signature of both keys to move the funds.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 08, 2022, 10:35:19 AM",
+      "body": "Quote from: nosferatu8701 on May 08, 2022, 10:15:04 AMI used to think that multi sig is enforced on chain and the chain would require signature of both keys to move the funds.But, there's no way to distinguish if a P2SH is multi-sig (unless it's spent coins). It's in the form of \"OP_HASH160 <script hash> OP_EQUAL\". If you want to avoid the scenario wherein you've been attacked alike, use P2MS where you include the public keys beforehand instead of a script hash. Note that P2MS comes with disadvantages:Quote from: https://learnmeabitcoin.com/technical/p2msWhy do we now use P2SH instead of P2MS?Because by using P2SH you can avoid the disadvantages that come with a “raw” P2MS script:1. P2MS has no address format. So if you want someone to put a P2MS lock on your bitcoins, you will need to construct and send them the raw locking script yourself. Worse still, they may not be able to create this transaction for you, as most wallets only allow you to use addresses (and not raw scripts) when making a transaction.2. P2MS is limited to 3 public keys. The locking script of a P2MS can get pretty sizeable with all the public keys, so it’s limited to 3 (to prevent too much data being stored in in the UTXO set). However, with P2SH you can use multisig locks with up to 15 public keys.So you can still use P2MS if you want, but it’s more convenient to use P2SH to achieve the same thing instead.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 08, 2022, 11:43:09 AM",
+      "body": "Quote from: nosferatu8701 on May 08, 2022, 08:52:00 AM-snip-Is the above true? If an attacker were to randomly come across my private key, he can move the funds without requiring the origin keys that resulted in the multi sig?It's true, but not in that scenario (are those the actual words from the source?).The attacker could come across a different private key that produces a \"scriptHash\" that's exactly the same as your MultiSig's scriptHash.In that case, he can use his own \"redeem Script\" and prvKey to spend your funds.It's about the \"collision\" explained by BlackHatCoiner.Quote from: nosferatu8701 on May 08, 2022, 10:15:04 AMI used to think that multi sig is enforced on chain and the chain would require signature of both keys to move the funds.If we disregard the collision of the scriptHash, just base it from your question above:If the attacker came across your private key and want to spend the funds of the MultiSig setup, then he needs to come across the cosigners' private keys too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 09, 2022, 06:40:46 AM",
+      "body": "Quote from: nosferatu8701 on May 08, 2022, 08:52:00 AMI am currently using a multi-sig setup for my bitcoin wallet (Sparrow wallet).Does using a multi-sig wallet protect me from random private key guessing attacks?The answer depends on the script that is inside the coin inputs that you are trying to spend.A random address sending you an output to a multisig address can be swiped if its individual private key is known, because the input (unlocking) script is a simple HASH160 call.But if the multisig wallet creates a transaction and ensures that in the scripts of any outputs that signatures from two or more private keys are required, then this provides some resistance from these attacks.In any case, if the wallet is multi-sig in name only (that only from the application the outputs need to be signed by multiple users but it emits normal output scripts to the blockchain), then it is just as vulnerable to a regular wallet.Also, when sending a transaction to a multi-sig wallet, the software doesn't necessarily know whether the sending address is multisig (assume the address is not inside the wallet for this), so it cannot really send another transaction with the \"proper\" multisig script format.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 09, 2022, 07:25:11 AM",
+      "body": "What you need to know about the attacks that you are thinking of is that such attacks don't affect you alone, they affect Bitcoin as a whole. Meaning for example if people could find HASH160 collisions, find public key (hash) collisions, script (hash) collisions and generally speaking anything that would let them spend someone else's coins and successfully pull off  the attack, Bitcoin that we know will no longer exist so it won't matter if you are holding your coins in a multi-sig address.The reason why Bitcoin works and keeps on growing is because such attacks are not possible and if there were the smallest possibilities of these attacks becoming possible in near future we would have changed the algorithm already.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "May 09, 2022, 03:33:00 PM",
+      "body": "Quote from: nosferatu8701 on May 08, 2022, 08:52:00 AMIs the above true? If an attacker were to randomly come across my private key, he can move the funds without requiring the origin keys that resulted in the multi sig?I never heard of a single case of anyone losing coins with multisig setup with attack like you mentioned, and I couldn't find anything about reddit topic talking about this, so maybe you should post a link for us to see.I know that more more co-signers you have in multisig setup, the harder it will be for attacker to stole your coins, and I don't see any real threat with this.With new taproot addresses all transactions like the same, so there is no way you could know if transaction is single or multi sig, but that is not the case with older address types.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nosferatu8701",
+      "created_time": "May 11, 2022, 04:53:31 AM",
+      "body": "Quote from: dkbit98 on May 09, 2022, 03:33:00 PMQuote from: nosferatu8701 on May 08, 2022, 08:52:00 AMIs the above true? If an attacker were to randomly come across my private key, he can move the funds without requiring the origin keys that resulted in the multi sig?I never heard of a single case of anyone losing coins with multisig setup with attack like you mentioned, and I couldn't find anything about reddit topic talking about this, so maybe you should post a link for us to see.I know that more more co-signers you have in multisig setup, the harder it will be for attacker to stole your coins, and I don't see any real threat with this.With new taproot addresses all transactions like the same, so there is no way you could know if transaction is single or multi sig, but that is not the case with older address types.This is the post and the other comments that follow it.https://www.reddit.com/r/Bitcoin/comments/ukuzsu/comment/i7ru02b/?utm_source=share&utm_medium=web2x&context=3My primary concern is dictionary attacks. I know and have tried using rotorcuda and fialka  to run random private key attacks and trying to find private keys. In fact, I have already found a few private keys (unfortunately they were already emptied before by someone else). However, this is very much a possibility. The fact that me, an individual can run such brute force attacks for random keys with little knowledge concerns me. I'm sure that North Korea and other big malicious actors would be running far bigger operations to brute force random keys. I may go so far as to even say that these whale alerts that we see on twitter (that some bitcoin was moved after 10-11 years) may be such crackers stumbling on these private keys.I want to protect myself from such attacks by using multi sig. My assumption was that the Bitcoin chain requires the 2 signatures and this enforcement is done on chain. However those reddit comments and the ones in this thread too suggest otherwise.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 11, 2022, 05:02:15 AM",
+      "body": "Quote from: nosferatu8701 on May 11, 2022, 04:53:31 AMThis is the post and the other comments that follow it.https://www.reddit.com/r/Bitcoin/comments/ukuzsu/comment/i7ru02b/?utm_source=share&utm_medium=web2x&context=3My primary concern is dictionary attacks. I know and have tried using rotorcuda and fialka  to run random private key attacks and trying to find private keys. In fact, I have already found a few private keys (unfortunately they were already emptied before by someone else). However, this is very much a possibility. The fact that me, an individual can run such brute force attacks for random keys with little knowledge concerns me. I'm sure that North Korea and other big malicious actors would be running far bigger operations to brute force random keys. I may go so far as to even say that these whale alerts that we see on twitter (that some bitcoin was moved after 10-11 years) may be such crackers stumbling on these private keys.I want to protect myself from such attacks by using multi sig. My assumption was that the Bitcoin chain requires the 2 signatures and this enforcement is done on chain. However those reddit comments and the ones in this thread too suggest otherwise.That is just fear mongering. Dictionary attacks and bruteforce attacks of that sorts are meant to target non-random and weak keys. They are neither effective, in terms of time and space as well as the cost to yield anything. Anyone can run brute force attacks to generate millions and millions of keys but with the key space so big, it would be impossible for them to find anything at all. There is nothing to protect at all because no one in the world can feasibly bruteforce any keys generated correctly. If they could, then we would've done something about it by now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 11, 2022, 06:17:30 AM",
+      "body": "Quote from: nosferatu8701 on May 11, 2022, 04:53:31 AMIn fact, I have already found a few private keys (unfortunately they were already emptied before by someone else). If I choose a number between 2 and 4 and not choose 2 and 4 themselves and you guess my number that doesn't mean you can read my mind.That is the simple way of saying what you have found is not a \"normal\" private key. You have found the solution to some sort of puzzle where you searched in an extremely reduced search space.Quote~ run such brute force attacks for random keys ~Why do you think those keys were \"random\"?QuoteI'm sure that North Korea and other big malicious actors would be running far bigger operations to brute force random keys.Not just NK but if all the 194 countries joined forces and tried brute forcing bitcoin private keys and continued doing it for decades, they still wouldn't be able to find any.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nosferatu8701",
+      "created_time": "May 11, 2022, 02:15:18 PM",
+      "body": "QuoteDid you run it randomly or on very specific range?I ran it randomly. I'm not concerned that someone will guess my private key with the intention of guessing \"my\" private key. I'm concerned about somebody stumbling upon my private key by running these softwares at scale (one instance can run 1 million combinations per second. If someone were to run 10,000 instances they will most likely come across keys which have bitcoin in them)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 11, 2022, 06:11:05 PM",
+      "body": "Quote from: nosferatu8701 on May 11, 2022, 02:15:18 PMI ran it randomly. I'm not concerned that someone will guess my private key with the intention of guessing \"my\" private key. I'm concerned about somebody stumbling upon my private key by running these softwares at scale (one instance can run 1 million combinations per second. If someone were to run 10,000 instances they will most likely come across keys which have bitcoin in them)Is it still that random if you came across keys which someone has already swept? It definitely doesn't sound very random to me.The key space is 2^256. Do the calculations for someone running 1 million instances of 1 million tries per second. How long would it take for someone to find a key assuming that there are 2 billion keys currently. There is tons of math being done on this, so it might be better to just google it first. We would've done something about it if it is really a security risk.Rate: 1,000,000 * 1,000,000Key space: 2^256Number of keys: 2,000,000,000Ps. That is still many many times of earth's existence.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "id": "topic_5463155",
+  "title": "darkv0rt3x",
+  "author": "darkv0rt3x",
+  "created_time": "August 13, 2023, 07:43:54 PM",
+  "content": "Hello.I'm using Debian Bookworm in a RockPro64 sbc and I have Bitcoin Core RPC client version v25.0.0.I'm using logrotate 3.21.0.This is my config file for Bitcoin Core logrotate file:Code:$ cat /etc/logrotate.d/bitcoin /home/xxxxxxxxxx/.bitcoin/debug.log{ daily rotate 5 missingok copytruncate notifempty maxsize 50M delaycompress sharedscripts postrotate  kill -HUP `cat /home/xxxxxxxxxx/.bitcoin/bitcoin.pid` endscript}But my files are all ~1.5Gb when I am asking them to be no more than 50Mb.For isntance, this is my config for my Lightning Network logrotate file, and it is working correctly:Code:$ cat /etc/logrotate.d/lightningd /home/xxxxxxxxxx/.lightning/debug.log{ daily rotate 5 missingok copytruncate notifempty maxsize 50M delaycompress sharedscripts postrotate  kill -HUP `cat /home/xxxxxxxxxx/.lightningd/lightningd-bitcoin.pid` endscript}These are my Bitcoin Core log files:Code:-rw-------  1 xxxxxxxxxx xxxxxxxxxx 1.1G Aug 13 20:41 debug.log-rw-------  1 xxxxxxxxxx xxxxxxxxxx 1.2G Aug 13 00:00 debug.log.1-rw-------  1 xxxxxxxxxx xxxxxxxxxx 1.6G Aug 12 00:00 debug.log.2-rw-------  1 xxxxxxxxxx xxxxxxxxxx 1.2G Aug 11 00:00 debug.log.3-rw-------  1 xxxxxxxxxx xxxxxxxxxx 1.9G Aug 10 00:00 debug.log.4-rw-------  1 xxxxxxxxxx xxxxxxxxxx 1.4G Aug  9 00:00 debug.log.5And these are my LN log files:Code:-rw-r--r--  1 xxxxxxxxxx xxxxxxxxxx  53M Aug 13 20:43 debug.log-rw-r--r--  1 xxxxxxxxxx xxxxxxxxxx  47M Aug 13 00:00 debug.log.1-rw-r--r--  1 xxxxxxxxxx xxxxxxxxxx  47M Aug 12 00:00 debug.log.2-rw-r--r--  1 xxxxxxxxxx xxxxxxxxxx  27M Aug 11 00:00 debug.log.3-rw-r--r--  1 xxxxxxxxxx xxxxxxxxxx  30M Aug 10 00:00 debug.log.4-rw-r--r--  1 xxxxxxxxxx xxxxxxxxxx  27M Aug  9 00:00 debug.log.5-rw-r--r--  1 xxxxxxxxxx xxxxxxxxxx  33M Aug  8 00:00 debug.log.6So, what am I missing here?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5463155",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "August 14, 2023, 05:17:10 PM",
+      "body": "It looks like it's only rotating the logs daily and not respecting maxsize. It just happens to be that your LN logs just happen to be around 50 MB when rotated daily.According to https://superuser.com/questions/1584101/why-logrotate-maxsize-condition-is-not-working, not all versions of logrotate have a maxsize option, so you should check the manpage of your install to make sure that it is indeed there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 15, 2023, 06:44:40 AM",
+      "body": "Your Bitcoin Core log files are not accessible to group and world, only to your account.If you set up logrotate to run with some system account and not as root, you should set the permissions of the debug.log file to be 0644 so that the file can be copied.Also try running logrotate daemon as root and see if that works, if it does then it is definitely a file permissions error as I explained.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "August 15, 2023, 08:12:07 PMLast edit: August 15, 2023, 08:35:20 PM by darkv0rt3x",
+      "body": "Quote from: achow101 on August 14, 2023, 05:17:10 PMIt looks like it's only rotating the logs daily and not respecting maxsize. It just happens to be that your LN logs just happen to be around 50 MB when rotated daily.According to https://superuser.com/questions/1584101/why-logrotate-maxsize-condition-is-not-working, not all versions of logrotate have a maxsize option, so you should check the manpage of your install to make sure that it is indeed there.I'm going to try size in my Bitcoin log file config and check tomorrow how are the log files. If it is that the case, then I'll also ave to change the same setting for my LN config file.When I run man logrotate I can see a maxsize option. But also in the manpage, where the examples are, they don't use this setting. They use size instead. But they mention minsize, size and maxsizeCode:minsize size              Log  files are rotated when they grow bigger than size bytes, but not before the additionally specified time interval (daily, weekly, monthly, or yearly).  The related size option is similar except that it is mutually              exclusive with the time interval options, and it causes log files to be rotated without regard for the last rotation time, if specified after the time criteria (the last specified option takes the  precedence).   When              minsize is used, both the size and timestamp of a log file are considered.Code:size size              Log files are rotated only if they grow bigger than size bytes.  If size is followed by k, the size is assumed to be in kilobytes.  If M is used, the size is in megabytes, and if G is used, the size is  in  gigabytes.              So  size  100,  size  100k, size 100M and size 100G are all valid.  This option is mutually exclusive with the time interval options, and it causes log files to be rotated without regard for the last rotation time, if              specified after the time criteria (the last specified option takes the precedence).Code:maxsize size              Log  files are rotated when they grow bigger than size bytes even before the additionally specified time interval (daily, weekly, monthly, or yearly).  The related size option is similar except that it is mutually ex‐              clusive with the time interval options, and it causes log files to be rotated without regard for the last rotation time, if specified after the time criteria (the last specified option  takes  the  precedence).   When              maxsize is used, both the size and timestamp of a log file are considered.But I'll try with size for a few days to see if anything changes!Edited 1;I also changed the permissions of log files of Bitcoin Core folder!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "August 17, 2023, 06:24:05 PM",
+      "body": "Seems that at least from yesterday, mu log files increased even further of size. lol. So, I guess that the keyword size and/or max/minsize may not be the problem here!Permissions either because I changed permissions and there was no effect on the size of the files!I have now 2 files with aroun 2.5Gb big!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "January 27, 2024, 05:05:43 PM",
+      "body": "I'm back to this as I have been told that Bitcoin Core won't work with Logrotate because it doesn't write any output to stdout, therefore systemd cannot know anything about it. Maybe my wording is not the most accurate, but I wanted to know if this is true, if anyone knows! Probably devs would know, no?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "January 28, 2024, 12:58:54 AM",
+      "body": "logrotate works fine with Bitcoin Core, you just need to send SIGHUP to it after rotating so that it starts writing a new log file.Just reading through the problem you were having last year, the issue is that logrotate is a one shot command, not a persistent daemon (not sure how I missed this the first time). When it runs, it checks whether the log file matches it's criteria for rotating and keeping old logs, and if it does, it will rotate the log files and do whatever. However, it does not sit there watching the specified files to see if they match, rather it requires something external to kick it off. This is usually done with a systemd timer which specifies how frequently it should be run. I would guess that it was running once per day, whereas you probably want it to run more frequently, like every hour. You'll need to find the logrotate.timer systemd unit file and modify it to start logrotate at the frequency that works with how quickly your log files grow.You can find where systemd unit files are located by using systemctl status, e.g.Code:sudo systemctl status logrotate.timerI have mine setup to rotate the log files every hour if they are bigger than 5 MB, and to save the old log files to my NAS. Here's what my whole config looks like:/etc/logrotate.d/bitcoinCode:/home/ava/.bitcoin/debug.log /home/ava/.bitcoin/testnet3/debug.log /home/ava/.bitcoin/signet/debug.log {    rotate -1    size 5M    dateformat %Y-%m-%d-%H_%M    dateext    olddir oldlogs    postrotate        /home/ava/.bitcoin/finish-logrotate.sh $@    endscript}/home/ava/.bitcoin/finish-logrotate.sh is a script that sends the SIGHUB signal and moves the rotated log file to the NAS:Code:#! /usr/bin/bashLOGS_DIR=$(dirname ${2})BASE_DIR=$(dirname ${LOGS_DIR})PID_FILE=\"${BASE_DIR}/bitcoind.pid\"NET=$(basename ${BASE_DIR})if [[ \"$NET\" == .bitcoin ]]; then    NET=\"mainnet\"fiif [[ -f \"${PID_FILE}\" ]]; then    kill -s SIGHUP $(cat ${PID_FILE})fifor f in ${LOGS_DIR}/*; do    gzip -q ${f}doneif [[ $(mountpoint \"/mnt/data\") ]]; then    NAS_LOGS_DIR=\"/mnt/data/bitcoin/oldlogs/${NET}/\"    mv $LOGS_DIR/* $NAS_LOGS_DIRfi/usr/lib/systemd/system/logrotate.timer is logrotate's systemd timer unit file:Code:[Unit]Description=Hourly rotation of log filesDocumentation=man:logrotate(8) man:logrotate.conf(5)[Timer]OnCalendar=hourlyAccuracySec=1hPersistent=true[Install]WantedBy=timers.target",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "March 10, 2024, 08:33:19 AMLast edit: March 12, 2024, 06:30:12 PM by LoyceV",
+      "body": "Quote from: darkv0rt3x on August 15, 2023, 08:12:07 PMI also changed the permissions of log files of Bitcoin Core folder!Just checking: you didn't give logrotate access to your wallet, right?My debug.log is 12 MB since last September, but I'm not doing anything else with it. Even if you rotate them more often, 1.5 or more GB per day is a lot! What do you use them for?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "March 12, 2024, 05:59:01 PM",
+      "body": "Quote from: LoyceV on March 10, 2024, 08:33:19 AMQuote from: darkv0rt3x on August 15, 2023, 08:12:07 PMI also changed the permissions of log files of Bitcoin Core folder!Just checking: you didn't give logrotate access to your wallet, right?My debug.log is 12 MB since last September, but I'm not doing anything else with it. Even if you rotate them than daily often, 1.5 or more GB per day is a lot! What do you use them for?The size was becuase I was using debug level.I'm not sure exactly what I would have to do to \"give logrotate access to my wallet\". Not even sure if you're asking that ironically or if we were actually supposed to! :p",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "March 12, 2024, 06:35:36 PM",
+      "body": "Quote from: darkv0rt3x on March 12, 2024, 05:59:01 PMI'm not sure exactly what I would have to do to \"give logrotate access to my wallet\".Usually, logrotate is used for system logs, which usually are stored in /var/log. Bitcoin Core's debug.log is (by default) stored inside your user directory. It's probably going to be okay, but I like to keep default OPSEC by not giving any program read-access to data it doesn't need. But now that I'm typing this, I'm wondering if logrotate doesn't use root-permissions by default anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

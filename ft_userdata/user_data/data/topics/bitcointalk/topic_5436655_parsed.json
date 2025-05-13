@@ -1,0 +1,165 @@
+{
+  "id": "topic_5436655",
+  "title": "bitmover",
+  "author": "bitmover",
+  "created_time": "January 24, 2023, 07:44:24 PMLast edit: March 16, 2023, 03:54:41 PM by bitmover",
+  "content": "Based on suggestions from many users in this post I created this simple tool to give more transparency and credibility to giveaways here, specially from honest newbieshttps://bitcoindata.science/giveaway-manager/Giveaways can now have their results easily verified.It is also possible to save and share the results in a unique URL.Provably fair giveaway managerAs the blockhash is just a number, its last 6 digits is converted to decimal using this function:Code:var decimal = parseInt(blockhash.slice(-6), 16);Now we have an integer (0 to 16777215) from the blockhash.After dividing this decimal by the number of participants, we use the modulo operator (%) to get the division remainder becomes the index_number.This index_number is applied in the participants list, to get the position of the winner.Code:var index_number = decimal % competitors.length;var winner = competitors[index_number];For additional winners, the past winners are removed from the list and one more digit is added from the blockhash. A maximum 30 was added to avoid working with big numbers.If you find this useful  , please refer this tool in upcoming giveaways",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5436655",
+  "comments": [
+    {
+      "author": "LoyceMobile",
+      "created_time": "January 24, 2023, 07:59:14 PM",
+      "body": "What if there's more than 1 winner?What if the hash ends on 007 and there are 8 participants?I'm wondering if all candidates have the same odds: what if the number of participants is large: my gut feeling tells me the first one on the list is more likely to be picked than the last one (LoyceV do the math).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 24, 2023, 08:26:50 PM",
+      "body": "Quote from: LoyceMobile on January 24, 2023, 07:59:14 PMWhat if there's more than 1 winner?This is an additional feature. I can think about a solution for this. I can just add one more hex digit for each new winner to be rolled.QuoteWhat if the hash ends on 007 and there are 8 participants?The result to this operation is 7You can check in the jsfiddlehttps://jsfiddle.net/ruxqjoLt/QuoteI'm wondering if all candidates have the same odds: what if the number of participants is large: my gut feeling tells me the first one on the list is more likely to be picked than the last one (LoyceV do the math).I don't know if that makes sense, maybe someone who knows more statistic can help us. DdmrDdmr?The number is a 3 digit hex, maximum 4095 in decimal.If the division has no remainder,  it is zero so the first in list.It cannot has  more remainders than the number it is divided by... It looks OK to me. But I am no math specialist",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "January 24, 2023, 08:35:09 PM",
+      "body": "LoyceV is right about different chances of winning. Assume that there are 10 participants.The participant number 1 wins the game if the outcome is 0, 10, 20, 30, ... 4090.The participant number 2 wins the game if the outcome is 1, 11, 21, 31, ... 4091.The participant number 3 wins the game if the outcome is 2, 12, 22, 32, ... 4092.................The participant number 10 wins the game if the outcome is 9, 19, 29, 39, ...., 4089The participants 1-6 will have slightly bigger chance than participants  7-10. The chance of winning for participants 1-6 will be  410/4096 and the chance of winning for participants 7-10 will be 409/4096",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "January 24, 2023, 08:36:11 PM",
+      "body": "Simple math: you use 1 digit, 0-9, and have 6 participants. That means the first 4 participants have 2 out of 10 chance, the last 2 have 1 out of 10 change of winning.Easy fix: use 6 digits. Or even more. That makes the difference between positions in the list very small.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 24, 2023, 08:53:57 PM",
+      "body": "Quote from: LoyceMobile on January 24, 2023, 08:36:11 PMSimple math: you use 1 digit, 0-9, and have 6 participants. That means the first 4 participants have 2 out of 10 chance, the last 2 have 1 out of 10 change of winning.Easy fix: use 6 digits. Or even more. That makes the difference between positions in the list very small.With already 4095 chances (fff), I believe the changes are OK, but I will add 3 more (ffffff)That is a nice suggestion for the problem.Then I can roll again with 1 more digit for each subsequent winner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 25, 2023, 04:11:41 AM",
+      "body": "Quote from: bitmover on January 24, 2023, 08:53:57 PMQuote from: LoyceMobile on January 24, 2023, 08:36:11 PMSimple math: you use 1 digit, 0-9, and have 6 participants. That means the first 4 participants have 2 out of 10 chance, the last 2 have 1 out of 10 change of winning.Easy fix: use 6 digits. Or even more. That makes the difference between positions in the list very small.With already 4095 chances (fff), I believe the changes are OK, but I will add 3 more (ffffff)That is a nice suggestion for the problem.Then I can roll again with 1 more digit for each subsequent winner. Added all the changes!Now you can add up to 50 winners (i put those limits to avoid unnecessary  loops with big numbers).Also, it has now 6 digits to find the first winner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "examplens",
+      "created_time": "January 25, 2023, 12:10:46 PM",
+      "body": "here, the giveaway initiator just randomly adds participants? how does each participant know his winning number? Are you thinking about the possibility that everyone chooses their own \"random\" number, like the previous way by an entry in the thread? I know that many people have their \"lucky\" numbers and always choose them if they are available.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "January 25, 2023, 12:32:58 PM",
+      "body": "Quote from: bitmover on January 25, 2023, 04:11:41 AMNow you can add up to 50 winners (i put those limits to avoid unnecessary  loops with big numbers).I just tested the tool with some random inputs and it seems that everything is working well.There's only a small bug. If you set the number of winners to 50, only 1 winner will be selected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 25, 2023, 12:46:07 PM",
+      "body": "Quote from: examplens on January 25, 2023, 12:10:46 PMhere, the giveaway initiator just randomly adds participants? how does each participant know his winning number? Are you thinking about the possibility that everyone chooses their own \"random\" number, like the previous way by an entry in the thread? I know that many people have their \"lucky\" numbers and always choose them if they are available.About this, the conclusion of the discussion was that those giveaways are easily verified.This giveaway manager is more focused in the contests like this, where people just add their addresses. Each participant number is in the order of applications.https://bitcointalk.org/index.php?topic=5435424.0However, I can add this feature. I will take a look.Quote from: hosseinimr93 on January 25, 2023, 12:32:58 PMThere's only a small bug. If you set the number of winners to 50, only 1 winner will be selected.Thanks, That is really a bug. Now fixed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CoinEraser",
+      "created_time": "January 25, 2023, 01:52:37 PMLast edit: January 25, 2023, 02:22:53 PM by CoinEraser",
+      "body": "It's really great that you are doing the work and creating such a page. This will surely enable newbies to hold a fair and equitable free raffle to avoid misunderstandings like current Rbah´s free raffle. While it doesn't solve the payout issue, but it is a good step in the right direction.  Quote from: bitmover on January 25, 2023, 12:46:07 PM-snip- However, I can add this feature. I will take a look. -snip-Examplens suggestion is really good. This definitely gives more opportunities to use the site in different ways.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 25, 2023, 03:41:00 PM",
+      "body": "Bugs:Quote from: https://bitcoindata.science/giveaway-manager/Now we have an integer (1 to 16777215) from the blockhash.This should be:0 to 16777215Quote from: https://bitcoindata.science/giveaway-manager/For additonal winners, the past winners are removed from the list and one more digit is added from the blockhash. A maximum 50 was added to avoid bugs.That's too much. The shortest block hash until now is:Code:0000000000000000000000005d6f06154c8685146aa7bc3dc9843876c9cefd0fThat's only 40 characters. To be (very) safe, you should probably limit it to about 30 winners if you keep the method of adding a digit. My preferred alternative: add a nonce for each winner: take the sha256sum of \"blockhash+1\" and use those digits. That gives an unlimited number of potential winners.I did a test, and checked the first 3 winners: your math checks out Feature requests Can you add a \"unique URL\" and \"future block\" feature? Example: If I enter 4 usernames, I'd like to be able to pick a block in the future. That should give me an URL that I can share here, so participants can follow the giveaway.Even if the block isn't in the future, a unique URL would be really cool to share the results.To select the Target Block: can you show the current latest block (773565) instead of \"1\" to start with?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 25, 2023, 11:16:36 PM",
+      "body": "Quote from: LoyceV on January 25, 2023, 03:41:00 PMBugs:Quote from: https://bitcoindata.science/giveaway-manager/Now we have an integer (1 to 16777215) from the blockhash.This should be:0 to 16777215Quote from: https://bitcoindata.science/giveaway-manager/For additonal winners, the past winners are removed from the list and one more digit is added from the blockhash. A maximum 50 was added to avoid bugs.That's too much. The shortest block hash until now is:Code:0000000000000000000000005d6f06154c8685146aa7bc3dc9843876c9cefd0fThat's only 40 characters. To be (very) safe, you should probably limit it to about 30 winners if you keep the method of adding a digit. My preferred alternative: add a nonce for each winner: take the sha256sum of \"blockhash+1\" and use those digits. That gives an unlimited number of potential winners.I did a test, and checked the first 3 winners: your math checks out Thank you, very sharp. I made all your suggestions, already in production.About this nonce alternative, I will take a look later.QuoteFeature requests Can you add a \"unique URL\" and \"future block\" feature? Example: If I enter 4 usernames, I'd like to be able to pick a block in the future. That should give me an URL that I can share here, so participants can follow the giveaway.Even if the block isn't in the future, a unique URL would be really cool to share the results.I hade to use some cryptography to accomplish this, but it was easier than I expected.I saved all the saved data in a variable and encrypted it using AES.Then I saved this encrypted data in a unique URL.As it is not sensible data, I just added the private keys in the script file.When you load it, data decrypted and will fill out automatically. Easily shareable!Take a look:https://bitcoindata.science/giveaway-manager/?U2FsdGVkX19E08GaMJDY1QNCMHlxQ4BoXO/TAEUSso0BHeEzziPww8wbM4/X+GHSUiyN6SPx0ilvAwu+//A7plknuyGUx/JgM/n8+qEoXeQzEisCo5zzepIskxTJefviVPRZwtFw6sUujNaJmlryVkWJ5t6eicz+NAemMECso3+8BS5hJ9k1qiZi/OtbyZFV0KR3BXxGKcZab+zKKDitPw==QuoteTo select the Target Block: can you show the current latest block (773565) instead of \"1\" to start with?Done!!!Tell me if you see any more bugs !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "January 26, 2023, 12:02:07 AMLast edit: January 26, 2023, 12:25:36 AM by hosseinimr93",
+      "body": "Quote from: bitmover on January 25, 2023, 11:16:36 PMTell me if you see any more bugs !Now, it's possible that a participant wins more than once. It wasn't like this before the changes.Edit:I found another bug. When I save the link, it doesn't save the target block. It's set to the current block again when I open the saved link.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 26, 2023, 01:09:35 AM",
+      "body": "Quote from: hosseinimr93 on January 26, 2023, 12:02:07 AMQuote from: bitmover on January 25, 2023, 11:16:36 PMTell me if you see any more bugs !Now, it's possible that a participant wins more than once. It wasn't like this before the changes.Edit:I found another bug. When I save the link, it doesn't save the target block. It's set to the current block again when I open the saved link. Thank you.I found the bugs. I guess all fixed now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 26, 2023, 06:33:53 AM",
+      "body": "Quote from: bitmover on January 25, 2023, 11:16:36 PMI saved all the saved data in a variable and encrypted it using AES.Then I saved this encrypted data in a unique URL.Even better than what I imagined, I like it",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "January 27, 2023, 04:33:49 AM",
+      "body": "Nice work, bitmover! Although it's not a big deal for this application, using the modulo operator like that will introduce a bias into the results (look up \"modulo bias\", if you're interested). One way to ensure a mathematically fair selection process is to generate a random number, and then (instead of applying a modulo operation to force it within range) throw it away and try again if it's not already in the range you need it to be in. A naive implementation of this \"rejection sampling\" would be very inefficient, so what you need to do is mask off some bits (based on the nearest enclosing power of two) and then apply the range check after that.To make the above feasible, you need a good source of deterministically-generated random numbers. One way to get them would be to use Loyce's tip, and treat the blockhash as a \"seed\" which you append a running counter onto and then take the SHA-256 of that. Another way, which I prefer (only by a little) is to do effectively what Loyce suggested, but use SHA-256 in an HMAC construction (i.e. as a keyed hash function, with the seed as the \"key\", and a running counter as the \"data\").I implemented the above as a Python (3.7+) script that you can play around with, if you like:Code:#!/usr/bin/env python3import sysimport hmacimport mathdef fail_if(condition, message):    if condition:        sys.exit('fatal error: ' + message)def random_uint32(seed_bytes, index):    fail_if(index < 0 or index > 4294967295, 'index is out of range.')    return int.from_bytes(hmac.digest(seed_bytes, index.to_bytes(4, 'little'), 'sha256')[:4], 'little')def pick_winners_unbiased(how_many, from_list, seed_bytes):    fail_if(how_many < 0 or how_many > len(from_list), 'how_many is out of range.')    remaining = from_list[:]    winners = []    counter = 0    while len(winners) != how_many:        mask = 2 ** math.ceil(math.log2(len(remaining))) - 1        random = random_uint32(seed_bytes, counter) & mask        counter += 1        if random < len(remaining):            winners.append(remaining.pop(random))    return winnersdef main(args):    fail_if(len(args) != 3, 'expected 3 arguments (how_many_winners, names_file_path, seed_text).')    how_many_winners, names_file_path, seed_text = int(args[0]), args[1], args[2]    with open(names_file_path) as file:        list_of_names = [name for name in file.read().splitlines() if name.strip()]    seed_bytes = seed_text.encode('utf-8')    print(f'Picking {how_many_winners} winner(s) from a list of {len(list_of_names)} participant(s), using seed \"{seed_text}\": {pick_winners_unbiased(how_many_winners, list_of_names, seed_bytes)}.')if __name__ == '__main__':    main(sys.argv[1:])To test it, I used this list of 54 names:Code:TryNinjaBitMaxzhilariousetcHeRetiKpooya87HCPOmegaStarScreamLeGauloismocacinnoDooMADjackgmk4buwaytressLoyceVAdolfinWolfHydrogenstompixPotato ChipsThe Sceptical ChymistWelshd5000SteamtymeranochigoDdmrDdmrRathETFbitcoinLuciuso_e_l_e_o1miaumalevolentmikeywithHusna QAsuchmoonHalabnc50lcmole0815fillipponeTrofoNotATetherBthdGazetaBitcoinbitmoverNeuroticFishdkbit98PmalekBlackHatCoinerDireWolfM14SFR10DaveFRatimovwebtricksRikafiphosseinimr93n0nceIt's mostly intended as reference code, so I didn't spend much time making it user-friendly. It expects 3 arguments: the number of winners to pick, a path to a file containing the names of participants (one per line), and a seed. So, if you place the script into a file named \"pick_winners.py\", and the above list into a file named \"names.txt\", and you wanted (for example) to pick 3 winners from that list (using the hash of the genesis block as the seed), then you would invoke it like this:Code:$ python3 pick_winners.py 3 names.txt 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26fWhich should produce the following:Picking 3 winner(s) from a list of 54 participant(s), using seed \"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\": ['n0nce', 'BlackHatCoiner', 'dkbit98'].Obviously, JavaScript would be more useful to you, and if you don't mind leaving older browsers out in the cold, then the above algorithm can actually be implemented pretty easily (by using the built-in SubtleCrypto interface; you just have to be careful to always serve the page over HTTPS, which is a requirement for this interface to be available on some browsers). Here are the important functions (forgive my clumsy JavaScript, I'm a bit out of practice):Code:async function seed_from_text(text) {    // assumes: \"text\" is a non-empty string    const encoder = new TextEncoder();    return { hmac_key: await window.crypto.subtle.importKey(\"raw\", encoder.encode(text), { name: \"HMAC\",  hash: \"SHA-256\" }, false, [\"sign\"]) };}async function random_uint32(seed, index) {    // assumes: \"seed\" came from seed_from_text(...)    // assumes: \"index\" is an integer >= 0 && <= 4294967295    const data = new Uint8Array([index & 255, index >> 8 & 255, index >> 16 & 255, index >> 24 & 255]);    const hash = await window.crypto.subtle.sign(\"HMAC\", (await seed).hmac_key, data);    return new DataView(hash).getUint32(0, true);}async function pick_winners_unbiased(how_many, from_array, seed) {    // assumes: \"how_many\" is an integer >= 0 && <= from_array.length    // assumes: \"from_array\" is an array of all participants    // assumes: \"seed\" came from seed_from_text(...)    const remaining = from_array.slice();    const winners = [];    let counter = 0;    while(winners.length != how_many) {        const mask = 2 ** Math.ceil(Math.log2(remaining.length)) - 1;        const random = await random_uint32(seed, counter++) & mask;        if(random < remaining.length) {            winners.push(remaining.splice(random, 1)[0]);        }    }    return winners;}The SubtleCrypto interface is asynchronous, so (unfortunately) these functions have to be, too. Here's a small example of me testing them, in the browser console:>> seed = await seed_from_text(\"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\");<< Object { hmac_key: CryptoKey }>> names = [\"TryNinja\", \"BitMaxz\", \"hilariousetc\", \"HeRetiK\", \"pooya87\", \"HCP\", \"OmegaStarScream\", \"LeGaulois\", \"mocacinno\", \"DooMAD\", \"jackg\", \"mk4\", \"buwaytress\", \"LoyceV\", \"AdolfinWolf\", \"Hydrogen\", \"stompix\", \"Potato Chips\", \"The Sceptical Chymist\", \"Welsh\", \"d5000\", \"Steamtyme\", \"ranochigo\", \"DdmrDdmr\", \"Rath\", \"ETFbitcoin\", \"Lucius\", \"o_e_l_e_o\", \"1miau\", \"malevolent\", \"mikeywith\", \"Husna QA\", \"suchmoon\", \"Halab\", \"nc50lc\", \"mole0815\", \"fillippone\", \"Trofo\", \"NotATether\", \"Bthd\", \"GazetaBitcoin\", \"bitmover\", \"NeuroticFish\", \"dkbit98\", \"Pmalek\", \"BlackHatCoiner\", \"DireWolfM14\", \"SFR10\", \"DaveF\", \"Ratimov\", \"webtricks\", \"Rikafip\", \"hosseinimr93\", \"n0nce\"];<< Array(54) [ \"TryNinja\", \"BitMaxz\", \"hilariousetc\", \"HeRetiK\", \"pooya87\", \"HCP\", \"OmegaStarScream\", \"LeGaulois\", \"mocacinno\", \"DooMAD\", ... ]>> winners = await pick_winners_unbiased(3, names, seed);<< Array(3) [ \"n0nce\", \"BlackHatCoiner\", \"dkbit98\" ]I hope all of the above can help you to improve your nice project! One cool thing about this approach is that it would remove the 30-winner limit you currently have. Also, having the algorithm available as a Python script might find a use case in giving people a second way to verify results.P.S. Two small spelling mistakes I spotted: \"For additonal winners\" and \"Provaly fair giveaway manager\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 27, 2023, 04:11:18 PMLast edit: January 27, 2023, 06:57:30 PM by bitmover",
+      "body": "Quote from: PowerGlove on January 27, 2023, 04:33:49 AMNice work, bitmover! Although it's not a big deal for this application, using the modulo operator like that will introduce a bias into the results (look up \"modulo bias\", if you're interested). One way to ensure a mathematically fair selection process is to generate a random number, and then (instead of applying a modulo operation to force it within range) throw it away and try again if it's not already in the range you need it to be in. A naive implementation of this \"rejection sampling\" would be very inefficient, so what you need to do is mask off some bits (based on the nearest enclosing power of two) and then apply the range check after that.Hello PowerGlove.Thank you a lot for pointing this out.I believe you read this article, where the author make similar suggestions about this problem:https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/The problem is that players who are in the first spots will more likely be winners than the ones in last (if we have more than 40 competitors), as pointed in the article.As in this project I am not dealing with cryptographic schemes that could be attacked and things like that,  I believe I can make an easier way out for this bias.I can just shuffle the list of competitors before applying the modulo operator.As I need to always have the same result, I will not use the built in  shuffle function. I can use the blockhash decimal in a custom function to shuffle it.Code:competitors.sort((a, b) => 0.5 - blockhash_lastdigit/10);This function will take move the item up or down depending if 0.5-blockhash_lastdigit is positive or negative.It will shuffle the array.  I will take a look if I can find a better way to shuffle it in a more random way.(Good ideas here: https://stackoverflow.com/questions/16801687/javascript-random-ordering-with-seed)I believe this will solve the problem in a much simpler way. What do you think?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "January 27, 2023, 04:33:19 PM",
+      "body": "Quote from: bitmover on January 27, 2023, 04:11:18 PMHello PokerPlayer.Long day? I wouldn't shuffle the list of participants, it makes it harder to verify the result.If you really mind the (give or take) 0.001% difference in chance of winning, just use more digits of the hash to make the difference even smaller. I'd say it's negligible already.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 27, 2023, 06:59:56 PM",
+      "body": "Quote from: LoyceMobile on January 27, 2023, 04:33:19 PMI wouldn't shuffle the list of participants, it makes it harder to verify the result.Yeah, this is certainly important. Easily verified by anyone who wants and always get the same result.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

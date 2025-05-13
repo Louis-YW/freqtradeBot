@@ -1,0 +1,165 @@
+{
+  "id": "topic_5441463",
+  "title": "NeuroticFish",
+  "author": "NeuroticFish",
+  "created_time": "February 27, 2023, 08:29:36 PM",
+  "content": "If one wants to have an Electrum server, one of the options is Fulcrum.I already have an Electrum server (Electrs), which I use and for which I've made a more complete tutorial in the past, but at some point I've made tests with Fulcrum too and it would be a shame to remove it without providing a tutorial for the others who want it.So... one major advantage of Fulcrum comes on Windows: the user can just get compiled binaries for Bitcoin Core, Fulcrum and Electrum, configure and run them all, without the need of stepping into Windows Subsystem for Linux (WSL). Another good thing is it's performance: it's processing the requests significantly faster than Electrs. Just in my experience (HDD, infrequent use for rather short tasks) Fulcrum gets in the state I can access it significantly slower than Electrs.But, tbh, I don't like Fulcrum as much as the other option I have (Electrs)* Fulcrum is made by somebody with BCH ties and it may be much better optimized for BCH (to say the least)* As I said, Fulcrum starts/syncs slower than Electrs and that's not OK for my use caseSomething more about this tutorial. This is made for a Fulcrum as I use it: me, for myself. No discussions with other servers, not announcing my server, also no SSL. I've kept it simple. If one wants to expand the tutorial with that, be my guest.Since an Electrum server works on top of a Bitcoin Core node, I'll handle Bitcoin Core first, but shortly.Bitcoin Core is with pretty much the same as in my other tutorial, but with some tiny bit of change in config:* already in that topic, later on, I've switched for use with rpc user and password instead of cookie. If you want to keep using cookie, that's fine too, just pay attention to the config files (both of them)* Bitcoin core's config needs one more line: zmqpubhashblock=tcp://127.0.0.1:8433So, I will not insist with Bitcoin Core, it's in the other tutorial, I'll just put here my config:Code: (bitcoin.conf)txindex=1server=1rpcbind=127.0.0.1rpcallow=127.0.0.1rpcallowip=127.0.0.1rpcuser=UsErNaMerpcpassword=PaSsWoRdzmqpubhashblock=tcp://127.0.0.1:8433Fulcrum (https://github.com/cculianu/Fulcrum)You download Fulcrum from https://github.com/cculianu/Fulcrum/releases ; you will get something like Fulcrum-1.9.0-win64.zipIt would be nice to verify your download, which is done with the correcponding *.asc file, like for Electrum.Unpack the zip into a new folder, maybe FulcrumBinaries. We won't touch that folder from now on.Now we create a file called Fulcrum.conf with the content:Code: (Fulcrum.conf)datadir = x:\\FulcrumData_MainNetbitcoind = 127.0.0.1:8332rpcuser = UsErNaMerpcpassword = PaSsWoRdtcp = 127.0.0.1:50001peering = falseannounce = falsepublic_tcp_port = 50001admin = 8000stats = 8080db_max_open_files = 80fast-sync = 8000Some details:* The username and password has to match with the one from Bitcoin* x:\\FulcrumData_MainNet is a folder you create, preferably somewhere fast (SSD), since this is where Fulcrum will keep its data; mine has now ~113 GB, but it may be safe to have some more space there, especially at start* that fast-sync line should be commented (put a # in front of it) after the initial sync finishes* the server is set to not discuss with other servers, not announce itself for other clients and so on; also no SSLI've made a batch file for start and one for stop, but this stop works only after the sync is done. Else you better press the good old CRTL-C.The content of the batch file is not very useful as it is, maybe as example, because it contains the path to the exe and, as parameter, the path to the config.In my case it's:Code: (start.bat)\"x:\\Fulcrum\\FulcrumBinaries\\Fulcrum.exe\" x:\\Fulcrum\\Fulcrum.confSame goes for the stop.Code: (stop.bat)\"x:\\Fulcrum\\FulcrumBinaries\\FulcrumAdmin\" -p 8000 stopAfter starting Fulcrum (start.bat) it might take an awful lot of time until everything is sync-ed. You may want to look for lines like:Code:[2023-02-27 21:42:48.964] Starting listener service for TcpSrv 127.0.0.1:50001 ...[2023-02-27 21:42:48.965] Service started, listening for connections on 127.0.0.1:50001orCode:[2023-02-27 22:03:32.758] <Controller> Block height 778553, up-to-dateThen you can start Electrum. As I wrote in the other tutorial I'm lazy and I'm using the portable Electrum. For me the command line is:Code:electrum-4.3.4-portable.exe --oneserver --server 127.0.0.1:50001:t",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5441463",
+  "comments": [
+    {
+      "author": "Macadonian",
+      "created_time": "February 28, 2023, 12:19:23 AM",
+      "body": "I recommend including the asc text in the OP because if github has been compromised and the asc has been changed for the latest release people can verify with this guide whether it has been changed or not. I think it is just a extra step in security and it might be a pain for you to keep updating it with every new release but it will add another layer of trust.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "February 28, 2023, 10:35:53 AM",
+      "body": "Quote from: Macadonian on February 28, 2023, 12:19:23 AMI recommend including the asc text in the OP because if github has been compromised and the asc has been changed for the latest release people can verify with this guide whether it has been changed or not. I think it is just a extra step in security and it might be a pain for you to keep updating it with every new release but it will add another layer of trust. I am not the developer of Fulcrum, I'm just an user. I would get the same asc file as you'd do. And if I'd put the content of the asc file into OP I'd have to update it with each new update of Fulcrum, which is not something I would want to do.So, as I said in OP, the user will look for the asc with the same name as the zip he's about to download/use. For Fulcrum-1.9.0-win64.zip it would be Fulcrum-1.9.0-win64.zip.asc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "February 28, 2023, 07:29:18 PMLast edit: May 14, 2023, 02:42:30 PM by NeuroticFish",
+      "body": "Quote from: ETFbitcoin on February 28, 2023, 12:07:21 PMThanks for the guide (even though i rarely use Windows). Did you check how much does Fulctrum use? Fulctrum GitHub page said it has minimum 1GB RAM, so i wonder if it actually use 1GB or less.Thank you for the kind words.I've fired it up and I have the numbers while syncing (blocks from about half a day) - first image and from when it was quiet - second image.The data is from both Task Manager and Process Explorer.As you see while syncing it goes up to 1GB, but when it's cool it's much lower.Also I'd add that I have in configCode:db_max_open_files = 80which is higher than the default and may have as result some more memory allocated, but honestly I didn't read much into the docs and I may be wrong with the implications.However, at some point at startup it was showing:Code:DB memory: 512.00 MiB",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AverageGlabella",
+      "created_time": "February 28, 2023, 09:35:09 PM",
+      "body": "Syncing will always use more disk usage and ram and I think that is good performance for a program on Windows. It would be nice to compare it with Electrum running on the Linux sub system and see if it uses more or less. I think it could be more efficient because it does not have the Linux sub system running in the background too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "April 26, 2023, 07:21:27 AM",
+      "body": "Hello! I just started syncing the data. I am just wondering, what am I syncing actually? What does my electrum server need to download?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "April 26, 2023, 11:23:19 AM",
+      "body": "Quote from: ETFbitcoin on April 26, 2023, 11:17:41 AMQuote from: apogio on April 26, 2023, 07:21:27 AMHello! I just started syncing the data. I am just wondering, what am I syncing actually?I don't read Fulcrum source code, but syncing (on Electrum server) usually involve obtaining blockchain data and create database which contain various index to speed up many things (such as retrieve TX from specific Bitcoin address).Quote from: apogio on April 26, 2023, 07:21:27 AMWhat does my electrum server need to download?Whole Bitcoin blockchain and node mempool (to show unconfirmed transaction to Electrum wallet).ok, so I guess that's why I need txindex=1 in bitcoin core conf file",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "April 28, 2023, 02:03:24 PM",
+      "body": "Quote from: apogio on April 26, 2023, 07:21:27 AMHello! I just started syncing the data. I am just wondering, what am I syncing actually? What does my electrum server need to download?Bitcoin Core downloads/synchronizes the blockchain. You'll need half a terra for that nowadays, btw.The Electrum Server will get Bitcoin Core's data and creates a database on top of that for easy retrieval of various things your wallet or a block explorer (!) would need.Depending on how it uses the data, I guess that an Electrum server can also survive without txindex (just the sync could be slower), depending on what data it gets from Bitcoin Core and what it stores.Quote from: apogio on April 26, 2023, 11:23:19 AMok, so I guess that's why I need txindex=1 in bitcoin core conf fileWell, Fulcrum specifically asks for txindex to be 1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "April 28, 2023, 03:36:58 PM",
+      "body": "Since I never ran it I'm trying it out now. Put a 1TB spinning drive in a 4th gen i3 with 8GB of ram and am in the process of download the blockchain now.Somebody remind me in a week to take a look at how it's going. I really hate spinning drives but it's all I have for larger then 512GB in the office. All the real ones are in the DC.Looks interesting since it's a compiled executable along with core it should allow people who 'don't know computers' to run their own electrum server without too much effort. Which is good for privacy. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 09, 2023, 07:58:01 AMLast edit: May 09, 2023, 11:16:00 AM by apogio",
+      "body": "Quote from: DaveF on April 28, 2023, 03:36:58 PMSince I never ran it I'm trying it out now. Put a 1TB spinning drive in a 4th gen i3 with 8GB of ram and am in the process of download the blockchain now.Somebody remind me in a week to take a look at how it's going. I really hate spinning drives but it's all I have for larger then 512GB in the office. All the real ones are in the DC.Looks interesting since it's a compiled executable along with core it should allow people who 'don't know computers' to run their own electrum server without too much effort. Which is good for privacy. -DaveAny feedback?? I am syncing slowly personally... I had to interrupt for several days and I just started the process yesterday night.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 09, 2023, 11:32:13 AM",
+      "body": "Core is still syncing slowly:There is a issue with the hardware for some reason the CPU keeps throttling. Was going to stop and start on a different box, but decided to see if it would finish syncing and then how Fulcrum would work on something with an old slow drive and funky hardware. Kind of a test to see if someone could do it on an old PC they pulled out of the closet.Although I don't know exactly when this PC was built, it has to be close to 8 or 9 years at this point.Just like what someone would have in storage to do something with sooner or later but never did.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 09, 2023, 11:36:05 AM",
+      "body": "Quote from: DaveF on May 09, 2023, 11:32:13 AMCore is still syncing slowly:There is a issue with the hardware for some reason the CPU keeps throttling. Was going to stop and start on a different box, but decided to see if it would finish syncing and then how Fulcrum would work on something with an old slow drive and funky hardware. Kind of a test to see if someone could do it on an old PC they pulled out of the closet.Although I don't know exactly when this PC was built, it has to be close to 8 or 9 years at this point.Just like what someone would have in storage to do something with sooner or later but never did.-DaveSo as I ve seen above you are using a spinning drive to store bitcoin and fulcrum data, is that correct? If so, is there any other storage device on the PC? Or is it the only disk you have?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 09, 2023, 01:35:34 PM",
+      "body": "Quote from: apogio on May 09, 2023, 11:36:05 AMSo as I ve seen above you are using a spinning drive to store bitcoin and fulcrum data, is that correct? If so, is there any other storage device on the PC? Or is it the only disk you have?That is the one and only disk.Trying to make it as 'authentic' as possible, except for the fact that I put the drive in, it's just an old machine that I pulled off a shelf.The same way someone who wanted to run their own node + electum server might have an old machine sitting around or get one from a friend.No more memory, no multiple drives, no figuring out (or even noticing) that the CPU keeps throttling back. Just install core and wait, and then install Fulcrum and wait.Will play with tweaks after that.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 09, 2023, 01:43:49 PM",
+      "body": "Quote from: DaveF on May 09, 2023, 01:35:34 PMQuote from: apogio on May 09, 2023, 11:36:05 AMSo as I ve seen above you are using a spinning drive to store bitcoin and fulcrum data, is that correct? If so, is there any other storage device on the PC? Or is it the only disk you have?That is the one and only disk.Trying to make it as 'authentic' as possible, except for the fact that I put the drive in, it's just an old machine that I pulled off a shelf.The same way someone who wanted to run their own node + electum server might have an old machine sitting around or get one from a friend.No more memory, no multiple drives, no figuring out (or even noticing) that the CPU keeps throttling back. Just install core and wait, and then install Fulcrum and wait.Will play with tweaks after that.-DaveAlright! Fair enough! I also run Bitcoin Core on an external HDD and after the initial synch, it works flawlessly now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 15, 2023, 08:27:55 PM",
+      "body": "Still working on this.But, it does show to me at lest that we as a group should probably have better instructions for people then just download core and let it sync the blockchain.1) Windows update forced a reboot with the patches last week and I did not notice for a few days so that added some time to the IBD. That's on me.2) Lost power and the PC did not power on. Yes, that's on me again.But with those 2 points above, someone who DOES know better can still drag what should be a 1 week or less IBD into a 2 week fiasco. Can you picture a normal user dealing with this.Yes, we all know SSD, faster PC, and so on and this becomes a non issue. But someone just reusing an old PC is going to be miserable.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 16, 2023, 10:54:56 AM",
+      "body": "Quote from: DaveF on May 15, 2023, 08:27:55 PMStill working on this.But, it does show to me at lest that we as a group should probably have better instructions for people then just download core and let it sync the blockchain.1) Windows update forced a reboot with the patches last week and I did not notice for a few days so that added some time to the IBD. That's on me.2) Lost power and the PC did not power on. Yes, that's on me again.But with those 2 points above, someone who DOES know better can still drag what should be a 1 week or less IBD into a 2 week fiasco. Can you picture a normal user dealing with this.Yes, we all know SSD, faster PC, and so on and this becomes a non issue. But someone just reusing an old PC is going to be miserable.-DaveHmm. I get your point, however I don't understand what you mean by the underlined text.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "May 16, 2023, 03:02:01 PM",
+      "body": "Quote from: DaveF on May 15, 2023, 08:27:55 PMYes, we all know SSD, faster PC, and so on and this becomes a non issue. But someone just reusing an old PC is going to be miserable.You're right.Putting at least chainstate and the indexes onto a small SSD at least until IBD is over helps a lot.A good dbcache may also help.Using UTP instead of old generation wireless makes a difference too.But these are mentioned in Bitcoin Core topics, better than I could write them.I've done my IBD on my main computer, with SSD and the data disk as external. Then I've moved everything to the final position.PS. Initial sync of Fulcrum is also rather lengthy on HDD iirc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "May 17, 2023, 02:40:41 PM",
+      "body": "Quote from: NeuroticFish on May 16, 2023, 03:02:01 PMI've done my IBD on my main computer, with SSD and the data disk as external. Then I've moved everything to the final position.PS. Initial sync of Fulcrum is also rather lengthy on HDD iirc.Do you have any experience with Electrs and may you compare the performance? Because that article (https://www.sparrowwallet.com/docs/server-performance.html) made my think if no to try Fulcrum... But would I really feel it as a simple user?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "May 17, 2023, 02:49:50 PM",
+      "body": "Quote from: PawGo on May 17, 2023, 02:40:41 PMDo you have any experience with Electrs and may you compare the performance? Because that article (https://www.sparrowwallet.com/docs/server-performance.html) made my think if no to try Fulcrum... But would I really feel it as a simple user?It depends on how you plan to use it.If you start it up and forget about it, Fulcrum would be better since it can deliver better performance after it's synced.If you plan to start it up every now and then when you need it and don't mind if a wallet with many transactions is not lightning fast to receive, Electrs is better choice.In both cases Bitcoin core sync is not taken into account.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "May 17, 2023, 02:52:33 PM",
+      "body": "Quote from: NeuroticFish on May 17, 2023, 02:49:50 PMIt depends on how you plan to use it.If you start it up and forget about it, Fulcrum would be better since it can deliver better performance after it's synced.If you plan to start it up every now and then when you need it and don't mind if a wallet with many transactions is not lightning fast to receive, Electrs is better choice.The other question is if I really need it - I have electrs running and I really do not feel I must change it to something else. But you know - numbers in performance comparison are tempting.Maybe one day if I have nothing better to do...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

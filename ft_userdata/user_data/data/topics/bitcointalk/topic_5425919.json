@@ -1,0 +1,85 @@
+{
+  "id": "topic_5425919",
+  "title": "bkelly13",
+  "author": "bkelly13",
+  "created_time": "December 06, 2022, 03:32:12 AM",
+  "content": "As I read about Bitcoin and the keys used, a thought occurs to me.When the value of an example key is shown, it usually takes one of three forms:Hex looks like:  50863ad64a8  …Base58 looks like:  1AQXmgRZTXr …And on occasion binary looks like: 01010000100 …But these are all representations so we can view them.  Computers deal with binary but we cannot display the binary directly, just the ASCII representation of the number.  When our wallets begin with a private key, do they translate to binary or do they start by hashing the hex or Base58 ASCII representation of the number?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5425919",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "December 06, 2022, 03:52:23 AM",
+      "body": "Quote from: bkelly13 on December 06, 2022, 03:32:12 AMWhen our wallets begin with a private key, do they translate to binary or do they start by hashing the hex or Base58 ASCII representation of the number?It depends on what they want to do with it.If the key is generated to be stored in the wallet file, some wallets convert it to base58 (called WIF) and store it in the file. The SHA256 hash is only for computation of the checksum.If the wallet is supposed to use it to sign a transaction or compute the public key and the address, they'll have to convert it to a 256-bit integer which in most cases an array of unsigned 32-bit integers that would stored the bits for subsequent arithmetics. There is no hashing involved in ECC and only for checksum in base58 address in last step.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bkelly13",
+      "created_time": "December 06, 2022, 04:07:39 AMLast edit: December 06, 2022, 04:50:43 AM by bkelly13",
+      "body": "I have read that the SHA-256 and the RIPEMD-160 are both used to produce the public key, then the address.  Am I wrong about that?And from the reply I presume that the hex or base58 version is converted to binary before the conversion?EditI just looked at the only SHA-256 code I could find and its input is std:stringMaybe this is not what I am looking for.Do all the engineers that make wallets use math guys with Master's degrees?  Or can they find example code and detailed procedures that I cannot find?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "December 06, 2022, 05:24:34 AM",
+      "body": "Quote from: bkelly13 on December 06, 2022, 04:07:39 AMI have read that the SHA-256 and the RIPEMD-160 are both used to produce the public key, then the address.  Am I wrong about that?Quite, those are used when deriving the address from the public key, but not the public key itself.The public key is computed from the private key through \"EC point multiplication\" along \"secp256k1\" curve.Some resources that cover that topic:Book - Mastering Bitcoin: github.com/bitcoinbook/bitcoinbook | Chapter4: Keys, AddressesWebsite - Learnmeabitcoin: learnmeabitcoin.com/technical/ecdsa",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "December 06, 2022, 06:37:28 AM",
+      "body": "Quote from: bkelly13 on December 06, 2022, 04:07:39 AMDo all the engineers that make wallets use math guys with Master's degrees?  Or can they find example code and detailed procedures that I cannot find?There is no point in re-inventing the wheel unless doing that for fun or learning purposes. Engineers are people who transform improvised materials into functional products, but that doesn't mean those materials themselves can't be functional products. If you're building a simple application such as a bitcoin wallet and looking for certain functionality such as private key-public key conversion, you simply import a certain third-party library that provides this functionality. This library will have all the functions required for the calculation of a public key, and you don't even need to know how it works (of course if we assume that the code is not malicious and well-reviewed) because you're only interested in the fact that the result returned by a function is correct.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fennic",
+      "created_time": "December 06, 2022, 07:04:53 PM",
+      "body": "In my point of view, Bitcoin private key that is represented in many ways. These private keys 🗝️ are mostly in Hexadecimal numbers or they can be in 64 numbers long.This key can be in 0-9 or A-F characters long.Here is an example,E9873D79C6D87DC0FB6A5778633389_SAMPLE_PRIVATE_KEY_DO_NOT_IMPORT_F4453213303DA61 F20BD67FC233AA33262For more information: https://en.bitcoin.it/wiki/Private_key#:~:text=In%20Bitcoin%2C%20a%20private%20key,range%200%2D9%20or%20A%2DF.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 07, 2022, 04:19:16 AM",
+      "body": "Quote from: fennic on December 06, 2022, 07:04:53 PMIn my point of view, Bitcoin private key that is represented in many ways. These private keys 🗝️ are mostly in Hexadecimal numbers or they can be in 64 numbers long.This key can be in 0-9 or A-F characters long.Actually every wallet or key took I've seen uses WIFs which is base58 encoding and they may show the hexadecimal format on top of that but not as the main encoding.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "December 07, 2022, 10:29:17 AM",
+      "body": "Quote from: pooya87 on December 07, 2022, 04:19:16 AMActually every wallet or key took I've seen uses WIFs which is base58 encoding and they may show the hexadecimal format on top of that but not as the main encoding.In the Bitcoin world, the private keys we see are usually encoded with Base58Check, but in other applications they are typically encoded as base-64 after being encrypted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 08, 2022, 04:01:41 AM",
+      "body": "Quote from: odolvlobo on December 07, 2022, 10:29:17 AMQuote from: pooya87 on December 07, 2022, 04:19:16 AMActually every wallet or key took I've seen uses WIFs which is base58 encoding and they may show the hexadecimal format on top of that but not as the main encoding.In the Bitcoin world, the private keys we see are usually encoded with Base58Check, but in other applications they are typically encoded as base-64 after being encrypted.That's right, the storage encoding is usually different from the encoding used for representing the keys. But that too depends on the software. For example sometimes they just store the key (encrypted or unecrypted) as binary in a .dat file so there is no string encoding used there, or in case of Electrum if the key is not encrypted they would be stored in Base58 form.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "December 09, 2022, 12:02:55 AM",
+      "body": "As many have been suggesting, storage format and display format are entirely up to the designer of the software (wallet, exchange, casino, whatever).  It can be Hex, Base58, Binary, Octal, or something else entirely.  Doesn't really matter.When its time to actually USE those values though (such as generating a public key or signature via ECDSA), then it will be used in its binary representation of the value itself (NOT the binary representation of whatever ascii characters were used to display it to a user)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

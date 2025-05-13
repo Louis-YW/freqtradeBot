@@ -1,0 +1,125 @@
+{
+  "id": "topic_5465680",
+  "title": "Drawesome",
+  "author": "Drawesome",
+  "created_time": "September 05, 2023, 12:23:52 AM",
+  "content": "Hi everyone,I was looking into the Bitcoin Genesis block and noticed something interesting. The hash of the Genesis block, 0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f, has two more leading zeros in its hex representation. This means its difficulty is thousands of times higher than what was initially set.Any idea why?I'll print the next 3 block hashes to illustrate:Block0:0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26fBlock1:0x00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048Block2:0x000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbdBlock3:0x0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5465680",
+  "comments": [
+    {
+      "author": "BlackBoss_",
+      "created_time": "September 05, 2023, 01:13:45 AM",
+      "body": "Its difficulty is 1 as three block explorers below show. You can get the same information for Genesis block's difficulty with more Bitcoin block explorers.List of useful Bitcoin block explorershttps://blockchair.com/bitcoin/block/0https://www.blockchain.com/explorer/blocks/btc/0https://bitinfocharts.com/bitcoin/block/0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 05, 2023, 03:46:44 AM",
+      "body": "When mining, we are trying to find a block header hash that is smaller than or equal to the target. So the actual hash can be a little smaller than the target or a lot smaller. Since the hash we find is completely random, there is always a chance that it ends up being a lot smaller like what you've found.The difficulty doesn't change though. It is calculated based on the target.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 05, 2023, 05:14:47 AM",
+      "body": "QuoteAny idea why?Because Satoshi first set 40-bit difficulty for mainnet, and 20-bit for testnet. And then, he changed it from 40 to 32 bits. However, what was already mined, was good enough to be used, because if you have a block with 40 leading zeroes, then you can use it in code, where you need 32 zero bits, and it will work fine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 05, 2023, 05:28:11 AMLast edit: September 05, 2023, 06:28:01 AM by hosseinimr93",
+      "body": "The more leading zeros doesn't necessarily mean that the block has a bigger difficulty. Here is another example.Block number 805936: 000000000000000000047b9acd5e05dacd3e64d1feff262820fdc9a771ef799aBlock number 805937: 000000000000000000000082bd248e332be398836e10ea5de3ad796983f1ca56As you see, the hash of block number 805937 which was mined only 3 days ago has 3 more leading zeros than the hash of its previous block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 05, 2023, 06:13:37 AM",
+      "body": "And also, it would be ridiculously easy to mine the genesis block because the difficulty is so low, and since there were no ASICs or GPUs or things like that mining back then, it was just with a regular CPU that could be completed very fast. That's how regtest manages to work as well, by artificially setting the difficulty to a low-enough value to bootstrap the network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 05, 2023, 07:09:12 AM",
+      "body": "Quote from: vjudeu on September 05, 2023, 05:14:47 AMBecause Satoshi first set 40-bit difficulty for mainnet, and 20-bit for testnet. And then, he changed it from 40 to 32 bits.Do you have a source on that?The nBits field for both the genesis block and block 1 (and many subsequent blocks) is 0x1d00ffff. All of these blocks have the same target:Code:0x00000000ffff0000000000000000000000000000000000000000000000000000That same target is also hard coded in to Core: https://github.com/bitcoin/bitcoin/blob/6f03c45f6bb5a6edaa3051968b6a1ca4f84d2ccb/src/kernel/chainparams.cpp#L54. How could the genesis block have a lower target than the one specified?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 05, 2023, 07:17:12 AM",
+      "body": "Quoteit would be ridiculously easy to mine the genesis block because the difficulty is so lowNo, it was \"not so low\", when it comes to CPU mining. You can try to mine it on your CPU. Also, if you want to see, which other blocks could be mined, then you can try to move those testnet coins: 16fb1c624b3658c78630c39f1c33e8f3dbdb71373f33eb22c6abe4405c0815bc. As you can notice, one of those outputs were spent, those related to the Genesis Block: ca079dbe1bc20d1ead479416ba4859dde4f3623a114da773a48dcdfb96baab1d.You can spend other coins in a similar way, just change your extraNonce, and re-mine it with your CPU.QuoteDo you have a source on that?QuoteCode:///static const unsigned int MINPROOFOFWORK = 40; /// need to decide the right difficulty to start withstatic const unsigned int MINPROOFOFWORK = 20;  /// ridiculously easy for testingThis is what you can find in November 2008 version.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 05, 2023, 07:25:11 AM",
+      "body": "Quote from: vjudeu on September 05, 2023, 07:17:12 AMQuoteCode:///static const unsigned int MINPROOFOFWORK = 40; /// need to decide the right difficulty to start withstatic const unsigned int MINPROOFOFWORK = 20;  /// ridiculously easy for testingThis is what you can find in November 2008 version.Interesting, thanks!So although he did set the difficulty higher initially, this must have been changed prior to the genesis block being mined, since the new lower difficulty is already specified in the genesis block's block header. He couldn't have mined the genesis block and then changed the difficulty afterwards since that would change the nBits field, change the hash, and therefore invalidate the block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 05, 2023, 07:49:36 AM",
+      "body": "QuoteHe couldn't have mined the genesis block and then changed the difficulty afterwards since that would change the nBits field, change the hash, and therefore invalidate the block.I assume he updated the difficulty in the code that generated the block data, but not in the code that checked if some block header is acceptable or not. Because if you explore the testnet transaction I gave you, then you notice that you can find a lot of block headers with 32 leading zero bits, and not that much headers with 40 zero bits. That means, his code probably mined, and skipped all of those 32-bit blocks, and landed on the first 40-bit block he could find.See transaction 16fb1c624b3658c78630c39f1c33e8f3dbdb71373f33eb22c6abe4405c0815bc in testnet, and see, how many 40-bit block headers you have, and how many 32-bit block headers are there, with a different extraNonce. Also, garlonicon in the past did some re-mining, you can find in this post:Quote from: garlonicon on January 31, 2022, 07:33:58 PMQuoteGenesis block header hash is this (hex): 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f Note that it starts with 43 zero bits. Why? The block target difficulty was much lower (around 32 bits), so we can assume Satoshi did this on purpose.There is more: if you use a different extraNonce value of 1, 2, 3 and 4, you will notice that there are more headers starting with 40 zero bits or more:Code:extraNonce: 0x01, time: 0x495fab1d, offset: 0x0c, nonce: 0x3429da6f, hash: 00000000 00052ab4 78b6f8a2 dcaba26a 189361c9 030b5d56 c524cb7b ddf00d0cextraNonce: 0x02, time: 0x495fab20, offset: 0x09, nonce: 0x6f42bb66, hash: 00000000 00381808 e3b876ad 01e1262e 3a4ca528 72b1cc25 ca072fbd bc29d41fextraNonce: 0x03, time: 0x495fab1f, offset: 0x0a, nonce: 0xe3d4f1f1, hash: 00000000 00792af0 bf962bc1 d3622071 92709091 65ae7c7b f8589911 d8277fa5extraNonce: 0x04, time: 0x495fab29, offset: 0x00, nonce: 0x7c2bac1d, hash: 00000000 0019d668 9c085ae1 65831e93 4ff763ae 46a2a6c1 72b3f1b6 0a8ce26fIf you try to find just another 40-bit block hash with the same extraNonce, it will be more than 300 seconds away. Here, the offset of time is so close that it seems to be done on purpose.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 05, 2023, 08:07:13 AM",
+      "body": "Quote from: NotATether on September 05, 2023, 06:13:37 AMAnd also, it would be ridiculously easy to mine the genesis block because the difficulty is so low, and since there were no ASICs or GPUs or things like that mining back then, it was just with a regular CPU that could be completed very fast. That's how regtest manages to work as well, by artificially setting the difficulty to a low-enough value to bootstrap the network.A regular CPU is already slow and they were even slower back in 2008 compared to today with all the core count rises and the parallelism improvements. It also can not be compared with RegTest because the PoW limit of RegTest is far less than the minimum on MainNet and TestNet.7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff vs 00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 05, 2023, 12:00:39 PM",
+      "body": "Also, if you think that CPU mining is easy, then tell me, why signet difficulty is so much lower than the mainnet difficulty? Compare those two targets:QuoteCode:consensus.powLimit = uint256S(\"00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff\"); //mainnet//...consensus.powLimit = uint256S(\"00000377ae000000000000000000000000000000000000000000000000000000\"); //signetSignet is mainly mined on CPUs, and as you can see, the minimal mainnet difficulty was too high for those people, that created signet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Drawesome",
+      "created_time": "September 05, 2023, 04:06:51 PM",
+      "body": "Quote from: vjudeu on September 05, 2023, 05:14:47 AMQuoteAny idea why?Because Satoshi first set 40-bit difficulty for mainnet, and 20-bit for testnet. And then, he changed it from 40 to 32 bits. However, what was already mined, was good enough to be used, because if you have a block with 40 leading zeroes, then you can use it in code, where you need 32 zero bits, and it will work fine.Thank you very much for the response and the other contributions to the thread. It has clarified a lot for me",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "September 05, 2023, 05:44:00 PM",
+      "body": "Quote from: vjudeu on September 05, 2023, 12:00:39 PMSignet is mainly mined on CPUs, and as you can see, the minimal mainnet difficulty was too high for those people, that created signet.The signet miner is implemented in Python which is way slower than the original built in miner. Also Signet doesn't rely on the PoW so it's difficulty can be much lower.IIRC even at difficulty 1, a naive single threaded mining program does still take quite a bit longer than 10 minutes. The miner in the original client was definitely naive and single threaded, so there was a lot of easy optimizations that could be done to get significant speed up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "September 05, 2023, 08:04:17 PM",
+      "body": "Quote from: vjudeu on September 05, 2023, 05:14:47 AMQuoteAny idea why?Because Satoshi first set 40-bit difficulty for mainnet, and 20-bit for testnet. And then, he changed it from 40 to 32 bits. However, what was already mined, was good enough to be used, because if you have a block with 40 leading zeroes, then you can use it in code, where you need 32 zero bits, and it will work fine.Wow, mystery solved.  It's a much more reasonable explanation than \"Satoshi did it just to show off\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

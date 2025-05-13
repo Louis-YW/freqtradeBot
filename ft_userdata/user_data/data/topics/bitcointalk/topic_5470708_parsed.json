@@ -1,0 +1,165 @@
+{
+  "id": "topic_5470708",
+  "title": "ElDalmatino",
+  "author": "ElDalmatino",
+  "created_time": "October 17, 2023, 05:11:18 PM",
+  "content": "Hi i have found this script but it seems slow, what is the way to make it faster, for education only  Code:from bit import Keyfrom bit.format import bytes_to_wiffrom tqdm import tqdmi = 1target = 1000000with open(\"wif.txt\", \"w\") as f, open(\"add.txt\", \"w\") as addr_file, open(\"target.txt\", \"r\") as b_file:    b_addresses = set(b_file.read().splitlines())    pbar = tqdm(total=(target - i + 1))    while i <= target:        key1 = Key.from_int(i)        wif = bytes_to_wif(key1.to_bytes(), compressed=False)        wif2 = bytes_to_wif(key1.to_bytes(), compressed=True)        key2 = Key(wif)        key1 == key2        f.write(wif + \"\\n\")        f.write(wif2 + \"\\n\")        address = key1.address        addr_file.write(address + \"\\n\")        if address in b_addresses:            print(\"Found matching address:\", address)        i += 1        pbar.update(1)    pbar.close()100%|██████████████████████████████████████████████████████████████████████| 1000000/1000000 [02:44<00:00, 6092.40it/s]This is the Result after testing, i read and hear it is possible to generate 1m in under 20sec but i can´t figure out how !Maybe somebody can help, only for personal education",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5470708",
+  "comments": [
+    {
+      "author": "albert0bsd",
+      "created_time": "October 17, 2023, 05:24:23 PM",
+      "body": "TBH with you if you want speed, you should start changing of language...There are a lot of changes and short cuts than can be implemented to generate that amount of keys and even more in less than a second.- Avoid to conver Integers to WIF that step isn't necessary at all. this mean (avoid bytes_to_wif )- Avoid to use Integer to address each time (in your case avoid to do key (wif) to address each time)- As i can see you are calculating Keys in sequential order, this can be faster if do only Point Addition in each step of the cycle (This is at least 32 times faster than your \"key.address\" )- Avoid search for addres directly insteat of search by address you need to do search by RMD160 hash, this avoid to conver each of those hash160 to address in each step of the cycle.- Add endomorphism, this can search keys over all the curve and increment your speed by 2 o 4 times depending of your implementation.Basicaly you need to stop using those API and slow languages. And starting to do almost all from scrash to avoid repetitive steps in each cycleDoing this a laptop can search some 20 Million keys per second with only CPU. A high end Computer can seach 100 Million keys/s with only CPU.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "October 17, 2023, 05:31:47 PM",
+      "body": "1) use Rust or C++ for computations2) use Cython, Numba, PyPy to compile Python into C3) use multiprocessong module for parallelized computations4) wait for Python 3.12 with subinterpreter feature5) avoid converting strings to bytes because this slows down your program",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "October 17, 2023, 05:37:06 PM",
+      "body": "I installed Python 3.12 btw. thank you for reply, i can a bit of python it´s the only language i can, this post https://bitcointalk.org/index.php?topic=5432068.0 gave my the idee to try something, but seems its not good enough.When i try the code from the post, my breaking wall is every time the \"import secp256k1\", but i read on the net others have also the problem installing it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 17, 2023, 05:40:24 PM",
+      "body": "The biggest bottleneck here is the IO inside the loop. Regardless of the programming language and whatever else you do, this will end up still being slow because each iteration it keeps writing something to the disk (the WIFs). Either skip that altogether (write to disk if it matches) or write them to memory (eg. in an array) then dump on disk once at the end of the loop specially since it is a small loop with a million items (~50 MB memory).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 17, 2023, 06:04:02 PM",
+      "body": "Quote from: ElDalmatino on October 17, 2023, 05:37:06 PMI installed Python 3.12 btw. thank you for reply, i can a bit of python it´s the only language i can, this post https://bitcointalk.org/index.php?topic=5432068.0 gave my the idee to try something, but seems its not good enough.When i try the code from the post, my breaking wall is every time the \"import secp256k1\", but i read on the net others have also the problem installing it.Just download everything manually from this link  https://github.com/iceland2k14/secp256k1?search=1 and place them in the same folder. Btw your other script calculating time differences, didn't work, pycoin libraries were all broken. Now I have to rewrite everything. (My assistant will do the rewriting).I'd like to suggest not to waste your time with WIFs, but for education, you should also try    WIFsolverCuda.I have noticed when I ask for code help, only 1 or 2 reply, but for \"strangers\" everyone becomes a home school teacher. (It was sarcasm)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "October 17, 2023, 06:08:08 PM",
+      "body": "Ok i try some changes, it makes it 4 sec faster, but i think my python knowledge is to small for change moreCode:from bit import Keyfrom bit.format import bytes_to_wiffrom tqdm import tqdmi = 1target = 1000000wif_list = []addr_list = []matching_addresses = []with open(\"target.txt\", \"r\") as b_file:    b_addresses = set(b_file.read().splitlines())pbar = tqdm(total=(target - i + 1))while i <= target:    key1 = Key.from_int(i)    wif = bytes_to_wif(key1.to_bytes(), compressed=False)    wif2 = bytes_to_wif(key1.to_bytes(), compressed=True)    key2 = Key(wif)    key1 == key2    wif_list.append(wif)    wif_list.append(wif2)    address = key1.address    addr_list.append(address)    if address in b_addresses:        matching_addresses.append(address)    i += 1    pbar.update(1)pbar.close()# Write to disk after the loopwith open(\"wif.txt\", \"w\") as f, open(\"add.txt\", \"w\") as addr_file:    f.write(\"\\n\".join(wif_list) + \"\\n\")    addr_file.write(\"\\n\".join(addr_list) + \"\\n\")for matching_address in matching_addresses:    print(\"Found matching address:\", matching_address)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "October 17, 2023, 06:17:38 PM",
+      "body": "Quote from: digaran on October 17, 2023, 06:04:02 PMQuote from: ElDalmatino on October 17, 2023, 05:37:06 PMI installed Python 3.12 btw. thank you for reply, i can a bit of python it´s the only language i can, this post https://bitcointalk.org/index.php?topic=5432068.0 gave my the idee to try something, but seems its not good enough.When i try the code from the post, my breaking wall is every time the \"import secp256k1\", but i read on the net others have also the problem installing it.Just download everything manually from this link  https://github.com/iceland2k14/secp256k1?search=1 and place them in the same folder. Btw your other script calculating time differences, didn't work, pycoin libraries were all broken. Now I have to rewrite everything. (My assistant will do the rewriting).I'd like to suggest not to waste your time with WIFs, but for education, you should also try    WIFsolverCuda.I have noticed when I ask for code help, only 1 or 2 reply, but for \"strangers\" everyone becomes a home school teacher. (It was sarcasm) How do you mean place in the same folder, can you explain it, english is not my main language, i can write a bit and understand it, but please explain it a bit more.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "October 17, 2023, 08:02:20 PM",
+      "body": "As already mentioned there are few things that can be improved. Overall you should consider using bit/tqdm as libraries. Instead of that you should look for more performant libraries or consider lower-level libraries. Checking 'if address in b_addresses' inside the loop may slow down the script since 'b_addresses' is growing continuously.Code:key1 == key2 doesn't seem to be do anything useful, just remove that to keep the script clean as possible. Code:wif = bytes_to_wif(key1.to_bytes(), compressed=False)    wif2 = bytes_to_wif(key1.to_bytes(), compressed=True)Try to avoid to use the same functions within the loop. You can store them in variables outside the loop. Code:wif_list.append(wif)    wif_list.append(wif2)Same for that. You can use 'wif_list.extend([wif, wif2])' for that. The script might be slightly faster if you are using a for-loop instead of using a while-loop. You might want to test that out:Code:for variable in range(start, stop, step):",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "October 17, 2023, 08:22:57 PM",
+      "body": "Quote from: seek3r on October 17, 2023, 08:02:20 PMAs already mentioned there are few things that can be improved. Overall you should consider using bit/tqdm as libraries. Instead of that you should look for more performant libraries or consider lower-level libraries. Checking 'if address in b_addresses' inside the loop may slow down the script since 'b_addresses' is growing continuously.Code:key1 == key2 doesn't seem to be do anything useful, just remove that to keep the script clean as possible. Code:wif = bytes_to_wif(key1.to_bytes(), compressed=False)    wif2 = bytes_to_wif(key1.to_bytes(), compressed=True)Try to avoid to use the same functions within the loop. You can store them in variables outside the loop. Code:wif_list.append(wif)    wif_list.append(wif2)Same for that. You can use 'wif_list.extend([wif, wif2])' for that. The script might be slightly faster if you are using a for-loop instead of using a while-loop. You might want to test that out:Code:for variable in range(start, stop, step):OK i try my best and this is the result ... more than happy for now, BIG THX100%|█████████████████████████████████████████████████████████████████████| 1000000/1000000 [01:07<00:00, 14767.12it/s]also i show the changes that i make, what is in my skills till nowCode:from bit import Keyfrom bit.format import bytes_to_wiffrom tqdm import tqdmi = 1target = 1000000wif_list = []addr_list = []matching_addresses = []with open(\"target.txt\", \"r\") as b_file:    b_addresses = set(b_file.read().splitlines())pbar = tqdm(total=(target - i + 1))# Calculate WIFs outside the loopwif_calculator = bytes_to_wif(Key.from_int(i).to_bytes())wif_compressed_calculator = bytes_to_wif(Key.from_int(i).to_bytes(), compressed=True)while i <= target:    key1 = Key.from_int(i)    # Use the precalculated WIFs    wif = wif_calculator    wif2 = wif_compressed_calculator    wif_list.extend([wif, wif2])    address = key1.address    addr_list.append(address)    if address in b_addresses:        matching_addresses.append(address)    i += 1    pbar.update(1)pbar.close()# Write to disk after the loopwith open(\"wif.txt\", \"w\") as f, open(\"add.txt\", \"w\") as addr_file:    f.write(\"\\n\".join(wif_list) + \"\\n\")    addr_file.write(\"\\n\".join(addr_list) + \"\\n\")for matching_address in matching_addresses:    print(\"Found matching address:\", matching_address)learning by testing and be educated from legends",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 17, 2023, 08:33:22 PM",
+      "body": "Quote from: ElDalmatino on October 17, 2023, 06:17:38 PMHow do you mean place in the same folder, can you explain it, english is not my main language, i can write a bit and understand it, but please explain it a bit more.Where do you keep your python scripts? For example, desktop \"python scripts\" folder (directory), after you downloaded secp256k1 ice files, paste them in the same folder(directory) you keep and run your scripts from. Then you can easily import it as ice.Ps, care to share what you are trying to achieve using WIFs?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "October 17, 2023, 08:48:21 PM",
+      "body": "Quote from: digaran on October 17, 2023, 08:33:22 PMPs, care to share what you are trying to achieve using WIFs?If you read all his code he is only scanning for some address, exactly the same thing that we do in puzzles.OP is using scalar multiplication in each cycle that is slow I already told him that searching for publickeys is up to 32 times faster, but he doesn't care.OP a very good optimized code in CPU can scan some 20 million keys per second. Try to reduce redundant steps in each cycle you are still some steps behind.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "October 17, 2023, 09:12:03 PM",
+      "body": "Quote from: albert0bsd on October 17, 2023, 08:48:21 PMQuote from: digaran on October 17, 2023, 08:33:22 PMPs, care to share what you are trying to achieve using WIFs?If you read all his code he is only scanning for some address, exactly the same thing that we do in puzzles.OP is using scalar multiplication in each cycle that is slow I already told him that searching for publickeys is up to 32 times faster, but he doesn't care.OP a very good optimized code in CPU can scan some 20 million keys per second. Try to reduce redundant steps in each cycle you are still some steps behind.I really care what is told here, but my python knowledge is bottom i think, \"I already told him that searching for publickeys is up to 32 times faster, but he doesn't care.\", and maybe i dont understand that part sry.What do you mean with publickeys, i have a target.txt, and yes i am also a 2015 \" Have a PC, have small kids that need dad when he make pictures of his pk, yes do some bitcoins in 3 addresses, make a picture of the pk ( Sony Xperia - now i know picture backup is important, my bad ) and write the pub address to a paper what i still have, so the target.txt in this script are my 2 bitcoin addresses ( one pk i wrote at the back of the paper where the pub addresses are ). I know it´s the sand of the Universe to find my address in generating random, but what i have to loose, a pc that is running all time anyway.OK now i have let my pants down ... that´s why i try to do this script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "October 17, 2023, 09:21:52 PMLast edit: October 17, 2023, 09:39:58 PM by albert0bsd",
+      "body": "Quote from: ElDalmatino on October 17, 2023, 09:12:03 PMWhat do you mean with publickeysThe process that is made to generate address from privatekeys is something like that:Code:private key --(ECDSA funtions)--> Public key --(Double Hash functions)--> Hash rmd160 --(Base58 Encode)--> AddressThe thing that you I told you to cut is the private key part, and the las Base58 Encode to an address.Private key to Publickey is necessary Only ONCE, but once that you already have the starting public key you can do Public key addition incrementing the public key in One in each cycle (This part is almost 32 times faster)Also you can remove the last step Base58 Encode Comparing only the RMD160 hash againts other rmd hashes, do to that you need to conver all your target addresses in to hashed (Again this process only ONCE)So, the process each cycle will look like:Code:(Public key addtion) New Public key --(Double Hash functions)--> Hash rmd160By doing the previous recomendations your program may can run at least x35 times faster.Please read:  https://www.oreilly.com/library/view/mastering-bitcoin/9781491902639/ch04.html How to do that on python I really don't know, I only did that in C",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "October 17, 2023, 09:27:05 PM",
+      "body": "OK, i will try to see what i can do, thank you !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 17, 2023, 09:42:24 PM",
+      "body": "I don't know if I have discussed this before or not, here it goes anyways :Having 42 characters out of 51 WIF chars including checksum, means we have to brute force 9 missing chars, correct? What if I tell you by knowing the checksum, there is a way to find the key much faster than brute forcing 9 missing characters?@OP, if you are interested to learn about the secrets of WIF/hex keys, try finding keys with identical last 8 characters in hex (checksum) in different ranges, you will find that some base58 characters only appear in certain ranges as checksum while their checksum in hex is identical.Anyways, since you are trying to code things, just try iterating through hexadecimal keys without even involving EC operations, you just need to pause and convert the WIF to address if you find a checksum match.Example :Code:0x80 4000000000000000000000000000000000000000000000000000000000000001  \"7f2e39b1\"You already have checksum, so you don't touch that, instead you increment the private key and only do base58 encode and whenever you see \"4FYxLG\" at the end of your WIF, you would then convert it to address to check for match with target, if no match just drop it and keep iterating.Using permutation you can skip at least 50% of possible keys and only look for right candidates instead of looking at all the keys one by one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "October 17, 2023, 09:46:42 PM",
+      "body": "Great now i must find somebody, who can translate this in my native language, so i really understand it, but it seems a better way, i thank you from my hart !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joniboini",
+      "created_time": "October 18, 2023, 01:45:39 AM",
+      "body": "Quote from: ElDalmatino on October 17, 2023, 09:46:42 PMGreat now i must find somebody, who can translate this in my native language, so i really understand it, but it seems a better way, i thank you from my hart !Just FYI, we have local boards where people speak their native language. If you can find your native language there, you can make a thread there. Alternatively, you can also tell us your native language or language that you know the most so that somebody who knows it can translate it for you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "October 18, 2023, 03:22:25 AM",
+      "body": "Quote from: joniboini on October 18, 2023, 01:45:39 AMQuote from: ElDalmatino on October 17, 2023, 09:46:42 PMGreat now i must find somebody, who can translate this in my native language, so i really understand it, but it seems a better way, i thank you from my hart !Just FYI, we have local boards where people speak their native language. If you can find your native language there, you can make a thread there. Alternatively, you can also tell us your native language or language that you know the most so that somebody who knows it can translate it for you.Ex YU mean Balkan all Language and German ... Thats my range of better understanding than english. Thank you for the TIP !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "October 18, 2023, 07:11:59 AM",
+      "body": "It is not a complete version, but it takes around 30 seconds to calculate 1000000 WIFs and addresses:Code:from bit import Keyfrom bit.format import bytes_to_wiffrom tqdm import tqdmimport itertoolsimport concurrent.futuresimport timei_list = range(1, 1000000)matching_addresses = []def batched(iterable, n):    if n < 1:        raise ValueError('n must be at least one')    it = iter(iterable)    while batch := tuple(itertools.islice(it, n)):        yield batchwith open(\"target.txt\", \"r\") as b_file:    b_addresses = set(b_file.readlines())def create_address(it):    wif_list = []    addr_list = []    for i in it:        key1 = Key.from_int(i)        wif = bytes_to_wif(key1.to_bytes(), compressed=False)        wif2 = bytes_to_wif(key1.to_bytes(), compressed=True)        wif_list.extend([wif + '\\n', wif2 + '\\n'])        address = key1.address        addr_list.append(address + '\\n')        if address in b_addresses:            matching_addresses.append(address)    with open(\"wif.txt\", \"a\") as f, open(\"add.txt\", \"a\") as addr_file:        f.writelines(wif_list)        addr_file.writelines(addr_list)t1 = time.perf_counter()with concurrent.futures.ProcessPoolExecutor() as executor:    executor.map(create_address, batched(i_list, 100))for matching_address in matching_addresses:    print(\"Found matching address:\", matching_address)t2 = time.perf_counter()print('Elapsed time:', t2-t1)I also did not implement tqdm progress bar because it is a little bit tricky to do when it comes to multiproccessing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

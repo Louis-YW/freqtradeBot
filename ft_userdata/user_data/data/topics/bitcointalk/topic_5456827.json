@@ -1,0 +1,101 @@
+{
+  "id": "topic_5456827",
+  "title": "powvex",
+  "author": "powvex",
+  "created_time": "June 19, 2023, 07:28:31 AM",
+  "content": "Bitcoin mining consist of finding a nonce to add to previous block header and after 2x sha256 resulting in number lower than target.Now my questis, where can I find previous mined block headers and solution nonce? Something that I check validity by myself.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5456827",
+  "comments": [
+    {
+      "author": "mocacinno",
+      "created_time": "June 19, 2023, 07:46:19 AMLast edit: June 19, 2023, 07:57:34 AM by mocacinno",
+      "body": "Quote from: powvex on June 19, 2023, 07:28:31 AMBitcoin mining consist of finding a nonce to add to previous block header and after 2x sha256 resulting in number lower than target.Now my questis, where can I find previous mined block headers and solution nonce? Something that I check validity by myself.My server is gone, so i'm no longer running bitcoin core, but isn't there a \"getblockheader\" parameter in bitcoin-cli?EDIT: i'm currently using getblock.io (which is free for personal use)... I tested the getblockheader parameter, and it seems to work:Code:curl --location 'https://btc.getblock.io/mainnet/' \\--header 'x-api-key: my_api_key' \\--header 'Content-Type: application/json' \\--data ' {    \"jsonrpc\": \"2.0\",    \"method\": \"getblockheader\",    \"params\": [        \"00000000000000000003db936a59e25354d7c9ad0b1922ae9430cf2643d0966f\",        true    ],    \"id\": \"getblock.io\"}'In reality, you'll have to combine this with the \"getbestblockhash\" parameter in order to get the hash of the block @ the tip of the chain... When you have this hash, plug it into the bitcoin-cli getblockheader command to get things like the merkleroot, time, nonce, bits,...If you're not running a reference implementation of the node software (bitcoin core), and you don't want to use getblock.io, there's always https://www.chainquery.com/bitcoin-cli/ aswell (which works without signing up, but you cannot automate using chainquery)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "June 19, 2023, 07:51:29 AM",
+      "body": "You can see the nonce and information contained in a block header on some blockchain explorers, or if you are a node runner, or a miner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 19, 2023, 08:01:08 AM",
+      "body": "Quote from: powvex on June 19, 2023, 07:28:31 AMNow my questis, where can I find previous mined block headers and solution nonce? Something that I check validity by myself.Depends on how you mean to check it yourself. There are two interpretations. The easy way: run bitcoin-cli getblockheader <BLOCK_HASH>, and check yourself the block header (with nonce included). You can also run bitcoin-cli getblock <BLOCK_HASH> 0 to get the raw block data (the zero indicates that it will return hexadecimal string). And the hard way: write the functions that perform block header validation from scratch.I think you mean the former. Indicative executions for block=1:Code:$ bitcoin-cli getblockheader 00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048{  \"hash\": \"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",  \"confirmations\": 795025,  \"height\": 1,  \"version\": 1,  \"versionHex\": \"00000001\",  \"merkleroot\": \"0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098\",  \"time\": 1231469665,  \"mediantime\": 1231469665,  \"nonce\": 2573394689,  \"bits\": \"1d00ffff\",  \"difficulty\": 1,  \"chainwork\": \"0000000000000000000000000000000000000000000000000000000200020002\",  \"nTx\": 1,  \"previousblockhash\": \"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\",  \"nextblockhash\": \"000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd\"}Code:$ bitcoin-cli getblock 00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048 0010000006fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000982051fd1e4ba744bbbe680e1fee14677ba1a3c3540bf7b1cdb606e857233e0e61bc6649ffff001d01e362990101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704ffff001d0104ffffffff0100f2052a0100000043410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac00000000",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "June 19, 2023, 08:19:33 AM",
+      "body": "Quote from: powvex on June 19, 2023, 07:28:31 AMBitcoin mining consist of finding a nonce to add to previous block header and after 2x sha256 resulting in number lower than target.Now my questis, where can I find previous mined block headers and solution nonce? Something that I check validity by myself.There are innumerable ways to retrieve information about Bitcoin blocks, including previous block hash. If you're not running your own full node software, you can utilize some external blockchain explorer API to fulfill your needs. Of course, you may also need some additional software to massage the data you get from APIs because not all of them have advanced filtering to extract only the required data. For example, here is a simple script in Python for extracting block hash from specific block height:Code:#!/usr/bin/env python3# a small script showing on of the ways to calculate bitcoin block header hash# Reference: https://en.bitcoin.it/wiki/Block_hashing_algorithmimport hashlibimport requestsheight = '784952'response = requests.get(    f'https://api.blockchair.com/bitcoin/raw/block/{height}')if response.status_code == 200:    block = response.json()['data'][height]['decoded_raw_block']    block_dict = {        'version': int(block['versionHex'], 16).to_bytes(4, 'little'),        'prev_block': int(block['previousblockhash'], 16).to_bytes(32, 'little'),        'merkle_root': int(block['merkleroot'], 16).to_bytes(32, 'little'),        'time': int(block['time']).to_bytes(4, 'little'),        'bits': int(block['bits'], 16).to_bytes(4, 'little'),        'nonce': int(block['nonce']).to_bytes(4, 'little')    }    header_bin = b''.join(chunk for chunk in block_dict.values())    header_hash = hashlib.sha256(hashlib.sha256(header_bin).digest()).digest()[::-1].hex()    print(header_hash)You can modify it to use some other endpopoint, for example https://chain.api.btc.com/v3/block/latest for retrieving only latest block hashes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "powvex",
+      "created_time": "June 19, 2023, 09:06:37 AM",
+      "body": "Thanks guys for prompt responses. I need those info for my own research on btc blockchain. I’ll test your ideas and will get back here for more questions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "powvex",
+      "created_time": "June 20, 2023, 07:43:39 AM",
+      "body": "Quote from: witcher_sense on June 19, 2023, 08:19:33 AMThere are innumerable ways to retrieve information about Bitcoin blocks, including previous block hash. If you're not running your own full node software, you can utilize some external blockchain explorer API to fulfill your needs. Of course, you may also need some additional software to massage the data you get from APIs because not all of them have advanced filtering to extract only the required data. For example, here is a simple script in Python for extracting block hash from specific block height:thanks for the answer.my question is, the nonce in header is the start nonce for mining I assume, right? where can I find exact nonce used to solve the target requirement for that block?also when miner increment nonce, it should be placed in header and header hash recalculatet, right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "June 20, 2023, 08:05:49 AM",
+      "body": "Quote from: powvex on June 20, 2023, 07:43:39 AMQuote from: witcher_sense on June 19, 2023, 08:19:33 AMThere are innumerable ways to retrieve information about Bitcoin blocks, including previous block hash. If you're not running your own full node software, you can utilize some external blockchain explorer API to fulfill your needs. Of course, you may also need some additional software to massage the data you get from APIs because not all of them have advanced filtering to extract only the required data. For example, here is a simple script in Python for extracting block hash from specific block height:thanks for the answer.my question is, the nonce in header is the start nonce for mining I assume, right? where can I find exact nonce used to solve the target requirement for that block?also when miner increment nonce, it should be placed in header and header hash recalculatet, right?no, that should be the actual nonce... If you would re-create the header using this info and do a sha256d hash of said header, the outcome should be under the current target... Starting nonces are not included into the block header when it gets broadcasted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "powvex",
+      "created_time": "June 20, 2023, 08:28:48 AM",
+      "body": "Quote from: mocacinno on June 20, 2023, 08:05:49 AMQuote from: powvex on June 20, 2023, 07:43:39 AMQuote from: witcher_sense on June 19, 2023, 08:19:33 AMThere are innumerable ways to retrieve information about Bitcoin blocks, including previous block hash. If you're not running your own full node software, you can utilize some external blockchain explorer API to fulfill your needs. Of course, you may also need some additional software to massage the data you get from APIs because not all of them have advanced filtering to extract only the required data. For example, here is a simple script in Python for extracting block hash from specific block height:thanks for the answer.my question is, the nonce in header is the start nonce for mining I assume, right? where can I find exact nonce used to solve the target requirement for that block?also when miner increment nonce, it should be placed in header and header hash recalculatet, right?no, that should be the actual nonce... If you would re-create the header using this info and do a sha256d hash of said header, the outcome should be under the current target... Starting nonces are not included into the block header when it gets broadcasted.but for example look at latest headers:https://explorer.btc.com/btc/block/795162nonce is: 0x2891b1c2 that is required just under 1TH that easily just a miner will do it under a second. Am I missing something?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "June 20, 2023, 08:50:35 AM",
+      "body": "Quote from: powvex on June 20, 2023, 08:28:48 AMbut for example look at latest headers:https://explorer.btc.com/btc/block/795162nonce is: 0x2891b1c2 that is required just under 1TH that easily just a miner will do it under a second. Am I missing something?By using modern hardware, you can quickly run out of possible nonce values, but this is not the only data that can be changed to calculate a block hash. When miners have no additional values to create a hash from, they can slightly modify a timestamp or change the ordering of transactions or transactions themselves. Once they changed the value, they start increasing nonce and change block data again and again until they find a hash below the target or until they lost the current competition. The number of possible combinations is so vast that it takes minutes to find a correct value. The number you see in a successful block is just one of the possible solutions: combinations of nonce+timestamp+merkle root.See this answer for additional information: https://bitcoin.stackexchange.com/questions/67771/why-the-nonce-is-difficult-to-find-in-bitcoin",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "June 20, 2023, 08:29:07 PM",
+      "body": "Quote from: powvex on June 19, 2023, 07:28:31 AMBitcoin mining consist of finding a nonce to add to previous block header and after 2x sha256 resulting in number lower than target.The nonce is not added to the previous block header.Quote from: powvex on June 20, 2023, 07:43:39 AMmy question is, the nonce in header is the start nonce for mining I assume, right? where can I find exact nonce used to solve the target requirement for that block?also when miner increment nonce, it should be placed in header and header hash recalculatet, right?The miner varies the nonce (as well as other values in the header) until the hash of the header is less than or equal to the target value. The nonce in a block's header is that nonce.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 22, 2023, 03:29:13 PM",
+      "body": "Quote from: powvex on June 20, 2023, 08:28:48 AMnonce is: 0x2891b1c2 that is required just under 1TH that easily just a miner will do it under a second. Am I missing something?They can indeed reach even the maximum nonce value in a second.But there's something called an \"extra nonce\" which can be anything in the block header that could be changed after the maximum nonce in reached.Each miner has their unique or simply a widely-used method of getting extra nonce,For example, some pools are changing a value in their coinbase transaction's OP_Return output which will produce a different \"merkle root hash\".With that they can restart the nonce since there's something's changed in the block header.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

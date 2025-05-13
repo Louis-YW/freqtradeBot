@@ -1,0 +1,61 @@
+{
+  "id": "topic_5464450",
+  "title": "cygan",
+  "author": "cygan",
+  "created_time": "August 24, 2023, 04:55:55 PM",
+  "content": "since there are no current threads on this topic, i would like to open this one and start a discussion and info round about the topic 'witness discount' also called 'segwit discount'to illustrate the whole thing to understand it perhaps easier i also post these 4 slidesi also found the following articles on this topic:QuoteWitness scripts are “discounted” because their cost to the network is less than the rest of the transaction data. Unlike outputs they do not go into the UTXO set, and do not need to be maintained on disk or in RAM for fast processing of future transactions.https://medium.com/@SegWit.co/what-is-behind-the-segwit-discount-988f29dc1edfQuoteWitness data is considered part of a transaction, and is stored alongside each transaction by all Bitcoin nodes who implemented the SegWit upgrade. However, witness data receives a discount when the weight of a transaction is calculated. While a regular byte of a transaction is equivalent to 4 weight units, a byte of witness data weighs only 1 weight unit. This discount makes spending SegWit outputs cheaper than legacy outputs. It also effectively increases the maximum size of blocks from 1MB to 4MB.https://river.com/learn/terms/w/witness",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464450",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "August 25, 2023, 04:06:50 AM",
+      "body": "QuoteWitness scripts are “discounted” because their cost to the network is less than the rest of the transaction data. Unlike outputs they do not go into the UTXO set, and do not need to be maintained on disk or in RAM for fast processing of future transactions.That's a weird paragraph specially the last part. The O in UTXO stands for output so obviously things like witness, script sig, transaction version, locktime, input count don't go into it! This is not a witness specific thing! And what is \"fast processing of future transactions\"? As for the slides, again the misleading word \"separate\" was used and the accompanying image is also misleading (the middle slide in second row). It gives the impression that the signature is removed and placed somewhere else \"outside\" the transaction whereas the signature is still part of the transaction and is mandatory.The [ver][input_count][outpoint][scriptsig][output_count][amount][scriptpub][locktime]becomes[ver][flag][input_count][outpoint][][output_count][amount][scriptpub][witness][locktime]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 25, 2023, 04:52:43 AM",
+      "body": "Quote from: pooya87 on August 25, 2023, 04:06:50 AMThe [ver][input_count][outpoint][scriptsig][output_count][amount][scriptpub][locktime]becomes[ver][flag][input_count][outpoint][][output_count][amount][scriptpub][witness][locktime]I'm pretty sure that the outpoint and scriptsig in your depiction of a non-Segwit transaction is supposed to be one per input (Given that Witness is an array of one stack per input itself). It would look more accurate if you showed an [inputs] and [outputs] and then placed those sub-fields in the appropriate place.Similarly amount and scriptpub are also one per input, but I'm sure you already know all of these.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 25, 2023, 08:20:36 AM",
+      "body": "If we want to dot all the i's and cross all the t's a transaction looks like the image below. The left side is one without witness and the right side is one with 3 inputs two of which have witness (the first and the last) with the middle one being legacy (no witness). The empty boxes are 0x00 in the serialized transaction.The boxes with doted lines aren't a separate field in the serialized transaction, they are there to indicate what the group is.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "August 26, 2023, 10:22:19 AM",
+      "body": "Few thoughts,1. On comic row 3, column 2 it's said \"No, they are restricted by Block weight\". I guess nobody use term \"discount factor\"[1] these days which IMO more accurate since the factor determine maximum block weight and weight calculation of TX/block.2. For notice 2, this block serve as good example https://mempool.space/block/0000000000000000000515e202c8ae73c8155fc472422d7593af87aa74f2cf3d.[1] https://medium.com/segwit-co/why-a-discount-factor-of-4-why-not-2-or-8-bbcebe91721e",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d5000",
+      "created_time": "August 27, 2023, 06:41:49 PMLast edit: August 27, 2023, 09:19:03 PM by d5000",
+      "body": "It's interesting to think a bit about the \"why\" question, and what could it mean for the future.ETFBitcoin's linked article for example (very interesting, a bit technical but I think I understood it) argues that if the witness discount was more than 0.25 (4x) then the risk that the network couldn't handle the blocks if the users try to pack arbitrary data into the witness would grow disproportionately. For example, a 0,125 (8x) discount would mean up to 8MB blocks.We learnt in the recent months that Ordinals inscriptions exactly do what the Segwit creators feared: they pack arbitrary data into the witness and max out the block size (the largest block was 3,9 MB, i.e. almost exactly the maximum Segwit block size).However, there are also potentially useful use cases of \"arbitrary data in the witness\". For example, we could think about rollups using this space to maximize transaction density per block. So perhaps, in the longer-term future, a higher discount could become an attractive option to maximize adoption without having to reccur to a \"traditional\" hard-forked blocksize increase.The article arguing for the 4x discount is from 2017, 6 years old. Would it's main thesis, that an 8x discount is too dangerous for the network, still be true in 2030, for example? (I know some will now think I'm advocating for a blocksize increase . I'm not, I'm fine with the 1-4MB limit and think more BTC action should go off-chain or to sidechains. But rollups perhaps could change that picture for me in the very long term.)Edit:@cygan do you create these infographics yourself? If yes, I've a slight improvement proposal according what pooya87 wrote. Replace \"the signature is included in the transaction data\" by \"the signature is included in the transaction inputs\". With this slight change I think it's becoming more clear.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "August 30, 2023, 12:39:10 PM",
+      "body": "Quote from: cygan on August 24, 2023, 04:55:55 PMsince there are no current threads on this topic, i would like to open this one and start a discussion and info round about the topic 'witness discount' also called 'segwit discount'to illustrate the whole thing to understand it perhaps easier i also post these 4 slidesThe \"discount\" depends on how many inputs and ouputs you have in a transaction. More  inputs, the biggest is the discount.A 1 input and 1 output transaction will save about 40% on fees using native segwit, while you will save more than 50% when using more than 10 inputs.I made a tool to calculate this, based on bitcoin wiki. The usd price is bugged, but the transaction size calculation is working fine and saving (discount) estimation is working fine.https://bitcoindata.science/plot-your-transaction-in-mempool.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

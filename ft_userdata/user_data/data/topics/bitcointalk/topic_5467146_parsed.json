@@ -1,0 +1,141 @@
+{
+  "id": "topic_5467146",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "September 18, 2023, 02:17:33 AMLast edit: October 31, 2023, 03:18:01 AM by PowerGlove",
+  "content": "I already posted about this (here), but almost instantly regretted doing that (I like the pattern of creating a new topic for each SMF patch, so I'm not sure why I tried to do things differently this time). Anyway, this one came about from joker_josue pointing out that receiving PMs with no subject is annoying, and Loyce (effectively) nodding his head and saying \"patch time?\". It's not something that bugs me all that much (out of the 203 PMs I've received, 15 don't have a subject), but I can imagine it being really annoying for people with thousands of PMs in their inbox who find themselves looking back through them from time to time. Also, I've got some ideas for future patches that might allow for quickly isolating PMs by author, or subject, so phasing out (or, at least discouraging) PMs with \"(No subject)\" as their subject line, just seems like a good idea all-around to me.Currently, the subject line is pre-populated with the text \"(No subject)\", like this:To stop lazy MFs from just going with the default, this patch leaves the subject line empty:If you try to send (or preview) a PM without attempting to describe what you're about to bang on about, then you'll get an error, like this:Here's the diff for @theymos:Code:--- baseline/Sources/PersonalMessage.php 2011-02-07 16:45:09.000000000 +0000+++ modified/Sources/PersonalMessage.php 2023-09-16 00:58:49.000000000 +0000@@ -1224,33 +1224,33 @@     $request = db_query(\"     SELECT realName     FROM {$db_prefix}members     WHERE ID_MEMBER IN (\" . implode(', ', $_REQUEST['u']) . \")     LIMIT \" . count($_REQUEST['u']), __FILE__, __LINE__);    while ($row = mysql_fetch_assoc($request))     $membersTo[] = '&quot;' . $row['realName'] . '&quot;';    mysql_free_result($request);   }    // Create the 'to' string - Quoting it, just in case it's something like bob,i,like,commas,man.   $_REQUEST['to'] = implode(', ', $membersTo);  }   // Set the defaults...- $context['subject'] = $form_subject != '' ? $form_subject : $txt[24];+ $context['subject'] = $form_subject;  $context['message'] = str_replace(array('\"', '<', '>'), array('&quot;', '&lt;', '&gt;'), $form_message);  $context['to'] = isset($_REQUEST['to']) ? stripslashes($_REQUEST['to']) : '';  $context['bcc'] = isset($_REQUEST['bcc']) ? stripslashes($_REQUEST['bcc']) : '';  $context['post_error'] = array();  $context['copy_to_outbox'] = !empty($options['copy_to_outbox']);   // And build the link tree.  $context['linktree'][] = array(   'url' => $scripturl . '?action=pm;sa=send',   'name' => $txt[321]  );   $context['visual_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];  if ($context['visual_verification'])  {   $context['use_graphic_library'] = in_array('gd', get_loaded_extensions());Edit: Adding a second diff which I think improves this patch quite a bit (read more below).Code:--- baseline/Themes/default/PersonalMessage.template.php 2006-12-01 15:43:03.000000000 +0000+++ modified/Themes/default/PersonalMessage.template.php 2023-10-31 02:09:46.000000000 +0000@@ -910,33 +910,33 @@         <td align=\"right\"><b', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' style=\"color: red;\"' : ''), '>', $txt[150], ':</b></td>         <td class=\"smalltext\">          <input type=\"text\" name=\"to\" id=\"to\" value=\"', $context['to'], '\" tabindex=\"', $context['tabindex']++, '\" size=\"40\" />&nbsp;          <a href=\"', $scripturl, '?action=findmember;input=to;quote=1;sesc=', $context['session_id'], '\" onclick=\"return reqWin(this.href, 350, 400);\"><img src=\"', $settings['images_url'], '/icons/assist.gif\" alt=\"', $txt['find_members'], '\" /></a> <a href=\"', $scripturl, '?action=findmember;input=to;quote=1;sesc=', $context['session_id'], '\" onclick=\"return reqWin(this.href, 350, 400);\">', $txt['find_members'], '</a>         </td>        </tr><tr>         <td align=\"right\"><b', (isset($context['post_error']['bad_bcc']) ? ' style=\"color: red;\"' : ''), '>', $txt[1502], ':</b></td>         <td class=\"smalltext\">          <input type=\"text\" name=\"bcc\" id=\"bcc\" value=\"', $context['bcc'], '\" tabindex=\"', $context['tabindex']++, '\" size=\"40\" />&nbsp;          <a href=\"', $scripturl, '?action=findmember;input=bcc;quote=1;sesc=', $context['session_id'], '\" onclick=\"return reqWin(this.href, 350, 400);\"><img src=\"', $settings['images_url'], '/icons/assist.gif\" alt=\"', $txt['find_members'], '\" /></a> ', $txt[748], '         </td>        </tr>';  // Subject of personal message.  echo '        <tr>         <td align=\"right\"><b', (isset($context['post_error']['no_subject']) ? ' style=\"color: red;\"' : ''), '>', $txt[70], ':</b></td>-        <td><input type=\"text\" name=\"subject\" value=\"', $context['subject'], '\" tabindex=\"', $context['tabindex']++, '\" size=\"40\" maxlength=\"50\" /></td>+        <td><input type=\"text\" name=\"subject\" placeholder=\"What does this message concern?\" value=\"', $context['subject'], '\" tabindex=\"', $context['tabindex']++, '\" size=\"40\" maxlength=\"50\" /></td>        </tr>';   if ($context['visual_verification'])  {   echo '        <tr>         <td align=\"right\" valign=\"top\">          <b>', $txt['pm_visual_verification_label'], ':</b>         </td>         <td>';   if ($context['use_graphic_library'])    echo '          <img src=\"', $context['verificiation_image_href'], '\" alt=\"', $txt['pm_visual_verification_desc'], '\" /><br />';   else    echo '          <img src=\"', $context['verificiation_image_href'], ';letter=1\" alt=\"', $txt['pm_visual_verification_desc'], '\" />People get attached to how things look (I know I do), and it occurred to me that three empty <input> elements in a row might look a bit stark. I think including a placeholder attribute on the third <input> element will do a good job of balancing the issue this patch is meant to address (PMs without subjects) against imitating the way it looked originally (that is, two empty <input> elements, followed by a third one with something already in it). That way, it looks similar, but PMs will still fail to send unless you actually type something in.Here's how it would look (I think the text I chose is short and to the point, but theymos can/should adjust it if he wants to):Note to theymos: This new diff doesn't replace the earlier one, and they should be merged as a pair (the first diff stops the subject from being pre-populated with \"(No subject)\", and the second diff adds the placeholder attribute explained above).",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5467146",
+  "comments": [
+    {
+      "author": "Don Pedro Dinero",
+      "created_time": "September 18, 2023, 03:12:04 AM",
+      "body": "I don't care if they don't put a title in the PM and I don't think it should be a priority for the forum right now to put a patch for it. I see that you have proposed a worked solution and I congratulate you for it, but have you thought that if I don't want to put a title and they force me I can just put a single character? Something like that:I guess in the face of lazy people putting just a dot in the title, you could force people to write a minimum number of characters but if I don't want to put a title and you give me a minimum number of characters then I can put '.....' or whatever.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "September 18, 2023, 03:22:54 AMLast edit: September 18, 2023, 03:34:25 AM by TryNinja",
+      "body": "Quote from: Don Pedro Dinero on September 18, 2023, 03:12:04 AMI don't care if they don't put a title in the PM and I don't think it should be a priority for the forum right now to put a patch for it. -snip-I guess in the face of lazy people putting just a dot in the title, you could force people to write a minimum number of characters but if I don't want to put a title and you give me a minimum number of characters then I can put '.....' or whatever. From what I understood, it’s an one line change on the code... Not too troublesome. And it’s not like this makes anyone’s life harder, people already put subjects on emails.The reason I think people forget to put a subject on their PMs is not laziness, but the fact that almost no one changes the subject of their posts (it’s usually “Re: <title of the OP”), so some people treat PMs as another post, just sent privately, and press send after writing the message.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Don Pedro Dinero",
+      "created_time": "September 18, 2023, 03:33:38 AM",
+      "body": "Quote from: TryNinja on September 18, 2023, 03:22:54 AMFrom what I understood, it’s an one line change on the code... Not too troublesome. And it’s not like this makes anyone’s life harder, people already put subjects on emails.The reason I think people forget to put a subject on their PMs is not laziness, but the fact that almost no one changes the subject of their posts (it’s usually “Re: <title of the OP”), so some people just treat PMs as another post, just sent privately, and press send after writing the message.From what I understand this comes from the fact that if you get a lot of PMs sent to you and they don't have a title you have no way to categorise them and manage them properly:Quote from: joker_josue on September 15, 2023, 08:20:43 PMNormally this field serves to define the title of the message - three or four words that identify the objective of the PM.Therefore, I ask that when you send a PM, write something in the subject of the PM and not just leave the \"(No subject)\". This helps a lot in managing PMs.What joker_josue wants is that whatever is put in the title should be descriptive enough to categorise it, and you can't force people to do that no matter how many patches you put in. I can put 'Hey' as a title in all my emails no matter how varied the subject matter or '.....' as I said before. But well, if it doesn't cost anything to change it then fine, what I'm saying is that this shouldn't be a priority in the forum, because I'm sure there are many of us who don't give a damn whether there is a title or not, what happens is that we haven't opened a thread to say that we don't give a damn (as it's normal, people usually open threads to complain about what bothers them, not to not complain about what doesn't bother them).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "September 18, 2023, 03:45:37 AM",
+      "body": "Quote from: Don Pedro Dinero on September 18, 2023, 03:33:38 AMWhat joker_josue wants is that whatever is put in the title should be descriptive enough to categorise it, and you can't force people to do that no matter how many patches you put in. I can put 'Hey' as a title in all my emails no matter how varied the subject matter or '.....' as I said before. I’m aware, but my guess is that this will indeed make some people write something valid on their PM subjects. Even “about our deal” or “wallet question” is 10x better than a sea of “(No subject)”. And it’s a trivial patch, like I said.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Upgrade00",
+      "created_time": "September 18, 2023, 05:43:13 AM",
+      "body": "Quote from: Don Pedro Dinero on September 18, 2023, 03:33:38 AMWhat joker_josue wants is that whatever is put in the title should be descriptive enough to categorise it, and you can't force people to do that no matter how many patches you put in. I can put 'Hey' as a title in all my emails no matter how varied the subject matter or '.....' as I said before. In my experience if people are forced to include a subject they will try to make it something related to the message they are sending. Use threads as a case study, including a subject is mandatory and we very rarely see people include things like \"Hey\" or ellipsis, they put in some effort to make the subject something remotely related to what the thread is to give you some hint about it, same may happen with PMs too.Quote from: Don Pedro Dinero on September 18, 2023, 03:33:38 AMBut well, if it doesn't cost anything to change it then fine, what I'm saying is that this shouldn't be a priority in the forum, because I'm sure there are many of us who don't give a damn It's not a priority at all, it's just a minor change that will take the most of a few minutes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DYING_S0UL",
+      "created_time": "September 18, 2023, 06:45:31 AM",
+      "body": "Just adding two line of word won't harm anybody. I think it is time for this \"patch\". Not that everyone needs it anyway (like me) but those who gets hundreds of PM's everyday does indeed need it. It would greatly help them sorting out important PM's or ignoring Spams etc. Two line of word has that power to prioritize ones PM. It's my personal opinion, I think of this that way.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Nwada001",
+      "created_time": "September 18, 2023, 07:18:23 AM",
+      "body": "I see this patch as a good one. I read through the old thread by joker_josue, and I must say I'm always in for making such a mistake. Most times it's not because I don't want to add a custom subject, but it's just that I forget most of the time. Sometimes when I open a new message to send to anyone, after spending several minutes trying to compose my message and finally concluding it, I don't usually remember to go to the up again, from the message body, as I don't think there is anything to do since when I send any one a PM I use their profile and use the direct send pm link, so I don't even type the receiver's username.So if I can get an error code or at least a warning message that states \"Are you sure you want to send this message without a subject\"? That alone can draw my attention to go and check back on what I have missed; this other option of not allowing the message to go at all until the subject box is filled is also a good idea.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 18, 2023, 07:50:04 AM",
+      "body": "Quote from: PowerGlove on September 18, 2023, 02:17:33 AMIt's not something that bugs me all that much (out of the 203 PMs I've received, 15 don't have a subject)I'm not going to count all 237 pages of PMs, but on the last 2 pages, I count \"(No subject)\" 17 times already.I would have Merited you, but I've been at my limit for you for a while now. Too many patches within 30 days",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tbct_mt2",
+      "created_time": "September 18, 2023, 08:07:58 AM",
+      "body": "Quote from: TryNinja on September 18, 2023, 03:22:54 AMFrom what I understood, it’s an one line change on the code... Not too troublesome. And it’s not like this makes anyone’s life harder, people already put subjects on emails.The reason I think people forget to put a subject on their PMs is not laziness, but the fact that almost no one changes the subject of their posts (it’s usually “Re: <title of the OP”), so some people treat PMs as another post, just sent privately, and press send after writing the message.The issue, if any user sees it as an issue, comes from an initial PM sender. If a sender sends a PM without PM title, very likely the receiver will reply on it without any title, without any change in PM title.I agree that receiving such no-title PMs is annoying and I can be an old person to hate it, not only in Bitcointalk but also in emails. Emails without titles look very odds and shows the senders are lazy people. I also consider senders as disrespectful people against the receivers.Improve your email subject line. Those tips to write a catchy email subject line can be used for Bitcointalk PM title too. Actually we don't need catch title, but at least to inform receivers what are issues in the email for discussions. The PM title is important.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Faisal2202",
+      "created_time": "September 18, 2023, 10:44:41 AM",
+      "body": "That's great work, I really liked the idea even though I don't receive hundreds or thousands of messages but it will be great for others who receive such a huge amount of PMs. It will definitely going to help managers and other service providers too. But as you mentioned in the post, it's not a problem for you but you are making it for others, I think many members will not need it as most of the members don't even receive huge messages, and the remaining ones who do receive it. most of them don't need it just like you don't need it but it is a great improvement and it will increase the quality of the PM as the sender will think before sending the message and he/she will double check it too. This will ultimately increase the quality and purpose of the PM and if people will start to make good PMs then the time will be saved for many users who are mostly active on messages.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "SamReomo",
+      "created_time": "September 18, 2023, 01:05:37 PM",
+      "body": "Quote from: PowerGlove on September 18, 2023, 02:17:33 AMAnyway, this one came about from joker_josue pointing out that receiving PMs with no subject is annoying, and Loyce (effectively) nodding his head and saying \"patch time?\". Also, I've got some ideas for future patches that might allow for quickly isolating PMs by author, or subject, so phasing out (or, at least discouraging) PMs with \"(No subject)\" as their subject line, just seems like a good idea all-around to me.A really nice patch for someone like joker_josue and some other members who receive so many private messages. I hope that theymos will soon implement it on forum and those users can easily read their PM's because the sender must have to select a title in order to send a Private message. Your have done a really great job by creating this patch I truly appreciate your efforts. I would love to see those patches that you're going to release in future because your patches have always helped the members of the forum and hope those ones will also be useful for the members who receive so many PM's.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AB de Royse777",
+      "created_time": "September 18, 2023, 01:43:11 PM",
+      "body": "The number of pages I have for my inboxIt's impossible for me to know a subject and find a message from a specific user.A lot of time I need to find the latest message sent by a user. I never felt a need for the subject or full message options, it's kind of useless but you can not search without it too which makes the PM search feature harder. We need \"Search for:\" failed disabled.May be you have something in mind?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Don Pedro Dinero",
+      "created_time": "September 18, 2023, 02:56:45 PM",
+      "body": "Quote from: Upgrade00 on September 18, 2023, 05:43:13 AMIn my experience if people are forced to include a subject they will try to make it something related to the message they are sending. Use threads as a case study, including a subject is mandatory and we very rarely see people include things like \"Hey\" or ellipsis, they put in some effort to make the subject something remotely related to what the thread is to give you some hint about it, same may happen with PMs too....It's not a priority at all, it's just a minor change that will take the most of a few minutes.After seeing this answer and others I see that surely the people who need the patch are people who get a lot more PMs than those of us who don't care about the issue, and since it won't take long to do, I also support it being done. The only thing is that I think thread titles work a little differently than PMs where the people who send them may not care what they title them because they are not trying to attract the attention of several people.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 31, 2023, 03:31:33 AM",
+      "body": "I edited the OP and updated the patch with an additional diff that I think improves this proposal.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DYING_S0UL",
+      "created_time": "October 31, 2023, 01:47:27 PM",
+      "body": "So can we expect approval from theymos about this patch?This patch doesn't have be the number one priority now, but it would be nice if you patched it. Although I don't use PM that much and I am only a full member, but even I almost have 6-7 pages of PM. Imagine what others may have on their side.I understand that people forget to add subjects or are too lazy to do so. Even me. Almost 90% of my ingoing and outgoing PM's don't have any subjects. But when it comes to checking old PMs for something important, it can be a headache. Just a reminder to add a small, 2 word subject won't harm anybody. So please patch it if it's possible. Thanks in advance, PowerGlove",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "November 01, 2023, 10:04:02 AM",
+      "body": "Quote from: PowerGlove on September 18, 2023, 02:17:33 AMI already posted about this (here), but almost instantly regretted doing that (I like the pattern of creating a new topic for each SMF patch, so I'm not sure why I tried to do things differently this time). Anyway, this one came about from joker_josue pointing out that receiving PMs with no subject is annoying, and Loyce (effectively) nodding his head and saying \"patch time?\". I'm sorry @PowerGlove, I don't know how I missed this topic, and I only saw it now! Sometimes we are involved in so much that something will escape.First of all, thank you for creating this patch. Your effort to improve the forum has been incredible. Honestly, I wasn't expecting that much when I created that topic. I know that this patch is not of great importance, the forum survived without it for many years. But, it could one day be implemented, and help the community to be more involved with each other.Once again, I appreciate your effort!  Quote from: Upgrade00 on September 18, 2023, 05:43:13 AMQuote from: Don Pedro Dinero on September 18, 2023, 03:33:38 AMWhat joker_josue wants is that whatever is put in the title should be descriptive enough to categorise it, and you can't force people to do that no matter how many patches you put in. I can put 'Hey' as a title in all my emails no matter how varied the subject matter or '.....' as I said before. In my experience if people are forced to include a subject they will try to make it something related to the message they are sending. Use threads as a case study, including a subject is mandatory and we very rarely see people include things like \"Hey\" or ellipsis, they put in some effort to make the subject something remotely related to what the thread is to give you some hint about it, same may happen with PMs too.I don't want to force anyone to do anything, just suggest people write something about what they're going to talk about. I believe that most people who use email already do this. Why not do it in the PM too?The current term \"(No Subject)\" is the same for everyone, if no one changes the title that's always what appears. If a person needs to write something in this field, each person will write different things. Even if it's just \".\" or \"xpto\", is different from each other. Because some write \".\", others just \"abc\", others \"xpto\", etc. It will always be better than finding one message among 30, saying \"No Subject\".  In any case, this is not an urgent update, but it is still welcome. Quote from: Royse777 on September 18, 2023, 01:43:11 PMThe number of pages I have for my inboxHave you ever thought about starting to use Labels?You would be able to reduce the number of messages in your inbox and have them more organized.You can label messages about the campaigns you manage. Per user, if you receive many messages from the same users. Or any other subject that you find relevant.But, after creating the Labels and flagging the messages in that label, don't forget to remove them from the Inbox label. See my topic on the subject.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

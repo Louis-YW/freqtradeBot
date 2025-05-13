@@ -1,0 +1,101 @@
+{
+  "id": "topic_5468284",
+  "title": "Martinac",
+  "author": "Martinac",
+  "created_time": "September 27, 2023, 10:08:54 AM",
+  "content": "- I followed the advice at https://github.com/chris-belcher/electrum-personal-server#how-to to set up a connection between Bitcoin Core v25 and Electrum Personal Server 0.2.4.- I try to set it up on Windows 11 Pro.- The Bitcoin Core is already installed, operational and fully synced - normally run with Ledger SatStack wallet. This works fine.When issuing the suggested command Code:.\\bitcoin-cli createwallet electrumpersonalserver true true \"\" false false true, I get the following response:QuotePassphrase provided but private keys are disabled. A passphrase is only used to encrypt private keys, so cannot be used for wallets with private keys disabled.I tried a variant without passphrase (if I got it right) too:Code:.\\bitcoin-cli createwallet electrumpersonalserver true true false false truebut I received exactly the same error message as before.So I created the wallet manually in the GUI:https://ibb.co/mRKPQWFI then ran:Quote<omitted>\\electrum-personal-server-windows-release-v0.2.4>electrum-personal-server.exe config.iniINFO:2023-09-27 11:33:32,629: Starting Electrum Personal Server 0.2.4INFO:2023-09-27 11:33:32,629: Logging to <omitted>\\AppData\\Local\\Temp/electrumpersonalserver.logDEBUG:2023-09-27 11:33:32,629: Process ID (PID) = 16216DEBUG:2023-09-27 11:33:32,630: no datadir configuration, checking in default locationDEBUG:2023-09-27 11:33:32,630: obtaining auth from .cookieDEBUG:2023-09-27 11:33:32,682: Checking whether rescan is in progressINFO:2023-09-27 11:33:32,688: Displaying first 3 addresses of each master public key:INFO:2023-09-27 11:33:32,693:electrumpersonalserver =>        bc1<omitted>        bc1<omitted>        bc1<omitted>INFO:2023-09-27 11:33:32,696: Obtaining bitcoin addresses to monitor . . .INFO:2023-09-27 11:33:32,696: Importing 1 wallets and 0 watch-only addresses into the Bitcoin nodeDEBUG:2023-09-27 11:33:37,706: Importing 0 watch-only address[es] and 1 wallet into label \"electrum-watchonly-addresses\"Press any key to continue . . .As I understand the correct message should be \"Listening for Electrum Wallet ...\", but it never appears. After I press \"any key\", the processing just ends.Please note that the bc1 addresses above are correct and based on the master public key \"electrumpersonalserver = zpub<omitted>\" I have put in the config.ini file. This master pub key was extracted from Electrum wallet from Wallet -> Information.I have checked the log file <omitted>AppData\\Local\\Temp\\electrumpersonalserver.log, but there is nothing useful in there - just the same messages that appear in the PowerShell console above.Any suggestion or help appreciated.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468284",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 27, 2023, 12:46:04 PM",
+      "body": "The wallet should not be a descriptor wallet. Try deleting the one you have made and recreating it with descriptors turned off.From your log, it looks like EPS is failing to import the necessary xpub in to Bitcoin Core (Importing 0 watch-only addresses). I assume the issue is the descriptor wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "September 27, 2023, 12:50:02 PM",
+      "body": "What exactly do you want to achieve here?I don't see that you would need to use the bitcoin-cli command from the personal server guide.If you just want the personal server to work you will need to set up both bitcoin.conf file and config.ini file according to the guide.Can you tell us your current config on bitcoin.conf file?Also, share with us your current config on config.ini?There might be a conflict between the Bitcoin core and personal server config which is why it didn't work.Can you follow the guide from this link below for Windows.- https://driftwoodpalace.github.io/Hodl-Guide/hodl-guide_63_eps-win.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Martinac",
+      "created_time": "September 27, 2023, 06:09:00 PM",
+      "body": "Quote from: o_e_l_e_o on September 27, 2023, 12:46:04 PMThe wallet should not be a descriptor wallet. Try deleting the one you have made and recreating it with descriptors turned off.From your log, it looks like EPS is failing to import the necessary xpub in to Bitcoin Core (Importing 0 watch-only addresses). I assume the issue is the descriptor wallet.As you suggested, I deleted the current wallet and created a new one without the descriptors.It looks like things moved forward:Now when I run \"electrum-personal-server.exe config.ini\", there are these extra lines in the output:INFO:2023-09-27 19:44:00,823: Importing wallet 1/1DEBUG:2023-09-27 19:44:01,606: Importing doneINFO:2023-09-27 19:44:01,606: Done.If recovering a wallet which already has existing transactions, thenrun the rescan script. If you're confident that the wallets are newand empty then there's no need to rescan, just restart this scriptAfter starting EPS again, it looks like EPS is available on 127.0.0.1:50002. This is also what the Electrum wallet is trying to connect to. Alas, the wallet does not seem to be able to connect:https://ibb.co/jh7VLRBBoth EPS and wallet are running on the same machine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 27, 2023, 06:49:48 PM",
+      "body": "That does indeed look like everything is set up properly, so I suspect the issue now is the expired certificates bug. See here for an explanation and a fix: https://github.com/chris-belcher/electrum-personal-server/issues/286If that doesn't work, then you could try sharing your log file here, as well as enabling logs in Electrum and sharing that too, to see if we can narrow down the problem any more.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Martinac",
+      "created_time": "September 27, 2023, 07:24:54 PM",
+      "body": "Quote from: BitMaxz on September 27, 2023, 12:50:02 PMWhat exactly do you want to achieve here?I don't see that you would need to use the bitcoin-cli command from the personal server guide.If you just want the personal server to work you will need to set up both bitcoin.conf file and config.ini file according to the guide.Can you tell us your current config on bitcoin.conf file?Also, share with us your current config on config.ini?There might be a conflict between the Bitcoin core and personal server config which is why it didn't work.Can you follow the guide from this link below for Windows.- https://driftwoodpalace.github.io/Hodl-Guide/hodl-guide_63_eps-win.htmlWhat I want to achieve is to be able to query EPS on localhost instead of random Electrum server on the internet (which is the default option for the Electrum wallet).If this works, I'd like to connect to EPS also from the Phoenix mobile wallet. I suppose port forwarding for port 50002 will be necessary to be set on the router. Plus some other auth stuff as the internet access is off by default, if I understood correctly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Martinac",
+      "created_time": "September 28, 2023, 07:37:01 AM",
+      "body": "Quote from: o_e_l_e_o on September 27, 2023, 06:49:48 PMThat does indeed look like everything is set up properly, so I suspect the issue now is the expired certificates bug. See here for an explanation and a fix: https://github.com/chris-belcher/electrum-personal-server/issues/286If that doesn't work, then you could try sharing your log file here, as well as enabling logs in Electrum and sharing that too, to see if we can narrow down the problem any more.I checked the installation-supplied cert.crt and indeed it expired on Mar 12 00:07:58 2023 GMT.I generated a new self-signed cert using OpenSSL with extended validity. I started again both EPS and E. wallet (\"C:\\Program Files (x86)\\Electrum\\electrum-4.4.6.exe\" --oneserver --server 127.0.0.1:50002:s).And it worked!!  But idiot as I'm, I had to fiddle with the cert - I wanted a really long validity to be future-proof. So I generated a new cert, exactly like before:openssl genrsa -des3 -passout pass:x -out server.pass.key 2048openssl rsa -passin pass:x -in server.pass.key -out cert.keydel server.pass.keyopenssl req -new -key cert.key -out cert.csropenssl x509 -req -days 4825 -in cert.csr -signkey cert.key -out cert.crtBut then the EPS <-> Wallet connection *stopped* working. The wallet refused to connect to EPS even though it was running fine - \"Listening for Electrum Wallet on ('127.0.0.1', 50002)\".After a lot of swearing, I found out that Electrum Wallet keeps a suspiciously named file 127.0.0.1 in %AppData%\\Roaming\\Electrum\\certs. The expectation was that it is the *old* cached cert that has already been overwritten in EPS. And because of cert-pinning, the fingerprint no longer matches.And indeed, after I deleted the file 127.0.0.1 and restarted the Wallet, the connection works again (fingers crossed):https://ibb.co/VSDwkxXI think it's rather stupid to distribute software (EPS) with expired certificate without which it does not work. Also I do not quite get why SSL is needed in the first place since the components by default communicate via localhost on the same machine.Anyway, thank you very much for help! BTC",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 28, 2023, 11:16:25 AM",
+      "body": "Quote from: Martinac on September 28, 2023, 07:37:01 AMI think it's rather stupid to distribute software (EPS) with expired certificate without which it does not work.There is an open pull request which will fix the issue here: https://github.com/chris-belcher/electrum-personal-server/pull/289Unfortunately the main developer of EPS (among other things, such as JoinMarket) - Chris Belcher - is suffering from long COVID and hasn't done any work on any of his bitcoin projects in over a year: https://gist.github.com/chris-belcher/ca5051285c6f8d38693fd127575be44d. I could fork the project simply to update the certificates, but if someone downloads the main version and gets as far as you have, then it's probably easier at that point just to apply the fix yourself than it is to download a fork and start the set up process again from scratch.Anyway, glad you got it working!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Martinac",
+      "created_time": "September 28, 2023, 01:37:44 PM",
+      "body": "Quote from: o_e_l_e_o on September 28, 2023, 11:16:25 AMQuote from: Martinac on September 28, 2023, 07:37:01 AMI think it's rather stupid to distribute software (EPS) with expired certificate without which it does not work.There is an open pull request which will fix the issue here: https://github.com/chris-belcher/electrum-personal-server/pull/289Unfortunately the main developer of EPS (among other things, such as JoinMarket) - Chris Belcher - is suffering from long COVID and hasn't done any work on any of his bitcoin projects in over a year: https://gist.github.com/chris-belcher/ca5051285c6f8d38693fd127575be44d. I could fork the project simply to update the certificates, but if someone downloads the main version and gets as far as you have, then it's probably easier at that point just to apply the fix yourself than it is to download a fork and start the set up process again from scratch.Anyway, glad you got it working!It can be even better like this if one wants to learn new things and take one's brain to the gym . But it's not for everybody. Moreover, without your hints, I do not think I would get it working on my own.Also, it may be a good idea to generate a new cert from the security point of view. As the README.md says:If your wallet connects over the public internet you should generate your own SSL certificate instead of using the default one, otherwise your connection can be decrypted.I updated some related posts on reddit, so it may help someone too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 29, 2023, 08:33:47 AM",
+      "body": "Quote from: Martinac on September 27, 2023, 10:08:54 AM-snip-When issuing the suggested command Code:.\\bitcoin-cli createwallet electrumpersonalserver true true \"\" false false true, I get the following response:QuotePassphrase provided but private keys are disabled. A passphrase is only used to encrypt private keys, so cannot be used for wallets with private keys disabled.This wont help you since you already created the wallet via GUI;But for others who have no access to the GUI, it can be circumvented by using --named arg to set the non-default required name=value pairs after passphrase while skipping the passphrase:Code:bitcoin-cli --named createwallet wallet_name=\"electrumpersonalserver\" disable_private_keys=true blank=true descriptors=false load_on_startup=true",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Martinac",
+      "created_time": "September 30, 2023, 05:48:17 PM",
+      "body": "I wanted to rename the wallet electrumpersonalserver to ElectrumPersonalServer (add nicer camel-case).According to what I found, it was to be enough to rename the folder in \\AppData\\Roaming\\Bitcoin\\wallets, which I did. Then I restarted the Bitcoin Core and indeed the wallet is available there under the new name.However, when I started the EPS, I got:QuoteJsonRpcError({'code': -18, 'message': 'Requested wallet does not exist or is not loaded'})Note the wallet *does* exist and *is* loaded. It seems that EPS does not recognize the renamed wallet for some reason.I tried to delete the wallet and create it again both in GUI and in CLI:Code:PS C:\\Program Files\\Bitcoin\\daemon> .\\bitcoin-cli --named createwallet wallet_name=\"ElectrumPersonalServer\" disable_private_keys=true blank=true descriptors=false load_on_startup=true{  \"name\": \"ElectrumPersonalServer\",  \"warnings\": [    \"Wallet created successfully. The legacy wallet type is being deprecated and support for creating and opening legacy wallets will be removed in the future.\"  ]}In both cases, the result is the same like before:QuoteINFO:2023-09-30 18:33:01,446: Starting Electrum Personal Server 0.2.4INFO:2023-09-30 18:33:01,446: Logging to C:\\Users\\Martin\\AppData\\Local\\Temp/electrumpersonalserver.logDEBUG:2023-09-30 18:33:01,446: Process ID (PID) = 7456DEBUG:2023-09-30 18:33:01,446: obtaining auth from .cookieERROR:2023-09-30 18:33:01,497: JsonRpcError({'code': -18, 'message': 'Requested wallet does not exist or is not loaded'})ERROR:2023-09-30 18:33:01,497: Wallet related RPC call failed, possibly the bitcoin node was compiled with the disable wallet flagI tried tweaking some parameters ((un-)commenting) in C:\\Users\\Martin\\Documents\\electrum-personal-server-windows-release-v0.2.4\\config.ini:Code:[master-public-keys]# electrumpersonalserver = zpub*ElectrumPersonalServer = zpub*(...)[bitcoin-rpc]#leave this option empty to have it look in the default location#datadir =datadir = C:\\Users\\Martin\\AppData\\Roaming\\Bitcoin# empty means default file, for when using a single wallet file# wallet_filename =wallet_filename = C:\\Users\\Martin\\AppData\\Roaming\\Bitcoin\\wallets\\ElectrumPersonalServer\\None of this did the trick.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Martinac",
+      "created_time": "September 30, 2023, 06:12:43 PM",
+      "body": "Please disregard the question above.I did not realize the parm wallet_filename must equal just wallet name and not the whole path.No:  wallet_filename = C:\\Users\\Martin\\AppData\\Roaming\\Bitcoin\\wallets\\ElectrumPersonalServer\\Yes: wallet_filename = ElectrumPersonalServer",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "topic_5440983",
+  "title": "Nheer",
+  "author": "Nheer",
+  "created_time": "February 23, 2023, 02:07:15 PM",
+  "content": "There is a part I don't seem to understand properly so I have decided to ask here again I hope I get answers to my questions.So I have been studying and I read that transactions in blocks do not contain IDs, so I've been wondering where on the node the IDs of transactions are kept. Or Are they stored on blocks?-Also, Could someone help me explain better what transaction processor is and what part of the transaction the transaction processors actually create?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440983",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "February 23, 2023, 02:33:13 PM",
+      "body": "Quote from: Nheer on February 23, 2023, 02:07:15 PMSo I have been studying and I read that transactions in blocks do not contain IDs, so I've been wondering where on the node the IDs of transactions are kept. Or Are they stored on blocks?I recommend you take a look into:https://learnmeabitcoin.com/technical/txidhttps://en.bitcoin.it/wiki/TransactionThese links should explain it better than I'd do (since I'm not that good at the internals).However, shortly: the first link tells how tx id can be easily obtained from the transaction itself:Quote from: https://learnmeabitcoin.com/technical/txidYou get a TXID by hashing transaction data through SHA256 twice.I will add that while tx ids seem to not be stored in the actual blockchain, Bitcoin Core does store the tx ids of unspent transactions (UTXO) in chainstate folder (levelDb), read:https://bitcoin.stackexchange.com/questions/28168/what-are-the-keys-used-in-the-blockchain-leveldb-ie-what-are-the-keyvalue-pairQuote from: Nheer on February 23, 2023, 02:07:15 PM-Also, Could someone help me explain better what transaction processor is and what part of the transaction the transaction processors actually create?I am not sure what you mean here.All the nodes validate transactions and forward them (one node's mempool may be different from another's), hence they can be seen as processors.The miners are the \"ultimate\" processors because they add the transactions into blocks.But none of them would alter a transaction (transaction created and signed by the sender). So.. I am not sure what you mean.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "February 23, 2023, 03:36:21 PM",
+      "body": "Quote from: Nheer on February 23, 2023, 02:07:15 PM-Also, Could someone help me explain better what transaction processor is and what part of the transaction the transaction processors actually create?If you mean payment processor, that term usually refers to companies offering Bitcoin payments as a service; if you want to offer Bitcoin as a payment method on your own website and don't like to host the software yourself.In that case, they create the whole transaction and have complete access to customer funds. I would recommend against such custodial solutions and self-host something like BTCPayServer.In regular (self-custodial / non-custodial) wallets, you yourself create the whole transaction. Nobody else creates any part of the transaction except your own wallet. It constructs all the fields like described on Learnmeabitcoin.com and signs it. Then it is broadcast to the network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "February 24, 2023, 03:59:09 AM",
+      "body": "Quote from: Nheer on February 23, 2023, 02:07:15 PMI've been wondering where on the node the IDs of transactions are kept.There is no need to keep the transaction ID of the transactions that have had all of their outputs spent.  They can be recreated at any time by simply hashing the transaction data.  Unspent transaction outputs are stored by each node in its own mempool.Quote from: Nheer on February 23, 2023, 02:07:15 PMOr Are they stored on blocks?The transaction data (version, inputs, outputs, locktime, etc) are stored in the blocks.  The transaction ID can be quickly and easily calculated for any transaction by simply hashing the data.Quote from: Nheer on February 23, 2023, 02:07:15 PMCould someone help me explain better what transaction processor is and what part of the transaction the transaction processors actually create?What do you mean by \"processor\"?Every node verifies the validity of every transaction it receives and then forwards that transaction to the peers it is connected to.  It doesn't create or modify the contents of the transaction.Solo miners (and mining pools) gather transactions together into a block, create a set of data (called a header) to identify that collection, and then complete a proof-of-work on that header.  They then broadcast the completed block to all their connected peers.  They CREATE blocks, but they don't create or modify transactions at all.Users of bitcoin run wallet software that creates transactions based on the details that they provide to that wallet software (address, value, possibly source of funds). The wallet software builds the transaction and provides the neccessary digital signatures, then it sends copies of the transaction to all connected peers.Service providers store bitcoin on behalf of their customers. They run their own wallet software and create transactions using that wallet software when their customers ask them to.  They can also monitor the blockchain and the network communications to notify their customers when they receive new transactions on behalf of their customers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Nheer",
+      "created_time": "February 26, 2023, 06:03:10 AM",
+      "body": "Quote from: NeuroticFish on February 23, 2023, 02:33:13 PMQuote from: Nheer on February 23, 2023, 02:07:15 PMSo I have been studying and I read that transactions in blocks do not contain IDs, so I've been wondering where on the node the IDs of transactions are kept. Or Are they stored on blocks?I recommend you take a look into:https://learnmeabitcoin.com/technical/txidhttps://en.bitcoin.it/wiki/TransactionThese links should explain it better than I'd do (since I'm not that good at the internals).However, shortly: the first link tells how tx id can be easily obtained from the transaction itself:thank you for the links, learnmeabitcoin have explained it all easily and simply i now have a better understanding about the transaction ID. This site is very helpful for beginners it explains and breaks everything down easily. Transaction IDs are not stored in the blockchain but bitcoin core rather.I appreciate your efforts all, i will not hesitate to ask when i feel the need.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

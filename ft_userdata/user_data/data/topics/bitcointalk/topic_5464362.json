@@ -1,0 +1,133 @@
+{
+  "id": "topic_5464362",
+  "title": "garlonicon",
+  "author": "garlonicon",
+  "created_time": "August 24, 2023, 05:16:51 AM",
+  "content": "As you may noticed, I changed my signature, and put a link to this post: https://bitcointalk.org/index.php?topic=289795.msg3187990#msg3187990For secp256k1, this works fine. We start from 2^256, then we subtract 2^32, and then we have a window of 1024 numbers, where there are only seven possible primes. The biggest t-value is selected, and that's why we have p=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f, and t=977.However, things get tricky, when we expand this pattern to cover other elliptic curves. Because then, we can get this:Code:256-bit   fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f (t= 977)224-bit           fffffffffffffffffffffffffffffffffffffffffffffffefffffcab (t= 853)192-bit                   fffffffffffffffffffffffffffffffffffffffefffffc11 (t=1007)160-bit                           fffffffffffffffffffffffffffffffefffffc2d (t= 979)But if we look at the real parameters, used in secp160k1, secp192k1, and secp224k1, we have this instead:Code:256-bit   fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f (t=  977)224-bit           fffffffffffffffffffffffffffffffffffffffffffffffeffffe56d (t= 6803)192-bit                   fffffffffffffffffffffffffffffffffffffffeffffee37 (t= 4553)160-bit                           fffffffffffffffffffffffffffffffeffffac73 (t=21389)See? Only for secp256k1, our p-value meets this pattern. For all other curves, our t-value is bigger than 1024. So, which formula is used to derive those p-values for other curves? Is it documented somehow? Is it related to binary curves? So far, I wrote something like this, but still, the question is, why someone picked for example 2^14, 2^12 or 2^11? For that reason, I am trying to find a better explanation.Code:(2^160-2^32-2^14-2^12     )-t(2^192-2^32     -2^12     )-t(2^224-2^32     -2^12-2^11)-t(2^256-2^32               )-t",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464362",
+  "comments": [
+    {
+      "author": "digaran",
+      "created_time": "August 24, 2023, 06:35:06 AM",
+      "body": "What happens if we change secp256k1 p from the current one to this p=0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2^256-1?How would the points look like, and also can you figure out a way to place a backdoor on a curve you design?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ertil",
+      "created_time": "August 24, 2023, 07:56:02 AM",
+      "body": "QuoteWhat happens if we change secp256k1 p from the current one to thisp=0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2^256-1?This is not a prime number. If you want to know, what will happen, then you can try to generate every possible elliptic curve, for example with p-value from 2 to 1000. You will see that if some number is prime, then the curve behaves correctly. But if it is not, then it is anomalous, and sometimes even trivial to break. If you use some non-prime number, then you can find subgroups, and use them to attack, unless you protect your curve by other means.For example, if you have p=255, then you know that 255/5=51. And then, you know that p=255=51*5. Then, by using 5 and 51, you can attack p=255 curve in the same way as p=5 and p=51 curves. And then, instead of having 8-bit security, you suddenly have 3-bit security, combined with 6-bit security. Also, if (p-1) and (n-1) is vulnerable, then it is even worse.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 24, 2023, 09:05:41 AM",
+      "body": "Secp256k1 P is equal to 2^256 - 2^32 - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1, as we all know.In this case, s is 2^9 + 2^8 + 2^7 + 2^6 + 2^4 + 1 and is indeed less than 2^10 or 1024.Looking at the old SEC2 domain properties paper https://www.secg.org/SEC2-Ver-1.0.pdf, we see that there's 2^11 and 2^12 terms for secp224k1, a 2^12 term with secp192k1, and 2^12 and 2^14 terms in secp160k1.The s terms of each:160:2^14 + 2^12  + 2^9 + 2^8 + 2^7  + 2^3 + 2^2 + 1192:2^12 + 2^8 + 2^7 + 2^6 + 2^3 + 1224:2^12 + 2^11 + 2^9 + 2^7  + 2^4 + 2 + 1 256:2^9 + 2^8 + 2^7 + 2^6 + 2^4 + 1Make of that what you will, but it seems that the value of S goes lower the larger the field size (except that's obviously not true, because the s for 224 is greater than for 192).The only terms that are present in every one are 2^7 and 1.Having said that, what's stopping you from changing the code from isProbablyPrime(1024) to use 16384 (2^14) instead? Granted, it will probably take longer, though I'm not sure exactly how much resources that will consume.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "August 24, 2023, 09:35:04 AMLast edit: August 24, 2023, 12:10:29 PM by garlonicon",
+      "body": "QuoteHaving said that, what's stopping you from changing the code from isProbablyPrime(1024) to use 16384 (2^14) instead?Of course, I can do that. But this is not the answer I am looking for. In case of secp256k1, if you have t=977, then it is the first value below 1024. You can use 16384, but then you will reach a lot of different values, and t=6803 or t=4553 will be somewhere in the middle. Then, you won't know, why \"t\" is equal to 6803. And that means, you cannot fully reproduce the algorithm. Because sure, the window for numbers is bigger. But why lots of them were skipped, and someone reached t=6803? That is the question: I want to know the answer without magic numbers, and if I know that t=21389 is in 32768 window, it doesn't help much, because still, I don't know why this magic number 21389 was picked, and why many different candidates were skipped.QuoteGranted, it will probably take longer, though I'm not sure exactly how much resources that will consume.You can use any online Java compiler, and see those results in seconds. One minute is the longest time I had to wait for all results, and later optimized it to just 10 seconds, by returning early from a for loop.Edit: Also, if you are curious, how \"isProbablePrime\" is implemented, you can look here: https://developer.classpath.org/doc/java/math/BigInteger-source.html#line.1279",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "August 24, 2023, 04:28:46 PM",
+      "body": "QuoteIf you want to know, what will happen, then you can try to generate every possible elliptic curve, for example with p-value from 2 to 1000.Let's see: https://github.com/vjudeu/curves1000Feel free to download a repository, for example as a ZIP package, and explore those curves. Then, you will quickly see, how vulnerable some of them are. For example, look at p=512:Can you see the subgroups now?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GR Sasa",
+      "created_time": "August 24, 2023, 05:16:51 PM",
+      "body": "I am reading much here about P value and prime numbers, does that mean that prime points on the curve are less vulnerable than non prime numbers or why is prime numbers here so important? Do prime points have security issues? I'm not that ECC expert",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 25, 2023, 04:55:21 AM",
+      "body": "Quote from: GR Sasa on August 24, 2023, 05:16:51 PMI am reading much here about P value and prime numbers, does that mean that prime points on the curve are less vulnerable than non prime numbers or why is prime numbers here so important? Do prime points have security issues? I'm not that ECC expertPrime field sizes are a security requirement because non-primes can be factorized into many smaller numbers, and the elliptic curve equation can be solved in those reduced terms using much less resources because the total search space is severely shrunken.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "August 25, 2023, 07:44:30 PM",
+      "body": "QuoteSo, which formula is used to derive those p-values for other curves?Finally, I found the answer, and it is easier than you probably think. Just picking p-value alone is not sufficient. You should always also calculate n-value. And then, you can see that those values are the first ones, that were possible to reach.QuoteFor all other curves, our t-value is bigger than 1024.This \"1024\" value is very misleading. If you start from t=0, and keep incrementing it, without thinking about any \"window\", then t=977 will be the first value, where both p-value and n-value will be prime.Code:p= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffef9 (t = 263)n= 0xffffffffffffffffffffffffffffffff9d70b40e72725ad652cd62c55808d873 (non-prime)p= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffe99 (t = 359)n=0x100000000000000000000000000000000b3c017eacf02babf49040910abee2e35 (non-prime)p= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffe97 (t = 361)n= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffe98 (non-prime)p= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffe19 (t = 487)n= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffe1a (non-prime)p= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffd1d (t = 739)n= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffd1e (non-prime)p= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc4b (t = 949)n= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc4c (non-prime)p= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f (t = 977)n= 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141 (prime)If you want to get n-value, based on p-value, then you can visit Sage Cell Server and use this code:Code:p = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffef9P = GF(p)aP = P(0x0)bP = P(0x7)Secp256k1 = EllipticCurve(P, (aP, bP))print(hex(Secp256k1.order()))Then, you will see 0xffffffffffffffffffffffffffffffff9d70b40e72725ad652cd62c55808d873 as a result.Also, don't forget to change b-value for other curves, because they are different:Code:secp160k1 a=0 b=7secp192k1 a=0 b=3secp224k1 a=0 b=5secp256k1 a=0 b=7",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "August 25, 2023, 08:35:20 PM",
+      "body": "Thank you very much vjudeu, this is what I was looking for! However, as always, solving one thing causes another questions: why 2^32 subtraction was introduced? Because after using your Sage script, I noticed it is possible to find another 256-bit elliptic curve, without this subtraction:Code:p=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9fdP=GF(p)aP=P(0x0)bP=P(0x7)curve=EllipticCurve(P,(aP,bP))n=curve.order()print(hex(n))p=0xfffffffffffffffffffffffffffffffef95ae576ce7c6cca38e2b32e6fb6214bP=GF(p)aP=P(0x0)bP=P(0x7)curve=EllipticCurve(P,(aP,bP))n=curve.order()print(hex(n))As you can see, it also has the same property as secp256k1, you can swap p-value with n-value, and those two curves also form a cycle. So, why those values were not used instead?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 25, 2023, 09:46:00 PM",
+      "body": "When searching you also must impose the constraint that there is a primitive cube root of unity, as that's required for the endomorphism. This requirement eliminates a lot of curves.As far as the -2^32 part goes, these numbers are Solinas primes, selected to admit fast modular reduction algorithms.I doubt the creators of secp256k1 cared that the group order could also be efficiently used to form a curve. They cared that P admitted fast operations (that it was congruent to 3 mod 4 to make sqrt fast, and that it supported a fast modular reduction), that there was an efficiently computable endomorphism (which means that a=0 in the curve equation and that there is a primitive cube root of unity) and that the resulting curve order was prime.  They may have also somewhat cared that the order of the twist has a large factor, or perhaps they got lucky (I never checked if 160k, 192k, and 224k had secure twists)-- I'm not sure when people started caring about twist security due to fault attacks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "August 28, 2023, 10:13:28 AM",
+      "body": "I'm guessing finding a way to implement a backdoor on a curve is extremely difficult, otherwise we could have seen such curves by now.The only thing I could think of, is having a special number which when divided/multiplied by any point on curve mod some other special number resulting in the private key for that point. I strongly believe there are such numbers/ values to just do that, but the question is how? Math+ECC expert could figure that out.😉",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "uanzpxy",
+      "created_time": "August 28, 2023, 11:28:15 AMLast edit: August 28, 2023, 11:48:19 AM by uanzpxy",
+      "body": "Quote from: digaran on August 28, 2023, 10:13:28 AMI'm guessing finding a way to implement a backdoor on a curve is extremely difficult, otherwise we could have seen such curves by now.The only thing I could think of, is having a special number which when divided/multiplied by any point on curve mod some other special number resulting in the private key for that point. I strongly believe there are such numbers/ values to just do that, but the question is how? Math+ECC expert could figure that out.I AGREE  , 3 years before i am thinking & i found iti am useing. my tiny brain with little math. I FIND strange_63_digest_PRIVATE i am trying to divided/multiplied == result is same 60f4d11574f5deee49961d9609ac6 /  strange_63_digest_PRIVATE  = same result60f4d11574f5deee49961d9609ac6 * strange_63_digest_PRIVATE  = same resulti am trying to connet n & p Unknow behavior for p= 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f (t = 977) n 100% working  strange_63_digest_PRIVATE  divided/multiplied == result is same n or p which one fist create ?answer:ecdsa developer fist create n 2nd connect to p thats itshare p-values topic thank Edit:any idea for  ( strange_63_digest_PRIVATE   , x ,y )mod n == 60f4d11574f5deee49961d9609ac6 , its possible                         ( strange_63_digest_PRIVATE   , x ,y )mod p == 60f4d11574f5deee49961d9609ac6 , its possible                        etc.....                       any formula ??....sorry my poor English ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GR Sasa",
+      "created_time": "August 28, 2023, 11:55:47 AM",
+      "body": "Quote from: digaran on August 28, 2023, 10:13:28 AMThe only thing I could think of, is having a special number which when divided/multiplied by any point on curve mod some other special number resulting in the private key for that point. I strongly believe there are such numbers/ values to just do that, but the question is how? Math+ECC expert could figure that out.😉Here i am, I got you, i have found that special magic number that meets exactly the description you described, that when that magic number divided/multiplied by any point on the curve number resulting in the private key for that pointThat Magic Number is 1ExamplePubkey:      Code:023b2052cfe60ee697a8a521c2b77fab00f51fc86b15e18d8c9259324ace797246ExamplePrivateKey: Code:4bc86787f597a8999ffc4ed344d26808edc14438c445950028f3e8dae2cd2be7Times 1:                 Code:023b2052cfe60ee697a8a521c2b77fab00f51fc86b15e18d8c9259324ace797246PubKeyResult:         Code:023b2052cfe60ee697a8a521c2b77fab00f51fc86b15e18d8c9259324ace797246PrivateKeyResult:    Code:4bc86787f597a8999ffc4ed344d26808edc14438c445950028f3e8dae2cd2be7Enjoy!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "August 28, 2023, 12:58:46 PM",
+      "body": "Quote from: uanzpxy on August 28, 2023, 11:28:15 AM60f4d11574f5deee49961d9609ac6 strange_63_digest_PRIVATE You could use a translator or simply use chat GPT, or ask from your native language board to assist you, anyways.This key 60f4d11574f5deee49961d9609ac6  is for puzzle #115, did you find this after 3 years?What is strange 63 digest private? Some sort of secret code?Quote from: GR Sasa on August 28, 2023, 11:55:47 AMHere i am, I got you, i have found that special magic number that meets exactly the description you describedI knew I could count on our crypto experts, could you give me the private key for the following point ( public key =Code:03633cbe3ec02b9401c5effa144c5b4d22f87940259634858fc7e59b1c09937852Solely for educational purposes.😅Sorry if my idea sounds stupid, I'm a simpleton and can only think like one, easy and simple.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "November 21, 2023, 10:50:14 AM",
+      "body": "QuoteThey cared that P admitted fast operations (that it was congruent to 3 mod 4 to make sqrt fast, and that it supported a fast modular reduction)Why secp224k1 does not follow those rules? It has p-value, equal to 0xfffffffffffffffffffffffffffffffffffffffffffffffeffffe56d, and in this case, p%4!=3. Do you know, why it is the case?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

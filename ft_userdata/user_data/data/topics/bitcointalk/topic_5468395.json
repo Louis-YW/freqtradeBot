@@ -1,0 +1,37 @@
+{
+  "id": "topic_5468395",
+  "title": "DdmrDdmr",
+  "author": "DdmrDdmr",
+  "created_time": "September 28, 2023, 08:05:21 AM",
+  "content": "Aquí los más versados en minería podrán aportar algo más de detalles, pero parece ser que la empresa de minería Marathon, realizando pruebas en vivo sobre la red de Bitcoin, minaron un bloque con un contenido erróneo el pasado día 26/09/2023.El bloque en cuestión fue rechazado por la red (y reemplazado por otro – el mostrado), por lo que Marathon se quedó sin la recompensa del bloque rechazado.Un analista describe el origen del problema de la siguiente manera:He leído que lo anterior llevó a un double spending, pero también he leído lo contrario. Por otro lado, no me ha quedado claro si el bloque se llegó a confirmar e introducirse en la cadena, para luego ser rechazado posteriormente (¿tras cuántas confirmaciones?). A ver cómo lo veis.Ver:https://decrypt.co/199005/marathon-mined-an-invalid-bitcoin-block-heres-what-that-meanshttps://es.cointelegraph.com/news/bitcoin-mining-firm-marathon-mines-invalid-block-btchttps://twitter.com/mononautical/status/1707055190971457698",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468395",
+  "comments": [
+    {
+      "author": "Don Pedro Dinero",
+      "created_time": "September 28, 2023, 04:56:04 PM",
+      "body": "Mis conocimientos sobre el minado de bloques son demasiado escasos como para responder a las dudas que planteas. Lo que sí que es de agradecir es que abras estos hilos en el foro local, pues gracias a ellos y poco a poco cada vez aprendemos más sobre temas técnicos y otros. Este hilo atraería más atención y méritos en el foro inglés, y entiendo que no hay uno allí, pues cuando lo hay lo mencionas en el OP.Después de leer los artículos enlazados, lo único que quería matizar es que ellos lo atribuyen a unas pruebas que estaban haciendo, como dices, pero concretamente 'para optimizar operaciones', cosa que me suena a estar tratando de que les salga más rentable el minado de los bloques que consiguen minar pero experimentando de momento han pagado un precio por ello, porque el minado correcto del bloque y con ellos la transacción de coinbase (recompensa+comisiones) se lo llevó Foundry USA.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DdmrDdmr",
+      "created_time": "September 28, 2023, 05:44:40 PM",
+      "body": "Otra cosa que no me queda clara (y así seguimos demostrando mi desconocimiento) es si técnicamente el bloque rechazado sería considerado como un bloque huérfano. Diría que sí, salvo que existan matices en la categorizaron, pero al intentar ver una lista completa de los bloques huérfanos, veo que aún no se ha incluido el caso del OP:https://bitcoinchain.com/block_explorer/orphanedTampoco figura en el listado el bloque 666833 (20/01/2021), el cual creó su controversia según veo:https://cointelegraph.com/news/bitcoin-double-spend-spotted-in-the-wildPuede que la lista de bitcoinchain no se esté actualizando…Luego hay otro comentario que me suscita dudas interpretativas:QuoteAs a general note, Andreas explained that a 1-block re-org happens naturally on average once every two weeks, a 2-block reorg occurs once a year or so, and a 3-block reorg has never happened until now. This is why the “3 confirmation rule” has been adopted in the community as absolutely legitimate proof of a BTC transaction’s immutability.Ver: https://cryptopotato.com/bitcoin-reorganization-triggers-panic/¿Una reorganización es lo que, de manera colateral, lleva a la existencia de bloques huérfanos ?De ser así, Andreas habla de que sucede en media una vez cada dos semanas, lo cual es bastante más que lo que se ve en el explorador de huérfanos, y micho más de lo que pensaría sucedería. No me cuadra algo …",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "September 28, 2023, 07:11:26 PM",
+      "body": "Quote from: DdmrDdmr on September 28, 2023, 08:05:21 AMHe leído que lo anterior llevó a un double spending, pero también he leído lo contrario. Por otro lado, no me ha quedado claro si el bloque se llegó a confirmar e introducirse en la cadena, para luego ser rechazado posteriormente (¿tras cuántas confirmaciones?).BlackHatCoiner lo explico en esta respuesta:Quote from: BlackHatCoiner on September 27, 2023, 07:18:57 PMThey did include both the parent and child transaction in the same block. It's just that they included the child before the parent in transaction data. So, when the nodes would verify the child, they'd deem it invalid as it'd spend missing UTXOs. That is called an orphaned transaction.No fue un doble gasto como tal, aunque algunos lo podrian interpretar de dicha manera, como lo mencionan Ambas Transacciones fueron incluidas en el bloque pero se incluyeron en el orden incorrecto. Es decir Transaccion A (Gasta un UTXO ya confirmado)-> Transaccion B Gasta el UTXO generado por la Transaccion A. Sin embargo en la data del bloque primero estaba contenida la transaccion B y posteriormente la Transaccion A. Cuando los nodos leen la Transaccion B, inmediatamente marcan el bloque como invalido ya que la transaccion A aun no estaba confirmada.El bloque no fue un bloque valido y nunca fue confirmado.El doble gasto se da cuando tratas de gastar 2 veces un mismo UTXO.Aqui mas bien fue que trataron de confirmar una transaccion con un UTXO aun no minado.Quote from: DdmrDdmr on September 28, 2023, 05:44:40 PMOtra cosa que no me queda clara (y así seguimos demostrando mi desconocimiento) es si técnicamente el bloque rechazado sería considerado como un bloque huérfano.Nuevamente citando BlackHatCoiner Quote from: BlackHatCoiner on September 28, 2023, 04:13:43 PM- Stale blocks are successfully mined blocks which aren't included in the most-worked chain. - Orphaned blocks are blocks whose parent hasn't ever been processed by the node, so they cannot be validated. Yo pensaba que los bloques huerfanos eran los llamados \"Stale\", pero al parecer tambien estaba equivocado. Y ahora leyendo la defincion me parece interesante pensar en que situaciones se da un bloque huerfano en un escenario real, lo unico que me imagino poniendo un ejemplo de bloques por minar [A->B->C] es que algun nodo reciba primero un bloque C, en lugar de un Bloque B  or A, en dado caso el nodo not tiene forma de validar que el bloque C sea valido ya que no a recibido la informacion de A o de B.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

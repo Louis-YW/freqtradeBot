@@ -1,0 +1,45 @@
+{
+  "id": "topic_5432830",
+  "title": "pimlam",
+  "author": "pimlam",
+  "created_time": "January 03, 2023, 09:45:16 AM",
+  "content": "Hi.I got a full node (pruned) up and running with Bitcoin Core via Tor. I installed Electrum Personal Server (EPS) and connected my hardware wallet with Electrum via Tor. I generated a watch-only wallet in Bitcoin Core of my hardware wallet by providing the master public key in the config.ini file (no other master public keys, only the one of my hardware wallet as shown on Electrum). Everything works: I get the green circle in Electrum, saying I'm connected to (only) my own node, and I can watch my wallet in Bitcoin Core.However, Bitcoin Core's \"receiving addresses\" show addresses that do not belong to my wallet according to Electrum. I tried to send a test amount to one of the addresses in Bitcoin Core that were not shown in Electrum. This transaction now shows in Bitcoin Core as belonging to one of my watch-only addresses but does not show in Electrum. The ismine(\"address\") command in Electrum returns false. I also can't sign messages with the address in Electrum with my hardware wallet connected as Electrum says the address doesn't belong to the wallet.I double checked that only one MPK is mentioned in EPS's config.ini file, and I also created a new wallet in Bitcoin Core and resynced the EPS. Same problem: my wallet now shows a different amount in Bitcoin Core (including the abovementioned address) than in Electrum (excluding that address). Bitcoin Core is showing many other addresses that are not present in Electrum, besides this one that I sent a test transaction to.How is this possible? The Bitcoin Core wallet has private keys disabled + blank wallet and is named \"electrumpersonalserver\", so it should be dedicated to EPS and since I only imported and master public key, shouldn't it contain only addresses derived from that one master public key?Is the issue that Bitcoin Core has derived an address from my master public key that Electrum hasn't generated yet? But I'd think that Electrum should recognise all addresses that belong to the wallet (and ismine returned false and I can't sign messages with the address in my Electrum wallet as it says the address doesn't belong to the wallet). Or shouldn't I have imported the master public key through the EPS config.ini file (and rather imported it through the Bitcoin Core console)?I would be very grateful for any help and insights into what's going on here. Many thanks in advance!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432830",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "January 03, 2023, 01:23:47 PM",
+      "body": "Quote from: pimlam on January 03, 2023, 09:45:16 AMHowever, Bitcoin Core's \"receiving addresses\" show addresses that do not belong to my wallet according to Electrum. I tried to send a test amount to one of the addresses in Bitcoin Core that were not shown in Electrum. This transaction now shows in Bitcoin Core as belonging to one of my watch-only addresses but does not show in Electrum. The ismine(\"address\") command in Electrum returns false. I also can't sign messages with the address in Electrum with my hardware wallet connected as Electrum says the address doesn't belong to the wallet.I can't tell what went wrong in your setup, but I wouldn't fund an address as seen in a watch-only wallet. The best practice to fund an address that belongs to your hardware wallet, is by verifying the address on the screen of your hardware wallet. That way, you know for sure you can access the funds.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "January 03, 2023, 01:56:05 PM",
+      "body": "Quote from: pimlam on January 03, 2023, 09:45:16 AMIs the issue that Bitcoin Core has derived an address from my master public key that Electrum hasn't generated yet?Probably, it could be the difference in default \"gap limit\".Electrum only generates 20 addresses beyond the last used address while Bitcoin Core has 1000.For example: for fresh wallets, if the receiving address is at 21th index due to multiple use of getnewaddress commandElectrum wont be able to see it until some of its first address received btc.You can try to increase Electrum's gap limit to match Bitcoin Core's default by using a command,Open the console and enter (\"View->Show Console\" to enable the tab):Code:wallet.change_gap_limit(1000)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pimlam",
+      "created_time": "January 03, 2023, 07:25:43 PM",
+      "body": "Quote from: LoyceV on January 03, 2023, 01:23:47 PMQuote from: pimlam on January 03, 2023, 09:45:16 AMHowever, Bitcoin Core's \"receiving addresses\" show addresses that do not belong to my wallet according to Electrum. I tried to send a test amount to one of the addresses in Bitcoin Core that were not shown in Electrum. This transaction now shows in Bitcoin Core as belonging to one of my watch-only addresses but does not show in Electrum. The ismine(\"address\") command in Electrum returns false. I also can't sign messages with the address in Electrum with my hardware wallet connected as Electrum says the address doesn't belong to the wallet.I can't tell what went wrong in your setup, but I wouldn't fund an address as seen in a watch-only wallet. The best practice to fund an address that belongs to your hardware wallet, is by verifying the address on the screen of your hardware wallet. That way, you know for sure you can access the funds.Thanks, well aware of this and normally I wouldn't. Just wanted to test the watch-only wallet's addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pimlam",
+      "created_time": "January 03, 2023, 07:33:10 PM",
+      "body": "Quote from: nc50lc on January 03, 2023, 01:56:05 PMQuote from: pimlam on January 03, 2023, 09:45:16 AMIs the issue that Bitcoin Core has derived an address from my master public key that Electrum hasn't generated yet?Probably, it could be the difference in default \"gap limit\".Electrum only generates 20 addresses beyond the last used address while Bitcoin Core has 1000.For example: for fresh wallets, if the receiving address is at 21th index due to multiple use of getnewaddress commandElectrum wont be able to see it until some of its first address received btc.You can try to increase Electrum's gap limit to match Bitcoin Core's default by using a command,Open the console and enter (\"View->Show Console\" to enable the tab):Code:wallet.change_gap_limit(1000)Many thanks, this turned out to be the issue and I managed to fix it!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

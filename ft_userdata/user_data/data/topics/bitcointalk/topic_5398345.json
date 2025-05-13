@@ -1,0 +1,61 @@
+{
+  "id": "topic_5398345",
+  "title": "vinshet",
+  "author": "vinshet",
+  "created_time": "May 12, 2022, 04:31:07 PM",
+  "content": "Hi,My bitcoin.conf looks like this# Coreconf=/root/.bitcoin/bitcoin.confserver=1daemon=1prune=23552maxconnections=1000# TOR#proxy=127.0.0.1:9050#bind=127.0.0.1#listen=1#listenonion=1#onlynet=onion#dnsseed=0#RPCrpcuser=usernamerpcpassword=passwordfrom when I moved over from my node running over TOR.Problem is, my node still has outgoing connections to .onion addresses and not to IP addresses. When I type bitcoin-cli -getinfo, the proxies field says 127.0.0.1(9050)I have no idea how my node is functioning right now(IP or onion). Can anyone explain this behaviour?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398345",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "May 12, 2022, 05:11:24 PM",
+      "body": "First of all, all lines starting with # are comments, so they're ignored. Adding this character in front of a line deactivates it, in practice, so you can just as well delete them to reduce clutter.You probably still have some settings in Tor / torrc file. The most straightforward thing would be to go back and find the guide you used to set your node up and undo any Tor settings.Try opening the torrc file (sudo nano /etc/tor/torrc) and undo any changes that you can identify came from you.In short, commenting out the following lines should deactivate the Tor proxy on your system:Code:ControlPort 9051CookieAuthentication 1CookieAuthFileGroupReadable 1On another note, I find it highly questionable that your node's data directory is located in /root/. I'm not sure if you gave some custom permissions or if it even runs as root, but that doesn't look like good security practice. A bug in Core could give the attacker instant root on your machine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vinshet",
+      "created_time": "May 12, 2022, 05:23:16 PM",
+      "body": "So basically, if a machine runs TOR and bitcoind at the same time, without me making any configurations to the .conf file, it will by default be on the TOR network?So is my node a combination of IP and TOR? Under what circumstance would someone opt for this?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "May 13, 2022, 02:20:57 AM",
+      "body": "Quote from: vinshet on May 12, 2022, 05:23:16 PMSo basically, if a machine runs TOR and bitcoind at the same time, without me making any configurations to the .conf file, it will by default be on the TOR network?So is my node a combination of IP and TOR? Under what circumstance would someone opt for this?Normally not, no, for instance in my guide here: [Guide] FULL NODE OpenSUSE 15.3: bitcoind + electrs + c-lightning + RTL, I install Tor to run the Electrum server and Core Lightning over it, but Bitcoin Core runs over clearnet IP.I suspect you just still have some onion connections due to your prior config. Completely disabling Tor would be a quick fix and the most we can do with the little information you provided about your previous install.You can definitely configure your node to run IP and Tor. You'd get the benefits of censorship resistance through Tor while at the same time having fast IP connections. Such nodes are also required to kind of tie the two networks (IP and onion Bitcoin networks) together. Otherwise a block mined by a miner who only runs an IP node, wouldn't reach onion nodes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 13, 2022, 04:32:25 AM",
+      "body": "Also, changes to the config file only take effect after Bitcoin Core is restarted. I'm sure you already knew this but it's worth pointing out. You cannot just send SIGHUP or SIGUSR1 to Core and expect it to reload its configuration.Now, if you want to connect to peers by IP address rather than just Tor hidden service, you need to remove the onlynet=onion line from your config file, because that tells Bitcoin Core only to conenct to Tor nodes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vinshet",
+      "created_time": "May 13, 2022, 07:37:26 AM",
+      "body": "So what would the configuration look like if I want to run the bitcoin node over clearnet and on TOR?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 14, 2022, 09:54:40 AM",
+      "body": "Quote from: vinshet on May 13, 2022, 07:37:26 AMSo what would the configuration look like if I want to run the bitcoin node over clearnet and on TOR?Use the /etc/tor/torrc configuration settings posted by  n0nce, and then put the following lines in your Bitcoin.conf:Code:listen=1listenonion=1proxy=127.0.0.1:9051Note that the control port has been changed from the default 9050 port to 9051 (the same as Tor Browser in case you don't want to start the tor daemon. If you want it to use the default port, change the 9051 in both config files to 9050.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

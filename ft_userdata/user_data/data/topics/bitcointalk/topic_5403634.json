@@ -1,0 +1,85 @@
+{
+  "id": "topic_5403634",
+  "title": "RequestPrivacy",
+  "author": "RequestPrivacy",
+  "created_time": "June 22, 2022, 01:32:52 PM",
+  "content": "Hey everyone, happy to post my first question in THE bitcoin forum.Problem I just installed Bitcoin Core 22.0 on a Raspberry Pi4. As far as I understand it, the preferred authentication method for rpc calls should be via the .cookie file. Since I want to compartmentalize all software on the node I would have thought that the correct procedure is to create a dedicated group (say btcCookie) with read access to the .cookie file and then add the different users that need access to that group (I'm thinking of generic users like for an indexer). To create a dedicated group I changed the systemd bitcoin.service file to Code:[Service]# Run as bitcoin:btcCookieUser=bitcoin Group=btcCookieThis gave me indeed a dedicated group for the .cookie, bitcoind.pid and settings.json file. I'm not sure if it's a problem to have the pid and json file on the same group?!Code:bitcoin@debian:~/.bitcoin $ lltotal 183364drwxrwx--- 5 bitcoin bitcoin        4096 Jun 22 14:32 .drwxr-xr-x 3 root    root           4096 Mar 13 17:26 ..drwx------ 3 bitcoin bitcoin      176128 Jun 22 06:20 blocksdrwx------ 2 bitcoin bitcoin      106496 Jun 22 14:37 chainstatedrwx------ 3 bitcoin bitcoin        4096 Apr  1 17:28 indexes-rw------- 1 bitcoin btcCookie        75 Jun 22 14:32 .cookie-rw------- 1 bitcoin bitcoin           0 Apr  1 17:28 .lock-rw------- 1 bitcoin bitcoin          34 Apr  1 17:28 banlist.json-rw-r--r-- 1 bitcoin bitcoin        5480 Jun 22 14:17 bitcoin.conf-rw------- 1 bitcoin btcCookie         6 Jun 22 14:32 bitcoind.pid-rw------- 1 bitcoin bitcoin   184060873 Jun 22 14:37 debug.log-rw------- 1 bitcoin bitcoin      247985 Jun 22 14:27 fee_estimates.dat-rw------- 1 bitcoin bitcoin     1799583 Jun 22 14:27 mempool.dat-rw------- 1 bitcoin bitcoin     1282929 Jun 22 14:27 peers.dat-rw-r--r-- 1 bitcoin btcCookie         7 Jun 22 14:32 settings.json Anyways, now I need to get the .cookie file in a readable state for the btcCookie group like so: Code:bitcoin@debian:~/.bitcoin $ ll...-rw-r----- 1 bitcoin btcCookie        75 Jun 22 14:32 .cookie....I've found someone with the same question https://www.reddit.com/r/Bitcoin/comments/9y1rtn/correct_way_to_use_cookie_auth_on_server/ but I'm not sure if his process is advisable and his outcome isn't problematic (in the process he also made mempool.dat and peers.dat group readable).Another discussion re:permissions can be found here: https://bitcointalk.org/index.php?topic=5160894.0Questions1. How can I make the .cookie file group readable?2. Is it problematic to have either or all of the following as group readable (bitcoind.pid, settings.json, mempool.dat and peers.dat)?3. How can I prevent them from becoming group readable if so?4. If no1 isn't possible, how can I provide other users with read access to the .cookie file?Thank you and glad to be here!Cheers, RequestPrivacy",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403634",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "June 22, 2022, 02:30:59 PM",
+      "body": "I'm not familiar with what you're asking, but if all you want is to give a user access to .cookie, why not just chgrp the file and hardlink it into their home directory?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RequestPrivacy",
+      "created_time": "June 22, 2022, 03:21:25 PM",
+      "body": "Hey, thanks for the answer.Not sure if I'm missing something or don't understand the magic behind hard-linking to the users home but with my limited knowledge I see following problems:As the .cookie file is always created anew on bitcoind start and removed once bitconid is stopped, I don't know if chgrp would set the group permanently for the file. I wouldn't expect it to, as it's always a new file with new content. That's also the reason why I went via the bitcoind.service route to set the group ownership.And even it it would preserve the group, how can the hard-linking to the other users home extend the file permission from a file it couldn't read in the first place?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "June 22, 2022, 03:34:28 PMLast edit: June 22, 2022, 11:17:44 PM by jackg",
+      "body": "Can you not justCode:sudo chmod 640 .cookieIf you're not used to doing things like this, it might be a reason not to and just run everything under admin until you actually need something more secure (eg have something people are likely to interact with).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 22, 2022, 03:54:32 PM",
+      "body": "Quote from: RequestPrivacy on June 22, 2022, 03:21:25 PMAs the .cookie file is always created anew on bitcoind start and removed once bitconid is stopped, I don't know if chgrp would set the group permanently for the file. I wouldn't expect it to, as it's always a new file with new content.Can't you just recreate the hardlink and change group permissions each time bitcoind starts?Quotehow can the hard-linking to the other users home extend the file permission from a file it couldn't read in the first place?I was thinking something like this:Code:chgrp btcCookie .cookiechmod 640 .cookieln /home/bitcoin/.bitcoin/.cookie /home/anotheruser/.cookieAnd \"anotheruser\" needs to be in group \"btcCookie\". I usually just edit /etc/group for that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RequestPrivacy",
+      "created_time": "June 22, 2022, 04:35:49 PM",
+      "body": "Those are all valid manual  ways but I want to have my node do do this automatically. I should have been more precise in communicating my final goal:I want to set-up the node in such a way that - once it has a power failure and power comes back - everything auto-starts without me setting groups, links or permissions. power comes back, Pi OS startssystemctl starts bitcoind which creates the .cookie fileonce bitcoind is up, systemctl starts the indexerSo I could write a script which looks for the .cookie file and once it is created by bitcoind changes group and permissions. systemctl would have to wait for this script to finish before bringing the indexer back up since its user needs the permissions to work properly. I just though there is an easier way provided by bitcoind itself, as I thought that's the whole point of the .cookie file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tadamichi",
+      "created_time": "June 22, 2022, 08:29:22 PM",
+      "body": "Quote from: RequestPrivacy on June 22, 2022, 04:35:49 PMThose are all valid manual  ways but I want to have my node do do this automatically. I should have been more precise in communicating my final goal:I want to set-up the node in such a way that - once it has a power failure and power comes back - everything auto-starts without me setting groups, links or permissions. This is possible and i have it set up that way. Theres actually an easy guide, that worked flawlessy for me, you might wanna look into it. You dont need a script btw.https://raspibolt.org/guide/bitcoin/bitcoin-client.html#create-the-bitcoin-user",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 22, 2022, 10:58:59 PM",
+      "body": "Quote from: RequestPrivacy on June 22, 2022, 04:35:49 PMSo I could write a script which looks for the .cookie file and once it is created by bitcoind changes group and permissions. systemctl would have to wait for this script to finish before bringing the indexer back up since its user needs the permissions to work properly. I just though there is an easier way provided by bitcoind itself, as I thought that's the whole point of the .cookie file.Take note of the above reference. Especially the systemd config: https://raspibolt.org/guide/bitcoin/bitcoin-client.html#autostart-on-boot.What you need is the -startupnotify=\"chmod g+r /home/bitcoin/.bitcoin/.cookie\" parameter.Quote from: https://github.com/bitcoin/bitcoin/blob/7fcf53f7b4524572d1d0c9a5fdc388e87eb02416/doc/release-notes/release-notes-0.21.0.md#new-settingsThe startupnotify option is used to specify a command to execute when Bitcoin Core has finished with its startup sequence. (#15367)And I don't think you need a separate bitcoin group. You just need bitcoin:bitcoin, and only assign the .cookie file as group readable, with the above command.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 23, 2022, 10:58:15 AM",
+      "body": "Place an ExecStartPost in the service section of the unit file pointing to a script (you can place it in /usr/local/bin), with the following contents:Code:#!/bin/bash# Wait 5 seconds for Bitcoind to initialize, so that the cookie file is known to be created:sleep 5# Now change the permissions of the cookie file:chmod 0640 /home/<you>/.bitcoin/.cookieThe ExecStartPost script runs immediately after the service is started (ie. bitcoind is started by systemd).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RequestPrivacy",
+      "created_time": "June 23, 2022, 08:50:49 PM",
+      "body": "Thank you all for the discussion and your suggestions. The solutions @tadamichi @vv181 and @NotATether provided are exactly the thing I was looking for.One final thing about groupingQuote from: vv181 on June 22, 2022, 10:58:59 PMAnd I don't think you need a separate bitcoin group. You just need bitcoin:bitcoin, and only assign the .cookie file as group readable, with the above command.If I go with bitcoin:bitcoin and add every user who needs access to the .cookie file to the bitcoin group there is the potential that I give them all access to all other files only by falsely setting a group permission of a file. With a dedicated bitcoin:btcCookie group for the .cookie file there is an additional layer of protection - since the other files would still be owned by bitcoin:bitcoin only. I would have to mess up group ownership AND file permissions. Maybe a bit overkill, I know  but hey, why not",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

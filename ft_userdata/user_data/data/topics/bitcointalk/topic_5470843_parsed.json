@@ -1,0 +1,37 @@
+{
+  "id": "topic_5470843",
+  "title": "Dr88",
+  "author": "Dr88",
+  "created_time": "October 18, 2023, 09:22:25 PM",
+  "content": "hi how to mod this two array in c    //a=0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f8179const uint64_t  a[4] =  {0x59f2815b16f81798, 0x029bfcdb2dce28d9, 0x55a06295ce870b07, 0x79be667ef9dcbbac};  // b=0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8const uint64_t  b[4] =  {0x9c47d08ffb10d4b8, 0xfd17b448a6855419, 0x5da4fbfc0e1108a8, 0x483ada7726a3c465};// result = a%b; uint64_t  result[4];",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5470843",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "October 19, 2023, 09:18:34 AMLast edit: October 19, 2023, 11:00:31 AM by NotATether",
+      "body": "Use the GMP library which allows for arbitrary-precision integers. It's much easier than trying to modulo multiple uint64_t parts - although you kinda miss out on performance if your end goal is to run it on CUDA.You can even import these numbers in hexadecimal base - as well as any other base.I'm going to assume your numbers are in big-endian, because manually flipping the bytes is too tedious for me.Code:const char* a = \"59f2815b16f81798029bfcdb2dce28d955a06295ce870b0779be667ef9dcbbac\";const char* b = \"483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8\";char result[256];mpz_t ma, mb, mresult;mpz_init(ma);mpz_init(mb);mpz_init(mresult);mpz_set_str(ma, a, 16);mpz_set_str(mb, b, 16);mpz_fdiv_r(mresult, ma, mb); // <--- modulusmpz_get_str(result, 16, mresult); // returns a hex string without a prefix// ...mpz_clear(ma);mpz_clear(mb);mpz_clear(mresult);EDIT: forgot to add bases to mpz_set_str",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 19, 2023, 10:54:19 PMLast edit: October 20, 2023, 06:09:41 AM by digaran",
+      "body": "Generator point on OP is invalid,  the last digit of //a = is missing, and NotATether, can you tell me why you used the correct y but mixed the x? So if your code is used the result would be unrelated to secp256k1.What I like to know, what is the purpose of using Gx mod Gy?Edit, thanks for the reply, I thought there is something new regarding the change of G in your script that I didn't know of.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 20, 2023, 06:02:15 AM",
+      "body": "Quote from: digaran on October 19, 2023, 10:54:19 PMGenerator point on OP is invalid,  the last digit of //a = is missing, and NotATether, can you tell me why you used the correct y but mixed the x? So if your code is used the result would be unrelated to secp256k1.What I like to know, what is the purpose of using Gx mod Gy?I just copied OP's pseudocode and changed it to use GMP - I had no idea that this was the generator point, but you can easily fix that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "id": "topic_5474083",
+  "title": "apogio",
+  "author": "apogio",
+  "created_time": "November 14, 2023, 08:30:09 PM",
+  "content": "Problem: I have really been struggling with understanding how the transaction size is calculated.Question: I will post my thoughts below. I will ask my questions with red color.The best answer: Every answer is much appreciated. However, I would be very happy if one could also point an example, either from a real transaction or not.A bitcoin transaction takes N inputs and produces X outputs.The transaction includes the following parts:Version4 bytes# of Inputs(How many bytes is this ?)InputsEach input's size (*)# of Outputs(How many bytes is this ?)OutputsEach output's size (**)Locktime4 Bytes* Each input consists of the following fields:TXID32 bytesVOUT4 bytesScriptSig Size(How many bytes is this ?)ScriptSig(How many bytes is this ?)Sequence4 Bytes** Each output consists of the following fields:Value8 bytesScriptPubKey Size(How many bytes is this ?)ScriptPubKey(How many bytes is this ?)",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5474083",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "November 14, 2023, 08:50:44 PM",
+      "body": "Quote from: apogio on November 14, 2023, 08:30:09 PMThe transaction includes the following parts:Version4 bytes# of Inputs(How many bytes is this ?)InputsEach input's size (*)# of Outputs(How many bytes is this ?)OutputsEach output's size (**)Locktime4 BytesIf I should not repeat myself again, because I posted something about this quoted part in the past, you read this about this part that I quote:Quote from: Charles-Tim on October 16, 2023, 11:11:42 AMLegacy addresses starts from 1Nested segwit starts from 3 (although not only nested segwit starts from 3)Segwit version 0 starts from bc1qSegwit version 1 starts from bc1p (pay-to-taproot)This is the formula necessary for the calculation:Formula:For legacy address: vbyte= Input*148 + output*34 + 10 plus or minus inputFor nested segwit: vbyte= Input*93 + output*32 + 10 plus or minus inputFor segwit version 0: vbyte= Input*68 + output*31 + 10 plus or minus inputFor pay-to-taproot: vbyte= Input*57.5 + output*43 + 10 plus or minus inputTo know more about the input and output virtual size: https://bitcoinops.org/en/tools/calc-size/To know more about the transaction virtual size: https://jlopp.github.io/bitcoin-transaction-size-calculator/For mempool (beginners): https://mempool.space/Mempool for advanced users: https://jochen-hoenicke.de/queue/#BTC%20(default%20mempool),24h,weightFor example:If you use the vbyte calculator or that formula above for 1 input and 2 outputs for native segwit addresses, you will get 110 vbyte as the virtual size of 1 input 2 outputs transaction.To check the fee rate, click on the above second to the last, or last link. Assuming the fee rate is 5 sat/vbyte. Fee rate = fee ÷ vbyteFee = fee rate * vbyteFee = 5 * 110Fee = 550 sat (0.0000055 BTC). I mean for 1 input and 2 outputs for segwit version 0.Which means the higher the fee rate, the higher the fee. As mempool is becoming more congested, the fee rate will increase and the fee will increase. Also if you understand ehat I explained above, you will noticed that as the input count is increasing, the fee will also increase. Also as the output count is increasing, the fee is also increasing. But if you send to two different addresses separately, the fee would be more. So we can still say increase in the output will make the fee to decrease, despite that the fee is increasing, but lower than sending to each addresses separately.From the virtual sizes, you can also know that you can save more in fee if you use segwit version 0 and pay-to-taproot addresses while legacy addresses have the highest fee.Also you will know that pay-to-taproot will be good for consolidation, while segwit version 0 for paying to many addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "November 15, 2023, 05:46:45 AM",
+      "body": "https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integerQuoteVariable length integerInteger can be encoded depending on the represented value to save space. Variable length integers always precede an array/vector of a type of data that may vary in length. Longer numbers are encoded in little endian.Code:+----------------+----------------+-----------------------------------------+| Value          | Storage length | Format                                  |+----------------+----------------+-----------------------------------------+| < 0xFD         |              1 | uint8_t                                 || <= 0xFFFF      |              3 | 0xFD followed by the length as uint16_t || <= 0xFFFF FFFF |              5 | 0xFE followed by the length as uint32_t || -              |              9 | 0xFF followed by the length as uint64_t |+----------------+----------------+-----------------------------------------+If you're reading the Satoshi client code (BitcoinQT) it refers to this encoding as a \"CompactSize\". Modern Bitcoin Core also has the VARINT macro which implements an even more compact integer for the purpose of local storage (which is incompatible with \"CompactSize\" described here). VARINT is not a part of the protocol.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "EL MOHA",
+      "created_time": "November 15, 2023, 07:43:40 AM",
+      "body": "The formulas from the last two responses are actually good for simplicity but one thing I noticed is that the calculations are not always accurate due to some informations or transactions details like the number of signatures  although it is not much different but when the input and output are much then it matters. So an accurate estimation will be gotten if one knows the full transaction details. You can refer to this tool by bitmover to cross check your calculations when practicing the above formulas",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 15, 2023, 03:31:00 PMLast edit: November 16, 2023, 10:41:14 AM by o_e_l_e_o",
+      "body": "I'll use your table to answer your parts in red:The transaction includes the following parts:Version4 bytes# of Inputs(VarInt. Will typically be one byte, unless you have more than 0xFC (252) inputs.)InputsEach input's size (*)# of Outputs(VarInt. Will typically be one byte, unless you have more than 0xFC (252) outputs.)OutputsEach output's size (**)Locktime4 Bytes* Each input consists of the following fields:TXID32 bytesVOUT4 bytesScriptSig Size(VarInt. Will typically be one byte for a ScriptSig of 252 bytes or fewer. 3 bytes for a ScriptSig of 10,000 bytes (the upper limit prior to taproot).)ScriptSig(Depends entirely on the ScriptSig. Typically ~107 bytes for a standard legacy P2PKH input.)Sequence4 Bytes** Each output consists of the following fields:Value8 bytesScriptPubKey Size(VarInt. Will typically be one byte for a ScriptPubKey of 252 bytes or fewer. 3 bytes for a ScriptPubKey up to 10,000 bytes.)ScriptPubKey(Again, depends on the ScriptPubKey. 25 bytes for a standard legacy P2PKH output.)VarInts are encoded as vjudeu has explained above. Anything up to 252 bytes is encoded in a single byte up to 0xFC. Anything above that and up to the maximum of 10,000 bytes will be encoded in three bytes with a 0xFD prefix, such as 0xFD2222.ScriptSigs will vary depending on a number of factors such as address type, locking script, grinding for small R values, and so on. These will also be calculated differently for segwit inputs given this is witness data. (Transactions spending segwit inputs will also need a segwit flag in the header). A standard P2PKH ScriptSig will typically be ~107 bytes. A standard P2WPKH segwit ScriptSig will typically be 107 vbytes, which will then work out to 26.75 bytes.ScriptPubKeys will vary depending on the output type:P2PKH - 25 bytesP2SH - 23 bytesP2WPKH - 22 bytesP2WSH - 34 bytesP2TR - 34 bytesHere is a very thorough explanation which might help you further: https://bitcoin.stackexchange.com/questions/92689/how-is-the-size-of-a-bitcoin-transaction-calculated",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 15, 2023, 06:48:04 PM",
+      "body": "Quote from: vjudeu on November 15, 2023, 05:46:45 AM<~>Brilliant, thanks! I really like how deep this link goes, but I need to study it further to understand it. Gonna need some time.Quote from: Charles-Tim on November 14, 2023, 08:50:44 PMFormula:For legacy address: vbyte= Input*148 + output*34 + 10 plus or minus inputFor nested segwit: vbyte= Input*93 + output*32 + 10 plus or minus inputFor segwit version 0: vbyte= Input*68 + output*31 + 10 plus or minus inputFor pay-to-taproot: vbyte= Input*57.5 + output*43 + 10 plus or minus inputWhat do you mean \"plus or minus input\" ?For 1 input and 2 outputs for segwit 0, the result should be 1*68 + 2*31 + 10 = 140 vB. Am I wrong?I appreciate that you also provided me with a formula to calculate fees, even if it seems trivial! Cheers!Quote from: o_e_l_e_o on November 15, 2023, 03:31:00 PMScriptSigs will vary depending on a number of factors such as address type, locking script, grinding for small R values, and so on. These will also be calculated differently for segwit inputs given this is witness data. (Transactions spending segwit inputs will also need a segwit flag in the header). A standard P2PKH ScriptSig will typically be ~107 bytes. A standard P2WPKH segwit ScriptSig will typically be 107 vbytes, which will then work out to 26.75 bytes.ScriptPubKeys will vary depending on the output type:P2PKH - 25 bytesP2SH - 23 bytesP2WPKH - 22 bytesP2WSH - 34 bytesP2TR - 34 bytesHere is a very thorough explanation which might help you further: https://bitcoin.stackexchange.com/questions/92689/how-is-the-size-of-a-bitcoin-transaction-calculatedThanks mate. Very helpful information.So, having seen all that, I assume:1. It is always better (but of course rarely possible) to spend a whole UTXO, since it is the only way to have 1 and not 2+ outputs. Correct?2. The amount of sats doesn't count at all, as it is always represented by 8 bytes of information in the output. Correct? I kinda knew that bit already, but I ask for clarification.Finally,Can you give 2-3 tips to follow if I wanted to create better transactions in terms of weight? Take for granted that I use coin-control by default, so I always choose the UTXOs I spend. What I want is a way to treat them more wisely.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 15, 2023, 07:56:29 PM",
+      "body": "Quote from: apogio on November 15, 2023, 06:48:04 PMFor 1 input and 2 outputs for segwit 0, the result should be 1*68 + 2*31 + 10 = 140 vB. Am I wrong?Correct. Or maybe 141 vbytes, depending on the exact size of the signature for the input.Quote from: apogio on November 15, 2023, 06:48:04 PM1. It is always better (but of course rarely possible) to spend a whole UTXO, since it is the only way to have 1 and not 2+ outputs. Correct?Correct. Not only cheaper, but also more private by avoiding creating change. If you hold a variety of UTXO sizes, then you can usually find one close to the size you need and can maybe add a few more products in to your basket to make up the difference.Quote from: apogio on November 15, 2023, 06:48:04 PM2. The amount of sats doesn't count at all, as it is always represented by 8 bytes of information in the output. Correct? I kinda knew that bit already, but I ask for clarification.Also correct. Whether you are sending a thousand sats or a thousand bitcoin, it's always 8 bytes. Also note that this number is little endian. So if I wanted to send you 1 BTC, that would be 100,000,000 sats, which in hex is 0x0000000005F5E100, which would be encoded as 00E1F50500000000.Quote from: apogio on November 15, 2023, 06:48:04 PMCan you give 2-3 tips to follow if I wanted to create better transactions in terms of weight? Take for granted that I use coin-control by default, so I always choose the UTXOs I spend. What I want is a way to treat them more wisely.Minimize the number of inputs and number of outputs. Ideally spend from taproot addresses and send to native segwit addresses, but in reality just use either native segwit or taproot, which ever you prefer, since the difference is very small.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 15, 2023, 08:13:35 PM",
+      "body": "Quote from: o_e_l_e_o on November 15, 2023, 07:56:29 PMMinimize the number of inputs and number of outputs. Ideally spend from taproot addresses and send to native segwit addresses, but in reality just use either native segwit or taproot, which ever you prefer, since the difference is very small.There is not an ideal UTXO size after all. You need variety so you can use it wisely.This is more difficult when you want privacy. The main issue is that Coinjoin implementations normally split UTXOs in standard UTXO sizes. For example in whirlpool the main pools are 100k sats and 1m sats. That said, if you put 750k sats, you must split it in 7 UTXOs of 100k sats and 50k sats for badbank.Therefore you are kind of obligated to use specific UTXO sizes. At least, to my knowledge... If you have any suggestions on other tools and implementations I am glad to listen to them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "November 15, 2023, 08:30:21 PM",
+      "body": "QuoteIdeally spend from taproot addresses and send to native segwit addresses, but in reality just use either native segwit or taproot, which ever you prefer, since the difference is very small.In the best case, we would only have taproot-to-taproot transactions, and nothing else. Because Taproot can handle both spend-by-key and spend-by-script.But of course, if you think about fees, then Segwit output is cheaper to create, but more expensive to spent. Which means, if you spend from Taproot into Segwit, it is the cheapest option, but in the long-term, it is more expensive, because your recipient will pay that price. So, in the perfect case, taproot-to-taproot produces the least amount of on-chain bytes, if you spend-by-key, and not by TapScript (well, technically, spending by TapScript could be cheaper, but then it will be unsafe, if you make it spendable without any signatures).So, to sum up: using Taproot and spending by key, is the easiest case to compress, even if it is not the cheapest, if you count your fees.QuoteTherefore you are kind of obligated to use specific UTXO sizes.The perfect choice is a huge multisig, hidden in a single Taproot address. Then, you can have for example 1000-of-1000 multisig, and then if there is 10 BTC on such address, then you don't know if everyone owns 0.01 BTC, or how exactly this amount is splitted between all participants. But still, this is the song of the future, for now, we have widely deployed 2-of-2 multisigs, and not much more than that. But of course, more things are possible, even if we are not there yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 16, 2023, 07:23:40 AM",
+      "body": "Quote from: vjudeu on November 15, 2023, 08:30:21 PMThe perfect choice is a huge multisig, hidden in a single Taproot address. Then, you can have for example 1000-of-1000 multisig, and then if there is 10 BTC on such address, then you don't know if everyone owns 0.01 BTC, or how exactly this amount is splitted between all participants. But still, this is the song of the future, for now, we have widely deployed 2-of-2 multisigs, and not much more than that. But of course, more things are possible, even if we are not there yet.Do you have any examples I could look into? Perhaps a mempool.space link with such a transaction?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 16, 2023, 08:28:35 AM",
+      "body": "Here is an exhaustive breakdown of how transaction size is calculated:version takes 4 bytes, it's on legacy and segwit.marker takes 1 byte, it's on segwit only (for identifying segwit transaction - always 0x00).flag takes 1 byte, it's on segwit only (for identifying segwit transaction - always 0x01).input_count is a varint (see below), it's on legacy and segwit. Also it's not allowed to be zero (helps to identify segwit transactions).inputs is a sequence of objects, it's on legacy and segwit. The objects are defined in the following order:        inputs[j].prev_tx_hash takes 32 bytes, it's on legacy and segwit.        inputs[j].prev_tx_output_index takes 4 bytes, it's on legacy and segwit.        inputs[j].script_length is a varint (see below), it's on legacy and segwit.        inputs[j].script_signature has length script_length bytes and is big endian, it's on legacy and segwit.        inputs[j].sequence takes 4 bytes and is big endian, it's on legacy and segwit.output_count is a varint (see below), it's on legacy and segwit. Also it's not allowed to be zero.outputs is a sequence of objects, it's on legacy and segwit. The objects are defined in the following order:        outputs[j].amount takes 8 bytes, it's on legacy and segwit.        outputs[j].script_length is a varint (see below), it's on legacy and segwit.        outputs[j].script_pubkey has length script_length bytes and is big endian, it's on legacy and segwit.witness_data is a sequence of objects. It's on segwit only, and is specified here instead of with the rest of the inputs data to avoid introducing incompatibilities. The objects are defined in the following order:        witness_data[j].witness_count is a varint (see below), it's on segwit only.        witness_data[j].witness_array is a sequence of objects, it's on segwit only. The objects are defined in the following order:                witness_data[j].witness_array[k].element_length is a varint (see below), it's on segwit only.                witness_data[j].witness_array[k].element has length element_length bytes and is big endian, it's on segwit only. It is the value for inputs[j].witness[k].lock_time takes 4 bytes and is big endian, it's on legacy and segwit.Varints are processed like this: If the first byte is less than 0xfd, the encoded number is that first byte. If the first byte is equal to 0xfd, the encoded number is the NEXT 2 bytes only. If the first byte is equal to 0xfe, the encoded number is the NEXT 4 bytes only. If the first byte is equal to 0xff, the encoded number is the NEXT 8 bytes only. No other conditions are possible. Also, the total length of the varint is the first byte, as well as any subsequent bytes according to the above conditional.Please note: all fields are processed in little endian unless otherwise specified.Now that we know the transaction fields, it is trivial to calculate the size of the transaction:For legacy transactions: the transaction size is simply the byte length of the transaction.For segwit transactions: we need to get the byte length of the transaction and the byte length of the witness_data: First, we calculate the weight_units (WU), and this is just (transaction_length_bytes - witness_length_bytes) * 3 + transaction_length_bytes. Then the weight units can be converted into vbytes (made-up size for the purposes of the Bitcoin protocol) by calculating weight_units / 4 and rounding up or down appropriately (using round functions in standard libraries).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "November 16, 2023, 08:29:11 AM",
+      "body": "QuoteDo you have any examples I could look into?https://en.bitcoin.it/wiki/SchnorrQuotePerhaps a mempool.space link with such a transaction?This part is the best one: you will never know, if it is a single person, or 1000-of-1000 multisig. All you can see in any block explorer, is just some Taproot address, and a single signature. If you spend by key, all you can see is just a signature. Only if you spend by TapScript, you can see more details, but then it is more expensive, and less private.Also, for that reason, Ordinals should just use commitments, and always spend by key. But they are pushing data on-chain for no reason, which also makes censoring them possible, and makes them incompatible with other protocols like CoinJoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 16, 2023, 10:15:04 AM",
+      "body": "Quote from: NotATether on November 16, 2023, 08:28:35 AM        inputs[j].script_signature has length script_length bytes and is big endian, it's on legacy and segwit.That's not quite accurate. For segwit, since the signature is moved to witness data, this field is left empty, and the preceeding script length field will be 0x00.Quote from: vjudeu on November 16, 2023, 08:29:11 AMOnly if you spend by TapScript, you can see more details, but then it is more expensive, and less private.Here's a 998-of-999 taproot transaction: https://mempool.space/tx/7393096d97bfee8660f4100ffd61874d62f9a65de9fb6acf740c4c386990ef73",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 16, 2023, 10:17:41 AM",
+      "body": "Quote from: o_e_l_e_o on November 16, 2023, 10:15:04 AMQuote from: NotATether on November 16, 2023, 08:28:35 AM        inputs[j].script_signature has length script_length bytes and is big endian, it's on legacy and segwit.That's not quite accurate. For segwit, since the signature is moved to witness data, this field is left empty, and the preceeding script length field will be 0x00.But the format is still correct, since if the preceding varint equates to zero, then there is no script (of any kind) that comes after it.Quote from: o_e_l_e_o on November 16, 2023, 10:15:04 AMQuote from: vjudeu on November 16, 2023, 08:29:11 AMOnly if you spend by TapScript, you can see more details, but then it is more expensive, and less private.Here's a 998-of-999 taproot transaction: https://mempool.space/tx/7393096d97bfee8660f4100ffd61874d62f9a65de9fb6acf740c4c386990ef73That's lower than some of the average fees nowadays. But the spender used an ultra-low transaction fee to offset the huge virtual size, so when you look at it from that angle, then it's not so bad. Well as long as the application can tolerate very long confirm times that is.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

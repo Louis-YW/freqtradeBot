@@ -1,0 +1,37 @@
+{
+  "id": "topic_5451276",
+  "title": "FluffyMuffin005",
+  "author": "FluffyMuffin005",
+  "created_time": "May 05, 2023, 03:41:59 AM",
+  "content": "I have been at this for days so I am hoping someone here might be able to shed some light on this issue.  I have multiple miners with a similar issue.  My miners are failing with the error \"Voltage read fail. Will exit.\".  Below are the last few lines from the kernel log, but I have the full one available if needed: 2023-05-05 03:15:24 driver-btm-api.c:1134:check_asic_number_with_power_on: Chain[0]: find 65 asic, times 02023-05-05 03:15:36 driver-btm-api.c:1134:check_asic_number_with_power_on: Chain[1]: find 65 asic, times 02023-05-05 03:15:47 driver-btm-api.c:1134:check_asic_number_with_power_on: Chain[2]: find 65 asic, times 02023-05-05 03:15:55 driver-hash-chip.c:266:set_uart_relay: set uart relay to 0x3300032023-05-05 03:15:55 driver-btm-api.c:435:set_order_clock: chain[0]: set order clock, stragegy 32023-05-05 03:15:55 driver-btm-api.c:435:set_order_clock: chain[1]: set order clock, stragegy 32023-05-05 03:15:55 driver-btm-api.c:435:set_order_clock: chain[2]: set order clock, stragegy 32023-05-05 03:15:56 driver-hash-chip.c:502:set_clock_delay_control: core_data = 0x342023-05-05 03:15:56 driver-btm-api.c:1892:check_clock_counter: freq 50 clock_counter_limit 62023-05-05 03:15:56 chain = 0, mode = 2, load_done = true.2023-05-05 03:15:56 Voltage read fail. Will exit.2023-05-05 03:15:56 driver-btm-api.c:222:set_miner_status: ERROR_SOC_INIT2023-05-05 03:15:56 driver-btm-api.c:156:stop_mining: stop mining: soc init failed!2023-05-05 03:15:56 thread.c:1403:cancel_read_nonce_reg_thread: cancel thread2023-05-05 03:15:56 driver-btm-api.c:141:killall_hashboard: ****power off hashboard****Thus far, I have tried:--Resetting it to factory settings--Flashing the firmware multiple times with multiple version of Bitmain software--Disconnecting/reconnecting all cables--Cleaning off the hashing cards and connection barsI think this is a software issue because I tested all of the cards individually and they all work as expected.  I am able to mine with two cards connected, but not 3.  I also tested a few other 3rd party mining software that allowed me to mine, but I ran into issues with them crashing do to their DevFee not being accepted.  I would be fine leverage a different mining software if there is something decent out there, but so far I have tried Asic.to, Awesome Miner, NiceHash, and VNISH without much luck.  Is there a different version of Bitmain software to fix this issue or maybe a simple way to disable the voltage discrepancy check?  I reached out to Bitmain support as well, but have not heard back thus far. Any help would be much appreciated.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5451276",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "May 05, 2023, 03:55:10 PM",
+      "body": "If the point of your issue is this \"Voltage read fail. Will exit.\" Then possibly your PSU is not giving enough power which is why all 3 hashboard fail except if you only run two hashboard.You almost tried all mod firmware except Braiins OS. Would you mind to try the Braiins firmware and then go to auto-tuning and enable it then set the power limit to 1500w. Let's see if all 3 hashboard will run fine if it did you can increase the power limit to test if the PSU can handle higher power than 1500w.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "May 05, 2023, 04:42:15 PM",
+      "body": "also keep in mind \"2 out of three ain't bad\" https://www.youtube.com/watch?v=pvSlSYpYtZAMeatloaf",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mikeywith",
+      "created_time": "May 06, 2023, 09:37:10 PM",
+      "body": "Quote from: FluffyMuffin005 on May 05, 2023, 03:41:59 AMI think this is a software issue because I tested all of the cards individually and they all work as expected.  I am able to mine with two cards connected, but not 3.  I also tested a few other 3rd party mining software that allowed me to mine, but I ran into issues with them crashing do to their DevFee not being accepted. Code:2023-05-05 03:15:24 driver-btm-api.c:1134:check_asic_number_with_power_on: Chain[0]: find 65 asic, times 02023-05-05 03:15:36 driver-btm-api.c:1134:check_asic_number_with_power_on: Chain[1]: find 65 asic, times 02023-05-05 03:15:47 driver-btm-api.c:1134:check_asic_number_with_power_on: Chain[2]: find 65 asic, times 02023-05-05 03:15:56 Voltage read fail. Will exit.While the kernel log is incomplete, you perfectly posted the most important part, your 3 hash boards show 65 asic which means nothing is wrong with any of them, the last part which shows voltage read faill is simply trying to tell you that the firmware is not happy with the voltage readings in the EEPROM, this mostly happens due to putting different hash boards from different miners in a single miner, these hashboards come with voltage settings stored in the EEPROM and since there is only a single psu-busbar the feeds all three boards the voltage must be the same across all hash boards.have you just bought the miners in used condition? Have you switched hash boards between them? I'd guess one of the answers is a \"yes\".However, this does happen sometimes when trying to flash a different firmware, the hex file will get corrupted on some of the hashbords and thus the voltage settings are no longer there.Options:1- Get the tool from Zeusbtc.com to extract the hex file from one of the hashboards and then write it on the rest of the hashbaords' EEPROM.2- Use custom firmware that doesn't need/read the voltage settings stored on the EEPROM.Both Vnish and BO+ will work. Quote I would be fine leverage a different mining software if there is something decent out there, but so far I have tried Asic.to, Awesome Miner, NiceHash, and VNISH without much luck.  Aside from Nicehash all those are essentially different VNISH distributions, for all we know, Nicehash could also be a different form of VNISH, try BO+ and see if the Dev pool works fine.If not, you are going to need to figure out WHY does the dev pool fail to connect, router firewall, ISP blocking those IP addresses? you need to spend some time to troubleshoot the issue, and then depending on the distro you use, you can request support, if it's AwesomeMiner, you are going to need to contact Patrick, ASIC.to you are going to need to contact Marc, both are fellow Bitcointlak members and will be willing to help (tho i'd start by posting on their thread rather than PMing first).An alternative for the Zeusbtc.com tool may use something like pickit 3, I know pickit 3 works great on S9s and I was able to read/write the hex file, I don't recall if it works just fine on the 17 series, but a bit of research will be enough to figure out the answer.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

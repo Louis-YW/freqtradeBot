@@ -1,0 +1,85 @@
+{
+  "id": "topic_5404019",
+  "title": "pbies",
+  "author": "pbies",
+  "created_time": "June 25, 2022, 10:47:41 AMLast edit: July 16, 2022, 10:16:08 PM by pbies",
+  "content": "I upgraded keyhunter Python script. See below.Base58Check encode can be used from library which you should install before running the script with Code:pip install base58Below script is faster than the original one.Code:#!/usr/bin/pythonimport binasciiimport osimport hashlibimport sysimport base58# bytes to read at a time from file (10meg)readlength=10*1024*1024magic = '\\x01\\x30\\x82\\x01\\x13\\x02\\x01\\x01\\x04\\x20'magiclen = len(magic)def b58c(hex):    return base58.b58encode_check(hex)def sha256(hex):    return hashlib.sha256(hex).digest()def find_keys(filename):    keys = set()    with open(filename, \"rb\") as f:        # read through target file one block at a time        while True:            data = f.read(readlength)            if not data:                break            # look in this block for keys            pos = 0            while True:                # find the magic number                pos = data.find(magic, pos)                if pos == -1:                    break                key_offset = pos + magiclen                key_data = \"\\x80\" + data[key_offset:key_offset + 32]                keys.add(b58c(key_data))                pos += 1            # are we at the end of the file?            if len(data) == readlength:                # make sure we didn't miss any keys at the end of the block                f.seek(f.tell() - (32 + magiclen))    return keysdef main():    if len(sys.argv) != 2:        print \"./{0} <filename>\".format(sys.argv[0])        exit()    keys = find_keys(sys.argv[1])    for key in keys:        print keyif __name__ == \"__main__\":    main()EDIT:Taken from original: https://github.com/pierce403/keyhunterKeyhunter scans files for private keys. You may want to scan HDD image for lost private keys.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5404019",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "June 25, 2022, 02:13:26 PM",
+      "body": "It seems to be in Python 2, which is not supported any more, is very hard to download because the links were hidden by the Python website, and many packages do not work on it anymore.It should be very trivial to port it to Python 3, no? It should be just replacing things like print statements, unicode strings, and xrange() loops.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "June 26, 2022, 10:41:05 AM",
+      "body": "Quote from: NotATether on June 25, 2022, 02:13:26 PMIt seems to be in Python 2, which is not supported any more, is very hard to download because the links were hidden by the Python website, and many packages do not work on it anymore.It should be very trivial to port it to Python 3, no? It should be just replacing things like print statements, unicode strings, and xrange() loops.Done, Python3:Code:#!/usr/bin/python3import binasciiimport osimport hashlibimport sysimport base58# bytes to read at a time from file (10meg)readlength=10*1024*1024magic = b'\\x01\\x30\\x82\\x01\\x13\\x02\\x01\\x01\\x04\\x20'magiclen = len(magic)def b58c(hex):    return base58.b58encode_check(hex)def sha256(hex):    return hashlib.sha256(hex).digest()def find_keys(filename):    keys = set()    with open(filename, \"rb\") as f:        # read through target file one block at a time        while True:            data = f.read(readlength)            if not data:                break            # look in this block for keys            pos = 0            while True:                # find the magic number                pos = data.find(magic, pos)                if pos == -1:                    break                key_offset = pos + magiclen                key_data = b\"\\x80\" + data[key_offset:key_offset + 32]                keys.add(b58c(key_data))                pos += 1            # are we at the end of the file?            if len(data) == readlength:                # make sure we didn't miss any keys at the end of the block                f.seek(f.tell() - (32 + magiclen))    return keysdef main():    if len(sys.argv) != 2:        print(\"./{0} <filename>\".format(sys.argv[0]))        exit()    keys = find_keys(sys.argv[1])    for key in keys:        print(key)if __name__ == \"__main__\":    main()",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "June 26, 2022, 03:54:36 PMLast edit: June 26, 2022, 11:45:27 PM by pbies",
+      "body": "And now next version which is giving the keys immediately, as previous version has cached the keys before printing them:(still Python 3)Code:#!/usr/bin/python3import binasciiimport osimport hashlibimport sysimport base58readlength=10*1024*1024magic = b'\\x01\\x30\\x82\\x01\\x13\\x02\\x01\\x01\\x04\\x20'magiclen = len(magic)def b58c(hex): return base58.b58encode_check(hex)if len(sys.argv) != 2: print(\"./{0} <filename>\".format(sys.argv[0])) exit()with open(sys.argv[1], \"rb\") as f: while True:  data = f.read(readlength)  if not data:   break  pos = 0  while True:   pos = data.find(magic, pos)   if pos == -1:    break   key_offset = pos + magiclen   key_data = b\"\\x80\" + data[key_offset:key_offset + 32]   print(b58c(key_data))   pos += 1  if len(data) == readlength:   f.seek(f.tell() - (32 + magiclen))",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrivatePerson",
+      "created_time": "July 13, 2022, 09:14:46 PM",
+      "body": "What does this script do?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 14, 2022, 12:42:38 AM",
+      "body": "Quote from: PrivatePerson on July 13, 2022, 09:14:46 PMWhat does this script do?From the name (and the first lines of code that I checked), it may relate to:Quote from: https://github.com/pierce403/keyhunterkeyhunterA tool to recover lost bitcoin private keys from dead harddrives.I would advise pbies to confirm and link to the original software so people actually know what it is and what it can do, etc.; also a little benchmark would be great to see by how much it was sped up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 14, 2022, 05:39:44 AM",
+      "body": "Quote from: pbies on June 26, 2022, 03:54:36 PMAnd now next version which is giving the keys immediately, as previous version has cached the keys before printing them:A more efficient method would be to cache the keys for only a few seconds (in case more keys are found) before printing them to output and clearing the cache. That way, there is no I/O bottleneck, as printing stuff to the terminal continuously can drastically slow down loops by an order of magnitude.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "July 16, 2022, 10:17:38 PM",
+      "body": "Quote from: NotATether on July 14, 2022, 05:39:44 AMA more efficient method would be to cache the keys for only a few seconds (in case more keys are found) before printing them to output and clearing the cache. That way, there is no I/O bottleneck, as printing stuff to the terminal continuously can drastically slow down loops by an order of magnitude.There is no sense to print keys partially. Script is mainly for redirecting to a file (python3 keyhunter.py > keys.txt).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "July 16, 2022, 11:00:01 PM",
+      "body": "Quote from: pbies on July 16, 2022, 10:17:38 PMQuote from: NotATether on July 14, 2022, 05:39:44 AMA more efficient method would be to cache the keys for only a few seconds (in case more keys are found) before printing them to output and clearing the cache. That way, there is no I/O bottleneck, as printing stuff to the terminal continuously can drastically slow down loops by an order of magnitude.There is no sense to print keys partially. Script is mainly for redirecting to a file (python3 keyhunter.py > keys.txt).It might be better to take a file path as input, and have the script output the keys to that particular file path. If the intended use is for the script to output to a txt file, there shouldn't be the potential for it to output to the console output.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "July 17, 2022, 11:16:42 PMLast edit: August 05, 2022, 01:36:05 PM by pbies",
+      "body": "Quote from: PrimeNumber7 on July 16, 2022, 11:00:01 PMIt might be better to take a file path as input, and have the script output the keys to that particular file path. If the intended use is for the script to output to a txt file, there shouldn't be the potential for it to output to the console output. Input file path and filename are taken.This is nonsense to always write to a file and put that in code to take output filename always, like you can always redirect the output with > sign.Now you have two possible options to choose from - print to screen or print to a file.EDIT:I am pasting last version from me of keyhunter, it is made to produce WIF + '_0' (space) which is format to directly import to a wallet.Code:#!/usr/bin/python3import binasciiimport osimport hashlibimport sysimport base58readlength=10*1024*1024magic = b'\\x01\\x30\\x82\\x01\\x13\\x02\\x01\\x01\\x04\\x20'magiclen = len(magic)def b58c(hex): return base58.b58encode_check(hex)if len(sys.argv) != 2: print(\"./{0} <filename>\".format(sys.argv[0])) exit()with open(sys.argv[1], \"rb\") as f: while True:  data = f.read(readlength)  if not data:   break  pos = 0  while True:   pos = data.find(magic, pos)   if pos == -1:    break   key_offset = pos + magiclen   key_data = b\"\\x80\" + data[key_offset:key_offset + 32]   print(b58c(key_data).decode('utf-8')+' 0')   pos += 1  if len(data) == readlength:   f.seek(f.tell() - (32 + magiclen))",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "topic_5456033",
+  "title": "seekererebus",
+  "author": "seekererebus",
+  "created_time": "June 11, 2023, 11:08:17 AM",
+  "content": "Recently tried to use Boltz to increase outbound liquidity on my node, and it did not go well (lightning invoice expiry time of 5 min, just why???). Fast forward a day, and I have a mempool transaction, set to refund the failed swap, and it looks good except for one massive issue: 6 sats/vbyte fee, no RBF. It is highly unlikely we'll ever see fees that low be included in a block again.While I am not fully familiar with the technical details behind how the redeem script of a P2SH transaction works, I am confident that I can painstakingly build a transaction manually that can move the funds along once the current expires from the mempool, UNLESS the redeem script includes the exact output amount. Then, since changing that would invalidate the hash, I'm just screwed out of 1.5M sats unless the network suffers a hard drop.If it can be done, I would appreciate any help in doing it.Transaction hex: 0200000000010122dd1246a9b71797c40a196b3aa854aed92c8323ed82b3245aac7fd514f9d7990 1000000232200206ddac42f346e8284c4cd8197bd3496afe96d8b865c0f44c9cd3f2e6579860c70 feffffff01cc171700000000001600147ba600ced8d0f0418a1166551ced671159600e2b0347304 402206bb047b0958219708e81e542879c5c8f094df3e28e1ad9c1607032c34bb6c31b02202e0e6b 4811bccf29dddbc3240a6a97224af7c525dd5e41c4eac97facf1d0ca8d010065a91460785dd29f6 b6ffe470e3b536ce1776dcb112a5e87632102a8bd2491ea9d3f28863d5e8ad220898d68eea86b02 34a267cfa19b85a35278ad6703961c0cb17521034b37bdff60907573855560e2608966f3f5bb95d 60364f8266c3d0bf43756fad368ac961c0c00",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5456033",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "June 11, 2023, 01:33:46 PM",
+      "body": "Quote from: seekererebus on June 11, 2023, 11:08:17 AMIf it can be done, I would appreciate any help in doing it.Sorry, it can't be done.The fee is the difference between the input(s)' and output(s)' amount, not exactly indicated in the transaction.So to edit the fee, you would need to change the output's amount which will invalidate the signature.It's possible only for unsigned raw transaction.BTW, mempool isn't too bad right now and 6sat/vB wont be dropped from nodes with the default settings.Try re-broadcasting it and then perform CPFP (Child-Pays-For-Parent) to bump the overall fee rate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 11, 2023, 01:51:58 PM",
+      "body": "As nc50lc says you can try a CPFP by sending from bc1q0wnqpnkc6rcyrzs3ve23emt8z9vkqr3tld645t. Or you can spend the $60 to $70 or so that the VIABTC transaction accelerator is going to charge and pay them to do it.Or wait and hope. But, hope is not a great plan...-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seekererebus",
+      "created_time": "June 11, 2023, 02:37:58 PM",
+      "body": "Quote from: DaveF on June 11, 2023, 01:51:58 PMAs nc50lc says you can try a CPFP by sending from bc1q0wnqpnkc6rcyrzs3ve23emt8z9vkqr3tld645t. Or you can spend the $60 to $70 or so that the VIABTC transaction accelerator is going to charge and pay them to do it.Or wait and hope. But, hope is not a great plan...-DaveFirst I've heard of ViaBTC. Thanks for that. While the expense isn't great at least it's a way to get those funds back. CPFP is a nice alternate idea, but I just had LND refuse to use an unconfirmed transaction and I have no idea how or if I can get it to do that. Still, at least that bitcoin is no longer inaccessible to me. Much appreciated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 11, 2023, 02:43:36 PM",
+      "body": "Quote from: seekererebus on June 11, 2023, 02:37:58 PMCPFP is a nice alternate idea, but I just had LND refuse to use an unconfirmed transaction and I have no idea how or if I can get it to do that.Try this: https://docs.lightning.engineering/lightning-network-tools/lnd/unconfirmed-bitcoin-transactionsGo to the \"Incoming transactions\" part, there's a part that includes a guide on how to do CPFP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 11, 2023, 03:41:56 PM",
+      "body": "Also, if EVERYTHING ELSE FAILS you can also try to use chantools https://github.com/lightninglabs/chantoolsThis should allow you to get the BIP32 key from the wallet.db file and you can then import the private keys from there.Before doing anything with the above script make sure you have made a bunch of backups. Also, a bunch of 8 & 9 sat / vb got confirmed so there is some chance of this clearing if the trend continues with dips into the single digits.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

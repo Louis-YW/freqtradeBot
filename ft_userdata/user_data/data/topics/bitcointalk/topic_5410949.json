@@ -1,0 +1,53 @@
+{
+  "id": "topic_5410949",
+  "title": "takuma sato",
+  "author": "takuma sato",
+  "created_time": "August 23, 2022, 03:33:48 PM",
+  "content": "Could someone explain why is it considered theoretically impossible that enough miners could collude to steal funds sitting on non-legacy addresses through a 51% attack?I don't see how it's technically impossible, but as all things in Bitcoin, besides the clever programing, the real magic happens within the game theory, the system in which incentives are set so bad actors lose more than gain.My simple answer to this would be that even if they managed to reorg the chain and get the funds, the price would crash, so much that they would be left with nothing. There would be no alternative to go into, since trust would be lost. They would lose their shirt before they can take any financial decisions about it. However, one could argue they would add in shorts, but they risk massive sentences from fraud and manipulation, remember anything that interacts with the fiat world is highly monitored, specially at the levels these guys would be operating at.I would like to see your take on this. Me personally, I like to keep my funds on the original format just in case we actually see something crazy. Or at least, if I was loaded, I would be holding the main stack on legacy addresses, then keep some money on bc1 addresses that I wanted to spend if I wanted to save on fees, but wouldn't go all in on holding it on anything but the original format, assuming funds would still be there after such an an apocalyptic black swan scenario, at least im betting the chances would be better than having kept it on non-legacy addresses.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5410949",
+  "comments": [
+    {
+      "author": "tromp",
+      "created_time": "August 23, 2022, 04:28:29 PM",
+      "body": "Quote from: takuma sato on August 23, 2022, 03:33:48 PMCould someone explain why is it considered theoretically impossible that enough miners could collude to steal funds sitting on non-legacy addresses through a 51% attack?Of course it's considered possible in theory.QuoteMy simple answer to this would be that even if they managed to reorg the chainThere's no need to reorg the chain. They just build a block with a segwit stealing tx, which everyone else ignores(as it breaks the segwit softfork rules), but that they keep building on. Since they are assumed to have a hashpower majority, their chain will likely stay ahead of the segwit-faithful branch that other miners build on.Quotethe price would crashNo it wouldn't, because exchanges and other non-mining entities would ignore this longest branch which breaks their rules. All that would happen is that blocks come in more than twice as slow until the next difficulty adjustment kicks in.Quoteso much that they would be left with nothing.They would be left with nothing, since everyone else sees their coinbases as invalid.In short, it's not just up to the miners.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "August 23, 2022, 05:01:12 PM",
+      "body": "Guess what: P2SH was introduced long time ago, and nobody even think about stealing coins from those addresses, that begin with 3, without meeting conditions in that pushed script. And they are present even on chains with no Segwit, for example BCH. In theory, you could steal those coins by pushing the unlocking script on the stack, without providing other data, like signatures required by such script.So, if you worry that one day all Segwit addresses will be spendable, then why don't you worry about P2SH first?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 23, 2022, 05:40:36 PM",
+      "body": "That's no different than any other consensus rule not even just P2SH as garlonicon points out.  But say, why not bare pubkeys? Or hash160s ending with 0xbeef, coins mined in odd number blocks, or coins last moved before January 13th 2013?  By fixating on segwit it only shows that your thinking is being distorted by the dishonest fud of third parties.Since miner's honest behavior is created by user's nodes enforcing the rules-- not just for segwit but for all rules, you'd have a case to make about any rule whose enforcement was less than substantially ubiquitous-- and, indeed, many users refrain from adopting new functionality right after it is deployed for that reason.  But that assuredly doesn't apply to segwit now as enforcement today is very close to 100%, and in general the community adopts deployment plans for new functionality that almost guarantees high deployment ahead of activation (by synchronizing enforcement via the blockchain after a long time is given for deployment).As tromp noted an reorg wouldn't be very relevant but on that point:  Reorging back that far would be practically and economically infeasible and if one were to do so it would hardly be any harder to reorg back out p2sh or the mining of all blocks.  Also, it's typical for the activation of consensus rule changes to get hard coded in once they're deeply buried-- this is mostly done for simplicity reasons since the activation logic can be replaced with a one line check (or in some cases actually enforced all the way back to the start, if there were no violations in the history), but it also has the effect of making any absurd reorg attack impossible in theory and not just in practice which is helpful for anti-fud even if its real security consequence is irrelevant since if you're assuming attackers powerful enough to rewrite years of the chain the system already can't be secure.This is the case for segwit:bitcoin/src/chainparams.cpp:        consensus.BIP34Height = 227931;        consensus.BIP34Hash = uint256S(\"0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8\");        consensus.BIP65Height = 388381; // 000000000000000004c2b624ed5d7756c508d90fd0da2c7c679febfa6c4735f0        consensus.BIP66Height = 363725; // 00000000000000000379eaa19dce8c9b722d46ae6a57c2f1a988119488b50931        consensus.CSVHeight = 419328; // 000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5        consensus.SegwitHeight = 481824; // 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893Looking it up, this was implemented in PR16060 in 2019 so anything running that code or later wouldn't fail to activate segwit enforcement at that height even if a fairytale reorg were generated, making the OP's specific attack technically and not just practically impossible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 23, 2022, 06:41:04 PM",
+      "body": "Quote from: tromp on August 23, 2022, 04:28:29 PMThere's no need to reorg the chain. They just build a block with a segwit stealing tx, which everyone else ignores(as it breaks the segwit softfork rules), but that they keep building on. Since they are assumed to have a hashpower majority, their chain will likely stay ahead of the segwit-faithful branch that other miners build on.To make this clear to anyone else reading:Bitcoin protocol is composed of blocks, and the node software keeps track of all chaintips that split off the active tip, and their heights. In fact, if you run bitcoin-cli getchaintips, you will currently get more than 10 orphaned chaintips. The full nodes will mark these tips as invalid or (different flavors of) valid, depending on the validity of the blocks. Full nodes are hardcoded to discard invalid blocks, and to append only blocks that are valid.This means that if you have a chain that's e.g. 500 blocks longer than the active chain, but it has a single invalid block (for example it just runs OP_PUSHDATA through the scriptPubKey without reading witness), the entire chain from that invalid block is orphaned, because nodes will only append valid blocks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 23, 2022, 07:06:19 PM",
+      "body": "Quote from: takuma sato on August 23, 2022, 03:33:48 PMI would like to see your take on this. Me personally, I like to keep my funds on the original format just in case we actually see something crazy.You're wasting your money in fees. Even if such black swan scenario was possible, do you really believe there would be demand for bitcoin? Absolutely zero. SegWit transactions are just what most do; eliminate that, and people would immediately stop trusting the software. Quote from: takuma sato on August 23, 2022, 03:33:48 PMCould someone explain why is it considered theoretically impossible that enough miners could collude to steal funds sitting on non-legacy addresses through a 51% attack?There's no point in discussing about this, because if a 51% attack was made successfully, the game theory would have been invalidated. Stealing funds would have the exact same consequences to reversing the transactions of those funds, whether it's a legacy or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

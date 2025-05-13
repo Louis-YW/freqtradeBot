@@ -1,0 +1,125 @@
+{
+  "id": "topic_5448558",
+  "title": "AdamLLL",
+  "author": "AdamLLL",
+  "created_time": "April 12, 2023, 03:57:33 PMLast edit: April 12, 2023, 05:19:58 PM by AdamLLL",
+  "content": "For now, the mnemonic words is totally random which is hard for people to memorize. So，how to store the seed?I think it would be convenient to store the seed in Cloud or Hard Disk. Just apply some encrypt methods to encrypt the seed using a customized password and then store the encrypt file. If you need the seed, just use your password to decrypt it.But it's unsafe. Because, the encrypt file actually contains the information of the seed. And hackers can crack the encrypt file easily. I design an algorithm for user to encrypt their seed(128 binary bits) using customized words while the encrypt file wouldn't contain any informations(just totally random words in it). And this algorithm will help user store their seed.Here's the idea:We have a word list contains words larger than 65536.(Almost all the words we are using in daily life). And the order of the words in the word list is fully random.Encrypt process:1. Get the wallet seed which is 128 bits.2. Users choose 8 - 20 words from the word list. Suppose user choose n words.3. Then it will use SHA256 to hash the entropy and get a hash string(256bit).4. Combine the first m bits of the hash string(256 bits) and the seed(128 bits) to get the new entropy(128 + m bits).the relationship for m and n :(128 + m) % n = 05. Split the new entropy(128 + m bits) into n segments which means there are (128 + m)/n bits for each segment. 6. Each segment is corresponding to a word which the user choose. Change each segment(binary number) into decimal number. And this decimal number is the index of the word the user choose.7. Switch word which the user choose in the word list with the word which the index refer to. And get a new word list file.The new word list file is the result of encrypted algorithm. And the file doesn't contain any informations. Also, only the customized words user set can get the result. There's no collision in it.The hacker just have two way to crack it.1. Brute force. (But the difficulty is as same as brute force the public key).2. Guessing the password(the English word space is large, so it's hard).Decrypt process:1. Get the customized words(n words) and the word list file.2. Calculate the length of each segment.(m bits each segment).3. Get the index of each customized word in word list.4. Change the index to binary number and combine them together.5. Remove the part which longer than 128 bits(we add it before).6. Get the seed.Some problems:1. People may frequently just using small part of the wordlist(maybe 8k words are frequently used), and this makes the entropy for customized words very small.We can change the content of the wordlist. Adding more things people like to use. For example, we can add emoji, common Chinese words, common Japanese words,.. etc. We can have a discussion in community. And make all the stuffs in the word list are people frequently use in their life. And this will make the hacker more difficult to guess the password.I have a github implement with Golang：https://github.com/Adamlixi/encrypt-wallet-seed",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5448558",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "April 12, 2023, 04:17:47 PM",
+      "body": "That's a great way to mask the contents of a seed phrase, but is it really worth the risk of forgetting it?Keep in mind that most people's hard drives are like museums with a bunch of old lost files and folders relegated to the archives section - where they are never viewed again - after someone opens them once or twice.Decryption inevitably will store the seed somewhere in plaintext which makes any kind of encryption implementation vulnerable to side-channels (as almost everyone is running this through some 3rd party terminal or GUI).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AdamLLL",
+      "created_time": "April 12, 2023, 05:09:38 PM",
+      "body": "Quote from: NotATether on April 12, 2023, 04:17:47 PMThat's a great way to mask the contents of a seed phrase, but is it really worth the risk of forgetting it?Keep in mind that most people's hard drives are like museums with a bunch of old lost files and folders relegated to the archives section - where they are never viewed again - after someone opens them once or twice.Decryption inevitably will store the seed somewhere in plaintext which makes any kind of encryption implementation vulnerable to side-channels (as almost everyone is running this through some 3rd party terminal or GUI).Hi, the algorithm doesn't store the seed(as I said, there's no information in the crypto file). I don't actually find the vulnerability of side channels attack. I would appreciate if you can point out the vulnerability.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "April 12, 2023, 06:05:55 PM",
+      "body": "Quote from: AdamLLL on April 12, 2023, 05:09:38 PMQuote from: NotATether on April 12, 2023, 04:17:47 PMThat's a great way to mask the contents of a seed phrase, but is it really worth the risk of forgetting it?Keep in mind that most people's hard drives are like museums with a bunch of old lost files and folders relegated to the archives section - where they are never viewed again - after someone opens them once or twice.Decryption inevitably will store the seed somewhere in plaintext which makes any kind of encryption implementation vulnerable to side-channels (as almost everyone is running this through some 3rd party terminal or GUI).Hi, the algorithm doesn't store the seed(as I said, there's no information in the crypto file). I don't actually find the vulnerability of side channels attack. I would appreciate if you can point out the vulnerability.The side channel attack is not present in your algorithm directly, however it can be found indirectly inside the other software the end user is using to run your decryption algorithm inside and store the output. I mean: The terminal, text editor, the clipboard, the filesystem driver, those kind of things.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "April 12, 2023, 07:07:26 PM",
+      "body": "Some questions:Is the 64k word list the same for every seed, or is it randomized for each encoding?Encryption requires a secret. What is the secret in your method? You mention a password, but you don't use one in your algorithm.How is your method better than standard encryption methods?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 12, 2023, 07:44:00 PM",
+      "body": "Quote from: AdamLLL on April 12, 2023, 03:57:33 PMFor now, the mnemonic words is totally random which is hard for people to memorize.You aren't supposed to memorize it.Quote from: AdamLLL on April 12, 2023, 03:57:33 PMSo，how to store the seed?Write it down on paper. Job done.If you are desperate to store your seed phrase electronically, then encrypt it using a standard encryption method. Any time someone tries to come up with their own weird method such as this, they either make an error they haven't considered and so their whole system is so weak as to be easily attacked, or they make things so overly complicated that they can't actually recover their seed phrase and their coins at all.In your system you need to store both your customized seed phrase and your customized word list file. Where are you planning to store both of these things? If you can't store them securely, then your system can be broken. If you can store them securely, then your system is unnecessary since you can just store a (optionally encrypted) seed phrase and passphrase instead.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "April 12, 2023, 07:55:31 PM",
+      "body": "Quote from: o_e_l_e_o on April 12, 2023, 07:44:00 PMQuote from: AdamLLL on April 12, 2023, 03:57:33 PMSo，how to store the seed?Write it down on paper. Job done.That is exactly what is needed,  and additional security procedures will most likely add more risk and less security.You can also use a passphrase and write in a different piece of paper if you are worried about the security of the paper.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AdamLLL",
+      "created_time": "April 13, 2023, 01:37:33 AMLast edit: April 13, 2023, 05:00:46 AM by AdamLLL",
+      "body": "Quote from: odolvlobo on April 12, 2023, 07:07:26 PMSome questions:Is the 64k word list the same for every seed, or is it randomized for each encoding?Encryption requires a secret. What is the secret in your method? You mention a password, but you don't use one in your algorithm.How is your method better than standard encryption methods?Hi, 1. 64k word list is same for every seed. But the order of the words in it is randomized for every seed.2. \"secret\", you mean secret key? The customized phrase is the secret key(like password). You need to memorize it.3. It's  more secure than the standard encryption methods. When compare with cryptographically strong algorithm(AES), it's easier to set/memorize the password(just 8-20 words) while keeping the difficulty to crack it.The encrypt file always contains the information of the content in it. When you try to decrypt it, you can always find some clues. Because, you need to use the encrypted file to recover the information you store in it. But the password you set don't contain the information in the file. So, the encrypted file must store the information in it.But this method is very different. Just like BIP39, the customized words you set contains all the informations of the seed. And there's no information in the encrypted file. This can be understood as each seed has its corresponding word list.(BIP39 all the seed using same word list)The whole encryption process for this algorithm is just swapping the order of the words in 64k word list. Before the encryption you have a randomized word list, and after encryption you get a randomized word list(same words but in different order). And we can also prove that the word list we get using this method is a fully randomized file.This algorithm is designed for encrypting the seed. Because the length of the seed is fixed. So, you cannot use it to encrypt other file. The decryption process is same as the BIP39, just mapping the words(you customized) to the word list(related).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AdamLLL",
+      "created_time": "April 13, 2023, 02:04:15 AM",
+      "body": "Quote from: bitmover on April 12, 2023, 07:55:31 PMQuote from: o_e_l_e_o on April 12, 2023, 07:44:00 PMQuote from: AdamLLL on April 12, 2023, 03:57:33 PMSo，how to store the seed?Write it down on paper. Job done.That is exactly what is needed,  and additional security procedures will most likely add more risk and less security.You can also use a passphrase and write in a different piece of paper if you are worried about the security of the paper.Hi, different people have different opinions on it. Actually, in my opinion, \"write it down on paper\" is idealism. I think it is not the best way. To be honest, for now, fewer and fewer people use paper. I think we need to find a new solution to help people store their seed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AdamLLL",
+      "created_time": "April 13, 2023, 02:28:12 AM",
+      "body": "Quote from: o_e_l_e_o on April 12, 2023, 07:44:00 PMQuote from: AdamLLL on April 12, 2023, 03:57:33 PMFor now, the mnemonic words is totally random which is hard for people to memorize.You aren't supposed to memorize it.Quote from: AdamLLL on April 12, 2023, 03:57:33 PMSo，how to store the seed?Write it down on paper. Job done.If you are desperate to store your seed phrase electronically, then encrypt it using a standard encryption method. Any time someone tries to come up with their own weird method such as this, they either make an error they haven't considered and so their whole system is so weak as to be easily attacked, or they make things so overly complicated that they can't actually recover their seed phrase and their coins at all.In your system you need to store both your customized seed phrase and your customized word list file. Where are you planning to store both of these things? If you can't store them securely, then your system can be broken. If you can store them securely, then your system is unnecessary since you can just store a (optionally encrypted) seed phrase and passphrase instead.Hi, for the encryption algorithm problem, I really suggest you to try the algorithm. It's a very easy encryption algorithm. And we cannot stop trying just because of the possible risks, right? I would be very appreciated it, if anyone find the loophole on it.For the storage problem, I think it's a trade off. There's no absolutely safe space to store the seed(including paper). The customized phrase is stored in your brain(that's very important.). The word list file can be stored in cloud or hard disk. If you set a strong customized seed phrase, it's would very hard to get the seed just using the word list file(cause it's just a random file, and don't contain any informations). There's no general way to crack the file, the only general way is brute force. And I keep brute force difficulty same as 2^128. For now, it's impossible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "April 13, 2023, 03:06:57 AM",
+      "body": "Quote from: AdamLLL on April 13, 2023, 02:04:15 AMHi, different people have different opinions on it. Actually, in my opinion, \"write it down on paper\" is idealism. I think it is not the best way. To be honest, for now, fewer and fewer people use paper. I think we need to find a new solution to help people store their seed.There are not different opinions on this subject.The biggests specialists on the area ALL recommend to note the seed down in a piece of paper.We are talking about security best practices and procedures, not opinions. https://trezor.io/learn/a/recovery-seed-cardQuoteImportant security notes:- Never make a digital copy of your recovery seed- Keep your recovery seed card safe from fire, water damage, and risk of thefthttps://electrum.readthedocs.io/en/latest/faq.htmlQuoteI have forgotten my password. What can I do?It is not possible to recover your password. However, you can restore your wallet from its seed phrase and choose a new password. If you lose both your password and your seed, there is no way to recover your money. This is why we ask you to save your seed phrase on paper.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "April 13, 2023, 04:07:07 AM",
+      "body": "Quote7. Switch word which the user choose in the word list with the word which the index refer to. And get a new word list file.If you want to end up storing the result digitally then there is no point in this step (and the steps leading to this) because the main purpose of encoding the result as a set of words is to make it easy for the user to write down something they see on their screens with minimal risk of mistakes.This brings up another problem with your algorithm. Having a large word list means in that list there are words that ought to look similar (act, apt, aft,...) which means the risk of typos when user writes it down is high and the reason for using a word list is not there anymore.Quote1. Get the wallet seed which is 128 bits.Another problem is the fact that you limited this algorithm to 128-bit entropy/seed whereas BIP39 entropies can be from 128 to 256 bits.And biggest problem of all is that this is not exactly a cryptographically strong encryption algorithm. A better method would have been to use an actual encryption algorithm like AES to actually encrypt the entropy/seed and then encode that result however you liked and then stored that instead.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "April 13, 2023, 04:39:49 AM",
+      "body": "I hope you won't shoot your feet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 13, 2023, 07:28:09 AM",
+      "body": "Quote from: AdamLLL on April 13, 2023, 01:37:33 AM3. It's  more secure than the standard encryption methods.It absolutely isn't.Quote from: AdamLLL on April 13, 2023, 01:37:33 AMWhen compare with cryptographically strong algorithm(AES), it's easier to set/memorize the password(just 8-20 words) while keeping the difficulty to crack it.If you desperately want to commit something to memory (although as I explain below that's a terrible back up method), then just memorize the seed phrase or use 8-20 words as an encryption key using a standard encryption algorithm, and not some homemade harebrained scheme.Quote from: AdamLLL on April 13, 2023, 02:28:12 AMThe customized phrase is stored in your brain(that's very important.).Here is why you should absolutely never rely on your memory for any critical information or back up:Quote from: o_e_l_e_o on June 12, 2022, 03:18:40 PMEach year:69 million traumatic brain injuries: https://pubmed.ncbi.nlm.nih.gov/29701556/12 million strokes: https://www.world-stroke.org/assets/downloads/WSO_Global_Stroke_Fact_Sheet.pdf10 million new diagnoses of dementia: https://www.who.int/news-room/fact-sheets/detail/dementia5 million new diagnoses of epilepsy: https://www.who.int/news-room/fact-sheets/detail/epilepsy2.5 million cases of meningitis: https://www.path.org/articles/toward-world-without-meningitis/2 million new brain tumors: https://academic.oup.com/noa/article/3/1/vdaa178/60433151.5 million cases of encephalitis: https://www.sciencedirect.com/science/article/pii/S0163445322002110That's each year, and that's only major conditions which directly affect the brain. Add in things like cardiac arrest, heart disease, sepsis, shock, diabetes, vascular injury, hemorrhage, poisoning, smoke inhalation, etc., all of which can cause secondary brain injury, and there are literally hundreds of millions of people every single year who suffer some form of insult to their brain which can lead to memory problems.Do you want to trust all your coins to those odds? I know I don't.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "un_rank",
+      "created_time": "April 13, 2023, 08:04:22 AM",
+      "body": "Quote from: AdamLLL on April 13, 2023, 02:04:15 AMHi, different people have different opinions on it. Actually, in my opinion, \"write it down on paper\" is idealism. I think it is not the best way. To be honest, for now, fewer and fewer people use paper. I think we need to find a new solution to help people store their seed.By different people, you mean you and then almost everyone else? Writing your seed phrase down a paper provides basic security, using two papers in two different locations is almost fool-proof.Quote from: AdamLLL on April 13, 2023, 02:28:12 AMFor the storage problem, I think it's a trade off. There's no absolutely safe space to store the seed(including paper).There is no absolute safe place but paper and ink has been used to send down information from one generation to another, if done properly, with a piece of paper in a book and not just a single sheet and then duplicated, it can be a safe storage for your back up.Quote from: AdamLLL on April 13, 2023, 02:28:12 AMThe customized phrase is stored in your brain(that's very important).Phrases like \"store\" does not apply to the brain, you try to memorize things but cannot copy a piece of data to your brain for storage and request that data whenever you want.Think of how many things you forget each day, your keys, wallet, why you stepped into a room, the lyrics of that song you could sing by heart and on. Your brain is an exceptional organ and can retain incredible amounts of information, but it is still a human organ and can be affected by stress, age, injury, overload, nutrition, and other natural activities.- Jay -",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

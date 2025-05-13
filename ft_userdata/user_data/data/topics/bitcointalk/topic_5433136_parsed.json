@@ -1,0 +1,85 @@
+{
+  "id": "topic_5433136",
+  "title": "yoshimitsu777",
+  "author": "yoshimitsu777",
+  "created_time": "January 05, 2023, 01:45:07 PM",
+  "content": "i downloadedhttps://github.com/iceland2k14/secp256k1into directory /home/yin4/secp256k1Code:yin4@qq:~ ls secp256k1CHANGELOG.md  ice_secp256k1.dll  ice_secp256k1.so  LICENSE  __pycache__  README.md  secp256k1.pywhen i am inside this directory it works good and i can import with commandCode:yin4@qq:~/secp256k1$ python3>>> import secp256k1 as ice>>> ice.somecommandbut i want to have this working also if i start python3 console from /other/directoryi created sys environment variableCode:yin4@qq:/other/directory$ export PYTHONPATH=/home/yin4/secp256k1Code:yin4@qq:/other/directory$ python3>>> import secp256k1 as ice>>> ice.then I press tab but no commands available only these:Code:>>> ice.__ice.__annotations__     ice.__format__(         ice.__loader__          ice.__reduce_ex__(ice.__class__(          ice.__ge__(             ice.__lt__(             ice.__repr__()ice.__delattr__(        ice.__getattribute__(   ice.__name__            ice.__setattr__(ice.__dict__            ice.__gt__(             ice.__ne__(             ice.__sizeof__()ice.__dir__(            ice.__hash__()          ice.__new__(            ice.__spec__ice.__doc__             ice.__init__(           ice.__package__         ice.__str__()ice.__eq__(             ice.__init_subclass__(  ice.__path__            ice.__subclasshook__(ice.__file__            ice.__le__(             ice.__reduce__()        then i tryCode:>>> from secp256k1 import secp256k1 as iceFile ice_secp256k1.so not foundTraceback (most recent call last):  File \"<stdin>\", line 1, in <module>  File \"/home/yin4/secp256k1/secp256k1.py\", line 92, in <module>    ice.scalar_multiplication.argtypes = [ctypes.c_char_p, ctypes.c_char_p]   # pvk,retNameError: name 'ice' is not definedwhat is wrong how can i fix and use library from all directorys?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5433136",
+  "comments": [
+    {
+      "author": "citb0in",
+      "created_time": "January 05, 2023, 01:57:54 PM",
+      "body": "I am not a Python expert, but as far as I understand it correctly, it is because the library is not found. Look at line 27 of secp256k1.py there you can see how iceland tries to load the needed ice_secp256k1.so file. You could try to put the absolute path there, e.g. like this:Code:    #dllfile = 'ice_secp256k1.so'    dllfile = '/home/yin4/secp256k1/ice_secp256k1.so'this should work but I bet there is a more convenient and best-practice way to achieve this. You will certainly get some better ideas on this from other users...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 05, 2023, 03:45:22 PM",
+      "body": "fantastic now worksthanks.is there more elegant way to solve this?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 05, 2023, 06:13:16 PM",
+      "body": "Quote from: yoshimitsu777 on January 05, 2023, 03:45:22 PMfantastic now worksthanks.is there more elegant way to solve this?Python has a \"get home folder\" and \"get current directory\" functions in tho os module, you can look into those. Especially if you never change directories and just want your CWD to be the same folder your binary (and libs) are located at.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "January 06, 2023, 01:10:19 PMLast edit: January 06, 2023, 02:03:42 PM by citb0in",
+      "body": "Quote from: yoshimitsu777 on January 05, 2023, 03:45:22 PMfantastic now worksthanks.is there more elegant way to solve this?yes there is. I have written a patch that allows you to import iceland's secp256k1 module from any folder==> PATCH <==You can get the patch or clone the patched version from my git repository.Without the patch, it would be necessary to change to the directory where iceland's secp256k1 files are located. Then you would run Python console with \"python\" or \"python3\" and import the module with:Code:import secp256k1 as icethis only works because in the current working directory the file \"secp256k1.py\" exists and also the required shared library \"ice_secp256k1.so\" is located there. If you would try to start the Python console from another directory and load the module, it would fail with an error as you already noticed.With the patch you can do it from any working directory, it doesn't matter then which is your working directory. The module will always find its required shared library \"ice_secp256k1.so\".Additional note:Since many users use both the standard Python module secp256k1 as well as iceland2k14/secp256k1 I would personally recommend renaming iceland's module to e.g. ice_secp256k1. Because the two modules are different. This will prevent you from shadowing the other module when importing one of the two modules.I myself have placed all 3rd party python modules in ~/foo/python/modulesIceland's secp256k1 module is located in ~/foo/python/modules/ice_secp256k1To allow Python to search for modules in ~/foo/python/modules you can use the PYTHONPATH environment variable:Code:export PYTHONPATH=$PYTHONPATH:/home/citb0in/foo/python/modulesAs you do not want to do this on each system start or terminal start it is suggested to add the export command mentioned above in your ~/.bashrc so it is executed each time you login or start a new terminal. You can ensure that everything is correct byCode:echo $PYTHONPATHWhenever I need iceland's secp256k1 module, I import it like that:Code:python3Python 3.10.6 (main, Nov 14 2022, 16:10:14) [GCC 11.3.0] on linuxType \"help\", \"copyright\", \"credits\" or \"license\" for more information.>>> from ice_secp256k1 import secp256k1 as ice>>> ice.privatekey_to_address(0, True, 123)'141fTonryMQxmkKcba9FstmyQv3tqdBzTY'>>>Whenever I need Python's standard module \"secp256k1\" I just ueCode:import secp256k1This way you can clearly distinguish between the two modules with the same name and you do not run the risk of confusion and problems.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "January 06, 2023, 05:25:13 PM",
+      "body": ":-XHow to use this lib for scalar to scalar/number's multiplication , addition, substraction ? what function of modular inversion ?Br",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "January 06, 2023, 05:27:09 PM",
+      "body": "RTFM and see what functions are available and how they are used?https://github.com/iceland2k14/secp256k1/blob/main/README.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "January 06, 2023, 05:41:26 PM",
+      "body": "Quote from: citb0in on January 06, 2023, 05:27:09 PMRTFM and see what functions are available and how they are used?https://github.com/iceland2k14/secp256k1/blob/main/README.mdCan't find function for scalar. Only mul pub to priv, no function priv * priv for ex.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "January 06, 2023, 05:51:59 PM",
+      "body": "Quote from: COBRAS on January 06, 2023, 05:41:26 PMQuote from: citb0in on January 06, 2023, 05:27:09 PMRTFM and see what functions are available and how they are used?https://github.com/iceland2k14/secp256k1/blob/main/README.mdCan't find function for scalar. Only mul pub to priv, no function priv * priv for ex.https://github.com/iceland2k14/secp256k1/blob/main/secp256k1.pyyou can only use what's available or develop and extend the program and contribute to the project",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 07, 2023, 12:17:01 PM",
+      "body": "ecdsa123 is not human but ai bot and posting into forum with crazy things not fitting to topic or without questions.this bot tries to reply in context but often fails see herehttps://bitcointalk.org/index.php?topic=5433136.msg61556811#msg61556811https://bitcointalk.org/index.php?topic=5433027.msg61544585#msg61544585https://bitcointalk.org/index.php?topic=5432839.msg61542178#msg61542178ecdsa123 is same bot as Nt013 and some other names in forumQuote from: citb0inyes there is. I have written a patch that allows you to import iceland's secp256k1 module from any folder==> PATCH (https://github.com/iceland2k14/secp256k1/pull/39/commits/f2b3aefd54b5bcd9d09d2a1e01630ac3bd30d2a0) <==You can get the patch or clone the patched version from my git repository (https://github.com/citb0in/ice_secp256k1).perfectthanks a lot",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

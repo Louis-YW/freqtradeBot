@@ -1,0 +1,165 @@
+{
+  "id": "topic_5465988",
+  "title": "xx879",
+  "author": "xx879",
+  "created_time": "September 07, 2023, 12:04:07 PM",
+  "content": "Hello, I was wondering if there is a way to use a custom seed in Bitcoin Core v23, rather than allow the program to use the default method to try to get entropy. At the moment I believe you need to create a random number (e.g. rolling dice), then convert it to base 6 (if not base 6 already), then input that 99 digit number into a program such as bitaddress.org to create a WIF private address and public address. Then you can import that private address into a new descriptor wallet. Is that correct? Considering all the buzz around entropy recently it seems like it would make more sense to input a random 99 digit number directly into Bitcoin Core.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5465988",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 07, 2023, 03:01:42 PM",
+      "body": "Quote from: xx879 on September 07, 2023, 12:04:07 PMI was wondering if there is a way to use a custom seed in Bitcoin Core v23, rather than allow the program to use the default method to try to get entropy.Yes. Use the sethdseed command. Link: https://bitcoincore.org/en/doc/25.0.0/rpc/wallet/sethdseed/Your custom seed has to be in the format of a WIF private key, so if you are using some manual process to generate the entropy, you'll need to convert it to WIF first. Entropy -> 32 byte hex -> prefix network byte -> calculate and append checksum -> encode to Base58.The simplest way to use a physical process to generate a private key will be to flip a coin to achieve an unbiased 256 bit number, and then convert that hex.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 07, 2023, 04:16:32 PM",
+      "body": "Quote from: o_e_l_e_o on September 07, 2023, 03:01:42 PMQuote from: xx879 on September 07, 2023, 12:04:07 PMEntropy -> 32 byte hex -> prefix network byte -> calculate and append checksum -> encode to Base58This is what I would like to do with Bitcoin Core.  I feel that using an additional program outside of Core (either an offline version of bitaddress.org, custom python script, etc.) to do this introduces a chance for mistakes. Do you know if this can be done with Bitcoin Core somehow?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 07, 2023, 04:25:01 PM",
+      "body": "Maybe it would be possible to compile only the relevant portions of the Bitcoin Core code, replacing the code which generates entropy with a simple prompt for the user, cout << \"Enter a number: \"; ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 07, 2023, 04:45:17 PM",
+      "body": "Quote from: xx879 on September 07, 2023, 12:04:07 PMThen you can import that private address into a new descriptor wallet.You cannot import a seed manually with sethdseed in a descriptor wallet. It has to be a legacy wallet, otherwise you'll encounter the error:QuoteOnly legacy wallets are supported by this command (code -4)Quote from: xx879 on September 07, 2023, 04:25:01 PM[...]Here's a quick Python program for you:Code:import hashlibimport base58def private_key_to_wif(private_key_hex, network_byte=0x80):    # convert private key from hex to bytes    private_key_bytes = bytes.fromhex(private_key_hex)    # add network byte prefix    extended_key = bytes([network_byte]) + private_key_bytes    # checksum = :4 from sha256(sha256(key))    checksum = hashlib.sha256(hashlib.sha256(extended_key).digest()).digest()[:4]    # append the checksum to the extended key    extended_key += checksum    # convert to base58    wif = base58.b58encode(extended_key)    return wif.decode('utf-8')if __name__ == \"__main__\":    private_key_hex = input(\"Enter the Bitcoin private key in hex format: \")        try:        wif = private_key_to_wif(private_key_hex)        print(\"WIF:\", wif)    except ValueError:        print(\"Invalid private key input.\")It takes as input a 256-bit private key, and converts it to WIF. You can create a new file, paste it there and run it with python3 file.py. Note that you must have base58 installed. To do it, run pip install base58 from the terminal.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 07, 2023, 07:18:37 PM",
+      "body": "Very nice, thank you! I wish I could use the bitcoin-cli for this, but I suppose this is the next best thing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 07, 2023, 07:28:02 PM",
+      "body": "Quote from: BlackHatCoiner on September 07, 2023, 04:45:17 PMYou cannot import a seed manually with sethdseed in a descriptor wallet. It has to be a legacy walletI am now confused by the workflow after converting the seed to a WIF private address, especially after reading this: https://bitcoin.stackexchange.com/questions/113846/how-can-a-private-key-be-imported-to-a-descriptor-walletI would like to use \"sethdseed\" so all future pub and priv keys are derived from the seed I provided. Can I use the \"importdescriptors\" command to do that?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 07, 2023, 08:20:05 PM",
+      "body": "Quote from: xx879 on September 07, 2023, 07:28:02 PMI would like to use \"sethdseed\" so all future pub and priv keys are derived from the seed I provided. Can I use the \"importdescriptors\" command to do that?No. As BlackHatCoiner has explained above, sethdseed command is only compatible with non-descriptor wallets.If you want to use the importdescriptor command to create an HD wallet, then your descriptor will need to include a master private key (xprv), rather than a WIF key. So you will need to use your manually generated entropy to generate an xprv first.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 08, 2023, 04:14:22 AM",
+      "body": "Quote from: o_e_l_e_o on September 07, 2023, 08:20:05 PMQuote from: xx879 on September 07, 2023, 07:28:02 PMI would like to use \"sethdseed\" so all future pub and priv keys are derived from the seed I provided. Can I use the \"importdescriptors\" command to do that?No. As BlackHatCoiner has explained above, sethdseed command is only compatible with non-descriptor wallets.If you want to use the importdescriptor command to create an HD wallet, then your descriptor will need to include a master private key (xprv), rather than a WIF key. So you will need to use your manually generated entropy to generate an xprv first.Do you know how I could do this? I see that somebody was working on this, but I guess it was not completed: https://github.com/bitcoin/bitcoin/pull/8735",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 08, 2023, 04:50:34 AM",
+      "body": "I should better explain my use case: I would like to create my own seed by using dice throws. When I have a 99 digit base 6 number, I want to type that into Bitcoin Core on an offline machine/live os. Then I want to take the XPUB that is created, and transfer it to an online machine running Bitcoin Core as \"watch only\". Then I can create new receiving addresses on the online machine, which I will also use to create PSBTs. I don't mind using a simple script or two if absolutely necessary, but I prefer to only use Bitcoin Core for security reasons.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 08, 2023, 05:10:44 AM",
+      "body": "Quote from: xx879 on September 08, 2023, 04:50:34 AMI should better explain my use case: I would like to create my own seed by using dice throws. When I have a 99 digit base 6 number, I want to type that into Bitcoin Core on an offline machine/live os. Then I want to take the XPUB that is created, and transfer it to an online machine running Bitcoin Core as \"watch only\". Then I can create new receiving addresses on the online machine, which I will also use to create PSBTs. I don't mind using a simple script or two if absolutely necessary, but I prefer to only use Bitcoin Core for security reasons. Here's the thing: First you have to convert that 99 digit base 6 number into a format that Bitcoin Core understands since it can't just take any string. 99*6 is 594 bits, divide that into 8 and it's slightly over 74 bytes, i.e. more than you'll need for the hdseed since as the others said, it is represented as a private key - those have 256 bits.And maybe it's not the best idea to use the digits directly, after all, they have no special meaning besides entropy, but maybe you can use something like this method: https://crypto.stackexchange.com/a/6177/94542Code:1 => 002 => 013 => 104 => 115 => 06 => 1The numbers on the right are binary bits you add to the right of the sequence that you're making (just as you would with the dice). Then you can group sequences of 4 bits into hex characters once you have 256 bits.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 08, 2023, 06:25:29 AM",
+      "body": "Quote from: Lattice Labs on September 08, 2023, 06:12:39 AMI understand your use case better now. You want to create a Bitcoin wallet using a manually generated seed, which you'll enter into Bitcoin Core on an offline machine, and then use the XPUB to create a \"watch-only\" wallet on an online machine. This approach can enhance security.Here's a high-level overview of the process:Generate Seed: Manually generate a 99-digit base-6 number using dice throws, ensuring it's highly random.Offline Machine:Install Bitcoin Core on an offline machine.Enter the seed to create a wallet.Note down the XPUB (extended public key).Online Machine:Install Bitcoin Core on an online machine.Import the XPUB from the offline wallet as a \"watch-only\" wallet.Create new receiving addresses on the online machine for transactions and PSBTs.You can follow these steps manually within the Bitcoin Core GUI, which is designed to handle these tasks securely. No additional scripts should be necessary for this process, as Bitcoin Core provides the needed functionality for generating and importing wallets.Remember to keep your offline machine entirely disconnected from the internet during the initial setup to maintain security. Additionally, ensure you have backups of your seed in case of data loss or hardware failure.hello chatgpt 3.5",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 08, 2023, 06:58:53 AM",
+      "body": "Quote from: xx879 on September 08, 2023, 04:50:34 AMI should better explain my use case: I would like to create my own seed by using dice throws. When I have a 99 digit base 6 number, I want to type that into Bitcoin Core on an offline machine/live os. Then I want to take the XPUB that is created, and transfer it to an online machine running Bitcoin Core as \"watch only\". Then I can create new receiving addresses on the online machine, which I will also use to create PSBTs. I don't mind using a simple script or two if absolutely necessary, but I prefer to only use Bitcoin Core for security reasons. It seems this is simply not going to be possible. From Bitcoin Core v23: the legacy wallet type is being deprecated and support for creating and opening legacy wallets will be removed in the futureI will not be able to update my version of Bitcoin Core beyond v23. I will have to use \"legacy\" wallet types only for my use-case. - createwallet \"wallet_name\" ( disable_private_keys blank \"passphrase\" avoid_reuse descriptors load_on_startup external_signer )descriptors will have to be set to false. Then I can use: - sethdseed ( newkeypool \"seed\" )I will set newkeypool to true, and the \"seed\" is the WIF private address that is generated by the python script provided by BlackHatCoiner.After that I can use: - getnewaddress on offline machine, then save this to text file and import into bitcoin core on online machine using importaddress \"address\" ( \"label\" rescan p2sh )And then, when I am ready to spend: - estimatesmartfee/createpsbt on server (to build a transaction with current fees)- save the transaction in a text file, take to offline machine- walletprocesspsbt on offline machine, save to text file and take to online machine- broadcast transactionIs this generally correct? This way I have a paper copy of my original seed (a random 99 digit number in base 6), I have an offline machine and electronic copies of an encrypted wallet.dat file with private keys, and I have an online machine which never sees private keys but allows access to the bitcoin network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 08, 2023, 08:46:53 AM",
+      "body": "Quote from: xx879 on September 08, 2023, 06:58:53 AMI will not be able to update my version of Bitcoin Core beyond v23.Not wise to lock yourself to an old version. Although legacy wallets still work fine in v25, by the way.Quote from: xx879 on September 08, 2023, 06:58:53 AMI will have to use \"legacy\" wallet types only for my use-case.You can turn your custom entropy in to a master private key you can import in to a descriptors wallet as I explained above, but you won't be able to do it without additional software.Alternatively, have you considered using something like Electrum or Sparrow instead? You can turn your custom entropy in to a BIP39 seed phrase and then import that to these wallets offline, and then export the master public key from your offline wallet to move to your other machine and create your watch only wallet. Your Electrum or Sparrow watch only wallet can be synced using your own node.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 08, 2023, 12:01:28 PM",
+      "body": "I asked an LLM to modify your python code, so that it outputs a master xpriv: Code:import hashlibimport base58def master_xprv_from_seed(seed_hex, network_byte=0x0488ADE4):    # convert seed from hex to bytes    seed_bytes = bytes.fromhex(seed_hex)    # add network byte prefix    extended_key = bytes([network_byte]) + seed_bytes    # checksum = first 4 bytes of sha256(sha256(key))    checksum = hashlib.sha256(hashlib.sha256(extended_key).digest()).digest()[:4]    # append the checksum to the extended key    extended_key += checksum    # convert to base58    xprv = base58.b58encode(extended_key)    return xprv.decode('utf-8')if __name__ == \"__main__\":    seed_hex = input(\"Enter the seed in hex format: \")    try:        xprv = master_xprv_from_seed(seed_hex)        print(\"Master xprv:\", xprv)    except ValueError:        print(\"Invalid seed input.\")And then to import the master private key into Bitcoin Core, I would: Code:importdescriptors '[{\"desc\": \"wpkh([master_xprv/84'/0'/0']/0/*)\", \"timestamp\": \"now\", \"range\": [0, 1000], \"watchonly\": true, \"label\": \"YourLabel\"}]'I assume \"wpkh\" and \"p2wpkh\" are arbitrary decisions in this case, but the decision will affect all future addresses that are generated. I would do all of this work on an offline machine. Then I would use Code: listdescriptors  to get the xpub, and then on the online machine I wouldCode: importmulti '[{\"desc\":\"pkh([Your xpub key])\",\"timestamp\":\"now\",\"range\":[0,100],\"watchonly\":true,\"label\":\"[Label for the wallet]\"}]'Is that right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 08, 2023, 12:34:35 PM",
+      "body": "Quote from: xx879 on September 08, 2023, 06:58:53 AMI will not be able to update my version of Bitcoin Core beyond v23. I will have to use \"legacy\" wallet types only for my use-case. Soon there should be a mechanism which allows you to specify your own hdseeds for descriptor wallets after they are created, which should reduce the need for the legacy wallet format. It's a work-in-progress I believe on github, but it's an annoying issue which affects other things like dumping private keys and performing manual derivation and stuff.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 08, 2023, 01:25:25 PM",
+      "body": "Quote from: NotATether on September 08, 2023, 12:34:35 PMQuote from: xx879 on September 08, 2023, 06:58:53 AMI will not be able to update my version of Bitcoin Core beyond v23. I will have to use \"legacy\" wallet types only for my use-case. Soon there should be a mechanism which allows you to specify your own hdseeds for descriptor wallets after they are created, which should reduce the need for the legacy wallet format. It's a work-in-progress I believe on github, but it's an annoying issue which affects other things like dumping private keys and performing manual derivation and stuff.I think I know the issue you are talking about, I saw it was closed due to inactivity",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "September 08, 2023, 03:42:09 PM",
+      "body": "If you're going through all the trouble to generate a key using dice you should be aware that all real dice are biased to some degree.  So you should either roll much more than needed and sha256 the result or you should use a debiasing procedure like the one in the codex32 booklet: https://www.secretcodex32.com/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "xx879",
+      "created_time": "September 08, 2023, 05:24:56 PM",
+      "body": "I saw Andrew Poelstra talking about this on a \"Bitcoin Layer\" podcast recently. I have casino grade dice, with the sharp edges. Are these really biased? I assumed the casinos would demand some controls during manufacturing to try un-bias the dice.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 08, 2023, 05:39:45 PM",
+      "body": "Quote from: gmaxwell on September 08, 2023, 03:42:09 PMSo you should either roll much more than needed and sha256 the result or you should use a debiasing procedure like the one in the codex32 booklet: https://www.secretcodex32.com/Even if the dice is very biased, throwing it 99 times, as xx879 says, will suffice. In this post, I demonstrate that even if there is a 50% chance of getting a 6 (and 10% for each 1, 2, 3, 4, 5), it will still produce 216 bits of entropy. As a disclaimer, I had just applied Shannon's equation, and I'm by no means an expert in that branch of math. Quote from: xx879 on September 08, 2023, 05:24:56 PMI saw Andrew Poelstra talking about this on a \"Bitcoin Layer\" podcast recently. I have casino grade dice, with the sharp edges. Are these really biased? I assumed the casinos would demand some controls during manufacturing to try un-bias the dice. All physical dice are biased to an extent. I think casino dice are known for approaching perfection.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

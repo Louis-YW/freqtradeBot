@@ -1,0 +1,12 @@
+{
+  "id": "topic_5475592",
+  "title": "cmpeq",
+  "author": "cmpeq",
+  "created_time": "November 26, 2023, 05:00:34 PM",
+  "content": "Recently I have been working on implementing binary biginteger arithmetic in tapscript for verifying zero knoweldge proofs, and with introspection op codes likely on the way, I was curious if anyone had found any good ways around OP_CAT for building something like recursive covenants. Currently, since we are representing all of our public inputs for the proof as bit vectors, we use an iterated hash of sha256 (if the top of bit stream = 0) and ripemd160 (if the top of bit stream = 1) to encode a commitment to a bitstream that connects the UXTOs:Code:function generateNBitStreamHash(numBits: number){  /*    Populate the stack like this    <bit n of the result of your computation>    ...    <bit 1 of the result of your computation>    <bit 0 of the result of your computation>    0x[previous result (for ZKP L2's, the bit stream of all state roots)] <--- top of stack  */  const ops: string[] = [];  for(let i=0;i<numBits;i++){    ops.push(\"OP_SWAP\");    ops.push(\"OP_IF\"); // if bit === 1, then ripemd160      ops.push(\"OP_RIPEMD160\");    ops.push(\"OP_ELSE\"); // if bit === 0, then sha256      ops.push(\"OP_SHA256\");    ops.push(\"OP_ENDIF\");  }  // your computed value is now on the top of the stack!  return ops.join(\"\\n\");}While this does work, it seems incredibly wasteful I was wondering if anyone had come up with a more clever way to work around not being able to use OP_CAT/enforce recursive covenants in its absence.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5475592",
+  "comments": []
+}

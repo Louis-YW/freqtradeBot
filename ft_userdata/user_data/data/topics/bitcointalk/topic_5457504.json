@@ -1,0 +1,133 @@
+{
+  "id": "topic_5457504",
+  "title": "Summer2023",
+  "author": "Summer2023",
+  "created_time": "June 25, 2023, 08:23:14 AM",
+  "content": "Hello everyoneIt has been 3   years since we started trying to recover an old wallet that might contain 0 to ~500 BTC (no clue what may have happened to the pieces bought so many years ago).The wallet was by Armory, probably purchased through a gaming platform.The laptop that was used back then is still working but sadly everything was formatted & overwritten (probably more than 1 times).Steps we have followed so far:1. Recovered files2. Back up in place3. Downloaded WinHex4. Run search for \"30 82 01 13 02 01 01 04 20\"5. Found 1 area where the above sequence exists plus one similar a bit below \"30 81 D3 02 01 01 04 20\"6. Currently trying to understand the next in line alphanumerical digits. I see a lot of 00, FF and combinations of letters & numbers.7. Willing to pay 10% of whatever is inside there.Any ideas? Thank you",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5457504",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "June 25, 2023, 08:37:10 AM",
+      "body": "Quote from: Summer2023 on June 25, 2023, 08:23:14 AM4. Run search for \"30 82 01 13 02 01 01 04 20\"I don't think Armory stores the private key the same way as Bitcoin Core, so searching for that pattern could lead to misleading results.If you can search though the recovered files, look for \"armory_nnn_.wallet\" files, the \"nnn\" could be different characters.But I'm not sure how the very old version works so it's best to ask the developer or other users in the Armory board.I'll ask a mod to move this there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Summer2023",
+      "created_time": "June 25, 2023, 11:52:46 AM",
+      "body": "Thank youWe are guessing it is Armory since we found bits and pieces mentioning something about updates of Armory and the name sounded somewhat familiar.The readable sector close to the sequence found includes the words CPubKey, PubKey, Seed and that is why we thought we were making progress.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "June 26, 2023, 07:22:20 AMLast edit: June 26, 2023, 09:21:01 AM by goatpig",
+      "body": "Recovering an old Armory wallet from fragments of data will require diving into the old file format.Code wise it's all in here: https://github.com/goatpig/BitcoinArmory/blob/master/armoryengine/PyBtcWallet.pyAs for specifics on what you're looking for:Code: self.fileTypeStr    = '\\xbaWALLET\\x00' This is what old Armory wallet files start with.As for the next steps, it depends on what you end up finding in the wallet. If you cannot recover the root, you can still recover part of the wallet based on how many private and public keys you can salvage. At first I'd suggest focusing on the root address and chaincode, so as to check if the wallet has any coins in the first place. This is because you will need to recover the KDF params and the associated IV for each private keys you recover, in order to decrypt them.You will need some python chops, with a cursory understanding of cryptography (or hire someone). I'll help you along the way.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Summer2023",
+      "created_time": "June 29, 2023, 01:07:06 PM",
+      "body": "Quote from: goatpig on June 26, 2023, 07:22:20 AMYou will need some python chops, with a cursory understanding of cryptography (or hire someone). I'll help you along the way.Hello Goatpig,The problem is that I know the bare minimum around codes, python and the rest that you mention (hence the little progress over the last 3 years)I would need details step by step as if you were speaking to a newbie.You mention about hiring someone, that is a legit thought.What skills should that someone have? Python?P.S. If it helps, I have just been able to identify the sequence 62 31 05 00 09 00 00 00 00 through WinHex.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "June 29, 2023, 01:20:50 PM",
+      "body": "Quote(hence the little progress over the last 3 years)Ah I missed this part in the OP. So I can assume time is not of the essence then? If you got some more patience in you, I can look at it directly. I assume you have an image of the recovered disk. I would need access to that somehow. Do you remember if you encrypted the wallet or not?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Summer2023",
+      "created_time": "July 03, 2023, 03:55:59 PM",
+      "body": "Quote from: goatpig on June 29, 2023, 01:20:50 PMQuote(hence the little progress over the last 3 years)Ah I missed this part in the OP. So I can assume time is not of the essence then? If you got some more patience in you, I can look at it directly. I assume you have an image of the recovered disk. I would need access to that somehow. Do you remember if you encrypted the wallet or not?Hello again,Time is not of the essence but (and how do I put it in words without offending you or anyone else) I believe that I shouldn't been giving copies/images of the recovered data.Is there a chance that you can guide me step by step? I have downloaded python 2.7Now what?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 03, 2023, 11:34:57 PM",
+      "body": "Quote from: Summer2023 on July 03, 2023, 03:55:59 PMIs there a chance that you can guide me step by step?There is a tool that can recover wallet files even if it was deleted but I do not know if this tool can recover the old wallet version since you said it's a 2009/2010 wallet.The tool called PyWallet is used to recover wallets there is a guide posted on this forum on how to use it you can check this guide \"[GUIDE] Recover your deleted keys\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "July 04, 2023, 07:19:27 AMLast edit: July 04, 2023, 07:38:02 AM by goatpig",
+      "body": "Quote from: BitMaxz on July 03, 2023, 11:34:57 PMQuote from: Summer2023 on July 03, 2023, 03:55:59 PMIs there a chance that you can guide me step by step?There is a tool that can recover wallet files even if it was deleted but I do not know if this tool can recover the old wallet version since you said it's a 2009/2010 wallet.The tool called PyWallet is used to recover wallets there is a guide posted on this forum on how to use it you can check this guide \"[GUIDE] Recover your deleted keys\"This is for wallet.dat (i.e. Bitcoin Core's wallet format). It won't work for Armory wallets.Quote from: Summer2023 on July 03, 2023, 03:55:59 PMQuote from: goatpig on June 29, 2023, 01:20:50 PMQuote(hence the little progress over the last 3 years)Ah I missed this part in the OP. So I can assume time is not of the essence then? If you got some more patience in you, I can look at it directly. I assume you have an image of the recovered disk. I would need access to that somehow. Do you remember if you encrypted the wallet or not?Hello again,Time is not of the essence but (and how do I put it in words without offending you or anyone else) I believe that I shouldn't been giving copies/images of the recovered data.Is there a chance that you can guide me step by step? I have downloaded python 2.7Now what?Let's try the easy way then. Search your disk data for this sequence: '\\xbaWALLET\\x00'. Grab it along with the following ~10kB and make that a file. Feed that file to the Armory wallet recovery tool (Wallet -> Fix Damaged Wallet). What do you get?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Summer2023",
+      "created_time": "July 04, 2023, 08:18:55 PM",
+      "body": "Quote from: goatpig on July 04, 2023, 07:19:27 AMQuote from: BitMaxz on July 03, 2023, 11:34:57 PMQuote from: Summer2023 on July 03, 2023, 03:55:59 PMIs there a chance that you can guide me step by step?There is a tool that can recover wallet files even if it was deleted but I do not know if this tool can recover the old wallet version since you said it's a 2009/2010 wallet.The tool called PyWallet is used to recover wallets there is a guide posted on this forum on how to use it you can check this guide \"[GUIDE] Recover your deleted keys\"This is for wallet.dat (i.e. Bitcoin Core's wallet format). It won't work for Armory wallets.Quote from: Summer2023 on July 03, 2023, 03:55:59 PMQuote from: goatpig on June 29, 2023, 01:20:50 PMQuote(hence the little progress over the last 3 years)Ah I missed this part in the OP. So I can assume time is not of the essence then? If you got some more patience in you, I can look at it directly. I assume you have an image of the recovered disk. I would need access to that somehow. Do you remember if you encrypted the wallet or not?Hello again,Time is not of the essence but (and how do I put it in words without offending you or anyone else) I believe that I shouldn't been giving copies/images of the recovered data.Is there a chance that you can guide me step by step? I have downloaded python 2.7Now what?Let's try the easy way then. Search your disk data for this sequence: '\\xbaWALLET\\x00'. Grab it along with the following ~10kB and make that a file. Feed that file to the Armory wallet recovery tool (Wallet -> Fix Damaged Wallet). What do you get?Hello,It might sound easy for a person with basic knowledge but unfortunately I need more details. How do I search something in Python?I open the command box and then what?How do I specify the location that I want Python to search for the sequence?The disk data is currently sitting in one of my external hard disks.Too many questions, I know.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Bitarock",
+      "created_time": "July 04, 2023, 09:51:37 PM",
+      "body": "Hi you said you found a key after 04 20? Then copy down those 64 characters after 0420 and you have private key.  Then you keep it safe and will need to convert it to Wif code. Let me know if you need help. If you need  instruction to run python try there - https://www.wikihow.com/Use-Windows-Command-Prompt-to-Run-a-Python-File thanks reply when you done.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "July 05, 2023, 07:21:19 AM",
+      "body": "Quote from: Summer2023 on July 04, 2023, 08:18:55 PMHello,It might sound easy for a person with basic knowledge but unfortunately I need more details. How do I search something in Python?I open the command box and then what?How do I specify the location that I want Python to search for the sequence?The disk data is currently sitting in one of my external hard disks.Too many questions, I know.There are no python specific commands in my instructions. Armory has a built in tool to check wallet integrity. It can be used to reconstruct a wallet which is partially damaged. This is all done graphically as long as you can come up with a wallet file.In the OP, you said you have already recovered the disk and ran a search for a specific hex sequence. My assumption is that you have all that you need to reproduce that wallet file. None of that requires any coding in Python yet (hence the \"easy\" remark).Armory wallet files are named along the following pattern: armory_xxxxxx.wallet. Unless you have recovered a file with this kind of naming, you will have to search the data you recovered from disk for that start sequence ('\\xbaWALLET\\x00').Assuming the ~1000 bytes following that sequence are intact, the recovery tool should be able to rebuild the wallet. Again, this whole process is graphical, you don't need any Python to try this out.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Summer2023",
+      "created_time": "July 18, 2023, 03:18:11 PM",
+      "body": "Update:I believe I have found the private keys though a python script but it is totally unreadable, meaning it is consisted of signs like squares, question marks, crosses etc.How do I decrypt it to a standard private key?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Bitarock",
+      "created_time": "July 18, 2023, 09:37:47 PM",
+      "body": "Hi, it sounds like encoding is not working. Try this and see what happens Follow these steps open Notepad on your computer1- Copy the original text2- In Notepad, open new file change Encoding -> pick an encoding you think the original text follows. Try as well the encoding ANSI as sometimes Unicode files are read as ANSI by certain programs3- Paste4- Then to convert to Unicode by going again over the same menu: Encoding -> \"Encode in UTF-8\" (Not \"Convert to UTF-8\") and hopefully it will become readableThe above steps apply for most languages. You just need to guess the original encoding before pasting in notepad, then convert through the same menu to an alternate Unicode-based encoding to see if things become readable.Most languages exist in 2 forms of encoding: 1- The old legacy ANSI (ASCII) form, only 8 bits, was used initially by most computers. 8 bits only allowed 256 possibilities, 128 of them where the regular latin and control characters, the final 128 bits were read differently depending on the PC language settings 2- The new Unicode standard (up to 32 bit) give a unique code for each character in all currently known languages and plenty more to come, if a file is unicode it should be understood on any PC with the language's font installed. Note that even UTF-8 goes up to 32 bit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "July 19, 2023, 07:16:12 AM",
+      "body": "Quote from: Summer2023 on July 18, 2023, 03:18:11 PMUpdate:I believe I have found the private keys though a python script but it is totally unreadable, meaning it is consisted of signs like squares, question marks, crosses etc.How do I decrypt it to a standard private key?Private keys are not saved in hex, and it is also very unlikely the key is unencrypted. The comment on this method explains how key data is serialized: https://github.com/goatpig/BitcoinArmory/blob/master/armoryengine/PyBtcAddress.py#L874To decrypt a private key, you will need the following for each key:Code:         InitVect    (16 bytes) :  Initialization vector for encryption         InitVectChk ( 4 bytes) :  Checksum for IV         PrivKey     (32 bytes) :  Private key data (may be encrypted)         PrivKeyChk  ( 4 bytes) :  Checksum for private key dataas well as the KDF, packaged in the wallet header:Code:   Crypto/KDF  -- (512) information identifying the types and parameters                        of encryption used to secure wallet, and key                        stretching used to secure your passphrase.                        Includes salt. (the breakdown of this field will                        be described separately)Assuming you can find the private key entry for the wallet root, you can ignore the rest of the wallet and reconstruct it from that one key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JRob",
+      "created_time": "January 06, 2025, 06:03:07 PM",
+      "body": "OP how did you make out?Would you remember the passphrase for the wallet if you found it?If so you'll need a bitcoin node and armory client running to test it out.  Did you make it that far?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "topic_5403124",
+  "title": "CounterEntropy",
+  "author": "CounterEntropy",
+  "created_time": "June 18, 2022, 05:20:47 PM",
+  "content": "I am using the following PHP code...Code:echo round(($satoshiValue/pow(10,8)),8);When, $satoshiValue = 10000, result is 0.0001 as expected.But, when, $satoshiValue = 10000000, result is 0.10000000000000001. Expected was 0.1 though.Why is this happening?p.s. I could not find a better place to ask this question on BitcoinTalk. So, asking it here. If mods think, it does not fit here, feel free to move.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403124",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 18, 2022, 05:45:16 PM",
+      "body": "With:Code: (\"test.php\")$satoshiValue = 10000000;echo round(($satoshiValue/pow(10,8)),8);I get:Code:0.1See: https://blackhatcoiner.com/5403124/testWhat PHP version do you use? Mine is 7.4.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "June 18, 2022, 05:47:11 PM",
+      "body": "It's an underflow error. I'm not used to php but you might be able to search that and find an optimal solution for how to represent the numbers. If you can't find a solution, bitcoin core stores numbers in bitcoin it uses as the number of satoshi and then just puts a decimal place between the 8th and 9th index. I'd advise this belong in development and technical discussion also.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 18, 2022, 05:58:01 PM",
+      "body": "Quote from: CounterEntropy on June 18, 2022, 05:20:47 PMWhy is this happening?Quote from: https://www.php.net/manual/en/language.types.float.phpWarningFloating point precisionFloating point numbers have limited precision. Although it depends on the system, PHP typically uses the IEEE 754 double precision format, which will give a maximum relative error due to rounding in the order of 1.11e-16. Non elementary arithmetic operations may give larger errors, and, of course, error propagation must be considered when several operations are compounded.Additionally, rational numbers that are exactly representable as floating point numbers in base 10, like 0.1 or 0.7, do not have an exact representation as floating point numbers in base 2, which is used internally, no matter the size of the mantissa. Hence, they cannot be converted into their internal binary counterparts without a small loss of precision. This can lead to confusing results: for example, floor((0.1+0.7)*10) will usually return 7 instead of the expected 8, since the internal representation will be something like 7.9999999999999991118....So never trust floating number results to the last digit, and do not compare floating point numbers directly for equality. If higher precision is necessary, the arbitrary precision math functions and gmp functions are available.For a \"simple\" explanation, see the » floating point guide that's also titled \"Why don’t my numbers add up?\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "June 18, 2022, 06:18:36 PM",
+      "body": "I am not much familiar with PHP. I just made a search and found an article which seems to be helpful to anyone who wants to know what's causing the issue. Why 0.1 Does Not Exist In Floating-Point",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 19, 2022, 04:12:32 AM",
+      "body": "Quote from: vv181 on June 18, 2022, 05:58:01 PMQuote from: CounterEntropy on June 18, 2022, 05:20:47 PMWhy is this happening?Quote from: https://www.php.net/manual/en/language.types.float.phpWarningFloating point numbers have limited precision. Although it depends on the system, PHP typically uses the IEEE 754 double precision format, which will give a maximum relative error due to rounding in the order of 1.11e-16. Non elementary arithmetic operations may give larger errors, and, of course, error propagation must be considered when several operations are compounded.You can always use floating-point precision if possible by rounding to 6 digits (most people will never need more than 6 digits of precision) using a neat scaling-up trick:Code:$num = $1.00000001;$scaling_factor = $1000000;$num = round($num * $scaling_factor) / $scaling_factor;echo $num; # 1.000000",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "theymos",
+      "created_time": "June 19, 2022, 07:24:10 AMLast edit: June 19, 2022, 07:53:47 AM by theymos",
+      "body": "As others have mentioned, when you're dealing with floating-point numbers, different numbers can have the same internal representation. 10000000/pow(10,8) returns 0.1, but because this is stored as a floating-point number, it has the same byte-level representation as 0.10000000000000001 as well as infinitely many other numbers, and when echo converts this float to a string, it chooses that particular value to display. round returns a float, so that doesn't fix the issue: in this case it outputs exactly the same thing that it takes as input.sprintf('%.8f', $satoshiValue/pow(10,8)) will do what you expected round to do because it returns a string instead of a float. There are other ways to address the issue, but that's what I'd do.Quote from: BlackHatCoiner on June 18, 2022, 05:45:16 PMWhat PHP version do you use? Mine is 7.4.The exact behavior of floats might depend on the CPU, OS, compiler, C library, and PHP version. You can't rely on any specific behavior.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "June 21, 2022, 02:13:31 PM",
+      "body": "When working with money, it's almost always best to work with integers. Don't store your value as a number of bitcoins. Store it as a number of satoshis. Anytime you are performing an operation that may return a fractional quantity of satoshis, make sure that you have decided what the proper rounding process is for your use case (floor, ceiling, round, etc), and then convert the result to an integer using your chosen method.If you want to display the result as a number of bitcoins (or millibitcoins, or microbitcoins), convert to the display value at the time of display using an output formatting function to restrict the displayed value to no more than the number of decimals that represent the original value.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 22, 2022, 04:50:04 AM",
+      "body": "Quote from: theymos on June 19, 2022, 07:24:10 AMThe exact behavior of floats might depend on the CPU, OS, compiler, C library, and PHP version. You can't rely on any specific behavior.It's more influenced by C compiler (and consequently the OS, as they have wildly different compilers) than anything else because that is the area where the multiplications and divisions are transformed to ASM instructions.C library doesn't play a part here unless you - and consequentially the language's library routines - makes use of pow() or other glibc math function.Pretty much the entire Pentium class of CPUs and derivatives divide numbers wrongly giving the same error remainders, or sites like 0.30000000000004 would not be able to give generic information about the problem, with people's vastly different CPU models.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

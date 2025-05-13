@@ -1,0 +1,165 @@
+{
+  "id": "topic_5462822",
+  "title": "adaseb",
+  "author": "adaseb",
+  "created_time": "August 10, 2023, 07:26:48 PM",
+  "content": "Hearing that there is some exploit with any software wallets which use Libbitcoin Explorer 3.xHowever they are not stating which wallets are affected. Only that so far $900,000 was stolen due to some poor random number generator when generating seeds.How do we find out if Electrum uses this dependency?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5462822",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "August 10, 2023, 08:13:19 PMLast edit: August 10, 2023, 11:19:01 PM by Charles-Tim",
+      "body": "Electrum is another wallet entirely and Libbitcoin Explorer has nothing to do with Electrum as Electrum is an open source wallet and known to have a secure way of generating seed phrase.Electrum wallet is not like Libbitcoin explorer (bx) that generates seed phrase with 32 bits of entropy which is not secure. Electrum wallet uses 132 bits of entropy which is secure enough.Electrum Seed Version System",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "logfiles",
+      "created_time": "August 10, 2023, 10:23:58 PMLast edit: August 10, 2023, 10:57:58 PM by logfiles",
+      "body": "Quote from: adaseb on August 10, 2023, 07:26:48 PMHearing that there is some exploit with any software wallets which use Libbitcoin Explorer 3.xHowever, they are not stating which wallets are affected. Only that so far $900,000 was stolen due to some poor random number generator when generating seeds.The most cited affected wallet was trust wallet.Remember when there was an issue with trust wallet, and they even had to make a quick update? Quote from: adaseb on August 10, 2023, 07:26:48 PMHow do we find out if Electrum uses this dependency?I believe electrum is safe, Since everything is open source unlike wallets like trust wallet, someone would have already pointed it out by now.https://milksad.info/disclosure.html#searching-for-wallets---implementationEdit:Refer to this topic: [WARNING] Wallets created with Libbitcoin Explorer (bx) are insecure!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "August 10, 2023, 10:57:18 PM",
+      "body": "Quote from: logfiles on August 10, 2023, 10:23:58 PMThe most cited affected wallet was trust wallet.All close source wallet should be an example because we do not know how they generate their seed phrase.Quote from: logfiles on August 10, 2023, 10:23:58 PMRemember when there was an issue with trust wallet, and they even had to make a quick update?Atomic wallet may be the good example to use, but other close source wallets included. But Trustwallet would have not gone for only update, it would have advised people not to generate seed phrase from the old version and not to use the seed phrase generated on the old version anymore.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 11, 2023, 02:25:01 AM",
+      "body": "Electrum is written in Python and does not use any C++ dependencies. There is no reason for Electrum to use a third-party C++ module and besides, their seed generation is vastly different from how libbitcoin generates theirs.Electrum uses os.urandom which is a CSPRNG. It does not suffer from this vulnerability.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "adaseb",
+      "created_time": "August 11, 2023, 04:39:10 AM",
+      "body": "Thank you all for replying. I didn’t think electrum was affected since there were no threads here. However all the articles didn’t state which wallets were used by the dependency.So thank you all for clarifying and putting my mind on ease.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 11, 2023, 04:57:36 AM",
+      "body": "Quote from: ranochigo on August 11, 2023, 02:25:01 AMElectrum is written in Python and does not use any C++ dependencies. There is no reason for Electrum to use a third-party C++ module Electrum doesn't use this particular library (libbitcoin) but being written in Python doesn't mean it doesn't need or use dependencies written in other languages like C++. In fact one of the dependencies Electrum has is libsec256k1 which is written in C. Some of its other dependencies (specially involving hardware wallets) utilize C++ libraries.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 11, 2023, 05:04:29 AM",
+      "body": "Quote from: pooya87 on August 11, 2023, 04:57:36 AMElectrum doesn't use this particular library (libbitcoin) but being written in Python doesn't mean it doesn't need or use dependencies written in other languages like C++. In fact one of the dependencies Electrum has is libsec256k1 which is written in C.That's correct. It is installed when building Electrum and I forgot that it is required as part of the list of non-pip dependencies.Regardless, Electrum still doesn't contain as many non-python dependencies as most wallets. Most of the wallets uses libsecp256k1, and seems to follow what Bitcoin Core does as well.There is a pure python secp256k1 library out there but I guess there are reasons for not adopting those but using more mainstream ones instead. ** Possibility due to adoption and how thoroughly tested those are.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "August 11, 2023, 02:20:53 PM",
+      "body": "No, and the number of open source wallets affected by Libbitcoin is small, at some point EdgeApp was using that library.Quote from: logfiles on August 10, 2023, 10:23:58 PMThe most cited affected wallet was trust wallet.Remember when there was an issue with trust wallet, and they even had to make a quick update? Did you mean Trust Wallet Browser Extension issue? If so, I don't think the reason is Libbitcoin, and that problem was only related to the addresses generated by the Browser Extension not trust wallet app.https://community.trustwallet.com/t/wasm-vulnerability-incident-update-and-recommended-actions/750786I know that the current code is closed source, but the open source wallet-core does not indicate that they used Libbitcoin, but we cannot say that your money is safe because the browser extension vulnerability that was discovered was due to a bug bounty and therefore there may be a lot of these bugs, which is reason enough To stop using Trust Wallet.https://github.com/trustwallet/wallet-core",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Faisal2202",
+      "created_time": "August 11, 2023, 06:24:01 PM",
+      "body": "Thanks for asking this question i actually read this thread yesterday --> https://bitcointalk.org/index.php?topic=5462674.msg62671275#msg62671275 and started to wonder why we should scare of care for this because I am not a developer or any technical person who might have used this BX seed generator to generate one but I also thought what if the wallet I am using might be using BX like electrum. Then I thought Electrum is open source so if something would be wrong or it will be made by using those generators then we definitely get to hear some alert or news about it as it is open source and many developers are doing favors for checking the Electrum for exploits. I am relieved now after reading many replied here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "August 12, 2023, 06:28:42 AM",
+      "body": "Quote from: Faisal2202 on August 11, 2023, 06:24:01 PM if something would be wrong or it will be made by using those generators then we definitely get to hear some alert or news about it as it is open source and many developers are doing favors for checking the Electrum for exploits. I am relieved now after reading many replied here. Although I think that using Electrum is safe for those who want to HODLing Bitcoin and do not have technical experience, but making sure that your private key was randomly generated or at least knowing how we can generate a random private key (128-bit entropy + checksum) is required and learning it is not difficult .This thread will teach you the basics https://bitcointalk.org/index.php?topic=5316005.0 and with a little research you can generate a private key that is guaranteed to be random and *impossible* to Brute-force it (not recommended for beginners or if you don't really know what you're doing)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "August 12, 2023, 06:59:35 AM",
+      "body": "Quote from: Yamane_Keto on August 12, 2023, 06:28:42 AMAlthough I think that using Electrum is safe for those who want to HODLing Bitcoin and do not have technical experience, but making sure that your private key was randomly generated or at least knowing how we can generate a random private key (128-bit entropy + checksum) is required and learning it is not difficult .To hold, it would be safer on a cold wallet. If you want to use Electrum as a cold storage on an airgapped device, you will need to read about it and that means you are having the technical knowledge gradually. All that is required is if you are interested to make your wallet more secure.I can only recommend (online) Electrum wallet for low amount of coins which you are spending.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 12, 2023, 10:10:30 AM",
+      "body": "Quote from: ranochigo on August 11, 2023, 05:04:29 AMThere is a pure python secp256k1 library out there but I guess there are reasons for not adopting those but using more mainstream ones instead. ** Possibility due to adoption and how thoroughly tested those are.That would be one reason but in my opinion the main reason should always be that any general purpose implementation of ECC runs the risk of having \"weird\" behavior which is not necessarily bug or weakness, just a weird behavior that is not suitable for a consensus critical protocol such as bitcoin that needs to be strict. The best example of \"weird\" behavior is OpenSSL that used to be used by bitcoin core. One issue was its value parsing rules in places such as signatures (DER), etc. That doesn't cause any issues when the library used for something like parsing a website certificate in your browser, but that can be the source of a lot of issues in something like Bitcoin.BTW Electrum used to use pure python implementation of ECC called python-ecdsa before they migrated to libsecp256k1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 12, 2023, 10:31:25 AM",
+      "body": "Quote from: pooya87 on August 12, 2023, 10:10:30 AMThat would be one reason but in my opinion the main reason should always be that any general purpose implementation of ECC runs the risk of having \"weird\" behavior which is not necessarily bug or weakness, just a weird behavior that is not suitable for a consensus critical protocol such as bitcoin that needs to be strict. The best example of \"weird\" behavior is OpenSSL that used to be used by bitcoin core. One issue was its value parsing rules in places such as signatures (DER), etc. That doesn't cause any issues when the library used for something like parsing a website certificate in your browser, but that can be the source of a lot of issues in something like Bitcoin.BTW Electrum used to use pure python implementation of ECC called python-ecdsa before they migrated to libsecp256k1. That's also true. Electrum used to use python-ecdsa with some monkey patching done to it while they were using it. It was slower though, as compared to libsecp256k1 library, that, Qt and cryptography are not pure python. The migration was done to enforce and improve performance; it used to be optional before the introduction of lightning which necessitated the speedup.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Bitcoin_Arena",
+      "created_time": "August 15, 2023, 11:25:29 PM",
+      "body": "Someone raised a similar issue on GitHubQuote from: https://github.com/spesmilo/electrum/issues/8570#issue-1842671994Hey,is it a chance that Electrum is vulnerable because of the CVE-2023-39910?See also: milksad.infoRegardsMichałThis was the response from one of the DevsQuote from: https://github.com/spesmilo/electrum/issues/8570#issuecomment-1671192869Hi. Nice write-up.Electrum uses the secrets module from the python standard library as source of entropy. Before that, os.urandom was used directly. Both are considered cryptographically secure.The interesting code starts here:electrum/electrum/mnemonic.pyLine 200 in bf86cd6Code: def make_seed(self, *, seed_type=None, num_bits=None) -> str: So, no, this issue should not affect Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 16, 2023, 05:27:44 PM",
+      "body": "Libbitcoin is a C++ project.Electrum only uses Python dependencies, or C++ dependencies that are compiled into \"wheels\" (binary format) first, like libsecp256k1, which libbitcoin does not have on PyPI.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "August 19, 2023, 04:51:33 PM",
+      "body": "Quote from: adaseb on August 11, 2023, 04:39:10 AMI didn’t think electrum was affected since there were no threads here. However all the articles didn’t state which wallets were used by the dependency. Some hints about wallets and partners are available on Libbitcoin's website. If you scroll down towards the bottom, you'll come across the \"Projects using Libbitcoin\" section. The website mentions several names there, although, there are surely more.The first one, Chip-Chap used to be a Spanish crypto to fiat exchange. I said used to because the website isn't working now.DarkWallet was a browser extension intended to become a privacy-focused wallet. It's been abandoned, though, and is no longer maintained. Airbitz is now Edge Wallet. A multi-coin mobile wallet.I am not sure about Joystream. Seems it was a video platform and a DAO.Darkleaks was a black market where you could anonymously sell leaked and stolen data. It's dead now.OpenBazaar is a decentralized crypto marketplace. Its website says a new version is coming soon.CanCoin is an altcoin that seems abandoned. I am guessing they tried to build some kind of community of users, buyers, and sellers. If we only had a currency we could use for that kind of thing.  Lastly, slur.io seems to have been a site to sell and obtain user data according to search engine results.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 20, 2023, 08:35:02 AM",
+      "body": "Quote from: Pmalek on August 19, 2023, 04:51:33 PMOpenBazaar is a decentralized crypto marketplace. Its website says a new version is coming soon.The activity on this whole project looks very disappointing so I don't think they'll even notice if there is a problem specially since nobody reported anything on their repository. Although skimming through the code quickly I believe they only used libbitcoin for communication as server/client thing not for key generation.https://github.com/OpenBazaar",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "August 20, 2023, 11:08:47 AM",
+      "body": "Quote from: pooya87 on August 20, 2023, 08:35:02 AM<Snip> From all of the projects and services I mentioned in my previous post, I think the most popular brand is Edge Wallet. At least it's something I have heard of compared to many of the other names. But it's not known if the new and rebranded Edge wallet still uses/used Libbitcoin libraries in its more current releases. It's a multi-coin wallet with exchange, staking, and buy/sell options, making it most probably closed-source to check anything.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Youghoor",
+      "created_time": "August 23, 2023, 03:33:25 AM",
+      "body": "Quote from: adaseb on August 10, 2023, 07:26:48 PMHearing that there is some exploit with any software wallets which use Libbitcoin Explorer 3.xHowever they are not stating which wallets are affected. Only that so far $900,000 was stolen due to some poor random number generator when generating seeds.How do we find out if Electrum uses this dependency?The Libbitcoin library is not a dependency of Electrum.  Even though Electrum and Libbitcoin both deal with Bitcoin and cryptocurrencies, they are independent endeavors with various goals. Electrum's main functionality is neither directly included into or dependent upon Libbitcoin as it has its own codebase.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

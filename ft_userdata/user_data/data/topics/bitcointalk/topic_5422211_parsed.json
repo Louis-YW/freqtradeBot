@@ -1,0 +1,53 @@
+{
+  "id": "topic_5422211",
+  "title": "ecdsa123",
+  "author": "ecdsa123",
+  "created_time": "November 19, 2022, 02:18:54 PMLast edit: November 20, 2022, 10:05:24 PM by ecdsa123",
+  "content": "Solved",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5422211",
+  "comments": [
+    {
+      "author": "COBRAS",
+      "created_time": "November 19, 2022, 07:51:20 PM",
+      "body": "a = Mod inv 2 * 1 = 1/2pub * a = 1/2 pub = bew G2 * new G = PUB.priv * G = PUB TOO this bug was found some esrs ago, I thin it was already patched",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 19, 2022, 08:34:20 PM",
+      "body": "You've considered s1 equal with s2, but s is a value resulted from d and k. If r and s values are the same (as you've let), then either d values are the same or it's a collision.This is the equation. Have you checked that it gives the same value for these two private keys?Code:s = k^(-1) * (z + d * r) mod nIs this your code? Seems clumsy. I leave room to question function verify.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "November 19, 2022, 10:35:49 PMLast edit: November 20, 2022, 04:05:33 AM by odolvlobo",
+      "body": "Quote from: ecdsa123 on November 19, 2022, 02:18:54 PMCode:...pub1=private1*Gpub2=private2*G...I am not familiar with SageMath. Does the '*' operator here do ECC multiplication?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "November 20, 2022, 03:02:17 AMLast edit: November 20, 2022, 04:28:58 AM by odolvlobo",
+      "body": "I can't tell you what is wrong with your code, though I suspect that '*' is not doing what you think is to doing, so I wrote this simple python script:Code:from cryptography.hazmat.primitives.asymmetric import ecfrom cryptography.hazmat.primitives import serializationprivate_key_1 = ec.derive_private_key(664613997892457936451903530140172288000, ec.SECP256K1())private_key_2 = ec.derive_private_key(110623181588558332205237110447978292605510900347349684371947434845384786316778, ec.SECP256K1())public_key_1 = private_key_1.public_key()serialized_public_key_1 = public_key_1.public_bytes(    encoding=serialization.Encoding.X962,    format=serialization.PublicFormat.CompressedPoint)print(serialized_public_key_1.hex())public_key_2 = private_key_2.public_key()serialized_public_key_2 = public_key_2.public_bytes(    encoding=serialization.Encoding.X962,    format=serialization.PublicFormat.CompressedPoint)print(serialized_public_key_2.hex())It outputs this:Code:$ /bin/python3 ecc.py0235837d0b32b721f7419eff16e0554f3ea7a723b70552bce041033793499394a1029070ed75372ac4cf02628996c1a68bda13669ac146303d63b6d28cb29f6c21a1As you can see the public keys are not the same.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "_Counselor",
+      "created_time": "November 20, 2022, 08:07:37 AM",
+      "body": "Quote from: ecdsa123 on November 19, 2022, 02:18:54 PMwhy it works?Because when checking the signature, only the x-coordinate is checked, and since due to symmetry there are two points with the same X, there are two different private keys that lead to the same solution. To calculate the second possible key, it is enough to take a symmetrical nonce. With your parameters from the example:Code:r= 69933057925445156103627311546056983351587171473600111963597898281808348149939s= 99514802695095857543902537284008490009261385852143431210120625655251582757337z= 12948693844049826047046411457108709640188688022302896372272988915976703455562nonce= 76658540346477621248539633331872761318528094222023647613764244410682868036596nonce_sym = (nonce * (n-1)) % npriv1 = (modinv(r,n) * ((nonce * s) - z)) % nprint(priv1) #664613997892457936451903530140172288000priv2 = (modinv(r,n) * ((nonce_sym * s) - z)) % nprint(priv2) #110623181588558332205237110447978292605510900347349684371947434845384786316778",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

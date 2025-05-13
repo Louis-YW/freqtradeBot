@@ -1,0 +1,53 @@
+{
+  "id": "topic_5437488",
+  "title": "bnbstorm",
+  "author": "bnbstorm",
+  "created_time": "January 31, 2023, 02:43:05 PM",
+  "content": "Hello all.BackstoryI am owner of https://selldefi.com (Read more). This website helps people to sell their files for bitcoin. This website script is kinda famous and have multiple clones in market but I have made its payment system by myself. Older system was on Coinpayments which requires heavy KYC so I thought to make my own custom solution. Though it is not a standard way and you can call it DIY method but it works perfectly and it is decentralized.Accepting PaymentTo accept Bitcoin payments you need 3 stepsGenerate new Bitcoin Address for each customerCheck balance of addressUpdate database once address have enough balance and confirmationGenerate new Bitcoin Address for each customerThere are two ways to generate Bitcoin address and both require xpub. For people who do not know XPUB is Master Public Key which can generate as many addresses as you want under same Seed. Mean all addresses can be derived by yourself if you have your seed phrase. Other names of XPUB are ZPUB and YPUB which are for addresses starting with bc and 3 respectively. You can play with seeds, addresses and master pub key here. Master public key is only used to derived addresses and if someone knows your master public key they can know all addresses that belong to you in that wallet. But they cannot spend funds from it.How to get XPUB/YPUB/ZPUBYou can get your Master public key from Electrum wallet or any other similiar wallet. For Electrum 4.3 you can get it in Menu as Wallet > Information > Master public key. There you can have your xpub, ybup or zpub.How to genenrate addresses from master keyWallets automatically generate addresses for us but for website we have to do it ourselves. So there are again two methods to generate addresses from Master public key.1. Blockchain API V22. BitswapIf you use Blockchain v2 Api it is very helpful and easy. You get API. You provide your xpub and it will automatically generate 1 address for you and when that address will receive balance with 6 confirmations then blockchain.com will call your callback url once. In your callback url you can put code for checking received balance, confirmations and update Database. You may face address limit (20 address gap limitation is met) problem which you can read about it once you face it but its solution is to add below code in end of your api call.Code:&gap_limit=1000000although setting such high limit is not feasible for you to handle as Electrum will take time to generate 1m addresses. Also if you do not know how to generate more addresses in Electrum then you can do this by these commands.Code:-----For Older versionwallet.create_new_address(False)wallet.storage.put('gap_limit',1000)-----For New versionwallet.change_gap_limit(5000)Restart Electrum to generate addressesBitswapYou can use Bitswap library to custom generate addresses for youCode:<?phpfunction GenerateAddress($nb){    require_once('loader.php');$xpub = 'xpub.........';$rem = '0/';$path = $rem.$nb; // Receiving address path$hd = new HD();$hd->set_xpub($xpub);$address = $hd->address_from_master_pub($path);return $address;}This function will return new address you will pass it number of address you want to generate.?>Save addresses in database and check last addresses you have used and generate next address.Check balance of addressOnce you have received bitcoins you can check with any APi to check for balance. That can be blockchain.info api likeCode:public function CheckBalance($addr) {    $balance = file_get_contents('https://blockchain.info/q/addressbalance/'.$addr.'?confirmations=2');    $balance = $balance/100000000; if($balance > 0 ) {  return $balance; } else return 0; }You can also check address balance and confirmations by subtracting block of payment confirmation from current block height. There are hundreds of free api available to do this you have to be little creative for this.Update database once address have enough balance and confirmationOnce you have received required balance you can update database and transactions. You can reuse addresses if you manage previous balance of each address and reuse it after a week.I recommend to not use above 5000 addresses from each master key and change new wallets because Electrum cannot handle more than 5000 addresses with ease. It can handle any number of addresses but for a normal computer it is not friendly.I hope you will like this and in future many more will take benefits from this. Remind me in your prayers.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5437488",
+  "comments": [
+    {
+      "author": "bitmover",
+      "created_time": "January 31, 2023, 03:52:36 PM",
+      "body": "I don't think this solution is exactly \"custom\", because you are mostly following Blockchain.com guideline, but it looks good.https://www.blockchain.com/explorer/api/api_receiveI am thinking about possibilities to receive bitcoin in a website, and I am particularly interested in btcpayserver.org, but it doesn't look that easy/quick to implement.I would like to know from other forum member here what might be any downside of using this method you suggested compared to blockchain.com and btcpayserver",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bnbstorm",
+      "created_time": "January 31, 2023, 04:02:14 PM",
+      "body": "Quote from: bitmover on January 31, 2023, 03:52:36 PMI don't think this solution is exactly \"custom\", because you are mostly following Blockchain.com guideline, but it looks good.https://www.blockchain.com/explorer/api/api_receiveI am thinking about possibilities to receive bitcoin in a website, and I am particularly interested in btcpayserver.org, but it doesn't look that easy/quick to implement.I would like to know from other forum member here what might be any downside of using this method you suggested compared to blockchain.com and btcpayserverNo I'm not using Blochchain. We are only using blockchain to check balance of address. You can bypass Blockchain request to check balance of any address from any other server or api. I am using Bitswap which is completely Decentralised code. Also If anyone have any questions then I will help and will also provide code.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bnbstorm",
+      "created_time": "January 31, 2023, 07:06:29 PM",
+      "body": "QuoteI would like to know from other forum member here what might be any downside of using this method you suggested compared to blockchain.com and btcpayserverSorry I did not see this.BTCPay server is difficult to implement but it is one of the most proper solution that offers complete payment solution. If you can deploy this you do not need to worry about anything. It is completely decentralized and you do not rely on any API or KYC.While Blockchain.com is a centralized solution which has API restriction. You can access Bitcoin blockchain through this but it does not allow you to take full potential of Bitcoin blockchain.My solution is something between BTCPay and 3rd party API. It is extremely light weight and you do not need any extra server. You are keeping private information yourself while using 3rd party to fetch only balances for addresses. You can also remove all these if you have a Bitcoin core running on a server. You can query balance from Bitcoin Core directly so my provided solution will become fully decentralized. Bitswap Library that I used is offline and can generate addresses from xpub/zpub/ypub. You can download its code to use it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "February 02, 2023, 04:48:30 AM",
+      "body": "Quote from: bnbstorm on January 31, 2023, 02:43:05 PMI recommend to not use above 5000 addresses from each master key and change new wallets because Electrum cannot handle more than 5000 addresses with ease. It can handle any number of addresses but for a normal computer it is not friendly.Try swapping Electrum wallet for Sparrow wallet which can also act as an SPV or watch only wallet (and possibly has better performance with many addresses, I am not sure). You will need an Electrum public or private server of some sort, or a full node because it doesn't connect to anything by default.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bnbstorm",
+      "created_time": "February 02, 2023, 05:52:13 AM",
+      "body": "Quote from: NotATether on February 02, 2023, 04:48:30 AMQuote from: bnbstorm on January 31, 2023, 02:43:05 PMI recommend to not use above 5000 addresses from each master key and change new wallets because Electrum cannot handle more than 5000 addresses with ease. It can handle any number of addresses but for a normal computer it is not friendly.Try swapping Electrum wallet for Sparrow wallet which can also act as an SPV or watch only wallet (and possibly has better performance with many addresses, I am not sure). You will need an Electrum public or private server of some sort, or a full node because it doesn't connect to anything by default.It is a good suggestion but Electrum is also working fine. 5000 limit is very high as for my usage and I can also reuse addresses so its not a big problem.However I will also read about Sparrow wallet as its new to me. Thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

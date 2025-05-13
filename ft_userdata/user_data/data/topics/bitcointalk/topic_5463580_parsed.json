@@ -1,0 +1,165 @@
+{
+  "id": "topic_5463580",
+  "title": "bip39org",
+  "author": "bip39org",
+  "created_time": "August 17, 2023, 11:30:34 AMLast edit: August 18, 2023, 10:39:30 AM by bip39org",
+  "content": "Web: https://bip39.orgIPFS Mirror: https://bip39org.eth.link, https://bip39org.eth.limo, https://bip39-org.ipns.cf-ipfs.comGithub: https://github.com/bip39org/bip39-orgIssues: https://github.com/bip39org/bip39-org/issuesReleases (Standalone Offline Version): https://github.com/bip39org/bip39-org/releases/latestEvery releases are signed with the public PGP key https://github.com/bip39org/bip39-org/blob/main/bip39org.ascDonate: 1ApLvtViUypng5uunszD6HTVpsoBwK14ZQAboutBip39-org is a free, open source html & cli standalone tool to create BIP39 Mnemonic from the combination of Email, Password, security questions, and nonces.It is a modification from the coinb.in's brain wallet https://coinb.in/#wallet with extra key stretching solution with PBKDF2.It is not audited and released as a proof of concept, so please use it at your own risk.Featuresbip39.org supports the following features- Offline BIP39 mnemonic generation with Email and Password- Offline PBKDF2 cbc encrypted backup generation- Offline PBKDF2 text encryption- BIP39 tools https://bip39.org/bip39-standalone.html from the latest signed release of https://iancoleman.io/bip39/.FAQs- Is it secure?Depends on the email and the password combination you are using, make sure those are not leaked or used from other sites, and utilize other key generation factors such as security questions and nonces.- Is it a brain wallet?Sort of, the entropy generation with email and password is optimized to have resistance against brain wallet brute forces,see https://rya.nc/files/cracking_cryptocurrency_brainwallets.pdf about the brain wallet securityand see https://github.com/bip39org/bip39-org/blob/main/src/js/bip39-org.js#L760 for how we optimized them( With more nonce length it will be hard for the third party to guess your mnemonic )- Is it deterministic?We use the WebCrypto Standard https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_APIand as long as your browser and the hardware supports it, you can reproduce mnemonic with the same email and password combination.We don't use other cryptographic libraries other than the WebCrypto API to utilize crypto functions.- Is it auditable?We don't use any other frontend frameworks other than the native browser DOM API.See https://github.com/bip39org/bip39-org/blob/main/src/js/frontend.js for the frontend source code.Also, the javascript codes we use are embedded in the frontend html file without minification so it will be easy to verify the source code.( Our ENS IPFS Mirror also guarantees the immutability of the source code of the frontend as well )ContributePlease, feel free to make a contribution or an audit of the source code https://github.com/bip39org/bip39-orgTO-DO- Audit of the full source code by well-known firm & people- Implement Argon2 password hashing algorithm for the mnemonic entropy stretching via Email and Password which could enhance generated mnemonic aginst possible brute-force attacks by hardwares like FPGAs or an ASIC devices.- Add Shamir's secret sharing tool to the UI to shard entropy to make a secure backup of mnemonics ( And any kind of strings ).- Enhance UI to make it more user friendly.- Add missing test units for browser and node.jsDonationEvery donation will be used to cover audits of the source code1ApLvtViUypng5uunszD6HTVpsoBwK14ZQ",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5463580",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "August 17, 2023, 05:11:51 PM",
+      "body": "I tried it, and my browser instantly produced a mnemonic. That means the encryption is easy to brute force.Now compare WarpWallet: it takes a very long time to create a private key, which means the encryption is very difficult to brute force. If you do anything brain wallet related, at least make use of heavy encryption.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 18, 2023, 02:37:37 AM",
+      "body": "Quote from: LoyceV on August 17, 2023, 05:11:51 PMI tried it, and my browser instantly produced a mnemonic. That means the encryption is easy to brute force.Now compare WarpWallet: it takes a very long time to create a private key, which means the encryption is very difficult to brute force. If you do anything brain wallet related, at least make use of heavy encryption.Hello, that is why I recommend you to set enough length of nonce ( > 10000 ) to make it resistant to the brute force attack.I am also planning to adopt some powerful password-hashing functions like Argon2 https://github.com/P-H-C/phc-winner-argon2 but it will not be the default option since not many browsers or user environments support WASM and since Argon2 is not the standard yet. ( As we stated on the FAQ, we are currently only using the standard WebCrypto function to make any modern device compatible ).About the brute force, our key generation from the email and password is still stronger than the original brain wallet implementation from https://coinb.in/#wallet ( only doing 50 times of SHA256 digest vs 100 x ( nonce ) times of SHA256 digest + PBKDF2 key stretching) and still, we haven't heard a man using coinb.in wallet getting robbed due to the brute force attack so I think it is still secure as it is. ( Unless somebody brings up FPGA loaded with the custom script to brute force with every leaked email and passwords )",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 18, 2023, 08:40:00 AM",
+      "body": "No offense, but I don't see the point of this at all.With your system, the user needs to back up an email address or other ID, a password, one or more \"additional phrases\", and a nonce. The loss of any one of these results in loss of their seed phrase and their coins. How is this simpler than just backing up a 12 word seed phrase which was properly generated from dev/urandom?Either they are backing up all that information on paper, in which case they should just back up a properly generated seed phrase, or they are relying on their memory for random strings, phrases, and numbers, which puts them at a very high risk of forgetting something and locking themselves out of their coins.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 18, 2023, 09:20:02 AM",
+      "body": "Quote from: o_e_l_e_o on August 18, 2023, 08:40:00 AMNo offense, but I don't see the point of this at all.With your system, the user needs to back up an email address or other ID, a password, one or more \"additional phrases\", and a nonce. The loss of any one of these results in loss of their seed phrase and their coins. How is this simpler than just backing up a 12 word seed phrase which was properly generated from dev/urandom?Either they are backing up all that information on paper, in which case they should just back up a properly generated seed phrase, or they are relying on their memory for random strings, phrases, and numbers, which puts them at a very high risk of forgetting something and locking themselves out of their coins.Note that the \"additional phrases\" and the nonce is an optional values, which means that you could only generate the same seed phrases with the same email and password.Additional phrases and the nonce could work as same as the BIP85 which enables generating multiple different seeds by a different BIP85 index.Backup option is provided in case you forgot your email or password, or any other values you have used and it is recommended if you tend to store valuable crypto.Same as you make a backup for credentials for other websites as well.Of course, you could generate random phrases via the website which is generated by the browser cryptography API, and make an encrypted backup of it https://bip39.org/#mnemonic.That is why our website is named \"bip39.org\". We will add multiple tools related to the seed phrases over time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joniboini",
+      "created_time": "August 18, 2023, 09:23:47 AM",
+      "body": "Quote from: bip39org on August 18, 2023, 02:37:37 AMHello, that is why I recommend you to set enough length of nonce ( > 10000 ) to make it resistant to the brute force attack.I tried this setting and it still generates my seed pretty fast. As a non-techy user, how would I know if the generated seed is relatively safe from brute force or not? Is there any tool or way for me to check the entropy value?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 18, 2023, 09:30:20 AM",
+      "body": "Quote from: joniboini on August 18, 2023, 09:23:47 AMQuote from: bip39org on August 18, 2023, 02:37:37 AMHello, that is why I recommend you to set enough length of nonce ( > 10000 ) to make it resistant to the brute force attack.I tried this setting and it still generates my seed pretty fast. As a non-techy user, how would I know if the generated seed is relatively safe from brute force or not? Is there any tool or way for me to check the entropy value?Check out the \"Generated Entropy\" area. Copy-pasting those entropy values to https://iancoleman.io/bip39/ will give you the same mnemonic phrases.To prevent brute force I think the generation time of 1~5 seconds is a safe measure but I don't think people will brute force them if you are using longer and safer password values.See https://www.security.org/how-secure-is-my-password/.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 18, 2023, 10:04:59 AM",
+      "body": "Quote from: bip39org on August 18, 2023, 09:20:02 AMNote that the \"additional phrases\" and the nonce is an optional values, which means that you could only generate the same seed phrases with the same email and password.Which would be highly insecure. Quote from: bip39org on August 18, 2023, 09:20:02 AMBackup option is provided in case you forgot your email or password, or any other values you have used and it is recommended if you tend to store valuable crypto.Which is entirely my point. Given that you should be backing up your wallet recovery process offline, then why not generate your seed phrase securely and back that up, than risk generating it insecurely by using this method and then backing up your additional phrases and so on (which also don't have a checksum or any way to identify an error).Quote from: bip39org on August 18, 2023, 09:20:02 AMOf course, you could generate random phrases via the website which is generated by the browser cryptography API, and make an encrypted backup of it https://bip39.org/#mnemonic.I wouldn't recommend that anyone uses a website based javascript generator: https://bitcointalk.org/index.php?topic=5324030.msg56590276#msg56590276",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 18, 2023, 10:19:23 AM",
+      "body": "Quote from: o_e_l_e_o on August 18, 2023, 10:04:59 AMQuote from: bip39org on August 18, 2023, 09:20:02 AMNote that the \"additional phrases\" and the nonce is an optional values, which means that you could only generate the same seed phrases with the same email and password.Which would be highly insecure. Quote from: bip39org on August 18, 2023, 09:20:02 AMBackup option is provided in case you forgot your email or password, or any other values you have used and it is recommended if you tend to store valuable crypto.Which is entirely my point. Given that you should be backing up your wallet recovery process offline, then why not generate your seed phrase securely and back that up, than risk generating it insecurely by using this method and then backing up your additional phrases and so on (which also don't have a checksum or any way to identify an error).Quote from: bip39org on August 18, 2023, 09:20:02 AMOf course, you could generate random phrases via the website which is generated by the browser cryptography API, and make an encrypted backup of it https://bip39.org/#mnemonic.I wouldn't recommend that anyone uses a website based javascript generator: https://bitcointalk.org/index.php?topic=5324030.msg56590276#msg56590276Yes, as I have said earlier \"use it at your own risk\" and my recommendation is to store crypto on something more audited and well-used. This website is only at the proof-of-concept stage for those who seek easy binding of the mnemonic against something easy to remember. My idea to publish the website here is to gather any ideas that could lead to improvement and get the audit done. If the function is mature enough, will port to other languages like C or Rust for a secure key generation framework. JS is preferred since it could demonstrate the whole process on Node.js and Web Browsers without sacrificing much time for building a UI.Still, this tool will provide you with convenient crypto storage as easy-to-remember mnemonic words that could be used across wallets like Metamask or Electrum if you don't intend to store millions worth of crypto.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 18, 2023, 10:32:28 AM",
+      "body": "QuoteI wouldn't recommend that anyone uses a website based javascript generator: https://bitcointalk.org/index.php?topic=5324030.msg56590276#msg56590276Might be worth looking at the Bitcoin Core's RNG code for me but the RNG of JS which would be `crypto.getRandomBytes()` is already used for wallets like Metamask which more than a million people use to store crypto.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "August 18, 2023, 06:57:03 PM",
+      "body": "Quote from: bip39org on August 17, 2023, 11:30:34 AMBip39-org is a free, open source html & cli standalone tool to create BIP39 Mnemonic from the combination of Email, Password, security questions, and nonces.I appreciate your efforts, but from my quick testing I see that I can enter anything I want in email field, so this is acting more like additional passphrase.I don't see any real benefit of adding real email address, and it can only hurt newbies who (by mistake) could generate keys while being online.Any random generation and mixing several sources is not really creating true randomness (based on my research).Using something like good old casino dices and calculating last word is much better option in my opinion, but one downside is much slower process.Quote from: bip39org on August 17, 2023, 11:30:34 AM- Is it auditable?I wouldn't recommend anyone using this tool until we see code review or audits from security experts, but it should be fine for experimental purposes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 19, 2023, 01:22:33 AM",
+      "body": "Quote from: dkbit98 on August 18, 2023, 06:57:03 PMQuote from: bip39org on August 17, 2023, 11:30:34 AMBip39-org is a free, open source html & cli standalone tool to create BIP39 Mnemonic from the combination of Email, Password, security questions, and nonces.I appreciate your efforts, but from my quick testing I see that I can enter anything I want in email field, so this is acting more like additional passphrase.I don't see any real benefit of adding real email address, and it can only hurt newbies who (by mistake) could generate keys while being online.Any random generation and mixing several sources is not really creating true randomness (based on my research).Using something like good old casino dices and calculating last word is much better option in my opinion, but one downside is much slower process.Quote from: bip39org on August 17, 2023, 11:30:34 AM- Is it auditable?I wouldn't recommend anyone using this tool until we see code review or audits from security experts, but it should be fine for experimental purposes.Thank you for your opinion and yes I would recommend the same. While I have examined the codes and the functionalities personally still the codes are released as a proof of concept and you should use them with your own risks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 19, 2023, 08:23:33 AM",
+      "body": "Quote from: bip39org on August 18, 2023, 02:37:37 AMQuote from: LoyceV on August 17, 2023, 05:11:51 PMI tried it, and my browser instantly produced a mnemonic. That means the encryption is easy to brute force.Now compare WarpWallet: it takes a very long time to create a private key, which means the encryption is very difficult to brute force. If you do anything brain wallet related, at least make use of heavy encryption.Hello, that is why I recommend you to set enough length of nonce ( > 10000 ) to make it resistant to the brute force attack.That's just another thing you'd have to remember. You could accomplish the same by adding a few more random characters. But if the encryption itself is a million times heavier, it gets more secure without requiring the user to remember more data.Quote from: o_e_l_e_o on August 18, 2023, 08:40:00 AMWith your system, the user needs to back up an email address or other ID, a password, one or more \"additional phrases\", and a nonce. The loss of any one of these results in loss of their seed phrase and their coins. How is this simpler than just backing up a 12 word seed phrase which was properly generated from dev/urandom?Good point. Also known as KISS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 19, 2023, 08:38:20 AM",
+      "body": "QuoteThat's just another thing you'd have to remember. You could accomplish the same by adding a few more random characters. But if the encryption itself is a million times heavier, it gets more secure without requiring the user to remember more data.Yes, that is the reason why we will be going to improve UI as well as adding Argon2 for the key stretching method",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Synchronice",
+      "created_time": "August 19, 2023, 09:44:07 AM",
+      "body": "Don't wanna be that guy who is skeptical and hopeless with full of negativity but there is really no point into creating this generator. If you wanted to test your skills, then great! But if you think that there could be made a project out of this, then no, don't hope that!1. You suggest to use unique details. Okay, but then what's the point? If I have to type unique details, I'll just download Electrum and generate my wallet via Electrum.2. You have to keep in mind that 99% of users will probably enter the information that they have already entered on different platforms. So, 99% of people will experience hacks and loss because this generator generates address according to what I type. If I fill the fields, save information and refill it again, I receive exactly the same seeds, entrophy, etc.3. The way Electrum generates seed phrases is safe enough to never worry about getting your wallet randomly hacked.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 19, 2023, 09:59:29 AM",
+      "body": "Quote from: Synchronice on August 19, 2023, 09:44:07 AMDon't wanna be that guy who is skeptical and hopeless with full of negativity but there is really no point into creating this generator. If you wanted to test your skills, then great! But if you think that there could be made a project out of this, then no, don't hope that!1. You suggest to use unique details. Okay, but then what's the point? If I have to type unique details, I'll just download Electrum and generate my wallet via Electrum.2. You have to keep in mind that 99% of users will probably enter the information that they have already entered on different platforms. So, 99% of people will experience hacks and loss because this generator generates address according to what I type. If I fill the fields, save information and refill it again, I receive exactly the same seeds, entrophy, etc.3. The way Electrum generates seed phrases is safe enough to never worry about getting your wallet randomly hacked.Hello, thank you for your opinions about the project.1. Not for testing my skills, but this website ( bip39.org ) will be a platform for various tools helping the management of BIP39 Mnemonic phrases.It is like building a safer, and more utilizable vault for your money, if your house is safe enough to store money in any place you would like it would be fine.But what I want to provide is a tool to help manage those who aren't and need some extra help.2. It is true, so I have placed a warning not to use details that could match with credentials that are used for other platforms.3. You might feel comfortable using Electrum for Bitcoin, but the mnemonics are also used for non-bitcoin wallets like Metamask and they are mostly browser-based ( js-based ) wallets.So, the security of the wallet generation itself will remain at the same level for other wallets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 19, 2023, 11:19:46 AM",
+      "body": "I do think that this project is an answer in search of a question, since just about every wallet is going to do their own key generation anyway.If people are more interested in security they will use a hardware wallet.If they are don't care they will use whatever is provided buy the wallet they are using.However, you really should force a minimum entropy that is somewhat large.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Medusah",
+      "created_time": "August 19, 2023, 01:50:25 PM",
+      "body": "Quote from: bip39org on August 18, 2023, 10:32:28 AMMight be worth looking at the Bitcoin Core's RNG code for me but the RNG of JS which would be `crypto.getRandomBytes()` is already used for wallets like Metamask which more than a million people use to store crypto.Metamask is running in the browser.  No secure software does that, if you were to compare it with something like electrum, because it introduces more risks than necessary.  Also, suggesting it because many use it holds as much water as suggesting custodial exchanges because millions use it, ignoring all the incidents of compromises there have been.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "August 19, 2023, 02:06:58 PM",
+      "body": "Quote from: DaveF on August 19, 2023, 11:19:46 AMI do think that this project is an answer in search of a question, since just about every wallet is going to do their own key generation anyway.If people are more interested in security they will use a hardware wallet.If they are don't care they will use whatever is provided buy the wallet they are using.However, you really should force a minimum entropy that is somewhat large.-DaveSure, that is why we will introduce Argon2 as well as improving our UI for generating mnemonics in longer timespacing.Quote from: Medusah on August 19, 2023, 01:50:25 PMQuote from: bip39org on August 18, 2023, 10:32:28 AMMight be worth looking at the Bitcoin Core's RNG code for me but the RNG of JS which would be `crypto.getRandomBytes()` is already used for wallets like Metamask which more than a million people use to store crypto.Metamask is running in the browser.  No secure software does that, if you were to compare it with something like electrum, because it introduces more risks than necessary.  Also, suggesting it because many use it holds as much water as suggesting custodial exchanges because millions use it, ignoring all the incidents of compromises there have been. As long as the computer is running on offline and which we supports it, it will be secure as it will be.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bip39org",
+      "created_time": "June 17, 2024, 11:12:31 PM",
+      "body": "I am pleased to announce that the development of this service is now acquired by CPUchain project.Thank you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

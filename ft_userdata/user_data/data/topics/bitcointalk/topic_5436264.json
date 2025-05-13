@@ -1,0 +1,109 @@
+{
+  "id": "topic_5436264",
+  "title": "simpic",
+  "author": "simpic",
+  "created_time": "January 21, 2023, 02:34:55 PM",
+  "content": "I'm running bitcoin-qt without parameters and with the following settings in \".bitcoin/bitcoin.conf\" file:Quotedatadir=/media/<my_user>/<external_hdd>/.bitcoinwalletdir=/home/<my_user>/.bitcoin/wallets/testOn a computer with Ubuntu it works like a charm: it gets blockchain data and wallet.On another computer with Linux Mint in which I copied the same Bitcoin Core (v24.0.1) and the same config folder, located in the same path (\".bitcoin/bitcoin.conf\"), when I launch bitcoin-qt (with no parameters) it gets the wrong bitcoin.conf file, using that is on the external disk and no wallet is loaded.What the hell is wrong???",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5436264",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "January 21, 2023, 02:43:49 PM",
+      "body": "I've always found it strange how Bitcoin Core places it's config files. I have (in use):Code:~/.config/Bitcoin/Bitcoin-Qt.confAnd (0 bytes):Code:~/.bitcoin/bitcoin.confThe former still exists if you change the latter to a different directory. I guess that's where you'll have to look too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 21, 2023, 02:44:46 PM",
+      "body": "In addition to what @LoyceV said I would check permissions. Since you said you copied it from another machine to another can this one read & write to those files & folders.Also, what does the debug.log file say? Any can't read or writes to anyplace?And, I know it's stupid but I have done it did you verify the <external_hdd> is the same mount name in both. Spent way too much time diagnosing that one once.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "January 21, 2023, 10:00:53 PM",
+      "body": "Quote from: LoyceV on January 21, 2023, 02:43:49 PMI've always found it strange how Bitcoin Core places it's config files. I have (in use):Code:~/.config/Bitcoin/Bitcoin-Qt.confAnd (0 bytes):Code:~/.bitcoin/bitcoin.confThe former still exists if you change the latter to a different directory. I guess that's where you'll have to look too.Yes, it does the trick, thank you!But... wtf!Quote from: DaveF on January 21, 2023, 02:44:46 PMIn addition to what @LoyceV said I would check permissions. Since you said you copied it from another machine to another can this one read & write to those files & folders.Also, what does the debug.log file say? Any can't read or writes to anyplace?And, I know it's stupid but I have done it did you verify the <external_hdd> is the same mount name in both. Spent way too much time diagnosing that one once.-DaveIt would have been the next check, thank you anyway for your help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "January 22, 2023, 05:09:29 AM",
+      "body": "Quote from: LoyceV on January 21, 2023, 02:43:49 PMI've always found it strange how Bitcoin Core places it's config files. I have (in use):Code:~/.config/Bitcoin/Bitcoin-Qt.confThose are the setting you've set in the \"Welcome Screen\" and the \"Options...->Settings\" in the GUI.Welcome screen can be re-accessed by adding a command line option -choosedatadirIf you've set a custom datadir in the welcome screen, QT wont use the datadir entry in the bitcoin.conf file nor the lines in bitcoin.conf in the default datadir;Bitcoin-Qt will use the bitcoin.conf in the custom datadir instead, perhaps that's what happened to OP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "January 22, 2023, 03:21:22 PM",
+      "body": "Quote from: nc50lc on January 22, 2023, 05:09:29 AMThose are the setting you've set in the \"Welcome Screen\" and the \"Options...->Settings\" in the GUI.Yes, I had guessed it.QuoteWelcome screen can be re-accessed by adding a command line option -choosedatadirThanks for the hint.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "KriptoBTC",
+      "created_time": "January 22, 2023, 03:45:50 PM",
+      "body": "Quote from: LoyceV on January 21, 2023, 02:43:49 PMI've always found it strange how Bitcoin Core places it's config files. I have (in use):Code:~/.config/Bitcoin/Bitcoin-Qt.confAnd (0 bytes):Code:~/.bitcoin/bitcoin.confThe former still exists if you change the latter to a different directory. I guess that's where you'll have to look too.Hey. I can't find it there. Any other place I should look for?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "January 22, 2023, 04:12:50 PM",
+      "body": "Meanwhile I made some changes and I get the following error:Error: Failed to load database path '/home/<my_user>/.bitcoin'. Data is not in recognized format.I solved deleting \"settings.json\" file, it will be created again on next opening of Bitcoin Core.Hope this can help who encounter the same error.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 25, 2023, 11:05:22 AM",
+      "body": "Use includeconf option inside the config file located under the default .bitcoin folder to load additional config files.An example:Code:# ~/.bitcoin/bitcoin.confincludeconf=/media/<my_user>/bitcoin.conf# in /media/<my_user>/bitcoin.conf:datadir=/<my_user>/<external_hdd>/.bitcoinwalletdir=/home/<my_user>/.bitcoin/wallets/testAnd make sure the datadir and wallet dir and all the files have 0777 (full user-group-other) permissions.This way you can specify the data and wallet folders without the entire config file being located on the root partition as well - only a skeleton of it with includeconf has to be there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 25, 2023, 12:36:17 PM",
+      "body": "Quote from: NotATether on January 25, 2023, 11:05:22 AMAnd make sure the datadir and wallet dir and all the files have 0777 (full user-group-other) permissions.This is bad advice: it's good practice to give files as few permissions as necessary. Giving all users on a multi user system full access to your wallet is a terrible idea. Also, non-executable files shouldn't have an executable flag.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "January 25, 2023, 02:08:43 PM",
+      "body": "Quote from: NotATether on January 25, 2023, 11:05:22 AMUse includeconf option inside the config file located under the default .bitcoin folder to load additional config files.Good to know, thank you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 25, 2023, 02:14:46 PM",
+      "body": "Quote from: LoyceV on January 25, 2023, 12:36:17 PMQuote from: NotATether on January 25, 2023, 11:05:22 AMAnd make sure the datadir and wallet dir and all the files have 0777 (full user-group-other) permissions.This is bad advice: it's good practice to give files as few permissions as necessary. Giving all users on a multi user system full access to your wallet is a terrible idea. Also, non-executable files shouldn't have an executable flag.Beyond that, if you have to do it to make things work something else is terribly wrong with either the application or system configuration.This is in general, not just related to core.I have had sysadmins over the years do things like that to get things to work instead of figuring out why they were having issues in the 1st place.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 28, 2023, 02:20:49 PM",
+      "body": "Quote from: LoyceV on January 25, 2023, 12:36:17 PMQuote from: NotATether on January 25, 2023, 11:05:22 AMAnd make sure the datadir and wallet dir and all the files have 0777 (full user-group-other) permissions.This is bad advice: it's good practice to give files as few permissions as necessary. Giving all users on a multi user system full access to your wallet is a terrible idea. Also, non-executable files shouldn't have an executable flag.1. Most people do not share their devices, in fact we have gravitated towards a situation where people use multiple devices.2. Device mountpoints are notoriously bad at dealing with file permissions, particularly with older versions of user/HAL that would just mount everything as root.3. If your Unix system gets hit with an application exploit, then it already obtained user access by virtue of the running program being owned by your user account (I will not deal with setUID madness here, but nobody should be using that horrible design anyway), and do not need the group and other bits; they might as well read your SSH keys.The executable flag, that was a mistake. In that case they can be set to 0644.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

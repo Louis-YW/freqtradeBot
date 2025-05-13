@@ -1,0 +1,77 @@
+{
+  "id": "topic_5495822",
+  "title": "studyzy",
+  "author": "studyzy",
+  "created_time": "May 09, 2024, 04:13:57 AM",
+  "content": "Rune protocol is a popular Bitcoin ecological token protocol recently, but Rune's Mint adopts a first-come-first-served method, which cannot reflect fairness. Here I propose a POW-based rune improvement protocol. In this protocol, mint must be based on pow proof, and the number of mint is determined by the hash value of the pow result, so that everyone can mint tokens more fairly.The changes to the pow rune are as follows:1. Modification of etching definition1.1 Remove premine, everyone mints fairly.1.2 HashSequenceThe etching definition contains the hash type, which can be concatenated in multiple ways. The enumeration of hash types is as follows:Code:type HashType intconst (    SHA256 HashType = iota + 1    SHA3_256    RIPEMD160    KECCAK256    BLAKE2B    BLAKE2S    SCRYPT    ETHASH    X11    NEOSCRYPT    EQUIHASH    LBRY    PENTABLAKE    QUARK    SKEIN    WHIRLPOOL    YESCRYPT    ZR5    //......)1.3 CommitWindowCommitWindow defines the height range of submission. For example, if the CommitWindow of a Rune is 100, when performing POW calculation and minting rune, based on the hash of the 1000th block, this mint transaction must be submitted and packaged before the height of 1000+100=1100. Mint beyond the CommitWindow will be considered invalid.1.4 BaseZeroDefines BaseZero, which requires at least how many zeros to be considered successfulCode:type Etching struct {    Divisibility *uint8    //Premine      *uint128.Uint128 //remove    Rune         *Rune    Spacers      *uint32    Symbol       *rune    Terms        *Terms    Turbo        bool    // new fileds for pow    HashSequence []HashType    CommitWindow uint32    BaseZero uint8 }2. Submit when minting:runeId, blockHeight, nonceHow to calculate how many runes are minted?Code:hashSequence:=getHashSequence(runeId) //Query the Etching definition of runeid and obtain its hashSequenceblockHash:=getBlockHash(blockHeight) //Get the block hash based on the block heighthash:=CalcHash(hashSequence,blockHash,nonce) //Concatenate blockHash and nonce, and use the hash algorithm corresponding to hashSequence to calculate the final POW hash value.Count how many zeros are in front of the hash, subtract baseZero, there are n left, then the number is 2^n, the code is as follows:Code:func CalcMintAmount(hash []byte, baseZero uint8) uint64 {    // Calculate how many zeros are at the beginning of the hash in binary    zeroCount := uint8(0)    for _, b := range hash {        if b == 0 {            zeroCount += 8        } else {            for i := 7; i >= 0; i-- {                if (b>>i)&1 == 0 {                    zeroCount++                } else {                    break                }            }            break        }    }    if zeroCount < baseZero {        return 0    }    // Calculate the final amount    amount := uint64(1) << (zeroCount - baseZero)    return amount}Other logics such as Transfer and Cenotaph remain unchanged.In order to distinguish between the existing rune protocol and the pow rune protocol, we can adjust the magic number of the pow rune, such as changing OP_13 to OP_14, so as to achieve mutual non-interference with the existing rune protocol.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5495822",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "May 09, 2024, 05:06:01 AM",
+      "body": "Quote from: studyzy on May 09, 2024, 04:13:57 AMRune protocol is a popular Bitcoin ecological token protocol recentlyWrong. Bitcoin is not a token creation platform and you cannot create any tokens inside Bitcoin. \"Rune\", \"Ordinals\" etc. are also not part of the Bitcoin protocol and they are not token protocols. They are all methods to exploit the bitcoin protocol in different ways to inject an arbitrary data into bitcoin transactions.There are a handful of side-chains and countless actual token creation platforms such as ethereum that should be used for token creation so that what you are proposing here can actually be part of the protocol and be enforced by that protocol instead of being an arbitrary data that means nothing and is worth nothing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khalidkhan82118",
+      "created_time": "May 09, 2024, 05:16:10 AM",
+      "body": "Quote from: pooya87 on May 09, 2024, 05:06:01 AMQuote from: studyzy on May 09, 2024, 04:13:57 AMRune protocol is a popular Bitcoin ecological token protocol recentlyWrong. Bitcoin is not a token creation platform and you cannot create any tokens inside Bitcoin. \"Rune\", \"Ordinals\" etc. are also not part of the Bitcoin protocol and they are not token protocols. They are all methods to exploit the bitcoin protocol in different ways to inject an arbitrary data into bitcoin transactions.There are a handful of side-chains and countless actual token creation platforms such as ethereum that should be used for token creation so that what you are proposing here can actually be part of the protocol and be enforced by that protocol instead of being an arbitrary data that means nothing and is worth nothing.Clear and concise clarification on the limitations of Bitcoin regarding token creation. Emphasizing the importance of utilizing appropriate platforms like Ethereum for token creation to ensure protocol enforcement.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "May 09, 2024, 09:21:37 AM",
+      "body": "I was about to suggest you post this elsewhere, but it seems you already do that[1]. Anyway, i skimmed your idea and i have 2 thoughts.1. How do you handle someone who intend to rent tons of GPU/ASIC at once to instantly mine all token?2. Limiting to few hash type is probably better for maintainability sake. IMO 2 hash type, where the former can be mined with ASIC and the latter only can be mined with CPU/GPU should be good enough as starter.[1] https://github.com/ordinals/ord/issues/3739",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "studyzy",
+      "created_time": "May 09, 2024, 12:53:12 PM",
+      "body": "Quote from: ABCbits on May 09, 2024, 09:21:37 AMI was about to suggest you post this elsewhere, but it seems you already do that[1]. Anyway, i skimmed your idea and i have 2 thoughts.1. How do you handle someone who intend to rent tons of GPU/ASIC at once to instantly mine all token?2. Limiting to few hash type is probably better for maintainability sake. IMO 2 hash type, where the former can be mined with ASIC and the latter only can be mined with CPU/GPU should be good enough as starter.[1] https://github.com/ordinals/ord/issues/3739My idea is that each type of Rune can define a serial list of Hash functions. For example, I can define a PoW Rune , whose HashSequence consists of three different hash algorithms: SHA256, ETHASH, and SCRYPT. The calculation process during Minting would be as follows:Code:hash1 := Sha256(blockHash + Nonce)hash2 := Ethash(hash1)hash3 := Scrypt(hash2)Hash3 is the final PoW hash result used to calculate the Mint Amount. You also can etch a new Rune that includes 10 different HashTypes in it.Introducing multiple different Hash algorithms can effectively prevent GPU/ASIC.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nutildah",
+      "created_time": "May 10, 2024, 12:29:10 AM",
+      "body": "Quote from: pooya87 on May 09, 2024, 05:06:01 AMQuote from: studyzy on May 09, 2024, 04:13:57 AMRune protocol is a popular Bitcoin ecological token protocol recentlyWrong. Bitcoin is not a token creation platform and you cannot create any tokens inside Bitcoin.That's not what he said, so he's not wrong. People have been using these types of platforms since 2012. The 1st version of Tether was on one such platform, and it worked fine. Nobody pretended it didn't exist because it relied on an external protocol.Quote from: pooya87 on May 09, 2024, 05:06:01 AMarbitrary data that means nothing and is worth nothing.If people are willing to pay money for something and there is a market for it, it has a value that exists independently of your world view. Don't blame me, blame the market.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 10, 2024, 03:28:32 AM",
+      "body": "Quote from: nutildah on May 10, 2024, 12:29:10 AMThat's not what he said, so he's not wrong. People have been using these types of platforms since 2012. The 1st version of Tether was on one such platform, and it worked fine. Nobody pretended it didn't exist because it relied on an external protocol.Tether is an excellent example to prove my point!It is not a \"Bitcoin token\", it does not exist inside Bitcoin protocol or even inside Bitcoin blockchain. It exists and is enforced inside a separate centralized database controlled by a company that can control the values being transferred, can shut it down, increase/decrease the circulating supply, freeze accounts and take your money, decide to ignore a tx on bitcoin blockchain that is supposed to transfer Tether, etc.So yeah like Tether, the Ordinals junk does not exist in Bitcoin either. It is just arbitrary data that is being stored inside bitcoin blockchain, treating it as cloud storage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nutildah",
+      "created_time": "May 10, 2024, 04:24:02 AM",
+      "body": "Quote from: pooya87 on May 10, 2024, 03:28:32 AMQuote from: nutildah on May 10, 2024, 12:29:10 AMThat's not what he said, so he's not wrong. People have been using these types of platforms since 2012. The 1st version of Tether was on one such platform, and it worked fine. Nobody pretended it didn't exist because it relied on an external protocol.Tether is an excellent example to prove my point!It is not a \"Bitcoin token\", That's exactly what it is. Its not a matter of opinion -- you're just wrong. I don't know what you get out of trying to trick newbies into believing your falsehoods, other than to further your personal dogma.Quote from: pooya87 on May 10, 2024, 03:28:32 AMit does not exist inside Bitcoin protocol or even inside Bitcoin blockchain. It exists and is enforced inside a separate centralized database controlled by a company that can control the values being transferred, can shut it down, increase/decrease the circulating supply, freeze accounts and take your money, decide to ignore a tx on bitcoin blockchain that is supposed to transfer Tether, etc.It uses the bitcoin blockchain as a method of accounting, just like bitcoin does. Everything else you describe is handled at the Omni protocol level. Nobody has ever once suggested bitcoin tokens were a totally inherent part of the bitcoin protocol. That's a red herring argument.Quote from: pooya87 on May 10, 2024, 03:28:32 AMSo yeah like Tether, the Ordinals junk does not exist in Bitcoin either. It is just arbitrary data that is being stored inside bitcoin blockchain, treating it as cloud storage.You just contradicted yourself here. It does not exist in bitcoin yet its stored in the bitcoin blockchain? Wut? Neither Omni nor Ordinals transactions are considered \"confirmed\" until the block containing their \"arbitrary/junk data\" is confirmed. Thus both protocols are at least somewhat intertwined with the bitcoin protocol. Its not really up for discussion so much as a reality, but feel free to continue spreading falsehoods and I'll continue correcting them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "May 10, 2024, 08:57:08 AM",
+      "body": "Quote from: studyzy on May 09, 2024, 12:53:12 PMQuote from: ABCbits on May 09, 2024, 09:21:37 AMI was about to suggest you post this elsewhere, but it seems you already do that[1]. Anyway, i skimmed your idea and i have 2 thoughts.1. How do you handle someone who intend to rent tons of GPU/ASIC at once to instantly mine all token?2. Limiting to few hash type is probably better for maintainability sake. IMO 2 hash type, where the former can be mined with ASIC and the latter only can be mined with CPU/GPU should be good enough as starter.[1] https://github.com/ordinals/ord/issues/3739My idea is that each type of Rune can define a serial list of Hash functions. For example, I can define a PoW Rune , whose HashSequence consists of three different hash algorithms: SHA256, ETHASH, and SCRYPT. The calculation process during Minting would be as follows:Code:hash1 := Sha256(blockHash + Nonce)hash2 := Ethash(hash1)hash3 := Scrypt(hash2)Hash3 is the final PoW hash result used to calculate the Mint Amount. You also can etch a new Rune that includes 10 different HashTypes in it.Introducing multiple different Hash algorithms can effectively prevent GPU/ASIC.Combining multiple hash algorithm is clever idea. I doubt Rune token will remain popular for long time, so i doubt anyone would bother create specific ASIC. Although personally i have doubt about preventing massive GPU usage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

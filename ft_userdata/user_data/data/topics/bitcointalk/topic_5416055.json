@@ -1,0 +1,101 @@
+{
+  "id": "topic_5416055",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "October 05, 2022, 04:34:29 PMLast edit: October 05, 2022, 06:42:02 PM by citb0in",
+  "content": "Hi all,please excuse if this has been already answered but I really searched and didn't find any helpful ressource. Let's say I wanna dump the field \"merkleroot\" of blocks 700,000 to 750,000 and save the results each per line so the output.lst contains 50,001 lines in total. What is the most efficient and fastes way to parse such information without the use of public (RESTful) API servers? I'd like to search locally on my full-node. Unfortunately I have no clue how to grep for this information from the existing binary files under ~/.bitcoin/blocks/blk*.datFor performance reasons I also want avoid running commands like this ...Code:bitcoin-cli getblock $(bitcoin-cli getblockhash 700000) |grep -i merkle... fifty thousand times, that would be totally overkill. I know the information is stored on the full-node, how to get them filtered as I like to ? The solution I'm looking for should also work on pruned nodes. I wanna search for various field of a block, \"merkleroot\" was just an example. I want to filter \"mediantime\" or \"chainwork\" or \"versionHex\", etc.thanks for any hints in advance.PP. Which bitcoin-cli command does list the available blocks that a pruned node contains?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5416055",
+  "comments": [
+    {
+      "author": "PawGo",
+      "created_time": "October 05, 2022, 04:45:13 PM",
+      "body": "Take a look at https://github.com/gcarq/rusty-blockparserIt takes some time to process blocks, but that app is highly configurable and you may easily dump the data you need to the file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "October 05, 2022, 04:56:03 PMLast edit: October 05, 2022, 06:44:57 PM by citb0in",
+      "body": "Thank you!This is what I call a coincidence. Just right now I switched to this thread and wanted to reply that I've found a solution which is bitcoin-iterate (by Rusty Russell)  But thanks for the suggested tool.Do you happen to know which one is better in terms of functionality and performance ?EDIT: just experienced that bitcoin-iterate doesn't seem to work on pruned nodes because it starts reading all available blocks and looking explicitly for the genesis block (see here where another user ran into this issue, too). Didn't find any switch in the tool yet that will allow me to bypass the genesis search. If anyone knows how to force bitcoin-iterate to run also on pruned nodes, please let me know.Meanwhile I will try the tool rusty-blockparser which you suggested...... Well, rusty-blockparser have a lot of requirements (like cargo and during compiling process it downloads and processes dozens of modules or libraries). It takes very long until everything is installed and finished. While typing this text I'm still waiting . .At the same time I stumbled over this very simple and neat tool, called blockchain-parser (from Denis Leonov) and was last updated 7 months ago. It's very simple: You input a blk*.dat file and it outputs the content as a text file. Very quick and straight-forward. One can grep and search for the particular info needed.And as a good reference I want to point to this great article, which explains in detail how everyone could manually dump and read information from bitcoind's blk*.dat files just by using linux standard tools like od or hexdump. This article covers everything to know about bitcoind structure for such blk*.dat files. I found it very helpful.EDIT: After long time waiting for the compilation process of rusty-blockparse unfortunately it doesn't seem to work on the pruned node I tested as expected. Although I even tried to use height start and end beyond the defaults (which usually are pretty fine settings according to the usage examples and manual) rusty-blockparse only detects one single block on my node:Code:$ ./rusty-blockparser simplestatsQuote[20:30:14] INFO - main: Starting rusty-blockparser v0.8.1 ...[20:30:14] INFO - index: Reading index from /home/bitcoin/.bitcoin/blocks/index ...[20:30:27] INFO - index: Got longest chain with 757246 blocks ... <--- this is not correct, my node is on height=757251)[20:30:27] INFO - blkfile: Reading files from /home/bitcoin/.bitcoin/blocks ...[20:30:27] INFO - parser: Parsing Bitcoin blockchain (range=0..) ...[20:30:27] INFO - callback: Executing SimpleStats ...[20:30:27] INFO - parser: Done. Processed 1 blocks in 0.00 minutes. (avg:     1 blocks/sec)[20:30:27] INFO - simplestats: SimpleStats:   -> valid blocks:      1   -> total transactions:   1   -> total tx inputs:      1   -> total tx outputs:      1   -> total tx fees:      0.00000000 (0 units)   -> total volume:      50.00000000 (5000000000 units)   -> biggest value tx:      50.00000000 (5000000000 units)        seen in block #0, txid: 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b   -> biggest size tx:      204 bytes        seen in block #0, txid: 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33bAverages:   -> avg block size:      0.28 KiB   -> avg time between blocks:   0.00 (minutes)   -> avg txs per block:   1.00   -> avg inputs per tx:   1.00   -> avg outputs per tx:   1.00   -> avg value per output:   50.00Transaction Types:   -> Pay2PublicKey: 1 (100.00%)        first seen in block #0, txid: 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b[20:30:27] INFO - main: Fin.as you see, it processed only one single block. But there are hundreds of blocks on that host. I even tried to specify a start range which I know for sure is valid but it didn't help either. Any clues? Seems to me like this tool also comes not along with pruned nodes ? Anyone have some insight or more information on this?But even if the tool would work on my pruned node as expected --> how should I achieve the originally mentioned and intended goal with it? I don't see in the options and in the manual any possibility to filter for such things. This tool seems to be more suitable to output dumps of balances, addresses, etc. into a .csv file, there are only three subcommands for that tool.So I'm still at the beginning. How should I achieve the goal mentioned in the beginning of my post?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 05, 2022, 05:11:53 PM",
+      "body": "Quote from: citb0in on October 05, 2022, 04:56:03 PM(see here where another user ran into this issue, too).Pruning is considered luxury in such small projects. But, leaving an issue unanswered is a sign that you shouldn't get involved with, if at least there's a more active alternative, that is rusty-blockparser.Quote from: citb0in on October 05, 2022, 04:56:03 PMIf anyone knows how to force bitcoin-iterate to run also on pruned nodes, please let me know.That would require altering the source code. IMO, this should be the last course. You and me don't know how they've written their program. I'd honestly prefer restarting from scratch than attempting to dive into these c files.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 06, 2022, 08:08:36 AM",
+      "body": "Quote from: citb0in on October 05, 2022, 04:34:29 PMFor performance reasons I also want avoid running commands like this ...Code:bitcoin-cli getblock $(bitcoin-cli getblockhash 700000) |grep -i merkle... fifty thousand times, that would be totally overkill.If you don't need to do this often, you could just let it loop through. I tested it, and from a spinning disk I get 10,000 merkle roots in 6 minutes.I'm surprised this isn't included in Blockchair's data dumps. If you want, I can add it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "October 06, 2022, 12:51:10 PM",
+      "body": "just for the comparison, on my side it took 1m12sec for 2,860 blocks when using RPCCode:$ time for i in {754500..757359..1}; do bitcoin-cli -rpcuser=myuser -rpcpassword=mypwd getblock $(bitcoin-cli -rpcuser=myuser -rpcpassword=mypwd getblockhash $i) | grep -i merkle; doneQuote  \"merkleroot\": \"9d5c1910d2e75d0b3e2fb36f09341ee8043e8d18fee327fc8bbad43dec95e47d\",real   1m12.700suser   0m13.720ssys   0m5.540ssame thing without RPC utilized --> 46sec for 2,860 blocksCode:$ time for i in {754500..757359..1}; do bitcoin-cli getblock $(bitcoin-cli getblockhash $i) | grep -i merkle; doneQuote  \"merkleroot\": \"9d5c1910d2e75d0b3e2fb36f09341ee8043e8d18fee327fc8bbad43dec95e47d\",real   0m45.959suser   0m13.702ssys   0m5.364swell, as you see in my case using RPC was not faster. I'd go the way without utilizing RPC",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 06, 2022, 01:12:48 PM",
+      "body": "Quote from: citb0in on October 06, 2022, 12:51:10 PMwell, as you see in my case using RPC was not faster. I'd go the way without utilizing RPCA lot of the speed between bitcoin-cli and rpc is going to depend on the rest of the system in terms of HDD speed / IO in general / CPU threads / RAM / and so on.It seems a bit counter intuitive and you would think a faster system would just be faster, but having run a bunch of nodes and apps on different hardware, there have been many times when A ran faster then B until you added RAM and then B was was faster. It all comes down to what resources you have available and what it is looking for.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 06, 2022, 04:47:42 PM",
+      "body": "Quote from: ETFbitcoin on October 06, 2022, 12:08:43 PM6 minutes is very fast.It's a Xeon that's mostly idle. Currently at block 383,000, I'll post the results tomorrow.Quote from: citb0in on October 06, 2022, 12:51:10 PMsame thing without RPC utilized --> 46sec for 2,860 blocksRunning from SSD, I assume?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 07, 2022, 01:01:45 AM",
+      "body": "Quote from: LoyceV on October 06, 2022, 04:47:42 PMQuote from: citb0in on October 06, 2022, 12:51:10 PMsame thing without RPC utilized --> 46sec for 2,860 blocksRunning from SSD, I assume?Pretty sure about that; my cheap node even with SSD (probably just limited compute power) took over 2:30min.Code:real 2m30.827suser 0m30.803ssys 0m18.266s",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "October 07, 2022, 05:44:56 AM",
+      "body": "Maybe my better performance resulted due to running a pruned node ? I'm just guessing",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 07, 2022, 08:19:28 AM",
+      "body": "Here's the result:block_hash_version_versionHex_merkleroot_time_mediantime_nonce_bits_difficulty_ chainwork_nTx_strippedsize_size_weight.tsv.gz (80 MB).Sample:Code:block hash version versionHex merkleroot time mediantime nonce bits difficulty chainwork nTx strippedsize size weight0 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f 1 00000001 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b 1231006505 1231006505 2083236893 1d00ffff 1 0000000000000000000000000000000000000000000000000000000100010001 1 285 285 11401 00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048 1 00000001 0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098 1231469665 1231469665 2573394689 1d00ffff 1 0000000000000000000000000000000000000000000000000000000200020002 1 215 215 8602 000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd 1 00000001 9b0fc92260312ce44e74ef369f5c66bbb85848f2eddd5a7a1cde251e54ccfdd5 1231469744 1231469665 1639830024 1d00ffff 1 0000000000000000000000000000000000000000000000000000000300030003 1 215 215 8603 0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449 1 00000001 999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644 1231470173 1231469744 1844305925 1d00ffff 1 0000000000000000000000000000000000000000000000000000000400040004 1 215 215 8604 000000004ebadb55ee9096c9a2f8880e09da59c0d68b1c228da88e48844a1485 1 00000001 df2b060fa2e5e9c8ed5eaf6a45c13753ec8c63282b2688322eba40cd98ea067a 1231470988 1231469744 2850094635 1d00ffff 1 0000000000000000000000000000000000000000000000000000000500050005 1 215 215 8605 000000009b7262315dbf071787ad3656097b892abffd1f95a1a022f896f533fc 1 00000001 63522845d294ee9b0188ae5cac91bf389a0c3723f084ca1025e7d9cdfe481ce1 1231471428 1231470173 2011431709 1d00ffff 1 0000000000000000000000000000000000000000000000000000000600060006 1 215 215 860..................700000 0000000000000000000590fc0f3eba193a278534220b2b37e9849e1a770ca959 1073733636 3fffe004 1f8d213c864bfe9fb0098cecc3165cce407de88413741b0300d56ea0f4ec9c65 1631333672 1631331088 2881644503 170f48e4 18415156832118.24 0000000000000000000000000000000000000000216dd8dc61fdffabb624feeb 1276 907224 1276422 3998094700001 00000000000000000002f39baabb00ffeb47dbdb425d5077baa62c47482b7e92 536895488 20006000 09200b2dfa12fd0626294ef8d8102d23ef09b8e52d6c24e4523a836fd153c9e7 1631333702 1631331729 2789376717 170f48e4 18415156832118.24 0000000000000000000000000000000000000000216de99c0f9f54c348aa1156 496 320315 474051 1434996700002 00000000000000000001993b6b5e4e3dac1187820bccc5ab324d6f01c05d6146 1073733636 3fffe004 5df5917295a07cb5361adc68093b1e40cc8a4755d2f10d7019e597505b48b857 1631333827 1631332460 3598498317 170f48e4 18415156832118.24 0000000000000000000000000000000000000000216dfa5bbd40a9dadb2f23c1 255 101177 159985 463516..................757434 000000000000000000029d11a2ff7d9446a7de7e575e50a79b0c83de37783f0b 805298176 2fffe000 c418d5a0e6322ed776887941f110cbf8b7a44cd2831b369413d193a76c3dfdf4 1665098543 1665096510 73455270 1708f9ae 31360548173144.85 000000000000000000000000000000000000000036907e07c3f7165e0e06d7a8 1464 386366 699282 1858380757435 0000000000000000000136d2e367c81f36bd4c1e320231ed5d501b4e654151a1 1073733636 3fffe004 1fa72363a7ad010bcf30e56ce33ba558f23526d00117ab0793503eac2424418f 1665099208 1665097058 861948933 1708f9ae 31360548173144.85 000000000000000000000000000000000000000036909a8d92d25a922c67bb40 1680 529683 957930 2546979757436 000000000000000000049c9f9176c2544b2d429d9ddc4d5461aeaa379fafcf8d 671080448 27ffe000 cd28bf0a6fca605d917ce3fee5dc0d97bcd44eeef8897e61b4dfe840d183cb8e 1665100292 1665097881 2098456665 1708f9ae 31360548173144.85 00000000000000000000000000000000000000003690b71361ad9ec64ac89ed8 2142 757447 1721126 3993467757437 00000000000000000007d55451ffad86e079bf9df2db6314fcfa8eed609df8eb 541065216 20400000 091b86fb517f368ee8b1c4060b3908e5ff185db863aae9915c1c235584e7e7a3 1665100530 1665097963 426079596 1708f9ae 31360548173144.85 00000000000000000000000000000000000000003690d3993088e2fa69298270 1133 342043 658547 1684676Daily updates take only 18 seconds. Enjoy Let me know if I messed anything up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "October 07, 2022, 08:44:56 AM",
+      "body": "Quote from: LoyceV on October 07, 2022, 08:19:28 AMHere's the result:block_hash_version_versionHex_merkleroot_time_mediantime_nonce_bits_difficulty_ chainwork_nTx_strippedsize_size_weight.tsv.gz (80 MB)....Great job Loyce, many thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

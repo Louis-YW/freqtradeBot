@@ -1,0 +1,69 @@
+{
+  "id": "topic_5456691",
+  "title": "darkv0rt3x",
+  "author": "darkv0rt3x",
+  "created_time": "June 17, 2023, 07:17:41 PMLast edit: June 19, 2023, 07:51:03 PM by darkv0rt3x",
+  "content": "Era uma vez...Isto é apenas uma pequena história que ocorreu comigo nestes últimos dias. Primeira vez que estive nesta situação.Vou contar, até porque se calhar, vai servir também como aprendizagem para outros, como serviu para mim.Eu costumo comprar Bitcoin mensalmente com a aplicação Relai que é uma self-custody wallet, que significa que nós temos as PKs das addresses da wallet e portanto temos controlo total sobre os nossos fundos.Acontece que um user aqui do forum contactou-me para abrirmos um canal LN entre os dois e eu aceitei. Então fui a essa wallet (Relai) e enviei 1M de sats para o meu node porque não tinha fundos onchain para poder abrir o canal.Acontece que como a pressa não era muita, eu escolhi a fee mais baixa que a wallet sugeria. Problema é que geralmente as wallets são uma bosta no que diz respeito a estimarem as fees e acabou por seleccionar uma fee emasiado baixa para a actual circunstância com a merda dos Ordinals e companhia.Resultado é que a minha TX não havia meio de entrar num bloco.Então com a ajuda de um (net)friend pensámos em criar uma CPFP. Eu já tinha ouvido falar nisto mas nunca tinha ido ler sobre o que era. Sabia apenas que tinha a ver com as fees e com as TXs. Não sabia sequer para que servia isto.Esta wallet, a Relai, não suporta RBF, por isso pensou-se numa CPFP - Child Pays For Parent. Isto significa na prática que vamos criar um pacote com 2 transacções (a original com fee muito baixa e uma outra com uma fee que dê para \"cobrir\" as fees das duas transacções e que dê para entrar nos próximos blocos) e o miner que escolher uma, tem que incluir as duas, no entanto, uma vai ser logo dada como \"already spent\".Então para fazer isto acontecer, eis o que tivémos que fazer:1 - Fazer um dump as priv keys da minha wallet do node da LN, na forma de descritpors!2 - Criar um file .json com o output do comando do passo 1 e guardar.3 - Importar este ficheiro no nó de Bitcoin. Isto vai importar a mesma wallet que tenho no node de LN mas no node de Bitcoin.4 - Fazer rescan de parte da blockchain para que o meu node Bitcoin fique \"a saber\" das transacções desta wallet5 - Tive que fazer re-broadcast da TX com fee baixa com o meu node de Bitcoin porque mesmo após o rescan, não me aparecia o unconfirmed balance. Depois deste passo, já tudo estava certinho no node Bitcoin.6 - Criar uma raw transaction com o meu node Bitcoin usando o mesmo output que foi usado quando enviei os fundos da Relai para o meu node LN, usando fees apropriadas. mais tarde posso dizer como calculei estas novas fees.7 - Assinar a transacção.8 - Fazer broadcast da nova transacção. Esta é prontamente detectada como uma CPFP.E pronto, depois disto, foi aguardar alguns blocos (ainda assim foram bastante mais que os que eu esperava) e os fundos chegaram ao meu node LN. No entanto ainda tive que fazer um rescan outputs no meu node LN porque o node nãoa viu que a transacção original (com os fees baixos) já tinha sido gasta, e o meu node LN estava a ver o dobro dos fundos que devia ver.Foi a primeira vez que estive nesta situação - stuck transaction - e que usei uma transacção CPFP para resolver o problema!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5456691",
+  "comments": [
+    {
+      "author": "joker_josue",
+      "created_time": "June 18, 2023, 06:44:02 AM",
+      "body": "Desconhecia essa possibilidade. Também nunca fui a procura de uma solução para esse cenários. Desde que uso o Electrum, que tenho sempre a função RBF ativa.Deixo duas sugestões:- Ajustar o titulo para incluir algo mais indicativo do que estas a falar, que parece-me algo útil e não me lembro de falarmos aqui. Algo do tipo: \"Uma pequena aventura - Como criar uma CPFP (Child Pays For Parent)\"- Dares mais pormenores de como se faz essa CPFP, porque a tua descrição ficou um pouco \"confusa\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "June 18, 2023, 01:42:02 PM",
+      "body": "Quote from: joker_josue on June 18, 2023, 06:44:02 AM- Dares mais pormenores de como se faz essa CPFP, porque a tua descrição ficou um pouco \"confusa\".É considerado CPFP simplesmente gastar o output de uma transação X ainda não confirmada com uma taxa mais alta de forma que os mineradores devam incluir a tal transação X ao mesmo tempo em que mineram a nova/última transação.Tanto que o nome já diz tudo: \"Child pays for parent\" = \"filho paga pelo pai\"Tipo assim:- Eu tenho 3 BTC na carteira.- Eu envio 1 BTC com um change de 2 BTC. Essa é a transação X que segue não confirmada.- Para fazer o CPFP, eu gasto os 2 BTC originados do change (na transação X), em uma nova transação Y com taxa ainda mais alta.- Os mineradores, para minerar a transação Y e desembolsar a taxa alta, devem também confirmar a transação X (pois Y usa moedas que vieram de X).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 18, 2023, 08:07:40 PM",
+      "body": "Quote from: TryNinja on June 18, 2023, 01:42:02 PM- Eu tenho 3 BTC na carteira.- Eu envio 1 BTC com um change de 2 BTC. Essa é a transação X que segue não confirmada.- Para fazer o CPFP, eu gasto os 2 BTC originados do change (na transação X), em uma nova transação Y com taxa ainda mais alta.- Os mineradores, para minerar a transação Y e desembolsar a taxa alta, devem também confirmar a transação X (pois Y usa moedas que vieram de X).Bem... falando isso desse modo, acho que eu fiz isso sem me aperceber algumas semanas atras, na fase das altas fees.Estava a transferir dinheiro de uma carteira para outra, só que ia dividindo o dinheiro por varios endereços. Como as fees eram baixas, as transações acabaram por demorar. E eu no meio do processo acabei por enviar dinheiro de um endereço de troco (que ainda não tinha recebido) para outro endereço. Resultado, como fiz uma fee mais alta nessa segunda transação, a outra também foi aprovada primeiro de outras que tinha feito antes.Método interessante, que desconhecia o termo.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "June 19, 2023, 07:54:35 PM",
+      "body": "Quote from: joker_josue on June 18, 2023, 06:44:02 AMDesconhecia essa possibilidade. Também nunca fui a procura de uma solução para esse cenários. Desde que uso o Electrum, que tenho sempre a função RBF ativa.Deixo duas sugestões:- Ajustar o titulo para incluir algo mais indicativo do que estas a falar, que parece-me algo útil e não me lembro de falarmos aqui. Algo do tipo: \"Uma pequena aventura - Como criar uma CPFP (Child Pays For Parent)\"- Dares mais pormenores de como se faz essa CPFP, porque a tua descrição ficou um pouco \"confusa\".Título editado.O @TryNinja já fez o que eu devia ter feito melhor. Obrigado por isso.No entanto, o meu caso foi um pouco diferente. Em vez de ter usado o \"troco\" (change), usei mesmo a TX em causa. Eu não decorei todos os cenários do que li mas acho que este caso em concreto só foi possível porque eu era o sender E o receiver! Se não, teria que ser como o @TryNinja explicou... Com o change!Aproveito ainda para deixar este link que explica relativamente bem como funciona:https://braiins.com/blog/btc-transaction-stuck#toc-child-pays-for-parent-cpfp-",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "June 19, 2023, 09:43:42 PM",
+      "body": "Quote from: darkv0rt3x on June 19, 2023, 07:54:35 PMNo entanto, o meu caso foi um pouco diferente. Em vez de ter usado o \"troco\" (change), usei mesmo a TX em causa. Eu não decorei todos os cenários do que li mas acho que este caso em concreto só foi possível porque eu era o sender E o receiver! Se não, teria que ser como o @TryNinja explicou... Com o change!Sim, o importante é gastar o output de uma transação, seja ele o troco ou o próprio valor que alguem te enviou. Como a nova transação só é válida caso a anterior seja confirmada, o minerador é obrigado a colocar as duas.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 19, 2023, 11:25:33 PM",
+      "body": "Quote from: TryNinja on June 19, 2023, 09:43:42 PMSim, o importante é gastar o output de uma transação, seja ele o troco ou o próprio valor que alguem te enviou. Como a nova transação só é válida caso a anterior seja confirmada, o minerador é obrigado a colocar as duas.Então quer dizer, que podemos fazer isso com alguma transação feita por outra pessoa para nós, mas que ainda não foi confirmada na rede?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "June 19, 2023, 11:38:42 PM",
+      "body": "Quote from: joker_josue on June 19, 2023, 11:25:33 PMEntão quer dizer, que podemos fazer isso com alguma transação feita por outra pessoa para nós, mas que ainda não foi confirmada na rede?Você pode fazer CPFP com qualquer transação não confirmada que tenha um output para você.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

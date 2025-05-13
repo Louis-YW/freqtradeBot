@@ -1,0 +1,101 @@
+{
+  "id": "topic_5433062",
+  "title": "Jason Brendon",
+  "author": "Jason Brendon",
+  "created_time": "January 05, 2023, 04:11:21 AM",
+  "content": "so for some reason, i deleted the latest blk03xxx.dat and its related rev.dat file in .bitcoin/blocks/ folder.Now, when i run the bitcoind command, starts to build up the headers and blocks. After one entire day, the blocks are at 4xxxxx and headers are at 7xxxxxi mean, i just deleted one blk.dat and rev.dat file. Supposedly it should be taking so long, right? Why is it taking so long?Any workaround, please?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5433062",
+  "comments": [
+    {
+      "author": "Plaguedeath",
+      "created_time": "January 05, 2023, 04:29:55 AM",
+      "body": "It has been answered here, Bitcoin Core need those file and if you delete it, you need to download both of blk.dat and rev.dat again.Except you're want to run Bitcoin Core through pruning, here's the way to run it safely Bitcoin Core's prune node. Please help to use it safely.Quote from: https://bitcoin.stackexchange.com/questions/71272/are-old-rev-dat-file-safely-deletableNo. You need the rev*.dat files as much as you need the blk*.dat files. If Bitcoin Core cannot find the rev*.dat, it will need to regenerate them by reindexing the databases. Removing them effectively corrupts the databases.If you want to save disk space, you can use pruning instead. This will have Bitcoin Core properly remove blk*.dat and rev*.dat files to save disk space.You need to move this thread to Bitcoin Technical Support (left bottom of your page).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "January 05, 2023, 04:34:59 AM",
+      "body": "Quote from: Plaguedeath on January 05, 2023, 04:29:55 AMIt has been answered here, Bitcoin Core need those file and if you delete it, you need to download both of blk.dat and rev.dat again.Except you're want to run Bitcoin Core through pruning, here's the way to run it safely Bitcoin Core's prune node. Please help to use it safely.Quote from: https://bitcoin.stackexchange.com/questions/71272/are-old-rev-dat-file-safely-deletableNo. You need the rev*.dat files as much as you need the blk*.dat files. If Bitcoin Core cannot find the rev*.dat, it will need to regenerate them by reindexing the databases. Removing them effectively corrupts the databases.If you want to save disk space, you can use pruning instead. This will have Bitcoin Core properly remove blk*.dat and rev*.dat files to save disk space.You need to move this thread to Bitcoin Technical Support (left bottom of your page).i did do some research before asking here. and i did find that post in stackexchange.the problem that i have is that i didn't remove all rev.dat files, i just removed one, the latest one, and it really shouldn't look back from the very beginning.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "January 05, 2023, 11:16:57 AM",
+      "body": "Quote from: Jason Brendon on January 05, 2023, 04:34:59 AMi did do some research before asking here. and i did find that post in stackexchange.the problem that i have is that i didn't remove all rev.dat files, i just removed one, the latest one, and it really shouldn't look back from the very beginning. There's no workaround, just check your dbcache is as high as it can be (in the 4000-8000mb region if you can spare that) and wait for it to catch up. The issue is when core loads it tries to load as quickly as possible and checks only a handful of blocks. It'd make some sense if it stored a way to check double the number of blocks, run the second check and then rewind only to the first detected corruption but that might be harder to find and manage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "January 05, 2023, 01:04:02 PM",
+      "body": "Quote from: Jason Brendon on January 05, 2023, 04:11:21 AMso for some reason, i deleted the latest blk03xxx.dat and its related rev.dat file in .bitcoin/blocks/ folder.Now, when i run the bitcoind command, starts to build up the headers and blocks. After one entire day, the blocks are at 4xxxxx and headers are at 7xxxxxi mean, i just deleted one blk.dat and rev.dat file. Supposedly it should be taking so long, right? Why is it taking so long?Any workaround, please?i believe its the mismatch of the index which then cant find the corresponding height thus started again from zeroi personally played around with my node to add better rules, features.. and to play around with other things.. so its been awhile since reading cores base code for things like this (it was a nice change to stretch those old brain muscles)i presumed that it would not be a problem as my node doesnt have that problem, but turns out core does still have that problemi kinda knew there might have been a re-scan risk but was not sure as it has been a while since looking into that part of the code to remember which was my code vs core base code,it just seemed such an obvious fix. that i thought the otherday it was just standard base code that allowed easily transfer of partial data. i was expecting it to just quick scan blk vs rev to then force utxoset into ram and then build new blockheight from peers IBD for the rest(ontop of what you had). sorry i misled you, but it probably still did save you a bit of time.. it might be worth you making a suggestion to core to change their cludgy code that only operates in \"one way or zero\" and is not as intuitive as it could be about less than full perfect archiving",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "January 05, 2023, 01:42:55 PM",
+      "body": "Quote from: franky1 on January 05, 2023, 01:04:02 PMQuote from: Jason Brendon on January 05, 2023, 04:11:21 AMso for some reason, i deleted the latest blk03xxx.dat and its related rev.dat file in .bitcoin/blocks/ folder.Now, when i run the bitcoind command, starts to build up the headers and blocks. After one entire day, the blocks are at 4xxxxx and headers are at 7xxxxxi mean, i just deleted one blk.dat and rev.dat file. Supposedly it should be taking so long, right? Why is it taking so long?Any workaround, please?i believe its the mismatch of the index which then cant find the corresponding height thus started again from zeroi personally played around with my node to add better rules, features.. and to play around with other things.. so its been awhile since reading cores base code for things like this (it was a nice change to stretch those old brain muscles)i presumed that it would not be a problem as my node doesnt have that problem, but turns out core does still have that problemi kinda knew there might have been a re-scan risk but was not sure as it has been a while since looking into that part of the code to remember which was my code vs core base code,it just seemed such an obvious fix. that i thought the otherday it was just standard base code that allowed easily transfer of partial data. i was expecting it to just quick scan blk vs rev to then force utxoset into ram and then build new blockheight from peers IBD for the rest(ontop of what you had). sorry i misled you, but it probably still did save you a bit of time.. it might be worth you making a suggestion to core to change their cludgy code that only operates in \"one way or zero\" and is not as intuitive as it could be about less than full perfect archivingyeah, no, thank you anyway mate. it's okay.i guess it's just a one time thing. i don't want developers to focus on something not worth focusing on.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lionheart78",
+      "created_time": "January 14, 2023, 01:45:36 PM",
+      "body": "Quote from: Jason Brendon on January 05, 2023, 04:11:21 AMi mean, i just deleted one blk.dat and rev.dat file. Supposedly it should be taking so long, right? Why is it taking so long?Any workaround, please?It takes so long because it needs to redownload to rebuild the blockchain because the client needs to verify the integrity of the blockchain starting from the genesis block to the present.When you deleted the file blk03xxx.dat and its related rev.dat file, it caused the client to need to re-download and verify the integrity of every block after that point.  As far as I know, this will take a significant amount of time worst when you have a slow internet connection.The workaround would be to download a bootstrap.dat file that contains the majority of the blockchain data and could make the sync process faster or use a pruned node as the earlier reply stated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "January 15, 2023, 04:21:49 AM",
+      "body": "Quote from: lionheart78 on January 14, 2023, 01:45:36 PMQuote from: Jason Brendon on January 05, 2023, 04:11:21 AMi mean, i just deleted one blk.dat and rev.dat file. Supposedly it should be taking so long, right? Why is it taking so long?Any workaround, please?It takes so long because it needs to redownload to rebuild the blockchain because the client needs to verify the integrity of the blockchain starting from the genesis block to the present.When you deleted the file blk03xxx.dat and its related rev.dat file, it caused the client to need to re-download and verify the integrity of every block after that point.  As far as I know, this will take a significant amount of time worst when you have a slow internet connection.The workaround would be to download a bootstrap.dat file that contains the majority of the blockchain data and could make the sync process faster or use a pruned node as the earlier reply stated.Thank you.So does it mean that deleting one .dat file and its rev.file takes the same amount of time as deleting say 100 .dat files and its rev.file?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "January 15, 2023, 03:02:36 PM",
+      "body": "Quote from: ETFbitcoin on January 15, 2023, 12:05:10 PMQuote from: lionheart78 on January 14, 2023, 01:45:36 PMThe workaround would be to download a bootstrap.dat file that contains the majority of the blockchain data and could make the sync process faster or use a pruned node as the earlier reply stated.Using bootstrap.dat file is very outdated method. AFAIK nobody create up-to-date bootstrap.dat anymore and nowadays it'll make sync process slower[1-2].Quote from: Jason Brendon on January 15, 2023, 04:21:49 AMSo does it mean that deleting one .dat file and its rev.file takes the same amount of time as deleting say 100 .dat files and its rev.file?I tried to reproduce what OP did with Bitcoin Signet[3] on Bitcoin Core 23.0 which has following files.Code:128M blk00000.dat128M blk00001.dat128M blk00002.dat128M blk00003.dat 64M blk00004.dat 21M rev00000.dat 24M rev00001.dat 22M rev00002.dat 24M rev00003.dat 13M rev00004.datI deleted blk00004.dat and rev00004.dat, then run Bitcoin Core on Signet mode. I got error message \"Error building block database. Do you want to rebuild the block database now?\", so i re-run with additional -reindex parameter. I observe what Bitcoin Core is doing and here's the result,1. It attempt to sync block header.2. Bitcoin Core indeed re-process all blocks from beginning which still exist on your storage.3. Bitcoin Core only download missing block. Bitcoin Core shows my Signet node was 15 weeks / about ~15.5K block behind. First Bitcoin Signet block was mined on 2020-08-31[4] and current highest block height is 125798[5].The conclusion is, deleting 1 blk/rev file pair and 100 blk/rev file pair takes different time due to amount of block needs to be re-downloaded.[1] https://bitcointalk.org/index.php?topic=986676.msg10753296#msg10753296[2] https://bitcointalk.org/index.php?topic=2234542.msg22524484#msg22524484[3] https://en.bitcoin.it/wiki/Signet[4] https://mempool.space/signet/block/00000008819873e925422c1ff0f99f7cc9bbb232af63a077a480a3633bee1ef6[5] https://mempool.space/signet/blocksthanks a lot and i really appreciate your time and effort here. Can you also help me check one thing please? That will save me opening up another post here.what is the permission you grant for .bitcoin/blocks?During the whole process, i am afraid i screwed the permission. I wanted to make sure if it is 700 or 600 and also all the permissions for those .blk and rev files under the .bitcoin/blocks/thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 15, 2023, 04:39:33 PM",
+      "body": "Quote from: Jason Brendon on January 15, 2023, 03:02:36 PMwhat is the permission you grant for .bitcoin/blocks?During the whole process, i am afraid i screwed the permission. I wanted to make sure if it is 700 or 600 and also all the permissions for those .blk and rev files under the .bitcoin/blocks/The default is 700 for directories and 600 for files. It doesn't matter much though, I prefer to set my home directory as 700.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "January 16, 2023, 02:06:20 AM",
+      "body": "Quote from: LoyceV on January 15, 2023, 04:39:33 PMQuote from: Jason Brendon on January 15, 2023, 03:02:36 PMwhat is the permission you grant for .bitcoin/blocks?During the whole process, i am afraid i screwed the permission. I wanted to make sure if it is 700 or 600 and also all the permissions for those .blk and rev files under the .bitcoin/blocks/The default is 700 for directories and 600 for files. It doesn't matter much though, I prefer to set my home directory as 700.If you do everything 700 within the home dir, then your lightning or electrum server can't access bitcoin core.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 16, 2023, 08:35:21 AM",
+      "body": "Quote from: Jason Brendon on January 16, 2023, 02:06:20 AMIf you do everything 700 within the home dir, then your lightning or electrum server can't access bitcoin core.For special cases, make a new user. Example: user bitcoincore gets it's own group and permissions 750, user electrum gets added to group bitcoincore for read access.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "topic_5427568",
+  "title": "Jodmapht",
+  "author": "Jodmapht",
+  "created_time": "December 09, 2022, 04:26:16 PM",
+  "content": "Hi,On my (RPI) node I use maxconnections to control the maximum number of connections to my node, but my understanding is that this limit applies to both onion and regular connections. I am trying to connect to the 8333 port on my node from localhost, but my connection does not work and I think it is due to maxconnections being reached. So I am trying to reserve some connection room for my local services. How can I do that? Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5427568",
+  "comments": [
+    {
+      "author": "vv181",
+      "created_time": "December 09, 2022, 08:41:38 PM",
+      "body": "You can try to use:Code:  -whitebind=<[permissions@]addr>       Bind to the given address and add permission flags to the peers       connecting to it. Use [host]:port notation for IPv6. Allowed       permissions: bloomfilter (allow requesting BIP37 filtered blocks       and transactions), noban (do not ban for misbehavior; implies       download), forcerelay (relay transactions that are already in the       mempool; implies relay), relay (relay even in -blocksonly mode,       and unlimited transaction announcements), mempool (allow       requesting BIP35 mempool contents), download (allow getheaders       during IBD, no disconnect after maxuploadtarget limit), addr       (responses to GETADDR avoid hitting the cache and contain random       records with the most up-to-date info). Specify multiple       permissions separated by commas (default:       download,noban,mempool,relay). Can be specified multiple times.  -whitelist=<[permissions@]IP address or network>       Add permission flags to the peers connecting from the given IP address       (e.g. 1.2.3.4) or CIDR-notated network (e.g. 1.2.3.0/24). Uses       the same permissions as -whitebind. Can be specified multiple       times.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "December 09, 2022, 11:32:29 PM",
+      "body": "Have you tried to add addnode=192.168.0.X:8333 under your Bitcoin.conf?X should be replaced with your full node IP where you want to connect to. You can also use the RPC command bitcoin-cli to addnode check this link below it will force you to connect to that node.- https://developer.bitcoin.org/reference/rpc/addnode.html You can also use connect=192.168.0.X:8333 and put it in your bitcoin.conf same goes for the RPC command as a reference link above.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "December 10, 2022, 12:01:00 PM",
+      "body": "Quote from: vv181 on December 09, 2022, 08:41:38 PMYou can try to use:Code:  -whitebind=<[permissions@]addr>       Bind to the given address and add permission flags to the peers       connecting to it. Use [host]:port notation for IPv6. Allowed       permissions: bloomfilter (allow requesting BIP37 filtered blocks       and transactions), noban (do not ban for misbehavior; implies       download), forcerelay (relay transactions that are already in the       mempool; implies relay), relay (relay even in -blocksonly mode,       and unlimited transaction announcements), mempool (allow       requesting BIP35 mempool contents), download (allow getheaders       during IBD, no disconnect after maxuploadtarget limit), addr       (responses to GETADDR avoid hitting the cache and contain random       records with the most up-to-date info). Specify multiple       permissions separated by commas (default:       download,noban,mempool,relay). Can be specified multiple times.  -whitelist=<[permissions@]IP address or network>       Add permission flags to the peers connecting from the given IP address       (e.g. 1.2.3.4) or CIDR-notated network (e.g. 1.2.3.0/24). Uses       the same permissions as -whitebind. Can be specified multiple       times.So using whitelist=127.0.0.1 would allow localhost not to be counted amongst the connections subjected to maxconnections, correct? Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "December 10, 2022, 01:28:31 PM",
+      "body": "Quote from: BitMaxz on December 09, 2022, 11:32:29 PMHave you tried to add addnode=192.168.0.X:8333 under your Bitcoin.conf?X should be replaced with your full node IP where you want to connect to. You can also use the RPC command bitcoin-cli to addnode check this link below it will force you to connect to that node.- https://developer.bitcoin.org/reference/rpc/addnode.html You can also use connect=192.168.0.X:8333 and put it in your bitcoin.conf same goes for the RPC command as a reference link above.I don't think this is what I need because I do not want to connect to a new node, instead I want to ensure that local (running on localhost) services that need access to the 8333 port of my full node can always connect to it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "December 10, 2022, 02:20:56 PM",
+      "body": "Quote from: Jodmapht on December 10, 2022, 12:01:00 PMQuote from: vv181 on December 09, 2022, 08:41:38 PMYou can try to use:Code:  -whitebind=<[permissions@]addr>       Bind to the given address and add permission flags to the peers       connecting to it. Use [host]:port notation for IPv6. Allowed       permissions: bloomfilter (allow requesting BIP37 filtered blocks       and transactions), noban (do not ban for misbehavior; implies       download), forcerelay (relay transactions that are already in the       mempool; implies relay), relay (relay even in -blocksonly mode,       and unlimited transaction announcements), mempool (allow       requesting BIP35 mempool contents), download (allow getheaders       during IBD, no disconnect after maxuploadtarget limit), addr       (responses to GETADDR avoid hitting the cache and contain random       records with the most up-to-date info). Specify multiple       permissions separated by commas (default:       download,noban,mempool,relay). Can be specified multiple times.  -whitelist=<[permissions@]IP address or network>       Add permission flags to the peers connecting from the given IP address       (e.g. 1.2.3.4) or CIDR-notated network (e.g. 1.2.3.0/24). Uses       the same permissions as -whitebind. Can be specified multiple       times.So using whitelist=127.0.0.1 would allow localhost not to be counted amongst the connections subjected to maxconnections, correct? Thanks!I looked at my config and I already had whitelist=bloomfilter@127.0.0.1 ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "December 13, 2022, 12:08:00 PM",
+      "body": "Quote from: Jodmapht on December 10, 2022, 12:01:00 PMSo using whitelist=127.0.0.1 would allow localhost not to be counted amongst the connections subjected to maxconnections, correct? Thanks!IIRC, using it while having maxconnections set up, will reserve any local service(Electrs) that I used to keep still connected.Quote from: Jodmapht on December 10, 2022, 02:20:56 PMI looked at my config and I already had whitelist=bloomfilter@127.0.0.1 ...What kind of local services you are trying to connect to? Do you have any logs when it rejects the connection attempt?And have you tried to include all the [permissions@] in the config?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "December 13, 2022, 02:41:15 PM",
+      "body": "Quote from: vv181 on December 13, 2022, 12:08:00 PMQuote from: Jodmapht on December 10, 2022, 12:01:00 PMSo using whitelist=127.0.0.1 would allow localhost not to be counted amongst the connections subjected to maxconnections, correct? Thanks!IIRC, using it while having maxconnections set up, will reserve any local service(Electrs) that I used to keep still connected.Quote from: Jodmapht on December 10, 2022, 02:20:56 PMI looked at my config and I already had whitelist=bloomfilter@127.0.0.1 ...What kind of local services you are trying to connect to? Do you have any logs when it rejects the connection attempt?And have you tried to include all the [permissions@] in the config?Services such as Bisq. In the log I was seeing that the connection to the node kept getting disconnected in a loop and it was unable to sync.It started to work again after I restart bitcoind. However I would prefer not having to restart bitcoind. Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "December 15, 2022, 03:15:40 PM",
+      "body": "Quote from: Jodmapht on December 10, 2022, 01:28:31 PMI want to ensure that local (running on localhost) services that need access to the 8333 port of my full node can always connect to it.Just to make sure, by your saying of localhost, does that mean Bisq and bitcoind are running on the same device(Raspberry Pi)? Or did you mean both applications are on the same network (LAN)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

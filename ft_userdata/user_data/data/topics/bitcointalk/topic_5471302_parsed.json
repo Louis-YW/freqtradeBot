@@ -1,0 +1,69 @@
+{
+  "id": "topic_5471302",
+  "title": "Sdlooking92020",
+  "author": "Sdlooking92020",
+  "created_time": "October 23, 2023, 07:52:46 AM",
+  "content": "Hello, I have about 6-7 hard drives to look for some bitcoin wallets I most likely deleted. I read through some posts and figured I could use winhex (could not get pywallet to work for me) and search for those magic numbers: magic = [    b'\\x01\\x30\\x82\\x01\\x13\\x02\\x01\\x01\\x04\\x20',    b'\\x02\\x42\\x60\\x8D\\x10\\x40\\x01\\x01\\x00\\x00',    b'\\x00\\x00\\x00\\x00\\x62\\x31\\x05\\x00',  # Bitcoin Core wallet.dat    b'\\x00\\x00\\x00\\x00\\x62\\x32\\x05\\x00',  # Bitcoin Core wallet.dat (testnet)    b'\\x00\\x00\\x00\\x00\\x62\\x33\\x05\\x00',  # Bitcoin Core wallet.dat (regtest)    b'\\x00\\x00\\x00\\x00\\x62\\x34\\x05\\x00',  # Bitcoin Core wallet.dat (signet)    b'ELECBUM',                           # Electrum wallet    b'BIE1\\x00',                          # Bither wallet    b'Mini',                              # Mini private key format    b'passphrase',                        # Blockchain.info wallet (encrypted)    b'encpriv',                           # Blockchain.info wallet (encrypted)    b'pmtu',                              # MultiBit wallet    b'Extended Private Key',              # Extended private key (xprv)    b'Extended Public Key',               # Extended public key (xpub)    b'\\x80',                              # WIF for mainnet    b'\\xEF',                              # WIF for testnet]I am unsure as to what I am supposed to do if I find them. As an example, I found this \"0000000062310500\" on one hard drive but unsure of the next step. I am gathering information as I search each drive for any of these magic numbers. Any info is appreciated and will gladly share anything I find.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471302",
+  "comments": [
+    {
+      "author": "seek3r",
+      "created_time": "October 23, 2023, 08:19:17 AM",
+      "body": "It seems that 0000000062310500 matches to wallet.dat of Bitcoin Core. Next steps would be to extract and reconstruct that wallet file.You can use WinHex to extract the data from the location. It may take some trys since it is not that easy to determine the length (atleast for me). Save the data as a new .dat file and replace it with your wallet.dat on the Bitcoin Core data directory - before you do that: make sure to backup the file you are replacing (your current wallet)If Bitcoin Core cannot read that new file you might want to start Bitcoin Core with the command line -salvagewallet which can fix the recovery attempt in a few cases.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 23, 2023, 08:28:22 AM",
+      "body": "Quote from: Sdlooking92020 on October 23, 2023, 07:52:46 AM(could not get pywallet to work for me)Have you read [GUIDE] Recover your deleted keys? It's in my bookmarks with the name \"use pywallet to search entire partition\". This should get you started.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sdlooking92020",
+      "created_time": "October 23, 2023, 01:48:37 PM",
+      "body": "Quote from: seek3r on October 23, 2023, 08:19:17 AMIt seems that 0000000062310500 matches to wallet.dat of Bitcoin Core. Next steps would be to extract and reconstruct that wallet file.You can use WinHex to extract the data from the location. It may take some trys since it is not that easy to determine the length (atleast for me). Save the data as a new .dat file and replace it with your wallet.dat on the Bitcoin Core data directory - before you do that: make sure to backup the file you are replacing (your current wallet)If Bitcoin Core cannot read that new file you might want to start Bitcoin Core with the command line -salvagewallet which can fix the recovery attempt in a few cases.How would I extract the data and how do I determine the length?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sdlooking92020",
+      "created_time": "October 23, 2023, 09:01:19 PM",
+      "body": "Quote from: LoyceV on October 23, 2023, 08:28:22 AMQuote from: Sdlooking92020 on October 23, 2023, 07:52:46 AM(could not get pywallet to work for me)Have you read [GUIDE] Recover your deleted keys? It's in my bookmarks with the name \"use pywallet to search entire partition\". This should get you started.I tried the commands and get a segmentation fault like below:Found 0 possible walletsFound 0 possible encrypted keysFound 0 possible unencrypted keyszsh: segmentation fault  python2.7 pywallet.py --recover --recov_device='./thumb7.img'",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joniboini",
+      "created_time": "October 24, 2023, 02:06:30 AM",
+      "body": "Quote from: Sdlooking92020 on October 23, 2023, 09:01:19 PMzsh: segmentation fault  python2.7 pywallet.py --recover --recov_device='./thumb7.img'If I'm not wrong, segmentation fault usually occurs when there are one or two missing libraries/not installed correctly. Some errors in the past also suggest this[1]. One of the users fixed it by installing pycrypto on his own. How do you install python and pywallet? Maybe experienced people can help you more if you also post the full logs and your installation steps. CMIIW.[1] https://github.com/jackjack-jj/pywallet/pull/13",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sdlooking92020",
+      "created_time": "October 24, 2023, 04:27:53 AM",
+      "body": "Quote from: joniboini on October 24, 2023, 02:06:30 AMQuote from: Sdlooking92020 on October 23, 2023, 09:01:19 PMzsh: segmentation fault  python2.7 pywallet.py --recover --recov_device='./thumb7.img'If I'm not wrong, segmentation fault usually occurs when there are one or two missing libraries/not installed correctly. Some errors in the past also suggest this[1]. One of the users fixed it by installing pycrypto on his own. How do you install python and pywallet? Maybe experienced people can help you more if you also post the full logs and your installation steps. CMIIW.[1] https://github.com/jackjack-jj/pywallet/pull/13I will try this. Probably after I try looking for the magic numbers. Thank you",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 24, 2023, 11:54:45 AM",
+      "body": "Quote from: joniboini on October 24, 2023, 02:06:30 AMQuote from: Sdlooking92020 on October 23, 2023, 09:01:19 PMzsh: segmentation fault  python2.7 pywallet.py --recover --recov_device='./thumb7.img'If I'm not wrong, segmentation fault usually occurs when there are one or two missing libraries/not installed correctly. Some errors in the past also suggest this[1]. One of the users fixed it by installing pycrypto on his own. It can also mean any of these things happened:- The program has a bug and got into some memory corruption problem- NULL pointer deference (does not normally happen in Python)- The file that was passed to pywallet.py was so large that it messed up some internal state inside Python while some method was being executed and that's how the process got killed.Although I don't recall missing python libraries being able to segfault a script, usually the worst that happens is a (fatal) import error and it prints a message.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

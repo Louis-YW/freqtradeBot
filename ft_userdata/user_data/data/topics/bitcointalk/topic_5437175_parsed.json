@@ -1,0 +1,45 @@
+{
+  "id": "topic_5437175",
+  "title": "ryankung",
+  "author": "ryankung",
+  "created_time": "January 29, 2023, 05:23:41 AM",
+  "content": "I see many implementations like lnd, c-lightning, is using local database (redis) for user data storage. I think it introduces the problem of a single point of failure.Is there any implementation is based on distributed storage? Just like DHT or somehow?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5437175",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "January 29, 2023, 12:02:47 PM",
+      "body": "How you handle your local lightning database is up to you.According to best practices you should have it on drives that are on some sort of RAID and do a backup of it at every channel change.But, it's the same thing as your wallet.dat file for core or whatever wallet file you are using for your wallet there are many ways to save it and then recover it, how you do it is up to you. On my small nodes with no raid or anything else I have the recovery words and auto backup running.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sha420hashcollision",
+      "created_time": "February 10, 2023, 07:21:15 AM",
+      "body": "Quote from: ryankung on January 29, 2023, 05:23:41 AMI see many implementations like lnd, c-lightning, is using local database (redis) for user data storage. I think it introduces the problem of a single point of failure.Is there any implementation is based on distributed storage? Just like DHT or somehow?The storage is not distributed on lightning because lightning is effectively an off-chain payment network. You need to settle the funds on chain for it to work properly at all, and if you are not careful you could lose funds to a party that is present when you are not present for a long time. So effectively there is no \"single\" point of failure for anyone in the lightning network there is in fact a lot of corresponding security mechanisms running parallel to each-other. The only single point of failure is the lightning node operator just like the only point of failure in owning your own private key is you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "serveria.com",
+      "created_time": "February 11, 2023, 07:36:14 AM",
+      "body": "Quote from: ryankung on January 29, 2023, 05:23:41 AMI see many implementations like lnd, c-lightning, is using local database (redis) for user data storage. I think it introduces the problem of a single point of failure.Is there any implementation is based on distributed storage? Just like DHT or somehow?Lightning network doesn't store any user data. You do. And I have to agree with the previous comments: you are in charge, you choose how to implement it. So, if you feel like overdoing things you can set up some sort of a distributed cloud storage with every node protected by RAID and real-time backups.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "February 12, 2023, 02:54:23 AM",
+      "body": "Quote from: ryankung on January 29, 2023, 05:23:41 AMI see many implementations like lnd, c-lightning, is using local database (redis) for user data storage. I think it introduces the problem of a single point of failure.Is there any implementation is based on distributed storage? Just like DHT or somehow?'User data' is a vague term which may be misunderstood in this context. Lightning nodes don't really store user data like real name, email address or other personally identifiable information at all. Lightning nodes use a database to store channel state information and that's the whole idea of Lightning. That all transactions are made off-chain. There is no distributed record keeping, which makes it scale so extremely well. If you were to introduce distributed storage into the system again, you're back at square one. Makes no sense.Of course, you need to make sure not to lose this data (have a reliable backup strategy). But in a way, a regular Bitcoin wallet is also a 'single point of failure' if you don't have seed phrase backups. There will never be a way around backups in Bitcoin, in my opinion, and it is the user's responsibility to make sure that they exist and are safe.The only real drawback of L2 backups is that they're not a 'set it and forget it' type of backup, but need to be kept up to date. But again, software handles that for you. Just need to set it up correctly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

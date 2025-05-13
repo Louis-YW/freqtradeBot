@@ -1,0 +1,69 @@
+{
+  "id": "topic_5477561",
+  "title": "ltcltcltc",
+  "author": "ltcltcltc",
+  "created_time": "December 12, 2023, 11:27:18 AMLast edit: December 16, 2023, 07:11:17 PM by ltcltcltc",
+  "content": "I'm looking for a way that a computer could get a rough estimate of the current date and time with a very high confidence level, for example in order to verify the expiry of a contract by means of a computer program.NTP[1] is a popular protocol for synchronising computer clocks across a network. Despite providing highly accurate time measurements, NTP doesn't sign timestamps, which, in the context of my project, is a lack of reliability in that the nodes are susceptible to DNS spoofing[2] or man-in-the-middle[3] attacks#, which are able to make the victim think it's communicating with someone else than who it's actually talking to, and thereby manipulate the victim's perception of current time.After some deliberation I realized that the blockchain can be taken as a trustworthy log of past timestamps, the latest of which give a rough estimate of the current time. Thus –I thought– I could write a program that starts a Bitcoin node, requests from its peers the latest blocks and fetches the timestamps from their headers... done! Now, I'm pretty confident this method is robust against the attacks discussed in #, but I don't know how to formalise the method. Here's my idea.In order for the method to equally apply to old and new users, let's assume that my computer starts a brand new node each time it wants to check the current time. Each time, it will DNS-lookup some node IPs and subsequently request the latest blocks from them, check their validity and, if positive, read the timestamps. This gives raise to the following question.What is the quickest way for my node to know that the blocks received from its peers have been validated by the network? Can it do so without downloading the full 400+GB blockchain nor compromising the robustness against DNS spoofing and MITM attacks?My guess is that I could verify all the transactions, Merkle roots and headers of the blockchain provided by my peers; but still what would guarantee me that the branch that I'm looking at is backed by the network?Despite the generic feeling of the question-marked questions, please note that my sole goal is to turn the blockchain into a trustworthy timekeeping log (a \"clockchain\", if you would), not running a Bitcoin node per se. It would be ideal to find a specific solution to the problem but the only approaches I have come up with are as generic as the questions up there.Edit: I found a possible solution. Read it here.  [1]: https://datatracker.ietf.org/doc/html/rfc5905  [2]: https://www.imperva.com/learn/application-security/dns-spoofing/  [3]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5477561",
+  "comments": [
+    {
+      "author": "DaCryptoRaccoon",
+      "created_time": "December 13, 2023, 02:38:55 AMLast edit: December 13, 2023, 05:44:10 AM by DaCryptoRaccoon",
+      "body": "Instead of running a full node, you may consider using a lightweight client or a Simplified Payment Verification (SPV) client. Since the SPV clients don't download the entire blockchain but verify transactions by downloading only the block headers, which is significantly less data.Block headers contain proof-of-work and can be used to check the validity of a block.They also include the Merkle root to verify the presence of a transaction within a block.To quickly ascertain that a block is accepted by the network, you can check the number of confirmations it has. The more confirmations (subsequent blocks added to the chain), the higher the certainty that the network has accepted the block.Typically, a block with 6 confirmations is considered secure and irreversible. For your purposes, even a block with 1-2 confirmations might suffice, considering you are using it for time verification rather than financial transactions.One thing to note is the risk of MITM attacks.To mitigate these risks, consider using multiple, reputable sources to fetch block headers. This reduces the likelihood of falling prey to targeted attacks on a single source.You can also cross-verify the block information with public blockchain explorers or through APIs provided by trusted entities in the blockchain space.One possible way to do this would be to define a protocol within your program to query multiple nodes or sources.?A possible area to look into is how to establish a criteria for accepting a block's timestamp (e.g., minimum number of confirmations, cross-verification with other sources)Implement checks for discrepancies in the timestamps received from different nodes.Since your goal is not to run a full Bitcoin node but to use the blockchain as a clock, your program can be optimized to start the verification process from the most recent block known and work backward as needed.I think this would be the most logical steps based on your OP. Best regard.Raccoon!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 13, 2023, 05:25:25 AM",
+      "body": "Quote from: ltcltcltc on December 12, 2023, 11:27:18 AMWhat is the quickest way for my node to know that the blocks received from its peers have been validated by the network? Can it do so without downloading the full 400+GB blockchain nor compromising the robustness against DNS spoofing and MITM attacks?If all you need is the timestamps of blocks, all you need to do (which will also address the issues you want to avoid) is to do exactly what a full node does.- Connect to trusted DNS seeds first to fetch a list of bitcoin nodes (peer list)- Connect to multiple random nodes that are distant enough- Start the handshake process and request a list of their peers (getaddr)- Build your peer list and populate it with reliable peers and start rating them- Request a list of headers by sending them a locator message (getdata)- Build your local header files which is roughly 60-70 MB- In subsequent connections, you just have to send the peers another locator with your tip to both sync or figure out forks if they have happened and you were on a wrong chainCheck out net_processing.cpp file.The most important thing to know is that even though the timestamps in bitcoin blocks are reliable and immutable but they are very flexible. Meaning a block's time can be up to 2 hours off because we don't need high accuracy here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 14, 2023, 07:09:28 AM",
+      "body": "If there was an RPC method in the Bitcoin Core client to fetch the timestamp from a particular client node, or if it was just added as a message in the ZeroMQ message bus, then you could sample a hundred different clients and take the median of those timestamps, for very high statistical accuracy.*You wouldn't take the average because a client that is several years behind or ahead could skew the result.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 14, 2023, 03:03:44 PM",
+      "body": "The Bitcoin communication protocol already has a way to get the system time of the node you connect to. When you handshake with a peer, they send you a \"version\" message which will contain a time field (nTime), this value the Epoch time (Unix timestamp) and can actually be used to figure out if your own system clock is off. You can also use that to figure out the current time in a decently decentralized way and with decent accuracy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "December 15, 2023, 03:35:08 AM",
+      "body": "@OP, by any chance, are you trying to build a security related network? Maybe if the exact time is not an issue, you could send a dust transaction and have the time of confirmation as your proof of being on the right chain? So you'd have to pay the fee for using Bitcoin's network as a safety measure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ltcltcltc",
+      "created_time": "December 16, 2023, 09:34:35 AM",
+      "body": "Quote from: digaran on December 15, 2023, 03:35:08 AM@OP, by any chance, are you trying to build a security related network? Maybe if the exact time is not an issue, you could send a dust transaction and have the time of confirmation as your proof of being on the right chain? So you'd have to pay the fee for using Bitcoin's network as a safety measure.Yeah, in some way, but no network involved. I'll start from the beginning. My goal is to code a time capsule. The program should work as follows.Input (at t=now): release_date (UNIX time value), encrypt=True (bool).Output (at t=now): encrypt_key (type key).Input (at t≥release_date): encrypt_key (type key), encrypt=False (bool).Output (at t≥release_date): decrypt_key (type key).Take some data you want to send to the future. Give the program a release date, encrypt your data with encrypt_key and throw the raw data and the encryption key away. Safely store the encrypted data. Wait. After the specified date, give the program back its encrypt_key and get back your decrypt_key to decrypt your data with.Everything must be run locally.Critical assumption: the user is good-intentioned right until they throw away the raw data, after which they feel an immense regret and become malicious.The problem: make it as hard as possible to get decrypt_key before release_dateFirst idea (which led to this post): 1) make the program get the current date from a trusted source and compare it to release_date; 2) if time is up proceed to outputting decrypt_key.This can be beautifully solved by BTC (or any other PoW-based cryptocurrency, really): give the program the whole chain of block headers; the program will check the PoW, that the difficulty increase is coherent and that the time intervals are not suspicious (i.e. 10 mins on average, also if the last time interval is 2 days, it might suggest that a malicious user mined their own last block and faked the timestamp... a few details should be taken into account despite compromising accuracy). The beauty for me is that the program doesn't care if the chain is the longest or whether it's been confirmed by the network: it only wants the proof of work; and the good-intentioned user doesn't need to bother about calculating that PoW: miners do that for them!This already makes for long-term reliable (though potentially very rough) time-checking method, but my task is to build a time capsule. I still face the issue of having to obfuscate the code responsible for producing decrypt_key. Sadly there is no way to avoid the threat of reverse engineering, especially for locally run programs. If a machine can follow the instructions in your executable, so can a talented enough human.Second idea (here you BTC geeks might help out): using the lock_time parameter. The program can issue a transaction that's time-locked to release_date. How could I exploit this feature? Or to put it another way: what kind of information does the user gain when a transaction is processed by the network?PD: should I mark this topic as solved and post the time-capsule-related question as a new one? Whatever gathers more attention.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "December 16, 2023, 09:42:05 AM",
+      "body": "Quote from: ltcltcltc on December 16, 2023, 09:34:35 AMPD: should I mark this topic as solved and post the time-capsule-related question as a new one? Whatever gathers more attention.Many don't read more than the first post.Some did answer here and might think they can't add more.So a new topic has the potential to get more attention imho....Maybe add a post here with a link to the other topic then lock this one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

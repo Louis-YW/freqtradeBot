@@ -1,0 +1,109 @@
+{
+  "id": "topic_5406580",
+  "title": "BlackBoss_",
+  "author": "BlackBoss_",
+  "created_time": "July 17, 2022, 06:00:50 AMLast edit: July 17, 2022, 06:19:25 AM by BlackBoss_",
+  "content": "Answer I got that I can import 1 private key and get three address types: Legacy, Nested Segwit and Native Segwit, if a wallet support it.Different public addresses in different types but private key is only one. So if I use 3 addreses from 1 key, to sign a message, is it possible to verify three messages and know that they are signed by a same private key?Legacy: 1addressNested Segwit: 3addressNative Segwit: bc1addressPrivate key: sameIs it possible to check private key used to sign three messages by technique?I know I can sign them but in message verification, can people know if 3 messages are signed by the same private key, but woth different public address?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5406580",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "July 17, 2022, 06:57:25 AM",
+      "body": "When it comes to the famous \"Bitcoin Message\", you can sign only legacy addresses, and by revealing your public key in your signature, the recipient can derive all address types from that public key alone.But when it comes to more complex address types, when you have N keys, or when you have a combination of keys and time, or keys and messages, or something else, then you should do it in another way: you should make a transaction that is invalid, and then you should sign it. You can use signet, and their way of creating \"to_spend\" and \"to_sign\" transactions. The easiest method is simply setting a local signet, passing your script as your signet challenge, and signing a signet block. In this way, your signature will be at least signet-compatible, because the new way of making signatures for all address types is still ongoing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "July 17, 2022, 11:47:03 AM",
+      "body": "Quote from: BlackBoss_ on July 17, 2022, 06:00:50 AMIs it possible to check private key used to sign three messages by technique?What actually possible is determining whether those message use same public key. Signing message/transaction expose public key of an address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "July 17, 2022, 05:49:01 PM",
+      "body": "Not sure if the clarification/simplification was needed but all three of the addresses used are hashes of your public key.It's your public key that's used to determine if a signature is valid. The part you put into a signature field on most wallets if your public key and the signature.To be a valid signature wallets then have to check if that public key can be hashed into the address and then if the decrypted message digest matches the hashed message (if you encrypt/sign something with a private key, you can decrypt/verify it with the public key).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 18, 2022, 03:48:38 AM",
+      "body": "Technically yes but practically no.What you need to know is that when signing a message you are signing it with your private key and it is verified with your public key. So technically the address doesn't even come in, regardless of the address type you sign any arbitrary message with your private key and reveal the signature + public key to prove ownership.But in practice the wallets only support signing a message from addresses and only a subset of address types. Majority support P2PKH and a handful support P2WPKH and even less support P2SH-P2WPKH and I have not seen any wallet that supports signing from any other address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 19, 2022, 06:56:31 AMLast edit: July 19, 2022, 11:22:27 AM by NotATether",
+      "body": "Quote from: jackg on July 17, 2022, 05:49:01 PMNot sure if the clarification/simplification was needed but all three of the addresses used are hashes of your public key.It's your public key that's used to determine if a signature is valid. The part you put into a signature field on most wallets if your public key and the signature.To be a valid signature wallets then have to check if that public key can be hashed into the address and then if the decrypted message digest matches the hashed message (if you encrypt/sign something with a private key, you can decrypt/verify it with the public key). This actually gives me a novel idea for implementing \"standardized signed messages for segwit\".Since the public key is being used to verify the message anyway, only the verification process needs to be changed.1) When signing the message, the procedure remains almost exactly the same - same ECSDA algorithm with the same parameters, except in the \"Address\" section you merely place the segwit address in there.2) Now when you verify the message, the signature and message will combine to give the public key. The public key can simply be hashed, and each encoding of P2PKH, P2SH, and P2WPKH can be tried in succession to see if they match the address. That way, it doesn't only try the base58 P2PKH encoder and fail for all segwit addresses.All that needs to be done is create a BIP, and then get it approved for implementation (the implementation which is a ridiculously easy process as there is only minimal modification required to the sign/verify message processes).Edit: I threw a rough draft of this idea into the mailing list, let's see what they have to say.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 19, 2022, 01:07:21 PM",
+      "body": "Quote from: NotATether on July 19, 2022, 06:56:31 AMThis actually gives me a novel idea for implementing \"standardized signed messages for segwit\".Since the public key is being used to verify the message anyway, only the verification process needs to be changed.1) When signing the message, the procedure remains almost exactly the same - same ECSDA algorithm with the same parameters, except in the \"Address\" section you merely place the segwit address in there.2) Now when you verify the message, the signature and message will combine to give the public key. The public key can simply be hashed, and each encoding of P2PKH, P2SH, and P2WPKH can be tried in succession to see if they match the address. That way, it doesn't only try the base58 P2PKH encoder and fail for all segwit addresses.All that needs to be done is create a BIP, and then get it approved for implementation (the implementation which is a ridiculously easy process as there is only minimal modification required to the sign/verify message processes).Edit: I threw a rough draft of this idea into the mailing list, let's see what they have to say.That is actually what Electrum is doing when signing with Segwit because Bitcoin doesn't allow it (No associated private key). However, that is not what we're getting at and treating addresses as entities with a single public key doesn't allow script based addresses, or multikey implementations to sign messages. You do need the address to cross check and that is usually provided by the user.BIP322 is an implementation that attempts to solve this but it is at a draft stage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "July 19, 2022, 01:18:14 PM",
+      "body": "Quote from: ranochigo on July 19, 2022, 01:07:21 PMThat is actually what Electrum is doing when signing with Segwit because Bitcoin doesn't allow it (No associated private key). However, that is not what we're getting at and treating addresses as entities with a single public key doesn't allow script based addresses, or multikey implementations to sign messages. You do need the address to cross check and that is usually provided by the user.Yup I thought I'd seen that before but couldn't work out where. I'm surprised it:s not done in all other wallets as it's a reasonably easy implementation (and might just be based off calling the same but slightly different method each of the three times).I know multisig compatibility has been stated on here before that devs would look to find a way that means different signatories can be used if necessary (ie there needs to be a way a signature can be removed from a raw transaction) if that's the same for signatures then it'll make things a bit harder.(the topic that came from was a discussion on taproot, I'm not sure I've done what was said justice but it was a discussion on combining signatures to mean you'd run a verification algorithm over 1 signatur but with n private keys having signed the same hash/message).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 19, 2022, 02:09:19 PM",
+      "body": "Quote from: jackg on July 19, 2022, 01:18:14 PMYup I thought I'd seen that before but couldn't work out where. I'm surprised it:s not done in all other wallets as it's a reasonably easy implementation (and might just be based off calling the same but slightly different method each of the three times).I know multisig compatibility has been stated on here before that devs would look to find a way that means different signatories can be used if necessary (ie there needs to be a way a signature can be removed from a raw transaction) if that's the same for signatures then it'll make things a bit harder.(the topic that came from was a discussion on taproot, I'm not sure I've done what - I think mprep - said justice but it was a discussion on combining signatures to mean you'd run a verification algorithm over 1 signatur but with n private keys having signed the same hash/message.Multisig transactions has multiple signatures, or one with an aggregated key in the case of Taproot. It is an easy implementation but it doesn't solve or address the root of the problem. You will always run into problems and continually try to catch up with the newer format by trying to validate with the keys instead of the spending script. We can better handle this by eliminating a ECDSA based validation (ie. validating individual keys and signatures) because that would introduce too many limitations.Current solutions only provide a way to sign and validate with the ECDSA keypair, but it doesn't validate the address per se.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "July 19, 2022, 02:15:18 PM",
+      "body": "Quote from: BlackBoss_ on July 17, 2022, 06:00:50 AMAnswer I got that I can import 1 private key and get three address types: Legacy, Nested Segwit and Native Segwit, if a wallet support it.Actually, there are 4 addresses: Legacy has an older uncompressed format. Each Hex privkey creates 2 different WIF keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "July 19, 2022, 04:06:17 PM",
+      "body": "Quote from: LoyceMobile on July 19, 2022, 02:15:18 PMActually, there are 4 addresses: Legacy has an older uncompressed format. Each Hex privkey creates 2 different WIF keys.@Loyce: Would P2PK make a 5th address? That's going really far back, and I guess no current software supports them, but weren't they just the public key encoded in Base58 or something? Maybe a 6th address too if they came in compressed/uncompressed form?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "July 19, 2022, 04:09:39 PM",
+      "body": "Quote from: PowerGlove on July 19, 2022, 04:06:17 PM@Loyce: Would P2PK make a 5th address?No, it's not an address. Bitcoin Core still supports them, I've recenty played around with them (recovering Forkcoins).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fivestar4everMVP",
+      "created_time": "July 19, 2022, 07:22:25 PMLast edit: December 16, 2023, 06:54:46 PM by Fivestar4everMVP",
+      "body": "Quote from: pooya87 on July 18, 2022, 03:48:38 AM and I have not seen any wallet that supports signing from any other address.I think Mycelium actually supports signing a message from different address which is controlled by one private key, I stopped using Mycelium a long time ago, but for this purpose, I installed the wallet and and imported my Bitcoin wallet into it to verify if the feature is still supported and behold, its still there.Like in the screenshot below, this is me trying to sign a message from Mycelium wallet and I was given the option of choosing one from four different addresses which are all controlled by one private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

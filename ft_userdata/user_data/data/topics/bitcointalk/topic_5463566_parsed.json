@@ -1,0 +1,125 @@
+{
+  "id": "topic_5463566",
+  "title": "DifDrama",
+  "author": "DifDrama",
+  "created_time": "August 17, 2023, 07:31:30 AM",
+  "content": "I'm curious to understand the limitations concerning the repetition of the same set of private keys within a multisig wallet. Specifically, if a 3 of 4 multisig wallet is established, could it be feasible to have two of the four keys identical? This way, withdrawals would require the signature of one of the remaining two unique keys. Your insights on this matter would be highly appreciated.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5463566",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "August 17, 2023, 07:41:07 AM",
+      "body": "It is possible. There are no such restrictions that checks for the public keys used in a multisig to be different. If it is a 3 of 4 Multisig and you have two of the same public keys, you just need the transaction to be signed using the private key. However, from a security and usability standpoint, it is entirely useless.There is no reason to do that though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "August 17, 2023, 07:54:33 AM",
+      "body": "Quote from: ranochigo on August 17, 2023, 07:41:07 AMIt is possible. There are no such restrictions that checks for the public keys used in a multisig to be different. If it is a 3 of 4 Multisig and you have two of the same public keys, you just need the transaction to be signed using the private key. However, from a security and usability standpoint, it is entirely useless.There is no reason to do that though.On Electrum, it brought up:Code:Error: duplicate master public key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zaguru12",
+      "created_time": "August 17, 2023, 07:57:13 AM",
+      "body": "Quote from: DifDrama on August 17, 2023, 07:31:30 AMThis way, withdrawals would require the signature of one of the remaining two unique keys. Your insights on this matter would be highly appreciated.I think this is simply as saying that the keys belonging to you (the two similar or identical keys) must be used for signing a transaction, it is actually possible. In fact these two keys could be derived from a single seed. But this breaches the security of the multi sig, as such if the identical key becomes compromised that would give of basically two of the keys to the hacker with just one left for it get to sign a transaction. Further more if you looking to have your key sign the transaction and just another co-signer needed, why not just go for a 2-3 multi sig and use a similar script suggested in this thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 17, 2023, 07:59:30 AM",
+      "body": "Quote from: Charles-Tim on August 17, 2023, 07:54:33 AMOn Electrum, it brought up:Code:Error: duplicate master public key.Nothing in the protocol rule would prevent that, you just need to fulfill the number of keys but there is no requirements on whether it has to be distinct or not.Electrum just doesn't allow it because it is probably just pointless and a waste of space.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 17, 2023, 08:36:45 AM",
+      "body": "Quote from: DifDrama on August 17, 2023, 07:31:30 AMSpecifically, if a 3 of 4 multisig wallet is established, could it be feasible to have two of the four keys identical? This way, withdrawals would require the signature of one of the remaining two unique keys.If you wanted to go down this route, it would still be better to have all four keys different but just retain two of the keys in your own possession. This allows you to diversify your back ups and adds more security, since one of the other parties would need to compromise two different keys to steal your funds instead of just one.Alternatively, use the script that Zaguru12 has linked to above. This is a 2-of-3 multi-sig which mandates one of the signatures must come from your keys, with the other signature coming from either of the other two keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 17, 2023, 09:26:43 AM",
+      "body": "Quote from: DifDrama on August 17, 2023, 07:31:30 AMSpecifically, if a 3 of 4 multisig wallet is established, could it be feasible to have two of the four keys identical?You can test this in Bitcoin Core, preferably in Regtest:Create a 'blank' 'watching-only' 'descriptor' wallet.Get some public key(s) for testing as well as the corresponding WIF private keys.Create an sh or wsh MultiSig descriptor using multiple public keys, for example (two same pubKeys): sh(sortedmulti(3,pubKey_1,pubKey_1,pubKey_2,pubKey_3))Go to console and type the command getdescriptorinfo \"YOUR_DESCRIPTOR\" and take note of the \"checksum\" that you'll need to include to import the descriptor.Import it to your newly created wallet using the command: importdescriptors \"[{\\\"desc\\\": \\\"YOUR_DESCRIPTOR#checksum\\\",\\\"label\\\": \\\"YOUR_LABEL\\\",\\\"timestamp\\\": \\\"now\\\"}]\"The address should be included in your Receiving addresses with the specified labelNow, do some tests with it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 17, 2023, 01:52:53 PM",
+      "body": "Quote from: Charles-Tim on August 17, 2023, 07:54:33 AMOn Electrum, it brought up:Code:Error: duplicate master public key.Wallets and even public APIs must always be a lot more restrictive than the consensus rules. An example would be the fact that you can't create SegWit addresses using uncompressed public keys that easily using any wallet or library even though they are perfectly fine as far as the consensus rules are concerned.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 17, 2023, 04:43:45 PM",
+      "body": "Quote from: pooya87 on August 17, 2023, 01:52:53 PMWallets and even public APIs must always be a lot more restrictive than the consensus rules. An example would be the fact that you can't create SegWit addresses using uncompressed public keys that easily using any wallet or library even though they are perfectly fine as far as the consensus rules are concerned.Might be under different circumstances though. Using uncompressed keys with Segwit would yield non-standard transactions and thus it would be quite difficult to spend it. In that case where creating something that results in non-standard transactions being generated, that is fine. However, using multiple of the same public keys to generate a Multisig would be fine and should still yield standard transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 18, 2023, 12:14:45 PM",
+      "body": "Quote from: ranochigo on August 17, 2023, 04:43:45 PMQuote from: pooya87 on August 17, 2023, 01:52:53 PMWallets and even public APIs must always be a lot more restrictive than the consensus rules. An example would be the fact that you can't create SegWit addresses using uncompressed public keys that easily using any wallet or library even though they are perfectly fine as far as the consensus rules are concerned.Might be under different circumstances though. Using uncompressed keys with Segwit would yield non-standard transactions and thus it would be quite difficult to spend it. In that case where creating something that results in non-standard transactions being generated, that is fine. However, using multiple of the same public keys to generate a Multisig would be fine and should still yield standard transactions.That's true and maybe I should have tried to find a better example that falls under the same category but the point is that there are cases where the developers would want to restrict what the \"regular\" users of their tools can do. Sometimes it is to prevent them from losing funds, sometimes it is to prevent them from doing something pointless.A good example in the category of this topic would be your wallet preventing you from paying an extremely high fee like 1BTC even though it is perfectly fine to do so.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 18, 2023, 02:53:38 PM",
+      "body": "Quote from: ranochigo on August 17, 2023, 07:41:07 AMHowever, from a security and usability standpoint, it is entirely useless.A 3-of-4 multi-sig with two keys owned by the same person can be useful, if say, one needs to sign regardless. For example, users A, B, C, where either A and B or A and C have to sign to spend (but not B and C alone). I don't know, is there a more efficient and standard way to do this?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 18, 2023, 04:14:29 PM",
+      "body": "Quote from: BlackHatCoiner on August 18, 2023, 02:53:38 PMI don't know, is there a more efficient and standard way to do this?Yes. Zaguru12 shared a link to a script which will do this more efficiently above. The script would be as follows:Code:PubkeyA OP_CHECKSIGVERIFY OP_1 PubkeyB PubkeyC OP_2 OP_CHECKMULTISIGThis script requires both a signature from public key A, and also a signature from a 1-of-2 multi-sig between public keys B and C. In effect you have a 2-of-3 multi-sig, but A must be one of the signers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 18, 2023, 04:19:19 PM",
+      "body": "Quote from: o_e_l_e_o on August 18, 2023, 04:14:29 PMCode:PubkeyA OP_CHECKSIGVERIFY OP_1 PubkeyB PubkeyC OP_2 OP_CHECKMULTISIGThat doesn't look standard though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 18, 2023, 06:57:45 PM",
+      "body": "Quote from: BlackHatCoiner on August 18, 2023, 04:19:19 PMThat doesn't look standard though. Your wallet will either not allow you to have repeated keys for your multisig or sign the transaction wrongly. So it isn't too good to do that as well.Either have two entity hold different keys, or use that setup above. I believe there was a conversation in one of the topics that ive created previously talking about this specific method. It is standard.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 19, 2023, 01:24:42 PM",
+      "body": "Quote from: BlackHatCoiner on August 18, 2023, 04:19:19 PMQuote from: o_e_l_e_o on August 18, 2023, 04:14:29 PMCode:PubkeyA OP_CHECKSIGVERIFY OP_1 PubkeyB PubkeyC OP_2 OP_CHECKMULTISIGThat doesn't look standard though. If this script is used a redeem script (wrapped inside a P2SH or P2WSH output scripts) I don't think there would be any standardness issues since this is pretty straight forward and specially since one of the purposes of introducing script-hash was to let us use more complex scripts that aren't \"common\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

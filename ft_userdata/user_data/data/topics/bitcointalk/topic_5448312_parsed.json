@@ -1,0 +1,101 @@
+{
+  "id": "topic_5448312",
+  "title": "whanau",
+  "author": "whanau",
+  "created_time": "April 10, 2023, 09:58:32 PM",
+  "content": "I have been using this parser. Source code athttps://github.com/ragestack/blockchain-parserwhich is very good. It runs happily for about 24 hours then I get the following error which I do not understand.Code:TX AE3F3F8D299D9A15479901FA776536D42C868E8CEDD1EC2DB27FC5B4CD3F71A2 TX A9A02B7FC93B9747918BBE0A96BCC2416895B4FD497C3B6C343B317C105134B4 Traceback (most recent call last):  File \"/media/blockchain-parseroriginal.py\", line 294, in <module>    tmpHex = merkle_root(tx_hashes).hex().upper()  File \"/media/blockchain-parseroriginal.py\", line 34, in merkle_root    return merkle_root([hash_pair(x, y) for x, y in zip(*[iter(lst)]*2)])  File \"/media/blockchain-parseroriginal.py\", line 34, in merkle_root    return merkle_root([hash_pair(x, y) for x, y in zip(*[iter(lst)]*2)])  File \"/media/blockchain-parseroriginal.py\", line 34, in merkle_root    return merkle_root([hash_pair(x, y) for x, y in zip(*[iter(lst)]*2)])  [Previous line repeated 995 more times]  File \"/media/blockchain-parseroriginal.py\", line 30, in merkle_root    if len(lst) == 1:RecursionError: maximum recursion depth exceeded while calling a Python objectPerhaps the program has reached the end of the blocks and has not exited gracefully or perhaps something else?Can anyone point me in the right direction to fix this? Thank you",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5448312",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "April 10, 2023, 11:44:24 PM",
+      "body": "I think according to the last part of the logs it exceeds the limit that is why I think that the tool has limited function/request. Or maybe the blk.dat file you are trying to convert might be corrupted?I don't know much about this block parser but I tried to search a bit and they point me to this link below you can maybe get some idea of alternatives under that thread.- https://bitcointalk.org/index.php?topic=5300448.0And someone recommends this alternative below that you can try.- https://github.com/gcarq/rusty-blockparser",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 11, 2023, 08:43:45 AM",
+      "body": "I got the same error with my node's last blk.dat file that's expected to have a lower size and lower number of blocks from the rest of the blk.dat files.Perhaps, that error occurred after parsing your second-to-last blk.dat file.Was the last \"Start blknnnnn.dat in 2023...\" the last blk.dat file in your blocks folder?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "April 11, 2023, 09:35:36 AM",
+      "body": "The problem is with this function:Code:def merkle_root(lst): # https://gist.github.com/anonymous/7eb080a67398f648c1709e41890f8c44    sha256d = lambda x: hashlib.sha256(hashlib.sha256(x).digest()).digest()    hash_pair = lambda x, y: sha256d(x[::-1] + y[::-1])[::-1]    if len(lst) == 1: return lst[0]    if len(lst) % 2 == 1:        lst.append(lst[-1])    return merkle_root([hash_pair(x,y) for x, y in zip(*[iter(lst)]*2)])It is a recursion and it continues to invoke itself because this condition:Code:if len(lst) == 1: return lst[0]...is never satisfied for some reason, which leads to maximum recursion error.And this condition is never satisfied because of the other condition:Code:if len(lst) % 2 == 1:        lst.append(lst[-1])that means that whenever we have an odd number of hashes, we append the last hash to the list of hashes thus making it again even. But I maybe wrong because I only got a quick look.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "April 11, 2023, 11:02:40 PM",
+      "body": "Thank you for the replies.I agree with witcher_sense the problem is in the merkel root function.In this program, it is for checking so can be  commented out but it would be nice if it could be tweaked to work by someone who knows what they are doing.If I have any merit points to give, they go to the person who can provide a fixed code snippet",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "April 12, 2023, 05:35:46 AM",
+      "body": "Quote from: whanau on April 11, 2023, 11:02:40 PMThank you for the replies.I agree with witcher_sense the problem is in the merkel root function.In this program, it is for checking so can be  commented out but it would be nice if it could be tweaked to work by someone who knows what they are doing.If I have any merit points to give, they go to the person who can provide a fixed code snippet  My previous comment is no longer relevant because when I first was looking on the function, I didn't understand precisely how the list of transaction hashes is shrinking. Now it makes sense to me why we have both these conditions, and I think  they should never interfere with each other upon function invocation. But I think I know why you encounter this strange bug: you use either a modified or old version of the script where merkle root recursive function doesn't exit properly under specific circumstances. Look at the traceback:Code:File \"/media/blockchain-parseroriginal.py\", line 294, in <module>tmpHex = merkle_root(tx_hashes).hex().upper()Original file is called blockchain-parser.py not blockchain-parseroriginal.py. And, at the time of writing, it has only 253 lines of code, so why it shows error on line 294? I suggest you to upgrade the parser to the latest version and check if the problem persists.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "April 12, 2023, 06:25:59 AM",
+      "body": "Thanks for the reply.I renamed the file as I made some changes to get rid of pycharm minor errors like removing redundant parentheses and 'if' statements and import on one line etc; which is why the line numbers grew.nc50lc reports getting the same error independently of me and it does seem to be at or near the last block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 12, 2023, 06:34:48 AM",
+      "body": "Quote from: whanau on April 12, 2023, 06:25:59 AMnc50lc reports getting the same error independently of me and it does seem to be at or near the last block. It always happens exclusively at the last blk.dat file which in my case \"blk03531.dat\" (differs per node), not necessarily the last block height.Node isn't running. I've tested the latest code, master branch.Here's the error in case someone needs a comparison:Code:Traceback (most recent call last):  File \"T:\\blockchain-parser-master\\blockchain-parser.py\", line 246, in <module>    tmpHex = merkle_root(tx_hashes).hex().upper()  File \"T:\\blockchain-parser-master\\blockchain-parser.py\", line 30, in merkle_root    return merkle_root([hash_pair(x,y) for x, y in zip(*[iter(lst)]*2)])  File \"T:\\blockchain-parser-master\\blockchain-parser.py\", line 30, in merkle_root    return merkle_root([hash_pair(x,y) for x, y in zip(*[iter(lst)]*2)])  File \"T:\\blockchain-parser-master\\blockchain-parser.py\", line 30, in merkle_root    return merkle_root([hash_pair(x,y) for x, y in zip(*[iter(lst)]*2)])  [Previous line repeated 995 more times]  File \"T:\\blockchain-parser-master\\blockchain-parser.py\", line 27, in merkle_root    if len(lst) == 1: return lst[0]RecursionError: maximum recursion depth exceeded while calling a Python object",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "April 12, 2023, 09:05:34 AM",
+      "body": "It looks like this parser can't handle correctly partially filled blk files or partially downloaded blocks, which is why it fails on recursion. I slightly modified the original file and added some checks to prevent it from parsing empty tx hashes, it also now exits the loop immediatly when it sees there is no merkle root to check.The script can be downloaded here: https://github.com/shadowy-pycoder/learning_python/blob/main/blockchain-parser.py",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "April 12, 2023, 07:19:43 PM",
+      "body": "If the length of lst is 0, would you have infinite recursion?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "April 13, 2023, 07:10:16 AM",
+      "body": "Quote from: odolvlobo on April 12, 2023, 07:19:43 PMIf the length of lst is 0, would you have infinite recursion?Yes, we have an infinite recursion (technically, it is not infinite because the maximum recursion depth is 1000) when the length is zero, but that is not the main issue with this parser. The main problem is that this script doesn't do proper error handling: when it encounters an incomplete block, it doesn't skip it, and as a result, we have a bunch of errors when it tries to convert binary data into a more human-friendly format. The problem is exacerbated by the fact that incomplete blocks don't clean up automatically: when bitcoind is interrupted, it just stops downloading blockchain data, and when it restarts, it just re-downloads the block without cleaning up incomplete information[1]. As a result of such behavior, we can have a bunch of unparsable information hard to detect and handle correctly. The current fix that I provided above just stops parsing a blk file whenever it sees empty Merkle root hashes, but if there is an incomplete byte, it just throws an Overflow Error and stops.[1] https://bitcoin.stackexchange.com/questions/70810/how-to-handle-incomplete-blocks-when-reading-blk-dat-files",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "April 14, 2023, 07:35:38 PM",
+      "body": "The updated version of blockchain parser is here: https://github.com/shadowy-pycoder/blockchain-parserChangelog:1) Fixed infinite recursion bug.2) Result file now doesn't include corrupted data from incomplete blocks3) Whenever a parser encounters a corrupted file, it now skips it gracefully without raising an error and continues to parse other files.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

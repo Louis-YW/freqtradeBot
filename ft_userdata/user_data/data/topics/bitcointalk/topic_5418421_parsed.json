@@ -1,0 +1,85 @@
+{
+  "id": "topic_5418421",
+  "title": "moejoejay",
+  "author": "moejoejay",
+  "created_time": "October 26, 2022, 03:05:02 PM",
+  "content": "Electrum: 4.3.2 Windows Version   10.0.19044 Build 19044Multisig:  2/2Main NetHey folks,i tried the cosigner pool plugin again and if i sent some funds from  1/2 Multisig Wallet to an normal one , the cosigner system pool  only reacts if i reopen the certain 2/2 Cosigner Wallet.could some one reproduce this or any clue why it's so  ? best regards",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5418421",
+  "comments": [
+    {
+      "author": "AB de Royse777",
+      "created_time": "October 26, 2022, 03:29:10 PM",
+      "body": "I have not used cosigner pool (not sure but mind is tricking that I once did). Why don't you use QR or exporting file even loading a text form are much easier.In case you are missing, you will find it under tools.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 26, 2022, 04:06:32 PMLast edit: October 26, 2022, 05:07:14 PM by nc50lc",
+      "body": "Quote from: moejoejay on October 26, 2022, 03:05:02 PMcould some one reproduce this or any clue why it's so  ? I can reproduce it in testnet, Electrum v4.3.2.But IIRC, it's always been the case in the older versions (at least from what I can recall in my previous test)For others who want to try reproducing the issue:If the other cosigner(s) is open while a cosigner sent a transaction to the cosigner pool server, it wont get prompted for a new partially signed transaction until the wallet get closed and reopened.-edit-I've tried to open the second cosigner in v3.3.8 and it worked without reopening the wallet.But AFAIK, it's always been the case somewhere in v4.x.x, I'll try another older version.-edit2-Same behavior in v4.2.0 & v4.0.6, cosigners have to be reopened to retrieve the partially signed transaction.But works in v4.0.1.Unfortunately, I can't find a relevant commit in cosigner_pool plugin history (link) and there's no similar open issue in GitHub,perhaps you might want to open one, the Devs might be able to fix/find-out the issue: github.com/spesmilo/electrum/issues?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "moejoejay",
+      "created_time": "October 26, 2022, 05:26:56 PMLast edit: October 26, 2022, 05:41:17 PM by moejoejay",
+      "body": "QuoteWhy don't you use QR or exporting file even loading a text form are much easier.I know this but this is not my intention for using the cosigner pool.neverthless u right this is quite an other possibility for sign the transaction over multiple wallets. Quote(at least from what I can recall in my previous test)as far as i remember on my test mainnet 2019 at this time it wasnt the case, the pool popup had rised up immediately.further observations (mainnet): sometimes its not possible to send the tx to from the 1/2 wallet to the cosigner pool ( there is no button availiable for it), then i closed the 1/2 wallet the popup from the cosigner pool appears on the 2/2 wallet without any interaction.  it seems that sometimes the pool popup appears also when u close the wallet and not reopen it, weird.  Quoteperhaps you might want to open one, the Devs might be able to fix/find-out the issuei'll think about itbest regards",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 27, 2022, 05:56:30 AM",
+      "body": "Quote from: moejoejay on October 26, 2022, 05:26:56 PMit seems that sometimes the pool popup appears also when u close the wallet and not reopen it, weird.  I tried to reproduce this and it did popped-up after closing the wallet after a few repeats.I've also saved the log and for some reason, cosigner_pool's \"listener\" started only after closing the cosigner wallet.Might be useful if you decided to open a new issue:Code:20221027T054506.765925Z |     INFO | gui.qt.main_window.[wallet_multisigsegwit2] | close_wallet <snip>electrum\\testnet\\wallets\\wallet_multisigsegwit220221027T054506.766924Z |     INFO | plugins.cosigner_pool.qt.Plugin | starting listener20221027T054506.767923Z |     INFO | util | unregistering callback <bound method Abstract_Wallet.on_event_adb_removed_verified_tx of <electrum.wallet.Multisig_Wallet object at 0x0750FC10>>20221027T054506.767923Z |     INFO | util | unregistering callback <bound method Abstract_Wallet.on_event_adb_added_verified_tx of <electrum.wallet.Multisig_Wallet object at 0x0750FC10>>20221027T054506.768924Z |     INFO | util | unregistering callback <bound method Abstract_Wallet.on_event_adb_set_up_to_date of <electrum.wallet.Multisig_Wallet object at 0x0750FC10>>20221027T054506.768924Z |     INFO | util | unregistering callback <bound method Abstract_Wallet.on_event_adb_added_tx of <electrum.wallet.Multisig_Wallet object at 0x0750FC10>>20221027T054506.768924Z |     INFO | util | unregistering callback <bound method AddressSynchronizer.on_event_blockchain_updated of <electrum.address_synchronizer.AddressSynchronizer object at 0x0750FBF8>>20221027T054506.768924Z |     INFO | wallet.Multisig_Wallet.[wallet_multisigsegwit2] | taskgroup stopped.20221027T054506.775919Z |     INFO | storage.WalletStorage | saved <snip>electrum\\testnet\\wallets\\wallet_multisigsegwit220221027T054506.775919Z |    DEBUG | util.profiler | WalletDB._write 0.0060 sec20221027T054509.663497Z |     INFO | plugins.cosigner_pool.qt.Listener | received message for e5a34dc730a17a829095b2b3d31ce9a2dff90d30c66852afc4c6a9dbd015cf5720221027T054509.663497Z |     INFO | plugins.cosigner_pool.qt.Plugin | signal arrived for e5a34dc730a17a829095b2b3d31ce9a2dff90d30c66852afc4c6a9dbd015cf57",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "moejoejay",
+      "created_time": "October 27, 2022, 04:56:24 PMLast edit: November 01, 2022, 04:09:09 PM by moejoejay",
+      "body": "@nc50lcgood point take this into consideration with my own one thnx for mention edit: GithubIssue best regards",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 02, 2022, 04:38:58 AM",
+      "body": "Quote from: moejoejay on October 27, 2022, 04:56:24 PMedit: GithubIssue I forgot to mention that writing \"1/2\" and \"2/2\" as the cosigner wallets might mislead the readers that you're talking about two unrelated MultiSig wallets.Because in MultiSig; m/n, \"m\" sets the number of required signatures and \"n\" indicates the number of cosigners.A better term would be \"cosigner 1\" and \"cosigner 2\" of a (2/2) MultiSig Electrum wallet or similar.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "moejoejay",
+      "created_time": "November 02, 2022, 07:39:15 AM",
+      "body": "@nc50lc:QuoteBecause in MultiSig; m/n, \"m\" sets the number of required signatures and \"n\" indicates the number of cosigners.So, 2/1 instead 1/2 and 2/2 should be fine or.best regards",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 02, 2022, 09:02:34 AM",
+      "body": "Quote from: moejoejay on November 02, 2022, 07:39:15 AM@nc50lc:QuoteBecause in MultiSig; m/n, \"m\" sets the number of required signatures and \"n\" indicates the number of cosigners.So, 2/1 instead 1/2 and 2/2 should be fine or.The MultiSig setup is 2/2 since you have two cosigners and it requires two signatures.So it should be \"..and if i sent some funds from 2/2 Multisig Wallet to an normal one\".Then, instead of calling cosigner2 as 2/2, just revise it into:\"...pool only reacts if i reopen/close the second cosigner Wallet.\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "moejoejay",
+      "created_time": "November 02, 2022, 06:35:39 PMLast edit: November 04, 2022, 08:20:16 AM by moejoejay",
+      "body": "@nc50lcchanged, and feel free to take part with ur experience on the issue too. best regards",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

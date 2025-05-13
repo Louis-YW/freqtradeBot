@@ -1,0 +1,45 @@
+{
+  "id": "topic_5436401",
+  "title": "vjudeu",
+  "author": "vjudeu",
+  "created_time": "January 22, 2023, 10:29:19 PM",
+  "content": "This point seems to be valid, and on secp256k1, as far as I know:Code:04 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 98F66641CB0AE1776B463EBDEE3D77FE2658F021DB48E2C8AC7AB4C92F83621EAlso, for those two different points, we reach the same r-value, because point coordinates are calculated modulo \"p\", but signatures are calculated modulo \"n\":Code:04 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364143 C94E559D14883E68CFDA34341568BF1127153254788DD974C6AF9BB9CD962A5C 04 0000000000000000000000000000000000000000000000000000000000000002 66FBE727B2BA09E09F5A98D70A5EFCE8424C5FA425BBDA1C511F860657B8535EDoes it mean that when it comes to malleability, there are more cases than (r,s) and (r,-s), and that it is possible to alter it somehow? Or does it mean that for the same message, and the same signature, there is more than one matching public key?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5436401",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "January 23, 2023, 02:06:46 AM",
+      "body": "Pretty sure any r that's above or equal to FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 is considered invalid by Bitcoin.Nevermind, I misunderstood. I think technically it might be a malleability, but since I assume you don't know the actual private keys behind any of the public keys, it's more a theoretical issue than practical.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "January 23, 2023, 04:35:53 AM",
+      "body": "You can derive more than one possible public key from a valid ECDSA signature and message but that is not related to malleability since the public key is always locked in the script that is being spent one way or another (it is unchangeable).For example in a P2PKH script the hash of the public key is already locked in the scriptpub and if you use a different public key the transaction will be rejected on OP_EQUALVERIFY before it even reaches the signature verification step.P.S. All 3 public keys you posted are valid since they are on secp256k1 curve.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 23, 2023, 11:26:07 AM",
+      "body": "Quote from: vjudeu on January 22, 2023, 10:29:19 PMThis point seems to be valid, and on secp256k1, as far as I know:Code:04 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 98F66641CB0AE1776B463EBDEE3D77FE2658F021DB48E2C8AC7AB4C92F83621EAlso, for those two different points, we reach the same r-value, because point coordinates are calculated modulo \"p\", but signatures are calculated modulo \"n\":Code:04 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364143 C94E559D14883E68CFDA34341568BF1127153254788DD974C6AF9BB9CD962A5C 04 0000000000000000000000000000000000000000000000000000000000000002 66FBE727B2BA09E09F5A98D70A5EFCE8424C5FA425BBDA1C511F860657B8535EDoes it mean that when it comes to malleability, there are more cases than (r,s) and (r,-s), and that it is possible to alter it somehow? Or does it mean that for the same message, and the same signature, there is more than one matching public key?According to BIP62, when the value of s is more than half of n (the total number of points), we simply take s = n - s. In other words, given this rule, any signature where the value of s is too high is considered invalid. As for public keys, there can theoretically be 4 different public keys for the same message and private key if the value of r is lower than n-p. In this case, you will have two x-coordinates (x=r and x=r+n) and two y-coordinates for each x (even and odd).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 23, 2023, 10:03:31 PM",
+      "body": "It is purely an academic discussion, as the probability of hitting any x mod n is already so low that dividing the probability by two won't make much of a difference in terms of security.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "id": "topic_5465000",
+  "title": "MarkSierra",
+  "author": "MarkSierra",
+  "created_time": "August 29, 2023, 07:13:12 PM",
+  "content": "Hey guys, I got a quick technical question...Is it true that Taproot addresses are just the Public Key encoded in bech32m?And native Segwit addresses are a hash of the Public Key encoded in bech32?Because that would mean that in order to get from the Public Key to the Private Key of the address, you would \"only\" need to break the elliptic curve with Taproot.While with native Segwit you would also need to break the hashing algorithm.Are the assumptions correct or do I have a misconception somewhere?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5465000",
+  "comments": [
+    {
+      "author": "Bitcoin Smith",
+      "created_time": "August 29, 2023, 07:23:44 PM",
+      "body": "Taproot addresses are not just the public key encoded in bech32m; they are a combination of the public key and the Taproot script. And Native Segregated Witness (SegWit) addresses are derived from the public key but are not a direct hash of the public key.Anyway breaking in the elliptic curve would allow an attacker to get private keys either it's Taproot address or Segwit address but the possibility of happening is not feasible even with the existing most powerful computer of this world.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 29, 2023, 08:30:35 PM",
+      "body": "Quote from: MarkSierra on August 29, 2023, 07:13:12 PMWhile with native Segwit you would also need to break the hashing algorithm.It depends on how fast you can break the elliptic curve, for if you can do it relatively very quickly, then it won't matter if you're locking coins in hashes or public keys, because the attacker can work out the private key before the transaction confirms. And we aren't capable to even do that within a year as far as I'm concerned. To break the curve within a reasonable time frame, like 1-2 years, you'd need more than ten thousand qubits, and our high score is how much? 127 qubits?Public-key vulnerable outputs can wait. Puzzles have priority.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "August 29, 2023, 08:33:33 PM",
+      "body": "QuoteIs it true that Taproot addresses are just the Public Key encoded in bech32m?Yes.QuoteAnd native Segwit addresses are a hash of the Public Key encoded in bech32?Yes.QuoteAre the assumptions correct or do I have a misconception somewhere?Yes, they are correct.QuoteTaproot addresses are not just the public key encoded in bech32m; they are a combination of the public key and the Taproot script.They don't have to be. You can spend by key, or spend by TapScript. Both paths are valid. There is always some public key, and if you know the private key, then you can entirely skip the script path, and always spend directly by key. Unless you have some invalid public key, where your x-coordinate does not correspond to any secp256k1 point. But in that case, it is simply unspendable, both by key, and by TapScript.QuoteAnd Native Segregated Witness (SegWit) addresses are derived from the public key but are not a direct hash of the public key.There is a direct hash. If you execute OP_HASH160 on some public key, you will get the hash, that corresponds to some P2WPKH address. If that key will be compressed, then for a given public key, that hash will be identical in P2WPKH and P2PKH addresses.QuoteAnyway breaking in the elliptic curve would allow an attacker to get private keys either it's Taproot address or Segwit addressNot exactly. If secp256k1 will be broken, then:1. All Taproot addresses could be spend by key.2. All hash-based addresses could be spent, if the public key is revealed (so if a transaction is in mempool, or if there were previous transactions in past blocks). If the public key is unknown, then those coins will be unaffected.3. All Lightning Network channels could be broken, as well as all other multi-party protocols, where you have any kind of multisig.4. All signatures based on those public keys will be useless.However, public key is called \"public\" for a reason. If it will be broken, then it should be replaced just by another address type, with another public key, on another curve, or completely different algorithm, for example lattice-based. Breaking public keys is just one-time-theft: when funds will move into another address type, then they will be safe again. Breaking hash functions could be more dangerous, because if you break SHA-256 on preimage level, then you can not only produce any hash, but also use hashing to produce any ECDSA-valid signature (just because message hash is signed, and if you can control that, then you can control ECDSA as well, you can easily confirm that, if you replace SHA-256 with some broken hash function, and try to produce a valid signature).Quotebut the possibility of happening is not feasible even with the existing most powerful computer of this worldThis is true as well. There are many topics, where people are worried \"what could happen if ECDSA will be broken\", or the same for SHA-256, but the truth is, that today, we are still far from that. We are not even close. In case of SHA-256, you can trace that by checking chainwork. In case of ECDSA, we have this famous puzzle, where 120-bit and 125-bit public keys were broken, and 130-bit key is still untouched (but as this puzzle is not provably fair, that proof is only useful to the puzzle creator, there are no proofs for other people that unsolved keys are in correct ranges, or that the creator didn't move the coins by himself).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jokers10",
+      "created_time": "August 29, 2023, 11:22:01 PM",
+      "body": "Quote from: vjudeu on August 29, 2023, 08:33:33 PMbut the truth is, that today, we are still far from thatPessimistic researchers predict that in just several years a quantum computer with the Grover search or Shor’s algorithm help will be able to crack modern version of Bitcoin. Optimistic think that we still have time up to several decades. Both think about new quantum computer resistant solutions (so called post-quantum cryptography). I hope they know what they do as I understand all that just in very general words. Breakthrough discoveries in quantum computers is not what we need right now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 30, 2023, 07:27:06 AM",
+      "body": "Quote from: vjudeu on August 29, 2023, 08:33:33 PMNot exactly. If secp256k1 will be broken, then:Add in almost all addresses ever synced via a light wallet which sends your xpub to the third party server to query your balances, which is probably the majority of addresses ever used. The only way to be sure your public key is actually private is to have it generated on an airgapped machine and never leave that machine.Quote from: jokers10 on August 29, 2023, 11:22:01 PMPessimistic researchers predict that in just several years a quantum computer with the Grover search or Shor’s algorithm help will be able to crack modern version of Bitcoin.Note that Grover's algorithm and Shor's algorithm are two entirely different things which can be used to solve different problems. When it comes to bitcoin, the former would be used for SHA256 while the latter for the ECDLP. While Shor's can provide an exponential speed up in attacking the ECDLP (and therefore make it possible to solve), Grover's can only provide a quadratic speed up in attacking SHA256 (which would still require 2128 operations and therefore incredibly unlikely to ever be broken), which is why many people (mistakenly) think that keeping public keys private provides more security.I'm not aware of any serious opinion which thinks these things will be feasible in just a few years, however. We are decades away at least.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jokers10",
+      "created_time": "August 30, 2023, 09:02:29 AM",
+      "body": "Quote from: o_e_l_e_o on August 30, 2023, 07:27:06 AMI'm not aware of any serious opinion which thinks these things will be feasible in just a few years, however. We are decades away at least.As far as I know, about two years ago a 127-qubit chip with a 0.001 error rate from IBM was most innovative, last year they produced 433-qubit 'Osprey' processor, this year they expect to have 1121-qubit 'Condor'. Of course, this is still several orders of magnitude less then needed to try to break bitcoin, but they are working good and any breakthrough can help them do it even faster. As far as I remember, several years ago even couple dozens of qubits was a wonder and now they expect to have 10x in just two years. If no unexpected breakthroughs then you are absolutely right, and we have decades. But what if there will be any?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MarkSierra",
+      "created_time": "August 30, 2023, 09:05:01 AM",
+      "body": "Quote from: vjudeu on August 29, 2023, 08:33:33 PMQuoteAre the assumptions correct or do I have a misconception somewhere?Yes, they are correct.So wouldn't it be smarter for me to use native Segwit addresses if I don't need any of the Taproot functionality (except for the future fee savings)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 30, 2023, 10:54:09 AM",
+      "body": "You can't use a coin without exposing its pubkey.  So in that sense hashed addresses are strictly less secure (because they can also be attacked through second pre-images and collisions).  One can argue that a race (or reorg) is required there and perhaps the mythical ECC cracker wouldn't quite be fast enough to win the race.  So then you're betting not just on there being an attack on the ECC but not the hash, but you're also betting that it will be slow.But then you're left with the fact that at any given time half of all coins in circulation are stored in addresses with exposed pubkeys -- which means the system as a whole is already busted if there is even a slow way to crack pubkeys.  \"I don't have to outrun the tiger, I only have to outrun you.\" only applies when its one victim vs another, but no one says \"I don't have to outrun the nuclear bomb, I just have to outrun you\".   It doesn't matter if *your* coins are secure when the economy is obliterated by half of everything else getting stolen. And if you're imagining that the attack comes from future quantum computers there I haven't seen any argument as to how it could be slow: coherence time means that it will have to happen fast or not at all.  And that same device would also halve the number of bits of hash function security (e.g. from 160 to 80 bits) just via known generic attacks but it may allow finding better ones. And at the same time the 160 bits of hashed addresses used in P2WPKH is actually security limiting: Their security against collisions is already only 80-bits which is at the uncomfortable fringe of tractable, this means that in usage models where collisions might apply (e.g. another party or less trusted device co-generates an address with you) the security of the 160-bit hashed addresses isn't just vulnerable to speculative attacks but real (if difficult) ones.Of course, this design property wasn't chosen arbitrarily, not having to express a hash (which ought to be 256-bits because of the above issues with 160 bit) hashes in addition to the public key is a big space waste.  Even if you don't personally care about wasting resources or funds on fees, other people will-- an extra diversity in key types reduces privacy. (Which then ultimately undermines security since a lack of privacy makes it easier to target you for theft).There were some cute proposals on ways to construct addresses such that there was a hidden hash inside the address, the knowledge of which could be ZK proven to provide a kind of rescue signature, but I think people haven't done much with that.  Alternatively, one could stick a QC safe public key in a taproot branch and then if this was widely done even if there was currently no consensus support for using those keys today, it could be softforked in if needed later (and the ability to spend via ECDSA softforked out) -- because the taproot commitments are still strongly binding against a quantum computer (well, at the same level a 256-bit hash is).  --- and I think these kind of moves would make a more meaningful difference in security than a blind gamble on an ecc break happening but not being fast enough to steal coins in realtime.Progress on this though depends on having an environment where people with the ability to build this stuff want to participate.  I don't think that environment exists today.  I debated today if even giving this benefit-of-expirence reply was worth the cost to me, concluded it probably wasn't, but replied anyways for some reason: Mostly because I hate seeing people midwit themselves into bad positions,  that's how you ended up with people losing coins due to libbitcoin seed.  I'll probably regret commenting anyways.  But just making a comment on a thread is a much lower investment than actually designing and deploying something that people will use in production.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "August 30, 2023, 11:31:16 AM",
+      "body": "Quote from: vjudeu on August 29, 2023, 08:33:33 PM2. All hash-based addresses could be spent, if the public key is revealed (so if a transaction is in mempool, or if there were previous transactions in past blocks). If the public key is unknown, then those coins will be unaffected.IMO it's also worth to mention that about half of top 100 richest Bitcoin address[1] have it's public key exposed (based on \"Outs\" amount). So there's no reason to target Taproot address specifically.Quote from: MarkSierra on August 30, 2023, 09:05:01 AMQuote from: vjudeu on August 29, 2023, 08:33:33 PMQuoteAre the assumptions correct or do I have a misconception somewhere?Yes, they are correct.So wouldn't it be smarter for me to use native Segwit addresses if I don't need any of the Taproot functionality (except for the future fee savings)?Maybe yes if you,1. Actually believe people who could break secp256k1 with intention to steal Bitcoin would after your coin first rather than other address which hold more coin[1].2. Don't re-use SegWit address after it's public key exposed.3. Care about few vB difference between SegWit and Taproot[2].[1] https://bitinfocharts.com/top-100-richest-bitcoin-addresses.html[/url][2] https://bitcoinops.org/en/tools/calc-size/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 30, 2023, 11:03:53 PM",
+      "body": "Quote from: ETFbitcoin on August 30, 2023, 11:31:16 AM1. Actually believe people who could break secp256k1 But also believe no one could attack ripemd160 AND believe that any break they had of secp256k1 wasn't fast enough for them to just steal your coins at the time you spend them (either by just double spending you with higher fee or doing a short reorg). ... and believe that the value of your bitcoin matters anymore when half of all coins in circulation get stolen. I think this whole thing is an example of midwit optimization.  Technically adept enough to understand some details, but not enough to put them in a wider context that regards them as insignificant.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dansus021",
+      "created_time": "September 02, 2023, 01:10:51 AM",
+      "body": "I am also a fool and want to ask and this could be more out of topic, so the question is there a possibility to change the current Bitcoin address format and make it easier like happens on Ethereum chain with their ENS system so it can be like dansus021.btc or that gonna possible in layer 2 and secondly is there any centralized exchange that accept taproot address because i saw binance has address for native segwit, lightning and regular address",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 02, 2023, 04:00:03 AM",
+      "body": "Quote from: dansus021 on September 02, 2023, 01:10:51 AMI am also a fool and want to ask and this could be more out of topic, so the question is there a possibility to change the current Bitcoin address format and make it easier like happens on Ethereum chain with their ENS system so it can be like dansus021.btc or that gonna possible in layer 2 The Ethereum ENS is a silly nonsense that \"maps\" human readable strings to actual addresses. It does not change the address format or anything under the hood. In other words it is creating an extra step when making payment since you'll have to first convert that string to an actual address then make the payment.It doesn't need layer 2, it can be built in a side chain very easily.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "September 02, 2023, 10:38:07 AM",
+      "body": "Quote from: dansus021 on September 02, 2023, 01:10:51 AMI am also a fool and want to ask and this could be more out of topic, so the question is there a possibility to change the current Bitcoin address formatIt's definitely possible. In addition, Bech32/Bech32m makes it easier since which can be seen with SegWit (bc1q...) and Taproot (bc1p...).Quote from: dansus021 on September 02, 2023, 01:10:51 AMand make it easier like happens on Ethereum chain with their ENS system so it can be like dansus021.btc or that gonna possible in layer 2RGB[1] and Taproot Assets[2] which utilize Lighning Network might do the job, although i barely know how it works. But even though Bitcoin itself doesn't have name service system, people already attempt to do that on Bitcoin blockchain. For example, Sats Names[3] utilize Ordinals to do that.Quote from: dansus021 on September 02, 2023, 01:10:51 AMand secondly is there any centralized exchange that accept taproot address because i saw binance has address for native segwit, lightning and regular addressFor starter, check https://en.bitcoin.it/wiki/Bech32_adoption#Exchanges under column \"Receive to P2TR\". But you also need to check whether they can generate new deposit address for existing user.[1] https://rgb.info/[2] https://docs.lightning.engineering/the-lightning-network/taproot-assets[3] https://docs.satsnames.org/sats-names/about",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dansus021",
+      "created_time": "September 03, 2023, 02:11:11 AM",
+      "body": "Quote from: pooya87 on September 02, 2023, 04:00:03 AMThe Ethereum ENS is a silly nonsense that \"maps\" human readable strings to actual addresses. It does not change the address format or anything under the hood. In other words it is creating an extra step when making payment since you'll have to first convert that string to an actual address then make the payment.It doesn't need layer 2, it can be built in a side chain very easily.Yeah hahaha but it's getting popular on EVM chains other than Ethereum Like Binance Smart Chain or Polygon but you know is like you said first convert that string to an actual address and then make the payment but I hear That some EVM wallet like trust wallet or safepal can transfer directly using an ENSQuote from: ETFbitcoin on September 02, 2023, 10:38:07 AMFor starter, check https://en.bitcoin.it/wiki/Bech32_adoption#Exchanges under column \"Receive to P2TR\". But you also need to check whether they can generate new deposit address for existing user.[1] https://rgb.info/[2] https://docs.lightning.engineering/the-lightning-network/taproot-assets[3] https://docs.satsnames.org/sats-names/aboutThanks again for the information @ETFbitcoin Im learning from you a lot  and it looks like that not much exchange that accept taproot but big cex accept lightning is already better",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

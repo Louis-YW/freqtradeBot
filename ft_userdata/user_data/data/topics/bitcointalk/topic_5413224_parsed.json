@@ -1,0 +1,101 @@
+{
+  "id": "topic_5413224",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "September 12, 2022, 12:19:42 AM",
+  "content": "At work I need to programmatically generate a bunch of wallet addresses that are forwarded to users to complete their purchases. For security and scalability reasons, exchange addresses are not used.I am having a hard time finding a non-custodial wallet that has an API - I know Electrum has one but it has a missing feature that makes it pointless for my use case.Preferably the software should be open source and should have support for at least the major cryptos (so I don't have to search for a wallet software for each one).Failing that, I'm happy with using a wallet for Bitcoin & derivatives and another for ETH & derivatives.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5413224",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "September 12, 2022, 03:00:36 AM",
+      "body": "I hear btcpayserver being thrown around a lot as an open source self hosted payment processor.I think you're going to have a hard time finding something that's non custodial with high acceptance without using a payment processor like bitpay (there's a chance they do automatic forwarding).You could also find an alternative by making addresses on the server from a master public key and having code (or manually) verifying them - there's probably a lot more of these types of code around.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "September 12, 2022, 11:56:35 AM",
+      "body": "I'm with jackg:Generate an xpub from the non custodial wallet of your choice.Take those addresses and put them into a database and send them your customers as needed.Do calls to a local block explorer to verify the payment and the amount.This way you don't even have to have the private keys anywhere near anything in terms of the operation. Just a wallet sitting someplace that the coins go to.It's probably a bit more programming and requires a bit more in HW (database server) but it is not that bad.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "September 12, 2022, 01:02:42 PM",
+      "body": "Edit, ups, I haven't seen the earlier post about OP's problems.Did you consider https://docs.btcpayserver.org/ ? Look at: https://docs.btcpayserver.org/CustomIntegration/Let us know if it fulfills your needs (and why does not I did not try it personally, but I plan to build a working solution on that for one shop & restaurant, I wonder if you have any suggestions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 12, 2022, 03:36:35 PM",
+      "body": "Regarding BTCPayServer:I have some background with this, having self-hosted it before. There are two three problems with integrating it here:1. BTCPayServer only supports Bitcoin & its derivatives out of the box. It requires multiple hacks to support things like Ethereum, Binance Smart Chain, Tron etc.2. Implementing all those adjustments requires knowledge of C# and .NET (which I do not have) because that's the language NBXplorer and BTCPayServer are written in, whereas any integration has to natively fit with our C++(11) codebase. 3. BTCPayServer has its own storefront and frontend which is undesirable considering that we already have in-house storefronts and frontends.Quote from: ETFbitcoin on September 12, 2022, 12:55:57 PMOP, if your workplace allow 3rd party usage while remain have control over funds, i'd recommend you service which only ask for master public key. AFAIK Mycelium Gear[1] and Coinbase Commerce[2] are most popular option.Coinbase Commerce has too limited selection of coins and ironically this is exactly the system we are trying to replace in our org.I am considering building some API on top of https://github.com/trustwallet/wallet-core and open-sourcing it. That'll work for the majority of L1 coins, but what should be done for Lightning Network?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 13, 2022, 02:11:05 PM",
+      "body": "Quote from: ETFbitcoin on September 13, 2022, 01:24:47 PMQuote from: NotATether on September 12, 2022, 03:36:35 PMI am considering building some API on top of https://github.com/trustwallet/wallet-core and open-sourcing it. That'll work for the majority of L1 coins, but what should be done for Lightning Network?I'm not very familiar with LN software, but do you have any specific requirement in mind (e.g. willing to run Bitcoin full node or must run it's own watchtower)? If no, popular implementation such as lnd or c-lightning would be safe choice.No specific requirements here, as long as we can receive payments through the LN.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 13, 2022, 02:12:14 PM",
+      "body": "Quote from: NotATether on September 12, 2022, 03:36:35 PMI am considering building some API on top of https://github.com/trustwallet/wallet-core and open-sourcing it. That'll work for the majority of L1 coins, but what should be done for Lightning Network?So, if I've understood right, you need an API that can help you generate a Lightning invoice in one machine (assuming you're running a Lightning node at home), and transmit it to your work's machine via http? Does it have to be an invoice? You can pay with keysend and offers too. Either way, why don't you just use the Lightning CLI with ssh?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 14, 2022, 02:22:42 AM",
+      "body": "Quote from: BlackHatCoiner on September 13, 2022, 02:12:14 PMQuote from: NotATether on September 12, 2022, 03:36:35 PMI am considering building some API on top of https://github.com/trustwallet/wallet-core and open-sourcing it. That'll work for the majority of L1 coins, but what should be done for Lightning Network?So, if I've understood right, you need an API that can help you generate a Lightning invoice in one machine (assuming you're running a Lightning node at home), and transmit it to your work's machine via http? Does it have to be an invoice? You can pay with keysend and offers too. Either way, why don't you just use the Lightning CLI with ssh?Not necessarily an entire HTTP API, but I need some working code/library to start with so that I can just make my own, since none seems to exist.Not from my home machine - prospective buyers of other things on the storefronts will be the ones sending Lightning payments to the work server. Though I agree with you that [re-]using at least some part of c-lightning will be necessary in the long run, if only to get the channel opening ability and the basically stay as a part of the network.And then I'm thinking with this wallet-core stuff I just connect to full nodes using some open-source SPV protocol/implementation.I'm leaning towards lightning invoices because we can audit them easily but I'm open to any format that works for us, really.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 17, 2022, 01:08:28 AM",
+      "body": "Quote from: NotATether on September 14, 2022, 02:22:42 AMThough I agree with you that [re-]using at least some part of c-lightning will be necessary in the long run, if only to get the channel opening ability and the basically stay as a part of the network.[...]I'm leaning towards lightning invoices because we can audit them easily but I'm open to any format that works for us, really.Running Core Lightning and writing (or installing) a plugin is definitely the way to go. Not really any way around spinning up a whole LN node, creating and managing channels.The plugin interface is one of my favorite features; if the plugins that do exist don't fit your preferred set of programming languages, you can write one in any language you like.This could be a place to start:https://github.com/lightningd/plugins/tree/master/request-invoiceAs well as:https://github.com/lightningd/plugins/tree/master/donationsAlso look at what BlackHatCoiner was / is (?) trying to do here; may be interesting for your application.Quote from: BlackHatCoiner on August 25, 2022, 05:32:48 PMI'm searching for an API that allows me to request an invoice from a lightning node, without owning that node.[...]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "September 18, 2022, 10:59:20 PM",
+      "body": "Quote from: NotATether on September 13, 2022, 02:11:05 PMNo specific requirements here, as long as we can receive payments through the LN.LN adoption currently is low, and I would not anticipate that most businesses will receive a large volume of LN payments unless they give specific incentives to using LN. If you do keep LN payments in scope, your best bet is to use RPC calls to an LN node. When accepting LN payments, you really don't have any choice except to keep your private keys connected to your backend server (even if indirectly). For the L1 coins you are going to accept, I think Dave's proposial is probably best, although API calls to a block explorer can get expensive, so I would suggest making RPC calls to a node that does not have access to any private keys. You can make RPC calls to get information about each transaction in each block as they are found, and check each address that received a transaction against a set of addresses that are due to receive a payment from your customers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 19, 2022, 01:54:55 AM",
+      "body": "I figured that I will eventually need some kind of node software for LN support. I'll look into just integrating the c-lightning networking functionality in this thing as that will be the best approach, especially if there is some way to \"prune\" the total size as this will be running on expensive cloud storage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 19, 2022, 02:06:38 PM",
+      "body": "Quote from: NotATether on September 19, 2022, 01:54:55 AMI figured that I will eventually need some kind of node software for LN support. I'll look into just integrating the c-lightning networking functionality in this thing as that will be the best approach, especially if there is some way to \"prune\" the total size as this will be running on expensive cloud storage.I posted some links and quote of BlackHatCoiner's topic. The idea is to run the (full) node and Lightning software on a home node, for instance, where disk size is not a problem and then generate invoices through HTTP API.No need for pruning or other unstable / unreliable experiments if you do it this way..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "topic_5399466",
+  "title": "RoxxR",
+  "author": "RoxxR",
+  "created_time": "May 20, 2022, 08:34:21 AM",
+  "content": "Does anyone know how of a mempool.space alternative, or a Python script, to calculate the fee ranges in the next few blocks (highlighted in red in this screenshot)?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5399466",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "May 20, 2022, 09:51:48 AM",
+      "body": "If you have your own mempool, maybe consecutive calls of estimatesmartfee with increasing (or decreasing) parameter would do.Or you can find web based mempools that allow API calls like https://mempool.space/api/v1/fees/mempool-blocks and parse/interpret the results, just make sure you're within the allowed amount of API calls for the platform(s).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 20, 2022, 02:03:05 PM",
+      "body": "You can parse the mempool yourself if you require such data. The range of fees are not fee estimations but rather the range of fees in each segment. If I remember correctly, and from the looks of it they use the range of transaction fee rates within each segment of the mempool. I don't think they account for the growth rate of the mempool with respect to time so take the accuracy of it with a grain of salt (if you're estimating the fees of course).Anyways, I'm not aware of any current implementations that does things like this. As mentioned, estimatesmartfee is the way to go. If you cannot work with that, then something that could work would be to dump the mempool (getrawmempool), organize the transactions in descending order. Then segment the transactions according to the size, get the boundaries of each segment and you're done.  This shouldn't be too difficult to do, might have some time to do it in the coming weeks but no guarantees.Edit: There's mempool.observer as well as jochen-hoenicke.de/queue but they are both visual representation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "May 20, 2022, 10:03:46 PM",
+      "body": "I needed something like this for my LED Bitcoin Dashboard [weekend project] and opted to simply use mempool.space's API for it. While I do have a full node on the same network, it was easier and faster to just use an online REST API than building something more custom - after all, it was a weekend project. The API endpoint I use to get the recommended fee: Code:https://mempool.space/api/v1/fees/recommendedHere you have their full API documentation:https://mempool.space/docs/api/restEndpoint for recommended fees:Quote from: https://mempool.space/docs/api/rest#get-recommended-feesEndpointGET /api/v1/fees/recommendedDescriptionReturns our currently suggested fees for new transactions.Code ExampleCode:curl -sSL \"https://mempool.space/api/v1/fees/recommended\"ResponseCode:{  fastestFee: 1,  halfHourFee: 1,  hourFee: 1,  minimumFee: 1}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 23, 2022, 02:28:53 PM",
+      "body": "Quote from: n0nce on May 20, 2022, 10:03:46 PM-snip-I think those are the floating fee estimation which would be okay if OP is trying to estimate the fees for their transactions. I think OP is trying to get the range of fees, mempool.space also offers an API call for that: https://mempool.space/api/v1/fees/mempool-blocks(https://mempool.space/docs/api/rest#get-mempool-blocks-fees). The extremes of each block denotes the range of fees included in that estimated block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "May 23, 2022, 03:19:48 PM",
+      "body": "Quote from: RoxxR on May 20, 2022, 08:34:21 AMDoes anyone know how of a mempool.space alternative, or a Python script, to calculate the fee ranges in the next few blocks (highlighted in red in this screenshot)?A simple python script using requests library and mempool.space data:Code:import requestsr = requests.get('https://mempool.space/api/v1/fees/recommended')r.status_code# 200r.json()# {'fastestFee': 17, 'halfHourFee': 10, 'hourFee': 1, 'minimumFee': 1}r.json()['fastestFee']#17fastestFee next blockhalfHourFee 3 blockshourFee 6 blocksQuote from: ranochigo on May 20, 2022, 02:03:05 PMEdit: There's mempool.observer as well as jochen-hoenicke.de/queue but they are both visual representation.I also made one visual representation , few years ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

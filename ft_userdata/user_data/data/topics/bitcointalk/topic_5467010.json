@@ -1,0 +1,141 @@
+{
+  "id": "topic_5467010",
+  "title": "88mph",
+  "author": "88mph",
+  "created_time": "September 16, 2023, 05:10:16 PMLast edit: September 16, 2023, 06:13:01 PM by 88mph",
+  "content": "I'm curious about the wallet \"address space\".We all know that with a 12, 18, or 24 word seed one can generate a Bitcoin wallet in an \"address space\" that is so large that it would be, essentially, impossible to guess. Right?A few questions:Does a 24 word seed phrase fully cover the entire \"address space\" such that if all combinations of seed words are used, all possible wallet addresses will be mapped / addressed?What about passphrases? Does the use of a passphrase open up new \"address space\" or does it map to an address in the original address space, such that seed phrase X without a passphrase may map to (be equivalent to) seed phrase Y with passphrase Z? Or seed phrase M with passphrase N maps to seed phrase O with passphrase P?And what about the following BIPs which talk about various forms of creating sub-accounts/sub-wallets based on a primary wallet seed? Do these result in \"overlap\" with the original 24 word \"address space\"?   https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki   https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki   https://github.com/bitcoin/bips/blob/master/bip-0085.mediawikiSorry if I'm not technically precise in how I'm asking these questions, but hopefully the general idea comes across.Thanks.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5467010",
+  "comments": [
+    {
+      "author": "odolvlobo",
+      "created_time": "September 16, 2023, 06:52:40 PMLast edit: September 16, 2023, 07:27:14 PM by odolvlobo",
+      "body": "Quote from: 88mph on September 16, 2023, 05:10:16 PMDoes a 24 word seed phrase fully cover the entire \"address space\" such that if all combinations of seed words are used, all possible wallet addresses will be mapped / addressed?That's a complicated question. I suspect the answer is probably yes because of all the redundancy, but there is no guarantee. However, I am not an expert.BIP 32 describes how private keys are derived from the seed.BIP 39 describes how the seed is derived from the seed phrase (and optional \"passphrase\").",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Knight Hider",
+      "created_time": "September 16, 2023, 07:15:36 PM",
+      "body": "Quote from: 88mph on September 16, 2023, 05:10:16 PMWe all know that with a 12, 18, or 24 word seed one can generate a Bitcoin wallet in an \"address space\" that is so large that it would be, essentially, impossible to guess. Right?Right.QuoteDoes a 24 word seed phrase fully cover the entire \"address space\" such that if all combinations of seed words are used, all possible wallet addresses will be mapped / addressed?Yes. Given 296 private keys per address, all addresses are covered billions times billions times billions of times.QuoteWhat about passphrases? Does the use of a passphrase open up new \"address space\" or does it map to an address in the original address space, such that seed phrase X without a passphrase may map to (be equivalent to) seed phrase Y with passphrase Z? Or seed phrase M with passphrase N maps to seed phrase O with passphrase P?And what about the following BIPs which talk about various forms of creating sub-accounts/sub-wallets based on a primary wallet seed? Do these result in \"overlap\" with the original 24 word \"address space\"?Each 24 word seed with or without passphrase covers all possible addresses. Think about what this means for a while, it's truly amazing.--Knight Hider",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaCryptoRaccoon",
+      "created_time": "September 16, 2023, 07:23:25 PM",
+      "body": "The 24-word seed allows for 204824 unique combinations. This yields an very large number, making it effectively impossible to guess a wallet's private key.  However, to your question, the seed phrase doesn't cover the entire Bitcoin address space. Bitcoin addresses are typically 160-bit hashes of the public key if I am not mistaken. This means the full address space would be 2160 or approximately 1.46 x 1048. The seed phrase combinations are vast but not equal to the entire possible Bitcoin address space.The use of an optional passphrase according to BIP-39 acts as a 25th word and creates an entirely new set of addresses. I believe this is designed to provide an extra layer of security, often referred to as 13th/19th/25th word depending on the length of the original seed phrase but don't quote me on that. The passphrase does open up an additional address space and a passphrase-protected seed will not map to another seed without a passphrase. In other words, seed phrase X with passphrase Z will not be equivalent to any seed phrase Y without a passphrase or with a different passphrase.BIP-44 and BIP-84 would not create overlaps with the original 24-word seed space as they are derivations from that space. BIP-85, on the other hand, could create seeds that open up new address spaces.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 16, 2023, 07:31:19 PMLast edit: September 16, 2023, 07:41:56 PM by o_e_l_e_o",
+      "body": "Knight Hider is correct. A single seed phrase of any length can be used to (almost certainly) generate every possible bitcoin address. This is thanks to derivation paths.When you use a seed phrase to generate an address, then most wallets will start to do so at a derivation path such as m/84'/0'/0'/0/0. Each address you generate from the same seed phrase will have a unique derivation path. So, just how many different derivation paths can you have?Well, as per BIP32, extended keys have 1 byte for the level they are at. 0x00 for the master key, 0x01 for the first level, 0x02 for the second level, and so on, up to 0xFF. This means you can have a total of 255 levels after the m. It also allows 4 bytes for the index. This means a total of 232 possible indices for each of those 255 levels. So a single seed phrase can generate (232)255 + (232)254 + (232)253 + (232)252 + .... private keys. This number works out at 2.5*102456, which is many orders of magnitude higher than the set of all possible private keys (a little less than 2256). This means that not only can any seed phrase (almost certainly) generate any private key at the right derivation path, but any seed phrase can generate any private key billions and billions of times over at many different derivation paths.Quote from: 88mph on September 16, 2023, 05:10:16 PMDoes a 24 word seed phrase fully cover the entire \"address space\" such that if all combinations of seed words are used, all possible wallet addresses will be mapped / addressed?Yes. As above, a single 24 word seed phrase will fully cover the entire address space on its own.Quote from: 88mph on September 16, 2023, 05:10:16 PMWhat about passphrases? Does the use of a passphrase open up new \"address space\" or does it map to an address in the original address space, such that seed phrase X without a passphrase may map to (be equivalent to) seed phrase Y with passphrase Z?At the right derivation path, then yes, two seed phrases will generate the same address. But in reality such a collision will never happen.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "September 16, 2023, 07:34:22 PM",
+      "body": "Quote from: MagicByt3 on September 16, 2023, 07:23:25 PMThe 24-word seed allows for 204824 unique combinations. ...However, to your question, the seed phrase doesn't cover the entire Bitcoin address space. Bitcoin addresses are typically 160-bit hashes of the public key if I am not mistaken. ... The seed phrase combinations are vast but not equal to the entire possible Bitcoin address space.204824 = (211)24 = 2264, which is much greater than 2160.However, note that a 24-word BIP-39 seed phrase encodes 8 check bits, so there are only 2264-8 = 2256 valid 24-word BIP-39 seed phrases.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "September 16, 2023, 08:58:35 PMLast edit: September 17, 2023, 07:29:44 AM by garlonicon",
+      "body": "QuoteWe all know that with a 12, 18, or 24 word seed one can generate a Bitcoin wallet in an \"address space\" that is so large that it would be, essentially, impossible to guess. Right?Yes.QuoteDoes a 24 word seed phrase fully cover the entire \"address space\" such that if all combinations of seed words are used, all possible wallet addresses will be mapped / addressed?Edit: Yes, because we have SHA-512 in HMAC, instead of SHA-256, we can cover the whole space.No. The reason is that hash functions are used in the middle. And, as it is well-known, hash functions, that are widely used, are not bijective. That means, if there are collisions and preimages, that means double hash will always create unreachable values. Then, such values will never be created as a result of double SHA-256, but they are valid if you take them modulo n-value, and use as your private key.So, even if single SHA-256 can cover all 2^256 values, then double SHA-256 can potentially contain some unreachable values (because then, you have 2^256 possible inputs, and 2^256 possible outputs, and if there are N collisions, then you can be 100% mathematically sure that at least N values are unreachable, just by comparing the number of inputs and outputs).Also, for that reason we have single SHA-256, and double SHA-256, but not triple, quadruple, or more SHA-256. But if we would have that, then guess what: executing hash function more than once will create holes. And the more times you will pass things through any hash function, the more holes there will be.Quote from: gmaxwell on August 30, 2023, 10:54:09 AMYou can't use a coin without exposing its pubkey.  So in that sense hashed addresses are strictly less secure (because they can also be attacked through second pre-images and collisions).And then, if you think about that sentence for a while, you will notice, how true it is. Obviously, if you take a single SHA-256, and then put it through RIPEMD-160, then by comparing the size of inputs and outputs, you can easily conclude that there should be around 2^(256-160)=2^96 collisions. In the same way, you can easily conclude that 12 word seed phrase can give you 12*11=132 bits of entropy, and that will not cover the almost-256-bit n-value of secp256k1.However, it is less obvious that if you have the same number of bits in your inputs and outputs, then you can have unreachable values, if you execute some hash function more than once. \"Bijective function\" is the key to understand it. Hash functions are not bijective, and if we look at some of the older hash functions, like SHA-1, then we can be 100% sure: they have collisions. Which means they are not bijective. Which means, double SHA-1 will not cover all 2^160 values. And it is extremely likely that SHA-256 is also not bijective, because the ARX (Addition-Rotation-Xor) construction is similar, even if it is stronger, than in SHA-1 (and also uses Merkle–Damgård construction, which makes it even less resistant to collisions and preimages, if you analyze that).QuoteWhat about passphrases?It doesn't matter, how many layers you have, before you get your private key. The only thing that matters, is the connections between inputs and outputs. If something is bijective, then it can cover the full space, but then, if you have a proof that it actually is bijective, then you can use that knowledge to break it, and eliminate paths that are known. For that reason, hashing based on elliptic curves alone, is so weak. Fortunately, we have none of that in Bitcoin, and here we have values modulo 2^32, that quickly loose any \"bijectivity\", which means it is quickly turned by all avalanche effects into a complete mess, that is very hard to simplify (and also, it is very hard to \"chain and reduce\", like Addition-with-Rotation or Rotation-with-Xor is, those three operations combined are much stronger than alone, or in such pairs).QuoteDoes the use of a passphrase open up new \"address space\"No. The space is always slightly less than 2^256. It is n-value of the secp256k1, which means exactly 115792089237316195423570985008687907852837564279074904382605163141518161494336 valid private keys.Quoteor does it map to an address in the original address space, such that seed phrase X without a passphrase may map to (be equivalent to) seed phrase Y with passphrase Z?Yes. That kind of thing is what we can call \"a collision\".QuoteOr seed phrase M with passphrase N maps to seed phrase O with passphrase P?Yes, it could also happen.QuoteAnd what about the following BIPs which talk about various forms of creating sub-accounts/sub-wallets based on a primary wallet seed? Do these result in \"overlap\" with the original 24 word \"address space\"?Yes. You have always 115792089237316195423570985008687907852837564279074904382605163141518161494336 valid private keys, and that space remains unchanged, no matter how you generate your keys. To change it, you would need to abandon OP_CHECKSIG entirely, and every place, where it is used (but it is not recommended, as long as secp256k1 works as intended).QuoteYes. Given 296 private keys per address, all addresses are covered billions times billions times billions of times.It depends on your address type. If you use P2PK, P2TR, or anything else, where your public key is directly exposed, then it is not the case. But yes, for 160-bit hash-based addresses, it is true.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "88mph",
+      "created_time": "September 16, 2023, 09:24:27 PM",
+      "body": "Thank you, everyone, for the replies. I appreciate it. As a software developer I consider myself reasonably smart, but discussions like this break my brain  A follow-up, if I may: Given what you know about the math behind this: How confident do you feel having your entire Bitcoin wealth in a single wallet? (Assume you have perfect OPSEC and the only \"risk\" is an accidental or brute-force collision with your wallet address.) Just curious.FWIW, I understand Grayscale (GBTC) has their Bitcoin split up in separate wallets of 1000 BTC each. (If only I had enough to split into 1000 chunks.)Thanks again!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "September 16, 2023, 09:45:58 PM",
+      "body": "QuoteI consider myself reasonably smart, but discussions like this break my brainThere is always a bigger fish. For example, I feel such things when I read about DLEQ. The more you know, the more questions you will have. Not to mention about deploying a good implementation for all of that: I put some quote in my signature, as a reminder, to start sharing some of my not-yet-published code, but we will see if I will be ready for that.QuoteHow confident do you feel having your entire Bitcoin wealth in a single wallet?If the conclusion about address space can lead to such decisions, then you should note that 2^80 is somewhat reachable in practice, 2^128 is good enough, and everything above 2^128 is rock solid. In practice, you should not worry about typical 160-bit hash-based addresses, if you are the only person that created them. You can be worried about multisig, wrapped in P2SH, because it has \"only\" 80-bit security, but if you created it alone, then it is good enough.QuoteAssume you have perfect OPSEC and the only \"risk\" is an accidental or brute-force collision with your wallet address.I assume it is more likely that OPSEC of anyone will be compromised much faster, than any key will be brute-forced. Note that the famous puzzle contains 66-bit hash-based address, that is still not taken, and 130-bit public-key-based address. That means, there is a long way to go, before any brute-force attempt will target an average Joe. There are easier puzzles, that remain unsolved.That means, the whole discussion in this topic is purely theoretical and mathematical. In practice, you can have thousands of addresses, and never worry about having accidental collisions in address space. It is big enough to avoid that. Here, we talk about travelling to Uranus, versus travelling to Neptune. It does not matter in practice, if you cannot even leave our Earth, and reach the nearest Moon.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 17, 2023, 06:29:10 AM",
+      "body": "Quote from: garlonicon on September 16, 2023, 08:58:35 PMThen, such values will never be created as a result of double SHA-256, but they are valid if you take them modulo n-value, and use as your private key.Where in BIP32 is double SHA256 used (outside of calculating the checksum for the address, which is not relevant here)? Or do you mean the double hash taking place within each HMAC function? If that's the case, then given the output is 512 bits would you not expect to still be able to reach every 256 left bits and therefore every valid private key? And even if your HMAC-SHA512 did output the same 256 left bits as elsewhere, you would be adding those 256 bits to a different parent private key and so your child key would still be different anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "September 17, 2023, 07:21:12 AM",
+      "body": "QuoteWhere in BIP32 is double SHA256 used (outside of calculating the checksum for the address, which is not relevant here)?You are right, I forgot that we have SHA-512, instead of SHA-256, just to avoid all of those problems.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 18, 2023, 01:01:51 PM",
+      "body": "Quote from: 88mph on September 16, 2023, 09:24:27 PMA follow-up, if I may: Given what you know about the math behind this: How confident do you feel having your entire Bitcoin wealth in a single wallet? (Assume you have perfect OPSEC and the only \"risk\" is an accidental or brute-force collision with your wallet address.) Just curious.If my security, privacy, process of making transactions, etc., are all perfect (they aren't, and neither is anybody else's), then I would be completely happy having all my funds in a single wallet. The risk of an accidental or brute force collision is zero. While theoretically possible, even if the entire human race diverted all its power and resources to nothing but generating new bitcoin addresses until the death of our sun in ~5 billion years' time, we still wouldn't see an address collision.Having said all that, I absolutely would not recommend keeping all your coins in a single wallet. Not because I am in the least bit concerned about address collisions, but because nobody's OPSEC is perfect regardless of how hard you try or how good you think it is. Different wallets, different devices, different mediums, different back ups, and so on.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "September 18, 2023, 01:28:45 PMLast edit: September 18, 2023, 01:41:34 PM by vjudeu",
+      "body": "QuoteHow confident do you feel having your entire Bitcoin wealth in a single wallet?There are many reasons to not do that. For example, the basic block reward was initially 50 BTC, and if people would reset their extraNonces in every block, those wallets could remain unlinked to this day. If you have one huge wallet, and you always use it for all payments, then even if you change your address in every transaction, you can still be traced by your amount.Also, if someone wants to buy something, it is generally a bad idea to always use your single coin, with your all lifetime savings. Because it is like going to the shop, buying one ice cream, and using a single gold bar, that is worth more than one house. You usually don't want to spend $10, and say out loud \"I did it from my account, where I have one million dollars\".Of course, there are ways to handle that correctly, for example CoinJoin. And you can as well pretend, that this \"millionaire\" is not you, but some exchange. Or you can have a sidechain, that always uses a single on-chain output, and is moved from one address to another every sometimes. So, there are ways to safely use a single coin, but they may not be instantly obvious, and it is too easy to reveal to the rest of the world, that you are very wealthy, so the whole OPSEC can be harder in this case.Edit: There was a topic, where wealthy people were mixing their coins with some users: https://bitcointalk.org/index.php?topic=139581.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 18, 2023, 02:21:14 PM",
+      "body": "Quote from: Knight Hider on September 16, 2023, 07:15:36 PMYes. Given 296 private keys per address, all addresses are covered billions times billions times billions of times.It's extremely likely to be the case, but if you haven't searched the entire space you can't make that assertion with 100% certainty. To put it this way: if I said there is no private key for an address, you couldn't disprove that claim unless you found a private key that gives that address. I do acknowledge that the chances for this to happen are very close to 0%, but there's an (inconceivably) small doubt that there might be an address without any private key. Quote from: 88mph on September 16, 2023, 09:24:27 PMA follow-up, if I may: Given what you know about the math behind this: How confident do you feel having your entire Bitcoin wealth in a single wallet? (Assume you have perfect OPSEC and the only \"risk\" is an accidental or brute-force collision with your wallet address.) Just curious.The fact that I'm having a hard time wrapping my head around the numbers behind that math, failing to make a fair comparison with other quantities I'm familiar with (like the total grains of sand in the Earth, or the chances of winning the lottery twice in a row), proves that I'm even incapable of understanding the difference between being impossible and improbable in this case. That's source of confidence.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Knight Hider",
+      "created_time": "September 18, 2023, 05:04:34 PM",
+      "body": "Quote from: BlackHatCoiner on September 18, 2023, 02:21:14 PMQuote from: Knight Hider on September 16, 2023, 07:15:36 PMYes. Given 296 private keys per address, all addresses are covered billions times billions times billions of times.It's extremely likely to be the case, but if you haven't searched the entire space you can't make that assertion with 100% certainty. To put it this way: if I said there is no private key for an address, you couldn't disprove that claim unless you found a private key that gives that address. I do acknowledge that the chances for this to happen are very close to 0%, but there's an (inconceivably) small doubt that there might be an address without any private key.You're right.It's close enough to confidently say all addresses are covered.--Knight Hider",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 19, 2023, 10:29:18 AM",
+      "body": "Quote from: 88mph on September 16, 2023, 09:24:27 PMThank you, everyone, for the replies. I appreciate it. As a software developer I consider myself reasonably smart, but discussions like this break my brain  A follow-up, if I may: Given what you know about the math behind this: How confident do you feel having your entire Bitcoin wealth in a single wallet? (Assume you have perfect OPSEC and the only \"risk\" is an accidental or brute-force collision with your wallet address.) Just curious.FWIW, I understand Grayscale (GBTC) has their Bitcoin split up in separate wallets of 1000 BTC each. (If only I had enough to split into 1000 chunks.)Thanks again!More wallets means more OPSEC required for you to do to keep all of them safe. That means more seed phrases to hide, more auditing of wallets required as well as the locations they are stored in, more computers because you can't truly split your holdings on different wallets on the same device, more passwords to remember and ultimately more ways to shoot yourself in the foot if any of these devices get phished or stolen, or simply if you forget a seed phrase or credential.As you can see, brute-force collision has almost no factor in this consideration because there are only 21 million bitcoins and theoretically they can be spread out in max 21,000,000 * 10^8 = 21 * 10^14  = 210 trillion addresses, a far cry from the total address space of 2^160. It ultimately means that most addresses will never have any coins in them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 19, 2023, 02:40:45 PM",
+      "body": "Quote from: vjudeu on September 18, 2023, 01:28:45 PMEdit: There was a topic, where wealthy people were mixing their coins with some users: https://bitcointalk.org/index.php?topic=139581.0Very interesting. Blockchain analysis is obviously a bit more advanced than that now, but you can still similarly fool it very easily by using things like StonewallX2 or Stowaway transactions via Samourai or Sparrow. Quote from: NotATether on September 19, 2023, 10:29:18 AMMore wallets means more OPSEC required for you to do to keep all of them safe.I still think that is a far preferable solution to having all your coins stored on a single wallet, especially if that single wallet is going to be a hot wallet on a phone or computer. If you really can only manage to have a single wallet then you should get a good hardware wallet, but I think most people would be able to have at least a hot wallet for small amounts and a hardware wallet for the bulk of their funds, at a minimum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "topic_5464239",
+  "title": "DifDrama",
+  "author": "DifDrama",
+  "created_time": "August 23, 2023, 03:46:48 AM",
+  "content": "I searched for information about ban score, but was still confused. Could you kindly provide insight into how the ban score algorithm calculates the ban score attributed to a node?  Specifically, I'm interested in understanding the criteria for misbehaviors that trigger the ban score algorithm and result in a ban score being assigned to a node.  Additionally, I would greatly appreciate guidance on where to access official documentation or resources to learn more comprehensively about this topic.  Any views or responses will be greatly appreciated.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464239",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "August 23, 2023, 04:57:40 AM",
+      "body": "I don't think there is any documentation that you can find and read specially since \"ban score\" is not part of the protocol (it is not part of consensus rules), it is what bitcoin core defines and uses internally to prevent abuse and can change.You'll have to read the source code to understand the details of it. As far as I can tell it is all happening in the net_processing.cpp file by making calls to the Misbehaving() method and passing a value as the \"points\" to add to the misbehaving point of the peer (that is the ban score). As long as the total point doesn't surpass the threshold (default=100) the connection will remain open otherwise it will be terminated.Some examples of the \"unacceptable\" behavior that would disconnect a peer is sending an invalid block or block header or transaction which would ban the peer.Other times where the peer would be given a \"yellow card\" instead of being banned are when they break some other \"soft\" rules like sending more headers in a headers message as they should, or when they send you a block that you don't have the parent to.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 23, 2023, 05:00:45 AM",
+      "body": "Quote from: DifDrama on August 23, 2023, 03:46:48 AMAny views or responses will be greatly appreciated.There's a lot of criteria and ban score based from the severity of its misbehavior.For that, you'll need to check it directly on the code, \"new_processing.cpp\": https://github.com/bitcoin/bitcoin/blob/master/src/net_processing.cpp#L539-L543The linked line and comments show \"howmuch\" ban score to add to a misbehaving peer.Search for \"misbehaving(\" on that link to check all the scores and reasons, the developers conveniently added comments to explain each.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 23, 2023, 09:36:33 AM",
+      "body": "It's also worth to note that the ban score is determined differently across Bitcoin Core versions, and probably even more across in different Bitcoin clients. For example, in release notes of v0.20.2 you can notice there has been update. Another example is Gocoin, which is another Bitcoin client, using a different algorithm for misbehaving[2].[1] https://github.com/bitcoin/bitcoin/blob/5aa67eb3655a0023f0cf115176fc8d5bac53cdcd/doc/release-notes/release-notes-0.20.2.md?plain=1#L61-L84[2] https://github.com/piotrnar/gocoin/blob/8d6e60ce6f16631f66585cc6ef75c8a31dd52afa/client/network/core.go#L440C1-L461",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DifDrama",
+      "created_time": "August 24, 2023, 06:22:09 AM",
+      "body": "Thank you all. It really helped me a lot.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

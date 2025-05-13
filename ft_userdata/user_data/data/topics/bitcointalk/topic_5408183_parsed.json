@@ -1,0 +1,53 @@
+{
+  "id": "topic_5408183",
+  "title": "Moussa Al-Basheer",
+  "author": "Moussa Al-Basheer",
+  "created_time": "July 30, 2022, 09:51:50 PM",
+  "content": "I am trying to estimate the cost of mining Genesis block for a research paper and wish to narrow down variables to the best i can. Here is how i got the ~8228 h/s hashrate.1- I took the difference between the block-header epoch timestamp of Genesis and block#1 which turned out to be 506,360 seconds (i.e 5.86 days).2- The nonce of Genesis Block is 2083236893 which means that satoshi proved the work on genesis block by performing 4,166,473,786 sha-256 hashing operations (2,083,236,893 nonce increments and \"Double\" sha 256 operations per nonce).Hoping the math is correct, it means that the device used for mining Genesis block performed at 8228 h/s hashrate (4,166,473,786 hashing operations / 506,360 seconds) .Is the above calculated hashrate close to the one you'd expect from CPU mining back in 2009? any notes on the math used here?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408183",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "August 04, 2022, 11:52:00 PM",
+      "body": "Interesting question!A quick web search reveals that people in 2011 were doing 65kHash/s on a single thread. Disconnected from Bitcoin Core though; just a simple standalone C program doing SHA256 hashes. https://stackoverflow.com/a/4765401/3338129It's very well possible that in 2008, hashrate was quite a bit lower, maybe 10kHash/s on similar hardware; of course, satoshi may have used a laptop giving lower numbers.Your calculation does assume a bunch of things, though:[1] The timestamps are 100% correct. Problem:Quote from: https://en.bitcoin.it/wiki/Block_timestampA timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours. \"Network-adjusted time\" is the median of the timestamps returned by all nodes connected to you. As a result block timestamps are not exactly accurate, and they do not need to be. Block times are accurate only to within an hour or two. [2] He started hashing with nonce=0 and incremented by 1. Problem: It's not required nor enforced to do it like that. You could also generate a random number every time or maybe after 1000 iterations and count up from there.That being said, it was the very first version of Bitcoin Core and both assumptions may very well have held true back then. I'm just not 100% sure, since by today things are a lot different; timestamps are even used as a kind of 'extra nonce' and deliberately time-shifted. Just make sure since you are doing this for a research paper, that your assumptions are indeed true.PS: I'd recommend moving this to 'Development & Technical Discussion'. Even though the topic is about mining, this board mostly covers modern ASIC mining and is very much 'applied'. More academic and technical or theoretical aspects might be best answered in Development & Technical Discussion.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 06, 2022, 12:41:54 AM",
+      "body": "Quote from: Moussa Al-Basheer on July 30, 2022, 09:51:50 PMHoping the math is correct, it means that the device used for mining Genesis block performed at 8228 h/s hashrate (4,166,473,786 hashing operations / 506,360 seconds) .It adds up, especially since Athlons and Core 2's did not have hardware-accelerated SHA256 instructions to take advantage of, so it was most likely all coded in software (C specifically, not any assembly or even __asm__ directives).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Moussa Al-Basheer",
+      "created_time": "August 07, 2022, 11:20:06 PM",
+      "body": "Thanks a lot n0nce.I didn't know about the median timestamp. With that said though, and specially for the case of genesis block, would you consider those 2 factors to be almost insignificant knowing that satoshi mined genesis Block alone (no competing nodes)? Note: Am new on here, is there a way I can move the topic to \"Development & Technical Discussion\" or shall I just delete and re-post?One last thing, nonce-search tweaking/algorithm is one of the topics am very interested in, but couldn't find any  good enough sources to put some algorithms to test on a Mac just for fun. any recommendation?I really appreciate the time you've taken and I learned something interesting today!   Quote from: n0nce on August 04, 2022, 11:52:00 PMInteresting question!A quick web search reveals that people in 2011 were doing 65kHash/s on a single thread. Disconnected from Bitcoin Core though; just a simple standalone C program doing SHA256 hashes. https://stackoverflow.com/a/4765401/3338129It's very well possible that in 2008, hashrate was quite a bit lower, maybe 10kHash/s on similar hardware; of course, satoshi may have used a laptop giving lower numbers.Your calculation does assume a bunch of things, though:[1] The timestamps are 100% correct. Problem:Quote from: https://en.bitcoin.it/wiki/Block_timestampA timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours. \"Network-adjusted time\" is the median of the timestamps returned by all nodes connected to you. As a result block timestamps are not exactly accurate, and they do not need to be. Block times are accurate only to within an hour or two. [2] He started hashing with nonce=0 and incremented by 1. Problem: It's not required nor enforced to do it like that. You could also generate a random number every time or maybe after 1000 iterations and count up from there.That being said, it was the very first version of Bitcoin Core and both assumptions may very well have held true back then. I'm just not 100% sure, since by today things are a lot different; timestamps are even used as a kind of 'extra nonce' and deliberately time-shifted. Just make sure since you are doing this for a research paper, that your assumptions are indeed true.PS: I'd recommend moving this to 'Development & Technical Discussion'. Even though the topic is about mining, this board mostly covers modern ASIC mining and is very much 'applied'. More academic and technical or theoretical aspects might be best answered in Development & Technical Discussion.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 09, 2022, 10:29:39 PM",
+      "body": "Quote from: Moussa Al-Basheer on August 07, 2022, 11:20:06 PMI didn't know about the median timestamp. With that said though, and specially for the case of genesis block, would you consider those 2 factors to be almost insignificant knowing that satoshi mined genesis Block alone (no competing nodes)? The timestamp can be adjusted forwards or backwards to the miner's will, no matter whether there is competition or not. Same with the way the nonce is selected. But I don't know why he would have done something like that. Most likely, your assumptions hold true. I'm also not aware, when exactly miners started playing with the timestamp as secondary nonce.This would be a question probably best answered by long-time miners from the Mining board, like philipma1957 and NotFuzzyWarm.Quote from: Moussa Al-Basheer on August 07, 2022, 11:20:06 PMNote: Am new on here, is there a way I can move the topic to \"Development & Technical Discussion\" or shall I just delete and re-post?On most boards, you can do it yourself just on the bottom left corner.There's even a 'Lesson' about it  https://bitcointalk.org/index.php?topic=5265053.0You can quickly find topics using the https://ninjastic.space/search search tool, by the way. Much better than forum search.Quote from: Moussa Al-Basheer on August 07, 2022, 11:20:06 PMOne last thing, nonce-search tweaking/algorithm is one of the topics am very interested in, but couldn't find any  good enough sources to put some algorithms to test on a Mac just for fun. any recommendation?Despite my name, I'm not an expert on nonce-search tweaking. I do understand what you're trying to do; personally I'd mostly stick to the maths and maybe write an isolated example to gather some benchmarks. But in theory, mining is a completely random process and you should not get any better or worse results in the long run whether you just count up or do something more complex.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "August 10, 2022, 08:56:47 AM",
+      "body": "Quote from: n0nce on August 09, 2022, 10:29:39 PMQuote from: Moussa Al-Basheer on August 07, 2022, 11:20:06 PMI didn't know about the median timestamp. With that said though, and specially for the case of genesis block, would you consider those 2 factors to be almost insignificant knowing that satoshi mined genesis Block alone (no competing nodes)? The timestamp can be adjusted forwards or backwards to the miner's will, no matter whether there is competition or not. Same with the way the nonce is selected.While it may have been able to be adjusted to any value initially, the genesis block clearly states the earliest date it could have been generated.Read the coinbase sig.Alas, bitcoin rules (which means all mining) sets limits on the value it can have as stated above.As I regularly state when the subject of the 'block timestamp' comes up, the stamp is not 'the time the block was mined'It is either when the pool sent the work to the miner or what it was adjusted to by mining code (or the pool).But adjusting the timestamp is no longer required with stratum, and all pools other than those setup by n00bs who don't know what they are doing, use stratum.Stratum was designed for this reason, to put extra nonces in the coinbase sig, not use the timestamp.This usually leads to the block timestamp being 'close' to when the block was mined - generally within X seconds of it, unless the miner or the pool is screwing with it.That X seconds depends on how often the pool sends work to the miner, e.g. on my pool that's every 30 seconds, but other pools that may be more.Some may screw with it, but in general for most blocks, the block timestamp will be within that X seconds of when the block was found.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

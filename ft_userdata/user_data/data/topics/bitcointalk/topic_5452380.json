@@ -1,0 +1,125 @@
+{
+  "id": "topic_5452380",
+  "title": "apogio",
+  "author": "apogio",
+  "created_time": "May 11, 2023, 12:50:23 PM",
+  "content": "Hello,the command Code:bitcoin-cli getmempoolinfo returnsCode:{  \"loaded\": true,  \"size\": 91656,  \"bytes\": 64818257,  \"usage\": 299677520,  \"total_fee\": 9.05498421,  \"maxmempool\": 300000000,  \"mempoolminfee\": 0.00003100,  \"minrelaytxfee\": 0.00001000,  \"unbroadcastcount\": 0}However, in https://mempool.space/ it says \"307,065 TXs\" uncorfimed transactions.Why is there such a difference between my node's mempool and the website's mempool?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5452380",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "May 11, 2023, 03:01:44 PM",
+      "body": "Quote from: apogio on May 11, 2023, 12:50:23 PMCode:  \"usage\": 299677520,  \"maxmempool\": 300000000,Why is there such a difference between my node's mempool and the website's mempool?It's full. That means it starts dropping transactions. Each node can use their own settings for this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 11, 2023, 03:32:49 PM",
+      "body": "Quote from: LoyceV on May 11, 2023, 03:01:44 PMIt's full. That means it starts dropping transactions. Each node can use their own settings for this.But my mempool says 91k TXs in size. What does this \"size\" mean?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 11, 2023, 03:45:17 PM",
+      "body": "Quote from: apogio on May 11, 2023, 03:32:49 PMBut my mempool says 91k TXs in size. What does this \"size\" mean?I guess it's the number of transactions. My node had 74243 of them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 11, 2023, 03:58:49 PM",
+      "body": "Quote from: LoyceV on May 11, 2023, 03:45:17 PMI guess it's the number of transactions. My node had 74243 of them.Allow me to rephrase because I think I haven't made myself clear.Inside every node's mempool there are unconfirmed transactions.In mine how many are there? Which number from the following represents the unconfirmed transactions?Code:{  \"loaded\": true,  \"size\": 95792,  \"bytes\": 65539423,  \"usage\": 299771632,  \"total_fee\": 11.40788335,  \"maxmempool\": 300000000,  \"mempoolminfee\": 0.00003200,  \"minrelaytxfee\": 0.00001000,  \"unbroadcastcount\": 0}What is the difference between \"usage\" and \"size\"?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 11, 2023, 04:04:42 PM",
+      "body": "Size is the number of unconfirmed transactions your node holds in its mempool. Your node is holding 95,792 transaction.Usage is the amount of memory those unconfirmed transactions are using after they have been deserialized. Your node is using 299,771,632 bytes. By default, the maximum is 300,000,000 bytes (300 MB).Since you asked about mempool.space, you'll see that under memory usage it currents says something around 910 MB / 300 MB. This is because they have increased their maximum limit from 300 MB to something much higher. If you also increased your node's max memory usage to over 1 GB, then your node would also store the other 200,000 or so transactions which mempool.space's node is storing. As it stands, your node will drop the lowest fee transactions to stay within the default memory limit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 11, 2023, 04:07:26 PM",
+      "body": "Quote from: apogio on May 11, 2023, 03:58:49 PMAllow me to rephrase because I think I haven't made myself clear.I thought I got it, but I'm starting to doubt now....I assume \"size\" is the number of transactions in mempool, \"bytes\" is the size, but now I'm confused why \"usage\" (I assume that's \"memory usage\") is so much more. It makes sense that it's very close to the maximum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 11, 2023, 04:09:58 PM",
+      "body": "Quote from: LoyceV on May 11, 2023, 04:07:26 PMI assume \"size\" is the number of transactions in mempool, \"bytes\" is the size, but now I'm confused why \"usage\" (I assume that's \"memory usage\") is so much more. It makes sense that it's very close to the maximum.Bytes is the raw size of these transactions. In OP's example, his 95,792 transactions will fill 65,539,423 bytes of block space when they are mined.This is different to usage. Usage is specifically RAM usage of these deserialized transactions, not the bytes they will take up on the blockchain. The RAM usage will vary based on everything from his node's hardware to the specifics of the transactions in his mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 11, 2023, 04:37:48 PM",
+      "body": "Quote from: o_e_l_e_o on May 11, 2023, 04:04:42 PMSize is the number of unconfirmed transactions your node holds in its mempool. Your node is holding 95,792 transaction.Usage is the amount of memory those unconfirmed transactions are using after they have been deserialized. Your node is using 299,771,632 bytes. By default, the maximum is 300,000,000 bytes (300 MB).Since you asked about mempool.space, you'll see that under memory usage it currents says something around 910 MB / 300 MB. This is because they have increased their maximum limit from 300 MB to something much higher. If you also increased your node's max memory usage to over 1 GB, then your node would also store the other 200,000 or so transactions which mempool.space's node is storing. As it stands, your node will drop the lowest fee transactions to stay within the default memory limit.Quote from: LoyceV on May 11, 2023, 04:07:26 PMI thought I got it, but I'm starting to doubt now....I assume \"size\" is the number of transactions in mempool, \"bytes\" is the size, but now I'm confused why \"usage\" (I assume that's \"memory usage\") is so much more. It makes sense that it's very close to the maximum.Thank you both. Shouldn't all nodes have the same mempool capacity?Quote from: o_e_l_e_o on May 11, 2023, 04:09:58 PMQuote from: LoyceV on May 11, 2023, 04:07:26 PMI assume \"size\" is the number of transactions in mempool, \"bytes\" is the size, but now I'm confused why \"usage\" (I assume that's \"memory usage\") is so much more. It makes sense that it's very close to the maximum.Bytes is the raw size of these transactions. In OP's example, his 95,792 transactions will fill 65,539,423 bytes of block space when they are mined.This confuses me... I mean you explained it perfectly, but I don't get it. The block size in Bitcoin is 1MB. So can I assume how many blocks are approximately left to be mined? Would that be 65MB / 1MB = 65 blocks?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 11, 2023, 04:59:21 PM",
+      "body": "Quote from: apogio on May 11, 2023, 04:37:48 PMShouldn't all nodes have the same mempool capacity?Although the majority of nodes run with the default setting of 300 MB, there is no requirement for any node to stick to this, and nodes are free to change the memory they dedicate to their mempool.Quote from: apogio on May 11, 2023, 04:37:48 PMThe block size in Bitcoin is 1MB. So can I assume how many blocks are approximately left to be mined? Would that be 65MB / 1MB = 65 blocks?For the transactions in your mempool, yes. But as we've seen, there are other nodes such as mempool.space which have much larger mempools. As the transaction in your mempool start to get added to blocks and your memory usage drops, your node will start to accept and store these transactions from other nodes with larger mempools.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 11, 2023, 05:02:43 PM",
+      "body": "Quote from: o_e_l_e_o on May 11, 2023, 04:59:21 PMQuote from: apogio on May 11, 2023, 04:37:48 PMShouldn't all nodes have the same mempool capacity?Although the majority of nodes run with the default setting of 300 MB, there is no requirement for any node to stick to this, and nodes are free to change the memory they dedicate to their mempool.Quote from: apogio on May 11, 2023, 04:37:48 PMThe block size in Bitcoin is 1MB. So can I assume how many blocks are approximately left to be mined? Would that be 65MB / 1MB = 65 blocks?For the transactions in your mempool, yes. But as we've seen, there are other nodes such as mempool.space which have much larger mempools. As the transaction in your mempool start to get added to blocks and your memory usage drops, your node will start to accept and store these transactions from other nodes with larger mempools.I guess my final question would be what does \"unbroadcastcount\": 0 indicate?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 11, 2023, 05:24:48 PM",
+      "body": "Quote from: apogio on May 11, 2023, 05:02:43 PMI guess my final question would be what does \"unbroadcastcount\": 0 indicate?Exactly as it suggests - the number of transactions in your mempool which have not yet been successfully broadcast to any peers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 11, 2023, 07:33:39 PM",
+      "body": "from developer.bitcoin.orgQuote  \"loaded\" : true|false,     (boolean) True if the mempool is fully loaded  \"size\" : n,                (numeric) Current tx count  \"bytes\" : n,               (numeric) Sum of all virtual transaction sizes as defined in BIP 141. Differs from actual serialized size because witness data is discounted  \"usage\" : n,               (numeric) Total memory usage for the mempool  \"maxmempool\" : n,          (numeric) Maximum memory usage for the mempool  \"mempoolminfee\" : n,       (numeric) Minimum fee rate in BTC/kB for tx to be accepted. Is the maximum of minrelaytxfee and minimum mempool fee  \"minrelaytxfee\" : n,       (numeric) Current minimum relay fee for transactions  \"unbroadcastcount\" : n     (numeric) Current number of transactions that haven't passed initial broadcast yetAlso, since I asked about it a while ago, there will be some variance between the mempool of different nodes:https://bitcointalk.org/index.php?topic=5200716With the filled mempool we are having now, depending on your config there could be a lot of difference depending on what nodes or explorers you are looking at.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "May 11, 2023, 07:51:58 PM",
+      "body": "Quote from: DaveF on May 11, 2023, 07:33:39 PMfrom developer.bitcoin.orgQuote  \"loaded\" : true|false,     (boolean) True if the mempool is fully loaded  \"size\" : n,                (numeric) Current tx count  \"bytes\" : n,               (numeric) Sum of all virtual transaction sizes as defined in BIP 141. Differs from actual serialized size because witness data is discounted  \"usage\" : n,               (numeric) Total memory usage for the mempool  \"maxmempool\" : n,          (numeric) Maximum memory usage for the mempool  \"mempoolminfee\" : n,       (numeric) Minimum fee rate in BTC/kB for tx to be accepted. Is the maximum of minrelaytxfee and minimum mempool fee  \"minrelaytxfee\" : n,       (numeric) Current minimum relay fee for transactions  \"unbroadcastcount\" : n     (numeric) Current number of transactions that haven't passed initial broadcast yetAlso, since I asked about it a while ago, there will be some variance between the mempool of different nodes:https://bitcointalk.org/index.php?topic=5200716With the filled mempool we are having now, depending on your config there could be a lot of difference depending on what nodes or explorers you are looking at.-DaveThanks Dave. How would I go about increasing my mempool's capacity? I haven't been able to find a straightforward answer. Is it an argument when running bitcoind?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 11, 2023, 08:54:05 PM",
+      "body": "Yes. For bitcoind, add the argument -maxmempool=300 where 300 is the number of megabytes you want to set as the upper limit.Alternatively, you can add the same argument to your bitcoin.conf file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

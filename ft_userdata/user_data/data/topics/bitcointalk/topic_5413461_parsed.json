@@ -1,0 +1,165 @@
+{
+  "id": "topic_5413461",
+  "title": "Skybuck",
+  "author": "Skybuck",
+  "created_time": "September 13, 2022, 09:04:38 PM",
+  "content": "27 july 2022, new seflish mining attack/strategy: \"Partial Selfish Mining for More Profits\":https://aps.arxiv.org/pdf/2207.13478.pdfI don't quite understand it. How can a miner proceed to mine on a partially revealed block ? Hmmm...This would imply that not all data from the previous block is needed/necessary to start computing the next block... maybe only the hash needed from previous block... hmm...",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5413461",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "September 13, 2022, 09:43:13 PM",
+      "body": "Quote from: Skybuck on September 13, 2022, 09:04:38 PMI don't quite understand it. How can a miner proceed to mine on a partially revealed block ? Hmmm...This would imply that not all data from the previous block is needed/necessary to start computing the next block... maybe only the hash needed from previous block... hmm...That's correct.https://en.bitcoin.it/wiki/Block#Block_structurehttps://en.bitcoin.it/wiki/Block_hashing_algorithmThe previous block hash is what ties all blocks together in a chain-type structure.Quote from: https://aps.arxiv.org/pdf/2207.13478.pdfA partial block is regarded as an invalid block by honest miners but does not hinder rational miners to mine after it if it is more profitable.Quote from: https://aps.arxiv.org/pdf/2207.13478.pdfRational miners:A minority group of miners that will not take the initiative to launch an attack but may choose the most profitable way to mine. Realizing the attacker launched a partial block sharing related attack like PSM, rational miners can choose their optimal strategies (i.e., mining on which branch) to get a higher reward.Basically, if I understand it correctly, this selfish mining technique adds a 3rd group to the 'normal' selfish-mining model, which is called rational miners.These knowingly decide to mine on a malicious branch, after verifying that the attacker has launched such an attack and after verifying that it is in possession of the full block through a zero-knowledge proof.By attracting such miners to the attacker's chain, they obviously have a higher chance of succeeding.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 14, 2022, 02:50:48 AM",
+      "body": "QuoteIn this paper, we propose a new block sharing strategy in the mining, called partial block sharing. Different from previous new block hiding or revealing, partial block sharing will only reveal part of a block (named partial block) while some fields are hiding, e.g., nonce and part of arbitrary bytes in the coinbase transaction. That's not even possible. For example if the other node sends a block/header message it has to have a valid header inside of it otherwise when your node receives a P2P message of a block that doesn't have a nonce it will reject it as an incomplete message or have an invalid nonce it simply rejects it for having an invalid proof of work or if it has incomplete/invalid coinbase it rejects that for having invalid merkle root.It doesn't even take major computation power to reject such an invalid P2P message.I didn't read the whole thing but it seems like the author has no understanding of how Bitcoin P2P protocol works.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "September 14, 2022, 12:11:50 PM",
+      "body": "Beyond it not being possible to do without a lot of collusion and spending a fortune in money it's also a very large risk.Much like the 'any 2 people can keep a secret so long as one of them is dead' to create a scenario where you get that much hashrate you would need a bunch of pool operators and some tech people who would do the actual programming. Someone is going to talk and then the hashrate to those pools is going drop like a rock.There are a lot of theoretical ways that it could happen, but in reality it's never going to. There is too much long term profit to be lost. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 14, 2022, 11:54:37 PM",
+      "body": "Quote from: pooya87 on September 14, 2022, 02:50:48 AMI didn't read the whole thing but it seems like the author has no understanding of how Bitcoin P2P protocol works.They do have an understanding, but they have this huge assumption that there is a group of 'rational miners' who are willing to accept an incomplete block and willingly participate in an attack, because rationally, it makes sense.I haven't read everything (like the crypto proofs) either, but in their scheme, they verify the attacker's knowledge of the (successfully mined) block through a zero-knowledge proof (as it cannot just share the full block to make this attack possible).Quote from: ETFbitcoin on September 14, 2022, 11:04:47 AMQuote from: https://aps.arxiv.org/pdf/2207.13478.pdfIn this paper, we extend the mining attack’s strategy space to partial block sharing, and propose a new and feasible Partial Selfish Mining (PSM) attack. We show that by releasing partial block data publicly and attracting rational miners to work on attacker’s private branch, attackers and these attracted miners can gain an unfair share of mining rewards.I only skimmed the paper for a minute, but why would miner work on \"attacker’s private branch\" (i'm don't know what they refer)? On practice, miner simply do work from mining pool they choose or block template from full node/light client (for solo mining).In a setting with mining pools, of course the pool operator would be the tone choosing which branch to mine on, as this is who creates the block candidates.As of why they would work on the attacker's branch, well, because it's more profitable / rational.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 15, 2022, 03:11:39 AM",
+      "body": "Quote from: n0nce on September 14, 2022, 11:54:37 PMThey do have an understanding, but they have this huge assumption that there is a group of 'rational miners' who are willing to accept an incomplete block and willingly participate in an attack, because rationally, it makes sense.But that makes no sense! You see it is one thing to describe an attack where the \"lazy miner\" doesn't download the whole block (eg 1.5 MB) and only gets the 80-byte header to skip merkle root computation and updating its database (eg. 2000 entries) to save a second. Which is SPV mining.But it is another thing to say that the \"lazy miner\" doesn't receive 4 bytes out of 80-byte header (the nonce) and blindly accepts it as valid.The article is describing the later which makes no sense because unlike the first case there is no benefit in doing that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 15, 2022, 08:46:13 PM",
+      "body": "Quote from: pooya87 on September 15, 2022, 03:11:39 AMQuote from: n0nce on September 14, 2022, 11:54:37 PMThey do have an understanding, but they have this huge assumption that there is a group of 'rational miners' who are willing to accept an incomplete block and willingly participate in an attack, because rationally, it makes sense.But that makes no sense! You see it is one thing to describe an attack where the \"lazy miner\" doesn't download the whole block (eg 1.5 MB) and only gets the 80-byte header to skip merkle root computation and updating its database (eg. 2000 entries) to save a second. Which is SPV mining.But it is another thing to say that the \"lazy miner\" doesn't receive 4 bytes out of 80-byte header (the nonce) and blindly accepts it as valid.The article is describing the later which makes no sense because unlike the first case there is no benefit in doing that.The idea is to verify the previous (mined by malicious miner) block not by receiving and hashing it once, but instead through a zero-knowledge proof. Then mine on that chain, fully knowing that it is an ongoing attack. I think that's the most problematic assumption in the whole paper.The reason the attacker can't just send the actual block (and needs to do the custom ZK stuff instead) is that otherwise any one of the 'rational miners' could actually just be an honest miner and submit it to the blockchain, sabotaging the attack.(PSA: I didn't read the whole thing, that's just how I understood it and it made sense to me this way - happy to be corrected if I misunderstood! )",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 15, 2022, 08:57:23 PM",
+      "body": "The paper seems difficult to read, but it may just be me who's tired at the moment. What I don't understand is how does this differ from a pool which essentially attacks the network by sending malicious block headers. One solution to incentivize honesty further is for miners to run software that checks for the block height. That way a pool can't make them work on a height they've zero-knowledgeably already seen. It already happens by minorities I presume. If a large pool wants to conduct a 51% attack, I'm sure there will be at least one miner who'll spot the cheating. I doubt he can do much though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 16, 2022, 11:25:23 PM",
+      "body": "Quote from: BlackHatCoiner on September 15, 2022, 08:57:23 PMThe paper seems difficult to read, but it may just be me who's tired at the moment. What I don't understand is how does this differ from a pool which essentially attacks the network by sending malicious block headers.I guess only the addition of ZK proofs is the difference. That 'normally honest miners' could 'go malicious' after getting a malicious block header from an unknown / untrusted attacker + the proof that they do have mined the actual block. Instead in your example, they're already working together with the attacker and simply trust that they possess the whole block.Quote from: BlackHatCoiner on September 15, 2022, 08:57:23 PMOne solution to incentivize honesty further is for miners to run software that checks for the block height. That way a pool can't make them work on a height they've zero-knowledgeably already seen. As far as I can tell, this scheme is more an 'opt-in' than an 'opt-out'; so miners actively need to accept these partial blocks and willingly decide to mine on a malicious branch; they're not tricked into it anyway. So we don't need a mechanism to help them not getting bamboozled..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 17, 2022, 10:26:12 AM",
+      "body": "Quote from: n0nce on September 16, 2022, 11:25:23 PMInstead in your example, they're already working together with the attacker and simply trust that they possess the whole block.In my example, they're working on a block, without knowing the current block height. In that case, they don't know if the block header they're receiving is malicious or not, unless they run a full node (with the proper mining software).Quote from: n0nce on September 16, 2022, 11:25:23 PMso miners actively need to accept these partial blocks and willingly decide to mine on a malicious branchI'm still finding difficult to grasp the context. How's partial blocks different from what I say?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 17, 2022, 12:40:39 PM",
+      "body": "Quote from: BlackHatCoiner on September 17, 2022, 10:26:12 AMQuote from: n0nce on September 16, 2022, 11:25:23 PMso miners actively need to accept these partial blocks and willingly decide to mine on a malicious branchI'm still finding difficult to grasp the context. How's partial blocks different from what I say?Just different assumptions. In your (weaker) model, the miners don't even know the current block height, so they can more easily be fooled by an attacker, who simply sends malicious block headers.In the paper, they assume that miners do know the current real block height and knowingly decide to mine on a malicious branch, after being presented with a ZK proof that the block is valid. They do realize that it's a fork and deliberately mine on that branch, though. That's been clearly highlighted.Therefore they are called 'rational miners'.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 17, 2022, 12:53:41 PM",
+      "body": "Quote from: BlackHatCoiner on September 17, 2022, 10:26:12 AMIn my example, they're working on a block, without knowing the current block height. In that case, they don't know if the block header they're receiving is malicious or not, unless they run a full node (with the proper mining software).To be fair you need height for many things but you can still check a lot of other things about a block header even without running a full node (like a SPV client that stores list of all headers) and find a malicious header.1) Validating header's work (Full + SPV + no need for height)2) Validating headers's target in difficulty adjustments (Full + SPV + needs height)3) Validating block version (Full + SPV + needs height)4) Validating coinbase script to contain the height (Full + SPV + needs height)5) Validating transactions (Full + needs height)The first step would reject the attack described in the article without needing a full node or even knowing the height. As you can see only the 5th point needs running a full node. Keep in mind that passing the first check means the attacker has actually spent computing power mining that block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 17, 2022, 01:40:18 PM",
+      "body": "Quote from: pooya87 on September 17, 2022, 12:53:41 PMThe first step would reject the attack described in the article without needing a full node or even knowing the height.Your first step demands from the miners to validate the block headers they receive and send, correct? So that if a pool tries to conduct a 51% attack, they can check their last block header, and deny to mine it if it's already been mined. True, there's no direct need for a full node if miners just need to ensure their pool isn't trying to reorg.Quote from: pooya87 on September 17, 2022, 12:53:41 PMKeep in mind that passing the first check means the attacker has actually spent computing power mining that block.Or the miners haven't made the proper setup, and just mine whatever block header their pool broadcasts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 17, 2022, 01:49:43 PM",
+      "body": "Quote from: BlackHatCoiner on September 17, 2022, 01:40:18 PMQuote from: pooya87 on September 17, 2022, 12:53:41 PMKeep in mind that passing the first check means the attacker has actually spent computing power mining that block.Or the miners haven't made the proper setup, and just mine whatever block header their pool broadcasts. In papers like that, 'miner' is synonymous with 'mining pool operator' nowadays. If the 'miner' is the entity deciding which hashPrevBlock to include in the header, it's actually a pool operator.This operator then sends the individual miners block candidates; just a header is not enough, as they don't have their own mempool. They also need to submit shares with the operator's address as the coinbase transaction recipient.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 17, 2022, 04:42:34 PM",
+      "body": "Quote from: n0nce on September 17, 2022, 01:49:43 PMIf the 'miner' is the entity deciding which hashPrevBlock to include in the header, it's actually a pool operator.Yes, the pool operator broadcasts the block header (to the miners' network), but the miners can see themselves at what height they're mining at. All that's needed to avoid building to a malicious chain blindly, is to validate the block headers as said by pooya (or just run a full node). The mining software should allow mining only for lastBlockHeight + 1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 17, 2022, 07:09:43 PM",
+      "body": "Quote from: BlackHatCoiner on September 17, 2022, 04:42:34 PMQuote from: n0nce on September 17, 2022, 01:49:43 PMIf the 'miner' is the entity deciding which hashPrevBlock to include in the header, it's actually a pool operator.Yes, the pool operator broadcasts the block header (to the miners' network), but the miners can see themselves at what height they're mining at. All that's needed to avoid building to a malicious chain blindly, is to validate the block headers as said by pooya (or just run a full node). The mining software should allow mining only for lastBlockHeight + 1. True! Then that's another broken / unrealistic assumption in the paper.The scheme only works if (a) there are only / mostly solo miners, so they can decide to take part in this attack for themselves or (b) pool miners don't check what they mine and therefore don't notice their pool operator trying to collude with an attacker.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mikeywith",
+      "created_time": "September 18, 2022, 02:16:05 AMLast edit: September 18, 2022, 02:27:09 AM by mikeywith",
+      "body": "This attack is an \"improvement\" of an imaginary attack writen by \"Ittay Eyal and Emin G¨un Sirer\" some dozen years ago, which you can read here.Now despite all the equations and the academic wordings you see in there, that attack was never implemented on the network, many research papers were written afterwards explaining how that attack does not work, oddly enough, even \"Fake Satoshi\" published research paper explaining how selfish mining \"doesn't work\" in real life, however, nobody can deny that it's indeed doable at least on papers.But just to clear the confusing about this \"Partial Selfish Mining \" let's first understand what is \"Selfish Mining\" and how does it benefit the attacker at least on theory, so if you are interested please watch this video since it's the simplest explanation I could find > https://www.youtube.com/watch?v=SWKjSEi-9pgNow whether you read the paper or watched the video you have probably seen that number of other miners \"called rational miners in the PSM paper\" is very critical, also since you can't control the latency of other miners, you would want them to purposely accept your blocks even if an orphan race was supposed to be lost to another honest miner.So what this research suggests is that other miners will WILLINGLY join the attacker in order to make more profit, but that puts both the attacker and the \"rational miner\" at risk.1- If the attacker broacasts a full valid block to the rational miner, that miner could just re-brocats it to the network and the attack will be over.2- The attacker can \"claim\" that they found a valid block when in fact they did not, so the rational miner will be at risk of mining on top an invalid block.So this research is trying to arrange this attack in a way that the rational miner can actually confirm the claim of the attacker without the attacker having to give away the complete block.An example with be using a third-party or a sort of a smart contract whereby the attacker has to deposit x amount of BTC which then gets released to the rational miner/s if it turns out that the hash which the attacker sent was invalid, by doing this, the rational miners will comfortably join the attack knowing that they will make more profit working with the attacker than actually being honest.So by applying this method, a few rational miners can join the attacker chain and help build a longer blockchain than the \"real one\", let's say they happen to build 10 blocks ahead and get to block 1010 when the actual chain is still at 1009, the attacker will then broadcast the full blocks and renders the 9 blocks found by honest miners invalid and thus causing them a huge loss.Notice that, even in theory, the attacker and the rational miners do NOT make any more profit only their share of the total profit increases, in fact, their profit could even decrease, but the damage they have to endure is less than the damage that the honest miners have to take, the attacker and the rational miner could easily make the same profit or more by just being honest since this attack requires taking the lead which and being a step ahead of the rest, so even at 50% of the hashrate, if one of the \"rational miners\" decides to go back to the \"honest chain\" the whole the cake will burn and the attackers would lose that race.The whole concept of the original attack or the improved PSM is to make other miners waste money and resources if they decide to be honest, that will either make them shutdown to actually reduce the difficulty, or at least join you so you can have a full control and do all kind of double-spending or transaction censorship, the original attack itself is pretty smart, the improvement is also pretty innovative and I like it.Applying that on the block-chain is also possible, but who will go this far? as long as miners are mining for profit, it's almost guaranteed that nobody would attempt it, unless this shit turns political where governments will be willing to spend billions of dollars to damage BTC these attacks won't go beyond us discussing them here, nonetheless, these improvements in \"theory attacks\" are good for BTC, it helps us think of what to do, if somebody, someday decides to actually attack us.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 18, 2022, 11:10:32 PM",
+      "body": "Quote from: mikeywith on September 18, 2022, 02:16:05 AMNotice that, even in theory, the attacker and the rational miners do NOT make any more profit only their share of the total profit increases, in fact, their profit could even decrease, but the damage they have to endure is less than the damage that the honest miners have to take, the attacker and the rational miner could easily make the same profit or more by just being honest since this attack requires taking the lead which and being a step ahead of the rest, so even at 50% of the hashrate, if one of the \"rational miners\" decides to go back to the \"honest chain\" the whole the cake will burn and the attackers would lose that race.[emphasis mine]That's a good point. In my opinion, selfish mining makes more sense in a pool mining scenario, e.g. to attack a pool by block withholding.In general though, it gets confusing what 'miner' refers to in a lot of academic papers. Sometimes the whole paper makes no sense because of the wrong assumption that solo-miners even exist (in meaningful quantity) anymore.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mikeywith",
+      "created_time": "September 19, 2022, 01:06:09 AM",
+      "body": "Quote from: n0nce on September 18, 2022, 11:10:32 PMIn general though, it gets confusing what 'miner' refers to in a lot of academic papers. Sometimes the whole paper makes no sense because of the wrong assumption that solo-miners even exist (in meaningful quantity) anymore.I personally see nothing wrong with the term \"miner\" knowing that the article is talking about \"pools\" because every mining pool is actually just a large miner, the word pool simply implies miners pooled together, a mining pool according to the whole mining network is just a miner, every pool/miner sees every other miner/pool as a single miner, so really, the word miner makes a lot more sense than the word pool in this context.As for performing the attack on a single pool it actually does not even increase the percentage of the overall payouts a single miner would get, so that attack is used purely to damage pools that pay PPS, and if the pool pays in PPLNS the attacker would just lose profit without any gains, so it makes more sense to deploy the attack on the whole network than just on a single mining pool.The only exception is if the attack was not pure withholding but rather \"Lie in wait\" which given how most mining pools operate today, that attack is near useless.Another attack on mining pools would be using firmware that doesn't find blocks at all, while I don't recall reading any research about it, I know a mining pool that rejects all miners that don't use stock firmware because he is not sure if they are capable of finding blocks, which means whatever the number of blocks the pool finds will always be less than what it was supposed to find based on the total hashrate at 100% luck.Despite that concerns, 99% of mining pools still allow all firmware versions to mine to their pool, even those PPS pools that would end up paying money out of their pockets, it just seems like they have not noticed that they are finding less block that they are supposed to, of course, that does not rule out the possibility that exists a few dozen thousand gears that keep getting paid for work that was never capable of actually hitting a block.See the good thing about POW is that only those who have skin in the game can attempt any type of attack, any attack that fails causes them to lose profit, on the other hand, any attack that succeeds makes whatever they gained and the tools they used to perform the attack worth a lot less, which is why nobody has attempted anything serious, Bitmain for a good while was so close and probably had the chance to perform a 51% attack on the network, but they chose not to, not because they are kind-hearted  (I am sure they are not  ), they just knew that they could gain more by not attacking BTC.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 19, 2022, 01:21:55 PM",
+      "body": "Quote from: mikeywith on September 19, 2022, 01:06:09 AMQuote from: n0nce on September 18, 2022, 11:10:32 PMIn general though, it gets confusing what 'miner' refers to in a lot of academic papers. Sometimes the whole paper makes no sense because of the wrong assumption that solo-miners even exist (in meaningful quantity) anymore.I personally see nothing wrong with the term \"miner\" knowing that the article is talking about \"pools\" because every mining pool is actually just a large miner, the word pool simply implies miners pooled together, a mining pool according to the whole mining network is just a miner, every pool/miner sees every other miner/pool as a single miner, so really, the word miner makes a lot more sense than the word pool in this context.I know where you're coming from, but in today's day and age, people think of 'miner' as the individual connecting to a pool operator.Quote from: mikeywith on September 19, 2022, 01:06:09 AMAs for performing the attack on a single pool it actually does not even increase the percentage of the overall payouts a single miner would get, so that attack is used purely to damage pools that pay PPS, and if the pool pays in PPLNS the attacker would just lose profit without any gains, so it makes more sense to deploy the attack on the whole network than just on a single mining pool.The only exception is if the attack was not pure withholding but rather \"Lie in wait\" which given how most mining pools operate today, that attack is near useless.I believe these attacks were once proposed to attack competing pools, but yes, in reality land they're all pretty unlikely / irrational to attempt.Quote from: mikeywith on September 19, 2022, 01:06:09 AMAnother attack on mining pools would be using firmware that doesn't find blocks at all, while I don't recall reading any research about it, I know a mining pool that rejects all miners that don't use stock firmware because he is not sure if they are capable of finding blocks, which means whatever the number of blocks the pool finds will always be less than what it was supposed to find based on the total hashrate at 100% luck.Wow, that's actually interesting. So this is to prevent miners purposefully trying to attack a pool?Do you know how exactly they check firmware integrity?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

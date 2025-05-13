@@ -1,0 +1,165 @@
+{
+  "id": "topic_5473802",
+  "title": "igor72",
+  "author": "igor72",
+  "created_time": "November 12, 2023, 12:46:39 PMLast edit: November 12, 2023, 01:32:52 PM by igor72",
+  "content": "Today I discovered that Electrum is capable of signing transactions with an alternative sighash flag (I tried SIGHASH_NONE) without notifying me in any way. In my opinion, this opens up the possibility of stealing money even when using a cold storage. Am I wrong?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5473802",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 12, 2023, 01:02:58 PM",
+      "body": "Which version did you use? I just created a transaction in 4.3.2 and by default it has SIGHASH_ALL. It shouldn't have SIGHASH_NONE, unless you've specified it. It goes beyond cold storage, the miner can simply change the outputs of your transaction and replace them with their, essentially taking all of your inputs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 12, 2023, 01:20:57 PMLast edit: November 12, 2023, 01:33:11 PM by igor72",
+      "body": "Quote from: BlackHatCoiner on November 12, 2023, 01:02:58 PMWhich version did you use? I just created a transaction in 4.3.2 and by default it has SIGHASH_ALL.I'm sorry, I misspoke. I meant to say that Electrum is capable of signing a transaction with SIGHASH_NONE without any notification.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "November 12, 2023, 01:47:10 PM",
+      "body": "Quote from: igor72 on November 12, 2023, 01:20:57 PMI'm sorry, I misspoke. I meant to say that Electrum is capable of signing a transaction with SIGHASH_NONE without any notification. What do you mean by \"without any notification\" you mean Electrum does not give you a notification about your transaction if it was sent or got confirmed?How did you change the hashtype of the transaction on Electrum? I can't seem to find where you change the hashtype in Electrum. By default it uses SIGHASH_ALL read the wiki below for an explanation.-  https://en.bitcoin.it/wiki/OP_CHECKSIG#Hashtype_SIGHASH_NONEMore explanation here https://bitcoin.stackexchange.com/questions/4213/what-is-the-point-of-sighash-none",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 12, 2023, 02:09:26 PM",
+      "body": "Quote from: BitMaxz on November 12, 2023, 01:47:10 PMWhat do you mean by \"without any notification\" you mean Electrum does not give you a notification about your transaction if it was sent or got confirmed?There is no notification that sighash is not the default SIGHASH_ALL.QuoteHow did you change the hashtype of the transaction on Electrum? I can't seem to find where you change the hashtype in Electrum.I created the transaction in Sparrow and signed in Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 12, 2023, 02:29:46 PM",
+      "body": "I've just been testing this locally on testnet, and igor72 is absolutely right.Although an unsigned raw transaction does not contain any information about the SIGHASH, if you export the transaction from Sparrow as a .psbt and then import it to Electrum, then whatever SIGHASH you have selected in Sparrow will be preserved and Electrum will sign the transaction with no warning or notification otherwise.And indeed, once you import that signed transaction back in to Sparrow, Sparrow also does not give any indication of which SIGHASH type(s) was used. The only way to know for sure in this scenario is to examine the transaction data yourself and to know what you are looking for. This does seem like a potential attack method to me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 12, 2023, 04:49:01 PM",
+      "body": "Quote from: o_e_l_e_o on November 12, 2023, 02:29:46 PMI've just been testing this locally on testnet, and igor72 is absolutely right.Thanks. I hope someone from the Electrum developers will notice this thread.BTW multisig wallets can be vulnerable as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "November 12, 2023, 10:33:21 PM",
+      "body": "Quote from: igor72 on November 12, 2023, 04:49:01 PMThanks. I hope someone from the Electrum developers will notice this thread.You might wanna create a new issue on their official Github about this \"bug\". Thats where you will probably get the most attention from the developers.Make sure that you go into quite a lot of detail on the subject otherwise they tend to be overlooked.  I would otherwise also like to report this but I don't want to decorate myself with the feathers of others and after all - you noticed that bug.If you don't have the time or the courage, thats another matter ofc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 14, 2023, 05:15:02 AM",
+      "body": "Quote from: igor72 on November 12, 2023, 02:09:26 PMI created the transaction in Sparrow and signed in Electrum.The import transaction feature is mainly there to be used with another Electrum instance (hot/cold wallet duo) which won't use other sighash types by default, you'll have to use an advanced feature through the console which means you already know what you're doing and there is no need for additional warning. If you are using another tool to create and/or sign a transaction then it should also be assumed that you already know what you are doing and most importantly that you know what the risks of using that tool are. For example that other tool could be sending your coins to someone else's address or be setting the fee too high, etc.In any case I'm for showing a notification when an uncommon sighash type is used regardless of whether it is risky or not. That way the warning/notification is simpler to implement.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 14, 2023, 07:30:45 AM",
+      "body": "Quote from: pooya87 on November 14, 2023, 05:15:02 AMYou're right, but that's not the point. A malware can change this flag on a hot computer and the user will not notice it when signing the transaction, that's the danger.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 14, 2023, 07:39:55 AM",
+      "body": "Quote from: igor72 on November 14, 2023, 07:30:45 AMYou're right, but that's not the point. A malware can change this flag on a hot computer and the user will not notice it when signing the transaction, that's the danger.A malware can do a host variety of things on a hot computer, from installing keyloggers and replacing your destinations with theirs, to seeming like signing your own transaction but when choosing to broadcast, signing and broadcasting theirs. They can even alter the cryptographic libraries so that it seems you are signing and broadcasting your own, and indeed it is true from a blockchain perspective, but they will know how to work out your private key afterwards.The last thing a malware will do is choose to give the coins to a miner by using SIGHASH_NONE.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 14, 2023, 07:52:14 AM",
+      "body": "Quote from: BlackHatCoiner on November 14, 2023, 07:39:55 AMA malware can do a host variety of things on a hot computer, from installing keyloggers and replacing your destinations with theirs, to seeming like signing your own transaction but when choosing to broadcast, signing and broadcasting theirs. They can even alter the cryptographic libraries so that it seems you are signing and broadcasting your own, and indeed it is true from a blockchain perspective, but they will know how to work out your private key afterwards.This is all useless if the transaction is verified and signed on cold Electrum.QuoteThe last thing a malware will do is choose to give the coins to a miner by using SIGHASH_NONE.Yes, but first the attacker will try to modify the transaction in the hope that the miner won't notice the sighash_none.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 14, 2023, 08:02:31 AM",
+      "body": "Quote from: igor72 on November 14, 2023, 07:52:14 AMThis is all useless if the transaction is verified and signed on cold Electrum.I see what you mean. So your problem is to verify of whether the \"hot Electrum\" is modified to insert SIGHASH_NONE. What if instead of creating the transaction there, you just copied the destinations and the payout amounts, and created the transaction in your airgapped device? That way, a malware can't have compromised your transaction anyhow unnoticed.You can also just install a software that checks for your transaction's SIGHASH like Sparrow.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 14, 2023, 08:14:58 AM",
+      "body": "Quote from: BlackHatCoiner on November 14, 2023, 08:02:31 AMI see what you mean. So your problem is to verify of whether the \"hot Electrum\" is modified to insert SIGHASH_NONE. What if instead of creating the transaction there, you just copied the destinations and the payout amounts, and created the transaction in your airgapped device? That way, a malware can't have compromised your transaction anyhow unnoticed.You can also just install a software that checks for your transaction's SIGHASH like Sparrow.Yes.You can also just find the sighash byte in the raw transaction after the signature, it should be 01, not 02 or some other. But it is better that Electrum does it, not the user.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 14, 2023, 11:05:55 AM",
+      "body": "Quote from: BlackHatCoiner on November 14, 2023, 08:02:31 AMWhat if instead of creating the transaction there, you just copied the destinations and the payout amounts, and created the transaction in your airgapped device?That becomes far more clunky and time consuming, as well as error prone. Since the airgapped wallet does not know anything about which inputs to be used, then you will also need to copy across individual inputs and then manually craft your transaction since I don't know of any airgapped wallet which allows you to import individual inputs.Quote from: BlackHatCoiner on November 14, 2023, 08:02:31 AMYou can also just install a software that checks for your transaction's SIGHASH like Sparrow.As I said above, although Sparrow lets you chose a different SIGHASH to use, it doesn't actually show you which SIGHASHes were used once the transaction has been created. So importing a signed transaction to Sparrow instead of Electrum does not solve this issue. The only way to know for sure at the moment is to manually examine the transaction data and check it uses 0x01 for SIGHASH_ALL on each input.It would be a fairly simple change for the preview transaction screen on either wallet to display the SIGHASH type for each input next to that input.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 14, 2023, 12:02:43 PMLast edit: November 14, 2023, 12:16:12 PM by BlackHatCoiner",
+      "body": "Quote from: o_e_l_e_o on November 14, 2023, 11:05:55 AMSince the airgapped wallet does not know anything about which inputs to be used, then you will also need to copy across individual inputs and then manually craft your transaction since I don't know of any airgapped wallet which allows you to import individual inputs.Indeed. You cannot import inputs in known wallet software via airgapped means (i.e., QR code). You can only sign unsigned transactions. Quote from: o_e_l_e_o on November 14, 2023, 11:05:55 AMAs I said above, although Sparrow lets you chose a different SIGHASH to use, it doesn't actually show you which SIGHASHes were used once the transaction has been created. Sparrow doesn't show you which SIGHASHes are used in a signed transaction, but it does show that information if you import an unsigned transaction. So, a solution would be to install Sparrow on your airgapped device, and before you sign a transaction, you can open it up with Sparrow to check. Although, I do agree that simply displaying the SIGHASH in the preview is fairly simple and informative. Edit: Sparrow does not show that sort of information for unsigned tx either. It is still better than Electrum to spot the 01 byte, which is the last byte of your input witness data. Has anyone reported this on either Electrum's or Sparrow's repo?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 14, 2023, 12:51:09 PM",
+      "body": "Quote from: BlackHatCoiner on November 14, 2023, 12:02:43 PMHas anyone reported this on either Electrum's or Sparrow's repo?I reported.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "November 14, 2023, 04:23:47 PM",
+      "body": "Quote from: igor72 on November 12, 2023, 12:46:39 PM~Nice catch!To check the response of  Passport 2 I have created (with Sparrow)  the testnet transaction, setting Sighash flag  to None and tried to sign it via QR. Passport has read QR but refused to sign transaction flagged as SIGHASH_NONE  :Quote from: satscraperI should say, Passport 2 , done wisely.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "igor72",
+      "created_time": "November 14, 2023, 04:45:45 PM",
+      "body": "Quote from: satscraper on November 14, 2023, 04:23:47 PMNice catch!To check the response of  Passport 2 I have created (with Sparrow)  the testnet transaction, setting Sighash flag  to None and tried to sign it via QR. Passport has read QR but refused to sign transaction flagged as SIGHASH_NONEThat's fine, but there should be an option somewhere in settings to enable signing of such transactions. Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "November 14, 2023, 06:32:06 PMLast edit: November 14, 2023, 07:08:23 PM by satscraper",
+      "body": "Quote from: igor72 on November 14, 2023, 04:45:45 PMQuote from: satscraper on November 14, 2023, 04:23:47 PMNice catch!To check the response of  Passport 2 I have created (with Sparrow)  the testnet transaction, setting Sighash flag  to None and tried to sign it via QR. Passport has read QR but refused to sign transaction flagged as SIGHASH_NONEThat's fine, but there should be an option somewhere in settings to enable signing of such transactions. Thanks!It seems I have perused all available menu's opts , but didn't find the relevant one. I doubt whether I would ever need to sign transaction with  SIGHASH flags other than SIGHASH_ALL. However, out of curiosity (both mine and yours) I've put the pertaining question in the official foundationdevices thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

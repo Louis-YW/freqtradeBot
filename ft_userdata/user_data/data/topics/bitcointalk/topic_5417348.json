@@ -1,0 +1,101 @@
+{
+  "id": "topic_5417348",
+  "title": "BTCapsule",
+  "author": "BTCapsule",
+  "created_time": "October 16, 2022, 11:17:04 PMLast edit: October 19, 2022, 11:47:28 AM by BTCapsule",
+  "content": "I’m sorry to create another post, but this is a significant upgrade. BTCapsule is an open source Bitcoin time capsule for your private keys. I have been listening to the community, and I really think I have addressed all issues with the previous version. BTCapsule now uses Bitcoin Core’s 'mediantime' to log the year from Bitcoin’s timestamp and decrypt your private keys. This actually solved two problems. Not only does BTCapsule use the only fully decentralized clock straight from the Bitcoin blockchain, but it also means BTCapsule never has to use the internet. This is not an API call to a centralized block explorer website. You can install Bitcoin Core, download the blockchain, and check the date offline. I have also made BTCapsule free to download. If you find value in BTCapsule, please consider donating some sats on my website. I still have a lot to do; like port BTCapsule to Linux, work on the UI, and clean up the code. I also want to throw it out there that I would love to work in the Bitcoin industry if anyone is hiring. My style is dirtier than fiat money, but I will hack away at a problem until it’s solved.You can view the source code here:https://github.com/BTCapsule/BTCapsuleAnd to download BTCapsule that’s been converted to C and compiled to an .exe, please visit my website:https://btcapsule.comUpdate 10/19/22Linux version has been temporarily removed",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417348",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "October 17, 2022, 07:38:36 AMLast edit: October 17, 2022, 02:28:12 PM by LoyceV",
+      "body": "I don't know much about python, but saw this:Code:   bitcoin = AuthServiceProxy(\"http://%s:%s@127.0.0.1:8332\"%(\"user\",\"pass\"))   info = bitcoin.getblockchaininfo()   date = info['mediantime']If this does what I think it does, it's just as easy to fake as a time server: the user can simply fake a date on local port 8332.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 17, 2022, 08:46:24 AM",
+      "body": "Quote from: LoyceV on October 17, 2022, 07:38:36 AMI don't know much about python, but saw this:Code:   bitcoin = AuthServiceProxy(\"http://%s:%s@127.0.0.1:8332\"%(\"user\",\"pass\"))   info = bitcoin.getblockchaininfo()   date = info['mediantime']If this does what I think it does, it just as easy to fake as a time server: the user can simply fake a date on local port 8332.They'd have to emulate a full JSON-RPC service on port 8332 with all Bitcoin Core methods - the JSON-RPC implementation used in Core allows someone to HTTP GET the root \"/\" and it returns a list of implemented methods. If none of these work of if any of them are missing, then it can be concluded that the service is a fake.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "FatFork",
+      "created_time": "October 17, 2022, 10:29:24 AM",
+      "body": "OP, I think you're overlooking some important facts about basic network security. Simple TCP/IP wasn't designed with security in mind, and will always be susceptible to man-in-the-middle attacks unless the data being transmitted is properly encrypted. As DaveF said in your other thread: \"Anything that at any time needs an outside service that is an open standard is never going to be secure.\" For example, you can use packet-sniffing programs like Wireshark to capture, modify and re-send every packet that comes in and out of your application.By the way, I think it would be better if you keep the discussion in one thread so that we can keep track of each other's comments.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 17, 2022, 12:11:28 PM",
+      "body": "It's going in a good direction and it's a work in progress so he can keep updating it as we give more suggestions. EVERYTHING is going to have some sort of vulnerabilities so long as they are being addressed as they are discussed.The point of doing it this way seems to be the fact that you can download core, disconnect from the net and have a bit more security.Not 100% perfect, but getting better. It boils down to what I said and you commented on about TCP/IP and services.But, it also gets back to having a hardware wallet and PIN is vulnerable to the $5 wrench. ($6 wrench with inflation)-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 17, 2022, 01:08:24 PM",
+      "body": "Quote from: FatFork on October 17, 2022, 10:29:24 AMOP, I think you're overlooking some important facts about basic network security. Simple TCP/IP wasn't designed with security in mind, and will always be susceptible to man-in-the-middle attacks unless the data being transmitted is properly encrypted. Speaking of encryption, this app should make a self-signed certificate to connect to a backend service of its own. Of course, this will require a domain name, but you could try setting an entry in the hosts file of the computer hosting the service, and then listen on 0.0.0.0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "October 17, 2022, 07:57:51 PM",
+      "body": "Quote from: BTCapsule on October 16, 2022, 11:17:04 PMI’m sorry to create another post, but this is a significant upgrade. This is your third topic about exact same thing and it was not needed at all.I appreciate you are working on this project, going open source and giving it for free, but there is still a problem I initially wrote..someone can fake the data and abuse your program, and he doesn't even have to be super-duper hacker at all to do this.I am not saying your idea is bad, but you need to rewrite everything from scratch and use some different method of calculating time, maybe by using multiple sources of information.This is not easy problem to solve, but I think you are going in right direction, so maybe try asking suggestion and opinion from known bitcoin security experts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "October 17, 2022, 08:36:25 PMLast edit: October 17, 2022, 09:51:48 PM by Mr. Big",
+      "body": "Quote from: LoyceV on October 17, 2022, 07:38:36 AMI don't know much about python, but saw this:Code:   bitcoin = AuthServiceProxy(\"http://%s:%s@127.0.0.1:8332\"%(\"user\",\"pass\"))   info = bitcoin.getblockchaininfo()   date = info['mediantime']If this does what I think it does, it's just as easy to fake as a time server: the user can simply fake a date on local port 8332.I previously setup a fake local time server, and was able to hack the program when requesting the time from Google’s time servers. I can confirm that this hack no longer works.BTCapsule is pulling the mediantime from Bitcoin Core. I’m sure you know this already, but this is the accepted timestamp compared to the previous 11 blocks. It’s written in Unix time and BTCapsule converts it to ISO format.https://en.bitcoin.it/wiki/Block_timestampIn order to hack the time, you would have to do what NotATether mentioned, as well as fake some blocks to get the mediantime. I would assume you need a lot more than 11 fake blocks for RPC to check, but this is well outside of my hacking knowledge.Quote from: ETFbitcoin on October 17, 2022, 09:05:18 AMBased on discussion on other thread[1], IMO you take wrong approach. When your target isn't technical or power user, you shouldn't ask them to install and configure Bitcoin Core manually. If you want to utilize median time on Bitcoin network, there are another approach such as connecting to several Bitcoin node, ask for recent block header and verify received block headers. [1] https://bitcointalk.org/index.php?topic=5417145.msg61133095#msg61133095I’m not really sure how to connect to other nodes and receive information without Bitcoin Core. I think the steps to use BTCapsule are simple enough. They might have to wait a few days for Bitcoin Core to download to see the private keys, but it would be worth it.The directions are:1. Install Bitcoin Core2. Choose Settings>Options>Open Configuration File3. Add rpcuser=user rpcpassword=pass to configuration file and save4. Wait for blockchain to download and view the keysWith the option to prune the blockchain, this shouldn’t be an inconvenience at all.Quote from: FatFork on October 17, 2022, 10:29:24 AMOP, I think you're overlooking some important facts about basic network security. Simple TCP/IP wasn't designed with security in mind, and will always be susceptible to man-in-the-middle attacks unless the data being transmitted is properly encrypted. As DaveF said in your other thread: \"Anything that at any time needs an outside service that is an open standard is never going to be secure.\" For example, you can use packet-sniffing programs like Wireshark to capture, modify and re-send every packet that comes in and out of your application.By the way, I think it would be better if you keep the discussion in one thread so that we can keep track of each other's comments.Can Wireshark be used to capture information that is being sent within localhost without the internet enabled? The only thing being sent is the mediantime of the blocks from Bitcoin Core, and these are installed locally.Also, this will be my last thread about BTCapsule. I will post all updates here. Changing the method of receiving the year was huge, and it’s my final attempt. Anything else will just be small upgrades.Quote from: DaveF on October 17, 2022, 12:11:28 PMIt's going in a good direction and it's a work in progress so he can keep updating it as we give more suggestions. EVERYTHING is going to have some sort of vulnerabilities so long as they are being addressed as they are discussed.The point of doing it this way seems to be the fact that you can download core, disconnect from the net and have a bit more security.Not 100% perfect, but getting better. It boils down to what I said and you commented on about TCP/IP and services.But, it also gets back to having a hardware wallet and PIN is vulnerable to the $5 wrench. ($6 wrench with inflation)-DaveThanks for the encouragement. I’m working on porting BTCapsule to Linux so that the private keys can be entered and decrypted with a temporary Linux OS that can be deleted afterwards.I looked into the $5 wrench, and it seems the only known protection is multi-sig. BTCapsule is not a wallet, and anything can be typed into the private keys sections. If someone has three children, they could copy BTCapsule to three separate flash drives, type a different private key into each, and then require all the children to decrypt the keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "October 18, 2022, 01:53:29 PM",
+      "body": "Quote from: ETFbitcoin on October 18, 2022, 08:23:22 AMQuote from: BTCapsule on October 17, 2022, 08:36:25 PMQuote from: ETFbitcoin on October 17, 2022, 09:05:18 AMBased on discussion on other thread[1], IMO you take wrong approach. When your target isn't technical or power user, you shouldn't ask them to install and configure Bitcoin Core manually. If you want to utilize median time on Bitcoin network, there are another approach such as connecting to several Bitcoin node, ask for recent block header and verify received block headers. [1] https://bitcointalk.org/index.php?topic=5417145.msg61133095#msg61133095I’m not really sure how to connect to other nodes and receive information without Bitcoin Core.In short, you utilize P2P communication protocol[1] and implement SPV/basic verification functionally[2]. But honestly it's more complex compared by connecting to Bitcoin Core through JSON-RPC.Quote from: BTCapsule on October 17, 2022, 08:36:25 PMI think the steps to use BTCapsule are simple enough. They might have to wait a few days for Bitcoin Core to download to see the private keys, but it would be worth it.The directions are:1. Install Bitcoin Core2. Choose Settings>Options>Open Configuration File3. Add rpcuser=user rpcpassword=pass to configuration file and save4. Wait for blockchain to download and view the keysWith the option to prune the blockchain, this shouldn’t be an inconvenience at all.As i said, it depends on your customer target. People with bare minimum technology literacy will experience some difficutly. And talking about pruned node, do not forget that pruned node still download whole blockchain (with current size 432.91GB[3]). If they have slow hardware or internet, it could take weeks.[1] https://developer.bitcoin.org/devguide/p2p_network.html[2] https://en.bitcoin.it/wiki/Thin_Client_Security[3] https://blockchair.com/bitcoinI will look into this some more. Anything to make BTCapsule easier to use is great. I think the program works just fine though, and I feel like it’s extra secure with the new Linux version. I realize it will be annoying to wait for Bitcoin Core to download, but if you get a whole Bitcoin out of it, then it’s got to be worth the wait.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "October 18, 2022, 03:46:14 PM",
+      "body": "Quote from: ETFbitcoin on October 18, 2022, 08:23:22 AMAnd talking about pruned node, do not forget that pruned node still download whole blockchain (with current size 432.91GB[3]). If they have slow hardware or internet, it could take weeks.I don't know how BTCapsule works with this, but last time I checked pruned node for Bitcoin was around 5.1 Gb in size, that is significantly less than full blockchain that is around 86 times bigger.https://prunednode.today/Quote from: BTCapsule on October 18, 2022, 01:53:29 PMI will look into this some more. Anything to make BTCapsule easier to use is great. I think the program works just fine though, and I feel like it’s extra secure with the new Linux version. I realize it will be annoying to wait for Bitcoin Core to download, but if you get a whole Bitcoin out of it, then it’s got to be worth the wait.Is there any difference in security of BTCapsule runing on Linux and wInD0ws operating system?There are significant number of people who are using MacOS (maybe higher than Linux), so it would be good if you could add BTCCapsule software for MacOS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "October 18, 2022, 09:22:18 PM",
+      "body": "Quote from: dkbit98 on October 18, 2022, 03:46:14 PMIs there any difference in security of BTCapsule runing on Linux and wInD0ws operating system?There are significant number of people who are using MacOS (maybe higher than Linux), so it would be good if you could add BTCCapsule software for MacOS.I updated the OP to explain the difference in security. There’s not really a security difference, but since Linux is free, it’s much easier to dual-boot and destroy the OS. Sorry, I’m trying not to repeat myself because I keep getting messages from the mods and they have to edit my posts.I’m working on a macOS version. It hopefully won’t take too long. I’m building all these ports in virtual machines, so it probably won’t work for Apple’s M chips until I can afford a new MacBook.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 19, 2022, 12:31:28 PM",
+      "body": "Quote from: BTCapsule on October 17, 2022, 08:36:25 PMQuote from: LoyceV on October 17, 2022, 07:38:36 AMI don't know much about python, but saw this:Code:   bitcoin = AuthServiceProxy(\"http://%s:%s@127.0.0.1:8332\"%(\"user\",\"pass\"))   info = bitcoin.getblockchaininfo()   date = info['mediantime']If this does what I think it does, it's just as easy to fake as a time server: the user can simply fake a date on local port 8332.[...]In order to hack the time, you would have to do what NotATether mentioned, as well as fake some blocks to get the mediantime. I would assume you need a lot more than 11 fake blocks for RPC to check, but this is well outside of my hacking knowledge.I don't think that's accurate. LoyceV is right.Checking whether all RPC methods exist is a pretty weak method to detect a modified bitcoind; besides the fact that it's not too hard to do what I did here or actually, ETFBitcoin's RPC-capable implementation here for all RPC calls, you may not even need that. You could whip up a script that tunnels all RPC calls to the real bitcoind running locally, without modifications, except for the blockchaininfo call. That command's result will be altered before being forwarded to your software, to display a different timestamp.No need to mess with any blockchain files; just intercept the result and alter it as needed.Structure:Code:┌────────────────────┐│Bitcoin Core on 8338││ (modified port)    │└────────────────────┘   ▲   │   ▼┌─────────────────────┐│Custom script on 8332│└─────────────────────┘   ▲   │   ▼┌─────────┐│BTCapsule│└─────────┘Is there anything stopping me from modifying Bitcoin Core's RPC port and writing the small script in the middle?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

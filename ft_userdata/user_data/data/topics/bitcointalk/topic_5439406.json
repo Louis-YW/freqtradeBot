@@ -1,0 +1,29 @@
+{
+  "id": "topic_5439406",
+  "title": "lisa6336",
+  "author": "lisa6336",
+  "created_time": "February 11, 2023, 12:54:41 AM",
+  "content": "salut les amis, j'ai vraiment besoin d'aideje recherche comme réponse ce checksum 9ed6e860 pour ma wallet 1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7j'ai essayer avec mon script mais ca ne me donne pas du tout la même chose dites moi où est le problème et aidez moi à modifier le script en question,import hashlibdef get_btc_checksum(address):    \"\"\"    Compute the checksum of a Bitcoin address.    Args:    - address (str): The Bitcoin address.    Returns:    - str: The checksum of the Bitcoin address.    \"\"\"    address = address.lower().encode('utf-8')    sha256_hash = hashlib.sha256(address).hexdigest()    ripe160_hash = hashlib.new('ripemd160', sha256_hash.encode('utf-8')).hexdigest()    checksum = ''    for i in range(len(ripe160_hash)):        if ripe160_hash in '123456789abcdef':            checksum += ripe160_hash        else:            checksum += str(ord(ripe160_hash))    return checksumbtc_address = '1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7'print('The checksum of the address', btc_address, 'is:', get_btc_checksum(btc_address))",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5439406",
+  "comments": [
+    {
+      "author": "Husires",
+      "created_time": "February 14, 2023, 12:57:52 PM",
+      "body": "Que recherchez-vous exactement, du code Python ou un débogage de ce que vous essayez de faire ? La meilleure façon de comprendre ce qui se passe peut être trouvée via ce lien  https://gobittest.appspot.com/AddressBase58Check encodingCode: code_string = \"\"   x = convert_bytes_to_big_integer(hash_result)      output_string = \"\"      while(x > 0)        {           (x, remainder) = divide(x, 58)           output_string.append(code_string[remainder])       }      repeat(number_of_leading_zero_bytes_in_hash)       {       output_string.append(code_string[0]);       }      output_string.reverse();",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "February 14, 2023, 07:18:07 PMLast edit: February 14, 2023, 09:25:35 PM by Saint-loup",
+      "body": "Quote from: lisa6336 on February 11, 2023, 12:54:41 AMsalut les amis, j'ai vraiment besoin d'aideje recherche comme réponse ce checksum 9ed6e860 pour ma wallet 1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7j'ai essayer avec mon script mais ca ne me donne pas du tout la même chose dites moi où est le problème et aidez moi à modifier le script en question,import hashlibdef get_btc_checksum(address):    \"\"\"    Compute the checksum of a Bitcoin address.    Args:    - address (str): The Bitcoin address.    Returns:    - str: The checksum of the Bitcoin address.    \"\"\"    address = address.lower().encode('utf-8')    sha256_hash = hashlib.sha256(address).hexdigest()    ripe160_hash = hashlib.new('ripemd160', sha256_hash.encode('utf-8')).hexdigest()    checksum = ''    for i in range(len(ripe160_hash)):        if ripe160_hash[i] in '123456789abcdef':            checksum += ripe160_hash[i]        else:            checksum += str(ord(ripe160_hash[i]))    return checksumbtc_address = '1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7'print('The checksum of the address', btc_address, 'is:', get_btc_checksum(btc_address))Tu es sûr de ton checksum pour commencer?Car Bitcoin eXplorer ne me donne pas la meme valeur :$ bx base58check-decode 1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7> wrapper{    checksum 576710249    payload b05fea8c3768f8fbb48f9c778bb36b91334cf7a1    version 0}soit 225fe669 en hexadecimal (69e65f22)$ bx base58-decode 1H5aq8vssj9fCKdw2mYEn8enzpUMEBsUZ7> 00b05fea8c3768f8fbb48f9c778bb36b91334cf7a169e65f22Ensuite quel algorithme suis-tu exactement? C'est toi qui l'as inventé/déduit toute seule?Ce n'est pas du tout comme cela qu'est calculé le checksum selon https://en.bitcoin.it/wiki/Technical_background_of_version_1_Bitcoin_addresseset Mastering Bitcoin https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch04.asciidoc#base58-and-base58check-encodingToi tu essayes juste d'additionner entre eux(mais visiblement tu les concatènes en fait) les chiffres de ripe160_hash d'après ce que je crois comprendre.Mais le checksum n'est juste qu'un hash en réalité (un sha256 d'un sha256) dont on prend les 4 premiers octets. QuoteTo convert data (a number) into a Base58Check format, we first add a prefix to the data, called the \"version byte,\" which serves to easily identify the type of data that is encoded. For example, in the case of a Bitcoin address the prefix is zero (0x00 in hex), whereas the prefix used when encoding a private key is 128 (0x80 in hex). A list of common version prefixes is shown in Base58Check version prefix and encoded result examples.Next, we compute the \"double-SHA\" checksum, meaning we apply the SHA256 hash-algorithm twice on the previous result (prefix and data):checksum = SHA256(SHA256(prefix+data))From the resulting 32-byte hash (hash-of-a-hash), we take only the first four bytes. These four bytes serve as the error-checking code, or checksum. The checksum is concatenated (appended) to the end.The result is composed of three items: a prefix, the data, and a checksum. This result is encoded using the Base58 alphabet described previously. Base58Check encoding: a Base58, versioned, and checksummed format for unambiguously encoding bitcoin data illustrates the Base58Check encoding process.https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch04.asciidoc#base58-and-base58check-encodingPS : utilise [nobbc] ou [code] comme Husires pour montrer ton code parce que des éléments disparaissent sinon, comme [i] qui sert à mettre en italique en BBcode, par exemple ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

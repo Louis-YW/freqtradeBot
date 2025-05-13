@@ -1,0 +1,69 @@
+{
+  "id": "topic_5403934",
+  "title": "Coin-Keeper",
+  "author": "Coin-Keeper",
+  "created_time": "June 24, 2022, 05:52:57 PMLast edit: June 24, 2022, 06:02:59 PM by Coin-Keeper",
+  "content": "Guys, this is not my first rodeo with Trezors.  Created a new Debian 11 system.  My Trezor is working perfectly using Suite or Electrum 4.2.2.  Flawlessly in fact.I like to use trezorctl to enhance security features ---- wipe PIN, SD support, etc....I installed trezorctl as noted below:-----------------------------------------------------------------https://wiki.trezor.io/Using_trezorctl_commands_with_Trezorinstall trezorctl from scratch debian:1. sudo apt update && sudo apt install -y python3-pip python3-dev libusb-1.0-0-dev libudev-dev2. pip3 install setuptools wheel3. pip3 install trezor  #Update your $PATH by running4. source .profile  #setup Udev rules:5.  install https://data.trezor.io/udev/trezor-udev_2_all.deb    #update your Python-trezor version run:6. pip3 install -U trezor     ---------------------------------------------------------------------------------I watched the install and the wheel being built it was all successfully completed.  I figured good to go because I have built several of these.  I connect my Trezor enter my PIN and open a terminal to start entering trezorctl commands.  NO GO.First a basic handshake type command to make sure its connected:XXX@Debian:~$ trezorctl get-featuresbash: trezorctl: command not foundXXX@Debian:~$ Brain dead today.  Any suggestions for how to run this down?  Repeating I watched the install and build it was good to go.Edit:  I don't remember running the aforementioned source command in the past.  Wondering if something is on a path out of the norm for some reason.  Just my initial thought.  Re-pasting below#Update your $PATH by runningsource .profile",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403934",
+  "comments": [
+    {
+      "author": "Coin-Keeper",
+      "created_time": "June 24, 2022, 08:45:04 PM",
+      "body": "fyi,  I restored the deb 11 system back to start with a forensic backup I made.  Then I repeated the trezorctl install process WITHOUT using the \"path\" command this time.  NO change.  still same result. bash: trezorctl: command not found",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 24, 2022, 09:00:57 PMLast edit: June 24, 2022, 09:11:42 PM by vv181",
+      "body": "Code: (pip install trezor)  WARNING: The script trezorctl is installed in '/home/<user>/.local/bin' which is not on PATH.  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.Check your  /home/<user>/.local/bin folder, does trezorctl exist?If it does. Your environment path hasn't yet been set up correctly.Do modify the ~/.profile file, add below code to the bottom of it.Code:export PATH=\"$HOME/.local/bin:$PATH\"Then do $ source ~/.profileEDIT:Quote from: Coin-Keeper on June 24, 2022, 08:45:04 PMThen I repeated the trezorctl install process WITHOUT using the \"path\" command this time.You can run \"source ~/.profile\" first, if it doesn't work, try to follow the above steps.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coin-Keeper",
+      "created_time": "June 24, 2022, 11:06:45 PM",
+      "body": "Thank you for trying to help me with this!!Quote from: vv181 on June 24, 2022, 09:00:57 PMCode: (pip install trezor)  WARNING: The script trezorctl is installed in '/home/<user>/.local/bin' which is not on PATH.  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.Check your  /home/<user>/.local/bin folder, does trezorctl exist?If it does. Your environment path hasn't yet been set up correctly.Do modify the ~/.profile file, add below code to the bottom of it.Code:export PATH=\"$HOME/.local/bin:$PATH\"Then do $ source ~/.profileEDIT:Quote from: Coin-Keeper on June 24, 2022, 08:45:04 PMThen I repeated the trezorctl install process WITHOUT using the \"path\" command this time.You can run \"source ~/.profile\" first, if it doesn't work, try to follow the above steps.We/YOU are on the right track.  That is the exact location where the trezorctl file was sent during install.  I modify'd the ~/.profile as you mentioned but NO joy even after a few reboots.  Paste below:# ~/.profile: executed by the command interpreter for login shells.# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login# exists.# see /usr/share/doc/bash/examples/startup-files for examples.# the files are located in the bash-doc package.# the default umask is set in /etc/profile; for setting the umask# for ssh logins, install and configure the libpam-umask package.#umask 022# if running bashif [ -n \"$BASH_VERSION\" ]; then    # include .bashrc if it exists    if [ -f \"$HOME/.bashrc\" ]; then   . \"$HOME/.bashrc\"    fifi# set PATH so it includes user's private bin if it existsif [ -d \"$HOME/bin\" ] ; then    PATH=\"$HOME/bin:$PATH\"fiexport PATH=\"$HOME/.local/bin:$PATH\"------------------------------------Note from warning in ~/.profile text:# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login# exists.I did confirm using a sudo terminal with gedit that neither of these two files exist on my machine!I have been doing some reading and Deb 11 is a pain with permanant PATH, at least its handing me mine today,LOLI am going to keep working at this but had a few thoughts/questions??Is it possible to do a \"move\" command for trezorctl that won't break the system?  No FrankenDebian!If I delete trezorctl could I create a command line during install to place it in a location/PATH of my choosing??I don't mind experimenting at all.  I have reliable forensic images and I can restore to perfect in 40 minutes every time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 25, 2022, 01:01:21 AM",
+      "body": "Quote from: Coin-Keeper on June 24, 2022, 11:06:45 PMI modify'd the ~/.profile as you mentioned but NO joy even after a few reboots. That's weird, try to move the export path line into .bashrc, then use the source command again. See if that solves it, you might want to see your PATH environment after that. Use \"echo $PATH\" to see if the change is reflected within your environment.Quote from: Coin-Keeper on June 24, 2022, 11:06:45 PMIs it possible to do a \"move\" command for trezorctl that won't break the system?  No FrankenDebian!You can use a symbolic link for that.Code:sudo ln -s ~/.local/bin/trezorctl <path>Usually, you might want to use the /usr/bin path, so you can directly use the $ trezorctl command.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coin-Keeper",
+      "created_time": "June 25, 2022, 05:06:54 PM",
+      "body": "Quote from: vv181 on June 25, 2022, 01:01:21 AMQuote from: Coin-Keeper on June 24, 2022, 11:06:45 PMI modify'd the ~/.profile as you mentioned but NO joy even after a few reboots. That's weird, try to move the export path line into .bashrc, then use the source command again. See if that solves it, you might want to see your PATH environment after that. Use \"echo $PATH\" to see if the change is reflected within your environment.Quote from: Coin-Keeper on June 24, 2022, 11:06:45 PMIs it possible to do a \"move\" command for trezorctl that won't break the system?  No FrankenDebian!You can use a symbolic link for that.Code:sudo ln -s ~/.local/bin/trezorctl <path>Usually, you might want to use the /usr/bin path, so you can directly use the $ trezorctl command.I tried the ~/.bashrc edit last night.  No Joy ----------- > dumbass me forgot to do the source ~/.profile afterwards so it didn't work of course.  This morning after reading the post above this one I remembered my \"brain fart\".  I went back and edited the bashrc again this time running source ~/.profile   --   Found trezorctl immediately!  Thank you!!Unrelate issue:  trezorctl is having issues with the latest Python.  It is all over github and being worked on.terminal command line produces this:XXXX@linux:~$ trezorctlTraceback (most recent call last):  File \"/home/bill/.local/bin/trezorctl\", line 5, in <module>    from trezorlib.cli.trezorctl import cli  File \"/home/bill/.local/lib/python3.9/site-packages/trezorlib/cli/trezorctl.py\", line 191, in <module>    @cli.resultcallback()AttributeError: 'TrezorctlGroup' object has no attribute 'resultcallback'So the good part is my Deb 11 now finds trezorctl but it is broken against the latest Python.  Some are downgrading their Python versions but I am patient and will wait for a fix via github!  I use trezorctl only configuring my Trezor T's and I have several working systems using older versions.I will come back and follow up on this thread when a working trezorctl \"fix\" is released.I love the support around here!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 26, 2022, 06:11:17 PM",
+      "body": "Yep that should be good to go The source command is merely to update the changed .bashrc file on the current terminal shell, so you can use the trezorctl immediately. Actually, you don't have to re-edit the .bashrc, by opening up a brand new terminal shell, the change is already reflected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coin-Keeper",
+      "created_time": "June 28, 2022, 05:24:49 PMLast edit: June 28, 2022, 09:22:18 PM by Coin-Keeper",
+      "body": "I know there a many times a Windows or Linux newbie would consider using trezorctl to add some enhanced features to their Trezor T's IF they were not blasted away with the complexity of installing trezorctl on their systems.I wanted to make sure that readers of this thread realize that TAILS 5.1.1 (some other versions do also) has trezorctl resident and ready to go on the ISO.  One advantage to TAILS is that you can completely configure your Trezor features offline.  TAILS can only go online IF you provide wireless connection details to your LAN (or if you plug in the ethernet on a wired desktop machine).  By mounting a TAILS USB you can simply connect the Trezor, use a terminal and type trezorctl with the instruction command following.  EASY.e.g. open terminal and type:trezorctl get-featuresIf you are new you do NOT have to use trezorctl but can setup your Trezor T and might use Trezor Suite instead.  THEN you can add advanced features such as wipe PIN or SD encrypt using trezorctl.  Once those features are enabled you can resume using Suite and all enabled features still work fine.  I setup up my Trezors using trezorctl because I like to do the seed creation and related stuff OFFLINE.  Just my take on this.Trying to be helpful here.  I am going to paste in some simple command stuff that I use.  There are more commands but you will see this is simple stuff.  Hope this helps some that might have been shy to install the software, but might like to try it.https://wiki.trezor.io/Using_trezorctl_commands_with_Trezor** Bitcoin-only firmware - NO SUDO NEEDEDPlace Trezor in bootloader modetrezorctl firmware-update --bitcoin-onlyVerify valid signatureConfirm the action on your Trezor device----- ** Show CURRENT configuration of Trezor:trezorctl get-features-----** Initialize device:Create DEFAULT Trezor wallet with PIN protection of desired SEED length.[This command initializes the device and generates a new seed after the new firmware is installed.]12 word SEEDtrezorctl reset-device -t 128 --pin-protection24 word SEEDtrezorctl reset-device -t 256 --pin-protection-----** Self Destruct PINtrezorctl set wipe-codedisable the wipe code: sudo trezorctl set wipe-code -r------** Turn on SD Protection - Trezor Ttrezorctl device sd-protect enabletrezorctl device sd-protect disabletrezorctl device sd-protect refresh-----** Wiping the Trezor device[This command removes all private data but not firmware -- NOT in bootloader mode]trezorctl wipe-device[If the device is in bootloader mode and the option --bootloader is called, it will erase both the user data and firmware.]trezorctl wipe-device --bootloader-----** Recover Trezor device:[recover Trezor, set PIN, pick 12,18,24 words, allow 4 characters only during entering SEED words]trezorctl recovery-device --pin-protection --words 24 --expandThis is absolutely easy stuff.-----",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

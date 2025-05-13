@@ -1,0 +1,157 @@
+{
+  "id": "topic_5449245",
+  "title": "Fudmottin",
+  "author": "Fudmottin",
+  "created_time": "April 18, 2023, 06:57:40 AM",
+  "content": "Bitcoin Client Software and Version Number: Bitcoin Core version v24.0.1Operating System: MacOS 13.3.1 (22E261)System Hardware Specs: M2 Mac mini 16GB RamDescription of Problem: I'm unable to export my private keys so that I can use my bitcoin core wallet on my iPhoneAny Related Addresses: bc1qat89vm35675s6k3u04n27g3wthjnhj0g0a0c36Any Related Transaction IDs: NAScreenshot of the problem: NALog Files from the Bitcoin Client: NA$ bitcoin-cli getwalletinfo{  \"walletname\": \"miner\",  \"walletversion\": 169900,  \"format\": \"sqlite\",  \"balance\": 0.00000000,  \"unconfirmed_balance\": 0.00000000,  \"immature_balance\": 0.00000000,  \"txcount\": 0,  \"keypoolsize\": 4000,  \"keypoolsize_hd_internal\": 4000,  \"unlocked_until\": 0,  \"paytxfee\": 0.00000000,  \"private_keys_enabled\": true,  \"avoid_reuse\": false,  \"scanning\": false,  \"descriptors\": true,  \"external_signer\": false}bitcoin-cli dumpwallet gives the same error.No transactions have been made to or from this wallet yet. I created it with Bitcoin Core. I'm hoping to use this wallet for mining. I also want a copy on my iPhone in the Bitcoin.com wallet app. I don't know what's broken here. I compiled from GitHub source. No GUI.Any ideas?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5449245",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "April 18, 2023, 07:22:08 AM",
+      "body": "See https://github.com/bitcoin/bitcoin/issues/26239Bitcoin Core is now creating descriptor wallets by default since version 24.0. These have an HD key by default, so Core is blocking you from exporting the private keys made by it.Docs say you should use backupwallet with the -rpcwallet command-line switch (to select the wallet) to make a backup copy of the wallet in a location you choose, which from my point of view is ridiculous since you could just make a copy of the wallet manually.It is always possible to open up the database wallet file and perform surgery on it to get its encrypted private keys though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 18, 2023, 07:27:19 AM",
+      "body": "Quote from: Fudmottin on April 18, 2023, 06:57:40 AM-snip-   \"walletname\": \"miner\",  \"walletversion\": 169900,  \"format\": \"sqlite\",Unfortunately, dumprivkey or dumpwallet commands aren't supported by descriptor wallets.Your option is to export the parent descriptor of that address and then use a tool that can derive the private key of that address from its master private key.Here's the procedure (requires https://github.com/iancoleman/bip39):Start Bitcoin Core, preferably on an offline machine and enter the command getaddressinfo \"bc1address\" and take note of the address' \"parent_desc\" and \"ischange\" values.Next, enter the command listdescriptors true and find the (private) descriptor with the matching script typeof your address' parent descriptor. (your address' should be \"wpkh\")But there'll be at least two desc with that script type, so based from your address' \"ischange\" value of 'true' or 'false', pick the descriptor with \"internal\" of the same value.From the correct descriptor, copy it's master private key which is the long \"xprv\" key. Do not include the script type and '(' before and '/' after it.Now open your iancoleman's BIP39 tool in an offline machine and paste your xprv key in \"BIP32 Root Key\".Scroll down a bit and select the correct script type: BIP44 for legacy, BIP49 for Nested-SegWit and BIP84 for Native Segwit.The default should be already correct for receiving addresses (internal: false), else, change the internal/external path from '0' to '1'.Scroll-down to the derived addresses and it should be there along with its private key.If your address' \"address_index\" is more than 20, you should derive more addresses in BIP39 tool by using the button: \"Show ___ more rows\" below the address list for it to show.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fudmottin",
+      "created_time": "April 18, 2023, 09:50:02 AM",
+      "body": "Thanks! I have a bit of confusion on a point. I was able to generate a 12 word mnemonic and that showed a QR code which I was able to scan in and import with my iPhone wallet. The words match fine. But the extended public key on the phone does not match the one in the Mnemonic Code Converter. Both have the xpub prefix. But from there they don't match. I was under the impression that they would and that I failed to follow instructions properly.Any further help or assistance would be greatly appreciated.I would like to do a small test transaction. It would be nice if the funds showed up on my full node",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "April 18, 2023, 10:39:31 AMLast edit: April 18, 2023, 11:08:08 AM by LoyceV",
+      "body": "Quote from: Fudmottin on April 18, 2023, 06:57:40 AMso that I can use my bitcoin core wallet on my iPhoneFor consideration: if you use the same wallet on multiple devices, you increase the risk of getting it compromised. In general, I consider phones to be untrusted devices, and only fund mobile wallets with small amounts. If you're expecting to get a substantial amount of Bitcoin, it's better to store the majority in a safer way.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "April 18, 2023, 10:45:46 AM",
+      "body": "Quote from: LoyceV on April 18, 2023, 10:39:31 AMQuote from: Fudmottin on April 18, 2023, 06:57:40 AMso that I can use my bitcoin core wallet on my iPhoneFor consideration: if you use the same wallet on multiple devices, you increase the risk of getting it compromised. In general, I consider phones to be untrusted devices, and only add fund mobile wallets with small amounts. If you're expecting to get a substantial amount of Bitcoin, it's safer to store the majority in a safer way.Cannot stress this enough if there is a 'real' amount of funds involved. If you are talking about going out to dinner money that's one thing. But treat any funds on your phone as cash and be prepared to loose it at any time. Not to mention, if something does happen, now you have to figure out is it the desktop PC or the phone that caused the funds loss. Who had access to what and when, and so on.Better off keeping them separate.-Dave-",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fudmottin",
+      "created_time": "April 18, 2023, 11:22:17 AM",
+      "body": "Real money goes to a \"paper wallet\". Secret keys aren't even on an electronic device and are kept separate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fudmottin",
+      "created_time": "April 19, 2023, 12:41:49 AM",
+      "body": "I used my phone app to transfer funds to the miner wallet that I thought I exported correctly. However, the funds are not showing up in getwalletinfo. I'm not sure what I did wrong. Wrong command perhaps? Bad export? I'm running a rescan right now, but I wouldn't have thought that necessary.I'm not sure what info to provide other than I've been following the recommended steps above. I have at least had success with a paper wallet (bitaddress.org.html running locally from the GitHub repository (gh repo clone pointbiz/bitaddress.org)).Since I'm here and it is partly on topic, what is the recommended usage for paper wallets? Reuse or throw away after spending all funds?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 19, 2023, 04:32:05 AMLast edit: April 19, 2023, 08:40:43 AM by nc50lc",
+      "body": "Quote from: Fudmottin on April 18, 2023, 09:50:02 AMThanks! I have a bit of confusion on a point. I was able to generate a 12 word mnemonic and that showed a QR code which I was able to scan in and import with my iPhone wallet. The words match fine. But the extended public key on the phone does not match the one in the Mnemonic Code Converter. Both have the xpub prefix. But from there they don't match. I was under the impression that they would and that I failed to follow instructions properly.Was it the instruction that I've provided?Because you're not supposed to create a mnemonic phrase there since it'll overwrite the \"BIP32 Root Key\" that you've pasted.And I'm positively sure that I haven't instructed to click the \"Generate\" button.Since you've provided an address that you want to export the private key, I've provided the instructions to do so.But if you want a shortcut: just create a non-descriptor wallet by providing the sixth argument descriptors false to make it non-descriptor.Here's more information about createwallet command: https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/createwallet/And with that type of wallet, dumpprivkey and dumpwallet will work.Quote from: Fudmottin on April 19, 2023, 12:41:49 AMI'm not sure what info to provide other than I've been following the recommended steps above. I have at least had success with a paper wallet (bitaddress.org.html running locally from the GitHub repository (gh repo clone pointbiz/bitaddress.org)).Since bitaddress defaults to 'Legacy' address and your address from Bitcoin Core is 'Native SegWit',I think it's because of the wallet in your IPhone is defaulting imports into legacy addresses.For your export, based from your replies, it seems like you've created a new wallet from the mnemonic phrase that you've created.-edit-typo-",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fudmottin",
+      "created_time": "April 20, 2023, 01:10:16 PM",
+      "body": "I failed to follow instructions properly. I was having issues getting the exact address. However, I found a better solution, I think. I found BlueWallet on the App Store. I was able to use the xpub key to import a watch only wallet into it. This is actually the functionality I wanted on the iPhone. I haven't tested sending funds with bitcoin-cli yet, but if sendtoaddress works (https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/sendtoaddress/) I'm golden.BlueWallet also works with the paper wallet generator earlier in this thread. I can set it up for receive only or use the private key to make it a hot wallet. It defeats the point of paper wallets, but it's nice to have options. I grabbed the source from GitHub so I can learn from it.Thank you for your time and patience.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "April 20, 2023, 01:28:54 PM",
+      "body": "Quote from: Fudmottin on April 18, 2023, 11:22:17 AMReal money goes to a \"paper wallet\". Secret keys aren't even on an electronic device and are kept separate.Hello! I strongly advise you not to use paper wallets. For reference: https://www.youtube.com/watch?v=iNHVbDtUL0E&ab_channel=aantonop",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fudmottin",
+      "created_time": "April 20, 2023, 03:07:44 PM",
+      "body": "I don't have enough money in to justify a hardware solution like Trezor or Ledger yet. As far as the 12 mnemonic words go, I do use that for wallet backup.I'm still new to this stuff. I already managed to send a small amount of money into a wallet address with no private key.   The thread was inspired by me wanting to setup a miner that is hopefully fast enough to get me accepted into a mining pool. I'm currently shopping for an ASIC solution. In the meantime, I can do GPU (I think) with a software I downloaded.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 21, 2023, 03:23:40 AM",
+      "body": "Quote from: Fudmottin on April 20, 2023, 01:10:16 PMI failed to follow instructions properly. I was having issues getting the exact address. However, I found a better solution, I think. I found BlueWallet on the App Store. I was able to use the xpub key to import a watch only wallet into it. This is actually the functionality I wanted on the iPhone.If you actually asked how to create a watching-only wallet from your Bitcoin Core,I would've been suggested you to get the descriptor's extended public key right in the first reply.Good that you've discovered watching-only wallet by yourself, and \"Blue Wallet\" is quite a good option, IMO.Quote from: Fudmottin on April 20, 2023, 03:07:44 PMI'm still new to this stuff. I already managed to send a small amount of money into a wallet address with no private key.   Right after that, try to send from Bitcoin Core where you got the xpub key.It's to make sure that your setup works before sending more bitcoins into it.Quote from: FudmottinThe thread was inspired by me wanting to setup a miner that is hopefully fast enough to get me accepted into a mining pool. I'm currently shopping for an ASIC solution. In the meantime, I can do GPU (I think) with a software I downloaded.Bitcoins cannot be mined with GPU at today's network difficulty, just wait for your SHA256 ASIC to be shipped.Your only option with GPU to earn bitcoins is to use something that mines Altcoin but payouts in Bitcoin. For example: Nicehash(DYOR in Mining (Altcoins) board)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "April 21, 2023, 08:53:39 AM",
+      "body": "Quote from: apogio on April 20, 2023, 01:28:54 PMI strongly advise you not to use paper wallets.Paper wallets are fine, as long as you know what you're doing. That includes knowing that almost all websites that offer paper wallets will scam you. Even when you use them offline, they can produce a compromised private key if the source is compromised.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "April 21, 2023, 10:18:06 AM",
+      "body": "Quote from: LoyceV on April 21, 2023, 08:53:39 AMQuote from: apogio on April 20, 2023, 01:28:54 PMI strongly advise you not to use paper wallets.Paper wallets are fine, as long as you know what you're doing. That includes knowing that almost all websites that offer paper wallets will scam you. Even when you use them offline, they can produce a compromised private key if the source is compromised.I have written a program in Java which creates old-school paper wallets. Therefore I am almost certain of the source code's validity. However, I believe it is much easier to use an airgapped device for signing transactions. Paper wallets are fine, as you said. I think though that nowadays, it's better to use more modern approaches. Anyway!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "April 21, 2023, 10:34:06 AM",
+      "body": "Quote from: apogio on April 21, 2023, 10:18:06 AMI have written a program in Java which creates old-school paper wallets. Therefore I am almost certain of the source code's validity.Unless you made a mistake somewhere, and the random isn't as random as you think.QuoteHowever, I believe it is much easier to use an airgapped device for signing transactions.Of course  Having a dedicated system for offline signing is easier than getting one each time you need it. And if you have said system already, it's easy to import a paper wallet when you need it.I like to use a wide variety of wallets, depending on my needs at the moment.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "April 21, 2023, 10:52:18 AM",
+      "body": "Quote from: LoyceV on April 21, 2023, 10:34:06 AMUnless you made a mistake somewhere, and the random isn't as random as you think.If you have the technical knowledge, feel free to check it here: https://bitcointalk.org/index.php?topic=5432897.0 although I have deleted the repository.\"Vampobit\" was my original account here, but for personal reasons, I don't want to be \"vampobit\" anymore. I may still have access to it though.As far as randomness is concerned, I have decided to follow a very simple approach. I roll a dice 256 times and if it's 4-6 I sign it as 1, else I sign it as 0. Then I have my entropy like 100010101....Quote from: LoyceV on April 21, 2023, 10:34:06 AMOf course  Having a dedicated system for offline signing is easier than getting one each time you need it. And if you have said system already, it's easy to import a paper wallet when you need it.I like to use a wide variety of wallets, depending on my needs at the moment.Sure! I have a 2-of-3 multisig and a singlesig with passphrase personally. But I totally agree with you.EDIT:I still have the code on my PC. If you 're interested, I could re-create a repository for you to check it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "April 21, 2023, 11:05:57 AMLast edit: April 21, 2023, 11:23:15 AM by LoyceV",
+      "body": "Quote from: apogio on April 21, 2023, 10:52:18 AMIf you have the technical knowledge, feel free to check it here: https://bitcointalk.org/index.php?topic=5432897.0 although I have deleted the repository.Sorry, that's not my area of expertise, so I can't check the code.Quote from: apogio on April 21, 2023, 11:07:52 AMI wonder what is truly random.Food for thought:Quote from: http://www.quotationspage.com/quote/461.htmlThe generation of random numbers is too important to be left to chance.    Robert R. Coveyou, Oak Ridge National Laboratory",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "April 21, 2023, 11:07:52 AM",
+      "body": "Quote from: LoyceV on April 21, 2023, 11:05:57 AMQuote from: apogio on April 21, 2023, 10:52:18 AMIf you have the technical knowledge, feel free to check it here: https://bitcointalk.org/index.php?topic=5432897.0 although I have deleted the repository.Sorry, that's not my area of expertise, so I can't check the code.Alright, however randomness is a very fascinating subject in my opinion. Sometimes I wonder what is truly random.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

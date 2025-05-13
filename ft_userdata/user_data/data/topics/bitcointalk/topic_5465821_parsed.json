@@ -1,0 +1,61 @@
+{
+  "id": "topic_5465821",
+  "title": "nicehome",
+  "author": "nicehome",
+  "created_time": "September 06, 2023, 06:57:54 AM",
+  "content": "Hi I opend many topics here to know what was my transaction Because I totally forgot - But now, after extensive research , I have found 2 transactions - first one 2011 ( P2PKH) and the secound one in 2013 that it is (P2SH) .I am very biggener - i have hash script and private keys ( ECDSA ) from 2013 - How to deal with it ?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5465821",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "September 06, 2023, 07:37:32 AM",
+      "body": "If you have the P2SH address (which will give you the HASH160 of the redeem script) and multiple private keys that you know are used in creation of that address, the recovery is a matter of simple brute force loop.You can use any wallet that can create multi-sig addresses from keys but keep in mind that it is not flexible since they usually sort the public keys lexicographically that may not have been the way your script were created in first place.In this case the most probable redeem script is a multi-sig one which means all you have to do is to test different combinations against the hash you have.Redeem script is: Code:OP_m | pub_1 | pub_2 | ... | pub_n | OP_n | OP_CheckMultiSigHere is a pseudocode of how the loop would look like:Code:loop m from 0 to n  select (1st pub) from [pub_1 to pub_n]  select (2nd pub) from [pub_1 to pub_n - (1st pub)]  ...  set last pub  compute RIPEMD160 hash of SHA256 hash of script  compare with P2SH hash    print result    break The loop for 3 public keys in total while allowing duplicates and accepting 0of3 scripts is like this:Code:int n = 3;pubList = [pub1, pub2, pub3]for (int m = 0; m <= n; m++){    for (int i = 0; i < pubList.Length; i++)    {        for (int j = 0; j < pubList.Length; j++)        {            for (int k = 0; k < pubList.Length; k++)            {                hash = ComputeHash(OP_m | pubList[i] | pubList[j] | pubList[k] | OP_n | 0xae);                if (hash == expected)                {                    Print(m + i + j + k);                    break;                }            }        }    }}This is 108 hashes that can be computed in a second or two.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nicehome",
+      "created_time": "September 06, 2023, 08:11:51 AMLast edit: September 07, 2023, 03:08:51 AM by nicehome",
+      "body": "Thanks for the response i am very biggener - i dont know what to do with the code ! is there programe i use for it ? befor 5 or 6 months i I bought software name File Magic to open the hash script - i saw inside the script ----> 2 line2 000000 32 digests and the third one encrypted - i think the third one is adress i have 4 lines private keys 256 ECDSA - this is for redeem script eh ? is there any step by step to know how ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "iBaba",
+      "created_time": "September 06, 2023, 09:13:15 PM",
+      "body": "Quote from: nicehome on September 06, 2023, 06:57:54 AMHi I opend many topics here to know what was my transaction Because I totally forgot - But now, after extensive research , I have found 2 transactions - first one 2011 ( P2PKH) and the secound one in 2013 that it is (P2SH) .I am very biggener - i have hash script and private keys ( ECDSA ) from 2013 - How to deal with it ?You can access and manage your funds if you have the hash script and private keys from 2013. I will suggest that you access your funds and perform transactions by importing your private keys into a wallet software like Electrum or Exodus but you must also keep your private keys safe and use only reputable wallet software. Let me know if this simple steps work for you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nicehome",
+      "created_time": "September 07, 2023, 03:08:07 AM",
+      "body": "I tried it a while ago and it didn't work",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nicehome",
+      "created_time": "September 16, 2023, 09:43:38 AM",
+      "body": "Really - no one help !!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nicehome",
+      "created_time": "September 16, 2023, 11:30:17 PM",
+      "body": "Yes your right - This is what I felt !@pooya87 says ( IF ) i have the adress - the adress already in the script becouse i seen it inside - I bought a program that opens anything - i seen in the script 2 hashes start zeros and one adress But in encrypted form - thats why i have 4 private keys ( ECDSA ) --->>> 2 of them for unlock the script and 2 of them sigs prof to take the adress .Thank you ( ETFbitcoin ) i will use these adresses - have a good one",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

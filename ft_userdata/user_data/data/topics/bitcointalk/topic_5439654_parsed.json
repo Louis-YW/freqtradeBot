@@ -1,0 +1,69 @@
+{
+  "id": "topic_5439654",
+  "title": "pbies",
+  "author": "pbies",
+  "created_time": "February 13, 2023, 01:12:16 AM",
+  "content": "Code:Code:#!/usr/bin/env bashecho Stage 1 - download the addresseswget http://addresses.loyce.club/blockchair_bitcoin_addresses_and_balance_LATEST.tsv.gzecho Stage 2 - unpack the archivegunzip blockchair_bitcoin_addresses_and_balance_LATEST.tsv.gzecho Stage 3 - check lowest balance lineline=$(grep -m 1 -bne $'\\t99999$' blockchair_bitcoin_addresses_and_balance_LATEST.tsv | cut -d \":\" -f 2)echo Stage 4 - get only with proper balancehead -c $line blockchair_bitcoin_addresses_and_balance_LATEST.tsv > int1.txtecho Stage 5 - get rid of first linetail -n +2 int1.txt > int2.txtecho Stage 6 - get only addresses, sort and write to filecut -f 1 int2.txt | sort > gte1mBTC.txtf=\"gte1mBTC.txt\"o=\"hash160.txt\"echo Stage 7 - search for incompatible addressesline=$(grep -m 1 -bne $'^bc1p' \"$f\" | cut -d \":\" -f 2)echo Stage 8 - get only compatible addresseshead -c $line \"$f\" > int3.txtecho Stage 9 - convert addresses to hash160~/bitcoin-tool/bitcoin-tool --batch --input-type address --output-type public-key-rmd --input-format base58check --network bitcoin --output-format hex --input-file int3.txt | sort > \"$o\"echo Stage 10 - convert hash160 to bloom filter~/brainflayer/hex2blf \"$o\" bloom.blfecho Finished!Taken are only >=1 mBTC.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5439654",
+  "comments": [
+    {
+      "author": "pbies",
+      "created_time": "February 19, 2023, 05:10:40 PM",
+      "body": "Fixed the script as bitcoin-tool does not properly convert to hashes, needed to use brainflayer:Code:#!/usr/bin/env bashset -eecho \"### Public addresses downloader and converter to bloom filter ###\"echo [01/12] Download the addresseswget http://addresses.loyce.club/blockchair_bitcoin_addresses_and_balance_LATEST.tsv.gzecho [02/12] Unpack the archivegunzip blockchair_bitcoin_addresses_and_balance_LATEST.tsv.gzecho [03/12] Check lowest balance lineline=$(grep -m 1 -bne $'\\t99999$' blockchair_bitcoin_addresses_and_balance_LATEST.tsv | cut -d \":\" -f 2)echo [04/12] Get only with proper balancehead -c $line blockchair_bitcoin_addresses_and_balance_LATEST.tsv > int1.txtecho [05/12] Get rid of first linetail -n +2 int1.txt > int2.txtecho [06/12] Get only addresses, sort and write to filecut -f 1 int2.txt | sort > gte1mBTC.txtecho [07/12] Search for incompatible addressesline=$(grep -m 1 -bne $'^bc1p' \"gte1mBTC.txt\" | cut -d \":\" -f 2)echo [08/12] Get only compatible addresseshead -c $line \"gte1mBTC.txt\" > int3.txtecho [09/12] Convert addresses to hash160~/brainflayer/brainflayer -v -i int3.txt -o int4.txtecho [10/12] Sort and uniq hashessort -u int4.txt > hash160.txtecho [11/12] Convert hex to bloom filter~/brainflayer/hex2blf \"hash160.txt\" bloom.blfecho [12/12] Finished!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "February 19, 2023, 05:27:43 PM",
+      "body": "Ehhm, do you realize that actively brute forcing random addresses of other people is illegal, right, right? 100BTC challenge is different. What you are doing is not good, untrustworthy. Just saying.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "February 19, 2023, 05:43:56 PM",
+      "body": "I just make a test with your code, and something isn't working fine:Code:~/brainflayer/brainflayer -v -i int3.txt -o int4.txtI don't think that line is the right one to get the hash160:Code:bitcoin@forum:~/brainflayer$ echo \"1BTCoinTc7gtcCvYic4KhdUTUqEikBrpVW\" > a.txtbitcoin@forum:~/brainflayer$ ./brainflayer -v -i a.txt -o b.txt rate:     47.60 p/s found:     0/1          elapsed:    0.021 sbitcoin@forum:~/brainflayer$ cat b.txt09da81f1147115816f8ea2b1ccf17ab11c506eda:u:sha256:1BTCoinTc7gtcCvYic4KhdUTUqEikBrpVW8488984ea64168e341374dbf45e46bd8bf0d007e:c:sha256:1BTCoinTc7gtcCvYic4KhdUTUqEikBrpVWbitcoin@forum:~/brainflayer$ And on this page we can verify the hash from that address:https://privatekeys.pw/address/bitcoin/1BTCoinTc7gtcCvYic4KhdUTUqEikBrpVWWhich is: 72a5ed772ca646ff6719c8e2621ad11d34345535So, to get the Hash 160 you will need to modify those steps, I have some methods to get this hash, but for them first we have to identify the kind of address that we are working with.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "February 19, 2023, 06:13:13 PM",
+      "body": "Quote from: seoincorporation on February 19, 2023, 05:43:56 PMI just make a test with your code, and something isn't working fine:Code:~/brainflayer/brainflayer -v -i int3.txt -o int4.txtI don't think that line is the right one to get the hash160:Code:bitcoin@forum:~/brainflayer$ echo \"1BTCoinTc7gtcCvYic4KhdUTUqEikBrpVW\" > a.txtbitcoin@forum:~/brainflayer$ ./brainflayer -v -i a.txt -o b.txt rate:     47.60 p/s found:     0/1          elapsed:    0.021 sbitcoin@forum:~/brainflayer$ cat b.txt09da81f1147115816f8ea2b1ccf17ab11c506eda:u:sha256:1BTCoinTc7gtcCvYic4KhdUTUqEikBrpVW8488984ea64168e341374dbf45e46bd8bf0d007e:c:sha256:1BTCoinTc7gtcCvYic4KhdUTUqEikBrpVWbitcoin@forum:~/brainflayer$ And on this page we can verify the hash from that address:https://privatekeys.pw/address/bitcoin/1BTCoinTc7gtcCvYic4KhdUTUqEikBrpVWWhich is: 72a5ed772ca646ff6719c8e2621ad11d34345535So, to get the Hash 160 you will need to modify those steps, I have some methods to get this hash, but for them first we have to identify the kind of address that we are working with.It is for bloom filter and searching purposes, it may be not directly hash160.Question should go to brainflayer author in that case.I tested that and it does later find the hash.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "February 19, 2023, 06:19:31 PM",
+      "body": "Bloom filter Newbie here: what can this be used for?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "February 19, 2023, 06:31:04 PM",
+      "body": "Quote from: LoyceV on February 19, 2023, 06:19:31 PMBloom filter Newbie here: what can this be used for?For quickly finding (with some dose of probability) that what we have in one data pack is in the another.Here it is for example any brainwallet phrases to be found in public addresses with balance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "February 19, 2023, 07:08:59 PMLast edit: February 20, 2023, 05:24:24 PM by seoincorporation",
+      "body": "Quote from: LoyceV on February 19, 2023, 06:19:31 PMBloom filter Newbie here: what can this be used for?The Bloom file is what Brainflayer uses to brute force the address... Is in that format because that way it works faster, but normally in the bloom file we have all the addresses in hash 160 of the address that we are searching (or bruteforcing) the private key.So, making a bloom file with all the addresses is a nice feature if we are working with brainflayer, but since we will have tons of hash160 addresses, comparing each newly generated address with the bloom file isn't an efficient process... So, I don't recommend at all this way to brute force crypto addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

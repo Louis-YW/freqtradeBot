@@ -1,0 +1,149 @@
+{
+  "id": "topic_5488203",
+  "title": "Flavatron",
+  "author": "Flavatron",
+  "created_time": "March 09, 2024, 11:14:39 AM",
+  "content": "I wrote a wallet client which takes some of the stuff I'd learned while looking at Merkalized Abstract Syntax Tree's and Schnorr signatures used in Taproot, and applied this concept more generally to secp256k1 Elliptic Curve:https://medium.com/@jamie.brian.gilchrist/my-new-wallet-client-txtailor-a-twist-on-cryptographic-key-tweaking-inspired-by-bitcoins-83233795feb1I'd be interested to see what people make of the tool. It is quite flexible, and works across any chain using the secp256k1 EC.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5488203",
+  "comments": [
+    {
+      "author": "dzungmobile",
+      "created_time": "March 09, 2024, 02:58:59 PM",
+      "body": "You want to do this for Privacy as one of two main goals as you wrote in Medium.\"Enriching Transactions with Purpose and Privacy\"I really doubt that if I want to gain privacy, I will be ready to add a transaction purpose to my transaction and make it public on the blockchain, block explorer for everyone to see.I see some processes in between sender and receiver but is it all encrypted end-by-end?Assume I and you are sender and receiver and we deal with each other about one trade, why do we need to add such information in our transaction?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 09, 2024, 05:37:55 PM",
+      "body": "Quote from: dzungmobile on March 09, 2024, 02:58:59 PMYou want to do this for Privacy as one of two main goals as you wrote in Medium.\"Enriching Transactions with Purpose and Privacy\"I really doubt that if I want to gain privacy, I will be ready to add a transaction purpose to my transaction and make it public on the blockchain, block explorer for everyone to see.I see some processes in between sender and receiver but is it all encrypted end-by-end?Assume I and you are sender and receiver and we deal with each other about one trade, why do we need to add such information in our transaction?Hey dzungmobile Thanks for the feedback.. I would like to clarify several aspects of the Txtailor wallet client that may not have been fully apparent from the article.( note this is a project I've developed solo, not a company, and intended as a free tool for use by anyone)1. Privacy is not compromised:The core functionality of Txtailor involves embedding transaction purposes or authentication codes directly within transactions in a secure and private manner. Importantly, this information is not publicly available on the blockchain or visible to all in the way you might think. Instead, it is accessible only to the intended recipient who possesses the correct cryptographic key or information to decode it. In order to validate the message, you must know the message & original public key(and this would assume it was unencrypted). Other people would simply see an address, which ofc is a hashed public key with encoding. In that scenario I describe( where the tweak or message is unencrypted) the anyone supplied with the message and the public key can verify( deliberately so).. However, not if it is also encrypted. 2. Security and Encryption:The transaction details are securely handled, leveraging cryptographic techniques to prevent unauthorized access. For instance, the tweak (message) can be communicated over secure channels, decided upon in person, or encrypted using the recipient's public key through schemes like ECIES (Elliptic Curve Integrated Encryption Scheme) and send via  encrypted email or such. Furthermore, I've implemented homomorphic encryption, allowing certain operations to be performed on encrypted data for more niche use cases I have been working on. This means that even while the data is encrypted, it retains its utility without compromising privacy.3. Utility of Added Information in Transactions:Adding specific information to transactions, such as a purpose or auth code, is not about sacrificing privacy. Instead, it's about enhancing the utility and security of standard transactions, especially in contexts where additional verification or context is necessary. This could be particularly beneficial in scenarios like legal contracts, detailed financial transactions, or any situation(maybe even for more trivial things like paid subscriptions with conditions, such as March2024+nonce or something) where added clarity and authentication are crucial, The funds are not spendable by the recipient until they are also in possession of this message/auth code(the tweak). Anyone who gained access to the tweak, would have no ability to sign from the address, without also having the recipients private key.4. Cold Addresses and Enhanced Security:The concept of cold addresses (or storage) is elevated through Txtailor by allowing the dynamic creation of addresses that are secure until the moment they are needed. By using a tweak to generate these addresses, the corresponding private key does not exist until its intended use. This greatly reduces the risk of key compromise, as there's no static key to steal or lose. It combines the security benefits of cold storage with the flexibility of dynamic access, tailored to the user's needs. If the original private key( akin to the root in a standard HD wallet, which does not using tweaking) is compromised, this alone is not able to spend the funds. 5. Flexible IRT Secure Communication of Tweaks:I absolutely recognize the importance of flexibility in how transaction-related information is communicated(and this is something totally open at the moment). Whether the tweak is sent over encrypted messaging services, decided in person, or through cryptographic encryption methods like ECIES, the priority is always on maintaining the utmost level of security and privacy. The advanced implementation of homomorphic encryption further ensures that the utility of this data is not lost, even when it is encrypted, allowing for secure operations that respect user privacy.The ability to create any number of new address on behalf of a user( i.e with only the public key, from a known spent tx or other), where the recipient can only access the funds when also supplied with an offchain message can be pretty powerful. Normally, doing this wouldn't be possible, because any alteration to the public key or the hashed version, would invalidate it. Using this method, the private key which corresponds to the public key, can similarly be altered, and access this valid address. Traditional HD wallets, first start with a private key seed, and you'd need to know the private key to create an address on behalf of another user. If we focus on this from your own perspective(i.e generating addresses for yourself).... if the addresses are generated using nonces, rather than hashes of known messages, timestamps,  or other, then you would effectively be creating random addresses similar to an HD wallet. However unlike an HD wallet, you can do this with just a public key, which means it can be done on a machine which has no access to the private key.Worth mentioning that this can also be used for encryption, rather than signing ofc. In that, the properties are the same, albeit the message is required( as well as  the recipients private key) before the content can be decrypted. It's like a  type of cryptographic MFA.This is a solo project, which is fully intended to become a free opensource tool. I am simply trying to validate the usefulness and get feedback on it, so I can make improvements, and (hopefully) share with people interested to try  it out or work on it with me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "March 09, 2024, 05:51:02 PM",
+      "body": "not new.. but just done differently than the old wayyear ago people used to create 1 of 2 multisig where the first key was the spender key, and second was just a hash160 of a secret message which was privately communicated thus proving the message was part of the multisig address to then know the purpose of the multisig address/txthe rest of the world just seen: 1 multisig address pre-spend(as an output) in the parent tx.and 2 legacy addresses +1signature post-spend(as input sigscript), in the child tx.. but the people involved also had secret knowledge of the message of the second legacy addresses hash",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 09, 2024, 06:00:33 PM",
+      "body": "Quote from: franky1 on March 09, 2024, 05:51:02 PMnot new.. but just done differently than the old wayyear ago people used to create 1 of 2 multisig where the first key was the spender key, and second was just a hash160 of a secret message which was privately communicated thus proving the message was part of the multisig address to then know the purpose of the multisig address/txthe rest of the world just seen: 1 multisig address pre-spend(as an output) in the parent tx.and 2 legacy addresses +1signature post-spend(as input sigscript), in the child tx.. but the people involved also had secret knowledge of the message of the second legacy addresses hashThanks. On traditional multisig setups, it's important to note that Txtailor significantly diverges from these methods though. Unlike multisig, which operates on the scripting or wallet level, Txtailor works directly with the cryptographic layer (layer 0) of blockchain protocols. This allows for a seamless application across any blockchain that uses the secp256k1 curve, not limited by the blockchain's scripting capabilities.Dynamic Address Generation: The approach I've used isn't about static address combinations but dynamically generating addresses through key tweaking. This means the address for each transaction can be unique and created on-the-fly, enhancing utility beyond what static multisig setups can achieve. ( i.e you can actually spend from an address tied to your email address for example if you chose to, or it was a requirement from a merchant)Efficiency and Broad Applicability: By not relying on the multisig structure, Txtailor avoids the added transaction complexity and costs associated with it. This efficiency is inherent and applicable across Bitcoin and other blockchains too( which may not use space saving techniques available via segwit)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "March 09, 2024, 06:14:12 PMLast edit: March 09, 2024, 06:24:51 PM by franky1",
+      "body": "Quote from: Flavatron on March 09, 2024, 06:00:33 PMEfficiency and Broad Applicability: By not relying on the multisig structure, Txtailor avoids the added transaction complexity and costs associated with it. This efficiency is inherent and applicable across Bitcoin and other blockchains too( which may not use space saving techniques available via segwit)you do know that in taproot to spend a TR, you have to reveal the spending conditions leaf hash is part of the merkle root of TR address. yes cores protocol of cludgy code miscounts witness bytes to appear smaller, but the real BYTE data is not as small as a wallet will tell youQuote from: Flavatron on March 09, 2024, 06:00:33 PMDynamic Address Generation: The approach I've used isn't about static address combinations but dynamically generating addresses through key tweaking. This means the address for each transaction can be unique and created on-the-fly, enhancing privacy beyond what static multisig setups can achieve.also in old method each TX can customise to a new recipient(spender key#1) or change the message(changing the hash of key#2).. to then cause there to be a new multisig, so not sure what you are on about as static multisig setups",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 09, 2024, 06:24:01 PM",
+      "body": "Quote from: franky1 on March 09, 2024, 06:14:12 PMQuote from: Flavatron on March 09, 2024, 06:00:33 PMDynamic Address Generation: The approach I've used isn't about static address combinations but dynamically generating addresses through key tweaking. This means the address for each transaction can be unique and created on-the-fly, enhancing privacy beyond what static multisig setups can achieve.Efficiency and Broad Applicability: By not relying on the multisig structure, Txtailor avoids the added transaction complexity and costs associated with it. This efficiency is inherent and applicable across Bitcoin and other blockchains too( which may not use space saving techniques available via segwit)you do know that in taproot to spend a TR, you have to reveal the spending conditions leaf hash is part of the merkle root of TR address. yes cores protocol of cludgy code miscounts witness bytes to appear smaller, but the real BYTE data is not as small as a wallet will tell youalso in old method each TX can customise to a new multisig recipient or change the message, thus changing the hash of send 'key'.. to then cause there to be a new multisig, so not sure what you are on about as static multisig setupsI get you.  I guess, what I mean is that the core feature of the client I have here is applicable across any blockchain using compatible cryptographic methods (like secp256k1), not just Bitcoin(and this is a standout property, rather than the fact people embedded messages previously or not). Me defending it being different from Multi-sig doesn't make any sense.. because it does so completely differently. It doesn't require 2 addresses for one. I guess similarly, in the past people could do a hash > address and include this as an additional output in their tx too...or even burn some utxo as op_return with an encrypted message)  But this still doesn't allow them to spend from the address ofc(similar to multisig). In traditional multisig setups, addresses are created based on a fixed set of conditions and keys at the time of setup, making changes to the address or its conditions a matter of creating a new multisig configuration. While you can change the message or recipient within a multisig transaction to create a new address. Txtailor allows for continuous, dynamic customization not just at the initial setup but through the entire lifecycle of an address, enabling a deeper level of privacy and flexibility. Not discounting there were methods of achieving this before, nor that (when using native Taproot)Bitcoin  features it wouldn't be better for a more seasoned user to provide tapscripts or similar conditions for this purpose too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "March 09, 2024, 06:35:54 PM",
+      "body": "your topic title eludes to adding message into a txi fully understand you are however embedding the message into the private key before its ECC'd to a public key. much like using the message as a nonce/salt,random addition to private key generation thus YOUR system doesnt even require the extra data on the blockchain(in a tx) as its just seen as a single legacy address but it requires partners pre-knowledge of private keys+message to create/spend..which some people dont like the other party knowing the private keyin theory your system has benefits of privacy from public.. but in practice the recipient is forced to quick spend the received funds of shared private key to a fresh non shared secret, in fear sender does a refund transaction using the shared private key",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 09, 2024, 06:39:12 PM",
+      "body": "Quote from: franky1 on March 09, 2024, 06:35:54 PMyour topic title eludes to adding message into a txi fully understand you are however embedding the message into the private key before its ECC'd to a public key. much like using the message as a nonce/salt,random addition to private key generation thus YOUR system doesnt even require the extra data on the blockchain(in a tx) as its just seen as a single legacy address but it requires partners pre-knowledge of private keys+message to create/spend..which some people dont like the other party knowing the private keyNo this is not correct. It does this with the public key... and therefore the other party most certainly does not need to have the private key(other than their own ofc).It can (in isolation) apply these manipulations to the Elliptic curve, to their a public key(can be done by anoyone) or the private key. Ofc, from a private key, you can generate a public key( but that isn't needed other than for generating private key(more aptly altering it, at use time). We can work exclusively with a public key to create the addresses... so think of it like an HD wallet, one where we work entirely on public keys, with no private keys at all. In my setup, it's somewhat reversed from an HD wallet User A has a private and public keyUser B knows user A's public key only. They can generate a new address ( or literally any number) on behalf of user A. They never needed to know user A's private key. This is where the confusion is, and how it works with a traditional HD wallet. What I am doing here, means the private key for this wouldn't actually exist yet.. becasue the public key( for which the base private key ofc does exist) would need manipulated too, by user A....",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 09, 2024, 06:45:57 PM",
+      "body": "There are absolutely no shared private keys in this process. I am sure my poor ability to explain myself isn't helping",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "March 09, 2024, 06:52:45 PM",
+      "body": "you do know that private is pre ECC and public is post ECC right",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 09, 2024, 07:13:08 PM",
+      "body": "Quote from: franky1 on March 09, 2024, 06:52:45 PMyou do know that private is pre ECC and public is post ECC rightYes, you're right about the sequence in ECC: we start with the private key and then generate the public key through ECC. Txtailor builds on this process by adding tweaks to enhance the system's privacy and security while adhering to ECC's core principles. This can be done on a public key in isolation( where the private key can be hidden.. unknown.. not shared... And thus creating a new address, which is accessible by only the user who's public key we tweaked... because only they have the corresponding original private keyi.e : Tweaked Public Key Point=Original Public Key Point+(Tweak×Generator Point)Generating a \"tweak\" value through a hash functionMultiplying this tweak value by the ECC curve's generator point to produce a new point on the curve.Adding this tweak point to the original public key's point on the curve, resulting in a new, tweaked public key point.As you can see, I am applying these only on the public key here, and this also involves EC manipulation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 09, 2024, 07:22:59 PM",
+      "body": "However as above, my wallet can then retrospectively match the private key with the newly generated public key. So the fact any user with my public key, can then create valid addresses for me, which I(and only I) can then generate the private key for, is the basis of most of what I am trying to explain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 09, 2024, 09:05:14 PM",
+      "body": "Hopefully, by including cryptographic process, it is clearer what I am doing:If we say: Original public key: PBUser B's private key: kBTweak (SHA-256 of message): t = SHA-256(M)Tweaked public key: PB' = PB + TTweaked private key: kB' = kB + t1: User B's Original Key pair ( which is created in the normal way on their own machine)User B's public key, PB, comes from multiplying their private key, kB, with the elliptic curve's generator point, G: PB = kB * G.2: User A Generates a new Address for User BUser A takes User B's public key(which is known to them), PB, and selects a message, M, for the tweak (like \"Payment for something\" or a nonce of some kind).User A generates a tweak value, t, by hashing the message M using SHA-256, for example: t = SHA-256(M).This tweak, t, is converted into a point on the curve by multiplying it with the generator point, G, to get T: T = t * G.User A adds this point, T, to User B's original public key, PB, to get a new tweaked public key, PB': PB' = PB + T.The tweaked public key, PB', now serves as User B's new address for receiving funds. User A, only ever came in contact with User B’s Public key. 3: User B Accesses the FundsTo spend the funds, User B needs the corresponding private key for PB', called kB'.( this is the one they generated or already had in step 1)Since PB' is the result of adding PB and T (PB' = PB + T = kB * G + t * G = (kB + t) * G), User B can find kB' by adding the original private key, kB, to the tweak value, t: kB' = kB + t.User B uses this tweaked private key, kB', to sign transactions from the new address.At no point was there a shared private key, and therefore there would be no urgency for User B to move the funds from the generated address, because only User B has both the original private key, and the message(the tweak) required to to generate the private key for the tweaked public key in the first place.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "March 10, 2024, 03:23:46 AM",
+      "body": "i know how things work with keypairsjust your title, description and explainer didnt match each other of where you put the message",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 10, 2024, 09:58:25 AM",
+      "body": "Quote from: franky1 on March 10, 2024, 03:23:46 AMi know how things work with keypairsjust your title, description and explainer didnt match each other of where you put the messageHey FrankyI wasn't explaining Keypairs, but how my system works. Your previous comment implied that I didn't know how ECC works, and I'm sure you can tell that's not true. It makes sense for me to include the full context to the postI am not trying to be argumentative, but I believe I have included all the information, answered everyone's questions, and did so completely, and politely. As I said, the tweaking doesn't need to take place on private keys initially, so I was simply clearing up that fact. I can start with a public key, and this would be the process if you were creating an address for someone else, rather than yourself. Therefore your comment above \"you do know private key is pre ECC and Public key post\"... in order to clarify I wanted to make it very clear. Additionally, I was simply answering your questions too. For example, there is no shared private key in this process as you mentioned previously. \"just your title, description and explainer didn't match each other of where you put the message\"  - How so? A public key is used to derive an address, and therefor the message is part of the address, and can be validated against it?Explaining complex subjects isn't a strong point of mine, but I think I've done an OK job of it, considering the article wasn't for a technical audience, and my follow up comments clear things up. Happy to take on any constructive criticisms or otherwise. Maybe I should have been clearer from the outset, however it is difficult to gauge exactly how much information to include initially and might just have been ignored completely, as other posts have been.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "March 10, 2024, 03:56:23 PM",
+      "body": "your title suggests adding message to a transaction.. yet its hidden in the key thus never appears in the blockchain as extra meta data.. you then said its related to any keypair that use ECC of secp256k1 type,..yet then you tell me its done after the ECC, to the public key not privateso it was about clarifying your description,i dont doubt your knowledge it was more of a poke at your description",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flavatron",
+      "created_time": "March 11, 2024, 11:39:54 AM",
+      "body": "Quote from: franky1 on March 10, 2024, 03:56:23 PMyour title suggests adding message to a transaction.. yet its hidden in the key thus never appears in the blockchain as extra meta data.. you then said its related to any keypair that use ECC of secp256k1 type,..yet then you tell me its done after the ECC, to the public key not privateso it was about clarifying your description,i dont doubt your knowledge it was more of a poke at your descriptionThank you, Franky. I do appreciate the feedback and hopefully I can make it clearer in the title and in the body of the post what I'm doing. Let me try to clarify these points more accurately:The title was intended to highlight the aspect of embedding transactional information or conditions directly within the cryptographic process, without adding extra metadata on the blockchain.(I just couldn't come up with a title which wasn't overly wordy). This is achieved through what I've termed the KeyShift process, which indeed tweaks the public key based on a condition or message. As you rightly point out, the data isn't stored on the blockchain in the conventional sense. However, it can be proved to have been part of the address where the funds are sent. This is by design ofc, because I specifically wanted to avoid storing arbitrary data on chain. Relation to ECC and secp256k1: The process I am using is deeply rooted in the principles of ECC, particularly with keys derived from the secp256k1 curve. The idea here is in the application on said keys(either public or private in any order) - performing a tweak on the public key derived from ECC operations. This allows for the creation of a new, unique address (public key) that incorporates the intended condition or message without altering the fundamental ECC process of generating keys. So while conventionally, the public key might not undergo further ECC operations, I do carry out further calculations within the ECC framework. Clarification on Public vs. Private Keys: The confusion might stem from my attempt to explain the technical process in layman's terms( but I'm having a hard time to gauge how to get people to engage with content in general, and so this is my bad). To clarify, the KeyShift process involves tweaking the public key in a manner that is cryptographically linked to a specific message or condition. This tweak does not require any manipulation of the private key itself by external parties. Instead, it's the derivation of the new, tweaked public key that's influenced. The owner of the original private key(for which the original public key is tied to) can then generate a corresponding private key to access the funds or data, maintaining the integrity and security of the ECC framework. The above can obviously be reversed, as would be the case if you started with an existing private key. In that scenario, you can tweak the private key directly, and derive the tweaked public key. However the order doesn't have to be so. Any public key can be tweaked first, and it only later required( when looking to spend) that the private key(for the tweaked public key) would need to be created by manipulating the original private key counterpart to the earlier tweaked public key. In any case, although the data isn't stored on chain in the conventional sense, it does act as a proof and/or mechanism to have this condition directly embedded into the transactional process. I'm totally open to how to reword/rephrase the title on initial description. I'd appreciate any ideas you have on that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

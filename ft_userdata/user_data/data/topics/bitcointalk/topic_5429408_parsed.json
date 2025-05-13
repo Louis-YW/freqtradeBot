@@ -1,0 +1,165 @@
+{
+  "id": "topic_5429408",
+  "title": "d5000",
+  "author": "d5000",
+  "created_time": "December 16, 2022, 01:56:08 PMLast edit: December 16, 2022, 04:06:15 PM by d5000",
+  "content": "The recent discussion about some politicians wanting to introduce KYC/AML requirements for miners (which I of course do hope will never come, in no country of the world) brought me to think about the censorship problem, i.e. the dangers of miners blacklisting certain UTXOs or addresses.Currently, Bitcoin's censorship resistance is based purely on incentives. A miner can include or censor the transactions he wants to, but if he doesn't chose those with most fees included, he will make less profit. And if a transaction gets rejected but pays significantly more fees than the current lower bound to be included, it is likely that another miner will include it in one of the next blocks.Now: What if e.g. 99% of miners blacklist an address or UTXO, would the current system be enough? Would there be a way to improve that, introducing new protocol rules? I have basic understanding of computing and blockchain tech but not advanced enough to know if an improvement is principally impossible or if there only hasn't been enough research on this.If there was research, even the goal it was deemed impossible, I would be grateful for links, possible BIPs, mailinglist discussions etc.As a layman one could imagine, for example, a mechanism where signatures of transaction data by potential miners are collected before the \"real\" inclusion of the block. (Edit: I clarify here that this is not a serious proposal but only an example where an idea for an approach could be starting.)The example I had in mind: Miners could publicly first sign all transactions to acknowledge they have received them. Three new rules are introduced for tx inclusions in blocks:1) They can only include transactions which they have publicly signed before.2) They cannot include any transaction which has a lower fee than another transaction they didn't include but have previously signed.3) Any node (\"challenger\") can challenge a recent block proving that the miner hasn't followed rule 1 or 2, and if he can prove it, then the \"challenger\" node gets the block reward and fees (this would need major protocol changes, but should be possible as similar mechanisms exist in \"slashing\" PoS protocols).This is in the end also a \"financial incentive\" to not censor, but it should be much stronger than the current mechanism as an entire block reward + fee would be in danger for the censoring miner.The problem is, obviously, \"where and how do the miners exactly publicly sign the transactions\"? There would have to be a \"global state\" of all these signatures.If they have to sign the complete transaction data on-chain (i.e. as an \"attachment\" to an earlier block, which later could be pruned), then they could censor transactions in this step based on blacklisted UTXOs, like they would when they decide which transaction they include in a block. Probably nothing would have been won, although I could imagine situations where a \"cartel\" censoring transactions could have to be bigger with such an approach if two different miners have to intervene in a \"approval\" of a transaction.Where my doubt is if there is a way to make them sign only the TXID or incomplete transaction data without the identification of UTXOs, without possible \"challengers\" being able to game the system, never transmitting the complete data to the miners. Is this perhaps possible with zero-knowledge approaches? Or could there be a second step, i.e. once the challenger has proven a miner has violated the rules, the miner gets some kind of second chance (as then the transaction data would be publicly known due to the challenger)?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5429408",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "December 16, 2022, 02:04:25 PM",
+      "body": "Quote from: d5000 on December 16, 2022, 01:56:08 PMNow: What if e.g. 99% of miners blacklist an address or UTXO, would the current system be enough? Would there be a way to improve that, introducing new protocol rules?What if it's only 51% of the miners, and they also ignore any blocks that include \"forbidden\" transactions?Quote3) Any node (\"challenger\") can challenge a recent block proving that the miner hasn't followed rule 1 or 2, and if he can prove it, then the \"challenger\" node gets the block reward and fees (this would need major protocol changes, but should be possible as similar mechanisms exist in \"slashing\" PoS protocols).That's easy to get around if the challenger colludes with the accused miner.The current mining system has worked just fine since it was created. At the moment, I see no reason to change it any time soon.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "December 16, 2022, 02:11:54 PM",
+      "body": "Quote from: d5000 on December 16, 2022, 01:56:08 PMSince every node (hence each pool) has its own mempool, you cannot ensure a node has received or not a transaction.This being said, the government nodes wanting to censor a transaction can simply not tell / sign that they've received it.Nobody stops them from doing that and eluding your system, yet still working in the same way they do now.So I see your system only something that gives more to do to honest (ie playing by the common rules) polls while the dishonest (in this case censoring) ones are favored.Am I missing something?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d5000",
+      "created_time": "December 16, 2022, 04:03:39 PM",
+      "body": "Quote from: LoyceV on December 16, 2022, 02:04:25 PMWhat if it's only 51% of the miners, and they also ignore any blocks that include \"forbidden\" transactions?You're right, that would be actually enough. Thus I think the problem is not only a theoretical danger.Quote from: LoyceV on December 16, 2022, 02:04:25 PMThat's easy to get around if the challenger colludes with the accused miner.If any node can challenge (not only miners), then there would be a low risk of such a collusion. Or am I understanding wrong?Quote from: LoyceV on December 16, 2022, 02:04:25 PMThe current mining system has worked just fine since it was created. At the moment, I see no reason to change it any time soon.For now, I was interested mainly in the theoretical possibility, for the case censorship could be a problem eventually. The example I gave was only a possibility I could imagine where, from a layman's perspective, a solution may lie, not at all really a \"proposal\". I've clarified this now in the OP.Maybe Lightning could also be an instrument to mitigate the threat, although of course the channels with coins with problematic history which could be blacklisted would have to be opened before the 51% censorship attack begins (and the problem is that those could then also not be closed during the censorship attack).@NeuroticFish: Exactly that is the problem if we don't collect the signatures on-chain in some way; thus the idea to \"collect\" signatures of partial transaction data in earlier blocks, but of course if these include the UTXO data, then these could be censored too (as the miner mining this block would see they contain a blacklisted UTXO and simply not process the signature); basically the problem would only be transferred to another miner (who in the case of an 51% attack will also be part of the censorship cartel).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "December 16, 2022, 04:25:51 PMLast edit: December 17, 2022, 08:23:13 AM by LoyceV",
+      "body": "Quote from: d5000 on December 16, 2022, 04:03:39 PMIf any node can challenge (not only miners), then there would be a low risk of such a collusion. Or am I understanding wrong?In that case: which one of the 12000 challenging nodes gets the block reward?Quotethe case censorship could be a problem eventuallyIf we're going to have large protocol changes anyway, wouldn't it make more sense to make transactions private by default (like Monero)? You can't censor what you can't see.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d5000",
+      "created_time": "December 16, 2022, 05:45:13 PMLast edit: December 17, 2022, 04:48:52 AM by d5000",
+      "body": "Quote from: LoyceV on December 16, 2022, 04:25:51 PMIn that case: which one of the 12000 challenging nodes gets the block reward?The first one accepted by the full nodes (just like normally a block is \"the first\" to be found and accepted). I'm however aware that this isn't easy to define, and would need a specific mechanism if there is ambiguity about who is the first in the network, and it's possible that this mechanism can be influenced by miners.Quote from: LoyceV on December 16, 2022, 04:25:51 PMIf we're going to have large protocol changes anyway, wouldn't it make more sense to make transactions private by defualt (like Monero)? You can't censor what you can't see.I had definitely thought about Monero as well. But I thought that there could be still a censorship problem, as I supposed miners still see all the origins (i.e. the UTXOs where all inputs of the block originate) of the transactions, only that they apply a mandatory CoinJoin to it.Maybe I'm wrong and they can't see that (due to a kind of stealth address, perhaps?), I unfortunately don't know the Monero protocol that well. If I'm wrong and miners can't censor anybody in the Monero protocol, then at least we can say that the problem is theoretically solvable and that would be awesome Then of course the question would be: could such a mechanism also be added to Bitcoin eventually in a way censorship is prevented? Or perhaps other mechanisms, coming e.g. from Zcash, Grin/Mimblewimble etc.?What about Taproot and P2SH?Edit: Just searched the Web a bit and found an interesting article leading me to this research. The essence seems to be that tracking/censorship would be still possible in Monero but only with a complicated \"elimination\" process, and that a recent upgrade made these attacks even harder. Need to look into it further however.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 17, 2022, 05:10:00 AM",
+      "body": "There is no need to change the protocol or add any more complication. It is easily solved by making bitcoin more decentralized.In fact any time you are thinking about any of the basic principles of bitcoin (in this case censorship resistance) the same question arises: how decentralized is bitcoin? Because decentralization is the solution to all your concerns regarding these principles.If one government in one jurisdiction demands censorship in their own country, the rest of the world are not going to follow and as long as all or majority of bitcoin mining power is not in that jurisdiction, their decision won't matter one bit.Case in point US government having a blacklist of bitcoin addresses they have \"sanctioned\". They simply can not enforce that on miners/mining-pools because bitcoin is decentralized and the amount of hashrate in US jurisdiction is small.The bitcoin community also doesn't look kindly to such actions.Case in point MARA pool. News came out they were censoring transactions, so they were attacked by eveeryone and even their stock price dumped. The small number of miners connecting to their pool (the majority of hashrate is owned by the company itself) left the pool too.It is going to be the same with any other mining pool that tries going down that road.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LegendaryK",
+      "created_time": "December 17, 2022, 05:50:30 AM",
+      "body": "Quote from: d5000 on December 16, 2022, 01:56:08 PMThe recent discussion about some politicians wanting to introduce KYC/AML requirements for miners (which I of course do hope will never come, in no country of the world) brought me to think about the censorship problem, i.e. the dangers of miners blacklisting certain UTXOs or addresses.Miners require massive amounts of power, any miners not being part of a mining pool in regulatory-compliance.Can have their power cut and be charged as a money launder after a few new laws are added.https://bitcoinmagazine.com/business/new-north-american-mining-pool-bets-on-region-and-regulatory-compliancehttps://bitaml.com/2022/03/21/crypto-mining-aml-compliance/https://www.coindesk.com/policy/2022/09/14/us-treasury-blacklists-several-more-bitcoin-addresses-tied-to-ransomware-attacks/https://www.washingtonpost.com/dc-md-va/2022/05/16/first-us-criminal-cryptocurrency-sanctions/Over 51% of btc hashrate is controlled by only 3 mining pool operators, they can be arrested for money laundering and have any ip addresses they use blocked by the ISPs that conform to government regulation.Not to worry, as I expect proof of work networks to be banned worldwide by 2025 before global KYC/AML controls the BTC mining pools.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "December 17, 2022, 08:32:12 AM",
+      "body": "Quote from: d5000 on December 16, 2022, 05:45:13 PMMaybe I'm wrong and they can't see that (due to a kind of stealth address, perhaps?), I unfortunately don't know the Monero protocol that well. If I'm wrong and miners can't censor anybody in the Monero protocol, then at least we can say that the problem is theoretically solvable and that would be awesome I don't know the technical details of Monero either, but as far as I know, miners can't know transaction details either.QuoteThen of course the question would be: could such a mechanism also be added to Bitcoin eventually in a way censorship is prevented?With concensus, I assume it can be done. But one of the reasons not to do it, is regulation. Governments won't like a secure private payment system out of their control.Quote from: LegendaryK on December 17, 2022, 05:50:30 AMOver 51% of btc hashrate is controlled by only 3 mining pool operatorsAnd the moment those pools start doing things that aren't in the interest of miners, those miners will move to a different pool and those 3 will no longer control 51%.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LegendaryK",
+      "created_time": "December 17, 2022, 08:45:25 AMLast edit: December 17, 2022, 09:17:25 AM by LegendaryK",
+      "body": "Quote from: LoyceV on December 17, 2022, 08:32:12 AMQuote from: LegendaryK on December 17, 2022, 05:50:30 AMOver 51% of btc hashrate is controlled by only 3 mining pool operatorsAnd the moment those pools start doing things that aren't in the interest of miners, those miners will move to a different pool and those 3 will no longer control 51%.And how long do those 3 mining pool operators need to doublespend to destroy trust in BTC.Less than ½ hour,and if they are on an exchange or markets that lets them short BTC or short companies that own BTC,they could become insanely rich in a single day, and no longer need to run a mining pool.Pretending it can't happen seems to be the normal response on btctalk.But there are literally no technical barriers stopping them from achieving a 51% attack against BTC weak proof of waste security model.PoW Miners can only switch after the damage is done, not before.For all we know the 3 mining pool operators are colluding and have already scheduled a D-Day for BTC for maximum profits.D-Day = DoubleSpend DaySatoshi always expected Miner Greed to secure BTC, what happens when the miners figure out a way to make more money faster by killing bitcoin.  Part of the reason that using one of the 7 deadly sins as a security model was a bad idea.FYI:  https://modernconsensus.com/cryptocurrencies/bitcoin/report-mining-pool-consolidation-threatens-bitcoin-security/QuoteBitcoin’s security depends on the network remaining decentralized. If a single entity, or group of entities under the control of one company, were to gain control of more than half of the network’s computing power, they could in theory use that to launch a so-called 51% attack. That would allow them to reverse transactions that were completed while they were in control of the network—meaning they could double-spend bitcoins. Group was five when the above article was written, now only 3 are required, I bet those rose colored glasses are really nice.  FYI2:  AI warns of loss of trust for btc driving it's fiat price to zero.Quote from: LegendaryK on December 17, 2022, 04:03:35 AMQuote from: GxSTxV on December 16, 2022, 09:46:09 PM [It is difficult to predict specific scenarios that could cause the price of bitcoin to drop to zero, as it would require a significant and unforeseen shift in market conditions or technology.However, there are a few hypothetical scenarios that could potentially lead to the collapse of the bitcoin market and a drop in the price of bitcoin to zero:Loss of trust: If the bitcoin network were to suffer a major security breach or if there were a widespread loss of trust in the integrity of the network, the price of bitcoin could potentially drop to zero.* Only 3 mining Pool operators control over 51% of btc hashrate, and could doublespend at any moment ,immediately causing Loss of Trust.*But let's all close our eyes and pretend it can't happen.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "December 17, 2022, 09:36:11 AM",
+      "body": "Quote from: LegendaryK on December 17, 2022, 08:45:25 AMAnd how long do those 3 mining pool operators need to doublespend to destroy trust in BTC.Less than ½ hour,I'll apply the feedback NotATether gave you to this:Code:Take this guy's posts about Proof of Work with a grain of salt.Quotethey could become insanely rich in a single day, and no longer need to run a mining pool.And yet, it hasn't happened for 13 years. Your anti Proof of Work propaganda is flawed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "December 17, 2022, 12:05:13 PM",
+      "body": "Rather than proposing complex mechanism, isn't it more practical to revive P2Pool (decentralized pool) and encourage miner to use decentralized pool?Quote from: LoyceV on December 16, 2022, 04:25:51 PMQuotethe case censorship could be a problem eventuallyIf we're going to have large protocol changes anyway, wouldn't it make more sense to make transactions private by default (like Monero)? You can't censor what you can't see.Monero transaction have bigger size and take more time to be confirmed, so i doubt it'll happen.Quote from: LegendaryK on December 17, 2022, 08:45:25 AMAnd how long do those 3 mining pool operators need to doublespend to destroy trust in BTC.Less than ½ hour,and if they are on an exchange or markets that lets them short BTC or short companies that own BTC,they could become insanely rich in a single day, and no longer need to run a mining pool.1. 0.5 hours would be difficult since some exchange require 6 confirmation.2. Huge withdraw usually is reviewed manually or checked more thoroughly by the system.3. Unless they swap BTC for decentralized altcoin, they face risk their fiat or altcoin frozen or reversed.4. They'll be arrested unless they could secure cooperation with various corrupt government worker.5. etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 17, 2022, 01:34:18 PM",
+      "body": "Quote from: ETFbitcoin on December 17, 2022, 12:05:13 PMRather than proposing complex mechanism, isn't it more practical to revive P2Pool (decentralized pool) and encourage miner to use decentralized pool?There are also protocols such as Stratum V2 which should be encouraged which allow miners in big pools to decide for themselves which transactions to include in their candidate block. Another possibility to prevent this kind of miner censorship is to expand upon coinjoins.At the moment, if a miner wants to censor your transaction, then they simply don't include it will lose the fee of your transaction only, which is like to be a few hundred to a few thousand sats and therefore of no real consequence to them. Let say instead that your transaction is part of a much larger coinjoin transaction, with 50 inputs and 100 outputs, and a combined fee of 100,000 sats. To censor your transaction they would need to exclude the entire coinjoin transaction, and lose out on a much larger fee. What if that coinjoin transaction included 200 inputs, or 500, or 1000? At some point it becomes worth enough that a miner is going to want to include it to cash in on the very large fee, especially over time as we move more and more towards the scenario of fees (rather than block subsidy) being the primary source of miner income.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LegendaryK",
+      "created_time": "December 18, 2022, 01:45:08 AMLast edit: December 18, 2022, 09:22:01 AM by mprep",
+      "body": "Quote from: LoyceV on December 17, 2022, 09:36:11 AMQuote from: LegendaryK on December 17, 2022, 08:45:25 AMAnd how long do those 3 mining pool operators need to doublespend to destroy trust in BTC.Less than ½ hour,Code:NotATether : Who has not had 24x7 power for Years.Quotethey could become insanely rich in a single day, and no longer need to run a mining pool.And yet, it hasn't happened for 13 years. Your anti Proof of Work propaganda is flawed.So if something has yet to happen, in your mind that means it can never happen.Now that is flawed.Please tell me you have been drinking, I hate to think this was you fully coherent, sprouting such nonsense.Just because you have not broke your arm in a fall, does not mean you have any guarantees you won't next week. or Just because your house has never burned down yet, does not mean it will never burn down. As the rewards fall and transaction fees don't make up the difference, dark thoughts increase for the miners.Don't forget, Satoshi original design of onchain transactions fee capacity increasing to offset lost rewards has been sidetracked by blockstream LN/Liquid debacle.So there is your growing difference. https://www.cs.princeton.edu/~arvindn/publications/mining_CCS.pdfQuoteOn the Instability of Bitcoin Without the Block RewardWith each halving dangers of miners or mining pool operators colluding for an alternative revenue stream increases.The increasing energy costs and lower Venture capital money are other vises tightening around their necksQuote from: ETFbitcoin on December 17, 2022, 12:05:13 PMQuote from: LegendaryK on December 17, 2022, 08:45:25 AMAnd how long do those 3 mining pool operators need to doublespend to destroy trust in BTC.Less than ½ hour,and if they are on an exchange or markets that lets them short BTC or short companies that own BTC,they could become insanely rich in a single day, and no longer need to run a mining pool.1. 0.5 hours would be difficult since some exchange require 6 confirmation.2. Huge withdraw usually is reviewed manually or checked more thoroughly by the system.Does not Matter, all that matters is a doublespend happens, and trust is lost. Amount is irrelevant. Fiat Price crashes. 3. Unless they swap BTC for decentralized altcoin, they face risk their fiat or altcoin frozen or reversed.Does not Matter, all that matters is a doublespend happens, and trust is lost. Amount is irrelevant. Fiat Price crashes.4. They'll be arrested unless they could secure cooperation with various corrupt government worker.   Doubtful you know who they are, or they claim they were hacked.Some exchanges only require 1 and many only require 3, which is why less than ½ hour was listed.Plus the money can be made shorting bitcoin in different ways.FYI:https://www.investopedia.com/news/short-bitcoin/Quote7 Ways to Short Bitcoin1. Margin Trading 2. Futures Market 3. Binary Options Trading 4. Prediction Markets 5. Short-Selling Bitcoin Assets 6. Using Bitcoin CFDs 7. Using Inverse Exchange-Traded Products So while some on btctalk have been crying hodl since $64K, alot of btc insiders have been raking in the money since the fall.[moderator's note: consecutive posts merged]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitcoinsFTW9",
+      "created_time": "December 18, 2022, 08:24:15 AM",
+      "body": "There are no known proposals to change the current mechanism for including transactions in blocks to introduce more explicit censorship resistance measures, such as the ones you described. While it is theoretically possible to introduce new protocol rules to achieve this, it is unlikely that such changes would be accepted by the wider Bitcoin community and would likely require a hard fork of the network.In general, the best way to ensure censorship resistance is to maintain a decentralized and competitive mining landscape, where miners have incentives to act in their own self-interest and include as many high-fee transactions as possible in order to maximize their profits. This helps to ensure that the network can continue to process and validate transactions without interference or manipulation by any individual or group of participants.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 18, 2022, 11:16:24 AM",
+      "body": "Quote from: ETFbitcoin on December 18, 2022, 08:48:16 AMIIRC it require pool owner to enable such feature manually, so IMO it's not really useful.Yes it requires the pool operator to enable it, but I don't think that means it should be discarded as not useful. Rather, a push to make every major pool operator run it (and specifically to enable the job negotiation protocol) would help to protect against censorship of individual transactions. It might also have some legal benefits for mining pools. If it were to become the default, and some government demands that a mining pool censors some specific UTXOs, then the mining pool can point to the fact that they do not have the power to do this and the miners themselves can choose to include those UTXOs if they choose.There are also a number of other upgrades that might entice pools to start using this software: https://braiins.com/stratum-v2",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "December 18, 2022, 12:02:13 PM",
+      "body": "Quote from: o_e_l_e_o on December 18, 2022, 11:16:24 AMQuote from: ETFbitcoin on December 18, 2022, 08:48:16 AMIIRC it require pool owner to enable such feature manually, so IMO it's not really useful.Yes it requires the pool operator to enable it, but I don't think that means it should be discarded as not useful. Rather, a push to make every major pool operator run it (and specifically to enable the job negotiation protocol) would help to protect against censorship of individual transactions.I doubt we'll see such push since enabling such feature doesn't have direct impact on miner's profit.Quote from: o_e_l_e_o on December 18, 2022, 11:16:24 AMIt might also have some legal benefits for mining pools. If it were to become the default, and some government demands that a mining pool censors some specific UTXOs, then the mining pool can point to the fact that they do not have the power to do this and the miners themselves can choose to include those UTXOs if they choose.It's interesting speculation, but half-competent government worker could say pool should disable such feature or even switch to different protocol.Quote from: o_e_l_e_o on December 18, 2022, 11:16:24 AMThere are also a number of other upgrades that might entice pools to start using this software: https://braiins.com/stratum-v2But looking at this thread (Stratum v2: After 10 Years, The Most Used Bitcoin Mining Software Gets Facelift), the reaction towards Stratum v2 is rather mixed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 18, 2022, 02:54:42 PM",
+      "body": "Quote from: ETFbitcoin on December 18, 2022, 12:02:13 PMI doubt we'll see such push since enabling such feature doesn't have direct impact on miner's profit.Not at the moment certainly, but maybe in the future in the hypothetical scenario we are discuss here where some miners might want to include high fee paying transactions which other miners want to exclude. Especially once fees start being worth more than subsidy.And still, if not via Stratum then it is still a good concept which we could see developed and rolled out in other software. Improving decentralization by allowing every individual miner to craft candidate blocks if they want, rather than just settling for centralized control via the pool operator, can only be a good thing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LegendaryK",
+      "created_time": "December 18, 2022, 04:54:42 PM",
+      "body": "Quote from: ETFbitcoin on December 18, 2022, 08:48:16 AMYour initial claim is \"they could become insanely rich in a single day\", so point 2-4 matters a lot to them (the one who perform double spend). And about point 4, exchange definitely have some data of account used to short BTC.The doublespend is only to destroy trust and cause a collapse in anything connected to btc, ($100 or $1000 doublespend) effect on trust will be the samethe money can be made in shorting options listed below , not from the double spend itself.7 Ways to Short Bitcoin1. Margin Trading2. Futures Market3. Binary Options Trading4. Prediction Markets5. Short-Selling Bitcoin Assets6. Using Bitcoin CFDs7. Using Inverse Exchange-Traded Products",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "December 18, 2022, 08:17:46 PM",
+      "body": "The problem is when people say \"the government\" it really comes down to which / what government.Worrying about a transaction being blocked is not any type of a concern since there are large mining pools across the world operating under different rules and government regulations and some of those government don't like each other. A pool operating in the US will probably listen to the US government and possibly others. Do you really think that one operating in Kazakhstan or Russia give a crap about what the US government says? Malaysian pools may care or may not. And so on.Not something worth worrying about.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

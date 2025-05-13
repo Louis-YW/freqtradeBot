@@ -1,0 +1,77 @@
+{
+  "id": "topic_5432020",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "December 27, 2022, 11:10:10 AM",
+  "content": "Hi, I would like to understand how exactly VanitySearch works.Can you actually search for a specific suffix with tools like VanitySearch or does it only work for prefixes? What is the reason that only in the prefix can be searched successfully and efficiently, but not in the middle or at the end of a bitcoin address? Are there tools available out there similar to VanitySearch that can search for certain suffixes or patterns ?And how does VanitySearch calculate the \"probability\" until a hit occurs? The program seems to know a range and can therefore estimate how long it could take until a hit would be achieved. I conclude from this that VanitySearch does not simply create random addresses and then compares them according to the desired search pattern, but VanitySearch must rather search a certain range. Or? How exactly does this work, who can explain it to me in easy to understand words please?Thank you very much.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432020",
+  "comments": [
+    {
+      "author": "PawGo",
+      "created_time": "December 27, 2022, 01:33:51 PM",
+      "body": "In generates the random starting point as launches search from that point (not exactly sequentially, but it is an implementation detail).So, it checks private keys one by one. For each private key a corresponding public key is generated (in compressed or uncompressed form), then public key it is hashed and what is tested is if hash encoded with base58 generates the expected text.Of course the more characters are requested, the more tries must be performed to fit the template. Basically we may say that each character makes it 58 times more difficult, but there are some details which makes calculations more complicated (the way how base58 encoding works etc). I do not know why you think search for ending of address could be more or less difficult. Statistically it would be the same, technically a bit more demanding because the end of address is a checksum part, so it requires some extra pre-calculations.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 27, 2022, 02:08:07 PM",
+      "body": "If the addresses are indeed randomly generated, then the starting point would not have any special role, since everything is generated randomly either way. How does VanitySearch calculate the probability which is already displayed shortly after the start and constantly updates in the course of the calculation? So there must be a previously defined quantity known, otherwise it could not calculate a probability for the duration. How does it calculate this, if the address generation is subject to chance?However, I am primarily interested in understanding whether VanitySearch creates random addresses and scans them for the search pattern. If it finds a hit, it remembers it, outputs it to the user. If it does not find a match, it immediately discards the address it just generated. Is this correct so far?Could you use VanitySearch to search for the search text \"test\", for example? According to your explanation, this should spit out several dozens or even hundreds of hits at once, because VanitySearch can find a 4-letter prefix very quickly. Are there modified VanitySearch versions, which can also search in the middle, do you know anything ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "December 27, 2022, 02:14:03 PM",
+      "body": "It generates random starting point and then checks private keys with some algorithm (one by one + some tricks, so at the end private keys tested are not purely sequential in the sense of 1,2,3..). With the same starting point and the same prefix requested, you will always receive the same result, that's why using random starting point is critical.You may check my fork where (https://github.com/PawelGorny/VanitySearch) where I added possibility to force starting point (--startPriv). The result will be always the same for pair starting key + prefix. There is no \"randomization of path\" in the middle of process.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 27, 2022, 02:20:45 PM",
+      "body": "Thank you, I understood the part about \"randomness\" and \"starting point\". What about the other questions. Is it possible to search for a pattern within the address, not as prefix ? I have written a simple solution in Python but it's way too slow. I do generate only about 36,000 addresses/sec per each thread. I'd like to use VanitySearch and its fast computation capabilities somehow, unfortunately I have no C++ knowledge.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hZti",
+      "created_time": "December 27, 2022, 04:00:08 PM",
+      "body": "It is possible to search for every kind of address (there are people that search for addresses that are extra short, have a specific ending, etc.). The problem would be to have the right tool for it. I think vanity search has limited options on what you can search. But this is just a limitation of vanity search and you could probably find somebody that could change that for you.Basically Vanity Search creates millions of addresses per second and then looks for specific things in theses addresses. You just have to change what vanity search is looking for, even if this will involve some coding skills.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 27, 2022, 05:11:34 PM",
+      "body": "Thank you very much. After some research and reading into the matter, I was already able to find and use the necessary information in the source code of VanitySearch. I'm glad and happy, now I have VanitySearch next to my own Python program, which I can pull up and use as a comparison. I will continue to tinker and see if I can somehow use the fast implementation from VanitySearch which is written in native C++ for my own Python projects. It should be possible as far as I understood. You can have native code in a low-level language like C or C++ and then call it from Python using a library like ctypes or PyBind. This can allow you to write highly optimized code that runs at near-native speeds.I'm excited and looking forward to it. Thanks so far",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 27, 2022, 06:51:36 PM",
+      "body": "Quote from: citb0in on December 27, 2022, 05:11:34 PMYou can have native code in a low-level language like C or C++ and then call it from Python using a library like ctypes or PyBind. This can allow you to write highly optimized code that runs at near-native speeds.I think it's better if you just make a Python module encapsulating it directly, instead of relying on a 3rd party library. Look how fast Numpy is for instance. And that's something written with Python bindings.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 27, 2022, 07:13:34 PMLast edit: December 27, 2022, 07:51:31 PM by citb0in",
+      "body": "I have tried a bunch of stuff with numpy, but certainly I'm doing it wrong. I cannot get any better speed using it. Here's an example of my simple code that will generate 1 million keys and the associated compressed address:Code:from fastecdsa import keys, curveimport secp256k1 as ice# how many addresses to generatenum_addresses = 1000000# Open a file for writingwith open('addresses.out', 'w') as f:  # Generate and write each address to the file  for i in range(num_addresses):    prvkey_dec   = keys.gen_private_key(curve.P256)    addr = ice.privatekey_to_address(0, True, prvkey_dec)    f.write(f'{addr}\\n')Quotereal   1m22,192suser   1m21,461ssys   0m0,640sThen I rewrite the code to implement numpy ...Code:import numpy as npimport fastecdsa.keys as fkeysimport fastecdsa.curve as fcurveimport secp256k1 as ice# how many addresses to generatenum_addresses = 1000000# Generate a NumPy array of random private keys using fastecdsaprivate_keys = np.array([fkeys.gen_private_key(fcurve.P256) for _ in range(num_addresses)])# Use secp256k1 to convert the private keys to addressesaddresses = np.array([ice.privatekey_to_address(0, True, dec) for dec in private_keys])# Write the addresses to a filenp.savetxt('addresses_numpy.out', addresses, fmt='%s')Quotereal   1m19,636suser   1m18,826ssys   0m1,027sI don't see any performance hit here. What am I doing wrong?EDIT: I am sorried for getting off-topic now. Let's continue HERE",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

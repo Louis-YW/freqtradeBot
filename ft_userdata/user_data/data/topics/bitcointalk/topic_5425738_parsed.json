@@ -1,0 +1,45 @@
+{
+  "id": "topic_5425738",
+  "title": "BoyFromDubai",
+  "author": "BoyFromDubai",
+  "created_time": "December 04, 2022, 05:41:53 PM",
+  "content": "The question is not about the connection of blocks with hashes of headers, but if I change one file in chain, what will happen? How this block will be recovered and when it will be clear that I have changed it for the program?Is there smth kinda periodical check or what? I've heard that the changed block will be replaced with the right one, but how? What does have to happen, so the program changes the block? The question is more about technical part of Bitcoin",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5425738",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 04, 2022, 05:56:25 PM",
+      "body": "Every time you start Bitcoin Core, it performs a verification check on its own local database of all the blocks it has already downloaded. You can see this at the bottom of the GUI window every time you start it up, when it says \"Verifying blocks...\". If it finds a block which is invalid (because you have edited it in some way), it will discard that block and download the original valid block from other nodes in order to rebuild the local database.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoyFromDubai",
+      "created_time": "December 04, 2022, 05:58:22 PM",
+      "body": "Ohh, thanks a lot!) I got",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "December 05, 2022, 01:27:08 AM",
+      "body": "Quote from: o_e_l_e_o on December 04, 2022, 05:56:25 PMEvery time you start Bitcoin Core, it performs a verification check on its own local database of all the blocks it has already downloaded. You can see this at the bottom of the GUI window every time you start it up, when it says \"Verifying blocks...\". If it finds a block which is invalid (because you have edited it in some way), it will discard that block and download the original valid block from other nodes in order to rebuild the local database.This is wrong. It does some verification at startup, but it's not the full chain, since reading 300+ gigabytes at every startup would be pretty slow. Looking at my bitcoin node that's been running for like a week, it's IO stats says it's read a little below 6 GB in total, which would be impossible if it did a full chain verification.Generally Bitcoin Core assumes any data it's already downloaded and verified is valid. There seems to be some integrity checking now and then, but a full chain scan is only done on the initial download or when a rescan is forced.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 05, 2022, 10:56:34 AM",
+      "body": "Quote from: ymgve2 on December 05, 2022, 01:27:08 AMThis is wrong. It does some verification at startup, but it's not the full chain, since reading 300+ gigabytes at every startup would be pretty slow.I never said it verified the full chain. As far as I am aware, the full chain is only verified on initial download, if the user performs a reindex, or executes the verifychain command starting from block 0.Still, poking in to it a bit more, it seems that Core now defaults to performing a level 3 check on only the last 6 blocks on start up, which is much fewer blocks than I thought it was. It used to be 288 blocks, but seems to have been reduced to only 6 many years ago.However, Andrew Chow points out here that Core still verifies the integrity of its databases on startup, so may detect a tampered block that way.So to more fully answer OP's question, it depends on how far back the block he is editing is, and how exactly he edits it, whether or not Core would pick up that it had been edited outside of a full reindex or verifychain. Not that editing an old block would achieve anything, since it won't be broadcast and would be rejected as invalid by any other node anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

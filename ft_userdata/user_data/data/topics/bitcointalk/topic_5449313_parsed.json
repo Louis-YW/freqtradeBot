@@ -1,0 +1,37 @@
+{
+  "id": "topic_5449313",
+  "title": "clemdementhe",
+  "author": "clemdementhe",
+  "created_time": "April 18, 2023, 03:24:55 PM",
+  "content": "Jeff Garzik linked to this article suggesting older (18.04) Ubuntu encrypted disks might be vulnerable to brute-force attacks: https://mjg59.dreamwidth.org/66429.htmlA fresh install of a later distro (22.04?) would seem to plug the possible vulnerability. Does Armory offline run on Ubuntu 22.04?In passing, this made me wonder if the Armory transaction-signing / key-exposing password has any anti brute-forcing mitigations? Could a 20+ mixed character password still survive today's attacks?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5449313",
+  "comments": [
+    {
+      "author": "goatpig",
+      "created_time": "April 19, 2023, 12:35:14 PM",
+      "body": "Quote from: clemdementhe on April 18, 2023, 03:24:55 PMJeff Garzik linked to this article suggesting older (18.04) Ubuntu encrypted disks might be vulnerable to brute-force attacks:In general you shouldn't trust on disk encryption schemes for data at rest as it uses a new IV per block, and the IVs have to be deterministic, when the AES candidates expect randomized IVs (iirc). In this case the \"vulnerability\" was PBKDF2, which does not actually enforce a hash function nor a number of iteration. I don't expect the first instance of LUKS is using SHA512 nor 512k passes, which is the more common use of PBKDF2 you encounter these days.Still, even with those parameters, I believe PBKDF2 can be brute forced by a state actor nowadays. It is a bit unsettling Ubuntu would use such a weak KDF when you need to unlock your key only at system start (meaning it's ok if it takes a few seconds, it won't degrade user experience).Quote A fresh install of a later distro (22.04?) would seem to plug the possible vulnerability.  The recommendation is to set the KDF manually, which likely can be changed after that fact. Disk encryption schemes do not typically encrypt the all the data on disk with your password. Rather, they encrypt a master key entry, and that master key is used to encrypt the actual data. This allows you to change the encryption key (or parameters in this case) on the cheap. If you really want to be sure of your encryption strength, this is what you need to do. Just updating your OS does no guarantee the default LUKS settings offered by the GUI installer (what most people use unless your an Arch nut) will fit your security needs.QuoteDoes Armory offline run on Ubuntu 22.04?The dev branch does, but it's not user friendly yet. If you want to run 96.5 on Ubuntu 22.04, you'll need to install both py2 and qt4, or setup a 18.04 VM.QuoteIn passing, this made me wonder if the Armory transaction-signing / key-exposing password has any anti brute-forcing mitigations? Could a 20+ mixed character password still survive today's attacks?Funny you ask, I looked at the KDF code last week. Armory uses Scrypt, which is a memory intensive KDF. The current parameters allow up to 32MB per pass and target a between 0,25 to 2 seconds long unlock based (this is something you can set to its upper bound at wallet creation/password change). I was considering removing the hardcoded limits. Of the top of my head, to crack a 20 characters password, you would need something like 10^20 attempts per seconds to be able get a solution within a lifetime. If it takes anywhere near 0.1s to perform a single attempt, I don't think there's enough hardware on the planet to handle that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "clemdementhe",
+      "created_time": "April 19, 2023, 08:21:17 PM",
+      "body": "Thanks, goatpig. Thats very helpful. The use of Scrypt is re-assuring (I do now remember setting a long unlock). So even if the machine were accessed and the disk encryption broken, the keys themselves would be secure for long enough for the coins to be safely moved using a back-up. Though at the loss of plausible deniability!I agree that the choice of such a weak process seems \"unsettling\", especially for single use - I can only imagine that 6 or 7 years ago (when I imagine 18 was being specced) it all seemed \"good enough\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "April 20, 2023, 07:37:30 AM",
+      "body": "Quote from: clemdementhe on April 19, 2023, 08:21:17 PMI can only imagine that 6 or 7 years ago (when I imagine 18 was being specced) it all seemed \"good enough\".Maybe they just forgot about it until LUKS itself receive a major update. Tends to happen in these large projects, you just don't go around turning stones on stuff that appear to work.QuoteThough at the loss of plausible deniability!If someone finds a wallet on your system with private keys in it, I think they can reasonably assume the coins are yours. The fact that they have access to the public keys would allow them to trace the movement of the coins too. To improve protection, the new wallet format allows you to encrypt all data in the wallet (not just private keys) with a second passphrase.This still means the attacker can see your public keys in your local blockchain database. Encrypting that data is a lot more complicated than the wallet, I haven't got around it yet. You'd have to use a supernode to avoid that data leak for now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

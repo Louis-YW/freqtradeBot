@@ -1,0 +1,37 @@
+{
+  "id": "topic_5412814",
+  "title": "noureddin_regula",
+  "author": "noureddin_regula",
+  "created_time": "September 08, 2022, 05:18:36 AM",
+  "content": "If I understand correctly, Samourai and Wasabi's Coinjoin implementations use a central coordinator.This coordinator is responsible for receiving the inputs that users want to join and distributing the values ​​equally among the outputs provided by them.The amounts left over from this division are considered change and should not be mixed with the outputs that were used.JoinMarket uses a similar process, but instead of a central coordinator, it uses IRC addresses where so-called takers can act as transaction coordinators and also uses the concept of \"mixdepths\" to isolate coins (for each coinjoin round).If what is described above is correct, the central coordinator (or the taker) needs to know which outputs are related to certain inputs in order to distribute the value correctly. In this case, a malicious coordinator or taker will know the relationship between the inputs/outputs of the transactions.So there is a relationship of trust involved (in relation to the coordinators) and in the case of takers, a chain analysis company can pass itself off as one with very attractive fees to be able to track the maximum number of transactions.My questions are: 1) Is this description about how coinjoin works correct?1.1) If so, is there a way to prevent coordinator or takers from knowing the relationship between inputs / outputs?1.2) If it is wrong, how can coordinators or takers be prevented from knowing this?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412814",
+  "comments": [
+    {
+      "author": "witcher_sense",
+      "created_time": "September 08, 2022, 05:52:54 AM",
+      "body": "Quote from: noureddin_regula on September 08, 2022, 05:18:36 AM1.1) If so, is there a way to prevent coordinator or takers from knowing the relationship between inputs / outputs?There is a way to prevent coordinators from knowing which outputs belong to which inputs - it is called the ZeroLink protocol. ZeroLink protocol describes the mixing technique, how inputs and outputs should be provided, and how communication between users and the coordinator should take place to preserve the anonymity of participants. Users connect to the coordinator's server through Tor and send inputs and blinded outputs. CoinJoin coordinator verifies that inputs are confirmed, and unspent and that they contain a sufficient amount. Also, the coordinator signs blinded outputs and give them back to the users. Users obtain new Tor identities by reconnecting to the network and send the coordinator unblinded signed outputs. The coordinator receives these outputs and constructs a CoinJoin transaction. Using blind signatures and different Tor identities for communication enables anonymous and trustless CoinJoin transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 08, 2022, 06:04:25 AM",
+      "body": "Quote from: witcher_sense on September 08, 2022, 05:52:54 AMThere is a way to prevent coordinators from knowing which outputs belong to which inputs - it is called the ZeroLink protocol. ZeroLink protocol describes the mixing technique, how inputs and outputs should be provided, and how communication between users and the coordinator should take place to preserve the anonymity of participants. Keep in mind that there's no way to tell whether a mixer is actually using ZeroLink so it is possible that they might reproduce the steps using the correct input set to arrive at the same output set.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 08, 2022, 02:29:57 PM",
+      "body": "I'm about to quote this Pieter Wuille's reddit comment, as I find it relevant:Quote from: https://www.reddit.com/r/Bitcoin/comments/e65vdf/comment/f9oxfyk/Nothing is \"sufficient\" for privacy. It's a goal to work towards, but it is so multi-faceted that no single piece of technology can \"solve\" privacy.Quote from: noureddin_regula on September 08, 2022, 05:18:36 AM1) Is this description about how coinjoin works correct?Not exactly. Wasabi uses ZeroLink, which is described here: https://github.com/nopara73/ZeroLinkWhirlpool is based on a fork of ZeroLink; architecture details: https://code.samourai.io/whirlpool/Whirlpool/-/blob/whirlpool/ARCHITECTURE.mdJoinMarket, as far as this issue is concerned, doesn't utilize blinded signatures. This P2EP (Pay-To-End-Point) proposal is also described here: https://blog.blockstream.com/en-improving-privacy-using-pay-to-endpoint/Quote from: noureddin_regula on September 08, 2022, 05:18:36 AM1.1) If so, is there a way to prevent coordinator or takers from knowing the relationship between inputs / outputs?There is, but there's no 100% effective zero-knowledge proof. For example, for n, the number of inputs, if a chain analysis company owns n-1 of the inputs, whether Chaumiam coinjoins are used or not, they can deanonymize that 1 input.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "topic_5444624",
+  "title": "simpleSliv3r",
+  "author": "simpleSliv3r",
+  "created_time": "March 12, 2023, 07:24:44 PM",
+  "content": "Hi all,I need to extract a commitment transaction on a simulated environment for a university project.The idea is to analyze on different LN node implementations how they react to a channel breach attack.Obviously LN clients don't have an option to extract commitment transactions, so I would need to know how could I extract manually this commitment transaction.I can work with c-lightning (core lightning), LND and Eclair.Thanks for reading and your help.Best regards,SS",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5444624",
+  "comments": [
+    {
+      "author": "simpleSliv3r",
+      "created_time": "March 15, 2023, 07:55:22 PM",
+      "body": "Quote from: ETFbitcoin on March 13, 2023, 12:17:54 PMWith open source LN client, you can check it's source code and see how important information (current/old channel state, commitment TX, etc.). For example, LND store use file channel.db to store \"open channels, past commitment revocation states, the channel graph which includes authenticated node and channel announcements, outgoing payments, and invoices\" which use Bolt DB[2]. Optionally you can configure LND to use SQLite instead[3] if you prefer SQL.P.S. I'm not LND developer, so i'm unable to answer specific question about LND.Many thanks for your answer. I think that this is what I'm looking for. I will continue investigating about LND implementation and the channel.db file.If someone knows how to extract the information that I need from this file, I appreciate the help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "March 19, 2023, 11:55:20 AMLast edit: March 19, 2023, 08:10:20 PM by simpleSliv3r",
+      "body": "Hi,In case someone reaches this post with the same question, here I post the solution on how to replicate a Contract Breach Attack for C-lighting (Core lightning) node implementation.Do this in a simulation environment as you could lose your funds.Simulator used: Polar: https://lightningpolar.com/ 1. Create polar enviorment with minimum 2 lightning nodes and one bitcoin core node, one has to be c-lightning (the malicious one). 2. Open a channel between two nodes. 3. Do a first transaction 4. The malicious node wants to keep this status after some payments, sign the last transaction following these steps (two methods available):   4.1 SQL METHOD:     4.1.1 Login into node as root:          · \"docker exec -it polar-n2-bob bash\" (polar-n2-bob is the container name, may be different)     4.1.2 Go to the node directory:          · \"cd /home/clightning/.lightning/regtest\"     4.1.3 Install the needed dependencies in order to make sql queries to the database:          · apt-get update -y; apt install sqlite3 -y     4.1.4 Open the database:          · \"sqlite3 lightningd.sqlite3\"     4.1.5 Take peer id with:          · \"SELECT HEX(node_id) FROM peers;\"     4.1.6 Sign the last tx with:          · \"lightning-cli dev-sign-last-tx {peer-id}\"   4.2 CLI METHOD:    4.2.1 Take the peer id:          · \"lightning-cli listchannels\"     4.2.2 Sign the last tx with:          · \"lightning-cli dev-sign-last-tx {peer-id}\" 5. Do some more payments to have a different last valid status. 6. Login into the bitcoin core node and broadcast the sign transaction with: \"bitcoin-cli sendrawtransaction {output 4.1.6 or 4.2.2}\" 7. Refresh the graph and you should see the channel closed and all the money on the victim node you may need to mine some blocks to add the tx into the blockchain.References: https://bitcoin.stackexchange.com/questions/96881/cheat-lightning-network-c-lightningHope this helps,SS",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

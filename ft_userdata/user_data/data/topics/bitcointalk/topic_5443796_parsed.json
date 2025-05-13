@@ -1,0 +1,77 @@
+{
+  "id": "topic_5443796",
+  "title": "wunchofbankers",
+  "author": "wunchofbankers",
+  "created_time": "March 06, 2023, 07:44:02 PM",
+  "content": "I have read conflicting specs online: when a node initiates a connection to another node, does the protocol level handshake go:version -->version <--verack <-- verack -->ORversion -->verack <--version <--verack -->(arrow from left to right represents a message from the connecting node to the listening node, and vice versa)In other words, does the listening node respond first with verack and then with a version message, or vice versa? Thanks all",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5443796",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "March 06, 2023, 08:31:08 PM",
+      "body": "Since it's not properly specified: your code should handle both cases.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "wunchofbankers",
+      "created_time": "March 06, 2023, 08:48:41 PM",
+      "body": "Why doesn't the protocol just specify this? Oh I guess there is a remote chance 2 peers both try and initiate a connection with each other at the same time. Specifying one or the other would cause a handshake failure if the listener sent a version message (coincidentally) whilst the client's own version message was in flight.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "March 06, 2023, 09:14:53 PM",
+      "body": "Quote from: wunchofbankers on March 06, 2023, 08:48:41 PMWhy doesn't the protocol just specify this? Oh I guess there is a remote chance 2 peers both try and initiate a connection with each other at the same time. Specifying one or the other would cause a handshake failure if the listener sent a version message (coincidentally) whilst the client's own version message was in flight.If both peers try to connect to each other at the same time, it will result in two different TCP connections, it doesn't automatically become a single connection.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "wunchofbankers",
+      "created_time": "March 06, 2023, 11:19:25 PM",
+      "body": "Ok. Then what is the reason the protocol doesn't specify whether the listener should respond with version or verack first?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "March 07, 2023, 03:57:47 AM",
+      "body": "Connections are two way (bidirectional) not one way and what you refer to as \"listener\" is just listening for incoming connections so after that it receives a connect request it opens up a new \"socket\" where it can both send and receive messages over TCP at the same time.The reason why you see version first then verack second or vice versa is that the clients put both messages into a single \"package\" and then send it over the opened socket. This only make implementation slightly more complicated (to handle both cases).Otherwise to make sure other node receives verack first it would have to first initiate a \"I/O send\" operation for verack then finish it and initiate another for version and both messages are tiny and have to be sent so it makes sense to send them together.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "March 07, 2023, 06:33:02 AM",
+      "body": "Quote from: wunchofbankers on March 06, 2023, 11:19:25 PMOk. Then what is the reason the protocol doesn't specify whether the listener should respond with version or verack first?Here is what I found inside Bitcoin Core unit tests that seems to imply that nodes can send anything before receiving the \"verack\" message:Quote from: https://github.com/bitcoin/bitcoin/blob/e9262ea32a6e1d364fb7974844fadc36f931f8c6/test/functional/p2p_leak.pyCode:\"\"\"Test message sending before handshake completion.Before receiving a VERACK, a node should not send anything but VERSION/VERACKand feature negotiation messages (WTXIDRELAY, SENDADDRV2).This test connects to a node and sends it a few messages, trying to entice itinto sending us something it shouldn't.\"\"\"And this is from another unit test that appears to support the theory that the version message should be received before verack is sent:Quote from: https://github.com/bitcoin/bitcoin/blob/8b4dc94734a2472a201296376bfb18f982e6d92f/test/functional/test_framework/test_node.pyCode:        p2p_conn.peer_connect(**kwargs, net=self.chain, timeout_factor=self.timeout_factor)()        self.p2ps.append(p2p_conn)        p2p_conn.wait_until(lambda: p2p_conn.is_connected, check_connected=False)        if wait_for_verack:            # Wait for the node to send us the version and verack            p2p_conn.wait_for_verack()            # At this point we have sent our version message and received the version and verack, however the full node            # has not yet received the verack from us (in reply to their version). So, the connection is not yet fully            # established (fSuccessfullyConnected).            #            # This shouldn't lead to any issues when sending messages, since the verack will be in-flight before the            # message we send. However, it might lead to races where we are expecting to receive a message. E.g. a            # transaction that will be added to the mempool as soon as we return here.            #            # So syncing here is redundant when we only want to send a message, but the cost is low (a few milliseconds)            # in comparison to the upside of making tests less fragile and unexpected intermittent errors less likely.            p2p_conn.sync_with_ping()Pay special attention to this section:Code:            # At this point we have sent our version message and received the version and verack, however the full node            # has not yet received the verack from us (in reply to their version). So, the connection is not yet fully            # established (fSuccessfullyConnected).I'm sure you can get a more precise answer by inspecting the P2P code written in C++, but then it's not guaranteed that other full nodes will do the same thing. Just do what ymgve2 said and handle both cases.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "wunchofbankers",
+      "created_time": "March 07, 2023, 04:01:53 PM",
+      "body": "Quote from: pooya87 on March 07, 2023, 03:57:47 AMConnections are two way (bidirectional) not one way and what you refer to as \"listener\" is just listening for incoming connections so after that it receives a connect request it opens up a new \"socket\" where it can both send and receive messages over TCP at the same time.The reason why you see version first then verack second or vice versa is that the clients put both messages into a single \"package\" and then send it over the opened socket. This only make implementation slightly more complicated (to handle both cases).Otherwise to make sure other node receives verack first it would have to first initiate a \"I/O send\" operation for verack then finish it and initiate another for version and both messages are tiny and have to be sent so it makes sense to send them together.I know now that both message orders are supported but I'm still a bit unclear on this explanation though. By packet do you mean a single TCP packet? I still don't get why, even if the verack and the version are sent together somehow, we don't just specify that one comes first. Say verack comes first. Then the node which initiates the connection sends version, then receiving node responds with varack-version in this order and then the initiating node responds with its own verack. What's the problem?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "March 07, 2023, 06:17:01 PMLast edit: March 07, 2023, 06:43:21 PM by digaran",
+      "body": "Quote from: wunchofbankers on March 07, 2023, 04:01:53 PMSay verack comes first. Then the node which initiates the connection sends version, then receiving node responds with varack-version in this order and then the initiating node responds with its own verack. What's the problem?Do you have any example to show us? Where did you see any interruption between sender and receiver? Edit, according to my source, both clients need to exchange their versions first, then the header ( verack ).Read from here, https://en.bitcoin.it/wiki/Protocol_documentation",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

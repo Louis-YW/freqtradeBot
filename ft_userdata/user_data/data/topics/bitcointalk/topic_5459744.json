@@ -1,0 +1,45 @@
+{
+  "id": "topic_5459744",
+  "title": "leomedina",
+  "author": "leomedina",
+  "created_time": "July 14, 2023, 04:36:27 AMLast edit: September 19, 2023, 08:48:00 PM by leomedina",
+  "content": "Welcome to MoneyPot's provably fair seeding event.Our provably fair system is based on the first seeding event, but with the addition of a third-party contribution. This preserves all provably fair guarantees while allowing external auditing. The high level of the scheme is:1. Starting with a secret, we generate a chain of sha256 hashes by hashing the previous hash.2. We play through that chain of hashes, in reverse order, and use the hashes to determine the crash point in a provably fair manner.3. We mix in a “client seed” which we are hereby committing to, along with Provably Honest’s vxSignature to prove that we are committing to a sequence of game results from a fair distribution, without knowing the outcome. Starting with a server secret, I have generated a chain of 100,000,000 sha256 hashes by recursively hashing the previous binary-encoded hash. The hash of the chain's last element is 3564a69ecd793515edefa28ae7440d5cdfefdfcb0b3f3cf840be6efb783c9891. This is also our commitment to Vx.You can verify if a hash is part of the chain with a function like this:Code:import { sha256 } from \"@noble/hashes/sha256\";import { bytesToHex, hexToBytes } from \"@noble/hashes/utils\";const terminatinghash = hexToBytes(\"575faa089b45aea15ac51fa35d9e2cb085510b286c6b27ac5fa93235cdc30e6c\");function verifyInChain(hash: Uint8Array) {  for (let gameId = 1; gameId < 10e6; gameId++) {    hash = sha256(hash);    if (hash === terminatinghash) {      console.log(\"Hash is in the chain. It is game: \", gameId);      return;    }  }  console.error(\"hash is not in the chain\");}Which could be used like:Code:verifyInChain(  hexToBytes(\"85afc58736609dfe6f093ff15ba25ea6b48e39e01706780a20ebb04c83df5058\"));If you also want to verify game results you can this use this open-source tool.Before calculating game results we need a house edge. Unlike normal casinos, instead of a fixed house edge (e.g. 1%) our house edge is only increased as little as necessary, in function of how much money the bankroll is risking and limited by the Kelly criterion.Code:// Note:// casinoBankroll - the casino's bankroll// playerBetting - the sum of money still in a game// multiplier - at what multiplier the game is currently at (use the crash point for the final house edge)function houseEdge(casinoBankroll, playerBetting, multiplier) {  return expectedValue(casinoBankroll, playerBetting, multiplier) / playerBetting;}// From the casino's perspective, tells us how much money we will win or lose in the long runfunction expectedValue(casinoBankroll, playerBetting, multiplier) {  const winProbability = winProbabilityFromRisk(casinoBankroll, playerBetting, multiplier);  const potentialProfit = winProbability * playerBetting;  const howMuchToPay = playerBetting * (multiplier - 1);  const potentialLoss = howMuchToPay * (1 - winProbability);  return potentialProfit - potentialLoss;}// Returns the casino's probability (from 0 to 1) if players were betting at a given multiplierfunction winProbabilityFromRisk(casinoBankroll, playerBetting, multiplier) {  const potentialPlayerWin = (multiplier - 1) * playerBetting;  return (potentialPlayerWin * (casinoBankroll + 2 * playerBetting)) / (casinoBankroll * (potentialPlayerWin + playerBetting));}The way we calculate the house edge could change in the future, without affecting our game generation algorithm. Have a look at our maths page if you want to learn more.Now we need a vxSignature. To prove that Provably Honest and MoneyPot are not collaborating, the message that is being signed will be mixed with the lowercase, hexadecimal representation of the hash of a Bitcoin block that has not been mined yet: Bitcoin block 798750.Code:import { concatBytes, utf8ToBytes} from \"@noble/hashes/utils\";// Concatenate the previous game hash bytes with the client seed bytesconst message = concatBytes(prevGameHash, utf8ToBytes(clientSeed));// Ask ProvablyHonest to sign the message using the public key // (VX_PUBKEY: 8be5ac83c91b3648d7b2c01d555dfbf60a0547c40524f495b656b6cfa9b69d5faf0967835257b30ac75fd80876c29c64)const vxSignature = await vx.make_message(commitment, message, gameId, wager);Once we have a vxSignature we can verify its authenticity: Code:import { bls12_381 as bls } from \"@noble/curves/bls12-381\";// Note: the VX_PUBKEY is what is returned when the game server commits to Vxconst verified = bls.verify(vxSignature, message, VX_PUBKEY);if (!verified) {  throw new Error(\"Vx gave us something that didn't verify\");}For more information on Provably Honest, see: https://www.provablyhonest.com.After we have our vxSignature and before each game begins, we take the next unused hash from the chain and use it to obtain a number ranging from 0 to 1. We call it scaledOutcome:Code:const crypto = require(\"crypto\");// The pure probability of the casino winning, before taking into account any edgefunction scaledOutcome(gameHash, vxSignature) {  const nBits = 52; // number of most significant bits to use  // 1. HMAC_SHA256(key=vxSignature, message=gameHash)  const hmac = crypto.createHmac(\"sha256\", vxSignature);  hmac.update(gameHash);  seed = hmac.digest(\"hex\");  // 2. r = 52 most significant bits  seed = seed.slice(0, nBits/4);  const r = parseInt(seed, 16);  // 3. X = r / 2^52  return r / Math.pow(2, nBits); // uniformly distributed in [0; 1)}Now we can use the current game hash, house edge, and vxSignature to determine game results:Code:function gameResult(gameHash, vxSignature, houseEdge) {  const X = scaledOutcome(gameHash, vxSignature);  const result = (1 - houseEdge) / (1 - X);  return Math.max(1, Math.floor(result * 100) / 100);}",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459744",
+  "comments": [
+    {
+      "author": "leomedina",
+      "created_time": "July 14, 2023, 04:44:19 AM",
+      "body": "To prevent editing of the original post, I have captured the page as it appears now: https://web.archive.org/web/20230714043951/https://bitcointalk.org/index.php?topic=5459744.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kakmakr",
+      "created_time": "July 14, 2023, 06:03:01 AM",
+      "body": "Just a question - Will the Open source code that are in use, be available at all times? So, will the gambler/investor be able to see the parameters that are set on the site at any given time? Example : const result = (1 - houseEdge) / (1 - X); ...... so when the houseEdge are changed, will the players and the investors see that in real-time or will it just be text being displayed to see how it is being calculated? We need total transparency in the gambling industry.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "leomedina",
+      "created_time": "July 15, 2023, 01:40:37 AM",
+      "body": "Quote from: Kakmakr on July 14, 2023, 06:03:01 AMJust a question - Will the Open source code that are in use, be available at all times? So, will the gambler/investor be able to see the parameters that are set on the site at any given time? Example : const result = (1 - houseEdge) / (1 - X); ...... so when the houseEdge are changed, will the players and the investors see that in real-time or will it just be text being displayed to see how it is being calculated? We need total transparency in the gambling industry.  Hey Kakmakr,Correct, everybody will be able to see the house edge changing in real time. Once the game finishes, you will see the \"final house\" in the game page. And you will also be able to verify everything yourself. For example, you could use the houseEdge function in our maths page to make sure it matches. And then go to provablyhonest to verify the game result (or do it yourself using one of the tools I posted above).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "leomedina",
+      "created_time": "July 15, 2023, 05:27:59 AM",
+      "body": "The Bitcoin block 798750 has been mined!. Our client seed is: 00000000000000000003131b1a4a73fc600a682878e4ac7664f535c48f9f75c1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

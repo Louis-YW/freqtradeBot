@@ -1,0 +1,21 @@
+{
+  "id": "topic_5425288",
+  "title": "BoyFromDubai",
+  "author": "BoyFromDubai",
+  "created_time": "December 03, 2022, 06:36:58 PM",
+  "content": "I'm a bit confused about naming new files of longest chain. I've heard about stale/orphan blocks and that they are not removed even when new block on the same height comes. I mean, that we have blk_<n>.dat, but new message with the longest chain came, and there is a file on the exact same place as blk_<n>.dat is in. So how the naming in Bitcoin is resolved? Maybe like new actual block becomes blk_<n>.dat, and the orphan block becomes blk_<n>*.dat or smth like this?And second question is why orphan blocks are not removed after new chain comes? It would save a lot of space on the disk, but these blocks are not removed, why?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5425288",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "December 03, 2022, 10:15:29 PM",
+      "body": "Each blk*.dat file contains a lot more than one block. New blk*.dat files are added once the highest numbered one reaches a maximum size (or adding the next block would cause it to go over the maximum). Since reorgs have been no more than 1 block (2 or more happens extremely rarely), it's highly likely that the block(s) being reorged to are also stored in the same blk*.dat file.Quote from: BoyFromDubai on December 03, 2022, 06:36:58 PMAnd second question is why orphan blocks are not removed after new chain comes? It would save a lot of space on the disk, but these blocks are not removed, why?     They are not removed in case of a reorg. Keeping those blocks allow the node to quickly switch over to the other chain. There also aren't actually a lot of stale blocks so it doesn't actually save a whole lot of space. Additionally, deleting the blocks in order to actually save space would require rewriting the block files, and this can have a significant impact on performance. It would require shifting all of the blocks in the same file, removing database entries, and rewriting database entries, all of which require disk I/O which is very slow. The storage gain is so small that it's not worth the effort.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

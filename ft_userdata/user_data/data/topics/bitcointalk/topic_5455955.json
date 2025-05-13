@@ -1,0 +1,77 @@
+{
+  "id": "topic_5455955",
+  "title": "tiffy",
+  "author": "tiffy",
+  "created_time": "June 10, 2023, 12:47:45 PM",
+  "content": "I apologise if this has already been answered somewhere. But I'm having trouble finding best practices instructions for installing the bitcoin daemon (bitcoind) on a Linux Server (Debian 11).Requirements:No miningNo full nodeThe daemon should connect to the network via a VPN or TOR (both are present)I'm interested in a watch-only service that provides the complete blockchain online for me personally. I would like to be able to use RPC commands, e.g. to query the balance of a specific address. I have solid experience with running Linux servers. No experience with running Bitcoin services. My understanding so far is that the bitcoin daemon is included in the Core Client and can be started independently of the QT client. Thank you for your attention.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5455955",
+  "comments": [
+    {
+      "author": "PawGo",
+      "created_time": "June 10, 2023, 09:25:14 PM",
+      "body": "Take a look at: https://bitcointalk.org/index.php?topic=5367296.0https://bitcointalk.org/index.php?topic=5368219.0https://en.bitcoin.it/wiki/Setting_up_a_Tor_hidden_serviceBitcoin core installation is not difficult, there are just a few parameters you may want to modify, so it is not very complicated. Having experience like you said, it will be easy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 11, 2023, 04:56:27 AM",
+      "body": "Quote from: tiffy on June 10, 2023, 12:47:45 PMRequirements:No full nodeI don't know how it's possible with this requirement since bitcoind is a Bitcoin full node.Quote from: tiffy on June 10, 2023, 12:47:45 PMMy understanding so far is that the bitcoin daemon is included in the Core Client and can be started independently of the QT client. Yes, bitcoind will run independently, and you can communicate with it using RPC or other methods. (e.g.: bitcoin-cli)Here's the developers guide for Bitcoin Core: https://developer.bitcoin.org/devguide/index.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 11, 2023, 05:25:52 PM",
+      "body": "Quote from: PawGo on June 10, 2023, 09:25:14 PMTake a look at: https://bitcointalk.org/index.php?topic=5367296.0https://bitcointalk.org/index.php?topic=5368219.0https://en.bitcoin.it/wiki/Setting_up_a_Tor_hidden_serviceAdditionally to above threads you can also have a look at the setup steps of https://raspibolt.org/. You will not need everything of and you may skip certain Raspi specific things along the setup. I have done this on an Ubuntu box and it works just fine.A pruned blockchain will have its limitations on certain RPC commands, so it really depends on which things you're going to query.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tiffy",
+      "created_time": "June 11, 2023, 08:13:19 PM",
+      "body": "Thank you all for the useful advice. I'm working through right now. Quote from: ETFbitcoin on June 11, 2023, 09:59:53 AMMaybe OP wanted to say he want to run pruned node.In fact, I don't know exactly what a full node is. In the meantime I have done some more research and I think the option \"blocksonly\" does what I want (only download blocks and ignore unconfirmed transaction). I would like to limit the network traffic for the time being. And now maybe another stupid question: The Bitcoin Daemon doesn't do any mining? I haven't found any option with which I can switch off mining. As far as I understand, the mining software runs separately and only uses the Bitcoin Daemon to communicate with the network. Is my understanding correct? In that case, there would be nothing else for me to do at this point, because I don't want to mine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 12, 2023, 04:45:09 AM",
+      "body": "Quote from: tiffy on June 11, 2023, 08:13:19 PMIn fact, I don't know exactly what a full node is.A full node starts by downloading ~500 GB. After that, it's ~2 GB per week.QuoteI think the option \"blocksonly\" does what I want (only download blocks and ignore unconfirmed transaction). I would like to limit the network traffic for the time being.Unconfirmed transactions (AKA the mempool) are small in size compared to the existing blockchain.QuoteThe Bitcoin Daemon doesn't do any mining?Correct. Mining on a computer isn't feasible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 12, 2023, 08:21:05 AM",
+      "body": "Quote from: tiffy on June 11, 2023, 08:13:19 PMAnd now maybe another stupid question: The Bitcoin Daemon doesn't do any mining? I haven't found any option with which I can switch off mining. As far as I understand, the mining software runs separately and only uses the Bitcoin Daemon to communicate with the network. Is my understanding correct? In that case, there would be nothing else for me to do at this point, because I don't want to mine. Yes, the mining commands generatetoaddress or generate do not automatically run since it's only recommended to use in RegTest.And AFAIK, even in the old versions, the \"Generate Coin\" option wasn't toggled on by default.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "June 12, 2023, 09:05:59 AM",
+      "body": "Quote from: LoyceV on June 12, 2023, 04:45:09 AMQuote from: tiffy on June 11, 2023, 08:13:19 PMIn fact, I don't know exactly what a full node is.A full node starts by downloading ~500 GB. After that, it's ~2 GB per week.And in case OP wants to use 'txindex' (I assume he would prefer to have it, as he plans \"to query the balance of a specific address\"*), then there are extra 50G.* - it will be much easier installing additional software for that, like https://github.com/janoside/btc-rpc-explorer",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 12, 2023, 12:48:49 PM",
+      "body": "Quote from: ETFbitcoin on June 12, 2023, 11:27:36 AMAs described by it's name, txindex only index transaction and cannot be used to query balance of specific address.Not exactly true. You can use the listunspent RPC for addresses in legacy wallets or the scantxoutset RPC if you're comfortable with descriptors (it does not require creating any wallet file), and then add up the resulting \"address\" fields in the array.This method also lets you get the balance of some or all the addresses as well, and in the case of descriptors, even an extended public key.You can even get the confirmed balance by ignoring every item with confirmations field set to 0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

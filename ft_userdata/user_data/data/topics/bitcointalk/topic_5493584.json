@@ -1,0 +1,165 @@
+{
+  "id": "topic_5493584",
+  "title": "achow101",
+  "author": "achow101",
+  "created_time": "April 20, 2024, 02:12:50 PM",
+  "content": "27.0 Release NotesBitcoin Core version 27.0 is now available from:https://bitcoincore.org/bin/bitcoin-core-27.0/This release includes new features, various bug fixes and performanceimprovements, as well as updated translations.Please report bugs using the issue tracker at GitHub:https://github.com/bitcoin/bitcoin/issuesTo receive security and update notifications, please subscribe to:https://bitcoincore.org/en/list/announcements/join/How to UpgradeIf you are running an older version, shut it down. Wait until it has completelyshut down (which might take a few minutes in some cases), then run theinstaller (on Windows) or just copy over /Applications/Bitcoin-Qt (on macOS)or bitcoind/bitcoin-qt (on Linux).Upgrading directly from a version of Bitcoin Core that has reached its EOL ispossible, but it might take some time if the data directory needs to be migrated. Oldwallet versions of Bitcoin Core are generally supported.CompatibilityBitcoin Core is supported and extensively tested on operating systemsusing the Linux Kernel 3.17+, macOS 11.0+, and Windows 7 and newer. BitcoinCore should also work on most other Unix-like systems but is not asfrequently tested on them. It is not recommended to use Bitcoin Core onunsupported systems.Notable changeslibbitcoinconsensuslibbitcoinconsensus is deprecated and will be removed for v28. This library hasexisted for nearly 10 years with very little known uptake or impact. It hasbecome a maintenance burden.The underlying functionality does not change between versions, so any users ofthe library can continue to use the final release indefinitely, with theunderstanding that Taproot is its final consensus update.In the future, libbitcoinkernel will provide a much more useful API that isaware of the UTXO set, and therefore be able to fully validate transactions andblocks. (#29189)mempool.dat compatibilityThe mempool.dat file created by -persistmempool or the savemempool RPC willbe written in a new format. This new format includes the XOR'ing of transactioncontents to mitigate issues where external programs (such as anti-virus) attemptto interpret and potentially modify the file.This new format can not be read by previous software releases. To allow for adowngrade, a temporary setting -persistmempoolv1 has been added to fall backto the legacy format. (#28207)P2P and network changesBIP324 v2 transport is now enabled by default. It remains possible to disable v2by running with -v2transport=0. (#29347)Manual connection options (-connect, -addnode and -seednode) willnow follow -v2transport to connect with v2 by default. They will retry withv1 on failure. (#29058)Network-adjusted time has been removed from consensus code. It is replacedwith (unadjusted) system time. The warning for a large median time offset(70 minutes or more) is kept. This removes the implicit security assumption ofrequiring an honest majority of outbound peers, and increases the importanceof the node operator ensuring their system time is (and stays) correct to notfall out of consensus with the network. (#28956)Mempool Policy ChangesOpt-in Topologically Restricted Until Confirmation (TRUC) Transactions policy(aka v3 transaction policy) is available for use on test networks when-acceptnonstdtxn=1 is set. By setting the transaction version number to 3, TRUC transactionsrequest the application of limits on spending of their unconfirmed outputs. Theserestrictions simplify the assessment of incentive compatibility of accepting orreplacing TRUC transactions, thus ensuring any replacements are more profitable forthe node and making fee-bumping more reliable. TRUC transactions are currentlynonstandard and can only be used on test networks where the standardness rules arerelaxed or disabled (e.g. with -acceptnonstdtxn=1). (#28948)External SigningSupport for external signing on Windows has been disabled. It will be re-enabledonce the underlying dependency (Boost Process), has been replaced with a differentlibrary. (#28967)Updated RPCsThe addnode RPC now follows the -v2transport option (now on by default, see above) for making connections.It remains possible to specify the transport type manually with the v2transport argument of addnode. (#29239)Build SystemA C++20 capable compiler is now required to build Bitcoin Core. (#28349)MacOS releases are configured to use the hardened runtime libraries (#29127)WalletThe CoinGrinder coin selection algorithm has been introduced to mitigate unnecessarylarge input sets and lower transaction costs at high feerates. CoinGrindersearches for the input set with minimal weight. Solutions found byCoinGrinder will produce a change output. CoinGrinder is only active atelevated feerates (default: 30+ sat/vB, based on -consolidatefeerate×3). (#27877)The Branch And Bound coin selection algorithm will be disabled when the subtract feefrom outputs feature is used. (#28994)If the birth time of a descriptor is detected to be later than the first transactioninvolving that descriptor, the birth time will be reset to the earlier time. (#28920)Low-level changesPruningWhen pruning during initial block download, more blocks will be pruned at eachflush in order to speed up the syncing of such nodes. (#20827)InitVarious fixes to prevent issues where subsequent instances of Bitcoin Core wouldresult in deletion of files in use by an existing instance. (#28784, #28946)Improved handling of empty settings.json files. (#29144)CreditsThanks to everyone who directly contributed to this release:22388o⚡️Aaron ClausonAmiti UttarwarAndrew TothAnthony TownsAntoine PoinsotAva ChowBrandon OdiwuorbrunoergChris StewartCory Fieldsdergoeggedjschnei21Fabian JahrfanquakefurszyGloria ZhaoGreg SandersHennadii StepanovHernan Marinoiamcarlos94ismaelsadeeqJameson LoppJesse BartonJohn MoffettJon AtackjosibakejrakibiJustin DhillonKashif SmithkevkevinKristaps KaupeL0la L33tzLuke DashjrLőrincmarcoMarcoFalkeMark FriedenbachMarnixMartin Leitner-AnkerlMartin ZumsandeMax EdwardsMurchmuxatornaiyomaNikodemas Tuckusns-xvrnpablomartin4btcPeter ToddPieter WuilleRichard MyersRoman ZeydeRussell YanofskyRyan OfskySebastian FalbesonerSergi Delgado SeguraSjors Provooststickies-vstratospherSupachai KheawjuyTheCharlatanUdjinM6Vasil Dimovw0xltwillcl-arkAs well as to everyone that helped with translations onTransifex.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5493584",
+  "comments": [
+    {
+      "author": "okae",
+      "created_time": "April 21, 2024, 04:56:42 PM",
+      "body": "Ty to everyone who contribute to this update!!!Please, never forget to Verifying Bitcoin Core before you install/use it, is a good practice... also go to the source and check those SHA256SUMS by yourselft.Code:dcd49a8e3711d867c4ad5d7ffbc1ff20f66c82cc8bf660b5f6964eeaa289a739  bitcoin-27.0-aarch64-linux-gnu-debug.tar.gzcb35e250ae9d0328aa90e7aad0b877ed692597420a1092e8ab1a5dd756209722  bitcoin-27.0-aarch64-linux-gnu.tar.gz61e1225d9c00b50c2e1712e722b285b6e4de1f1dd9da969596511b8a8986c1f0  bitcoin-27.0-arm-linux-gnueabihf-debug.tar.gz9d4c28e7620d03bf346ebea388f222e4d6d2b996d7eb32fab72707b8320d5249  bitcoin-27.0-arm-linux-gnueabihf.tar.gz7f060f2cd07746ff9d09b000b4195fee88dfca8444ab7a73f0c76aff4225227c  bitcoin-27.0-arm64-apple-darwin.zipd1ddb2855a6c76ab4d2cc31315303cba77ef44fdd877b01ffd5918e548b07cae  bitcoin-27.0-arm64-apple-darwin-unsigned.tar.gz48d47cf0944034d7ef288f24ce73a6e2f85a9b6199dad5425464dd589ecf96e9  bitcoin-27.0-arm64-apple-darwin-unsigned.zip1d9d9b837297a73fc7a3b1cfed376644e3fa25c4e1672fbc143d5946cb52431d  bitcoin-27.0-arm64-apple-darwin.tar.gzd22f0f8b2d9eb8eac0819d5ebc4b3c4c5f5984cf6e0acefa81ebc6e914938293  bitcoin-27.0-codesignatures-27.0.tar.gz9c1ee651d3b157baccc3388be28b8cf3bfcefcd2493b943725ad6040ca6b146b  bitcoin-27.0.tar.gz837c72fea5ceca69b3d06870dd4926c011dec7924f3f8f3428b2153945bbbb4a  bitcoin-27.0-powerpc64-linux-gnu-debug.tar.gz6ceaedb59ca33b751387b15f2c8da7f2f7cd2739c6464fc6cbef440852869b92  bitcoin-27.0-powerpc64-linux-gnu.tar.gz81102572b0aee8627b162680699ce1d2828908cc4dd317e34697404ac04220fa  bitcoin-27.0-powerpc64le-linux-gnu-debug.tar.gz3c00f81a7c67b4cf3e382fae7eaa2c7facea2dfdf39f4c281512237c06b71960  bitcoin-27.0-powerpc64le-linux-gnu.tar.gz7274aedbfc363adc28d3b19340e4578b983cfbd617f328313fb5b95e24864799  bitcoin-27.0-riscv64-linux-gnu-debug.tar.gz371e53b21c3ba29a90e69c30b7213d75c165d084bde50ae6d73ee0e1ef179e68  bitcoin-27.0-riscv64-linux-gnu.tar.gz8c94d3a7e34b59effdcf283263d5e84f2b009e601076282e9697ab4244bef3e8  bitcoin-27.0-x86_64-apple-darwin.zip8cdabb19c0b2464ec21306615e0429362b6de9b73d5e796dc4dbc82437e76ddd  bitcoin-27.0-x86_64-apple-darwin-unsigned.tar.gz0b347bd2474eab483ee24e1751a2de3e37260826bf71340eaad233f6017af306  bitcoin-27.0-x86_64-apple-darwin-unsigned.zipe1efd8c4605b2aabc876da93b6eee2bedd868ce7d1f02b0220c1001f903b3e2c  bitcoin-27.0-x86_64-apple-darwin.tar.gz3d9ed703ceaeba9d234d05bf7ae20dde48fb52287eae236e8c2b2021a8db0fbc  bitcoin-27.0-x86_64-linux-gnu-debug.tar.gz2a6974c5486f528793c79d42694b5987401e4a43c97f62b1383abf35bcee44a8  bitcoin-27.0-x86_64-linux-gnu.tar.gza2aa3db390a768383e8556878250a44f3eb3b7a6e91e94e47fa35c06b6e8d09f  bitcoin-27.0-win64-setup.exe33fadef48835acf9b2dfda42b2d2015f30403608dc8af7a3f3dd2b9ec224e56e  bitcoin-27.0-win64-debug.zipe8114ed85a976ff439bd78cbf026e3f9bfafdf40d0fe75121e73bd4b7af347a4  bitcoin-27.0-win64-setup-unsigned.exe1578aa2b88427086336e6990e4ce9b752d3d83b34b38ecc29f6325abb6ad3694  bitcoin-27.0-win64-unsigned.tar.gzca75babeaa3fb75f5a166f544adaa93fd7c1f06cf20d4e2c8c2a8b010f4c7603  bitcoin-27.0-win64.zip",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "April 22, 2024, 07:53:58 AM",
+      "body": "I have tested v.27.0 on a few machines running either Linux or Windows 10/11 and got the feeling that updated nodes halt  (when needed) all operations a bit faster than when they were armored with previous v. 26.0Anyone can confirm this observation or it is solely my impression?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "SAHASAN",
+      "created_time": "April 30, 2024, 05:21:11 AM",
+      "body": "What about Apple iOS is it able to mine and others work smoothly with apply IOS system?I want to try it with apple ios system.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khalidkhan82118",
+      "created_time": "April 30, 2024, 07:24:38 AMLast edit: May 03, 2024, 03:01:01 PM by hilariousandco",
+      "body": "Wow, version 27.0 of Bitcoin Core seems packed with updates! I'm particularly intrigued by the introduction of CoinGrinder for coin selection. I wonder how much this will impact transaction costs and overall efficiency. Also, the move towards a C++20 compiler requirement is interesting. I'm curious about the implications for developers and the ecosystem as a whole. Any insights or thoughts on these changes?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MysteryMiner",
+      "created_time": "May 14, 2024, 06:17:56 PM",
+      "body": "Would not C++20 requirement cause C++ runtime files being required on Windows and in turn not working on Windows7 or 8?Also it appears that Bitcoin have catched mild form of featuritis causing bloat without reason.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "May 15, 2024, 10:33:26 AM",
+      "body": "Quote from: MysteryMiner on May 14, 2024, 06:17:56 PMWould not C++20 requirement cause C++ runtime files being required on Windows and in turn not working on Windows7 or 8?Looking at microsoft website, i don't think that would happen.Quote from: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redistCurrent versions of the Visual C++ Redistributable for Visual Studio 2015-2022 only support Windows 7, 8.1, 10, and 11.Although i also wonder whether Bitcoin Core actually support Windows 7 or 8.Quote from: MysteryMiner on May 14, 2024, 06:17:56 PMAlso it appears that Bitcoin have catched mild form of featuritis causing bloat without reason.I'm curious, which feature you're talking about?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MysteryMiner",
+      "created_time": "May 15, 2024, 11:03:10 AM",
+      "body": "QuoteAlthough i also wonder whether Bitcoin Core actually support Windows 7 or 8.Running Bitcoin Core 27.0 64-bit on Windows 7 SP1 64-bit right now without issuses. I confirm it works.QuoteI'm curious, which feature you're talking about? New transport protocol, new wallet formats and options. These are the very basic of Bitcoin that should not be touched without great necessity and majority consensus. Imagine I go to prison for 10 years. Or join army. Or enter coma after colliding with train. When I get back to my computer I should be able to turn on my computer and sync the Bitcoin client right away. Bitcoin now have become a value storage medium in addition to tool for transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "May 15, 2024, 06:11:07 PM",
+      "body": "Quote from: MysteryMiner on May 15, 2024, 11:03:10 AMNew transport protocol, new wallet formats and options. These are the very basic of Bitcoin that should not be touched without great necessity and majority consensus. Imagine I go to prison for 10 years. Or join army. Or enter coma after colliding with train. When I get back to my computer I should be able to turn on my computer and sync the Bitcoin client right away. Bitcoin now have become a value storage medium in addition to tool for transactions.These features are not added \"without reason\".The new transport protocol is specifically an encrypted protocol in order to make it harder to censor Bitcoin nodes. However, just because a new protocol is introduced doesn't mean that the original protocol is going away. The new protocol has considerations for backwards compatibility so it will be possible for nodes that don't understand it to still be able to connect to the network.The new wallet format is specifically BDB is entirely unmaintained and unmaintainable. Keeping the software in general up to date is generally a hard task, and gets harder when there are dependencies that are difficult to maintain. Even so, the change to the new wallet format is still specifically being done in a way to allow users with old wallets to still be able to use them in the future. There will be a migration path that will live indefinitely, and this will allow those people to load their old wallets and migrate them to the new format. This will not result in any loss of funds, whether preexisting, or new funds sent to old addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "May 16, 2024, 08:21:04 AM",
+      "body": "Quote from: MysteryMiner on May 15, 2024, 11:03:10 AMQuoteI'm curious, which feature you're talking about? New transport protocol, new wallet formats and options. These are the very basic of Bitcoin that should not be touched without great necessity and majority consensus. Imagine I go to prison for 10 years. Or join army. Or enter coma after colliding with train. When I get back to my computer I should be able to turn on my computer and sync the Bitcoin client right away. Bitcoin now have become a value storage medium in addition to tool for transactions.Aside from what @achow101 said, personally i expect older version of Bitcoin Core still can connect to network and sync in the future. In 2022, Jameson Lopp manage to run full node with Bitcoin Core version 0.8 which released on 2013[1]. Although you would miss any performance improvement and bug/security fix.[1] https://blog.lopp.net/bitcoin-core-performance-evolution/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jascrypt",
+      "created_time": "May 17, 2024, 09:38:37 PM",
+      "body": "Can someone simplify the whole thing about Bitcoin Core.27.0 and is it going help reduce cost of trxn and enhance speed?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 19, 2024, 08:02:18 AM",
+      "body": "Quote from: Jascrypt on May 17, 2024, 09:38:37 PMCan someone simplify the whole thing about Bitcoin Core.27.0 and is it going help reduce cost of trxn and enhance speed?It doesn't really do any of that except for the BIP324 part which makes connections between nodes more private.It has already been covered extensively by achow101 in the post above.But Bitcoin Core in general has no influence on txn cost and speed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MarketNeutral",
+      "created_time": "May 22, 2024, 05:43:33 PM",
+      "body": "Quote from: achow101 on May 15, 2024, 06:11:07 PMQuote from: MysteryMiner on May 15, 2024, 11:03:10 AMNew transport protocol, new wallet formats and options. These are the very basic of Bitcoin that should not be touched without great necessity and majority consensus. Imagine I go to prison for 10 years. Or join army. Or enter coma after colliding with train. When I get back to my computer I should be able to turn on my computer and sync the Bitcoin client right away. Bitcoin now have become a value storage medium in addition to tool for transactions.These features are not added \"without reason\".The new transport protocol is specifically an encrypted protocol in order to make it harder to censor Bitcoin nodes. However, just because a new protocol is introduced doesn't mean that the original protocol is going away. The new protocol has considerations for backwards compatibility so it will be possible for nodes that don't understand it to still be able to connect to the network.The new wallet format is specifically BDB is entirely unmaintained and unmaintainable. Keeping the software in general up to date is generally a hard task, and gets harder when there are dependencies that are difficult to maintain. Even so, the change to the new wallet format is still specifically being done in a way to allow users with old wallets to still be able to use them in the future. There will be a migration path that will live indefinitely, and this will allow those people to load their old wallets and migrate them to the new format. This will not result in any loss of funds, whether preexisting, or new funds sent to old addresses.Sorry if this has been answered elsewhere, but is there true consensus among the Bitcoin developers that a migration path from legacy wallets will indeed be supported indefinitely, even decades from now, and that all legacy formats will remain operational in all newer versions of Bitcoin? I know there may be nuance, and things may change, but I've read some opinions contrary to indefinite legacy wallet migration, and the mixed signals and uncertainty on this topic are concerning.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "May 22, 2024, 10:57:59 PM",
+      "body": "Quote from: MarketNeutral on May 22, 2024, 05:43:33 PMSorry if this has been answered elsewhere, but is there true consensus among the Bitcoin developers that a migration path from legacy wallets will indeed be supported indefinitely, even decades from now,Yes. That is why there has been a lot of work put into the implementing the minimum required for migration to work without relying on any external dependencies.Quote from: MarketNeutral on May 22, 2024, 05:43:33 PMand that all legacy formats will remain operational in all newer versions of Bitcoin? I know there may be nuance, and things may change, but I've read some opinions contrary to indefinite legacy wallet migration, and the mixed signals and uncertainty on this topic are concerning. This sounds like you are conflating legacy wallets with legacy address types. Legacy wallets refer to Bitcoin Core's wallet format only, and has no effect on anything else. Legacy address types (address types that existed prior to segwit), are not guaranteed to stick around and there has been a little bit of discussion about maybe soft forking them out eventually, but this is not a seriously considered idea yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MarketNeutral",
+      "created_time": "May 23, 2024, 12:10:00 PM",
+      "body": "Quote from: achow101 on May 22, 2024, 10:57:59 PMQuote from: MarketNeutral on May 22, 2024, 05:43:33 PMSorry if this has been answered elsewhere, but is there true consensus among the Bitcoin developers that a migration path from legacy wallets will indeed be supported indefinitely, even decades from now,Yes. That is why there has been a lot of work put into the implementing the minimum required for migration to work without relying on any external dependencies.Quote from: MarketNeutral on May 22, 2024, 05:43:33 PMand that all legacy formats will remain operational in all newer versions of Bitcoin? I know there may be nuance, and things may change, but I've read some opinions contrary to indefinite legacy wallet migration, and the mixed signals and uncertainty on this topic are concerning. This sounds like you are conflating legacy wallets with legacy address types. Legacy wallets refer to Bitcoin Core's wallet format only, and has no effect on anything else. Legacy address types (address types that existed prior to segwit), are not guaranteed to stick around and there has been a little bit of discussion about maybe soft forking them out eventually, but this is not a seriously considered idea yet.Wonderful. I was primarily concerned about legacy wallets. As long as legacy wallets are still supported, I see no problem. While I do prefer legacy address support, I understand the reasoning behind deprecating them. Thank you for the clarification!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "needmorebitcoins",
+      "created_time": "May 30, 2024, 03:22:00 AM",
+      "body": "Thanks achow101 and all contributors to this Bitcoin Core version 27.0 release! QuoteLegacy address types (address types that existed prior to segwit), are not guaranteed to stick around and there has been a little bit of discussion about maybe soft forking them out eventually, but this is not a seriously considered idea yet.Hopefully it will be possible to maintain backwards compatibility for legacy address types, I started with a Base 58 (Legacy) on my install of Bitcoin Core. Bitcoin wallets should be accessible in a disaster scenario, or also if someone mined Bitcoin a long time ago but didn't sync until recently.BTC!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 01, 2024, 05:56:54 AM",
+      "body": "Quote from: franky1 on May 28, 2024, 01:42:34 AMQuote from: achow101 on May 22, 2024, 10:57:59 PMLegacy address types (address types that existed prior to segwit), are not guaranteed to stick around and there has been a little bit of discussion about maybe soft forking them out eventually, but this is not a seriously considered idea yet.truth is andrew chow is the main instigator that wants to remove legacy address utilityhe is the one that keeps trying to make it part of the roadmap agenda and promoting votes towards getting it prioritised in one of the next versionsEverything in that issue seem to be related to wallet layer not the consensus layer so it doesn't matter even if it completely removed legacy support or not since you'd just use another wallet that does.However, I dare say \"invalidating\" legacy outputs would go against Bitcoin principles and it should not even be considered specially not through a soft fork. If anything I would argue for a hard fork to also remove/fix a lot of other mess in the protocol!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 02, 2024, 08:41:14 PM",
+      "body": "Quote from: pooya87 on June 01, 2024, 05:56:54 AMQuote from: franky1 on May 28, 2024, 01:42:34 AMQuote from: achow101 on May 22, 2024, 10:57:59 PMLegacy address types (address types that existed prior to segwit), are not guaranteed to stick around and there has been a little bit of discussion about maybe soft forking them out eventually, but this is not a seriously considered idea yet.truth is andrew chow is the main instigator that wants to remove legacy address utilityhe is the one that keeps trying to make it part of the roadmap agenda and promoting votes towards getting it prioritised in one of the next versionsEverything in that issue seem to be related to wallet layer not the consensus layer so it doesn't matter even if it completely removed legacy support or not since you'd just use another wallet that does.However, I dare say \"invalidating\" legacy outputs would go against Bitcoin principles and it should not even be considered specially not through a soft fork. If anything I would argue for a hard fork to also remove/fix a lot of other mess in the protocol!To be clear, legacy address types are not being removed, neither from consensus, nor from the wallet. Descriptor wallets support legacy address types and makes a descriptor for them by default too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "June 03, 2024, 07:38:34 PMLast edit: June 11, 2024, 06:46:09 PM by franky1",
+      "body": "the menace of achow never stopsthe word \"legacy support depreciation\" is YOUR(achow) buzzword for removing legacy functionality in coreits YOUR efforts of trying to push it forwardmultiple default functions and features of legacy have already been depreciated. and you know it. stop pretending. your efforts/campaigns have not been unnoticedyou dont want legacy functionality and its obvious nowyet you then on this forum pretend its not happening and you pretend to have no involvement or clue about the roadmap plans you want about depreciating legacy support2020Quote from: https://github.com/bitcoin/bitcoin/issues/20160Proposed Timeline for Legacy Wallet and BDB removal #20160 ..Note that we expect users who go through the effort to make a legacy-sqlite or descriptor-bdb wallet to suck it up and deal with the consequences of doing something that isn't really supported. Such users should be able to figure out for themselves how to migrate their wallets. (Maybe migratewallet can migrate legacy-sqlite to descriptor-sqlite. bdb to sqlite is way easier than legacy to descriptor).oct 2023Quote from: https://github.com/bitcoin/bitcoin/issues/28642#issuecomment-1759667107achowe: Legacy wallet removalfeb 2024Quote from: https://github.com/bitcoin/bitcoin/issues/29439#issuecomment-1946144606achowe: Legacy wallet removal #20160even though in github it shows your multiple attempts and then your own quotes of telling people to suck it up and deal with the consequencesedit to respond to belowno, you andrew chose to delete posts about legacy depreciation in general.. to then stupidly meander the discussion to specifics. everyone knows that many legacy features have been depreciated and you are consorting plans to depreciate morethe post you chose to retain was just one example of feature you want and were involved in depreciating with your attitude of let people suck it up and figure it out for themselvesas for your buzzword of following the social media trends of gender dysmorphia(mental illness). i hope you informed your parents and police that you murdered someone. what should you be charged with.. MANslaughter or assisted suicide?let me guess you want to pretend you are now a young female child so you can go into school girls bathrooms, is that your real agenda? you do know that science and even just observation can see that you are not a girl born recently right?and your personality is still MANipulating and MENacing. you have not changed at all and thats why i am calling you out on your silliness of your pronoun game because i feel you are gaming around and not actually trying to truly transition by the real world methods, it feels like you are just social trending to be part of some community or to satisfy some sexual fetish of your boss you are trying to rub up against",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 03, 2024, 08:04:22 PM",
+      "body": "Quote from: franky1 on June 03, 2024, 07:38:34 PMthe menace of achow never stopsThe menace of franky1 never stops. I'll humor you this one time, but do know that I will remove any of your posts from any of my self moderated topics, including this release announcement and future announcements. Your gish gallop deserves no response, and no one should have to read it. Not to mention your continuous abuse and deadnaming towards me.Quote from: franky1 on June 03, 2024, 07:38:34 PMthe word \"legacy support depreciation\" is YOUR(achow) buzzword for removing legacy functionality in coreits YOUR efforts of trying to push it forwardThere are many things referred to as \"legacy\" in Bitcoin Core. The only \"legacy\" thing being removed that I have been pushing for has been the non-descriptors based wallet which uses BDB. Do not confuse this legacy wallet to be legacy addresses or legacy anything else in Bitcoin and Bitcoin Core.Quote from: franky1 on June 03, 2024, 07:38:34 PMmultiple default functions and features of legacy have already been depreciated. and you know it. stop pretending. your efforts/campaigns have not been unnoticedyou dont want legacy functionality and its obvious nowNo shit sherlock, it's all public, been publicly announced, and publicly discussed. But do not confuse the legacy wallet with legacy address or legacy anything else in Bitcoin and Bitcoin CoreQuote from: franky1 on June 03, 2024, 07:38:34 PMyet you then on this forum pretend its not happening and you pretend to have no involvement or clue about the roadmap plans you want about depreciating legacy supportNowhere have I ever claimed that.Quote from: franky1 on June 03, 2024, 07:38:34 PM2020Quote from: https://github.com/bitcoin/bitcoin/issues/20160Proposed Timeline for Legacy Wallet and BDB removal #20160 ..Note that we expect users who go through the effort to make a legacy-sqlite or descriptor-bdb wallet to suck it up and deal with the consequences of doing something that isn't really supported. Such users should be able to figure out for themselves how to migrate their wallets. (Maybe migratewallet can migrate legacy-sqlite to descriptor-sqlite. bdb to sqlite is way easier than legacy to descriptor).You've highlighted something in red which I assume you want to draw attention to, yet failed to equally highlight the sentence before that which discusses which configuration it is that is actually unsupported. It's not legacy wallets in general, it's specifically two configurations for which the user had to explicitly go out of their way to create using external tooling.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

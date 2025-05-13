@@ -1,0 +1,69 @@
+{
+  "id": "topic_5416450",
+  "title": "ywnasdzkd",
+  "author": "ywnasdzkd",
+  "created_time": "October 09, 2022, 04:01:05 AM",
+  "content": "-------------------------------------------------------------------------------------------------------------------------------ywn@ywn-virtual-machine:~/bitcoin/bin$ bitcoind -connect=\"18.214.92.184\"Error: Cannot obtain a lock on data directory /home/ywn/btc_data. Bitcoin Core is probably already running.ywn@ywn-virtual-machine:~/bitcoin/bin$ ------------------------------------------------------------------------------------------------------------------------------The bitcoin node I deployed is running, and I use “ bitcoind -connect=\"18.214.92.184\" ” command to connect to the new node, but the above error occurs. what do I do?I know that connect can be set via config file bitcoin.conf, but I want to set connect dynamically with command.Ubuntu18Bitcoin Core version v0.20.1",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5416450",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "October 09, 2022, 05:10:27 AM",
+      "body": "Either close bitcoind first and start it with that -connect command line option...Or use addnode RPC, use bitcoin-cli instead of bitcoind to use the command:Code:bitcoin-cli addnode \"18.214.92.184:8333\" \"add\"But take note that addnode works differently than connect,connect will exclusively use the selected node(s) while addnode will still enable your node to connect to other peers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 09, 2022, 04:18:01 PM",
+      "body": "I suggest redacting the IP address from your post if it belongs to a public network and isn't some loopback address like 127.0.0.1, or anything starting with 192.168.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "serhack",
+      "created_time": "October 09, 2022, 04:27:49 PM",
+      "body": "Quote from: ywnasdzkd on October 09, 2022, 04:01:05 AM-------------------------------------------------------------------------------------------------------------------------------ywn@ywn-virtual-machine:~/bitcoin/bin$ bitcoind -connect=\"18.214.92.184\"Error: Cannot obtain a lock on data directory /home/ywn/btc_data. Bitcoin Core is probably already running.ywn@ywn-virtual-machine:~/bitcoin/bin$ ------------------------------------------------------------------------------------------------------------------------------Identify all the Bitcoin core processes, kill those \"gracely\" and then follow the steps that other users indicated. Your device can not obtain a lock on the folder because another process is using it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 09, 2022, 05:33:44 PM",
+      "body": "Quote from: serhack on October 09, 2022, 04:27:49 PMIdentify all the Bitcoin core processes, kill those \"gracely\" and then follow the steps that other users indicated. Your device can not obtain a lock on the folder because another process is using it.Simply running bitcoin-cli stop in a terminal will shut it down. No process identification necessary.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "serhack",
+      "created_time": "October 09, 2022, 07:55:28 PM",
+      "body": "Quote from: NotATether on October 09, 2022, 05:33:44 PMQuote from: serhack on October 09, 2022, 04:27:49 PMIdentify all the Bitcoin core processes, kill those \"gracely\" and then follow the steps that other users indicated. Your device can not obtain a lock on the folder because another process is using it.Simply running bitcoin-cli stop in a terminal will shut it down. No process identification necessary.Yes, another possibility. I think you should specify the custom datadir for that.By the way, if I have more than one Bitcoin node running in the same machine, using that command, which node will be stopped?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 10, 2022, 03:32:36 AM",
+      "body": "Quote from: serhack on October 09, 2022, 07:55:28 PMQuote from: NotATether on October 09, 2022, 05:33:44 PMQuote from: serhack on October 09, 2022, 04:27:49 PMIdentify all the Bitcoin core processes, kill those \"gracely\" and then follow the steps that other users indicated. Your device can not obtain a lock on the folder because another process is using it.Simply running bitcoin-cli stop in a terminal will shut it down. No process identification necessary.Yes, another possibility. I think you should specify the custom datadir for that.By the way, if I have more than one Bitcoin node running in the same machine, using that command, which node will be stopped?The daemon which is listening on the RPC port that got the shutdown message.Lets say that you have two daemons running, A and B, and you have the bitcoin.conf of node A listening on the default ports 8332/8333, and since you can't reuse the same config file for two different nodes (they must have different address/port combos) you set node B to listen on 9332/9333 through another Bitcoin.conf or you just pass those arguments on the command line. If you don't do this then it won't be able to bind the P2P & RPC ports in the first place.- So you have a particular bitcoin-cli (possibly from another binary distribution)...- ...hooked up to a particular RPC server port...- ...that shuts down the Bitcoind daemon that spawned the RPC server on that port in the first place.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "serhack",
+      "created_time": "October 10, 2022, 01:45:44 PM",
+      "body": "Quote from: NotATether on October 10, 2022, 03:32:36 AMQuote from: serhack on October 09, 2022, 07:55:28 PMQuote from: NotATether on October 09, 2022, 05:33:44 PMQuote from: serhack on October 09, 2022, 04:27:49 PMIdentify all the Bitcoin core processes, kill those \"gracely\" and then follow the steps that other users indicated. Your device can not obtain a lock on the folder because another process is using it.Simply running bitcoin-cli stop in a terminal will shut it down. No process identification necessary.Yes, another possibility. I think you should specify the custom datadir for that.By the way, if I have more than one Bitcoin node running in the same machine, using that command, which node will be stopped?The daemon which is listening on the RPC port that got the shutdown message.Lets say that you have two daemons running, A and B, and you have the bitcoin.conf of node A listening on the default ports 8332/8333, and since you can't reuse the same config file for two different nodes (they must have different address/port combos) you set node B to listen on 9332/9333 through another Bitcoin.conf or you just pass those arguments on the command line. If you don't do this then it won't be able to bind the P2P & RPC ports in the first place.- So you have a particular bitcoin-cli (possibly from another binary distribution)...- ...hooked up to a particular RPC server port...- ...that shuts down the Bitcoind daemon that spawned the RPC server on that port in the first place.Thanks for the explanation!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "topic_5454183",
+  "title": "Antotena",
+  "author": "Antotena",
+  "created_time": "May 27, 2023, 11:05:51 AM",
+  "content": "I am always confuse when I see Sats/bytes corrected. What is the difference between sats/bytes and sats/vbytes and what is the relationship between sats/vbytes with weight measurement transactions in segwit transactions. Explain to me like a baby.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454183",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "May 27, 2023, 11:28:50 AM",
+      "body": "1 vbyte or vsize is equals to 4 weight units. The byte is the actual byte or size while vbyte is the virtual byte. Actual byte is higher than its corresponding vbyte which was introduced in nested and native segwit. Because of this, the vbyte makes transaction to be of lower fee.Example of legacy address transaction with 10 sat/vbyte, the transaction have 10 sat/vbyte too. Virtual byte exist in segwit.Example is 10 sat/byte segwit transaction is around 18 sat/vbyte. If you make a transaction from native segwit address to native segwit address with 18 sat/vbyte, it has 10 sat/byte if it is legacy address. So with the virtual byte, transaction fee becomes lower.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 27, 2023, 11:38:52 AM",
+      "body": "Quote from: Antotena on May 27, 2023, 11:05:51 AMExplain to me like a baby.A SegWit transaction has \"Witness\" data in it, those data will only be counted as 1 \"Weight Units\" (WU) per Byte whilst non-witness data counts as 4WU per Byte.With that Weight Units, you can get the transaction's virtual size (vByte) by dividing it by 4. (I hope babies know division)But the size of the transaction (in Bytes) is the actual size of the transaction is your disk.Here's the \"Detailed Example\" of which part of a SegWit transaction are Witness data: https://en.bitcoin.it/wiki/Weight_units#Detailed_exampleThe units \"sat/vByte\" and \"sat/Byte\" are the fee rate based from those units above: absolute fee divided by vByte or Byte.Take note that the majority of Miners are using the virtual size when prioritizing transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 27, 2023, 01:03:19 PM",
+      "body": "In addition to what has been said above, the simplest solution is that the vast majority of people should ignore sats/byte and only pay attention to sats/vbyte. This is the only number that matters when considering the priority of your transaction.Block space is measured in either vbytes or weight units. 4 weight units = 1 vbyte. A block's maximum size is 4,000,000 weight units, which is 1 MvB. Miners priortize transactions paying the higher fee per vbyte, since this allows them to earn the most fees from finding a block. It is your fee in sats/vbyte which determines your transaction's position within the mempool.Some outdated wallets and block explorers still use sats/byte, despite this figure not being accurate since segwit was activated nearly 6 years ago. I would avoid such services.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "May 27, 2023, 01:08:32 PM",
+      "body": "Imagine that you have a block space of 1MB, and you are asked to fill it, any transaction you add takes space in that block, but you are lazy and with a few transactions you find that block is full.Now someone arranged and said I will reorganize the data inside the block so that the same block holds more data, what the person did is segregrate the witness data to a different partition so that it still maintains the same size of 1MB but the non-witness data consumes 4 weight units per Byte .So every new block contains a (lazy) legacy transaction with Byte = vByte and a (new) with Segwit transactions containing 4 vByte.The final result is that we have a block of 1MB, but the data inside it is more than it.Transaction example:  Block 787719 size is 2123.675 KBIn short, avoid using legacy address and calculate fees using sats/vByte because if you are a miner, you will try to fill your block with more data, so you will prefer Segwit transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 27, 2023, 02:37:35 PM",
+      "body": "Quote from: Yamane_Keto on May 27, 2023, 01:08:32 PMso that it still maintains the same size of 1MBThis is not correct. Blocks can be up to 4 MB of actual disk space, with average sizes around 1.5-2.5 MB. They have a maximum size of 4,000,000 weight units, which is the same as 1 MvB.Quote from: Yamane_Keto on May 27, 2023, 01:08:32 PMSo every new block contains a (lazy) legacy transaction with Byte = vByte and a (new) with Segwit transactions containing 4 vByte.The non-witness parts of segwit transactions are still counted the standard way, with 1 byte taking up 4 weight units. It is only the witness part of the transactions which costs 1 weight unit per byte, not the entire segwit transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "May 27, 2023, 05:15:50 PM",
+      "body": "Quote from: o_e_l_e_o on May 27, 2023, 01:03:19 PMSome outdated wallets and block explorers still use sats/byte, despite this figure not being accurate since segwit was activated nearly 6 years ago. I would avoid such services.Not to sure what to tell but Electrum [even latest version] is still using bytes This is the only wallet software I am using. The people who don't have much technical idea including me, they see bytes on Electrum but then see vbyte on block-explorer like blockchair and become confused.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 27, 2023, 06:59:22 PM",
+      "body": "Electrum actually correctly uses sats/vbyte, but labels it as sats/byte.An issue was opened about this years ago: https://github.com/spesmilo/electrum/issues/6961. Unfortunately the devs haven't got round to fixing it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

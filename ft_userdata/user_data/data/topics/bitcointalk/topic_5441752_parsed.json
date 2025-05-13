@@ -1,0 +1,85 @@
+{
+  "id": "topic_5441752",
+  "title": "digaran",
+  "author": "digaran",
+  "created_time": "March 01, 2023, 06:49:30 PMLast edit: January 20, 2024, 07:42:34 AM by digaran",
+  "content": "🖤",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5441752",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 01, 2023, 08:46:43 PM",
+      "body": "Quote from: digaran on March 01, 2023, 06:49:30 PMHi guys, I was messing around with address generator, I did a SHA256 on an address and then used Hash160 on the result, then turned the hash160 into an address, now the address turns out to have a balance, can I find the private key or not? I would like to notify the owner about it so they could transfer the coins.You cannot find the private key. There is no link between the private key of the actual address and the address you ended up with by performing RIPEMD160(SHA256(address)).Further, it is incredibly unlikely that by performing RIPEMD160(SHA256(anything)) that you end up with an address which is already funded, unless you are deliberately reusing a string (which should be a public key) someone else has already used. I suspect there is something else going on here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 01, 2023, 09:02:07 PM",
+      "body": "Quote from: digaran on March 01, 2023, 08:54:48 PMLook, I performed SHA256 on a bitcoin address, it gave me a hex string, then I performed RIPEMD160 on that string, I then turned that hash160 string into an address which holds 5,000$ in bitcoin.If this is true, then someone else has followed these exact steps before to generate that address and send coins to it. The only other option is that you have stumbled across the world's first RIPEMD160 or SHA256 collision, which is exceedingly unlikely.Quote from: digaran on March 01, 2023, 08:54:48 PMFirst I want to know if it is possible to derive the private key from the 2 hex strings that I have or not, then I'd post everything publicly once I'm sure there is no risk of theft on the address.No, it isn't. Even in a normally generated address, knowledge of SHA256(pubkey) or RIPEMD160(SHA256(pubkey)) (or indeed, just the raw pubkey itself) is not enough to derive the private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "March 02, 2023, 04:57:03 AM",
+      "body": "Quote from: digaran on March 01, 2023, 11:23:34 PMSo do we perform ripemd160 on public key or private key?Neither. RIPEMD-160 algorithm is usually applied on hash of data, not data itself. You can't convert a bitcoin address back to public key because both RIPEMD-160 and SHA256 are one-way functions. No matter what you do with these raw hashes and strings, it is unlikely that you will ever find a collision that would give you an option to spend coins of someone else. According to Bitcoin Wiki, \"because the space of possible addresses is so astronomically large it is more likely that the Earth is destroyed in the next 5 seconds, than that a collision occur in the next millenium.\" QuoteIf it's the public key then if you do sha256 on bitcoin addresses you can get the public key of some other addresses, and somehow I can get the public key of some addresses by doing sha256 on them. Don't know if I'm misunderstanding the concept or I just stumbled upon a bug.You need a corresponding private key to spend from public key-address, but you will not get a private key by simply converting someone else's address to another address. What you need to do to find a collision is generate every possible private key, convert each of them to public key, apply SHA256 and RIPEMD-160 and check if it matches the address in question. There is no shortcut because any garbage can be converted to a valid bitcoin address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "March 02, 2023, 05:38:34 AM",
+      "body": "Quote from: digaran on March 01, 2023, 06:49:30 PMHi guys, I was messing around with address generator, I did a SHA256 on an address and then used Hash160 on the result, then turned the hash160 into an address, now the address turns out to have a balance,-snip-It just happened that the result of Hash160 is always 160-bit so any data that you've hashed can be converted into an address.Now, if it's pure coincidence, then you've discovered a collision (but only until you find the owner of that address to confirm that your and his inputs are different).But the most possible scenario here is someone did the exact same thing.Quote from: digaran on March 01, 2023, 06:49:30 PMcan I find the private key or not? I would like to notify the owner about it so they could transfer the coins.You can't, and I highly doubt that there's an owner of that address. (someone who owns its private key)If there's someone who claims it for some reason, ask him to provide a signed message.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "March 02, 2023, 11:56:31 AM",
+      "body": "Quote from: digaran on March 02, 2023, 10:06:27 AMEdit: what is this? Code:19eVSDuizydXxhohGh8Ki9WY9KsHeT75TYIt shows as invalid address but blockchair shows only the BCH balance and not BTC, I changed the checksum myself, isn't it weird?That looks like a bug in blockchair website's backend that simply skips checksum validation of the base58 string you enter in the search box. They probably decode it using base58 and just drop the last 4 bytes (and version byte) then search their database.The reason why it only shows bcash history is because this address was only used on bcash blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 02, 2023, 06:19:58 PM",
+      "body": "Quote from: digaran on March 02, 2023, 10:06:27 AMI think what I'm using is rigged, just realized that the online tool I use just gives out rigged values and that's why I encountered this addressSounds like whoever created the site you are using is trying to scam people by spitting out pre-generated addresses regardless of what string you enter to be hashed.Quote from: digaran on March 02, 2023, 10:06:27 AMIt shows as invalid address but blockchair shows only the BCH balance and not BTC, I changed the checksum myself, isn't it weird?As pooya87 says, it's a bug on blockchair. You can enter any checksum and it will still find the corresponding BCH address with the correct checksum listed as \"Legacy address format\", while showing an empty (and invalid) bitcoin address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MrFreeDragon",
+      "created_time": "March 06, 2023, 08:20:31 PM",
+      "body": "Quote from: digaran on March 02, 2023, 10:06:27 AMEdit: what is this? Code:19eVSDuizydXxhohGh8Ki9WY9KsHeT75TYIt shows as invalid address but blockchair shows only the BCH balance and not BTC, I changed the checksum myself, isn't it weird?Do not rely on blockchair - it shows the 0 balance for the mentioned address as well: https://blockchair.com/bitcoin/address/19eVSDuizydXxhohGh8Ki9WY9KsHeT75TYYou can even observe the 0 balance for this address: https://blockchair.com/bitcoin/address/7ThisMySuperBTCAddressSo, pooya87 is absolutely right \"That looks like a bug in blockchair website's backend that simply skips checksum validation\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "March 07, 2023, 08:11:09 AM",
+      "body": "Quote from: digaran on March 01, 2023, 08:54:48 PMLook, I performed SHA256 on a bitcoin address, it gave me a hex string, then I performed RIPEMD160 on that string, I then turned that hash160 string into an address which holds 5,000$ in bitcoin. First I want to know if it is possible to derive the private key from the 2 hex strings that I have or not, then I'd post everything publicly once I'm sure there is no risk of theft on the address.Then that means you have stumbled upon some sort of \"watch-only\" brainwallet, because no keypair-derived address should ever be hashable from a block of text using a single round of SHA256. There's no risk to be found here, because it does not yield a private key, but rather, an address.Besides, you don't know who the address belongs to. How are you going to contact them?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 07, 2023, 10:56:43 AM",
+      "body": "Quote from: digaran on March 07, 2023, 10:13:29 AMWhat I wanted to know, if I do RIPEMD-160 on something to get an address, that something is what? Is it the hash of the public key or we could do it on the public key itself?I get some results which I need to add 00 in front of the result in order to get the address, otherwise I get an error, just like the address above which I later added a leading 1 and got an address with wrong checksum. I have a lot to learn.I think this site might help to answer your questions here: https://gobittest.appspot.com/AddressIt shows quite clearly the individual steps involved in moving from a private key, through a public key, and finally to an (uncompressed P2PKH) address.To answer your specific questions above, you perform RIPEMD-160 on the output of a SHA-256 hash of your public key. You must then add an 0x00 network byte to the start of this result and the checksum to the end before encoding it as an address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "id": "topic_5471637",
+  "title": "cygan",
+  "author": "cygan",
+  "created_time": "October 25, 2023, 03:41:14 PM",
+  "content": "there is a new proposal for a bip under the name 'OP_CAT'. the draft was published by Ethan Heilman and Armin Sabouri.the change itself consists of just 13 lines of code, and the functionality is also similarly straightforward at first glance. OP_CAT is about concatenation, i.e. linking or appending two input values to one output value. the CAT-opcode is nothing new, it was already once in a very early version of Bitcoin a part of the official command set of Bitcoin script, but then (because small and new) was deactivated again quietly and secretly for safety's sake.if you would like to know more about this bip draft, i recommend these two links:QuoteThis BIP defines OP_CAT a new tapscript opcode which allows the concatenation of two values on the stack. This opcode would be activated via a soft fork by redefining the opcode OP_SUCCESS80.https://github.com/EthanHeilman/op_cat_draft/blob/main/cat.mediawikiQuote> Hi everyone,> > We've posted a draft BIP to propose enabling OP_CAT as Tapscript opcode.> https://github.com/EthanHeilman/op_cat_draft/blob/main/cat.mediawiki> > OP_CAT was available in early versions of Bitcoin. It was disabled as> it allowed the construction of a script whose evaluation could create> stack elements exponential in the size of the script. This is no> longer an issue in the current age as tapscript enforces a maximum> stack element size of 520 Bytes.https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2023-October/022055.htmlin any case, the ratio between effort and possible use cases is very promising for OP_CAT, while there are actually no obvious disadvantages at the moment, apart from the principles mentioned. however, one should not forget that we are currently still at a draft proposal stage and an actual activation in the Bitcoin network is still relatively far away in any case.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471637",
+  "comments": [
+    {
+      "author": "Yamane_Keto",
+      "created_time": "October 26, 2023, 07:33:41 AM",
+      "body": "After Bitcoin added a limit (520 bytes) to the size of the element in the stack, there are logical arguments for reactivating some opcodes. OP_CAT is simple and easy to understand, and I see some people defending it on the grounds that it can be used to make Bitcoin is \"quantum safe\" by signing an EC signature https://lists.linuxfoundation.org/pipermail/lightning-dev/2019-October/002201.htmlSo it is not to do new things but to enable some basic things.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 26, 2023, 07:43:58 AM",
+      "body": "What is the use case for this opcode? As in, a practical example where this would be helpful.So far, the majority of items that are on the stack are hashes, signatures, and integers. None of which seem to have any clear deficiencies that could be solved by concatenating them.The only thing I can think of is something like BitVM where you have bits as stack elements and this allows you to combine two of them together into (over several instructions) bytes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "October 26, 2023, 09:35:43 AM",
+      "body": "QuoteWhat is the use case for this opcode?There are many, read the whole \"Motivation\" paragraph for details: https://github.com/EthanHeilman/op_cat_draft/blob/main/cat.mediawiki#motivation1. Unlocking a coin by signing a given message. Let's assume that you have \"Hello World\" message, and you signed it with some public key. That means, you can create an output script, that will push r-value and s-value of the signature separately, and then use OP_CAT, combined with OP_CHECKSIG, to require a specific r-value in your signature. Which means, instead of signing \"this transaction\", you can sign \"this message\" instead.2. Doing Proof of Work to move coins. For example, you can split some hash into two parts: a target, and a tail of the hash. Then, after combining that with OP_CAT, you can run OP_SHA256 or similar opcodes on some data, and check if it is equal. In this way, you can for example move a coin if you compute 2^32 hashes.3. Restricting ways of spending the coin by requiring a specific transaction. For example, you can trap a coin on a particular address, by requiring identical output script. Of course, in case of TapScript, that chain could always end, if you spend-by-key. But in some altcoins, it is possible to trap it directly by using Script. In general, it is just a consequence of applying the first point to \"this transaction\" as a message. Then, you can use OP_CAT instead of using sighashes, and exactly decide, what \"transaction template\" is accepted. Which means, you can for example say: \"if you sign this, you can take up to 1 BTC from this output, and you have to put the rest in this change address\".4. Provably fair transaction puzzles, where the creator would not know the solution, without solving the puzzle. The spend-by-key path could be provably unspendable (as long as secp256k1 is not fully broken, but then spend-by-key can be softforked-out) for example if you put \"x=1\" public key as your TapScript key, and then put a TapScript, that requires mining N bits of the public key (probably non-zero, because of the half of the generator, or it could be relative to some other key than the generator, but this is harder).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "October 26, 2023, 10:24:10 AM",
+      "body": "Quote from: NotATether on October 26, 2023, 07:43:58 AMWhat is the use case for this opcode? As in, a practical example where this would be helpful.✂in principle, OP_CAT can be used to implement so-called covenants, i.e. predefined conditions to whom a certain Bitcoin output can be issued. the recently introduced concept of BitVM to verify arbitrary calculations on Bitcoin would also be much easier to implement and more efficient with OP_CAT. another very interesting possibility is to link the validity of a transaction not only to a valid signature, but to a specific valid signature, thus enabling effective protection for unconfirmed transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "October 26, 2023, 10:25:47 AM",
+      "body": "QuoteAs in, a practical example where this would be helpful.1. Sign any message:Input script: \"<sigS>\"Output script: \"<sigR> OP_SWAP OP_CAT <pubkey> OP_CHECKSIG\"Execution:Code:<sigS> <sigR> OP_SWAP<sigR> <sigS> OP_CAT<signature> <pubkey> OP_CHECKSIGOP_TRUE2. Proof of Work to move coins:Input script: \"<message> <tailHash>\"Output script: \"<target> OP_CAT OP_SWAP OP_SHA256 OP_EQUAL\"Execution:Code:<message> <tailHash> <target> OP_CAT<message> <hash> OP_SWAP<hash> <message> OP_SHA256<hash> <hash> OP_EQUALOP_TRUE3. Transaction introspection:Very similar as to point one. In the best case, it could be identical. In some other cases, it could require transaction building with \"<txHead> <txData> <txTail> OP_CAT OP_CAT\", and then hashing it with OP_SHA256. Then, you could set \"<txHead> <txTail>\" in your output script, but \"<txData>\" could be some part of the input, and for example represent some part of the transaction output amount, which can be changed by the transaction signer. Which means, if you for example allow picking three bytes in your <txData>, and it would be placed, where you have transaction output amount, then you can change the amount, and pick a number from 0.00000000 BTC to 0.16777215 BTC.Some links, also from the BIP for OP_CAT:https://medium.com/blockstream/cat-and-schnorr-tricks-i-faf1b59bd298https://www.wpsoftware.net/andrew/blog/cat-and-schnorr-tricks-ii.html4. Provably fair transaction puzzles:Input script: \"<signature> <pubkeyTail>\"Output script: \"<pubkeyHead> OP_SWAP OP_CAT OP_CHECKSIG\"Execution:Code:<signature> <pubkeyTail> <pubkeyHead> OP_SWAP<signature> <pubkeyHead> <pubkeyTail> OP_CAT<signature> <pubkey> OP_CHECKSIGOP_TRUEThen, if you pick for example 0xbadc0ded as your <pubkeyHead>, then people could mine a public key, starting with x-value equal to 0xbadc0ded, and that would be a proof, that someone can break 32-bit public keys. Of course, any non-zero pattern will do (the only reason why zero will not work, is the half of the generator).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stwenhao",
+      "created_time": "October 26, 2023, 11:08:47 AM",
+      "body": "Quote1. Sign any message:Input script: \"<sigS>\"Output script: \"<sigR> OP_SWAP OP_CAT <pubkey> OP_CHECKSIG\"Execution:Code:<sigS> <sigR> OP_SWAP<sigR> <sigS> OP_CAT<signature> <pubkey> OP_CHECKSIGOP_TRUEInteresting. For example, it could be used as a reward, to reveal the private key to some address, for example to 120-bit and 125-bit puzzle:Input script: \"<sigS>\"Output script: \"OP_TOALTSTACK <puzzle120> OP_DUP OP_FROMALTSTACK OP_CAT OP_SWAP OP_CHECKSIG\"Execution:Code:<sigS> OP_TOALTSTACK<puzzle120> OP_DUP<puzzle120> <puzzle120> OP_FROMALTSTACK<puzzle120> <puzzle120> <sigS> OP_CAT<puzzle120> <sig> OP_SWAP<sig> <puzzle120> OP_CHECKSIGOP_TRUE",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "October 26, 2023, 02:36:51 PM",
+      "body": "Quote2. Proof of Work to move coins:Input script: \"<message> <tailHash>\"Output script: \"<target> OP_CAT OP_SWAP OP_SHA256 OP_EQUAL\"Execution:Code:<message> <tailHash> <target> OP_CAT<message> <hash> OP_SWAP<hash> <message> OP_SHA256<hash> <hash> OP_EQUALOP_TRUEIt gets better. You can request generating some vanity address by some third-party in a provably fair way, and put some reward on that:User input script: \"<signature>\"Miner input script: \"<pubkey> <vanityHead>\"Input script: \"<signature> <pubkey> <vanityHead>\"Output script: \"<vanityTail> OP_CAT OP_SWAP OP_DUP OP_HASH160 OP_ROT OP_EQUALVERIFY OP_CHECKSIG\"Execution:Code:<signature> <pubkey> <vanityHead> <vanityTail> OP_CAT<signature> <pubkey> <vanity> OP_SWAP<signature> <vanity> <pubkey> OP_DUP<signature> <vanity> <pubkey> <pubkey> OP_HASH160<signature> <vanity> <pubkey> <vanity> OP_ROT<signature> <pubkey> <vanity> <vanity> OP_EQUALVERIFY<signature> <pubkey> OP_CHECKSIGOP_TRUEBecause we have Schnorr signatures, it is possible to do that in a provably fair way, without forcing anyone to pass any private keys. In the end, everything will be just combined, and <signature> will be just some 2-of-2 multisig, expressed as a single signature.Also, instead of using OP_HASH160, it is possible to work on public keys directly, and request some vanity Taproot address in this way. But this is already covered in example \"4. Provably fair transaction puzzles\", because such puzzles are directly related to \"vanity public keys\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "December 13, 2023, 02:48:21 PM",
+      "body": "the OP_CAT bip is now officially listed in the bips repo: https://github.com/bitcoin/bips/pull/1525",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cmpeq",
+      "created_time": "December 14, 2023, 04:14:15 AM",
+      "body": "So hyped for merkle proofs!!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 14, 2023, 08:24:19 AM",
+      "body": "Quote from: cygan on December 13, 2023, 02:48:21 PMthe OP_CAT bip is now officially listed in the bips repo: https://github.com/bitcoin/bips/pull/1525But I don't see the OP_CAT bip on the repository file listing, there's only this pull request you linked that is still open. So doesn't that means the commit(s) haven't been merged yet?Quote from: cmpeq on December 14, 2023, 04:14:15 AMSo hyped for merkle proofs!!!To get an idea of what is going on in there, are you listing the Merkle leaf hashes from top to bottom and left to right, or are you putting them in another order?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cmpeq",
+      "created_time": "December 14, 2023, 09:21:19 AM",
+      "body": "Quote from: NotATether on December 14, 2023, 08:24:19 AMQuote from: cmpeq on December 14, 2023, 04:14:15 AMSo hyped for merkle proofs!!!To get an idea of what is going on in there, are you listing the Merkle leaf hashes from top to bottom and left to right, or are you putting them in another order?For the merkle proof in the example, the json-ified inputs are:Code:{  \"root\": \"227c4fdcd6c57bf13f6af315dfeebfab6976e46276f11cc6160bbd0fb5ee22ec\",  \"siblings\": [    \"8bf7fe31f973206a1084adc625aceba47a07a406bb7af0a4856be80369879f3f\",    \"d05ae323ade50eb5b3e2ecfa09a9529bf693fb1a955b1a157f7b71c2cf8d629b\",    \"08632de6f4ccaccfb2a3ffbf0e2c00ab21e9c09a5864dc052a5578db200edac5\",    \"e3fe0f607bf194529d798a3c7409a6d0cb5efc19dce375b3c90611bc79f3247d\",    \"215228fd2afa2869f579093df1525b0e440f43f7145aa988d03438a78e9b72bf\",    \"f81ce02ef679e2e29d542d3cdee78fd4d556b78ae03421909651bb6be77e7da9\",    \"a1a08c07ccce1c6a26bc6f3338543e15c8803c5c9f909c459f3127b7b72da0bf\",    \"dfe8433c4dc9407812272638647640d138b1cc036d38cdb6adc8a1e5efc03f0d\",    \"17b14e63a9b0eeb7f40552b99ab3ec349dbfe80ed1497c47c1da17c2fc529054\",    \"ab8c794ff3f0e8c2477f7be9e9660e61218d5ba7be8d6ac8e4ce0568e64b28d8\",    \"e480b84964547ef3e9342a9f915ec7144d6bec674030b521d20049066474089b\",    \"a2944984637a8639a2805bd5efb7f0151895f5be68e6f733cf102b332c1aebe6\",    \"345b091a43a4e56c86ff2034f80279c45e6c3417741c446103b4c29b8cd489e6\",    \"d59e50b06c21c7a201a1c469e76a21e7cdc0def5be06d49d0ee43ec964176938\",    \"b58d900f5e182e3c50ef74969ea16c7726c549757cc23523c369587da7293784\",    \"d49a7502ffcfb0340b1d7885688500ca308161a7f96b62df9d083b71fcc8f2bb\",    \"8fe6b1689256c0d385f42f5bbe2027a22c1996e110ba97c171d3e5948de92beb\",    \"8d0d63c39ebade8509e0ae3c9c3876fb5fa112be18f905ecacfecb92057603ab\",    \"95eec8b2e541cad4e91de38385f2e046619f54496c2382cb6cacd5b98c26f5a4\",    \"f893e908917775b62bff23294dbbe3a1cd8e6cc1c35b4801887b646a6f81f17f\",    \"cddba7b592e3133393c16194fac7431abf2f5485ed711db282183c819e08ebaa\",    \"8a8d7fe3af8caa085a7639a832001457dfb9128a8061142ad0335629ff23ff9c\",    \"feb3c337d7a51a6fbf00b9e34c52e1c9195c969bd4e7a0bfd51d5c5bed9c1167\",    \"e71f0aa83cc32edfbefa9f4d3e0174ca85182eec9f3a09f6a6c0df6377a510d7\",    \"31206fa80a50bb6abe29085058f16212212a60eec8f049fecb92d8c8e0a84bc0\",    \"21352bfecbeddde993839f614c3dac0a3ee37543f9b412b16199dc158e23b544\",    \"619e312724bb6d7c3153ed9de791d764a366b389af13c58bf8a8d90481a46765\",    \"7cdd2986268250628d0c10e385c58c6191e6fbe05191bcc04f133f2cea72c1c4\",    \"848930bd7ba8cac54661072113fb278869e07bb8587f91392933374d017bcbe1\",    \"8869ff2c22b28cc10510d9853292803328be4fb0e80495e8bb8d271f5b889636\"  ],  \"index\": 999,  \"value\": \"1337133713371337133713371337133713371337133713371337133713371337\"}You can see that there are 30 siblings in the merkle proof, so the merkle tree has a height of 30 (i.e the tree has a total of 2^30=1073741824 leaves).Since the tree is of height 30, we first need to decompose the index into its 30 bits:Code://tb is a trace builder that emits the code we needconst numBits = 30;for(let i=numBits-1;i>=1;i--){  tb.OP_DUP();  tb.constant(1<<i);  tb.OP_LESSTHAN(); // range check the index to sniff the highest bit  tb.OP_IF();    tb.OP_0();// if the index is less than 2^i, then the i-th bit is 0    tb.OP_TOALTSTACK(); // push the i-th bit of the index to the alt stack  tb.OP_ELSE();    tb.constant(1<<i);    tb.OP_SUB(); // subtract 2^i from the index    tb.OP_1(); // if the index is greater or equal to 2^i, then the i-th bit is 1    tb.OP_TOALTSTACK(); // push the i-th bit of the index to the alt stack  tb.OP_ENDIF();}tb.OP_TOALTSTACK(); // after the loop, the index is only 1 bit long, so we push it to the alt stack (least significant bit)Now that we have the bits in the alt stack ordered in increasing significance (i.e, least significant bit is at the top of the alt stack), we can begin to check the merkle proof.Currently, our primary stack looks like the following:Code:<0x227c4fdcd6c57bf13f6af315dfeebfab6976e46276f11cc6160bbd0fb5ee22ec> #root,<0x8869ff2c22b28cc10510d9853292803328be4fb0e80495e8bb8d271f5b889636> #sibling_1,<0x848930bd7ba8cac54661072113fb278869e07bb8587f91392933374d017bcbe1> #sibling_2,<0x7cdd2986268250628d0c10e385c58c6191e6fbe05191bcc04f133f2cea72c1c4> #sibling_3,<0x619e312724bb6d7c3153ed9de791d764a366b389af13c58bf8a8d90481a46765> #sibling_4,<0x21352bfecbeddde993839f614c3dac0a3ee37543f9b412b16199dc158e23b544> #sibling_5,<0x31206fa80a50bb6abe29085058f16212212a60eec8f049fecb92d8c8e0a84bc0> #sibling_6,<0xe71f0aa83cc32edfbefa9f4d3e0174ca85182eec9f3a09f6a6c0df6377a510d7> #sibling_7,<0xfeb3c337d7a51a6fbf00b9e34c52e1c9195c969bd4e7a0bfd51d5c5bed9c1167> #sibling_8,<0x8a8d7fe3af8caa085a7639a832001457dfb9128a8061142ad0335629ff23ff9c> #sibling_9,<0xcddba7b592e3133393c16194fac7431abf2f5485ed711db282183c819e08ebaa> #sibling_10,<0xf893e908917775b62bff23294dbbe3a1cd8e6cc1c35b4801887b646a6f81f17f> #sibling_11,<0x95eec8b2e541cad4e91de38385f2e046619f54496c2382cb6cacd5b98c26f5a4> #sibling_12,<0x8d0d63c39ebade8509e0ae3c9c3876fb5fa112be18f905ecacfecb92057603ab> #sibling_13,<0x8fe6b1689256c0d385f42f5bbe2027a22c1996e110ba97c171d3e5948de92beb> #sibling_14,<0xd49a7502ffcfb0340b1d7885688500ca308161a7f96b62df9d083b71fcc8f2bb> #sibling_15,<0xb58d900f5e182e3c50ef74969ea16c7726c549757cc23523c369587da7293784> #sibling_16,<0xd59e50b06c21c7a201a1c469e76a21e7cdc0def5be06d49d0ee43ec964176938> #sibling_17,<0x345b091a43a4e56c86ff2034f80279c45e6c3417741c446103b4c29b8cd489e6> #sibling_18,<0xa2944984637a8639a2805bd5efb7f0151895f5be68e6f733cf102b332c1aebe6> #sibling_19,<0xe480b84964547ef3e9342a9f915ec7144d6bec674030b521d20049066474089b> #sibling_20,<0xab8c794ff3f0e8c2477f7be9e9660e61218d5ba7be8d6ac8e4ce0568e64b28d8> #sibling_21,<0x17b14e63a9b0eeb7f40552b99ab3ec349dbfe80ed1497c47c1da17c2fc529054> #sibling_22,<0xdfe8433c4dc9407812272638647640d138b1cc036d38cdb6adc8a1e5efc03f0d> #sibling_23,<0xa1a08c07ccce1c6a26bc6f3338543e15c8803c5c9f909c459f3127b7b72da0bf> #sibling_24,<0xf81ce02ef679e2e29d542d3cdee78fd4d556b78ae03421909651bb6be77e7da9> #sibling_25,<0x215228fd2afa2869f579093df1525b0e440f43f7145aa988d03438a78e9b72bf> #sibling_26,<0xe3fe0f607bf194529d798a3c7409a6d0cb5efc19dce375b3c90611bc79f3247d> #sibling_27,<0x08632de6f4ccaccfb2a3ffbf0e2c00ab21e9c09a5864dc052a5578db200edac5> #sibling_28,<0xd05ae323ade50eb5b3e2ecfa09a9529bf693fb1a955b1a157f7b71c2cf8d629b> #sibling_29,<0x8bf7fe31f973206a1084adc625aceba47a07a406bb7af0a4856be80369879f3f> #sibling_30,<0x1337133713371337133713371337133713371337133713371337133713371337> #valueWhen we verify a merkle proof, we start from the bottom of the tree where our value is, and hash up the tree to the root, and finish by comparing our computed root with the attested root at the bottom of the stack.Code:for(let i=0;i<30;i++){  tb.OP_FROMALTSTACK(); // pop the i-th least significant bit from the alt stack  tb.OP_NOT(); // invert the bit since our current merkle path is at the top of the stack.   // if the i-th least significant bit of the index is 1, then the merkle path at the i-th level is a right child, so running OP_CAT would push cat(<sibling>,<current>) to the stack  tb.OP_IF();    tb.OP_SWAP(); // if the i-th least significant bit of the index is a zero, then we need the current merkle path hash on the left, so our OP_CAT'd payload is cat(<current>, <sibling>)   tb.OP_ENDIF();  tb.OP_CAT(); // cat(<left>,<right>)  tb.OP_SHA256(); // sha256(cat(<left>,<right>))}tb.OP_EQUALVERIFY(); // check to make sure the computed root equals the attested root at the bottom of the stack, in this case 227c4fdcd6c57bf13f6af315dfeebfab6976e46276f11cc6160bbd0fb5ee22ecHope that helps!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 14, 2023, 11:26:50 AM",
+      "body": "Yeah, it really made things clear. But what do you plan on using this for in a Bitcoin script?Is it going to be something like validating a previous block's hash for the purpose of starting a new protocol on top of Bitcoin?Also, since this is TapScript, have you calculated how many bytes the witness stack would use on average? I'm going to guess that it will be quite expensive unless you set it to some fee rate below the purge level (as of now, 17.2 sats/vbyte).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cmpeq",
+      "created_time": "December 14, 2023, 12:55:05 PM",
+      "body": "Quote from: NotATether on December 14, 2023, 11:26:50 AMYeah, it really made things clear. But what do you plan on using this for in a Bitcoin script?Is it going to be something like validating a previous block's hash for the purpose of starting a new protocol on top of Bitcoin?Also, since this is TapScript, have you calculated how many bytes the witness stack would use on average? I'm going to guess that it will be quite expensive unless you set it to some fee rate below the purge level (as of now, 17.2 sats/vbyte).Great point, yeah might get a bit pricy.The main motivation for merkle proofs in my case is as a part of a trustless peg-out system/locking script for a zk layer 2 on bitcoin where we want to prove that, given a known withdrawals tree root (a public input of a zk proof), there exists a withdrawal for n bitcoin to a given address. To solve issues around cost, the first thing that comes to mind is that it would be a mechanism of last resort.Average users can buy wrapped BTC on L2 by having the seller of thew wrapped BTC lock their tokens on l2 for a period during which the buyer has to prove that they paid the seller on Bitcoin L1, with the knowledge that if they wanted to, they could always trustlessly swap back for bitcoin, and a few large liquidity providers would be the ones actually swapping between wBTC  <-> BTC and likely charging a small spread to smaller guys who want to buy wBTC from them/bridge back to bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "December 21, 2024, 09:33:27 AM",
+      "body": "the picture for Bitcoin's next soft fork is becoming clearer:OP_CSFS, OP_CTV and OP_CAT are the covenants with the most support from developers. in my opinion, only features that extend Bitcoin's usefulness as money should be enabled, and use cases that harm Bitcoin's usefulness as money should be rejected.https://en.bitcoin.it/wiki/Covenants_support",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 22, 2024, 04:40:13 PM",
+      "body": "Quote from: cygan on December 21, 2024, 09:33:27 AMthe picture for Bitcoin's next soft fork is becoming clearerI don't see how this is the case. There's no consensus on any particular covenant implementation. In fact, it's clear that preferences vary and there is no choice that comes with no tangible tradeoff. OP_CTV is apparently the most preferable choice, but there are many who don't support it, just as OP_CAT, which is also very preferable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Wind_FURY",
+      "created_time": "December 23, 2024, 07:18:41 PM",
+      "body": "Quote from: cygan on December 21, 2024, 09:33:27 AMthe picture for Bitcoin's next soft fork is becoming clearer:OP_CSFS, OP_CTV and OP_CAT are the covenants with the most support from developers. in my opinion, only features that extend Bitcoin's usefulness as money should be enabled, and use cases that harm Bitcoin's usefulness as money should be rejected.https://en.bitcoin.it/wiki/Covenants_supportAs a money for what? Plus what other \"non-money\" features will OP_CSFS, OP_CTV and OP_CAT enable?Because if it enables those features that would make it easier for people to use their Bitcoins on-chain to purchase an on-chain \"artifact\" like a dick pic or a fart sound, then that, I believe, has also extended its usefulness as a kind of \"money\", no?Programmable money through extended scripts?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

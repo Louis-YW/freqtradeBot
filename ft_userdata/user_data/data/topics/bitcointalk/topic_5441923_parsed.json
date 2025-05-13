@@ -1,0 +1,141 @@
+{
+  "id": "topic_5441923",
+  "title": "100sIg00sI",
+  "author": "100sIg00sI",
+  "created_time": "March 03, 2023, 01:52:32 AM",
+  "content": "I want to view the stratum data between mining pool and my ASIC - how to do this?Basic but hard to find info on thisOnly relevant info I've found thus far:https://bitcointalk.org/index.php?topic=763510.msg8796431#msg8796431Specifically post #102However, this only works for cgminer??? No need for cgminer when running an asic pointed at a poolI would like to view stratum data between my ASIC (S9) and mining pool. The previous answer mentions wireshark....would this be my option? What particulars do i need to setup this connection to monitor stratum data?All help appreciated",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5441923",
+  "comments": [
+    {
+      "author": "paid2",
+      "created_time": "March 03, 2023, 09:55:19 AM",
+      "body": "You should have a look on this topic : https://bitcointalk.org/index.php?topic=5397166.msg60503248#msg60503248QuoteA method to verify the jobs, to get the current payouts mounts and the current payouts address of the differents outputs of the current Block, from the jobs I send you via the pool.It requires to do a little bit of retro engineering, patience and a running bitcoin core It works on every mining pool as soon as you know what is the Extradata (method to get it via GenTX1 is longer, and reverse extraction of outputs is possible though, but I need to maximise confidence).You can see from netcat what you are mining I spent few minutes to give you this scheme to verify the data I broadcast :- Step 0 : Get a random job via netcat  - Get the mining.notify to get the GenTX2, by pasting this on your terminal (don't hesitate to change your address), this is how your miner connects to the mining pool Code:» nc soloblocks.io 3333{\"id\": 1, \"method\": \"mining.subscribe\", \"params\": []}{\"id\": 2, \"params\": [\"bc1qtfl2u4l3gqdzvr45v50dfvefaffzft0zfnhcan.worker\", \"password\"],  \"method\": \"mining.authorize\"}- You getCode:{\"id\":1,\"result\":[[[\"mining.notify\",\"bc247797\"]],\"72f7cdb3\",8],\"error\":null}{\"id\":2,\"result\":true,\"error\":null}{\"method\":\"mining.set_difficulty\",\"params\":[65535],\"id\":2}{\"method\":\"mining.notify\",\"params\":[\"6\",\"2baedb2023a7ed2c1386a571fb3f3fe8068f5f69000042fe0000000000000000\",\"01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff220353580b04a31cc26208\",\"0f536f6c6f626c6f636b732e696f203100000000030000000000000000266a24aa21a9ed36fb8aa37b0515f8589481c4d08568cea1d1b156dd74b7aa09dc51823d7c494ade5e2725000000001600145a7eae57f1401a260eb4651ed4b329ea5224ade2c23226000000000017a914d3bc8e113a19c690c23d0436a54a9f54bd3a9bcc8700000000\",[\"a2e03c00888ff04fc5e798a2bbbe85524b1d4cdd8f2583a65a6affa598375976\",\"66d85a62d08f00f4d98fbaee0451d39110a990b9704f5de1a4f3c5401ea34a92\",\"fba424b04036a455c98acaa6b99bd07a06299720c760d3992f0326c6abea7e06\",\"017662772c7a47998336ddc859fc9dae6036b14a33b1d1e23330478b7e734f44\",\"bdba777179d6b68fc8d1bda510212fc0f17332626d934dec61f598e988012b7e\",\"dc58f53aeb93cb88c2c5bbb15aae73ee855be07f1dbe217b5017a86db13bb049\",\"7de31d3ee3fc6ef976e87754d7a7041bcff161efb5e884a6e3e3b7a8b4bcabe8\",\"24ab3fe6557e60152c24935d0edac01326b653f879d831045c162fcd63a130cd\"],\"20000000\",\"170984cc\",\"62c21ca1\",true],\"id\":3}- GenTX2 is the 4'th param.Code: 0f536f6c6f626c6f636b732e696f203100000000030000000000000000266a24aa21a9ed36fb8aa37b0515f8589481c4d08568cea1d1b156dd74b7aa09dc51823d7c494ade5e2725000000001600145a7eae57f1401a260eb4651ed4b329ea5224ade2c23226000000000017a914d3bc8e113a19c690c23d0436a54a9f54bd3a9bcc8700000000- Step 1 : Extradata - Extradata on soloblocks is \"Soloblocks.io 1\" for port 3333 and \"Soloblocks.io 2\" for port 3334. With that you can verify that the job I broadcast is to mine to Soloblocks.ioCode:txExtradataByteFromString [15 83 111 108 111 98 108 111 99 107 115 46 105 111 32 49]txExtradataHex 0f536f6c6f626c6f636b732e696f2031 (verify on http://www.unit-conversion.info/texttools/hexadecimal/) - you can see that you are mining on SoloBlocks.io on port 3333. - Step 2 : the output transaction - Split GenTX2 from \"0f536f6c6f626c6f636b732e696f2031\", you have the outputTransaction and sequences of \"00000000\". Last 8 chars is the txLockTime, set by default to 0. (txExtradata+txInSequence(00000000)+outputTransactions+txLockTime(00000000))- The output transaction of the job is \"030000000000000000266a24aa21a9ed36fb8aa37b0515f8589481c4d08568cea1d1b156dd74b7a a09dc51823d7c494ade5e2725000000001600145a7eae57f1401a260eb4651ed4b329ea5224ade2 c23226000000000017a914d3bc8e113a19c690c23d0436a54a9f54bd3a9bcc87\"-\"03\" is the number of outputs- Step 3 : the Default Commitment - First output is the Default Commitment.- \"0000000000000000266a24aa21a9ed36fb8aa37b0515f8589481c4d08568cea1d1b156dd74b7aa0 9dc51823d7c494a\" is the DefaultSegwitCommitment- \"0000000000000000\" is util.PackInt64LE(0)- 26 is the varIntBuffer of the length of DefaultSegwitCommitmentBytes- \"6a24aa21a9ed36fb8aa37b0515f8589481c4d08568cea1d1b156dd74b7aa09dc51823d7c494a\" is the hex of the DefaultSegwit Commitment- Step 4 : the Miners Address and miners Payout - Second Output is the miners address (your payout)- \"de5e272500000000\" is the PackInt64LE of the miners reward (99.6% of the coinbase value, value in input is in satoshi)- \"16\" is the hex length of the miner's transaction script (22)- the next 22*2 chars are 00145a7eae57f1401a260eb4651ed4b329ea5224ade2 (miners script)You can then decode the Script on your bitcoin core like that :  Code:curl -d '{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\": \"decodescript\",\"params\":[\"00145a7eae57f1401a260eb4651ed4b329ea5224ade2\"]}'  -s localhost:8332it replies Code:{  \"result\": {    \"asm\": \"0 5a7eae57f1401a260eb4651ed4b329ea5224ade2\",    \"address\": \"bc1qtfl2u4l3gqdzvr45v50dfvefaffzft0zfnhcan\",    \"type\": \"witness_v0_keyhash\",    \"p2sh\": \"3Lbwmabrxu9YDjbGwBB3RvAGD9nHEXbN3n\"  },  \"error\": null,  \"id\": \"1\"}Here you have your payout address, your payout amount, and you have a solution for this trust problem - Step 5 : the pool's Address and pool's Payout - repeat the Step4 over the rest of the outputTransaction - you can see that i'm taking 0.4% fees.Crosspost : https://bitcointalk.org/index.php?topic=5405106.msg60505734#msg60505734I am not sure that is what you were looking for, but this is a good example on how you can verify the job done by your Antminer Have a good day !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "March 04, 2023, 03:54:43 PM",
+      "body": "If you want to see the entire conversation across the network: https://www.wireshark.org/With this you can see all the packets that come and go and from things on your network.Wireshark also will reassemble the 'conversation' that happens.Obviously, you need to know what you are looking for when reading what is being send to / from your miner but that should get you all the data, you can then decode it.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "March 04, 2023, 06:53:46 PM",
+      "body": "Quote from: 100sIg00sI on March 03, 2023, 01:52:32 AM...However, this only works for cgminer??? No need for cgminer when running an asic pointed at a pool...A lot of miners have cgminer (or an illegal fork of it) in them.Alas you can't always get at cgminer and change how it runs.As DaveF mentioned above, you can watch the whole conversation between the miner and the pool.Alas one exception, you can't see what braiins is doing ... ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "100sIg00sI",
+      "created_time": "March 05, 2023, 01:26:04 AM",
+      "body": "iwantmyhomepaidwithbtc2: Thanks for the info on that post, looks interesting and verifying payout address is very helpful. DaveF: Sounds like wireshark could be very helpful, however I am not clear on what I would be seeing with the stratum data, would you have any links or anything that would show some examples of how to disseminate this info? I will try it out soon, but without giving it a try at the moment FAFO method I'm just trying to collect some more insight from everyone on how to do this.kano: Interesting, if I think what your saying is correct the ASIC has cgminer or something similar already running onboard.....i am not using braiins. Lol. Is there a way I can tap into the onboard cgminer program to view stratum data?And again, I am just trying to find out how to view the stratum data. Next I need to figure out what I'm looking at. So any help with examples that can demonstrate the breakdown of the comms would be very helpful.Thanks again everyone",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "March 05, 2023, 03:50:55 PM",
+      "body": "Quote from: 100sIg00sI on March 05, 2023, 01:26:04 AMDaveF: Sounds like wireshark could be very helpful, however I am not clear on what I would be seeing with the stratum data, would you have any links or anything that would show some examples of how to disseminate this info? I will try it out soon, but without giving it a try at the moment FAFO method I'm just trying to collect some more insight from everyone on how to do this.Not much to really show, it's just going to be the conversation between your miner and the pool.Pool -> here is what I want you to work on.Miner -> this is what I got so far.The stratum protocol is well documented: https://braiins.com/stratum-v1/docshttps://github.com/lclc/stratum-docs/blob/master/protocol-specs.rstthat along with what iwantmyhomepaidwithbtc2 posted should give you a more or less complete view of what is happening.There is really not much too it the fact that although what is going on in the miner is somewhat sophisticated the actual conversation between the miner and pool only has basic information.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Artemis3",
+      "created_time": "March 05, 2023, 11:57:20 PM",
+      "body": "Yes that's one the reasons for v2: encrypted communications so precisely, the kind of things you can do with wireshark with v1 which is clear text, cannot be done by your neighbor, your isp, your government, etc with v2.Same reason web pages are now https instead of http, Sure, clear text is great for debugging, in your own lan. Perhaps adequate for a time where you were expected to mine against your own node, But alas, the times have changed.Of course, if you do use bosminer with v1, you can still see it in clear text. Or if you make your own v2 proxy...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "March 06, 2023, 12:33:23 AM",
+      "body": "Quote from: Artemis3 on March 05, 2023, 11:57:20 PMYes that's one the reasons for v2: encrypted communications so precisely, the kind of things you can do with wireshark with v1 which is clear text, cannot be done by your neighbor, your isp, your government, etc with v2.Same reason web pages are now https instead of http, Sure, clear text is great for debugging, in your own lan. Perhaps adequate for a time where you were expected to mine against your own node, But alas, the times have changed.You could also use SSL/TLS if you want to have encrypted communication and be certain you are talking to the server you think you are.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Artemis3",
+      "created_time": "March 06, 2023, 12:42:21 AM",
+      "body": "Yes, and you can also do a whitelist so those encrypted connections go where they are supposed to.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "March 06, 2023, 06:10:56 AM",
+      "body": "Quote from: Artemis3 on March 05, 2023, 11:57:20 PMYes that's one the reasons for v2: encrypted communications so precisely, the kind of things you can do with wireshark with v1 which is clear text, cannot be done by your neighbor, your isp, your government, etc with v2.Same reason web pages are now https instead of http, Sure, clear text is great for debugging, in your own lan. Perhaps adequate for a time where you were expected to mine against your own node, But alas, the times have changed.Of course, if you do use bosminer with v1, you can still see it in clear text. Or if you make your own v2 proxy...Nah, I've just written a router that supports TLS, so your entire network is clear text, and all data out from your network is encrypted.I do wonder why someone would promote miners doing encryption/decryption on crappy performance hardwareand sending everything as unknown hidden data out to the internet ...Oh right, coz he makes more money if people do what he wants Money changes everything - Cindy Lauper",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Artemis3",
+      "created_time": "March 06, 2023, 03:12:31 PMLast edit: March 06, 2023, 04:40:16 PM by Artemis3",
+      "body": "Well, it turns out the ARM cpus in those control boards are capable enough, except maybe the beagle bone; that one is single core and struggles a bit more for certain tasks but its not an issue with the encryption. The others are dual core and even quad core with the amlogic.Sure, you can also place a v1 to v2 proxy in your network perimeter, so your v1 miners are clear text only in the lan and then go to the pool using v2 Stratum V2 is an open spec, any pool operator can implement it (the lazier ones by putting a v2 to v1 proxy in front), and there is an open independent implementation. You can tell exactly what is going on by yourself from your own mining software talking to your own mining pool.Bitcoin Magazine: Why Bitcoin Mining Needs Stratum V2",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "March 07, 2023, 01:47:24 PM",
+      "body": "Quote from: Artemis3 on March 06, 2023, 03:12:31 PMWell, it turns out the ARM cpus in those control boards are capable enough, except maybe the beagle bone; that one is single core and struggles a bit more for certain tasks but its not an issue with the encryption. The others are dual core and even quad core with the amlogic.Sure, you can also place a v1 to v2 proxy in your network perimeter, so your v1 miners are clear text only in the lan and then go to the pool using v2 Stratum V2 is an open spec, any pool operator can implement it (the lazier ones by putting a v2 to v1 proxy in front), and there is an open independent implementation. You can tell exactly what is going on by yourself from your own mining software talking to your own mining pool.Bitcoin Magazine: Why Bitcoin Mining Needs Stratum V2Sigh, still trying to trumpet that waste of time.There's nothing new there.GBT existed long ago and died for good reason, trying to resurrect GBT for marketing and calling it v2 is simply that, marketing.The data requirements make it unusable, so as before with GBT, no one ever implemented any transaction bias within miners.... and what you call v2 is that, transaction bias. Previously called GBT.This issue about risks of pools destroying bitcoin is as ludicrous as saying that miners will destroy bitcoin.The system exists in such a way that it is to the advantage of pools and miners to not alienate themselves from the rest of the network.I will agree that miners in general are indeed stupid, and greed makes them blind.This is clearly apparent by the fact that most mine on pools that risk the bitcoin network on every block change.Your pool does this also.Or I could also point out that they let slide pools like yours ripping off their miners and sweeping it under the carpet as you've done 3 times.Alas that has no effect on bitcoin itself, but on you as happened when you recently lost a massive amount of hash rate.I guess you guys never learn though, coz you lost it before for the same reason.Though probably the fact that you make enough money anyway and recover by deception is the reason why you keep doing it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "March 07, 2023, 02:46:52 PM",
+      "body": "Quote from: Artemis3 on March 05, 2023, 11:57:20 PMcannot be done by your neighbor, your isp, your government, etc with v2.Drifting OT a bit here but your neighbor can't do it.Your ISP and government can. Setting up a MITM attack is not that difficult if you have the time and money.At least braiins.com is using DNSSEC, so many pools are not making it much easier to pull off other forms of attacks against the pools.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Artemis3",
+      "created_time": "March 07, 2023, 03:18:07 PMLast edit: March 07, 2023, 03:30:20 PM by Artemis3",
+      "body": "Quote from: DaveF on March 07, 2023, 02:46:52 PMQuote from: Artemis3 on March 05, 2023, 11:57:20 PMcannot be done by your neighbor, your isp, your government, etc with v2.Drifting OT a bit here but your neighbor can't do it.Your ISP and government can. Setting up a MITM attack is not that difficult if you have the time and money.At least braiins.com is using DNSSEC, so many pools are not making it much easier to pull off other forms of attacks against the pools.-DaveYou should see the kind of cr*p some \"ISP\"s do in certain places. Basically putting a bunch of people in the same segment with wide mask and all, so yeah, it can literally be your neighbor playing with wireshark and a nic in promiscuous mode. I also tell people to use dnscrypt-proxy in their lan and point all their devices to it, but alas, not everyone listens.As for Kano, its fine, you don't have to do anything. Others will if they are interested, as you may have noticed, the spec is out there...PS: I'm not the pool, people use it because they like it. Whatever you complain about it, no one cares. Still the stuff from 2015? whatever. If you have a complain, open your ticket like everybody else. Braiins Pool offers no support anywhere else but the pool web page itself.If you are worried about Bitcoin, you should say something about the spam that started polluting the mempool since Feb 6, AND those behind it...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "paid2",
+      "created_time": "March 07, 2023, 04:10:46 PM",
+      "body": "Quote from: Artemis3 on March 07, 2023, 03:18:07 PMIf you are worried about Bitcoin, you should say something about the spam that started polluting the mempool since Feb 6, AND those behind it...Excuse me for being off topic, but I wonder: I think we all agree here that Ordinals is an abomination for Bitcoin. But am I the only one who thinks that there is a possibility that this is orchestrated by owners of big mining pools?Who are the winners besides these people? Look at the fees on recent blocks: 0.25 BTC, 0.21 BTC, 0.28 BTC... I know in the past there were bigger fees, like block 500500 with  9.993 BTC of fees 5 years ago. But now I don't see how they can go down until this NFT delirium stops.I feel like we are entering a mempool bottleneck, and I have a feeling that the only winners are those who mine multiple blocks a day.I'd love to hear the point of view from people involved in pools, I imagine your perspective must be more fair and more realistic than mine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "March 07, 2023, 06:05:12 PM",
+      "body": "Quote from: iwantmyhomepaidwithbtc2 on March 07, 2023, 04:10:46 PMQuote from: Artemis3 on March 07, 2023, 03:18:07 PMIf you are worried about Bitcoin, you should say something about the spam that started polluting the mempool since Feb 6, AND those behind it...Excuse me for being off topic, but I wonder: I think we all agree here that Ordinals is an abomination for Bitcoin. But am I the only one who thinks that there is a possibility that this is orchestrated by owners of big mining pools?Who are the winners besides these people? Look at the fees on recent blocks: 0.25 BTC, 0.21 BTC, 0.28 BTC...Ordinals and the mess they are causing is being discussed here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "March 07, 2023, 11:02:35 PM",
+      "body": "Quote from: Artemis3 on March 07, 2023, 03:18:07 PM...If you are worried about Bitcoin, you should say something about the spam that started polluting the mempool since Feb 6, AND those behind it...If you cared you would have read about it yourself, and seen that I've made comments already ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

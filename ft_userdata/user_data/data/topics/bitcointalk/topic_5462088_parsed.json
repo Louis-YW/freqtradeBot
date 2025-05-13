@@ -1,0 +1,29 @@
+{
+  "id": "topic_5462088",
+  "title": "andy912",
+  "author": "andy912",
+  "created_time": "August 04, 2023, 04:30:21 PM",
+  "content": "Hi. We are trying to start using a multisig taproot address in regtest. We can create the address, and it seems to be a valid one. However, when we try to spend funds received in said address, we run into a problem: the witness script we are trying to use is apparently not valid. We are trying to build the witness script this way:        address_info = self.call(\"getaddressinfo\", multisig_address)        witness_program_hex = address_info[\"witness_program\"]        witness_version = address_info['witness_version']        witness_script = bytes([witness_version]) + binascii.unhexlify(witness_program_hex)        witness_script = binascii.hexlify(witness_script).decode()(this is basically Copilot code)where multisig_address is the created taproot address. However, when we try to sign the transaction using signrawtransactionwithkey, we receive an error:  'Witness program was passed an empty witness'. We are not 100% sure exactly what the error is, but we believe it is related to the witness script not being valid, since the \"decodescript\" command with witness_script gives us: {'asm': '85 OP_UNKNOWN [error]', 'desc': 'raw(0155ee431293f4e29678b294e48f96d5ac47678ccba2d7c33783f99014ddfa8fcf)#0tv3kpc7', 'type': 'nonstandard'}Again, any advice or guidance would be appreciated.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5462088",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "August 04, 2023, 04:53:34 PM",
+      "body": "signrawtransactionwithkey doesn't know how to sign for complex taproot scripts.For now, the only way to sign such transaction is to have imported the descriptor with at least one private key, and then use the PSBT RPCs.The next release will have a descriptorprocesspsbt that will allow for the keys to be provided in a descriptor external to the wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "andy912",
+      "created_time": "August 04, 2023, 07:04:19 PM",
+      "body": "Quote from: achow101 on August 04, 2023, 04:53:34 PMsignrawtransactionwithkey doesn't know how to sign for complex taproot scripts.For now, the only way to sign such transaction is to have imported the descriptor with at least one private key, and then use the PSBT RPCs.The next release will have a descriptorprocesspsbt that will allow for the keys to be provided in a descriptor external to the wallet.thanks! so basically, if we want to use taproot multisig address, we are forced to use psbts instead of regular transactions, good to know.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

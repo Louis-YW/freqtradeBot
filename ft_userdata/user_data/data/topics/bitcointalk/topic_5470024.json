@@ -1,0 +1,165 @@
+{
+  "id": "topic_5470024",
+  "title": "apogio",
+  "author": "apogio",
+  "created_time": "October 11, 2023, 06:48:01 PMLast edit: May 02, 2024, 01:39:56 PM by apogio",
+  "content": "This tutorial is no longer valid. Since Sparrow 1.9.0 the mixing feature is no longer supported.Links to other tutorials from the series:[BitcoinTalk Node Tutorial #1] Running Bitcoin Core on Raspbian Lite (GUI-less) https://bitcointalk.org/index.php?topic=5476754.0[BitcoinTalk Node Tutorial #2] Installing Electrs from source https://bitcointalk.org/index.php?topic=5477339.0[BitcoinTalk Node Tutorial #4] Connecting BISQ to our node https://bitcointalk.org/index.php?topic=5478756.0[BitcoinTalk Node Tutorial #5] Hosting a Monero node on the same machine https://bitcointalk.org/index.php?topic=5480371.0Sparrow terminal / infinite Whirlpool mixesInstalling SparrowSteps:Find the proper version for our architecture and download with wget:Code:wget \"https://github.com/sparrowwallet/sparrow/releases/download/1.7.9/sparrow-server_1.7.9-1_arm64.deb\" Install the deb file using the command:Code:sudo dpkg -i sparrow-server_1.7.9-1_arm64.debBy default, the Sparrow binary will be in Code:/opt/sparrow/binRunning SparrowNote: Using ssh can be tricky. If you initiate a session, start sparrow and then close ssh, it will close sparrow too. So we will use the \"screen\" command. If it is not installed, run:Code:sudo apt install screenSteps:Run screen command:Code:screenNavigate to the path mentioned above (\"/opt/sparrow/bin\") and run Sparrow.Code:./SparrowIt will load the following screen:Insert the preferences tab and go to server:Then choose the option you desire for the node to which you wish Sparrow to be connected. Personally I run Sparrow on the same linux device as my node, so it looks like this:Then head back to the wallets tab and click on it:Click on \"Create wallet\":Go to the \"Deposit\" tab:It will give you an address where you can send your funds:Go to the UTXO tab and click on \"Mix Selected\"Once the process goes further, head back to \"Postmix\" tab: There, you will be presented with your UTXOsFinal StepsClick: Code:Ctrl-A Ctrl-Dthis will get you out of the Sparrow app and it will leave it running on the background.Whenever you decide, you can enter Code:screen -rSparrow will be presented to you exactly where you left it and you can enjoy your free mixes.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5470024",
+  "comments": [
+    {
+      "author": "DireWolfM14",
+      "created_time": "October 11, 2023, 07:33:13 PM",
+      "body": "Good tutorial.One suggestion:  You can use systemd to start Sparrow as a daemon on system startup, eliminating the need to start it manually.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "October 11, 2023, 10:20:39 PM",
+      "body": "You would not gain any privacy with this method if you do not enable Tor, the Whirlpool coinjoin coordinator can simply link your inputs to your outputs for every mix by looking at the IP address that registered them.And unfortunately, Whirlpool coinjoins reveal common input ownership and create toxic change that can be used to track your future transactions:Quote from: Kruw on April 11, 2023, 11:47:39 AMQuote from: o_e_l_e_o on April 11, 2023, 06:08:42 AMQuote from: Kruw on April 10, 2023, 08:30:20 PMPost the tx ID of any Whirlpool transaction and I will show you the tx0 transaction that was created by each of the new entrants.Ok, here's one: https://mempool.space/tx/ed3131b544fbf00a71709942e483b55e629312ecb181e6e819409f419ee0d226Where exactly is the privacy loss for new entrants, splitting a single UTXO in to multiple UTXOs to join the pool?Okay, here's all the payments that can be tracked from the two new participants of the Whirlpool coinjoin transaction:Entrant 1: bc1q03c0443ausjjdxl2h6ud5m8c0dux0zyg3dqdj7 created 0.00170417 BTC in unmixed change sent to bc1q3fduld0l3r8nclyt5p3r7ak675tekurstn55tl.  Since this UTXO is not private, the sats were marked as unspendable and have not been recovered by the wallet owner    Entrant 2: bc1qzc8zku26ej337huw5dlt390cy2r9kgnq7dhtys created 0.00191247 BTC in unmixed change sent to bc1qjlltxr443uy236wl4xhpxlr6dgsu0zltlv3m44. This UTXO was used in a second tx0 transaction, creating a huge trail of transactions that could be traced to each other    The 2nd tx0 transaction created 0.00076348 BTC unmixed change which was sent to bc1qehd7gy8rza9mnzm9wnfjhgw82rp47wmqt7vpgySince this unmixed change is below the .001 pool minimum, it was consolidated in a 3rd tx0 with 3 other addresses owned by the same wallet:31x8GPqrhzdaxiBJa9N5UisuoxbX1rAnHa16Gw5WKjbxZmg1zhZQs19Sf61fbV2xGujx3LZtsJfUjiV5EZkkG1fwGEpTe2QEa7CNeYThe 3rd tx0 transaction created .00200317 in unmixed change which was sent to bc1q2p7gdtyahct8rdjs2khwf0sffl64qe896ya2y5This was spent in a 0.00190000 payment to 3B8cRYc3W5jHeS3pkepwDePUmePBoEwyp1 (a reused address)That payment left .00008553 in change that was tracked to 3Dh7R7xoKMVfLCcAtVDyhJ66se82twyZSn and consolidated with two other inputs in a 4th tx0 transaction:bc1qeuh6sds8exm54yscrupdk03jxphw8qwzdtxgde3ByChGBFshzGUE5oip8YYVEZDaCP2bcBmZThis 4th tx0 created .00533406 in unmixed change which was sent to bc1qzh699s75smwukg9jcanwnlkmkn38r79ataagd9 which was consolidated with 3 more addresses into a 5th tx0:3F2qiWQJKQjF7XFjEo8FUYP3AU5AC6RqX83HAYYVKUpYbr2ARMdZJr9yVu8xi8UcxtPz3GQtwwRK31wwCc22q6WS5sCgixUHsG5KaTThe 5th tx0 created 0.00058494 BTC in unmixed change that was sent to bc1qvh2zjcwwkj9y70xulla2semvlav3lty0p3l3w3This was spent in a .00047290 payment to bc1qvzg8jq6wqtr5navn4e3ps4qrkk9r6n4h98gjckThat payment left .00008411 in change that was tracked to bc1qg6j0f0wfhpktt2l8uzdn48ct3um2xyur40eyzd and consolidated with another input into a 6th tx0 transaction:31iZLXWfoywhuMZTPGxTkpzphzh2NXshpPThe 6th tx0 created .00753775 in unmixed change that was tracked to bc1qgfll2apc27yct6h2c8r8wq4kqhxjsfrudhhn5qThis was spent in a .00737000 payment to bc1q5emzer2t0sq5dez0zsrqgh6scvwn0n24xsladp (a reused address)This payment left 0.00010896 BTC in change which has not been spent yet, but the payment only took place 11 days ago, so I assume it will eventually be spent, allowing the Whirlpool user to be tracked even further.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 12, 2023, 09:38:44 AM",
+      "body": "Quote from: Kruw on October 11, 2023, 10:20:39 PMYou would not gain any privacy with this method if you do not enable Tor, the Whirlpool coinjoin coordinator can simply link your inputs to your outputs for every mix by looking at the IP address that registered them.Thanks for the info. It doesn't affect the tutorial itself though. Any addition is welcome, so If you have any technical details, let me know and I can add them to the OP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 12, 2023, 11:12:16 AM",
+      "body": "First you'll need to install and run a Tor daemon on your Raspberry Pi.Inside the Sparrow terminal, go to to Preferences -> Server -> Edit, and then select whether you are using Bitcoin Core or Private Electrum. Select Continue. On the next screen go down to \"Use Proxy?\" and select \"Yes\", in \"Proxy URL\" put 127.0.0.1 on port 9050. This will route all external Sparrow traffic via Tor.Excellent set up, by the way. Your own node, own Electrum server, Sparrow, all via Tor, for endless free coinjoins. Which Electrum server package are you running on your Raspberry Pi? Next up you'll want your own instance of https://github.com/mempool/mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 12, 2023, 11:34:31 AM",
+      "body": "Quote from: o_e_l_e_o on October 12, 2023, 11:12:16 AMExcellent set up, by the way. Your own node, own Electrum server, Sparrow, all via Tor, for endless free coinjoins. Which Electrum server package are you running on your Raspberry Pi? Next up you'll want your own instance of https://github.com/mempool/mempool.Thanks. Who said I don't run my own mempool instance?  I do run my own mempool instance  I run 2 nodes, to be honest. Specifically:1. I run Umbrel on an RPi. There I run btc core + electrs + dojo + robosats + LND (which I plan to remove soon) + my own mempool instance2. I run Raspbian Lite (no GUI) on an RPi. I wanted to have clean custom setups here. So, for now, I run btc core + electrs + Sparrow + CLN (which doesn't work as expected but I don't have time to figure out what's wrong) Next steps:0. I will properly install Tor on the second RPi. The first node (umbrel) works with TOR as expected.1. I want to remove LND forever2. I want to properly install CLN 3. I want to install mempool instance on the second node.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 12, 2023, 11:55:59 AM",
+      "body": "In the past when I ran Sparrow Wallet from the command line, or at all really, I had issues getting it to connect to anything. There was no firewall running. With a Bitcoin node, the connection would not get established, and the same thing happened with public Electrum servers but that must have a more obscure reason.I had never tried connecting a private server to it, though.So Sparrow is a pretty good wallet, once you get the connection working first.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "October 12, 2023, 12:27:31 PMLast edit: October 12, 2023, 01:21:49 PM by Kruw",
+      "body": "Quote from: o_e_l_e_o on October 12, 2023, 11:12:16 AMExcellent set up, by the way. Your own node, own Electrum server, Sparrow, all via Tor, for endless free coinjoins.There's a huge problem with \"endless free coinjoins\" - Sybil attackers get endless free coinjoins as well.  As you might imagine, Chain analysis companies attacking the coinjoin pool disproportionately benefit from these free remixes because they have a lower time preference than real Bitcoiners that actually transact.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 12, 2023, 12:40:46 PM",
+      "body": "Quote from: apogio on October 12, 2023, 11:34:31 AMI run 2 nodes, to be honest. Specifically:Ok, that's an even better set up. Do you also use Samourai on the go while pointed at your Dojo? Or do you just use Dojo for Sentinel?Quote from: NotATether on October 12, 2023, 11:55:59 AMIn the past when I ran Sparrow Wallet from the command line, or at all really, I had issues getting it to connect to anything. There was no firewall running. With a Bitcoin node, the connection would not get established, and the same thing happened with public Electrum servers but that must have a more obscure reason.Did you check the logs to find out what was going on?That's pretty much the opposite of my experience. I was pretty taken aback when I first installed Sparrow at just how easy it was to connect to my own node on the same device. Literally one click on the button which says \"Bitcoin Core\" in Sparrow and it was done. It's a little bit more involve to connect it to your Electrum server or a node/server on a different machine, but I've still gone through those processes several times with different machines and OSs without ever having too much trouble.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 12, 2023, 12:56:23 PM",
+      "body": "Quote from: o_e_l_e_o on October 12, 2023, 12:40:46 PMDo you also use Samourai on the go while pointed at your Dojo? Or do you just use Dojo for Sentinel?Currently my mobile experience with Bitcoin is: Sentinel  I have some addresses in Sentinel and I use them to receive funds (on the go). Those are addresses from my cold storage wallet. I could also monitor the XPUB of course, but I didn't want to. I only have 10 - 20 addresses ready to be deployed in case I need to receive funds.Zeus I use Zeus to connect to LND node (CLN is also available of course). I like Zeus because it is mandatory to connect to own node in order to use it, so it helped me privacy-wise. Also the main dev is very approachable and we had a small conversation once (not too technical). The main reason why I use it is for LN transactions. I don't manage my channels with it. I have tried Samourai and I have used it for a while (connected to my Dojo). I liked it very much, but for several reasons I don't want to have an on-chain bitcoin wallet on my phone.In general, when \"on the go\", I need to have super minimal functionalities. I try to minimalise most of my everyday clutter (I hope this word makes sense here). I only need to pay fast or receive fast. I can pay fast with LN and receive fast both on-chain and on LN. So my set-up is very convenient so far. Of course being connected to my node is a must for me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "October 27, 2023, 12:48:42 PM",
+      "body": "By the way, I have tried something more.I have added my Cold PubKey on Sparrow and I have set my PostMix UTXOs to automatically send there after several rounds of mixing.More specifically I have:1. imported my XPUB on another wallet in Sparrow 2. gone to the Postmix UTXO tab in my hot wallet and pressed \"mixing to...\" button. I have set a value of 20 mixes. This translates to \"send to the other wallet once the utxo has 20 mixes or more\". Using those steps above you can literally set it and forget it.The only thing you have to do is send funds to a Deposit address and the whole process is done automatically.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 02, 2023, 03:02:34 PM",
+      "body": "Here's a question I haven't been able to find a straight answer to - can you bring the cold storage online and continue remixing for free?Let's say I generate a new wallet on my airgapped computer, import the relevant xpub in to Sparrow, and mix a few coinjoin outputs to this cold wallet. A year later, I want to spend these coins, but I want to coinjoin them a bit more first. Can I import the seed phrase for this cold wallet in to Sparrow (making it a hot wallet), have Sparrow detect the UTXOs as coinjoin outputs, and pick up exactly where they left off and keep remixing?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 02, 2023, 04:34:43 PM",
+      "body": "Quote from: o_e_l_e_o on November 02, 2023, 03:02:34 PMHere's a question I haven't been able to find a straight answer to - can you bring the cold storage online and continue remixing for free?Let's say I generate a new wallet on my airgapped computer, import the relevant xpub in to Sparrow, and mix a few coinjoin outputs to this cold wallet. A year later, I want to spend these coins, but I want to coinjoin them a bit more first. Can I import the seed phrase for this cold wallet in to Sparrow (making it a hot wallet), have Sparrow detect the UTXOs as coinjoin outputs, and pick up exactly where they left off and keep remixing?I don't think so. Here is why...In order for this to happen, adding the seed phrase should create 4 accounts (deposit, premix, postmix, badbank) and send the coins to the deposit account. I think the deposit account lives under the default derivation path, so technically perhaps it wouldn't need to \"send\" the coins to this account because this is also the default derivation path for the cold wallet.Now, let me share my own experience, because I have tried something very similar.I think you have actually found a \"bug\" here.I have added the seed phrase to a cold wallet I had and it didn't generate the 4 accounts. When I imported my seed phrase, it didn't actually become a hot wallet. I was unable to sign transactions without using my HW. Essentially, I had a hot wallet where I could see the seed phrase, but I couldn't use it as a hot wallet. I had to sign using my HW instead.Give it a try, I think it will behave exactly as I mentioned above.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "November 02, 2023, 04:50:36 PM",
+      "body": "Quote from: apogio on November 02, 2023, 04:34:43 PMI think you have actually found a \"bug\" here.I have added the seed phrase to a cold wallet I had and it didn't generate the 4 accounts. When I imported my seed phrase, it didn't actually become a hot wallet. I was unable to sign transactions without using my HW. Essentially, I had a hot wallet where I could see the seed phrase, but I couldn't use it as a hot wallet. I had to sign using my HW instead.Give it a try, I think it will behave exactly as I mentioned above. Shouldn't the software know how to generate the individual private keys based on the seed you imported into it? Have you tried importing a master private key or individual private keys (if it's possible) to see if you will be able to sign the transactions then?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 02, 2023, 04:59:42 PM",
+      "body": "Quote from: Pmalek on November 02, 2023, 04:50:36 PM Shouldn't the software know how to generate the individual private keys based on the seed you imported into it? Have you tried importing a master private key or individual private keys (if it's possible) to see if you will be able to sign the transactions then?No I have only tried importing the seed phrase to the existing wallet.Obviously you can start a new wallet (hot software wallet) and start fresh adding the seed phrase. This can potentially work. I expect the utxos to be in the deposit account. If they are there then of course you can coinjoin a bit more",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 03, 2023, 09:33:30 AM",
+      "body": "Quote from: apogio on November 02, 2023, 04:34:43 PMI don't think so. Here is why...In order for this to happen, adding the seed phrase should create 4 accounts (deposit, premix, postmix, badbank) and send the coins to the deposit account. I think the deposit account lives under the default derivation path, so technically perhaps it wouldn't need to \"send\" the coins to this account because this is also the default derivation path for the cold wallet.So let's say I create an airgapped Sparrow wallet, set it up to be a coinjoin wallet so it creates the usual four accounts, and then from my hot Sparrow wallet mix coins directly to the xpub of the cold postmix account. A year later if I bring that cold Sparrow wallet online, then the previously coinjoined UTXOs will already be in the postmix account. Would Sparrow detect that and allow me to continue to coinjoin them?Quote from: apogio on November 02, 2023, 04:34:43 PMI have added the seed phrase to a cold wallet I had and it didn't generate the 4 accounts. When I imported my seed phrase, it didn't actually become a hot wallet. I was unable to sign transactions without using my HW. Essentially, I had a hot wallet where I could see the seed phrase, but I couldn't use it as a hot wallet. I had to sign using my HW instead.You can add the four accounts manually by opening your wallet, clicking on the \"Settings\" tab, clicking \"Add Account...\" and scrolling down to \"Whirlpool Accounts\".Quote from: apogio on November 02, 2023, 04:59:42 PMIf they are there then of course you can coinjoin a bit moreYes, but then you would have to pay the pool fee and the Tx0 fee again, which would necessitate you either joining a smaller pool or consolidating some UTXOs together to stay in the same pool, which negates the point of doing this in the first place. I want to keep coinjoining as if nothing has happened.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 03, 2023, 10:12:46 AMLast edit: November 13, 2023, 03:20:08 PM by apogio",
+      "body": "Quote from: o_e_l_e_o on November 03, 2023, 09:33:30 AMSo let's say I create an airgapped Sparrow wallet, set it up to be a coinjoin wallet so it creates the usual four accounts, and then from my hot Sparrow wallet mix coins directly to the xpub of the cold postmix account. A year later if I bring that cold Sparrow wallet online, then the previously coinjoined UTXOs will already be in the postmix account. Would Sparrow detect that and allow me to continue to coinjoin them?I will try it and I will update this post as soon as I have an answer.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 13, 2023, 03:25:02 PM",
+      "body": "Answer to o_e_l_e_o for the question above:It didn't work. For some reason I am unable to create the whirlpool accounts for an airgapped wallet. I could only add accounts 1 - 9. I scrolled down but there is no \"whirlpool accounts\" option, whereas for a hot wallet the option was there.So I did something else. I created a hot wallet in Samourai with the Whirlpool Accounts enabled. I sent some sats and it made some coinjoins. So, I had 3 UTXOs in my Postmix account with some mixing rounds each (3, 5, 6 respectively).Then I created a hot wallet in Sparrow with the same seed phrase. Indeed there were 3 UTXOs in Postmix, so I pressed \"Start Mixing\" and it started all over again. Now, my UTXOs have more mixes (4,5,7 respectively).So, this workaround worked, but the original approach you mentioned didn't work for me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jon_Hodl",
+      "created_time": "November 14, 2023, 01:38:24 PM",
+      "body": "Quote from: Kruw on October 11, 2023, 10:20:39 PMAnd unfortunately, Whirlpool coinjoins reveal common input ownership and create toxic change that can be used to track your future transactions:This is FUD. Address clusters and peeling chains are not unique to Whirlpool CoinJoins. The exact same thing can happen with Wasabi mixes (which you are obviously here to shill) without proper coin control practices. I followed all of the txs you mentioned and you're right. They are linked to each other via a peeling chain but that doesn't mean that the common ownership heuristic doesn't apply to Wasabi txs after they get mixed. Not using adequate coin control practices can absolutely result in txs being linked together but that has nothing to do with Whirlpool specifically. I think you're being a bit disingenuous with your response and are more interested in flexing on OP while you tout Wasabi in your signature and website link.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "November 14, 2023, 01:54:42 PMLast edit: November 15, 2023, 12:03:47 PM by Kruw",
+      "body": "Quote from: Jon_Hodl on November 14, 2023, 01:38:24 PMQuote from: Kruw on October 11, 2023, 10:20:39 PMAnd unfortunately, Whirlpool coinjoins reveal common input ownership and create toxic change that can be used to track your future transactions:This is FUD. Address clusters and peeling chains are not unique to Whirlpool CoinJoins. The exact same thing can happen with Wasabi mixes (which you are obviously here to shill) without proper coin control practices. I followed all of the txs you mentioned and you're right. They are linked to each other via a peeling chain but that doesn't mean that the common ownership heuristic doesn't apply to Wasabi txs after they get mixed. Not using adequate coin control practices can absolutely result in txs being linked together but that has nothing to do with Whirlpool specifically. I am not spreading FUD, address clusters from common input ownership and peeling chains from leftover change ARE unique to Whirlpool coinjoins.  You are spreading FUD about Wasabi's coinjoins because common input ownership is not revealed, and peeling chains are not produced (unless you are a whale with more coins than all the other participants), and there is no coin control necessary.  Anyone can verify this is FUD by simply looking at the Bitcoin blockchain:Quote from: Kruw on October 15, 2023, 05:49:01 PMZoom out to see Wasabi's coinjoin of the week!  This behemoth transaction contains 23 BTC - https://mempool.space/tx/927a4d5f3e17faae611f623eaf06206b966b30ba1bacbec49d7ab35afa50dbcaBitcoin is divisible. WabiSabi coinjoins make Bitcoin divisible privately.Inputs: 370Outputs: 340Average input anonset: 4.2Average output anonset: 10.63Whirlpool does not provide this sort of complete privacy for your entire funds like Wasabi does.  You always generate traceable leftovers:Quote from: Kruw on November 10, 2023, 11:57:14 AMhttps://mempool.space/address/bc1qp25y8kfywz88myuh7ed3dmx3vv2z2dwuxhjnlvValue of output: 305 satsMining fee paid to create output: 369 satsMining fee paid to spend input: 1,776 satsNet loss from dust bug: 1,840 satsNew transactions clustered: 5 txshttps://mempool.space/address/bc1q83sfgfefwupz8w3faawxjr5v8uf03ttjclrkdaValue of output: 933 satsMining fee paid to create output: 1,234 satsMining fee paid to spend input: 4,333 satsNet loss from dust bug: 4,634 satsNew transactions clustered: 12 txsQuote from: Kruw on November 09, 2023, 05:22:01 PMOuch, this non private toxic change output created by Whirlpool's tx0 was even larger than the 0.001 pool denomination itself: https://mempool.space/address/bc1qmgnthpjk4ecgmq4hlne6h79q7ykaf4w8n9jzkvQuote from: Jon_Hodl on November 14, 2023, 01:38:24 PMI think you're being a bit disingenuous with your response and are more interested in flexing on OP while you tout Wasabi in your signature and website link.  No, I'm not being disingenuous, people following the guide will automatically be deanonymized since they are not using Tor.  The worst possible outcome is that people get a false sense of security (and pay sats for it!)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

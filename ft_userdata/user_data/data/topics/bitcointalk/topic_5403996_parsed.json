@@ -1,0 +1,53 @@
+{
+  "id": "topic_5403996",
+  "title": "Zaguru12",
+  "author": "Zaguru12",
+  "created_time": "June 25, 2022, 08:34:20 AM",
+  "content": "Memory pool is said to be the temporary storage where transaction is stored before been transfer to the candidate block.The candidate block of a node is where transaction from memory pool are kept before there been mined into the blockchainReading through transactions in a memory pool and candidates block I got little confuse with this questions1. Can a transaction ID in a block be the Same  before been spent, Or if the outputs of that transaction becomes fully can its ID be reused for a new transaction.2. Does a memory pool gets full? Then what happens to the unconfirmed transaction, where do they go to?3. In the candidate's block what happens to the transactions that where not successfully mined do they still remained thereSorry if this questions have been answered before",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403996",
+  "comments": [
+    {
+      "author": "hosemary",
+      "created_time": "June 25, 2022, 09:08:32 AM",
+      "body": "Quote from: Zaguru12 on June 25, 2022, 08:34:20 AM1. Can a transaction ID in a block be the Same  before been spent, Or if the outputs of that transaction becomes fully can its ID be reused for a new transaction.If all outputs of a transaction have been spent, (in theory) it's possible that a new transaction with the same ID is included in the blockchain. In practice, that's very very unlikely. If there's a non-spent output in a transaction, even in theory it's impossible that a new transaction with the same ID is included in the blockchain. According to BIP30, a block can't include a transaction with the same ID as a not-fully-spent transaction.Quote from: Zaguru12 on June 25, 2022, 08:34:20 AM2. Does a memory pool gets full? Then what happens to the unconfirmed transaction, where do they go to?Yes. By default the mempool size is 300 MB. (A node can have a different setting.) If the mempool reaches that capacity, the node has to remove the transactions paying low fee, so transactions paying higher fee can enter the mempool.Quote from: Zaguru12 on June 25, 2022, 08:34:20 AM3. In the candidate's block what happens to the transactions that where not successfully mined do they still remained thereIn every new block, some transactions are included in the blockchain. Other transactions stay in the mempool and wait for next blocks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 25, 2022, 11:02:30 AM",
+      "body": "Quote from: Zaguru12 on June 25, 2022, 08:34:20 AM3. In the candidate's block what happens to the transactions that where not successfully mined do they still remained thereYour other questions have been well answered above, but it sounds from this like you have a misunderstanding about candidate blocks.Firstly, a candidate block is either mined, or it isn't. It is never the case that part of a candidate block is mined and part of it isn't.Secondly, every miner or mining pool constructs their own candidate block which they attempt to mine. Think of it as a template. Once a miner is successful, then their candidate block is added to the blockchain. Every other miner then has to abandon the candidate block they were working on a create a new one. This is because each candidate block must contain a specific piece of data from the last block that was mined, which is how we keep blocks in the correct order.Thirdly, when a miner creates a candidate block, they do not remove any transactions from their mempool. They simply pick the ones they want to try to include and copy them over in to their candidate block. If they have to abandon their candidate block because another miner was successful, then all the transactions which were in their candidate block will still exist in their mempool until they update their mempool with the information from the other miner's block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "June 25, 2022, 12:17:39 PM",
+      "body": "Quote from: hosseinimr93 on June 25, 2022, 09:08:32 AMQuote from: Zaguru12 on June 25, 2022, 08:34:20 AM2. Does a memory pool gets full? Then what happens to the unconfirmed transaction, where do they go to?Yes. By default the mempool size is 300 MB. (A node can have a different setting.) Take note 300MB refer to RAM usage. Transaction size on RAM is bigger than on disk since the transaction is de-serialized and contain additional information (e.g. RBF flag). At the moment i open https://mempool.space/, it reports 23MB memory usage although total size of the unconfirmation transaction is only 7.8 vMB.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 25, 2022, 01:47:22 PM",
+      "body": "Quote from: Zaguru12 on June 25, 2022, 08:34:20 AM1. Can a transaction ID in a block be the Same  before been spent, Or if the outputs of that transaction becomes fully can its ID be reused for a new transaction.No, two transactions must never share the same ID. It is the only identififier that can be used to differentiate between two transactions. Fortunately, the ID is generated with a cryptographic hash from the raw transaction, so this case will never happen in practice.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 25, 2022, 02:01:08 PM",
+      "body": "Quote from: NotATether on June 25, 2022, 01:47:22 PMNo, two transactions must never share the same ID. It is the only identififier that can be used to differentiate between two transactions. Fortunately, the ID is generated with a cryptographic hash from the raw transaction, so this case will never happen in practice.No, hosseinimr93 is right with his reply above.Two transactions cannot share the same ID if the original transaction is not yet fully spent. In other words, if a transaction currently exists which has at least one unspent output, then no new transaction can share its transaction ID. However, once all the outputs of a transaction are spent, and so no outputs from that transaction remain in the UTXO set, then a second transaction can indeed reuse that same transaction ID.This distinction is important, because without it, pruned nodes could not exist. If the stipulation was that any new transaction cannot share the ID of any previous transaction, then every node must keep a record of every previous transaction, and so could not be pruned. However, with the wording of BIP30, which allows transaction IDs to be reused once fully spent, then pruned nodes do not need to keep a record of all previous transactions, and indeed only need to keep a record of the UTXO set, which they do anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

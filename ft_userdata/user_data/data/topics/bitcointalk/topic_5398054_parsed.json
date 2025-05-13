@@ -1,0 +1,77 @@
+{
+  "id": "topic_5398054",
+  "title": "COBRAS",
+  "author": "COBRAS",
+  "created_time": "May 10, 2022, 04:16:27 PM",
+  "content": "HelloThen I divide in modmath I get:./modmath  0x60f4d11574f5deee49961d9609ac / 2                                  Result: 307a688aba7aef7724cb0ecb04d6in Python:He =0x60f4d11574f5deee49961d9609ach2 = int(He / 2) % nprint(hex(h2))result 0x307a688aba7af000000000000000[Program finished]HOW TO GET IN PYTHON result = af55fc59c335c8ec67ed24827 ?------/modmath 0x60f4d11574f5deee49961d9609ac / 8                                  Result: 7fffffffffffffffffffffffffffffff5d577a91f1c6febc9bc6f8792bcde1d6python:n = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141He =0x60f4d11574f5deee49961d9609ach2 = int(He / 8 ) % nprint(hex(h2))0xc1e9a22ae9ebc00000000000000[Program finishedHOW TO GET IN PYTHON result = 7fffffffffffffffffffffffffffffff5d577a91f1c6febc9bc6f8792bcde1d6 thanks !!!ASAP PLEASE",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398054",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "May 10, 2022, 07:55:46 PM",
+      "body": "This happens because the division operator gives you a float which can only have so many bits of accuracy. You circumvent it by using //.Example:Code:>>> 1966507701910865760267104647776684/29.832538509554329e+32>>> hex(int(1966507701910865760267104647776684/2))'0x307a688aba7af000000000000000'As you correctly noticed, all those trailing zeroes are wrong and due to the rounding done by Python floats.By dividing with //, you force it to stay in the integer realm and you get the correct result.Code:>>> 1966507701910865760267104647776684//2983253850955432880133552323888342>>> hex(int(1966507701910865760267104647776684//2))'0x307a688aba7aef7724cb0ecb04d6'The second division is mathematically wrong (the modmath output, that is), it seems to have overflown. I don't know how many bits a modmath number has, so I can't tell you how to replicate the result in Python. But the method from above (with double //) will give you mathematically correct results no matter what.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 11, 2022, 04:09:27 AM",
+      "body": "Quote from: COBRAS on May 10, 2022, 04:16:27 PM./modmath  0x60f4d11574f5deee49961d9609ac / 2                                  ...h2 = int(He / 2) % n...HOW TO GET IN PYTHON result = af55fc59c335c8ec67ed24827 ?[I have trimmed your code and cmdline above]Apparently, the first line is for a c++ program (did you write it?), the other is for a custom script that you made.If you did not write the modmath program then you ought to take a look at its code on Github to see how it's getting the correct results. Maybe there are some ANDs being done there which you thought weren't necessary in Python because of its lack of overflow. (and while you're at the codebase, drop us a link to it please).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "iceland2k14",
+      "created_time": "May 11, 2022, 04:51:27 AM",
+      "body": "Quote from: NotATether on May 11, 2022, 04:09:27 AMIf you did not write the modmath program then you ought to take a look at its code on Github to see how it's getting the correct results. Maybe there are some ANDs being done there which you thought weren't necessary in Python because of its lack of overflow. (and while you're at the codebase, drop us a link to it please).He is Talking about https://github.com/albertobsd/ecctools  I think.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mausuv",
+      "created_time": "May 11, 2022, 06:12:11 AMLast edit: May 11, 2022, 06:25:38 AM by mausuv",
+      "body": "Quote from: COBRAS on May 10, 2022, 04:16:27 PMHelloThen I divide in modmath I get:./modmath  0x60f4d11574f5deee49961d9609ac / 2                                  Result: 307a688aba7aef7724cb0ecb04d6@COBRASyou need this ( 0x60f4d11574f5deee49961d9609ac / 2 =  307a688aba7aef7724cb0ecb04d6) result run python2, its workingCode:user@0d3aad1851b1:~/Downloads$ python2 1.py0x307a688aba7aef7724cb0ecb04d6L you need this ( 0x60f4d11574f5deee49961d9609ac /8 = 7fffffffffffffffffffffffffffffff5d577a91f1c6febc9bc6f8792bcde1d6) result , wrongCode:user@0d3aad1851b1:~/Downloads$ python2 1.py0xc1e9a22ae9ebbddc932c3b2c135L your need python from ./modmath    #its easy but some result wrong output printedit:@COBRAS share your ./modemath ideas thinkeasy123@protonmail.comanswer me https://bitcointalk.org/index.php?topic=5395858.msg60039035#msg60039035",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fxsniper",
+      "created_time": "May 11, 2022, 07:54:20 AM",
+      "body": "I think modmath.c it is not a division number by simple mathbut modmath.c it is division by use function Elliptic curve  point divisionCode:  case '/':   mpz_invert(inversemultiplier,B,EC.n);   mpz_mul(C,A,inversemultiplier);   mpz_mod(C,C,EC.n);Code:def ECdiv(Qx,Qy,Scalar): # EC point division    A = (N-1)/Scalar    Px,Py = ECmul(Qx,Qy,A)    Py = P-Py    return Px,Pytry to use Elliptic curve  point division function on pythonI am not sure I am correct, wait programmer/expert coder to help confirm",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "May 11, 2022, 01:32:21 PM",
+      "body": "Quote from: mausuv on May 11, 2022, 06:12:11 AMQuote from: COBRAS on May 10, 2022, 04:16:27 PMHelloThen I divide in modmath I get:./modmath  0x60f4d11574f5deee49961d9609ac / 2                                  Result: 307a688aba7aef7724cb0ecb04d6@COBRASyou need this ( 0x60f4d11574f5deee49961d9609ac / 2 =  307a688aba7aef7724cb0ecb04d6) result run python2, its workingCode:user@0d3aad1851b1:~/Downloads$ python2 1.py0x307a688aba7aef7724cb0ecb04d6L you need this ( 0x60f4d11574f5deee49961d9609ac /8 = 7fffffffffffffffffffffffffffffff5d577a91f1c6febc9bc6f8792bcde1d6) result , wrongCode:user@0d3aad1851b1:~/Downloads$ python2 1.py0xc1e9a22ae9ebbddc932c3b2c135L your need python from ./modmath    #its easy but some result wrong output printedit:@COBRAS share your ./modemath ideas thinkeasy123@protonmail.comanswer me https://bitcointalk.org/index.php?topic=5395858.msg60039035#msg60039035Hi Bro. Yes, I need this.pm me we are talk.I not agree what 0xfffff... is wrang. because then I div for ex 10 to 9 (10 / 9) 0xfff.......  is ok, result without floating part not good for dividing...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "May 11, 2022, 01:33:32 PM",
+      "body": "Quote from: iceland2k14 on May 11, 2022, 04:51:27 AMQuote from: NotATether on May 11, 2022, 04:09:27 AMIf you did not write the modmath program then you ought to take a look at its code on Github to see how it's getting the correct results. Maybe there are some ANDs being done there which you thought weren't necessary in Python because of its lack of overflow. (and while you're at the codebase, drop us a link to it please).He is Talking about https://github.com/albertobsd/ecctools  I think.yes",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "May 12, 2022, 04:08:59 PMLast edit: May 12, 2022, 10:42:01 PM by COBRAS",
+      "body": "example of dividing./md 1 / 3             Result: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9d1c9e899ca306ad27fe1945de0242b81 (let it be 1/3)10000 x 1/3:./md 10000 x 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9d1c9e899ca306ad27fe1945de0242b81                                            Result: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9d1c9e899ca306ad27fe1945de02438861000*1/3 - 1/3=3333:./md 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9d1c9e899ca306ad27fe1945de0243886 - 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9d1c9e899ca306ad27fe1945de0242b81                                 Result: d05search range:1/3 to 1/3*100000xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9d1c9e899ca306ad27fe1945de0242b81:0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9d1c9e899ca306ad27fe1945de0243886= 3333 3 times smale then 10000.You can play with ecctools for making your methods based on this example.Use pubkeys from start privkeys and you get pubkey in range 3 time smaler too !!!I looking for python programmer who know good simplest math operation in python for work on code for dividing pubksys.ASAP.YOU MAST KNOW HOW TO GET THIS RESULT, IF YOU CAN MESSAGE ME  YOUR TELEGRAMM FOR TALK:Quote from: mausuv on May 11, 2022, 06:12:11 AMQuote from: COBRAS on May 10, 2022, 04:16:27 PMHelloThen I divide in modmath I get:./modmath  0x60f4d11574f5deee49961d9609ac / 2                                  Result: 307a688aba7aef7724cb0ecb04d6@COBRASyou need this ( 0x60f4d11574f5deee49961d9609ac / 2 =  307a688aba7aef7724cb0ecb04d6) result run python2, its workingCode:user@0d3aad1851b1:~/Downloads$ python2 1.py0x307a688aba7aef7724cb0ecb04d6L you need this ( 0x60f4d11574f5deee49961d9609ac /8 = 7fffffffffffffffffffffffffffffff5d577a91f1c6febc9bc6f8792bcde1d6) result , wrongCode:user@0d3aad1851b1:~/Downloads$ python2 1.py0xc1e9a22ae9ebbddc932c3b2c135L your need python from ./modmath    #its easy but some result wrong output printedit:",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

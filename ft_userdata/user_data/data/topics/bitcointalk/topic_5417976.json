@@ -1,0 +1,53 @@
+{
+  "id": "topic_5417976",
+  "title": "Zilon",
+  "author": "Zilon",
+  "created_time": "October 22, 2022, 09:28:17 AMLast edit: October 22, 2022, 09:43:33 AM by Zilon",
+  "content": "I learnt it was introduced in April 2012 been standardised in BIP16. With the pure intent of simplifying the security model of Bitcoin using Bitcoin scripting language. Where the  redeem hash provided by the sender must get a corresponding redeem-script from the recipient and a signature script in the UTXO.Can we call it a perfect transition from P2MS since P2MS is limited to just 3 public keys and will require 2 of 3 to spend an UXTO. whereas P2SH gives room for custom redeem script encircled by HASH160 and EQUAL opcodes of the script hash if P2SH is replacing P2MS will it be seen as the most prominent or is there a new BIP that has better qualities?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417976",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "October 22, 2022, 09:45:31 AM",
+      "body": "Quote from: Zilon on October 22, 2022, 09:28:17 AMCan we call it a perfect transition from P2MS since P2MS is limited to just 3 public keys and will require 2 of 3 to spend an UXTO.AFAIK there are only standard rules that are limiting P2MS compared to P2SH (multisig) otherwise the only limiting factor in any MultiSig scripts is MAX_PUBKEYS_PER_MULTISIG (=20) and the OP/SigOp count as far the consensus rules are concerned.Quotewhereas P2SH gives room for custom redeem scriptTechnically you can pay to any custom script (in your scriptpub). The benefit of P2SH is that it uses the hash of the script so you don't need to reveal that script and also it helps you create an address (something you can't do in P2MS or any custom output script) and give that address to others to pay you.Quotethis brings me to my question if P2SH is the most prominent or is there a new BIP that has better qualities?P2SH is one of the early changes to the consensus rules that involved the bitcoin scripts, I don't know if it is the most prominent though.Quote from: ETFbitcoin on October 22, 2022, 09:45:19 AMdue to bug on P2SH multi-signatureThat is not a bug in P2SH, it is a bug in OP_CHECKMULTISIG(VERIFY)I also don't think it was a bug but an intentional \"feature\" to have an open room for future soft forks where the dummy item is used for something while still being backward compatible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 22, 2022, 09:57:08 AM",
+      "body": "Quote from: ETFbitcoin on October 22, 2022, 09:52:41 AMThanks for the correction. Although i notice few website has vague explanation about it. For example bitcoin.org describe as implementation bug which preserved for compatibility.It most probably is a bug, I'm just floating the idea about possible plans for the dummy item in early days. Something like the plans Satoshi had for OP codes that are disabled today.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "October 23, 2022, 07:01:58 AMLast edit: October 23, 2022, 07:41:03 AM by garlonicon",
+      "body": "Multisig has n^2 complexity. So I guess it was just the number of the public key to start with, because then you can make it linear.Quote from: gmaxwell on July 15, 2021, 01:01:08 AMCHECKMULTISIG has a stupid design where it has to use trial and error.Say your stack looks like 0 [sig3] [sig2] 2 [pub3] [pub2] [pub1] 3  with sig3 and sig2 being signatures with pubkeys 3 and 2 respectively.The validation will first attempt to verify with pub1 and sig2, which will fail. Then it will try pub2 and sig2 which will be successful.This is pointlessly inefficient and in a batch validation *no* signature can fail or otherwise the whole batch fails. In something like a 1 of 20 signature every node could be forced to process 20 failing signatures just to find the one passing one.Perhaps Satoshi had intended to use the dummy value to indicate which signatures were in use, but that was never implemented.The checksigadd construction avoids the inefficiency and makes batch validation possible-- because no checksig(add) input is allowed to fail except for an empty signature regardless of what the surrounding script does.  It also works equally well for weighed thresholds without losing any efficiency.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zilon",
+      "created_time": "October 24, 2022, 04:26:56 PM",
+      "body": "Quote from: pooya87 on October 22, 2022, 09:45:31 AMTechnically you can pay to any custom script (in your scriptpub). The benefit of P2SH is that it uses the hash of the script so you don't need to reveal that script and also it helps you create an address (something you can't do in P2MS or any custom output script) and give that address to others to pay you.I was thinking since i can create my own custom redeem script that can be shared with people who will need to pay me using the script  hashed inside another hash that is to say \" The script is first hashed using HASH160 then hashed  again with Equal Opcodes to conceal the initial script as you pointed. just confirming if i am not far from the pointQuote from: pooya87 on October 22, 2022, 09:45:31 AMThat is not a bug in P2SH, it is a bug in OP_CHECKMULTISIG(VERIFY)I also don't think it was a bug but an intentional \"feature\" to have an open room for future soft forks where the dummy item is used for something while still being backward compatible. That means the bug was doesn't need to the removed just for compatibility sake of nodes that aren't upgraded yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 25, 2022, 04:37:12 AM",
+      "body": "Quote from: Zilon on October 24, 2022, 04:26:56 PMI was thinking since i can create my own custom redeem script that can be shared with people who will need to pay me using the script  hashed inside another hash that is to say \" The script is first hashed using HASH160 then hashed  again with Equal Opcodes to conceal the initial script as you pointed. just confirming if i am not far from the pointYeah, the benefit is that you give an address instead of a hard-to-transfer script. But there is only one HASH160 applied to the script (RIPEMD160 of SHA256 of the script).QuoteThat means the bug was doesn't need to the removed just for compatibility sake of nodes that aren't upgraded yet.Yes, otherwise the old nodes would reject any transaction that doesn't have that dummy item. But we could add an additional limitation to require the dummy item to always be OP_0 (one byte) instead of arbitrary. This change was still backward compatible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

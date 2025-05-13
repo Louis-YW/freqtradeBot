@@ -1,0 +1,69 @@
+{
+  "id": "topic_5449867",
+  "title": "donilito",
+  "author": "donilito",
+  "created_time": "April 23, 2023, 09:14:16 AMLast edit: April 24, 2023, 08:23:30 AM by donilito",
+  "content": "Hi, I have a problem signing a message with ledger on electrum. I open the electrum app with my ledger open, choose the standard wallet, then the hardware device option, I get to choose my device and then the legacy address as it is the one I have. I create a receive request and then try to sign a message but I get the following error: \"invalid literal for int() with base 10: '44h' \" . https://i.ibb.co/SwW7sNN/sc1.pngEDIT: Managed to get it done. Once I choose the type of address I wanted, in my case legacy, I changed the bottom parameters from m/44h/0h/0h to m/44/0/0 and it worked fine.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5449867",
+  "comments": [
+    {
+      "author": "OmegaStarScream",
+      "created_time": "April 23, 2023, 09:33:22 AM",
+      "body": "Did you export -> manually change -> and import your requests by any chance? There was a similar problem reported not a long time ago: https://github.com/spesmilo/electrum/issues/8232Are you getting that message when creating a receive request, or when clicking the \"Sign message\" button? I don't see how you would get it in the latter, since you're not limited to certain characters when signing a message.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "donilito",
+      "created_time": "April 23, 2023, 09:36:04 AM",
+      "body": "I get the message once I click on \"sign\". I didn't change any parameters as I'm not even sure what they are. I can provide you with my teamviewer ID if it can help to resolve this issue faster.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "April 23, 2023, 10:39:46 AM",
+      "body": "There is a crash report about this error here below - https://github.com/spesmilo/electrum/issues/8232It seems this error not only trigger on signing a message.Have you selected the check button when confirming the sign message? If you did then it might be a bug.You don't have any other choice but to make a signed message through the ledger live as optional.You can follow this guide How to Sign Message With Ledger Live",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "April 23, 2023, 10:43:05 AM",
+      "body": "Quote from: BitMaxz on April 23, 2023, 10:39:46 AMYou don't have any other choice but to make a signed message through the ledger live as optional.For ease, I think no other choice. But for people that can use airgapped device, there is other choice:Quote from: donilito on April 23, 2023, 09:36:04 AMIf there is urgent need to sign a message with that address and you have done the above and still not able to sign message, follow what BitMaxz posted, or follow this:If possible you can make yourself an airgapped device by reinstalling your device OS. Import Electrum on it.Also import offline version of iancoleman: https://github.com/iancoleman/bip39/releases/download/0.5.4/bip39-standalone.htmlYou will need a text editor for the iancoleman offline version link that I paste above.Use the text editor to open the offline iancoleman on the airgapped device Input the seed phrase to get the private key of the bitcoin address that you want to use to sign a messageOpen electrum on the airgapped device and import the private keyThen sign the message and it would work.After you are done, reinstalled the OS of the airgapped device to make everything you have done to be deleted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "donilito",
+      "created_time": "April 23, 2023, 11:20:43 AM",
+      "body": "When I go to account and then settings in my ledger live, I only get these options: Export operation history, Export to mobile and Hide empty token accounts. Can't seem to find the Tools tab there or anywhere else...As far as Electrum goes, I never got to the part where I confirm the sign on the ledger device as I get the error before that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 25, 2023, 04:37:35 AM",
+      "body": "Quote from: donilito on April 23, 2023, 09:14:16 AM-snip- but I get the following error:EDIT: Managed to get it done. Once I choose the type of address I wanted, in my case legacy, I changed the bottom parameters from m/44h/0h/0h to m/44/0/0 and it worked fine.Seems like the issue was the new hardened derivation path scheme which uses \"h\" instead of \" ' \".Your solution is kind of insecure since you've used non-hardened derivation paths for the \"purpose\", \"coin\" and \"account\" level which should be hardened by the standards.If you're planning to use the wallet where you'll create a signed message, use this derivation path instead: m/44'/0'/0'",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ghost43",
+      "created_time": "April 27, 2023, 05:49:04 PM",
+      "body": "This is a regression in 4.4.0 (and 4.4.1). Fixed now on master.Please report similar bugs on github.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

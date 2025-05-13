@@ -1,0 +1,37 @@
+{
+  "id": "topic_5445448",
+  "title": "chiefpriest",
+  "author": "chiefpriest",
+  "created_time": "March 19, 2023, 12:42:01 AM",
+  "content": "Bitcoin Core Version: bitcoin-core-24.-Wallet version : 169900Operating System: Ubuntu 22.04 64-bitSystem Hardware Specs: N/ADescription of Problem: is there a reason why the total sum of listunspent and getbalances are not the same Any Related Addresses: N/AAny Related Transaction IDs: N/AScreenshot of the problem: N/ALog Files from the Bitcoin Client: N/Abitcoin-cli listunspent | grep amount    \"amount\": 0.00002129,    \"amount\": 0.00002129,    \"amount\": 0.00004280,    \"amount\": 0.00002756,    \"amount\": 0.00004278,    \"amount\": 0.00004263,    \"amount\": 0.00004263,bitcoin-cli getbalances{  \"mine\": {    \"trusted\": 0.00002756,    \"untrusted_pending\": 0.00000000,    \"immature\": 0.00000000,    \"used\": 0.00021342  }}",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5445448",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "March 19, 2023, 12:58:41 AM",
+      "body": "I don't see where they are not the same. All of the amounts sum to the same value. Your wallet appears to have enabled the avoid_reuse flag, so the values in UTXOs for scripts that have already been used before will be counted in the \"used\" balance separately from \"trusted\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "March 19, 2023, 07:22:38 AM",
+      "body": "Quote from: chiefpriest on March 19, 2023, 12:42:01 AM-snip-    \"used\": 0.00021342\"used\" doesn't mean that those are spent, it only means (in layman terms) that you've received bitcoins through an addresses, spent it and then received coins through that address again.In case you unintentionally enabled the flag, you can disable it with:Code:bitcoin-cli setwalletflag \"avoid_reuse\" falseOn a side note, accumulating more UTXOs with small amounts like those could end up causing you to pay high txn fee if you need to spend hundreds of them in one transaction.If those are mining pool payments, I'd consider setting a higher minimum payment amount.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "chiefpriest",
+      "created_time": "March 19, 2023, 07:55:15 AM",
+      "body": "Quote from: achow101 on March 19, 2023, 12:58:41 AMI don't see where they are not the same. All of the amounts sum to the same value. Your wallet appears to have enabled the avoid_reuse flag, so the values in UTXOs for scripts that have already been used before will be counted in the \"used\" balance separately from \"trusted\".Is there any real potential benefits for settings avoid_reuse as False. And thanks for the explanation. I did some calculations and yeah, it matches.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

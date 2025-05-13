@@ -1,0 +1,117 @@
+{
+  "id": "topic_5441007",
+  "title": "Shymaa-Arafat",
+  "author": "Shymaa-Arafat",
+  "created_time": "February 23, 2023, 05:11:29 PMLast edit: February 23, 2023, 06:55:58 PM by Shymaa-Arafat",
+  "content": "I've asked here before about confidential TXs, Pederson commitments,...etc and how the fee is determinedPeople answered they don't know of a real implementationI found them in almost every Blockchain course https://youtu.be/H3GmsxRU1Kweven MIT that was mainly about Bitcoin with a very little Ethereum.https://youtu.be/UySc4jxbqi4And also this paper that mentioned Bitcoin explicitly and my same question about how do we know the fee? (Although didn't directly answer it)https://youtu.be/Adrh6BCc_AoThen I found out it's a sure thing that they're not really implemented.So, why no one simply implemented them (I mean by suggesting a BIP) through a flag bit (like HTCL if I remember correctly) that changes the TX format where UTXOs are encrypted, only the fee is a separate clear field?And applying any Zero Knowledge schemes that checks:1-all values in range to avoid overflow ( like explained in the paper)2- (Sum of inputs-Sum of outputs)= the clear flag value which will be considered constant to the Zero Knowledge scheme Is it simply due to lack of interest?I mean all of that was back in 2018, but maybe now no one really demanding confidential TXs in Bitcoin, or what?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5441007",
+  "comments": [
+    {
+      "author": "Welsh",
+      "created_time": "February 23, 2023, 05:29:24 PM",
+      "body": "What do you mean exactly by confidential? I'm not sure if this is a technical term I'm just not familiar with, but if you mean transactions which don't appear on the Blockchain or somehow obfuscated? Doing that, would go against the fundamentals of having a public ledger like the Blockchain. There's a few alternative coins that provide something similar, although those are privacy focused coins. Whereas, Bitcoin prioritizes verifiability, and integrity over privacy. Although, that's not to say Bitcoin isn't focused on privacy either, just in a different way to conventional money systems. Since, I can't review the Youtube video right now; I'll edit the post a little later once I've taken a look if need be.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Shymaa-Arafat",
+      "created_time": "February 23, 2023, 05:58:36 PM",
+      "body": "Quote from: Welsh on February 23, 2023, 05:29:24 PMWhat do you mean exactly by confidential? I mean encrypted; the UTXOs values to be sent encrypted still keeping the 2 mandatory conditions: summation & overflow check",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "February 23, 2023, 06:52:49 PMLast edit: February 23, 2023, 07:17:05 PM by tromp",
+      "body": "Quote from: Shymaa-Arafat on February 23, 2023, 05:11:29 PMI've asked here before about confidential TXs, Pederson commitments,...etc and how the fee is determinedPeople answered they don't know of a real implementationSo, why no one simply implemented them (I mean by suggesting a BIP)Is it simply due to lack of interest?I mean all of that was back in 2018, but maybe now no one really demanding confidential TXs in Bitcoin, or what?Confidential transactions have been implemented on the Liquid sidechain [1], and a more scalable version based on Mimblewimble has been implemented as a recent soft-fork in Litecoin. The corresponding LIP [2] could be ported to a BIP if there was sufficient interest, but it does seem that such interest is lacking...[1] https://help.blockstream.com/hc/en-us/articles/900001390743-How-does-Liquid-keep-my-transaction-data-confidential-[2] https://github.com/litecoin-project/lips/blob/master/lip-0003.mediawiki",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Shymaa-Arafat",
+      "created_time": "February 23, 2023, 07:03:32 PMLast edit: February 23, 2023, 07:14:26 PM by Shymaa-Arafat",
+      "body": "Quote from: tromp on February 23, 2023, 06:52:49 PMConfidential transactions have been implemented on the Liquid sidechain [1], and a more scalable version based on Mimblewimble has been implemented as a recent soft-fork in Litecoin. The corresponding LIP [2] could be ported to a BIP if there was sufficient interest, but it does seem that such interest is lacking...[1] https://help.blockstream.com/hc/en-us/articles/900001390743-How-does-Liquid-keep-my-transaction-data-confidential-[1] https://github.com/litecoin-project/lips/blob/master/lip-0003.mediawikiI take it that Liquid is a side chain that is attached to the Bitcoin Blockchain (like in Lightning network)?.By the way, thank you for the references; I added the lecture references where you can notice that the subject is mostly discussed as related to Bitcoin.Ah, when I had a quick read, it seems they created a switch from Mimble Wimble (isn't it MW?) to El GAMAL commitment scheme because1- MW is perfectly hiding but not perfectly binding (binds value to its commitment)2-For the case of Quantum Computers threat, El GAMAL scheme although will be broken will protect against supply inflation(I don't understand this part about inflation, would be grateful if u can explain it if u understand it)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "February 23, 2023, 07:25:36 PM",
+      "body": "Quote from: Shymaa-Arafat on February 23, 2023, 07:03:32 PMI take it that Liquid is a side chain that is attached to the Bitcoin Blockchain (like in Lightning network)?.Yes, Liquid is a sidechain to Bitcoin. Lightning is *not* a side-chain, but a 2nd layer on bitcoin, meaning that Lightning txs are Bitcoin txs that are simply held until needed, or until obsoleted by updated versions.QuoteAh, when I had a quick read, it seems they created a switch from Mimble Wimble (isn't it MW?) to El GAMAL commitment scheme because1- MW is perfectly hiding but not perfectly binding (binds value to its commitment)2-For the case of Quantum Computers threat, El GAMAL scheme although will be broken will protect against supply inflation(I don't understand this part about inflation, would be grateful if u can explain it if u understand it) No, MWEB uses Pedersen commitments, not El-Gamal ones. Their MW implementation differs from a pure MW one (such as Grin) in using a hybrid scheme to support non-interactive txs.This hybrid scheme adds a receiver stealth address to every Pedersen commitment (whose blinding factor is also known to the sender) so that only the receiver can spend it.Even if the MWEB side suffers inflation (e.g. due to someone discovering log H), this inflation cannot affect the transparent supply, since the total of all confidential amounts is held in a single transparent utxo.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Shymaa-Arafat",
+      "created_time": "February 23, 2023, 07:45:23 PM",
+      "body": "It is written in the link you wrote, that they decided to create a switch to El GAMAL from MW, and they will push it more if there's QC threatMaybe this is a recent update that you haven't read",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "February 23, 2023, 08:23:08 PM",
+      "body": "Quote from: Shymaa-Arafat on February 23, 2023, 07:45:23 PMIt is written in the link you wrote, that they decided to create a switch to El GAMAL from MW, and they will push it more if there's QC threatMaybe this is a recent update that you haven't readNo, you misunderstood. See https://docs.grin.mw/wiki/miscellaneous/switch-commitments/#introducing-switch-commitmentsThey use Pedersen commitments, but the Pedersen blinding factor itself is tweaked (as in taproot) to allow for revealing an additional El-Gamal type commitment. Which potentially allows for a future migration to a post quantum scheme if ECDLP hardness is threatened by quantum computers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "February 23, 2023, 08:35:11 PM",
+      "body": "QuoteWhy confidential TXs are not implemented in Bitcoin?Because it requires a soft-fork. In general, things that require soft-fork, are not things you can easily introduce. You have to go through the same path as in Segwit or Taproot, it is a long process of reaching consensus, and people can always reject your proposal, then you have to try some no-fork, which is harder.You can also ask the same question about other features, like sidechains, and you will get a similar answer. Also, as things like confidential transactions can enable sidechains as a side-effect, people will carefully check that they won't. The same is true for any transaction joining features, that could enable sidechains.Recently, it turned out that Taproot can be used for NFTs, and it is side-effect that was never planned. For that reason, any feature that could have undesired side-effects, will take a long time to introduce. And confidential transactions is one of those features.Quotehow do we know the fee?Even in Monero, you know the amount in the coinbase transaction. Fee has to be explicit, because if it won't be, then non-upgraded nodes cannot see the coinbase amount. So, all amounts are hidden, but fees are explicitly visible, and the whole computation is done only for those hidden amounts.Quotethat changes the TX format where UTXOs are encryptedChanging the transaction format is a big change. Even in typical soft-forks, when you have Segwit vs non-Segwit addresses, all old nodes can understand Segwit transactions to some extent. They cannot see the witness, but they can see many other things, and perform at least partial validation.Also, I guess that if something like that will ever be introduced, then it will be a part of Taproot or something around that. So, if you want to hide addresses, then a single old-style output will represent many new-style outputs, so old nodes will know that coins were moved, but they will have no idea, how to process the proof (similar to witness vs non-witness nodes). However, when it comes to amounts, they have to be accumulated.The basic building block for Taproot is N-of-N multisig with Schnorr signatures, through spending by key. So, that could be your H, then if everyone agrees, it can be simplified to a single signature. And then, maybe it is a matter of redefining some OP_SUCCESS, or changing Taproot sighashes. Because now, you can create a confidential transaction, where people will see that 1 BTC from some Taproot address moved, but nobody will know, how many users were there, and how this amount was internally splitted between them. So, that proposal will just make it non-interactive, where you could take 0.5 BTC out of that, and send to another Taproot address, and again, nobody will know if a single person moved 0.5 BTC, or maybe two people moved 0.2 BTC and 0.3 BTC, so you will reach that confidentiality. Also, if it would be non-interactive, then all confidential transactions could be batched in a huge UTXO, then you will know that 1000 BTC moved, but you won't know how many users were there, and which amount they used, because it will be batched before going on-chain.QuoteI don't understand this part about inflation, would be grateful if u can explain it if u understand itIf amounts are hidden, then you don't know, which value is behind. And then, some tricks are possible, similar to Value Overflow Incident, but using a different modulo, inside ECDSA. It is basically about hacking the proof that protects from overflow. Because that proof only works in certain conditions, and it is still unlikely, but mathematically possible, to produce something that will pass the verification, but will act as a negative value, and will allow producing more coins.It is similar to other things, like SHA-256: if it works as intended, then ECDSA works. But break SHA-256, and then you can sign any coins, because from any public key, you can make a valid signature for random z-value, and then if you can break SHA-256, then you can make it valid. Here, it is similar: if you can break some assumptions, then you can produce a value, that will overflow, but will pass overflow protections. One of those things is finding a private key for H.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "February 23, 2023, 09:57:38 PM",
+      "body": "Quote from: garlonicon on February 23, 2023, 08:35:11 PMRecently, it turned out that Taproot can be used for NFTs, and it is side-effect that was never planned. For that reason, any feature that could have undesired side-effects, will take a long time to introduce. And confidential transactions is one of those features.I really didn't expect this circus with ordinals and posting stupid rock images on Bitcoin blockchain... now they even have dex exchanges for trading this stuff, result is that 1 sat is not 1 sat anymore.  Can you guess what would be the worst case scenario in case if confidential transactions get introduced after soft-fork in Bitcoin?I am sure there would be much higher transaction fees, and blockchain size would increase a lot, but I am asking for other things that could happen.Sidechains and second layer solutions can be good for privacy, but I would prefer if Bitcoin introduced privacy on mainnet years ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "February 24, 2023, 06:22:04 AM",
+      "body": "QuoteCan you guess what would be the worst case scenario in case if confidential transactions get introduced after soft-fork in Bitcoin?It depends on implementation details. For example, if you will have Pedersen Commitments, when H is chosen as a N-of-N multisig, and when you know that behind some N-of-N multisig (with unknown N), someone locked 1 BTC, then by breaking H, you can steal this 1 BTC, and nothing more than that. However, if your H will be hardcoded in the protocol (for example by picking 020000000000000000000000000000000000000000000000000000000000000001, or with x=1 replaced by x=HASH(something)), and no old nodes will know, which amount is really locked in the new system (for example because it will be expressed as zero satoshis, to make it compatible, but internally there will be some amount, calculated in a new way), then if H is broken, you can get more coins than is locked, because then amounts will be fully hidden, and there is a potential to break validation rules (and for example produce more than 21 million BTC on those new outputs, in this case it will be worse than Value Overflow Incident, because it can be present, but unnoticed).QuoteI am sure there would be much higher transaction feesAny proposal, where some group will have a better scaling than other, will cause higher transaction fees for the latter. For example, imagine that it will be possible to join transactions in a cut-through way. Then, if a chain of A->B->C->...->Z transactions could be non-interactively batched into A->Z on-chain transaction, you can have 1000 users paying one satoshi per user, and it will form one satoshi per virtual byte transaction. Then, it is effectively one satoshi per virtual kilobyte for those users, but then non-upgraded nodes will pay more, because they won't get that discount. The same is true for Segwit, where those users can get an explicit discount, and the same is true for Taproot, where N-of-N multisig is smaller than it was before, so users can get an implicit, size-based discount.Quoteand blockchain size would increase a lotI doubt it will be the case, because recently, NFTs taught us that Taproot may be misused, and then block witness is the only limit stopping us from having 1 GB blocks now. I think next proposals will have stricter rules, as to what can be put in a witness, also because in confidential transactions, it is mainly about signatures. When Segwit was introduced, it caused smaller blocks for non-upgraded nodes, because every witness decreased this 1 MB limit by a witnessSize/4. Here, another proposal could also decrease witness limits, so if more confidential transactions will be included, then less witness space will be used by non-upgraded nodes.QuoteSidechains and second layer solutions can be good for privacy, but I would prefer if Bitcoin introduced privacy on mainnet years ago.Introducing sidechains will be hard, because then anyone will have a chance to introduce any rules to the network, and encourage people to lock coins in those sidechains. Some people will tell you that it is the official association with altcoins, that they don't like, and they don't want to take a risk that bad sidechains will be officially supported on the protocol level.And for that argument, you cannot write better code, because you can never guarantee that your sidechain proposal will not introduce new risks, related to bad sidechains. Because those risks are unknown, and they cannot be controlled, most sidechains-related proposal will be rejected, and people will check ten times that a new feature will not activate sidechains as a side-effect (and of course, confidential transactions can potentially do that, so they can be rejected for that reason).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "February 24, 2023, 07:53:57 AM",
+      "body": "Quote from: garlonicon on February 24, 2023, 06:22:04 AMQuoteCan you guess what would be the worst case scenario in case if confidential transactions get introduced after soft-fork in Bitcoin?It depends on implementation details. For example, if you will have Pedersen Commitments, when H is chosen as Point H is defined in nothing-up-my-sleeve fashion (as essentially SHA256(G)) inhttps://github.com/mimblewimble/secp256k1-zkp/blob/master/src/modules/commitment/main_impl.hL20-L25Discovering log H results in undetectable inflation, i.e. a completely broken system.QuoteQuoteand blockchain size would increase a lotI doubt it will be the caseCorrect. The blockchain size could in fact shrink a lot, since in Mimblewimble, spent outputs are not needed for historical verification, so none of that data would be downloaded in the Initial Block Download. Besides the MW UTXO set, only about 100B remain for each MW transaction. This assumes that the same block weight limit applies to the sum weight of the classical block data, the segwit block data , and new MW block data, and that the relative weight of the latter grows over time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Shymaa-Arafat",
+      "created_time": "February 24, 2023, 09:27:38 AM",
+      "body": "Most comments discuss the possible implications as if Mimble Wimble, (MW) as abrreviated in Lite coin, but what is discussed in the paper there are other Zero Knowledge solutions that allow hiding the UTXO values and doing the necessary checks at the same time (inputs-outputs=fee)AND (each UTXO<overflow value)-Also, they discuss Monero as another example; ie, not just Lite coin.Other comments on ur comments:-I don't think nothing will change for the UTXO set, nodes probably will just store the encryption of those UTXOs instead of the plian UTXO, and verify according to the Zero Knowledge scheme used.-You guys talk about what if there were side chains in Bitcoin, aren't there already side chains and L2 solutions in Bitcoin?!How do you then describe Liquid shown in one of the comments?https://www.blockstream.com/liquid/https://help.blockstream.com/hc/en-us/articles/900001390743-How-does-Liquid-keep-my-transaction-data-confidential-",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "February 24, 2023, 11:27:01 AM",
+      "body": "Quotebut what is discussed in the paper there are other Zero Knowledge solutions that allow hiding the UTXO values and doing the necessary checks at the same timeI agree with garlonicon, it doesn't change the reason. It requires soft-fork anyway, so unless you can think about no-fork solution, it is as difficult to introduce as any other soft-fork.QuoteI don't think nothing will change for the UTXO setUTXO change has a big impact on non-upgraded nodes. That means, it will be a different soft-fork than previously, because we never had a soft-fork, where old nodes could no longer check the whole amount in circulation. If that proposal will be incompatible with the current UTXO model, then how do you want to send coins from new to old addresses? Old nodes should know that some UTXO was transferred to the new address, and then there should be some way to recognize that some UTXO was converted back into the old format. If not, then it will be one-way-ticket, so it will be more similar to burning coins.Quotearen't there already side chains and L2 solutions in Bitcoin?!You can always make a federation, where some third party is needed to execute a sidechain. But there is no truly independent sidechain I am aware of, where mining, peg-ins, and peg-outs can be controlled by anyone, and not only by some specific group. Because if you want to make a federation, then it was always possible, but it pushes things backwards, because some parts of that sidechain are then centralized.QuoteHow do you then describe Liquid shown in one of the comments?It is a federation, so it is not truly decentralized sidechain. It is like comparing signet to testnet: there are blockstorms in testnet, but it is the only test network, where you can independently mine a block, without asking creators for a signature.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

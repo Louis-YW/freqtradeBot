@@ -1,0 +1,45 @@
+{
+  "id": "topic_5460967",
+  "title": "Cruxleo",
+  "author": "Cruxleo",
+  "created_time": "July 25, 2023, 09:19:11 AM",
+  "content": "I've been studying more about bitcoin lately and the article I have now is about seed phrases and bitcoin addresses then I came across these two confusing terms.i. Checksumii. EntropyI've surfed the internet but handy explanations seem ambiguous, I would appreciate an Eli5 explanation.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5460967",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "July 25, 2023, 09:28:40 AM",
+      "body": "Checksum are used to check for the correctness of your seeds, or addresses, WIF keys, etc. They are included in data where mistyping is prone. Your BIP39 seeds include a checksum as a part of the last word which is used to check if the seed is valid. If it is not, you have typed something wrong in your seed. The same goes for the address, where there is a checksum which tells the user whether they have mistyped anything. This is not foolproof however, there is a chance where you've mistyped something and the checksum still checks out.Checksums are usually included within the string, where the checksum is usually a hash that corresponds to the first X bytes of data. Since each hash are likely to differ if any of the character in the first X bytes of data are wrong, the checksum is able to tell the correctness of it, but not the position where it is wrong. Entropy is a part of how you generate your keys and seeds. For an ECDSA keypair, entropy is used to determine the private key and for the BIP39 seeds, entropy are concatenated with the checksum and segmented into blocks of 11 bits, where each block corresponds to a word on the wordlist. Entropy is required for your addresses and seeds to be secure, as they are basically random inputs to ensure that your addresses and seeds is random enough such that no one can feasibly guess your keys.Take BIP39 seeds for example, if the entropy used is not random enough, the blocks of 11 bits becomes predictable and thereby any adversary would be able to guess those words that you've used for your seed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "July 25, 2023, 10:06:24 AM",
+      "body": "It's hard to give actual ELI5, so other member is free to improve my wording.Checksum: Fixed size of data used to check intactness of data, which usually have bigger size than checksum itself. It means if the data is changed (even if the difference is only 1 bit), the checksum would be different.Entropy: Measurement of how random/disordered is certain data. Higher entropy value means it's harder to predict/more secure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "July 25, 2023, 10:28:01 AM",
+      "body": "It is used in seed phrase generation, private keys and addresses generation.Example is in seed phrase generation. Entropy is the lack of predictability and it indicate randomness. Example is to use the entropy generated using SHA256 hash function in hexadecimal which can be converted to binary.The hexadecimal can be 32, 40, 48, 56 or 64 long characters converted to 128, 160, 192, 224 or 256 bits.Or you can throw a dice 128, 160, 192, 224 or 256 times and record it in binary.If SHA256 hash function is used, 256 bits will be generated and it is called the entropy.CS = ENT / 32MS = (ENT + CS) / 11|  ENT  | CS | ENT+CS |  MS  |+---------+----+---------------+--------+|   128   |  4 |      132     |  12  ||   160   |  5 |      165     |  15  ||   192   |  6 |      198     |  18  ||   224   |  7 |      231     |  21  ||   256   |  8 |      264     |  24  |ENT= EntropyCS= ChecksumMS= Mnemonic sentence in wordsRead more about checksum from https://learnmeabitcoin.com/technical/checksum. QuoteIn Bitcoin, checksums are created by hashing data through SHA256 twice, and then taking the first 4 bytes of the resultYou would then keep the data and the checksum together, so that you can check that the whole thing has been typed in correctly the next time you use it.From the above table, depending on how long the seed phrase to be generated. 4 for 12 words,  8 for 24 words. The checksum helps to check the seed phrase validity.Read more here: https://learnmeabitcoin.com/technical/checksum",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 28, 2023, 03:04:57 PMLast edit: July 28, 2023, 03:39:26 PM by BlackHatCoiner",
+      "body": "The following makes a great breakdown of these term:- https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05.asciidoc (this one talks about deterministic wallets as well)- https://learnmeabitcoin.com/technical/checksum (already shared above, great site for learning the technical parts)Quote from: Charles-Tim on July 25, 2023, 10:28:01 AMOr you can throw a dice 128, 160, 192, 224 or 256 times and record it in binary.Sounds too many. Each dice roll gives about 2.58 bits of entropy if you apply Shannon's equation. Throwing it 50 times will generate ~129 bits, which are enough.Fun fact: Throwing it a hundred times would suffice, even if the dice is very biased. Proof:Suppose the probability of resulting 6 is 1/2, instead of 1/6. This means that on average, in every two rolls, you get a 6. We know that:Code:for i from 1 to 6: Σpi = 1=> p1 + p2 + p3 + p4 + p5 + p6 = 1=> p1 + p2 + p3 + p4 + p5 = 1 - p6 = 0.5=> p1, p2, p3, p4, p5 = 1/10Equation becomes: H(X) = - (p(1)*log2(p(1)) + p(2)*log2(p(2)) + ... + p(6)*log2(p(6))). For i=5, p(i) = 0.1  (for i < 6), that's equal with: -Σip(i)log2(p(i)) - p(6)log2(p(6)) = 1.660964 + 0.5 = 2.160964.Rolling it a hundred times would give you about 216 bits of entropy. Please correct me if I'm wrong somewhere. Went a little bit off-topic, but it does good to refresh your math knowledge once in a while.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

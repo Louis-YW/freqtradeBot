@@ -1,0 +1,77 @@
+{
+  "id": "topic_5463583",
+  "title": "peterhbct",
+  "author": "peterhbct",
+  "created_time": "August 17, 2023, 12:03:33 PM",
+  "content": "Hello,Back in the early days I remember mining some BTC with a CPU using the original miner.I think I've found the drive I did this on but it has since been reformatted and used to store a mix of photos and videos.I have attempted a recovery using Pywallet which is indicating that it's finding some keys but then doesn't seem to be putting them into a wallet.Can anyone tell me how I can view these keys?Code:Read 250.0 Go in 238.0 minutesFound 0 possible walletsFound 0 possible encrypted keysFound 100 possible unencrypted keysAll the found encrypted private keys have been decrypted.The wallet is encrypted and the passphrase is correctImporting:The new wallet C://recovered_wallet_1691644223.dat contains the 0 recovered keyThanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5463583",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "August 17, 2023, 04:53:22 PM",
+      "body": "If you want to extract the keys from the recovered wallet file you can open it directly with Notepad or Notepad++ you should be able to see the private keys inside.Or you can import the wallet.dat file directly to bitcoin core and use \"dumpprivkey\" to dump private keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 17, 2023, 05:09:04 PM",
+      "body": "Quote from: peterhbct on August 17, 2023, 12:03:33 PMI have attempted a recovery using Pywallet which is indicating that it's finding some keys but then doesn't seem to be putting them into a wallet.Can anyone tell me how I can view these keys?The related files are saved in your --recov_outputdir directory.Namely, bunch of \"__db.001\" files which contain (some) data that it recovered from your drive.But those aren't human-readable, it's binary so you'll have to open them with any hex editor/viewer tool or similar to see what's inside.If you see repeating: 00 01 03 6b 65 79, it may indicate that pywallet actually saw unencrypted keys from a bitcoin wallet file.But it's better if you can fix the importing issue.One way that I can reproduce it is by giving a random \"Possible passphrases\".When I didn't specified any possible passphrase (just 'Enter'), the 'possible unencrypted keys' are imported to the recovered_wallet.dat file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "peterhbct",
+      "created_time": "September 05, 2023, 01:20:01 PM",
+      "body": "Thanks for the help so far but it's still not working unfortunately.I'm running this command:c:\\Python27\\python.exe pywallet.py --recover --recov_size=250Gio --recov_device E: --recov_outputdir C:/I've tried without entering a pass phrase and get the following:Read 250.0 Go in 194.0 minutesFound 0 possible walletsFound 0 possible encrypted keysFound 100 possible unencrypted keysTraceback (most recent call last):  File \"pywallet.py\", line 4039, in <module>    db_env = create_env(options.recov_outputdir)  File \"pywallet.py\", line 1489, in create_env    r = db_env.open(db_dir, (DB_CREATE|DB_INIT_LOCK|DB_INIT_LOG|DB_INIT_MPOOL|DB_INIT_TXN|DB_THREAD|DB_RECOVER))bsddb.db.DBRunRecoveryError: (-30974, 'DB_RUNRECOVERY: Fatal error, run database recovery -- unable to join the environment')c:\\>The only file that's being created is:pywallet_partial_recovery_1693919436.jsonThere's no \"__db.001\" filesThanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 05, 2023, 02:54:39 PM",
+      "body": "Quote from: peterhbct on September 05, 2023, 01:20:01 PM-snip-The only file that's being created is:pywallet_partial_recovery_1693919436.jsonYou've encountered an error when you run pywallet that's why the necessary files aren't created.The \"pywallet_partial_recovery_<timestamp>.json\" file doesn't contain the private keys but a list of positions of possible encrypted and unencrypted private keys.It's not too important.I haven't encountered that error when testing Pywallet's --recover when a password isn't provided.I'll try if I can reproduce it.Have you tried a different --recov_outputdir?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "peterhbct",
+      "created_time": "September 05, 2023, 03:37:37 PM",
+      "body": "Quote from: nc50lc on September 05, 2023, 02:54:39 PMQuote from: peterhbct on September 05, 2023, 01:20:01 PM-snip-The only file that's being created is:pywallet_partial_recovery_1693919436.jsonYou've encountered an error when you run pywallet that's why the necessary files aren't created.The \"pywallet_partial_recovery_<timestamp>.json\" file doesn't contain the private keys but a list of positions of possible encrypted and unencrypted private keys.It's not too important.I haven't encountered that error when testing Pywallet's --recover when a password isn't provided.I'll try if I can reproduce it.Have you tried a different --recov_outputdir?Thanks I'll try a different recov_outputdir and see if that helps. Problem is it takes several hours to run before showing me the error message.Is there anyway I can just get it to do a faster run using the locations from the pywallet_partial_recovery_<timestamp>.json file?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 06, 2023, 04:40:11 AM",
+      "body": "Quote from: peterhbct on September 05, 2023, 03:37:37 PMIs there anyway I can just get it to do a faster run using the locations from the pywallet_partial_recovery_<timestamp>.json file?I can't find any arg that can use that file, try playing with with pywallet -h command to find anything useful.Yeah, more than 3hours is too long.But since the issue is the importation of the possible keys, if you can find at least one key with lower --recov_size, that'll speed up each test run.Quote from: peterhbct on September 05, 2023, 03:37:37 PMThanks I'll try a different recov_outputdir and see if that helps. Problem is it takes several hours to run before showing me the error message.If you have other physical drives, use that as recov_outputdir instead,pywallet seems to be having problems writing on C:/ but permission issue should show a different error and wont even write any file.I have no luck reproducing the error that you got.You may also try to contact the developer if he can assist you with that particular issue: github.com/jackjack-jj/pywalletHere's his Bitcointalk profile (inactive since Dec2022): http://bitcointalk.org/index.php?action=profile;u=21053Take note to never ever use \"E:\" where the deleted wallet.dat file was (best if it has a backup).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 06, 2023, 05:54:21 AM",
+      "body": "Quote from: peterhbct on September 05, 2023, 03:37:37 PMProblem is it takes several hours to run before showing me the error message.Have you created a (backup) image of the drive yet? It's old, and you don't want it to fail during those runs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "September 09, 2023, 10:50:55 PM",
+      "body": "Quote from: nc50lc on September 06, 2023, 04:40:11 AMTake note to never ever use \"E:\" where the deleted wallet.dat file was (best if it has a backup).Try to tell that to Windows that it should treat the Drive E:\\ as read-only.Quote from: LoyceV on September 06, 2023, 05:54:21 AMHave you created a (backup) image of the drive yet? It's old, and you don't want it to fail during those runs.It should be common practice to execute recovery operations only on forensic backup copies of the source device or filesystem. By forensic backup copy I mean a bit-by-bit copy of all sectors of the source device or filesystem. That way you can always revert to the last known state of the source device or filesystem.I'd rather do such recovery operations on a Linux host where it's easy to mount filesystems, devices or backup image files in read-only mode.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

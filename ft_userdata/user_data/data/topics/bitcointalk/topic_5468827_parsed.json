@@ -1,0 +1,93 @@
+{
+  "id": "topic_5468827",
+  "title": "CY4NiDE",
+  "author": "CY4NiDE",
+  "created_time": "October 01, 2023, 09:57:29 PMLast edit: October 02, 2023, 01:32:01 AM by CY4NiDE",
+  "content": "Hello fellow Bitcoiners. This is my first post here, I've been lurking for a while now and I've finally decided to create my account to engage here in the forum. I really like it here, you guys are awesome.   So, I've heard about the reused R value scenario and decided to check my past transactions to see if I could have been compromised at some point, and so I've noticed something rather peculiar. There was this one transaction from 2017, from a Legacy address I've used a couple of times, in which two input indexes had their respective R values sharing the first 7 characters. They were identical up to the 7th character, then afterwards it seemed to get random  [no patterns were found in the respective S and Z values]. Needless to say I immediately moved the funds out of that address, which was not much anyways. I'm not going to share specific details 'cause it could expose some of the addresses I'm still using to hodl my dust. I would like to know tho if this could be an indication of a biased nonce, and if this could have been exploited somehow to gain access to my funds, had some malicious entity spotted this in time to take any action. I think that's it for my first post. Stay awesome and stay safe!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468827",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "October 01, 2023, 10:45:56 PM",
+      "body": "My instinct says that you messed up and aren't actually looking at the actual R values. Even close related and biased nonces would have wildly different R values, having R that partially matches like that is a 1 in 72057594037927936 chance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CY4NiDE",
+      "created_time": "October 01, 2023, 10:53:54 PMLast edit: October 02, 2023, 01:35:19 AM by CY4NiDE",
+      "body": "Quote from: ymgve2 on October 01, 2023, 10:45:56 PMMy instinct says that you messed up and aren't actually looking at the actual R values. Even close related and biased nonces would have wildly different R values, having R that partially matches like that is a 1 in 72057594037927936 chance.Hello and thanks for your reply.  I've used this tool for my paranoid endeavors [ https://github.com/iceland2k14/rsz ].Each txid gave me a list of every input index' R, S, Z values + Pubkey.That was how I've spotted it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "October 01, 2023, 11:31:06 PM",
+      "body": "Were the matching characters all zeroes? There are some known weak values that do that.Also, do you mean 7 hex characters, or 7 bytes (14 hex characters) matching? 7 hex characters would be a quite common coincidence, and there would in theory be one collision in 8000 random signatures due to the birthday paradox, though it's interesting that you managed to hit one unless you have a big number of signatures.7 bytes would be much more rare, and I see a few collisions in the total blockchain up to around 2019, which is expected due to the birthday paradox, but managing to hit a collision within a narrow number of signatures created by yourself would be exceptional.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CY4NiDE",
+      "created_time": "October 01, 2023, 11:42:30 PM",
+      "body": "Quote from: ymgve2 on October 01, 2023, 11:31:06 PMWere the matching characters all zeroes? There are some known weak values that do that.Also, do you mean 7 hex characters, or 7 bytes (14 hex characters) matching? 7 hex characters would be a quite common coincidence, and there would in theory be one collision in 8000 random signatures due to the birthday paradox, though it's interesting that you managed to hit one unless you have a big number of signatures.7 bytes would be much more rare, and I see a few collisions in the total blockchain up to around 2019, which is expected due to the birthday paradox, but managing to hit a collision within a narrow number of signatures created by yourself would be exceptional.I meant 7 hex characters, not bytes. And they were not just zeroes.So we can consider it being a somewhat expected occurrence?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "October 01, 2023, 11:47:17 PM",
+      "body": "A little bit unexpected, but still within reasonable probability.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CY4NiDE",
+      "created_time": "October 01, 2023, 11:56:38 PM",
+      "body": "Alright then! Thanks a lot for all the info you provided, I really appreciate it!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "October 02, 2023, 07:04:52 AM",
+      "body": "7 hex characters is 28 bits... if the program is printing the r points in encoded form (all beginning with 03 or 02?) then that would be 20 bits.Assuming 28 bits there is a 50% probability of a 28 bit collision if you look at 2^14 = 16384 r values. So  if your total number of inputs is greater than that then it would be unlikely for there to NOT be a match.   Even if you have far fewer, it's just not that unlikely for there to be a short collision like that.You can go look at a birthday probability calculator-- whats the probability that at least two people out of $INPUTS people share a 'birthday' in a year with 2^28 (268435456) days.It wouldn't concern me to find such a match.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CY4NiDE",
+      "created_time": "October 02, 2023, 09:13:44 PM",
+      "body": "Quote from: gmaxwell on October 02, 2023, 07:04:52 AM7 hex characters is 28 bits... if the program is printing the r points in encoded form (all beginning with 03 or 02?) then that would be 20 bits.Assuming 28 bits there is a 50% probability of a 28 bit collision if you look at 2^14 = 16384 r values. So  if your total number of inputs is greater than that then it would be unlikely for there to NOT be a match.   Even if you have far fewer, it's just not that unlikely for there to be a short collision like that.You can go look at a birthday probability calculator-- whats the probability that at least two people out of $INPUTS people share a 'birthday' in a year with 2^28 (268435456) days.It wouldn't concern me to find such a match.Hello and thanks for your reply!  I assume the program did not print the R points in encoded form then, as they would all begin with a random Hex character. At first I was afraid this could mean a bias in the nonce, but based on the replies to this post I now think this is well withing reasonability.I'm not quite there yet with all the technical stuff, but I'm working on it.Again, thanks for your reply and for all the info provided.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 03, 2023, 12:17:41 PM",
+      "body": "Quote from: gmaxwell on October 02, 2023, 07:04:52 AM7 hex characters is 28 bits... if the program is printing the r points in encoded form (all beginning with 03 or 02?) then that would be 20 bits.I'm pretty sure that since R and S values are 32 or 33 bytes long, 28 bits or whatever is still a long shot from a serious collision.There is not much you can do with two transactions that share the first N bits of the R value (where N is very low), because these are the high bits - without knowing the low bits, you can get anything for the elliptic multiplication.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "October 05, 2023, 05:01:33 AM",
+      "body": "Quote from: NotATether on October 03, 2023, 12:17:41 PMThere is not much you can do with two transactions that share the first N bits of the R value (where N is very low), because these are the high bits - without knowing the low bits, you can get anything for the elliptic multiplication.I think your response is may be confused in two ways: First this is about the R value, the image of the nonce K on the curve. Your comment about \"you can't get anything for the elliptic curve multiplication\" makes it sound like you think it's about K-- the value that gets multiplied by G to produce R.  There isn't any special relationship between the lower vs upper bits of R.Secondly, for K it would absolutely absolutely not okay for the upper bits (or any bits of it) to be leaked/predictable/etc. as the lattice attacks on multiple signatures work just as well for the high bits of K being known.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

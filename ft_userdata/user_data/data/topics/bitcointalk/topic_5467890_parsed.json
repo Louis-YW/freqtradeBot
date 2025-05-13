@@ -1,0 +1,21 @@
+{
+  "id": "topic_5467890",
+  "title": "HoBzY",
+  "author": "HoBzY",
+  "created_time": "September 24, 2023, 09:21:58 AMLast edit: September 24, 2023, 12:20:02 PM by HoBzY",
+  "content": "Как вытащить из hex raw транзакции комиссию и получить входные суммы?020000000001012ed19c0d7cee13d32e36a0b3f42e07404e0db43ac589962693264f9b764c38a50 100000000fdffffff023b770a000000000017a914252c6ccd8c3d8f72d5ac424fa05daf7db7e9f8 b5875a17fc6800000000160014f60834ef165253c571b11ce9fa74e46692fc5ec10248304502210 086b64a551e68fdea629930ab7590da58cbec8b5ec6648100cb69eacd87410ca402204b4afe518c 84874b03e31246542d8a41e3e18e8157c4fee71b26f94610bd7c7c0121026e5628506ecd33242e5 ceb5fdafe4d3066b5c0f159b3c05a621ef65f177ea28600000000{    \"Version\": \"02000000\",    \"IsCoinBase\": \"False\",    \"IsWitness\": \"True\",    \"WitnessCount\": \"0001\",    \"InputCount\": \"01\",    \"Inputs\": [        {            \"ID\": \"2ed19c0d7cee13d32e36a0b3f42e07404e0db43ac589962693264f9b764c38a5\",            \"AddressType\": \"Hash160\",            \"Address\": \"f60834ef165253c571b11ce9fa74e46692fc5ec1\",            \"VOUT\": \"01000000\",            \"ScriptSigSize\": \"\",            \"ScriptSig\": \"\",            \"WitnessDataSig\": [                \"48304502210086b64a551e68fdea629930ab7590da58cbec8b5ec6648100cb69eacd87410ca4022 04b4afe518c84874b03e31246542d8a41e3e18e8157c4fee71b26f94610bd7c7c01\",                \"21026e5628506ecd33242e5ceb5fdafe4d3066b5c0f159b3c05a621ef65f177ea286\"            ],            \"Sequence\": \"fdffffff\"        }    ],    \"OutputCount\": \"02\",    \"Outputs\": [        {            \"AddressType\": \"Hash160\",            \"Address\": \"252c6ccd8c3d8f72d5ac424fa05daf7db7e9f8b5\",            \"Value\": \"3b770a0000000000\",            \"ScriptPubKeySize\": \"17\",            \"ScriptPubKey\": \"a914252c6ccd8c3d8f72d5ac424fa05daf7db7e9f8b587\"        },        {            \"AddressType\": \"Hash160\",            \"Address\": \"f60834ef165253c571b11ce9fa74e46692fc5ec1\",            \"Value\": \"5a17fc6800000000\",            \"ScriptPubKeySize\": \"16\",            \"ScriptPubKey\": \"0014f60834ef165253c571b11ce9fa74e46692fc5ec1\"        }    ],    \"LockTime\": \"00000000\"}",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5467890",
+  "comments": [
+    {
+      "author": "A-Bolt",
+      "created_time": "September 24, 2023, 11:57:30 AM",
+      "body": "Quote from: HoBzY on September 24, 2023, 09:21:58 AMКак вытащить из hex raw транзакции комиссию и получить входные суммы?Зачем непременно из raw? Вы, я вижу, умеете получать транзакцию в формате JSON, с ним удобнее работать.Итак, у вас есть вход, который ссылается на выход 1 транзакции a5384c769b4f2693269689c53ab40d4e40072ef4b3a0362ed313ee7c0d9cd12e:Code:\"Inputs\": [        {            \"ID\": \"2ed19c0d7cee13d32e36a0b3f42e07404e0db43ac589962693264f9b764c38a5\",            . . .            \"VOUT\": \"01000000\",Обратите внимание, в вашем выводе JSON некоторые параметры выводятся с обратным порядком байт, что неудобно. Необходимо сделать запрос транзакции с ID a5384c769b4f2693269689c53ab40d4e40072ef4b3a0362ed313ee7c0d9cd12e и получить этот выход:Code:{      \"value\": 17.62073647,      \"n\": 1,      . . .}Параметр value даёт сумму, которую тратит ваша транзакция. Если бы в ней было несколько входов, пришлось бы просуммировать value всех выходов, на которые ссылаются эти входы. А в вашем случае (один вход), на входе транзакции имеем 17.62073647 BTC.Теперь суммируем value выходов:Code:\"Outputs\": [        {            . . .            \"Value\": \"3b770a0000000000\",            . . .        },        {            . . .            \"Value\": \"5a17fc6800000000\",              . . .                  }    ],685883 + 1761351514 = 1762037397 sat = 17.62037397 BTCКомиссия за транзакцию равна разности между суммой входов и суммой выходов:17.62073647 - 17.62037397 = 0.0003625 BTC",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

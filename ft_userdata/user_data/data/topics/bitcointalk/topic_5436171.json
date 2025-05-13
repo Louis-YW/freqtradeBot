@@ -1,0 +1,165 @@
+{
+  "id": "topic_5436171",
+  "title": "markantoine",
+  "author": "markantoine",
+  "created_time": "January 20, 2023, 07:39:07 PM",
+  "content": "Issue: I am trying to access funds I had stored in a legacy Coinbase Vault 2/3 multisig wallet using the Coinbase multisig recovery tool (https://coinbase.github.io/multisig-tool/) . I have all of the necessary information to access the wallet, including the Coinbase xpubkey, the Shared xpubkey and the User xpubkey. Additionally, I have both the User seed and the Shared seed (encrypted) including the password.However, I am encountering an issue with the recovery tool whereby the Vault wallet balance is not displaying upon entering in the xpubkeys in Step 1. Upon further research, it appears that there is an issue with the recovery tool referencing a Bitpay API endpoint that is no longer active. As such, the Coinbase multisig recovery tool is no longer functional. For reference, see the Reddit post and Bitcointalk forum post I'm referring to. Note, that I am experiencing the same issue described in the Reddit post (i.e. I have all of the necessary information to access the vault wallet).1. https://www.reddit.com/r/BitcoinBeginners/comments/ndvhom/coinbase_multisig_vault_recovery_tool_wtf/2. https://bitcointalk.org/index.php?topic=5316286.0Therefore, my question is, what are some other alternative methods to access the funds in my legacy Coinbase Vault 2/3 multisig wallet? Note, that the options should be prioritized in terms of technical complexity, with less technical methods preferred.Thanks",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5436171",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 21, 2023, 03:47:50 PM",
+      "body": "I remember trying to help the user in that quoted thread at the time. If I remember correctly, he told me in another thread that his encrypted shared seed began with the characters \"6P\". Is this the case for you? Two additional questions regarding your user seed. Does it start with \"5\", \"K\" or \"L\", and is it 51 or 52 characters long?If the answer to all those questions is yes, then it should be fairly easy to recover your vault in a wallet such as Electrum. If not, then we'll need to figure out exactly what format your two seeds are taking.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "January 21, 2023, 07:53:22 PM",
+      "body": "Quote from: markantoine on January 20, 2023, 07:39:07 PMTherefore, my question is, what are some other alternative methods to access the funds in my legacy Coinbase Vault 2/3 multisig wallet? Note, that the options should be prioritized in terms of technical complexity, with less technical methods preferred.Have you by any chance tried contacting Coinbase exchange and BitPay support for help?Coinbase probably removed all vaults since 2018 but I see they still have page about that multisig vault available on their website, so they could help you to overcome unavailable Bitpay API.https://www.coinbase.com/blog/multisig-vaults-on-coinbaseYou can also download files and tried doing everything locally instead web tool, just follow this instructions:https://github.com/coinbase/multisig-tool",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "markantoine",
+      "created_time": "January 24, 2023, 05:21:07 AM",
+      "body": "Quote from: o_e_l_e_o on January 21, 2023, 03:47:50 PMI remember trying to help the user in that quoted thread at the time. If I remember correctly, he told me in another thread that his encrypted shared seed began with the characters \"6P\". Is this the case for you? Two additional questions regarding your user seed. Does it start with \"5\", \"K\" or \"L\", and is it 51 or 52 characters long?If the answer to all those questions is yes, then it should be fairly easy to recover your vault in a wallet such as Electrum. If not, then we'll need to figure out exactly what format your two seeds are taking.1. To your first question, yes, the encrypted shared seed begins with the characters \"6P\".2. To your second question, the user seed begins with the character \"L\" and it is 52 characters long.I greatly appreciate your help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "markantoine",
+      "created_time": "January 24, 2023, 05:27:30 AM",
+      "body": "Quote from: dkbit98 on January 21, 2023, 07:53:22 PMQuote from: markantoine on January 20, 2023, 07:39:07 PMTherefore, my question is, what are some other alternative methods to access the funds in my legacy Coinbase Vault 2/3 multisig wallet? Note, that the options should be prioritized in terms of technical complexity, with less technical methods preferred.Have you by any chance tried contacting Coinbase exchange and BitPay support for help?Coinbase probably removed all vaults since 2018 but I see they still have page about that multisig vault available on their website, so they could help you to overcome unavailable Bitpay API.https://www.coinbase.com/blog/multisig-vaults-on-coinbaseYou can also download files and tried doing everything locally instead web tool, just follow this instructions:https://github.com/coinbase/multisig-toolYes, I tried contacting support but they were unable to provide any help, they simply just referred me to the 2018 Coinbase blog re: discontinuing support for the multisig vault tool. And I'm fairly certain the issue has to do with the Bitpay Insights api endpoint referenced in the code--as it appears to no longer be maintained (i.e. SSL handshake error). As such, I would prefer to access the funds using a regular wallet application vs. potentially running into issues trying to fix the code in the Coinbase recovery tool myself.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 24, 2023, 09:59:05 AM",
+      "body": "Quote from: markantoine on January 24, 2023, 05:21:07 AM1. To your first question, yes, the encrypted shared seed begins with the characters \"6P\".2. To your second question, the user seed begins with the character \"L\" and it is 52 characters long.Great. I think this should be relative straightforward then, although since I've never used Coinbase vaults myself I can't confirm for certain.Your key which starts with \"L\" and is 52 characters long is a compressed private key in the wallet import format (WIF). Your encrypted shared seed which begins with 6P is an encrypted private key which uses the BIP38 standard. All BIP38 encrypted keys start with 6P. When you decrypt this with your password, it should (hopefully) provide you with a second key which mirrors your other one - starting with \"L\" and 52 characters long.The combination of these two private keys alongside the third Coinbase public key should be enough to recover your wallet. We might hit a stumbling block regarding individual addresses or derivation paths, but we can cross that bridge when we get to it.Next question: What format is the Coinbase public key in? Does it start with something like \"xpub\" or does it start with \"02\", \"03\", or \"04\"?For the next steps, you are going to need to start importing these keys in to a wallet or other software. Doing this on a computer with internet access brings risk of your keys being compromised. Do you have a spare computer or laptop which you can disconnect and do the next steps offline?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "January 24, 2023, 05:26:39 PM",
+      "body": "Quote from: o_e_l_e_o on January 24, 2023, 09:59:05 AMFor the next steps, you are going to need to start importing these keys in to a wallet or other software. Doing this on a computer with internet access brings risk of your keys being compromised. Do you have a spare computer or laptop which you can disconnect and do the next steps offline? That would be the best, but OP shouldn't reconnect that other device to the internet until (hopefully) the coins have been recovered and moved elsewhere. Alternatively, a Live OS could be used and booted from USB. But the Live OS shouldn't save anything to a local storage to prevent leakage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "markantoine",
+      "created_time": "January 25, 2023, 06:00:26 AM",
+      "body": "Quote from: o_e_l_e_o on January 24, 2023, 09:59:05 AMQuote from: markantoine on January 24, 2023, 05:21:07 AM1. To your first question, yes, the encrypted shared seed begins with the characters \"6P\".2. To your second question, the user seed begins with the character \"L\" and it is 52 characters long.Great. I think this should be relative straightforward then, although since I've never used Coinbase vaults myself I can't confirm for certain.Your key which starts with \"L\" and is 52 characters long is a compressed private key in the wallet import format (WIF). Your encrypted shared seed which begins with 6P is an encrypted private key which uses the BIP38 standard. All BIP38 encrypted keys start with 6P. When you decrypt this with your password, it should (hopefully) provide you with a second key which mirrors your other one - starting with \"L\" and 52 characters long.The combination of these two private keys alongside the third Coinbase public key should be enough to recover your wallet. We might hit a stumbling block regarding individual addresses or derivation paths, but we can cross that bridge when we get to it.Next question: What format is the Coinbase public key in? Does it start with something like \"xpub\" or does it start with \"02\", \"03\", or \"04\"?For the next steps, you are going to need to start importing these keys in to a wallet or other software. Doing this on a computer with internet access brings risk of your keys being compromised. Do you have a spare computer or laptop which you can disconnect and do the next steps offline?1. To your first question, the Coinbase public key begins with the characters \"xpub\"2. To your second question, yes I do have a spare laptop I can use.Additionally, if it is of help, see below the vault Coinbase multisig vault wallet configuration information below.Multisig P2SH addresses: BIP16HD wallets: BIP32Seed format: Bitcoin private key in WIFSeed encryption: BIP 38Seed to BIP32 wallet: BitcoinJSOrder of pubkeys in P2SH: lexicographicalBIP32 paths: m/n (m/0, m/1, ...)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 25, 2023, 09:24:59 AM",
+      "body": "Ok. This is where things unfortunately are going to get rather complicated. Looking in to it a bit more, it appears that Coinbase don't just use the WIFs they give as normal WIFs like any other wallet does to generate a single private key. Instead, they use the WIFs to generate a seed to then generate a master private key. This is a very weird way of doing things and I'm not aware of any other wallet or service which does this.You have two option. The first is more secure but much more complicated. It will involve your airgapped computer, installing Linux, installing various Python tools, using those tools to decrypt your BIP38 encrypted key, and then following the instructions here (with a little modification) to generate your two xprvs, before using those two xprvs and your other xpub to recreate your vault in a wallet such as Electrum.The second option is far easier, but not as secure. There is a fork of Coinbase's vault tool here (https://github.com/dlajarretie/multisig-tool) which replaces the now defunct BitPay API with BlockCypher's API which is still working just fine. However, I've never used this myself so cannot vouch for it. I've skimmed the code and it looks fine, but you will still be importing all your private keys on to an online computer with internet access, which is always a risk.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "markantoine",
+      "created_time": "January 26, 2023, 08:58:13 PM",
+      "body": "Quote from: o_e_l_e_o on January 25, 2023, 09:24:59 AMOk. This is where things unfortunately are going to get rather complicated. Looking in to it a bit more, it appears that Coinbase don't just use the WIFs they give as normal WIFs like any other wallet does to generate a single private key. Instead, they use the WIFs to generate a seed to then generate a master private key. This is a very weird way of doing things and I'm not aware of any other wallet or service which does this.You have two option. The first is more secure but much more complicated. It will involve your airgapped computer, installing Linux, installing various Python tools, using those tools to decrypt your BIP38 encrypted key, and then following the instructions here (with a little modification) to generate your two xprvs, before using those two xprvs and your other xpub to recreate your vault in a wallet such as Electrum.The second option is far easier, but not as secure. There is a fork of Coinbase's vault tool here (https://github.com/dlajarretie/multisig-tool) which replaces the now defunct BitPay API with BlockCypher's API which is still working just fine. However, I've never used this myself so cannot vouch for it. I've skimmed the code and it looks fine, but you will still be importing all your private keys on to an online computer with internet access, which is always a risk.I'm open to trying the Python script approach. Regarding the modification you mentioned, are you simply referring to replacing the USER_PUB and USER_SEED values in the script? Assuming the case, then I feel reasonably confident with the first approach. In any case, I'll try the first approach and let you know whether I'm able to successfully restore the wallet using Electrum afterwards.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "January 26, 2023, 11:15:53 PM",
+      "body": "Quote from: o_e_l_e_o on January 25, 2023, 09:24:59 AMOk. This is where things unfortunately are going to get rather complicated. Looking in to it a bit more, it appears that Coinbase don't just use the WIFs they give as normal WIFs like any other wallet does to generate a single private key. Instead, they use the WIFs to generate a seed to then generate a master private key. This is a very weird way of doing things and I'm not aware of any other wallet or service which does this.You have two option. The first is more secure but much more complicated. It will involve your airgapped computer, installing Linux, installing various Python tools, using those tools to decrypt your BIP38 encrypted key, and then following the instructions here (with a little modification) to generate your two xprvs, before using those two xprvs and your other xpub to recreate your vault in a wallet such as Electrum.The second option is far easier, but not as secure. There is a fork of Coinbase's vault tool here (https://github.com/dlajarretie/multisig-tool) which replaces the now defunct BitPay API with BlockCypher's API which is still working just fine. However, I've never used this myself so cannot vouch for it. I've skimmed the code and it looks fine, but you will still be importing all your private keys on to an online computer with internet access, which is always a risk.Not really from what they say in the readmeQuoteInternet connection is only required in Step 1, where you input the public keys, so that we can fetch the unspent outputs from your vault addresses.Before inputting your keys in Step 2 and signing the transaction you can safely go offline.In Step 3 you will get a signed transaction in raw hex form.You never have to go online with your public keys. You can do what you have to do online and then that machine never has to see the internet ever again. A live CD will work fine. There are even tools to read what the transaction says without going back online.Might work a bit better.Cannot vouch for any of it working since like you have not used it.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "January 28, 2023, 07:34:56 AM",
+      "body": "Quote from: DaveF on January 26, 2023, 11:15:53 PMQuoteInternet connection is only required in Step 1, where you input the public keys, so that we can fetch the unspent outputs from your vault addresses.Before inputting your keys in Step 2 and signing the transaction you can safely go offline.In Step 3 you will get a signed transaction in raw hex form.You never have to go online with your public keys.  I am guessing this is a simple typo. From the source you quoted, it's clear that you need to be online when importing public keys because the software needs to check if there are still any coins in the vault hiding behind those keys. But once that is done, you can apparently take the system offline while working with private keys and transaction signing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 28, 2023, 09:36:38 AM",
+      "body": "Quote from: markantoine on January 26, 2023, 08:58:13 PMI'm open to trying the Python script approach. Regarding the modification you mentioned, are you simply referring to replacing the USER_PUB and USER_SEED values in the script? Assuming the case, then I feel reasonably confident with the first approach. In any case, I'll try the first approach and let you know whether I'm able to successfully restore the wallet using Electrum afterwards.Not quite. The code that Andrew Chow has given there is in direct response to the user wanting to derive the individual private keys at index 14. You probably don't want individual keys like this and instead just want the master private keys which will let you recreate the entire vault alongside your already known master public keys.So yes, change USER_SEED and USER_PUB to your own values. You can then run the code as is, but it will output an extended private key at index 14 and a WIF key that you don't want. Make sure you use the keys it will give you entitled \"Master Private Key corresponding to seed\" and \"Master Public Key corresponding to seed\". Alternatively, just miss out the bottom two lines (print \"Extended Private... and print \"WIF format...).Quote from: DaveF on January 26, 2023, 11:15:53 PMNot really from what they say in the readmeAhh well spotted. Still a risk if you simply turn off your internet on your main OS for a short period though. OP should use a live OS instead, as you say.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "markantoine",
+      "created_time": "February 07, 2023, 06:02:01 AMLast edit: February 07, 2023, 06:56:53 AM by markantoine",
+      "body": "I tried running the modified script that Andrew Chow posted, however, it appears that the pybitcointools library has been deprecated.At this point, I'm open to trying the forked Coinbase recovery tool, though I'm not entirely certain how to run the tool locally. I'll try to figure it out myself how to do so, but any simple guidance you could provide would be greatly appreciated as well.Edit: I was able to successfully recover the funds from my old Coinbase multisig vault using the forked Coinbase tool (for anyone's reference: https://github.com/dlajarretie/multisig-tool)Thanks again for your help through all this, o_e_l_e_o",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "February 07, 2023, 12:54:03 PM",
+      "body": "Quote from: markantoine on February 07, 2023, 06:02:01 AMThanks again for your help through all this, o_e_l_e_oThat's great news, and more than happy to have helped. Thanks also for updating us with your solution so we can refer anyone else in the future to the same solution.For future reference, pybitcointools has a number of still maintained forks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "February 07, 2023, 01:14:29 PM",
+      "body": "@gmaxwell and @achow101 since this and a few other issues keep coming up again and again for the same wallets / services do you think a sticky post would be good?i.e. for conbase multisig vault look here for old multibit look there and so on.I have the link to this post saved but 18 months from now and I'm sure others do to now. But 18 months from now we as a group may or may not remember it.Just a thought.OP glad to see you got your BTC.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jadavault",
+      "created_time": "February 07, 2025, 10:13:30 PM",
+      "body": "Greetings,Unfortunately or fortunately, I still have a sum of bitcoin to recover from my multisig vault in Coinbase still (2025). It is visible in my Coinbase account but inaccessible on the user interface.I recognize the https://github.com/coinbase/multisig-tool no longer works.I have attempted to recover the sum by using the https://github.com/dlajarretie/multisig-tool. However, after decrypting, it states that the shared seed is incorrect even though I copy pasted it from the Coinbase site when they made it available to me back in roughly 2017.I reached out to Coinbase support today and requested that they verify the shared seed with me but they informed me that they cannot provide any information on multisig vault accounts at this time.The Coinbase rep told me this:\"However, you should be able to access your funds using the two keys you already control:1. Use your vault password and user seed to approve the withdrawal.2. If you don't know your vault password, use the user seed in the password field.3. Transfer funds to a non-multisig Bitcoin account within Coinbase.\"\"If you're unable to access your multisig vault through Coinbase, you may need to use third-party software not controlled by Coinbase to access the multisig address associated with your vault.The two keys I'm referring to are:1. Your vault password2. Your user seedThese are the two pieces of information you should have saved when you created your multisig vault. You can use either of these to approve a withdrawal from your multisig vault.\"Can anyone direct me to how I can create a withdrawal from the multisig vault in Coinbase? If not in Coinbase, how can I do this successfully with third-party software?I have my 3 public keys, shared seed, user seed, and vault password. However, I am not sure if the shared seed is correct or not, but it sounds possible to make the transfer regardless based on the response from the Coinbase rep.Many thanks for any assistance!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "conradbain",
+      "created_time": "March 02, 2025, 10:31:16 PM",
+      "body": "Hey JadaV, have you had any luck with your coingbase multisig?  I'm in the same predicament and looking for a solution..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jadavault",
+      "created_time": "March 17, 2025, 06:53:31 PM",
+      "body": "Quote from: conradbain on March 02, 2025, 10:31:16 PMHey JadaV, have you had any luck with your coingbase multisig?  I'm in the same predicament and looking for a solution..No luck yet. Still looking for an answer. I am also open to a consulting company or private company to make the withdrawal for a fee if there is a reliable firm out there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "March 19, 2025, 06:08:16 AM",
+      "body": "Quote from: jadavault on March 17, 2025, 06:53:31 PMQuote from: conradbain on March 02, 2025, 10:31:16 PMHey JadaV, have you had any luck with your coingbase multisig?  I'm in the same predicament and looking for a solution..No luck yet. Still looking for an answer. I am also open to a consulting company or private company to make the withdrawal for a fee if there is a reliable firm out there.Just to inform you, since that reply is quote old, he already replied to the other thread and explained that he's in the same situation and seem to have the correct credentials, but never replied with the result.Here's the link to his post: /index.php?topic=5316286.msg65120819#msg65120819For your case, only Coinbase can help since your decrypted \"Shared Seed\" mismatched any of the provided xpub,But they may be able to co-sign it with their own key instead so no other firm can help you with it, if there's someone offering their help, it's a scam.You can refer to my reply to your other post: /index.php?topic=5316286.msg65040157#msg65040157Additionally, providing the wrong xpub can also cause this but it shouldn't be a simple typo since it contains a checksum,e.g.: you've mistakenly written xpub keys of another wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

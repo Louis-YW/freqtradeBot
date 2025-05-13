@@ -1,0 +1,101 @@
+{
+  "id": "topic_5403472",
+  "title": "ardb",
+  "author": "ardb",
+  "created_time": "June 21, 2022, 12:18:05 PM",
+  "content": "I'd like to monitor some BTC address balances. Since bitcoin core does not provide such feature I was thinking about a separate electrummx server or something similar. But I see that these solutions require to have transaction indexing turned on and in consequence bitcoin core database cannot be pruned. Is there any open source solution I can use on a tiny server without the necessity of having a not-pruned node?It is acceptable for it to start with a full node for initial indexing but then I'd like it to update using pruned-node data. Any chance?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403472",
+  "comments": [
+    {
+      "author": "OmegaStarScream",
+      "created_time": "June 21, 2022, 12:21:11 PM",
+      "body": "Since you want to run this on a tiny server, I'm guessing that you're not expecting many requests? If so, why don't you just use some (free) block explorer API instead? Someone compiled a list not so long ago, I suggest you check it out: https://bitcointalk.org/index.php?topic=5386348.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "June 21, 2022, 12:40:20 PM",
+      "body": "Pruned node and \"any address' balance\" don't go together. But if you only have a clear fixed list of addresses you may have a chance.If the addresses are few, EPS may do.On EPS readme I've also found out about BWT, which may also be useful for you. I've never used it though.I'll add that I've had some small experience with EPS and I've found it unpleasant to set it up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 21, 2022, 12:45:37 PM",
+      "body": "Quote from: ETFbitcoin on June 21, 2022, 12:31:52 PMIf you have fixed list of address you want to watch, you can create watch only wallet and import the list of the address before you start sync process.You can also add a new watch-only address to a pruned node before it gets funded. Example:Code:importaddress 1NXYoJ5xU91Jp83XfVMHwwTUyZFK64BoAD theymos falseOkay, I'm cheating, the address above is funded already. Your pruned node will only know about new transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ardb",
+      "created_time": "June 21, 2022, 03:27:54 PM",
+      "body": "Quote from: NeuroticFish on June 21, 2022, 12:40:20 PMPruned node and \"any address' balance\" don't go together. But full UTXO database is still kept in chainstate DB in pruned node, isn't it?If so, what is the technical problem of making a sum for a given address?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "June 21, 2022, 04:34:12 PM",
+      "body": "Quote from: ardb on June 21, 2022, 03:27:54 PMQuote from: NeuroticFish on June 21, 2022, 12:40:20 PMPruned node and \"any address' balance\" don't go together. But full UTXO database is still kept in chainstate DB in pruned node, isn't it?If so, what is the technical problem of making a sum for a given address?My answer was based on the fact that whenever you change the wallet (not to a new one) in a pruned Bitcoin Core you have to download everything again.Also afaik getbalance returns 0 for addresses not in your wallet.However, when I've done more research I've found somewhat contradicting info.According to this answer, all UTXO are indeed kept in pruned data.While chainstate does contains the UTXOs, there are no addresses there, it's scriptPubKeys (and amounts) (see here and here)Clearly scriptPubKey doesn't necessarily translate to an address, but that may not be a big problem. Even more, a tutorial here tells how to extract the data.One show stopper may be the fact Level DB doesn't like concurrent access from multiple apps, hence you may have to use the chainstate while bitcoind is stopped, or keep a copy for the job...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 21, 2022, 04:54:45 PM",
+      "body": "Quote from: ardb on June 21, 2022, 03:27:54 PMBut full UTXO database is still kept in chainstate DB in pruned node, isn't it?I think so, yes.QuoteIf so, what is the technical problem of making a sum for a given address?You can try https://github.com/in3rsha/bitcoin-utxo-dump to dump all addresses and their balance. I haven't tested it myself, so use at your own risk.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ardb",
+      "created_time": "June 21, 2022, 07:52:42 PM",
+      "body": "Quote from: NeuroticFish on June 21, 2022, 04:34:12 PMAccording to this answer, all UTXO are indeed kept in pruned data.While chainstate does contains the UTXOs, there are no addresses there, it's scriptPubKeys (and amounts) (see here and here)Clearly scriptPubKey doesn't necessarily translate to an address, but that may not be a big problem. Even more, a tutorial here tells how to extract the data.One show stopper may be the fact Level DB doesn't like concurrent access from multiple apps, hence you may have to use the chainstate while bitcoind is stopped, or keep a copy for the job...Thanks! It looks promising. I'll try to run levelDB instance on working node data with chainstate directory exposed as read only.I suppose I need to discover how to recognize new records on updates and learn how to convert scripts to addresses.But luckily LoyceV linked something interesting...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "June 21, 2022, 10:45:04 PM",
+      "body": "If it's not yet been mentioned, bitcoinj works a bit like electrum but scans blocks received from Bitcoin nodes that it's able to connect to which might be something you could also look at too: https://bitcoin.org - I'm not sure it's too user friendly though as the last time I used it in its raw form it was only usable via the command line (I also only used it to convert a wallet file).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 22, 2022, 04:40:54 AM",
+      "body": "Quote from: NeuroticFish on June 21, 2022, 04:34:12 PMOne show stopper may be the fact Level DB doesn't like concurrent access from multiple apps, hence you may have to use the chainstate while bitcoind is stopped, or keep a copy for the job...Easy to circumvent. Just make a C library that exports the particular details that you need from the chainstate, and make the library a build-time dependency of Bitcoin Core, so that they get compiled together.So that accesses to LevelDB from your library will still use Bitcoin Core's internal locks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "June 22, 2022, 09:40:16 AM",
+      "body": "Quote from: ETFbitcoin on June 22, 2022, 09:34:45 AMAlternatively, copy chainstate directory somewhere else. It's easier and faster....Just if fresh / up-to-date values are important for OP he may have to do this either on every new block coming, either for each call he makes.It really depends on OP needs.From what I see OP wants to just do tests. If he goes on this route and wants to switch afterwards to full blockchain, and maybe txindex too, the effort done now may be for nothing.So now, with fresher head, I think that ardb should still consider going for full data from start.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 22, 2022, 10:44:58 AM",
+      "body": "I am going to go back to the point I made here about cheaply self hosting a node: https://bitcointalk.org/index.php?topic=5399730Can you do what the OP wants to save some $ on HD storage space? Yes.Will it cost them a lot of time trying to do it this way and if something changes will it cost them even more time to do it again since they don't have all the data? Yes.Just because you CAN does not mean you SHOULD.For a thought experiment fine. For someone who has been playing with crypto for years and knows what the real issues can be fine.But for real use, probably not.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "id": "topic_5459553",
+  "title": "Free Market Capitalist",
+  "author": "Free Market Capitalist",
+  "created_time": "July 12, 2023, 02:08:49 PM",
+  "content": "The double spending thing is not new to me, I have a certain idea but one thing I read has made me think and look for information about it:Quote from: JeromeTash on July 07, 2023, 09:18:52 PMIs there anyone who has ever lost Bitcoins to a double spend attack after 1 confirmation?  Personally, I have never come across such a case.With this thread I would like to raise doubts as well as expose what I think I understand because explaining also helps to learn.The first type of double spending I believe has little to do with what the quote raises, as it does not involve any miners. It is simply someone who sends a transaction with RBF enabled as payment for a product or service but receives such product or service before the transaction is confirmed and what they do is send that amount of Bitcoin to another address with a higher fee. Now let's move on to the hypothetical double spending that already involves some miner, in my opinion. I have searched a bit to see if there have been any cases of double spending after a confirmation and I haven't found anything either.I don't quite understand how this could happen. In theory a miner should somehow mine an invalid block in which there would be a transaction or transactions that we could not consider valid as such?It is clear to me that as more blocks are mined and in turn the previous blocks are reconfirmed, the probability of invalidation of the previous blocks increases, up to 6 confirmations, which are considered safe, leaving only the hypothetical case of the 51% attack as a threat, quite unlikely with Bitcoin.Can you help me understand what a double spend transaction that has already been confirmed once would look like?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459553",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "July 12, 2023, 02:13:44 PM",
+      "body": "There is no such thing as a double spending with confirmation. At any point in time, each chain should not have a scenario whereby the same inputs are being spent twice because that would violate protocol rules. The so-called one confirmation double spending that you might encounter would be when a longer chain supersedes another, where a transaction would belong to a stale chain and thereby abandoned. Take the following two scenario:Propagation of blocks across the network is not instantaneous. Take for example, a miner mines a block (Block A) and propagates it throughout the network. When the block is being propagated, another miner mines a block (Block B) at the same height and relays his. If another miner sees block A first, the miner would build their block ontop of Block A and the same goes for block B. If a miner happens to mine another block (Block A*) ontop of Block A, the block is relayed and chain containing Block A and A* would be the longest chain and thereby accepted by the network. In this case, if your transaction is included in Block B but not included in Block A, your transaction would become unconfirmed and returned to the mempool. However, if there is another competing transaction that is spending the same input as that transaction which is included in Block A or A*, your transaction would become invalid and thereby abandoned. The latter is commonly considered double spending.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Free Market Capitalist",
+      "created_time": "July 12, 2023, 02:17:32 PM",
+      "body": "Quote from: ranochigo on July 12, 2023, 02:13:44 PMThere is no such thing as a double spending with confirmation. At any point in time, each chain should not have a scenario whereby the same inputs are being spent twice because that would violate protocol rules. The so-called one confirmation double spending that you might encounter would be when a longer chain supersedes another, where a transaction would belong to a stale chain and thereby abandoned.Well, I would like to try to understand it in a more practical way as follows: I am a miner, or whoever, and I want to try to scam someone with a transaction that is confirmed once. How could I do it? Does it make sense what I am saying?It's just that it's clear to me how you can try to scam someone with an unconfirmed transaction, with RBF enabled, as I commented before, but not this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "July 12, 2023, 02:24:28 PM",
+      "body": "Once a transaction is confirmed, to double spend it would be difficult and not likely to occur. The only means it can occur is when the transaction become unconfirmed after chain reorg as ranochigo explained it. For this not to happen, wait for at least 6 confirmations.If you want to know more about chain reorg: https://learnmeabitcoin.com/technical/chain-reorganisation",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 12, 2023, 02:26:05 PMLast edit: July 12, 2023, 02:36:31 PM by ranochigo",
+      "body": "Quote from: Poker Player on July 12, 2023, 02:17:32 PMWell, I would like to try to understand it in a more practical way as follows: I am a miner, or whoever I want to try to scam someone with a transaction that is confirmed once. How could I do it? Does it make sense what I am saying?Sorry, edited my post a bit to reflect what I am talking about.My scenario describes a process where it can happen naturally (ie. occurs in a non-malicious intent). It has happened at least once: https://medium.com/deribitofficial/was-there-a-bitcoin-double-spend-on-jan-20-2021-45bdbd178c58. Note that your number confirmation is in the perspective of which chain you're looking at. Hence, with the malicious intent, this is what an adversary would do given that he owns a significant portion of the hashrate.1) You send a transaction to Person A, and the transaction is included in block 883, hence both of you see 1 confirmation.2) As a miner, you can build an alternate chain ontop of Block 882 which does not include that transaction BUT includes another transaction which sends the coins back to yourself. In that alternate chain, you try to find a valid hash of block 883 and a block 884, while including the malicious transaction in your block 883 and mining another block on top of that. If you can do so, you can propagate that chain and the network accepts your alternate chain because it is the longest chain. 3) Because your new longest chain does not contain the transaction that you've sent originally but it contains the new transaction for which you spent the same inputs back to yourself, the original transaction becomes invalid and the rest of the network mines on your new chain and you've successfully reversed a 1 conf transaction.Note that anything below 6 confirmations doesn't require 51% of the network, in theory. You are always trying to outpace the honest miners by mining blocks and building a longer chain than them. Luck becomes a less significant factor at 6 conf. Hence, the probability of you outpacing the honest miners increases with a higher hashrate and at 51% of the hashrate, you will always win.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Free Market Capitalist",
+      "created_time": "July 12, 2023, 02:40:27 PM",
+      "body": "Quote from: ranochigo on July 12, 2023, 02:26:05 PMSorry, edited my post a bit to reflect what I am talking about.hashrate, you will always win.Yeah, I have noticed that you have added two rather clarifying paragraphs.Quote from: ranochigo on July 12, 2023, 02:26:05 PMMy scenario describes a process where it can happen naturally (ie. occurs in a non-malicious intent). It has happened at least once: https://medium.com/deribitofficial/was-there-a-bitcoin-double-spend-on-jan-20-2021-45bdbd178c58. Note that your number confirmation is in the perspective of which chain you're looking at. Hence, with the malicious intent, this is what an adversary would do given that he owns a significant portion of the hashrate...In other words, in the scenario without malicious intent, it is rare that someone has actually attempted a double spend because it is extremely unlikely to happen and trying to guess when it might happen is like trying to guess the lottery numbers. Or even less likely.*I mean the person has not tried to double spend. As said in the article:QuoteWe call this a double-spend not because a user has been double spent, but an input to the transaction has.And the malicious case, I see it as a fairly high level of conspiracy in addition to having the luck that miner to mine the blocks he needs, so that probability is almost 0 as I see it and it would only be worth trying with large amounts of bitcoins. Even more difficult and unlikely with 2 or 3 confirmations.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 12, 2023, 02:43:40 PM",
+      "body": "Quote from: Poker Player on July 12, 2023, 02:40:27 PMIn other words, in the scenario without malicious intent, it is rare that someone has actually attempted a double spend because it is extremely unlikely to happen and trying to guess when it might happen is like trying to guess the lottery numbers. Or even less likely.Yeah probably, and propagation time for blocks has gotten so much quicker in the recent years. There were accidents though, see the article I linked.Quote from: Poker Player on July 12, 2023, 02:40:27 PMAnd the malicious case, I see it as a fairly high level of conspiracy in addition to having the luck that miner to mine the blocks he needs, so that probability is almost 0 as I see it and it would only be worth trying with large amounts of bitcoins. Even more difficult and unlikely with 2 or 3 confirmations.If you have a high amount of hashrate, it is totally possible. If not, trying to build on a potentially stale chain would be a giant waste of money. Without a significant amount of hashrate or the network being in your favour, your chances of mining consecutive blocks would be close to zero.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 13, 2023, 07:52:28 AM",
+      "body": "Quote from: Poker Player on July 12, 2023, 02:08:49 PMIt is simply someone who sends a transaction with RBF enabled as payment for a product or service but receives such product or service before the transaction is confirmed and what they do is send that amount of Bitcoin to another address with a higher fee.With full RBF becoming more commonplace, this attack is becoming possible with any transaction, whether or not it is opted in to RBF.You might also be interested to read this post, which describes how a miner can double spend a transaction with one confirmation: https://bitcointalk.org/index.php?topic=36788.msg463391#msg463391. It is essentially the same scenario described by ranochigo above where there are two competing blocks at the same height, with some of the network working on one and some of the network working on the other, but the scenario has been deliberately engineered in order to give the attack the highest chance of success. The advantage of this method for the attacker is they do not need a large amount of the hashrate as you only need to mine a single block to attempt the attack.Quote from: ranochigo on July 12, 2023, 02:26:05 PMNote that anything below 6 confirmations doesn't require 51% of the network, in theory. You are always trying to outpace the honest miners by mining blocks and building a longer chain than them. Luck becomes a less significant factor at 6 conf. Hence, the probability of you outpacing the honest miners increases with a higher hashrate and at 51% of the hashrate, you will always win.Anything above 6 confirmations doesn't require 51% of the hashrate either. Even with, say, 30% of the hashrate, you still have a 4.2% chance of reversing 10 confirmations and a 0.2% chance of reversing 20 confirmations.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 13, 2023, 08:05:05 AM",
+      "body": "Quote from: o_e_l_e_o on July 13, 2023, 07:52:28 AMWith full RBF becoming more commonplace, this attack is becoming possible with any transaction, whether or not it is opted in to RBF.You might also be interested to read this post, which describes how a miner can double spend a transaction with one confirmation: https://bitcointalk.org/index.php?topic=36788.msg463391#msg463391. It is essentially the same scenario described by ranochigo above where there are two competing blocks at the same height, with some of the network working on one and some of the network working on the other, but the scenario has been deliberately engineered in order to give the attack the highest chance of success. The advantage of this method for the attacker is they do not need a large amount of the hashrate as you only need to mine a single block to attempt the attack.The caveat being that the amount that you're depositing has to be more than your block reward at least for the attack to the worthwhile. Given how well the mining pools are connected to each other, it's unlikely that your block would be able to propagate faster than them so the scenario whereby your block gets stale is much more likely. The minimum cost for this attack would likely be more than the block reward, if you were to factor everything in.It would also fail if the person receiving the funds sees the other block first with how the topology of Bitcoin network is designed. A more worthwhile attack would be the selfish mining, where an attacker tries to withhold and generate blocks faster than the rest.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 13, 2023, 08:19:57 AM",
+      "body": "Quote from: ranochigo on July 13, 2023, 08:05:05 AMThe caveat being that the amount that you're depositing has to be more than your block reward at least for the attack to the worthwhile.Of course. And a lot of such centralized services require 3 or more confirmations before crediting your deposit or allowing you to request a withdrawal, which renders the attack useless.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Free Market Capitalist",
+      "created_time": "July 13, 2023, 01:49:43 PM",
+      "body": "Quote from: o_e_l_e_o on July 13, 2023, 07:52:28 AMYou might also be interested to read this post, which describes how a miner can double spend a transaction with one confirmation: https://bitcointalk.org/index.php?topic=36788.msg463391#msg463391. Nice read. I have taken the opportunity to read the thread as well, from twelve years ago. In the end, the conclusion I reach with this thread is the same as the one reached by a forum member in that thread. Basically that making such scam attempts could only cross the mind of a miner with large amounts:Quote from: indio007 on August 15, 2011, 05:08:19 AMI think it's more profitable to stay honest and rake in all those fees than try to spoof the block chain. Especially if it works and they get caught.Bitcoin will be declared worthless by the world.And the one who answered him I think he was wrong:Quote from: cunicula on August 15, 2011, 06:35:44 AMFor now. In future years, generation rates will become low and fees will remain meager. Alternative revenue models will become more attractive.Apart from that: Quote from: ranochigo on July 13, 2023, 08:05:05 AMThe caveat being that the amount that you're depositing has to be more than your block reward at least for the attack to the worthwhile. Given how well the mining pools are connected to each other, it's unlikely that your block would be able to propagate faster than them so the scenario whereby your block gets stale is much more likely. The minimum cost for this attack would likely be more than the block reward, if you were to factor everything in.It would also fail if the person receiving the funds sees the other block first with how the topology of Bitcoin network is designed. A more worthwhile attack would be the selfish mining, where an attacker tries to withhold and generate blocks faster than the rest.I think that for a miner to think seriously about that nowadays it should be quite a bit more than block reward, I believe you here think in mathematics only. If a miner can earn $170K or more by mining a block honestly, why would he try to scam someone for only $180K? That someone might later try to track him down to get revenge for the scam or be reported and wanted by the police.With these considerations I conclude that this type of attempts, although possible, are quite improbable nowadays. In the thread cited by o_e_l_e_o perhaps the case that the OP tells is a case of this style, but the price at that time was like $1, and the block reward of 50 Bitcoins. It would be worth a dishonest miner's while to try for a few thousand dollars. Plus there were more individual miners, mining from a laptop from home, it wasn't as concentrated as it is now. This is the reading I make, although obviously I am aware that I know much less about the subject than you do and I am open to your clarifications and corrections.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "July 13, 2023, 02:20:56 PM",
+      "body": "I don't think it will happen ever ever never.But if someone has access to Foundry pool back end  it is possible.Foundry mines 25% of all blocks. So 144 x 6.25 x .25 = 225 coinsI do not have enough hash to use foundry as you need 20ph in hash.I do not know how often they pay coins.But the earn 225 coins a day.  So if they pay daily 225 coins = about 7 million.The pool would need to pay 225 btc all miners then pay 225 btc to a new hidden btc address and have the above cases play out.Its only 7 million dollars and unless it was done back door and full remote the person would likely be caught.I think that we won't see this happening as it would be easier to simply take the coins since you have wallet access anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 13, 2023, 02:48:15 PM",
+      "body": "Quote from: Poker Player on July 13, 2023, 01:49:43 PMIf a miner can earn $170K or more by mining a block honestly, why would he try to scam someone for only $180K? That someone might later try to track him down to get revenge for the scam or be reported and wanted by the police.I think the larger consideration is what if the scam doesn't work? Given how interconnected the network is today, and how quickly blocks spread, it is difficult to pull off. It is also trivial for the target to learn about chain split, and there are plenty of blockchain explorers and other entities out there which operate multiple nodes and can easily send alerts about chain split within a second or two of it happening. Given this, is it worth sacrificing a guaranteed $170k for a very small chance at $180k? Obviously not. You would need to be dealing with values which were multiple times higher than the current block reward, and as soon as you start talking about depositing 20+ BTC then no service in their right mind is going to accept only one confirmation.Quote from: philipma1957 on July 13, 2023, 02:20:56 PMIts only 7 million dollars and unless it was done back door and full remote the person would likely be caught.The pool would effectively be committing suicide. No miner is going to continue to mine on a pool they know are attempt to pull off a scam and are sacrificing block rewards (i.e. the miner's income) for the pool's own personal profit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 13, 2023, 03:57:17 PM",
+      "body": "Quote from: ranochigo on July 12, 2023, 02:13:44 PMThere is no such thing as a double spending with confirmation.Pardon me, but I understand double-spending as: spending money more than once. Sure, I can't spend the same input twice as it would violate the protocol rules, but if spend it once, reorg the chain, and re-spend it, it'd be perfectly valid from a protocol point of view.Quote from: philipma1957 on July 13, 2023, 02:20:56 PMBut if someone has access to Foundry pool back end  it is possible.It's possible regardless of the intentions. But even if the back end of Foundry was compromised, I think it'd be less damaging for the hacker to simply withdraw their coins. I mean, a 51% attack would be suicidal.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 13, 2023, 04:03:42 PM",
+      "body": "Quote from: BlackHatCoiner on July 13, 2023, 03:57:17 PMPardon me, but I understand double-spending as: spending money more than once. Sure, I can't spend the same input twice as it would violate the protocol rules, but if spend it once, reorg the chain, and re-spend it, it'd be perfectly valid from a protocol point of view.Yes, you are right.However, note that by definition, double spending is being able to spend your inputs more than once. Bitcoin uses blockchain which by design doesn't allow that because a single chain can't have the inputs being spent twice. If you were to go by that definition, double spending doesn't exist in Bitcoin. If you were to consider Bitcoin as something with multiple states (which rightfully it can be) and taking it as a system with multiple possible chains, then you can spend the coins multiple times, just not on the same chain.Now, the definition has evolved into those that we have discussed which can involve multiple chains, but if you were to consider only a single chain and state, then it doesn't make sense. Only one transaction that spends a specific input can exist in that chain (and thus having a confirmation) , not two different transactions with confirmations.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 13, 2023, 04:59:48 PM",
+      "body": "Quote from: ranochigo on July 13, 2023, 04:03:42 PMOnly one transaction that spends a specific input can exist in that chain (and thus having a confirmation) , not two different transactions with confirmations.By that definition, then sure, there cannot ever be a chain with a single input being spent twice, but that isn't the only way to double-spend money. It's entirely possible for the chain to mark the coin as spent, then mark it as unspent, and the again as spent. That's obviously double-spending.I think we're arguing on semantics. The Bitcoin protocol is a solution to the double-spending problem, as long as there's a condition that is being met, and that condition isn't to merely check for transactions double-spending, but to not having a malicious chain reorg.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dzungmobile",
+      "created_time": "July 14, 2023, 09:44:15 AM",
+      "body": "Quote from: ranochigo on July 12, 2023, 02:26:05 PMNote that anything below 6 confirmations doesn't require 51% of the network, in theory. You are always trying to outpace the honest miners by mining blocks and building a longer chain than them. Luck becomes a less significant factor at 6 conf. Hence, the probability of you outpacing the honest miners increases with a higher hashrate and at 51% of the hashrate, you will always win.Having bigger hashrate will increase chance to do it successfully. With same hashrate, with a more confirmations, chance to succeed with such attacks is smaller.How many Bitcoin confirmations is enough?Bitcoin confirmation risk calculators.https://github.com/jlopp/bitcoin-confirmation-risk-calculatorhttps://web.archive.org/web/20181231045818/https://people.xiph.org/~greg/attack_success.htmlGeneral advice from Jameson LoppQuote1 confirmation: sufficient for small payments less than $1,000.3 confirmations: for payments $1,000 - $10,000. Most exchanges require 3 confirmations for deposits.6 confirmations: good for large payments between $10,000 - $1,000,000. Six is standard for most transactions to be considered secure.10 confirmations: suggested for large payments greater than $1,000,000.If you don't move very big fund, 3 confirmations are enough and waiting times for 2 confirmations can be smaller than 20 minutes, like within 2 or 3 minutes. Sometimes two blocks are found quickly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 14, 2023, 10:04:06 AM",
+      "body": "Quote from: dzungmobile on July 14, 2023, 09:44:15 AMIf you don't move very big fund, 3 confirmations are enough and waiting times for 2 confirmations can be smaller than 20 minutes, like within 2 or 3 minutes. Sometimes two blocks are found quickly.If you're moving more than a million dollars, I think you should wait as much as it is financially discouraged to have your transaction reversed. For instance, if you're moving $10M, then 6 confirmations aren't enough as 6 blocks are valuated at about 37.5 BTC ~= $1.1M. To be confident there is no such incentive, you should wait for x blocks, where x satisfies: x*block_reward > transaction_value. It doesn't completely remove the incentive one might have to rob you that way; it depends on what you're exchanging.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dzungmobile",
+      "created_time": "July 15, 2023, 10:55:22 AM",
+      "body": "Quote from: BlackHatCoiner on July 14, 2023, 10:04:06 AMIf you're moving more than a million dollars, I think you should wait as much as it is financially discouraged to have your transaction reversed. For instance, if you're moving $10M, then 6 confirmations aren't enough as 6 blocks are valuated at about 37.5 BTC ~= $1.1M. To be confident there is no such incentive, you should wait for x blocks, where x satisfies: x*block_reward > transaction_value. It doesn't completely remove the incentive one might have to rob you that way; it depends on what you're exchanging. You have a good stance on it and it makes sense too.I quoted that recommendation from Jameson Lopp, it's not mine. Honestly, if I want to move $1M through Bitcoin network, I will not do it in a single transaction. I will split it into some transactions and I even do it in different days. Black swan events, attacks on the network won't stay too long and by splitting my fund on the move into different transactions and days, I will reduce the risk.If I move it in only one transaction, when shit happens, I lose all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 15, 2023, 02:17:59 PM",
+      "body": "Quote from: o_e_l_e_o on July 13, 2023, 07:52:28 AMAnything above 6 confirmations doesn't require 51% of the hashrate either. Even with, say, 30% of the hashrate, you still have a 4.2% chance of reversing 10 confirmations and a 0.2% chance of reversing 20 confirmations.I tried, but got different numbers. How did you calculate this?Either way, it's very costly. You'd risk losing 6 blocks (of 6.25 Bitcoin block reward plus transaction fees each) for a 4% chance of reversing a transaction. That means it costs tens of millions of dollars on average to pull this off.Quote from: ranochigo on July 13, 2023, 08:05:05 AMQuote from: o_e_l_e_o on July 13, 2023, 07:52:28 AMYou might also be interested to read this post, which describes how a miner can double spend a transaction with one confirmation: https://bitcointalk.org/index.php?topic=36788.msg463391#msg463391.The caveat being that the amount that you're depositing has to be more than your block reward at least for the attack to the worthwhile.It's nice to read how simple things in 2011 were: I assume the guy was talking about a very large deposit (in Bitcoin), followed by a very quick withdrawal (after 1 confirmation). Nowadays, nobody in their right mind accepts such a deposit right after 1 confirmation.Quote from: vector76 on August 17, 2011, 05:37:56 PMEventually, I succeed in creating a valid block.  I do not broadcast it immediately, but instead I wait until someone else mines a blockVector76 didn't even mention the loss of a block (back then worth about $500) if his plan failed and his block become orphaned.Nowadays this means you're gambling with a $200,000 block reward.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

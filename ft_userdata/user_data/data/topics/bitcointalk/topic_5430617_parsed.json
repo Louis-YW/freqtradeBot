@@ -1,0 +1,125 @@
+{
+  "id": "topic_5430617",
+  "title": "yoshimitsu777",
+  "author": "yoshimitsu777",
+  "created_time": "December 20, 2022, 06:47:43 PM",
+  "content": "it should be possible but i did not find a python lib that supports this kind of data extraction any clues?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5430617",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 20, 2022, 08:47:41 PM",
+      "body": "I'm not a cryptography expert, but I know that you can't do that with just the signature. You need at least the signature and the message that was signed (curve details asides). If there's no library that does this operation (I highly doubt, but if), you'll have to implement the paragraph 4.1.6 from this paper: https://www.secg.org/sec1-v2.pdf. You're already starting to sweat, I can feel it. You better do some good search for already implemented code.  How about this?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 21, 2022, 04:16:22 AM",
+      "body": "Look inside any bitcoin library that has the \"message verification\" function implemented (which is almost all of them) then follow that code to find a method that performs public key recovery using the signature and the message (hash) before it verifies the signature against that public key. That is how you recover public keys from ECDSA signatures.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "December 25, 2022, 08:37:38 AMLast edit: December 25, 2022, 06:19:42 PM by yoshimitsu777",
+      "body": "i stumbled over bit which is very fast.can I use bit library for this task? https://github.com/ofek/bit/search?q=signatureI do not think it work with bit right?maybe python-ecdsa and keys.py but i have no clue how to run and use it.any example?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "riceberryrice",
+      "created_time": "December 26, 2022, 05:23:53 AM",
+      "body": "use thishttps://github.com/Sean-Bradley/ECDSA_secp256k1_JordonMatrix_nodejshttps://asecuritysite.com/ecdsa/ecdsa_recpub",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 26, 2022, 08:11:08 AMLast edit: December 26, 2022, 04:48:02 PM by citb0in",
+      "body": "Quote from: riceberryrice on December 26, 2022, 05:23:53 AMuse thishttps://asecuritysite.com/ecdsa/ecdsa_recpubMy understanding is that the example demonstrated is not what OP is looking for. In the example shown, the private key is created first and everything that follows is based on it. But the OP does not know the private key, he wants to extract the pubkey from an existing signature without knowing the private key.@yoshimitsu777: have a look at https://pypi.org/project/secp256k1/, there is a function \"recpub\" which you can use comfortably and it does exactly what you are looking for. Example:Code:$ python -m secp256k1 recpub \\ -s 515fe95d0780b11633f3352deb064f1517d58f295a99131e9389da8bfacd64422513d0cd4e18a58d9f4873b592afe54cf63e8f294351d1e612c8a297b5255079 \\ -i 1 \\ -m helloQuotePublic key: 02477ce3b986ab14d123d6c4167b085f4d08c1569963a0201b2ffc7d9d6086d2f3I do not understand what the switch -i 1 stands for, but the result seems to be correct. I tried to implement the whole thing in Python using the ecdsa library. Here is my approach:Code:#!/usr/bin/env python3# 2022-Dec-26 by citb0inimport hashlibfrom ecdsa import SigningKey, VerifyingKey, SECP256k1from ecdsa.util import sigencode_der, sigdecode_der# private key in hex, 32 bytesprivateKeyHex = \"2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b\"# convert private key from hex to bytesprivateKeyBytes = bytes.fromhex(privateKeyHex)# create a SigningKey object of the private keyprivateKey = SigningKey.from_string(privateKeyBytes, curve=SECP256k1)# get the associated public keypublicKey = privateKey.get_verifying_key()# message to signmessage = \"hello\"# calculate the hash of that messagemessageHash = hashlib.sha256(message.encode(\"utf-8\")).digest()# create the signaturesignature = privateKey.sign(messageHash, sigencode=sigencode_der)# encode signatur in hexsignatureHex = signature.hex()# show some outputprint(f\"privKey in hex: {privateKeyHex}\")print(f\"SigningKey object: {privateKey}\")print(f\"pubKey in hex: {publicKey}\")print(f\"message: {message}\")print(f\"messageHash: {messageHash}\")print(f\"Signature: {signature}\")print(f\"Signature in hex: {signatureHex}\") # output is \"3045022075ace5b099991073ef11947127249d0c43f16e1069762360ae1b892b13aeffb50221009792e26181f84f1882944626f669fdfc8eb0c63e80058e498ff56ee5ac1e6041\" but is wrong# the correct and expected signatureHex should be:signatureHex = \"304502210095ade2b0fd9caa90e4993e59232b774e4dc2082fdb8a30267abf21fc6a076715022016d762b4a23e30e8151f2852e88f6beebe65290266aafbbd0cbf2c1f6b3dc78c\"print(f\"correct signature in hex should be: {signatureHex}\")# verify signature with pubKeytry:    publicKey.verify(signature, message, hashlib.sha256, sigdecode=sigdecode_der)    print(\"Signature is valid.\")except:    print(\"Invalid signature!\")Unfortunately, the generated signature is not correct, I would have expected something else. Even if I write the correct signature into the variable, I still get \"Invalid signature\" as error message.Where do I have a (thinking) error ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 02, 2023, 09:36:03 AM",
+      "body": "Quote from: riceberryrice on December 26, 2022, 05:23:53 AMhttps://asecuritysite.com/ecdsa/ecdsa_recpubis this available for python?thanks citb0in but i get the same error as you.yes you are right.i do now know the private key only signature and message and the address.how can we fix this to have a python program that can make this conversion to pubkey without knowing the private key?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "January 02, 2023, 01:46:44 PM",
+      "body": "Quote from: yoshimitsu777 on January 02, 2023, 09:36:03 AMQuote from: riceberryrice on December 26, 2022, 05:23:53 AMhttps://asecuritysite.com/ecdsa/ecdsa_recpubis this available for python?thanks citb0in but i get the same error as you.yes you are right.i do now know the private key only signature and message and the address.how can we fix this to have a python program that can make this conversion to pubkey without knowing the private key?you mean RSZ to pubkey ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 02, 2023, 02:21:26 PM",
+      "body": "i dont know what RSZ is.i have signature,message and bitcoin address.i want pubkey, if possible in small python script",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "January 02, 2023, 02:32:17 PM",
+      "body": "Quote from: yoshimitsu777 on January 02, 2023, 02:21:26 PMi dont know what RSZ is.i have signature,message and bitcoin address.i want pubkey, if possible in small python scriptwrite hereyou have information , which you want convert to pubkey",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "January 02, 2023, 02:32:41 PM",
+      "body": "Quote from: brainless on January 02, 2023, 02:32:17 PMQuote from: yoshimitsu777 on January 02, 2023, 02:21:26 PMi dont know what RSZ is.i have signature,message and bitcoin address.i want pubkey, if possible in small python scriptwrite hereyou have information , which you want convert to pubkeywritesignature,message and bitcoin address",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 02, 2023, 02:49:05 PM",
+      "body": "Bitcoin address: \"1NLbHuJebVwUZ1XqDjsAyfTRUPwDQbemfv\"Message: \"Hello, world!\"Signature: \"HxhJdJzdl0W7TeL/GWJ2bCp5gGE+kLNhRfZYKfPhQdWWcuGXkWx3W60lvCM/3bfnwdYL58ZNCcx4sgohPkCrwH4=\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "January 02, 2023, 03:25:36 PM",
+      "body": "Quote from: yoshimitsu777 on January 02, 2023, 02:49:05 PMBitcoin address: \"1NLbHuJebVwUZ1XqDjsAyfTRUPwDQbemfv\"Message: \"Hello, world!\"Signature: \"HxhJdJzdl0W7TeL/GWJ2bCp5gGE+kLNhRfZYKfPhQdWWcuGXkWx3W60lvCM/3bfnwdYL58ZNCcx4sgohPkCrwH4=\"long time ago i converted sign messages to transaction , RSZ generate, and then to pubkey, need to find python scripts inside my big bank, you may study this old topic herehttps://bitcointalk.org/index.php?topic=5192074.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 03, 2023, 08:31:39 AM",
+      "body": "did you find? still looking for helpful answers.anybody knows if secp256k1 from iceland can be used for this task?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 05, 2023, 03:55:31 PM",
+      "body": "Quote from: citb0in on December 26, 2022, 08:11:08 AM@yoshimitsu777: have a look at https://pypi.org/project/secp256k1/, there is a function \"recpub\" which you can use comfortably and it does exactly what you are looking for. Example:Code:$ python -m secp256k1 recpub \\ -s 515fe95d0780b11633f3352deb064f1517d58f295a99131e9389da8bfacd64422513d0cd4e18a58d9f4873b592afe54cf63e8f294351d1e612c8a297b5255079 \\ -i 1 \\ -m helloPublic key: 02477ce3b986ab14d123d6c4167b085f4d08c1569963a0201b2ffc7d9d6086d2f3but how works?look my message and signature isQuote from: yoshimitsu777 on January 02, 2023, 02:49:05 PMBitcoin address: \"1NLbHuJebVwUZ1XqDjsAyfTRUPwDQbemfv\"Message: \"Hello, world!\"Signature: \"HxhJdJzdl0W7TeL/GWJ2bCp5gGE+kLNhRfZYKfPhQdWWcuGXkWx3W60lvCM/3bfnwdYL58ZNCcx4sgohPkCrwH4=\"this is not accepted by tool i get errorCode:python3 -m secp256k1 recpub -s HxhJdJzdl0W7TeL/GWJ2bCp5gGE+kLNhRfZYKfPhQdWWcuGXkWx3W60lvCM/3bfnwdYL58ZNCcx4sgohPkCrwH4= -i 1 -m \"Hello, world!\"Traceback (most recent call last):  File \"/usr/lib/python3.10/runpy.py\", line 196, in _run_module_as_main    return _run_code(code, main_globals, None,  File \"/usr/lib/python3.10/runpy.py\", line 86, in _run_code    exec(code, run_globals)  File \"/home/yin4/.local/lib/python3.10/site-packages/secp256k1/__main__.py\", line 7, in <module>    main()  File \"/home/yin4/.local/lib/python3.10/site-packages/secp256k1/__init__.py\", line 543, in main    sys.exit(_main_cli(args, sys.stdout, enc))  File \"/home/yin4/.local/lib/python3.10/site-packages/secp256k1/__init__.py\", line 491, in _main_cli    sig_raw = bytes(bytearray.fromhex(args.signature))ValueError: non-hexadecimal number found in fromhex() arg at position 0please somebody explain what is correct way to use this tool correctly.do i need to convert signature to something else before input into command line?where do i enter bitcoin address?please show instruction",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

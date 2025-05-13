@@ -1,0 +1,29 @@
+{
+  "id": "topic_5400652",
+  "title": "coolbits",
+  "author": "coolbits",
+  "created_time": "May 29, 2022, 07:40:45 PM",
+  "content": "Mods: please move it somewhere if it does not belong here. Couldn't find a better suited subforum.I'm writing a trading engine and am right now at the point where I am implementing Stop-limit order logic.I have a simple question:Let L1 be a taker limit order that a customer just submitted, and it matches a maker book order.Let SL1 and SL2 stop-limit orders with a stop price that will be triggered by the execution of L1.Let SL3 a stop-limit order with a stop price that will be triggered by the execution of SL1SL3 has been created BEFORE SL2.The cascade of stop price triggering would look like that.Code:                       L1                       |                  SL1--|--SL2                   |                  SL3Question 1: Which one should be executed first, SL2 or SL3 ?  (remember, SL3 is an older order than SL2)Question 2: If we do not take into account the date of order creation at all, should I execute vertically down first, or fill the orders horizontally first, then go down a level?Question 3: Forget SL3. Generally speaking, how do we pick the first order to be executed between SL1 and SL2? Creation time, stop price, or a combination of both? Or some other factor?Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400652",
+  "comments": [
+    {
+      "author": "noorman0",
+      "created_time": "May 30, 2022, 12:47:19 PM",
+      "body": "1. If you follow the general rule with the condition that all SL orders are in the same trading pair and the trigger price is the same, then the first executed is by date/time (older date is executed first).2. If so, then see which order is triggered first at the current price. In your scenario, the order that triggers another order is the one that gets executed first.3. Creation time.Anyway, your scenario is confusing. How can an SL order be triggered by another new order that hasn't been created yet?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "coolbits",
+      "created_time": "May 30, 2022, 02:47:47 PM",
+      "body": "Thanks for your reply.When I say X has been created before Y, it doesn't mean Y isn't created yet. It's just \"younger\".I think you might have missed my actual question. In my scenario, a Limit order L1 is created and happens to match something in the order book. It could have been a Market order, doesn't really matter.A trade happens, the mark price changes, and it triggers two SL orders (SL1 and SL2).SL1 gets priority as it is older than SL2.SL1 gets matched, it again happens to produce a trade, further changing the mark price.That second mark price change triggers SL3.Now I have SL2 and SL3 that need to be matched. My question is, which of them should be matched first?SL3 is an older order than SL2, but SL2 has been triggered before SL3 (by the very first trade).Obviously they don't have the same stop price (or both would have been triggered by the first trade).So should I match SL3 first (it's older than SL2), or should I match SL2 first (it has been triggered first)?I have a gut feeling that there's no dogmatic wisdom there and an exchange may do it one way or the other, but thought I'd ask.Never thought writing a trading engine would be so freaking hard :p",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "topic_5403115",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "June 18, 2022, 04:19:36 PM",
+  "content": "As far as I know, with Core you can only create transaction with createrawtransaction. But, from what I can see in the examples, you can either create a script that pays to an address or to an OP_RETURN. My question is, can you create custom scripts with createrawtransaction, besides those four?Code:OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG (for P2PKH)OP_HASH160 <redeemScriptHash> OP_EQUAL (for P2SH)OP_0 OP_PUSHBYTES_20 <witnessScriptHash> (for P2WSH)OP_RETURN <data>",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403115",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "June 19, 2022, 04:20:39 AM",
+      "body": "send RPC call has a parameter in the JSON dictionary of the first argument to allow you to specify arbitrary hex data for an address (which I assume represents a locking script).You can see for yourself in the documentation:Quotesend [{\"address\":amount},{\"data\":\"hex\"},...] ( conf_target \"estimate_mode\" fee_rate options )                                                                                                                                                                                                               EXPERIMENTAL warning: this call may be changed in future releases.                                                                                    Send a transaction.                  Arguments:                           1. outputs                               (json array, required) The outputs (key-value pairs), where none of the keys are duplicated.                                         That is, each address can only appear once and there can only be one 'data' object.                                         For convenience, a dictionary, which holds the key-value pairs directly, is also accepted.     [                                      {                                 (json object)                                                                                                         \"address\": amount,              (numeric or string, required) A key-value pair. The key (string) is the bitcoin address, the value (float or string) is the amount in BTC       },                                   {                                 (json object)                                                                                                         \"data\": \"hex\",                  (string, required) A key-value pair. The key must be \"data\", the value is hex-encoded data       },                                   ...                                ]...etcAs you can see, it does not specifically define the function of \"data\", nor gives any examples that use it, so this is my best-guess assumption.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 19, 2022, 04:37:08 AM",
+      "body": "Quote from: BlackHatCoiner on June 18, 2022, 04:19:36 PMBut, from what I can see in the examples, you can either create a script that pays to an address or to an OP_RETURN.My question is, can you create custom scripts with createrawtransaction, besides those four?My assumption is the \"data\" key-value pair in the output is just OP_RETURN, it wont process scripts;Reason is, it automatically prepend 0x6A to the value which is OP_RETURN.The \"address\" key-value pair will only take addresses and the amount to be sent.Quote from: BlackHatCoiner on June 18, 2022, 04:19:36 PM-Title-If you want to spend a custom script's UTXO, its txid and vout should be entered in the inputs array of createrawtransaction,then indicate the custom \"scriptPubKey\", \"redeemScript\" or \"witnessScript\" in prevtxs when signing the transaction: signrawtransactionwithkey",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 19, 2022, 01:07:15 PM",
+      "body": "Quote from: NotATether on June 19, 2022, 04:20:39 AMsend RPC call has a parameter in the JSON dictionary of the first argument to allow you to specify arbitrary hex data for an address (which I assume represents a locking script).Yes, but you can only input an address there. P2PKH, P2SH, P2WPKH, P2WSH and P2TR (that I have forgotten to mention in OP). Not a custom script.Quote from: NotATether on June 19, 2022, 04:20:39 AMAs you can see, it does not specifically define the function of \"data\", nor gives any examples that use it, so this is my best-guess assumption.The value of data is taken as OP_RETURN data.Code:(network: testnet)input: 46f1bfbe99e12841841e131b8ce04c4708881d8facc4729c16c97d78bcfad3c8vout: 0data: aa206fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d619000000000087 (OP_HASH256 OP_PUSHBYTES_32 6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000 OP_EQUAL)Code: (\"Bitcoin Core\")createrawtransaction \"[{\\\"txid\\\":\\\"46f1bfbe99e12841841e131b8ce04c4708881d8facc4729c16c97d78bcfad3c8\\\",\\\"vout\\\":0}]\" \"[{\\\"data\\\":\\\"aa206fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d619000000000087\\\"}]\"0200000001c8d3fabc787dc9169c72c4ac8f1d8808474ce08c1b131e844128e199bebff1460000000000ffffffff010000000000000000256a23aa206fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d61900000000008700000000decoderawtransaction 0200000001c8d3fabc787dc9169c72c4ac8f1d8808474ce08c1b131e844128e199bebff1460000000000ffffffff010000000000000000256a23aa206fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d61900000000008700000000{  \"txid\": \"b5a051fa0281d3f6b1023c8517f47011faef9e2de6e315cd71ed60ded9aee8f0\",  \"hash\": \"b5a051fa0281d3f6b1023c8517f47011faef9e2de6e315cd71ed60ded9aee8f0\",  \"version\": 2,  \"size\": 97,  \"vsize\": 97,  \"weight\": 388,  \"locktime\": 0,  \"vin\": [    {      \"txid\": \"46f1bfbe99e12841841e131b8ce04c4708881d8facc4729c16c97d78bcfad3c8\",      \"vout\": 0,      \"scriptSig\": {        \"asm\": \"\",        \"hex\": \"\"      },      \"sequence\": 4294967295    }  ],  \"vout\": [    {      \"value\": 0.00000000,      \"n\": 0,      \"scriptPubKey\": {        \"asm\": \"OP_RETURN aa206fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d619000000000087\",        \"hex\": \"6a23aa206fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d619000000000087\",        \"type\": \"nulldata\"      }    }  ]}See?Quote from: nc50lc on June 19, 2022, 04:37:08 AMMy assumption is the \"data\" key-value pair in the output is just OP_RETURN, it wont process scripts;Reason is, it automatically prepend 0x6A to the value which is OP_RETURN.Exactly.Quote from: nc50lc on June 19, 2022, 04:37:08 AMIf you want to spend a custom script's UTXO [...]I don't want to spend a custom script's UTXO. I want to create the custom script's UTXO.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 20, 2022, 03:01:26 AM",
+      "body": "No, you cannot.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 20, 2022, 04:46:39 AM",
+      "body": "Quote from: BlackHatCoiner on June 19, 2022, 01:07:15 PMQuote from: nc50lc on June 19, 2022, 04:37:08 AMIf you want to spend a custom script's UTXO [...]I don't want to spend a custom script's UTXO. I want to create the custom script's UTXO.A custom script should be derived into an address to be useable in createrawtransaction, thus to create a UTXO, send bitcoins to the derived address normally.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 20, 2022, 12:17:25 PM",
+      "body": "Quote from: nc50lc on June 20, 2022, 04:46:39 AMA custom script should be derived into an address to be useable in createrawtransaction, thus to create a UTXO, send bitcoins to the derived address normally.Most likely it would require feeding the transaction parameters with the custom script into custom software (might even be just a hacked up C program) that outputs a raw transaction which can then be signed and broadcasted using Bitcoin Core - since achow said they can't be created in Core anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "litecoin_messiah",
+      "created_time": "June 27, 2022, 04:59:24 AM",
+      "body": "http://bitcoin-script-debugger.visvirial.com/?input=OP_1Outputs can be… you know what i cant explain just check out the tool .",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

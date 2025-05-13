@@ -1,0 +1,77 @@
+{
+  "id": "topic_5458380",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "July 03, 2023, 03:15:08 AM",
+  "content": "At this point, I am able to successfully decode a raw transaction, but then I read here: https://en.bitcoin.it/wiki/Weight_units that the weight units of a transaction is not simply the transaction byte length * 4, but actually it must be converted into whats called a \"P2P protocol block message\" first - probably the internal representation in Bitcoin Core (and segwit transactions have certain fields like the flag and witness data consuming less weight units than others).The issue is, I can't seem to find any documentation for what a block message is supposed to look like. The only hints I have are the diagrams on the wiki page, and I am not sure if they are accurate.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5458380",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "July 03, 2023, 03:47:37 AM",
+      "body": "https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#user-content-Transaction_size_calculations",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "SeriouslyGiveaway",
+      "created_time": "July 03, 2023, 03:47:50 AM",
+      "body": "Quote from: NotATether on July 03, 2023, 03:15:08 AMAt this point, I am able to successfully decode a raw transaction, but then I read here: https://en.bitcoin.it/wiki/Weight_units that the weight units of a transaction is not simply the transaction byte length * 4, but actually it must be converted into whats called a \"P2P protocol block message\" first - probably the internal representation in Bitcoin Core (and segwit transactions have certain fields like the flag and witness data consuming less weight units than others).The issue is, I can't seem to find any documentation for what a block message is supposed to look like. The only hints I have are the diagrams on the wiki page, and I am not sure if they are accurate.My answer can be wrong but I try to learn too.My answer is a block message is supposed to contain 0x01Segwit wallet developers. Transaction serializationQuoteA segwit-compatible wallet MUST also support the new serialization format, as nVersion|marker|flag|txins|txouts|witness|nLockTimeFormat of nVersion, txins, txouts, and nLockTime are same as the original formatThe marker MUST be 0x00The flag MUST be 0x01BIP 0141QuoteThe flag MUST be a 1-byte non-zero value. Currently, 0x01 MUST be used.Transaction size calculatorQuoteOnly in transactions spending one or more segwit UTXOs:Segwit marker & segwit flag (0.5) A byte sequence used to clearly differentiate segwit transactions from legacy transactionsP2P networkingQuote2†“MSG_WITNESS_BLOCK”The hash is of a block header; identical to “MSG_BLOCK”. When used in a “getdata” message, this indicates the response should be a block message with transactions that have a witness using witness serialization. Only for use in“getdata” messages.† These are the same as their respective type identifier but with their 30th bit set to indicate witness. For example MSG_WITNESS_TX = 0x01000040.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 03, 2023, 10:19:21 AM",
+      "body": "Quote from: achow101 on July 03, 2023, 03:47:37 AMhttps://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#user-content-Transaction_size_calculationsI read BIPs 141 and 144 but there is one confusion that still bothers me:Are these diagrams as depicted on the Bitcoin Wiki entry equivalent to the raw (segwit or non-segwit) transaction serialized format?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 03, 2023, 10:59:36 AM",
+      "body": "Quote from: NotATether on July 03, 2023, 10:19:21 AMQuote from: achow101 on July 03, 2023, 03:47:37 AMhttps://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#user-content-Transaction_size_calculationsI read BIPs 141 and 144 but there is one confusion that still bothers me:Are these diagrams as depicted on the Bitcoin Wiki entry equivalent to the raw (segwit or non-segwit) transaction serialized format?Look at serialized transactions here https://hongchao.me/anatomy-of-raw-bitcoin-transaction/ and compare it to these diagrams. From my point of view, colorized hexadecimal format is much easier to understand.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 03, 2023, 02:02:43 PMLast edit: July 03, 2023, 02:13:37 PM by pooya87",
+      "body": "Quote from: NotATether on July 03, 2023, 10:19:21 AMQuote from: achow101 on July 03, 2023, 03:47:37 AMhttps://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#user-content-Transaction_size_calculationsI read BIPs 141 and 144 but there is one confusion that still bothers me:Are these diagrams as depicted on the Bitcoin Wiki entry equivalent to the raw (segwit or non-segwit) transaction serialized format?Those are two very hard to understand pictures if you ask me.Maybe I'm looking at the picture out of context but for example why is there the word \"witness\" in parenthesis in first picture (P2PKH), there is no witness in P2PKH scripts and even with witness putting it in parenthesis in front of \"scriptsig\" is just misleading in my opinion. There is also the \"count\" boxes which are wrong. The one before scriptsig and 2 scriptpubkeys in first picture are not count they are of the same integer encoding scheme (variable length integer) but they show the \"length\" of the script not the count. The other two counts before outpoint and first amount are correct and they show the count of inputs and outputs and are of the same type (var. int).Same with the second picture but with the addition of another \"count\" behind \"sequence\" which is wrong and misleading. It is not count, it is another length and it is zero (since the P2WPKH scriptsig is empty).Same with 3 blue counts. The first one is the actual count (2 witness items in this case) the next two \"counts\" are the length of the data that exists on the stack (eg. 72 bytes signature and 33 byte public key).Should be something like this:",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 03, 2023, 03:15:45 PMLast edit: July 03, 2023, 03:30:32 PM by NotATether",
+      "body": "@witcher_sense @pooya87 Those were very helpful. Just one last problem:With the exception of all the var_int types, are all of the multi-byte structures in the raw transactions in big endian? I suspect so, because I'm getting crazy values when parsing them as little endian.EDIT: Sorry, apparently it was big endian conversion this whole time that was causing chaos.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 03, 2023, 05:24:42 PM",
+      "body": "Quote from: NotATether on July 03, 2023, 03:15:45 PMWith the exception of all the var_int types, are all of the multi-byte structures in the raw transactions in big endian? Version, outpoint index, input sequence, output amount and locktime are all in little endian.R and S values in signature, public key (integer value) are in big endian.Any integer inside the scripts (used in something like OP_ADD) are interpreted as little endian.Variable length integers indicating the length of the scripts, input/output/witness_item count and witness_item length are all using a special compact encoding with the integer encoded in little endian.Variable length integers inside scripts used to push something to the stack are using a different special compact encoding but also using the little endian system.4 byte representation of one:0x01000000 <-- little endian0x00000001 <-- big endian",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 04, 2023, 08:17:18 AM",
+      "body": "Quote from: NotATether on July 03, 2023, 03:15:45 PM@witcher_sense @pooya87 Those were very helpful. Just one last problem:With the exception of all the var_int types, are all of the multi-byte structures in the raw transactions in big endian? I suspect so, because I'm getting crazy values when parsing them as little endian.EDIT: Sorry, apparently it was big endian conversion this whole time that was causing chaos.Field formats of a legacy bitcoin transaction are well-explained here: https://learnmeabitcoin.com/technical/transaction-data.You can also use this article https://daniel.perez.sh/blog/2020/bitcoin-format/ and this simple bitcoin transaction parser https://github.com/danhper/simple-bitcoin-parser as a reference:",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

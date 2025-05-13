@@ -1,0 +1,45 @@
+{
+  "id": "topic_5433348",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "January 07, 2023, 09:43:27 AMLast edit: January 07, 2023, 09:54:46 AM by citb0in",
+  "content": "Hello all. I am referring to secp256k1 library in Python where you can signrec a message.Following example:Quoteprivkey = '0000000000000000000000000000000000000000000000000000000000000001'message = 'Hello, world!'after signing it will produce the signatureQuoteb85d62928d63583f52b14995c9444a92e1b7998a3fcfd0c134f327d61b162c6e7ea40adb783bd4c 00f9cfdb829c7e7d5b8d8e25a797d8548aec6f41df461fab9I am digging into the code and like to understand what the process looks in detail. I am stuck on the last point and hopefully someone can shed some light onto...The signrec command line argument calls the function ecdsa_sign_recoverableCode:[...]    elif args.action == 'signrec':        priv, sig = sign('ecdsa_sign_recoverable', args)[...]the message is hashed one time through sha256 and stored into the variable name msg32. The sha256 from the message shown isQuote315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3Code:[...]    def ecdsa_sign_recoverable(self, msg, raw=False, digest=hashlib.sha256):        if not HAS_RECOVERABLE:            raise Exception(\"secp256k1_recovery not enabled\")        msg32 = _hash32(msg, raw, digest)[...]So far so good and understood. But on the next step the raw_sig variable is created by calling ffi.new('secp256k1_ecdsa_recoverable_signature *')Code:[...]        raw_sig = ffi.new('secp256k1_ecdsa_recoverable_signature *')        signed = lib.secp256k1_ecdsa_sign_recoverable(            secp256k1_ctx, raw_sig, msg32, self.private_key,            ffi.NULL, ffi.NULL)        assert signed == 1        return raw_sig[...]I am trying to understand what exactly is done in this step but I have no insight. I see that the called functions are derived from _libsecp256k1.Code:from ._libsecp256k1 import ffi, libI looked into the filesystem of that python module secp256k1, there is the file:Quote~/.local/lib/python3.10/site-packages/secp256k1/_libsecp256k1.cpython-310-x86_64-linux-gnu.sobut I have no clue what's inside. Can anyone explain to me, please?What process in detail is done to get from the sha256 hash \"315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3\"--> to the final signature ?Quoteb85d62928d63583f52b14995c9444a92e1b7998a3fcfd0c134f327d61b162c6e7ea40adb783bd4c 00f9cfdb829c7e7d5b8d8e25a797d8548aec6f41df461fab9My next question ... If I'm not mistaken the shown final signature in base64 representation is: QuoteIEkjQHms3Yy0+B8INBVgKozpZc1rf3OHf7MCk2CnrGorYk2TEnwnNSHnLuK8tRkBIAIR1c9i8NCO19EebEHCMak=How do you convert this base64 to get to the hex representation and vice-versa ?Thanks to all.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5433348",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "January 07, 2023, 02:31:39 PM",
+      "body": "When signing messages in order to prevent possible exploits, some additional bytes are added to the beginning of the message before it is hashed twice using SHA256. - The bytes are the length of the fixed message- The fixed message (\"Bitcoin Signed Message:\\n\")- The length of the message- The messageThat means the digest of \"Hello, world!\" is not 0x315f... butCode:02d6c0643e40b0db549cbbd7eb47dcab71a59d7017199ebde6b272f28fbbf95fAs for signing, there is nothing special. It is using the same ECDSA algorithm as always, but also returns a single byte that helps the verifier recover only one public from the signature when they are verifying the whole thing.When encoding that signature it uses the following structure [1-byte-recid][32-byte-r][32-byte-s]BIP-137 has more explanation: https://github.com/bitcoin/bips/blob/master/bip-0137.mediawikiQuoteHow do you convert this base64 to get to the hex representation and vice-versa ?Usually all programming languages have some sort of converter that does Base64 conversion, if not finding a library that does base conversion in the programming language you are working with is not hard. For example in C# it is System.Convert.FromBase64String()Same with Base16 (or hex).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "January 08, 2023, 07:51:53 PM",
+      "body": "Quote from: pooya87 on January 07, 2023, 02:31:39 PMBIP-137 has more explanation: https://github.com/bitcoin/bips/blob/master/bip-0137.mediawikithanks for the link provided.Quote from: pooya87 on January 07, 2023, 02:31:39 PMThat means the digest of \"Hello, world!\" is not 0x315f... butCode:02d6c0643e40b0db549cbbd7eb47dcab71a59d7017199ebde6b272f28fbbf95fIn secp256 library the message is hashed once into the variable msg32, see code in __init__.py here:Code:[...]    def ecdsa_sign_recoverable(self, msg, raw=False, digest=hashlib.sha256):        if not HAS_RECOVERABLE:            raise Exception(\"secp256k1_recovery not enabled\")        msg32 = _hash32(msg, raw, digest)[...]When you debug output msg32 at this step you will see that the result isQuote315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3I am just trying to follow the steps done in this library secp256k1. Honestly said, I still don't understand that. Using the given exampleQuoteprivkey = '0000000000000000000000000000000000000000000000000000000000000001'address = '1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH'message = 'Hello, world!'signature (hex?) = 'b85d62928d63583f52b14995c9444a92e1b7998a3fcfd0c134f327d61b162c6e7ea40adb783bd4c 00f9cfdb829c7e7d5b8d8e25a797d8548aec6f41df461fab9'signature (base64?) = 'IEkjQHms3Yy0+B8INBVgKozpZc1rf3OHf7MCk2CnrGorYk2TEnwnNSHnLuK8tRkBIAIR1c9i8NCO19EebEHCMak='pubkey = '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'can anyone show a step-by-step (at best with Python code) how to get to the final base64-encoded form and vice-versa ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "January 09, 2023, 04:18:34 AM",
+      "body": "Quote from: citb0in on January 08, 2023, 07:51:53 PMIn secp256 library the message is hashed once into the variable msg32, see code in __init__.py here:I'm not the best at reading python but isn't \"msg32 = digest(msg).digest()\" inside the \"_hash32\" method performing double hash? The python docs seems to suggest each \"digest()\" method call performs a single hash and it is called twice here.Quote from: citb0in on January 08, 2023, 07:51:53 PMWhen you debug output msg32 at this step you will see that the result isYou probably broke something when debugging because the signature you posted is valid and it only verifies against the hash I posted above not the one you get from your debug.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 09, 2023, 12:28:57 PM",
+      "body": "Quote from: citb0in on January 07, 2023, 09:43:27 AMI am trying to understand what exactly is done in this step but I have no insight. I see that the called functions are derived from _libsecp256k1.Code:from ._libsecp256k1 import ffi, libI looked into the filesystem of that python module secp256k1, there is the file:Quote~/.local/lib/python3.10/site-packages/secp256k1/_libsecp256k1.cpython-310-x86_64-linux-gnu.sobut I have no clue what's inside. Can anyone explain to me, please?Although I am not an expert and have little understanding of C language, but I think I can tell what is inside these odd-looking function calls: all these functions are present here https://github.com/bitcoin-core/secp256k1/blob/master/src/secp256k1.c I think every time the python code uses ffi (which stands for Foreign function interface it delegates to functions written in C, sends them some arguments and receives a result. So, to figure out what happens under the hood, you need to know how signature signing/verification process is implemented in C language.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

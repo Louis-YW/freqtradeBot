@@ -1,0 +1,45 @@
+{
+  "id": "topic_5419123",
+  "title": "ykt",
+  "author": "ykt",
+  "created_time": "November 02, 2022, 12:40:24 AM",
+  "content": "Hi,I’m coming from the perspective of someone who would hypothetically like to build service yet another to track all the transactions for a given xpub.And I wonder if there is a way to circumvent initial address scanning.For example https://blockpath.com/wallets/local/101?action=appxpub saysQuoteThis mode will scan over 3915 possible addresses within different possible derivation paths. If a used derivation path is found, we automatically increase the gap limit from 20 to 150 to be sure all used addresses are found. Please be patient. This scan takes about 2-3 minutes to finish!Which seems to be quite a heavy process if I understand it right:- start scanning at 0 depth until gap conditions are met- take all addresses with txs from previous step and scan their deviation spaces until gap conditions are met- repeatThe service above provides the following illustration of what it’s doing Code:Paths Scanned:m/0-19+m/0-50/0-19+m/0/0-20/0-19+m/0/0-10/0-10/0-19Does every watch-only service out there go through a similar procedure?(for example, tax assistance  platforms)",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5419123",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "November 02, 2022, 04:11:51 AM",
+      "body": "When recovering a wallet without explicitly telling the software the actual derivation path, it has to derive keys at different paths at different depths to find the actual wallet.Quote from: ykt on November 02, 2022, 12:40:24 AMDoes every watch-only service out there go through a similar procedure?(for example, tax assistance  platforms)Each service is different and should be reviewed separately. Since this is an Electrum board, the Electrum client uses versioned seed phrases which means the derivation path is already known when the wallet is recovered using a seed phrase. If a BIP39 seed is used or a master public/private key that doesn't have that path (like a watch only wallet using xpub) then it uses a feature added in v 4.0.3 called \"Automated BIP39 recovery\" where it does something similar to what you explained above. You can see it in this pull request: https://github.com/spesmilo/electrum/pull/6219",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 02, 2022, 06:08:06 AM",
+      "body": "Quote from: ykt on November 02, 2022, 12:40:24 AMThe service above provides the following illustration of what it’s doing Code:Paths Scanned:m/0-19+m/0-50/0-19+m/0/0-20/0-19+m/0/0-10/0-10/0-19Does every watch-only service out there go through a similar procedure?That's only necessary if you need to extensively search rarely used derivation paths.Because if it's just the standard paths, you'll only need these three which will only scan 60 addresses (plus more if gap limit is increased, \"0-19+\" = 20gap limit):Code:m/0-19+m/0/0-19+m/1/0-19+For more info: in most wallets, the structure of derivation path looks like this (from master prvKey derived from the seed): m/purpose'/coin'/account'/chain (internal or external)/address indexIn some wallets that use BIP32 standard, differs but usually: m/account'/chain/address indexThe xpub that the users usually get from their wallet is at the \"account\" level, so to derive the addresses from their xpub.you only have to scan the paths (from xpub): m/external/address index [m/0/0-19+] (receiving addresses) and m/internal/address index [m/1/0-19+] (change addresses)So that's basically the options: \"Typical Receiving Addresses (m/0)\" and \"Typical Change Addresses (m/1)\" in your example tool.Some wallets have xpub at the \"chain\" level or the addresses are derived from the master pubKey pair of the master prvKey, so the path from the xpub should be: m/address index [m/0-19+]Same as the option: \"Root Addresses (m/)\" in your example tool.TL;DR: My suggestion is if you do not want to scan through the rarely used paths, go for the standard paths which should be a lot faster, but include an \"advanced option\" to manually set a derivation path so that users can manually set the path for their \"rare wallet\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ykt",
+      "created_time": "November 03, 2022, 12:31:53 AM",
+      "body": "Thank you for your replies, folks. It starts to make a bit more sense now. I ran into an interesting case today with a sample xpub that I'm using - Code:xpub6BkMTgBrwVvFZ8bDfVCKv88Fineb2sy74eNnWBWweppSjSmg17bHzrjHBANWASEjKbRuB7KWuyoDMgyFr2YVLSbKLCFLiNc4XbuQUaXXXJaWhen scanning it with https://github.com/LedgerHQ/xpub-scan, I'm getting bc1 addresses like Code:bc1qvu7duj8v5gu6tq2ysjatvudp8ftm7qzrwk53mj, which shouldn't be a part of the xpub, only zpubs.How does that work?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 03, 2022, 03:52:36 AM",
+      "body": "Quote from: ykt on November 03, 2022, 12:31:53 AMHow does that work? Technically there is nothing wrong with that since the keys are the same and derived the same regardless of the xkey's version bytes.Extended public keys are mainly encoding the key and chaincode. The version bytes at the beginning (leading to xpub, zpub, etc.) wasn't used by wallets/tools pre-SegWit and after SegWit activation it took some time for the new versions to be introduced and adopted by wallets/tools. Consequently some of them were still using their legacy setup (producing xpub) to create SegWit wallets in early days and some may still do.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

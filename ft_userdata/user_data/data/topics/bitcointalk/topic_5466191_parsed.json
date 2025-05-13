@@ -1,0 +1,37 @@
+{
+  "id": "topic_5466191",
+  "title": "mine49",
+  "author": "mine49",
+  "created_time": "September 09, 2023, 08:50:35 AM",
+  "content": "Hi all! I'm running a slightly modified Bitcoin Core node (for our own educational blockchain, Bitcoin Edu, https://github.com/bitcoinedu-io).We recently upgraded the code base to 24.0. The RPC return format for getrawtransaction seems to have changed slightly, a single \"address\" is decoded instead of the \"addresses\" field. That's fine. But, we found one peculiar transaction (in our chain):Old v21 bitcoind, one of the outputs:Code:     \"scriptPubKey\": {        \"asm\": \"02d316d8a24940934460a6c97de69718afb1ea6e5f054ae60b1c62e6cd2758e9ed OP_CHECKSIG\",        \"hex\": \"2102d316d8a24940934460a6c97de69718afb1ea6e5f054ae60b1c62e6cd2758e9edac\",        \"reqSigs\": 1,        \"type\": \"pubkey\",        \"addresses\": [          \"1DZxEMQqMHdgcazmMk4XtedUmXhsntzuMN\"        ]      }But, the new v24 bitcoind, responds with:Code:      \"scriptPubKey\": {                                                                     \"asm\": \"02d316d8a24940934460a6c97de69718afb1ea6e5f054ae60b1c62e6cd2758e9ed OP_CHECKSIG\",        \"desc\": \"pk(02d316d8a24940934460a6c97de69718afb1ea6e5f054ae60b1c62e6cd2758e9ed)#jdtmre63\",        \"hex\": \"2102d316d8a24940934460a6c97de69718afb1ea6e5f054ae60b1c62e6cd2758e9edac\",        \"type\": \"pubkey\"                                                                  }Here we got no \"address\" at all. This is a bit rare, normally we get an \"address\" field and everything looks alright. But, in this case, why didn't the script get decoded? Anyone have a clue? A bug?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466191",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 09, 2023, 09:08:45 AMLast edit: September 09, 2023, 12:26:59 PM by o_e_l_e_o",
+      "body": "The old \"addresses\" field was initial depreciated in v22.0.0 and replaced with a new \"sane addresses\" field: https://github.com/bitcoin/bitcoin/pull/20286The old field was then fully removed in v23.0.0: https://github.com/bitcoin/bitcoin/pull/22650If you look at the RPC docs for anything from v23 onward (https://bitcoincore.org/en/doc/25.0.0/rpc/rawtransactions/getrawtransaction/), you'll see the address field now returns an address \"only if a well-defined address exists\". Given that the script you have shared is pay to pubkey, and not pay to pubkey hash, then you are not paying an address and so getrawtransaction will not return an address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mine49",
+      "created_time": "September 09, 2023, 09:14:58 AM",
+      "body": "Great! Thank's for the explanation. That makes sense! I wonder how we managed to get some \"pubkey\" outputs at all. We probably experimented too much some years back",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 09, 2023, 11:24:08 AM",
+      "body": "Quote from: mine49 on September 09, 2023, 09:14:58 AMGreat! Thank's for the explanation. That makes sense! I wonder how we managed to get some \"pubkey\" outputs at all. We probably experimented too much some years back  Yeah, as oeleo said, if it's not a common address type then Bitcoin Core will bail out during the RPC call and won't return an address. Basically if it's P2PKH, P2SH, P2[w]PKH and so on, that's what they call a common address type. If you however have a complex multisig script then determining the address type will probably fail since there are many ways you can make a multisig script look valid.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

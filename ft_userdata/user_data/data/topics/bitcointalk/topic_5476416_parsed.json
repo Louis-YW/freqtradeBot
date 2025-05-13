@@ -1,0 +1,69 @@
+{
+  "id": "topic_5476416",
+  "title": "toto99303",
+  "author": "toto99303",
+  "created_time": "December 03, 2023, 10:24:24 PM",
+  "content": "Hi guys, newbie here,I'm just trying to have some fun with an old USB Block Erupter, but I can't compile cg-miner.I'm compiling on armbian (banana pi zero board), basically the same as raspbian for raspberry pi.I tried 3 different repos and it's always the same error when I reach \"make\"Steps:sudo apt-get update -ysudo apt-get install build-essential autoconf automake libtool pkg-config libcurl4-openssl-dev libudev-dev \\libjansson-dev libncurses5-dev libusb-1.0-0-dev zlib1g-dev git -ygit clone https://github.com/kanoi/cgminer.git   (tried also https://github.com/wareck/cgminer-gekko.git and the original http://ck.kolivas.org/apps/cgminer/)cd cgminerCFLAGS=\"-O2 -fcommon\" ./autogen.sh --enable-icarusmakeand it fails with this:Code:In function ‘recv’,    inlined from ‘api’ at api.c:5061:8:/usr/include/arm-linux-gnueabihf/bits/socket2.h:40:12: warning: call to ‘__recv_chk_warn’ declared with attribute warning: recv called with bigger length than size of destination buffer [-Wattribute-warning]   40 |     return __recv_chk_warn (__fd, __buf, __n, sz, __flags);      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  CC       cgminer-logging.o  CC       cgminer-klist.o  CC       cgminer-noncedup.o  CC       cgminer-usbutils.o  CC       cgminer-driver-icarus.o  CCLD     cgminer/usr/bin/ld: cgminer-api.o: in function `mcast':api.c:(.text+0x814): undefined reference to `__glibc_safe_or_unknown_len'/usr/bin/ld: api.c:(.text+0x82a): undefined reference to `__glibc_unsafe_len'/usr/bin/ld: cgminer-api.o: in function `api':api.c:(.text+0x7596): undefined reference to `__glibc_safe_or_unknown_len'/usr/bin/ld: api.c:(.text+0x75ac): undefined reference to `__glibc_unsafe_len'collect2: error: ld returned 1 exit statusmake[2]: *** [Makefile:907: cgminer] Error 1make[2]: Leaving directory '/home/pi/cgminer'make[1]: *** [Makefile:1896: all-recursive] Error 1make[1]: Leaving directory '/home/pi/cgminer'make: *** [Makefile:810: all] Error 2pi@bananapim2zero:~/cgminer$Can anyone point me what could be the problem here?Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5476416",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "December 03, 2023, 11:11:34 PM",
+      "body": "All guides and solution for cgminer is on the Kano Gekko page which you can find in the link below.- https://kano.is/gekko.phpAlso, scroll down to the bottom and read under \"Remove pre-installed hack linux\".Would you mind to try this command below and update here if the error will be the  same.Code:sudo apt-get updatesudo apt-get upgrade -ysudo apt-get install -y build-essential autoconf automake libtool pkg-config libcurl4-openssl-dev libudev-dev libusb-1.0-0-dev libncurses5-dev zlib1g-dev gitcdgit clone https://github.com/kanoi/cgminer.gitcd cgminerCFLAGS=\"-O2 -march=native -fcommon\" ./autogen.sh --enable-gekko --enable-icarusmakesudo apt-get install -y openjdk-8-jre-headless",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "toto99303",
+      "created_time": "December 04, 2023, 08:39:40 PMLast edit: December 04, 2023, 08:50:39 PM by toto99303",
+      "body": "Hello BitMaxz,I tried with your commands, but unfortunately it's still the same:Code:In function ‘recv’,    inlined from ‘api’ at api.c:5061:8:/usr/include/arm-linux-gnueabihf/bits/socket2.h:40:12: warning: call to ‘__recv_chk_warn’ declared with attribute warning: recv called with bigger length than size of destination buffer [-Wattribute-warning]   40 |     return __recv_chk_warn (__fd, __buf, __n, sz, __flags);      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  CC       cgminer-logging.o  CC       cgminer-klist.o  CC       cgminer-noncedup.o  CC       cgminer-usbutils.o  CC       cgminer-crc16.o  CC       cgminer-driver-icarus.o  CC       cgminer-driver-gekko.o  CCLD     cgminer/usr/bin/ld: cgminer-api.o: in function `mcast':api.c:(.text+0x822): undefined reference to `__glibc_safe_or_unknown_len'/usr/bin/ld: api.c:(.text+0x838): undefined reference to `__glibc_unsafe_len'/usr/bin/ld: cgminer-api.o: in function `api':api.c:(.text+0x757c): undefined reference to `__glibc_safe_or_unknown_len'/usr/bin/ld: api.c:(.text+0x7592): undefined reference to `__glibc_unsafe_len'collect2: error: ld returned 1 exit statusmake[2]: *** [Makefile:907: cgminer] Error 1make[2]: Leaving directory '/home/pi/cgminer'make[1]: *** [Makefile:1896: all-recursive] Error 1make[1]: Leaving directory '/home/pi/cgminer'make: *** [Makefile:810: all] Error 2pi@bananapim2zero:~/cgminer$I also checked and I don't have any previous version to remove. It's a clean box...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "December 05, 2023, 12:29:36 AM",
+      "body": "Quote from: toto99303 on December 04, 2023, 08:39:40 PMHello BitMaxz,I tried with your commands, but unfortunately it's still the same:~snip~I also checked and I don't have any previous version to remove. It's a clean box...Ok I found a similar issue and it seems he solved the issue but the device is undetectable.Can you try the command provided by IDontModLobbies from the link below?- https://github.com/luke-jr/bfgminer/issues/816#issuecomment-1098654521",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "toto99303",
+      "created_time": "December 06, 2023, 12:39:00 AM",
+      "body": "I tried it, same problem Code:In function ‘recv’,    inlined from ‘api’ at api.c:5061:8:/usr/include/arm-linux-gnueabihf/bits/socket2.h:40:12: warning: call to ‘__recv_chk_warn’ declared with attribute warning: recv called with bigger length than size of destination buffer [-Wattribute-warning]   40 |     return __recv_chk_warn (__fd, __buf, __n, sz, __flags);      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  CC       cgminer-logging.o  CC       cgminer-klist.o  CC       cgminer-noncedup.o  CC       cgminer-usbutils.o  CC       cgminer-driver-blockerupter.o  CCLD     cgminer/usr/bin/ld: cgminer-api.o: in function `mcast':api.c:(.text+0x822): undefined reference to `__glibc_safe_or_unknown_len'/usr/bin/ld: api.c:(.text+0x838): undefined reference to `__glibc_unsafe_len'/usr/bin/ld: cgminer-api.o: in function `api':api.c:(.text+0x757c): undefined reference to `__glibc_safe_or_unknown_len'/usr/bin/ld: api.c:(.text+0x7592): undefined reference to `__glibc_unsafe_len'collect2: error: ld returned 1 exit statusmake[2]: *** [Makefile:907: cgminer] Error 1make[2]: Leaving directory '/home/pi/cgminer'make[1]: *** [Makefile:1896: all-recursive] Error 1make[1]: Leaving directory '/home/pi/cgminer'make: *** [Makefile:810: all] Error 2pi@bananapim2zero:~/cgminer$",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "paid2",
+      "created_time": "December 06, 2023, 12:50:53 AM",
+      "body": "Did you tried with fcommon?Code:-fcommon Quote from: kano on January 27, 2022, 02:32:42 AMQuote from: cBrix1984 on January 26, 2022, 06:25:43 PM.../usr/bin/ld: cgminer-driver-gekko.o:(.bss+0xd48): multiple definition of `modminer_drv'; cgminer-cgminer.o:(.bss+0x2078): first defined here/usr/bin/ld: cgminer-driver-gekko.o:(.bss+0xdd0): multiple definition of `bitforce_drv'; cgminer-cgminer.o:(.bss+0x1ff0): first defined herecollect2: error: ld returned 1 exit statusmake[2]: *** [Makefile:893: cgminer] Fehler 1make[2]: Verzeichnis „/home/pi/mining/newpac/cgminer“ wird verlassenmake[1]: *** [Makefile:1837: all-recursive] ERROR 1make[1]: Verzeichnis „/home/pi/mining/newpac/cgminer“ wird verlassenmake: *** [Makefile:796: all] ERROR 2STILL THE SAME ERROR...My updated version includes a README build comment that may fix this...-fcommonhttps://github.com/kanoi/cgminer/blob/master/README#L153Alas you are compiling someone else's version, so no idea if that is the fix.I had to 'fix' a large number of compile warnings and a few errors when I pulled the code into the master cgminerRead here for 4.12.0:https://bitcointalk.org/index.php?topic=5355470.msg58200639#msg58200639-j has no effect on if it will compile",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "December 08, 2023, 02:38:05 AM",
+      "body": "The problem is that the latest RPiOS uses a buggy gcc version.As tested with gcc 12.3.0 if you use the latest ubuntu (and any version in the last few years) on RPi it works fine.Someone has already come to my pool #gekko channel with this error and verified that even the earlier versionsof the RPiOS compile OK also.The error is clearly false.If you check further up in your error output you will see that it is a bug in gcc, since it effectively claims(TMPBUFSIZ / 2 - 1) is greater than TMPBUFSIZ(which is obviously not correct)api.c:5061 is:Code:n = recv(c, &buf[0], TMPBUFSIZ / 2 - 1, 0);However buf defined above that is:Code:char buf[TMPBUFSIZ];So I can only guess there are rather blatant bugs in the version of gcc on the RPiOSsince obviously (TMPBUFSIZ / 2 - 1) is NOT greater than TMPBUFSIZ",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Nexus9090",
+      "created_time": "April 25, 2024, 05:01:46 PM",
+      "body": "Quote from: kano on December 08, 2023, 02:38:05 AMThe problem is that the latest RPiOS uses a buggy gcc version.As tested with gcc 12.3.0 if you use the latest ubuntu (and any version in the last few years) on RPi it works fine.Someone has already come to my pool #gekko channel with this error and verified that even the earlier versionsof the RPiOS compile OK also.The error is clearly false.If you check further up in your error output you will see that it is a bug in gcc, since it effectively claims(TMPBUFSIZ / 2 - 1) is greater than TMPBUFSIZ(which is obviously not correct)api.c:5061 is:Code:n = recv(c, &buf[0], TMPBUFSIZ / 2 - 1, 0);However buf defined above that is:Code:char buf[TMPBUFSIZ];So I can only guess there are rather blatant bugs in the version of gcc on the RPiOSsince obviously (TMPBUFSIZ / 2 - 1) is NOT greater than TMPBUFSIZThanks for the info Kano,I'd tried this on a Raspberry PI 5 a few times and ran into the same issues. I even tried downgrading GCC to 11 but that appears to have the same problem. There's no package for the PI5 distro for earlier versions of GCC than 11. I've succesfully built CGMiner using GCC 10.2.1 on the PI3B and PI-Zero-2W and that is my main driver for my set-ups. While I can get the executable running on the PI5 it'd be nice to be able to build it there too.I'm wondering if I can build GCC 10 from source, but thats giving me a headache just thinking about it.Anyway, thanks for your help on this topic.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

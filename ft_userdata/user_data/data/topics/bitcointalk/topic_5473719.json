@@ -1,0 +1,125 @@
+{
+  "id": "topic_5473719",
+  "title": "Drawesome",
+  "author": "Drawesome",
+  "created_time": "November 11, 2023, 03:04:19 PM",
+  "content": "Hey everyone,I've been messing around with Nostr and Bitcoin and got curious about something. Since both use the same secp256k1 curve, do you think it's possible to take a public key from Nostr and turn it into a Bitcoin address?.Here's what I'm thinking about:Both Nostr and Bitcoin use secp256k1, right? So, can we just use a Nostr public key as is for a Bitcoin public key and manage both with the nostr private key (nsec)? Are there any format or encoding issues I should be aware of?If I can use the Nostr public key for Bitcoin, how would I go about turning it into a Bitcoin address? Does it matter what type of address? The main concern I see is that the BTC public key is revealed in advanced, unless there's some zero knowledge way to do it. Has Anyone Done This? I'd really appreciate any insights or just a point in the right direction.Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5473719",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "November 11, 2023, 04:02:09 PM",
+      "body": "Quote from: Drawesome on November 11, 2023, 03:04:19 PMI've been messing around with Nostr and Bitcoin and got curious about something. Since both use the same secp256k1 curve, do you think it's possible to take a public key from Nostr and turn it into a Bitcoin address?Here's what I'm thinking about:Both Nostr and Bitcoin use secp256k1, right? So, can we just use a Nostr public key as is for a Bitcoin public key and manage both with the nostr private key (nsec)? Are there any format or encoding issues I should be aware of?Turning Public keys into Bitcoin address involves hash functions that'll result with specific size which is encoded into an address;So generally, any input can be turned into a valid address. The issue is you might not be able to spend from it using Nostr public key's private key pair.I'm not familiar with Nostr so don't count on my words alone.Anyways, if the private key's size is 256bit, then just encode your private key into WIF (Wallet Import Format) so that it can be imported to almost all Bitcoin wallets.The wallet will do the job of deriving the bitcoin-compatible public key and address from it.In that regard, it doesn't matter if your Nostr public key is incompatible as long as your private key is valid.Quote from: Drawesome on November 11, 2023, 03:04:19 PMHas Anyone Done This?I doubt it since it's not a good idea to use the same private key on different platforms, it has the same security risk as reusing passwords.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "November 11, 2023, 05:27:03 PM",
+      "body": "What is nostr, Is that a new garbage coin? Anyways you can use all private/public key pairs in existence as long as your coins are using the same curve parameters, if it's secp256k1, you can use the key pair on any other coin using the same curve.Only difference is address generation process, for instance, ETH uses uncompressed public keys and a different hash function, Bitcoin uses nowadays compressed public keys with sha256 + rmd160 hash functions to derive the address.In practice you should do as our friend suggested, import the private key and let the wallet do the rest.But you can't use the same address formats if they are not compatible, just like you can't use ETH address to send BTC and vice versa. What type of address you want anyways?Edit, lol don't use any private key generated outside a secure wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Drawesome",
+      "created_time": "November 11, 2023, 09:20:36 PM",
+      "body": "Quote from: nc50lc on November 11, 2023, 04:02:09 PMThe issue is you might not be able to spend from it using Nostr public key's private key pair.This is my doubt. If anyone can derive a Bitcoin wallet directly from a Nostr public key (npub) so that they are natively linked. It would be simpler (and perhaps safer) to post a message on Nostr, publishing and signing with any Bitcoin address, but my question is more theoretical than practical.Quote from: digaran on November 11, 2023, 05:27:03 PMWhat is nostr, Is that a new garbage coin? [...]Edit, lol don't use any private key generated outside a secure wallet.Not a shitcoin at all, a public signed comunication protocol: https://nostr.com/And you can use too a signing device the same as you use a Hardware Wallet to sign BTC.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "November 11, 2023, 10:18:09 PM",
+      "body": "I now know it's a decentralized social media like, but to clear a few things up, generally speaking in elliptic curve cryptography all numbers are to be considered a valid private key with 1 exception which is the group order n, in any curve you can pick any random number whether greater than n or smaller, negative or positive, they all are valid private keys.So, as long as you hold a private key, you can convert that to as many different curve public keys as you want, but it's not safe  to carry a funded private key, in your clipboard when online going to different apps, pages etc. And it's not safe to use nostr keys to generate Bitcoin addresses to store large amounts of fund.If you need more details, here is the address type wallets use nowadays :Code:# Copyright (c) 2017, 2020 Pieter Wuille## Permission is hereby granted, free of charge, to any person obtaining a copy# of this software and associated documentation files (the \"Software\"), to deal# in the Software without restriction, including without limitation the rights# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell# copies of the Software, and to permit persons to whom the Software is# furnished to do so, subject to the following conditions:## The above copyright notice and this permission notice shall be included in# all copies or substantial portions of the Software.## THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN# THE SOFTWARE.\"\"\"Reference implementation for Bech32/Bech32m and segwit addresses.\"\"\"from enum import Enumclass Encoding(Enum):    \"\"\"Enumeration type to list the various supported encodings.\"\"\"    BECH32 = 1    BECH32M = 2CHARSET = \"qpzry9x8gf2tvdw0s3jn54khce6mua7l\"BECH32M_CONST = 0x2bc830a3def bech32_polymod(values):    \"\"\"Internal function that computes the Bech32 checksum.\"\"\"    generator = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]    chk = 1    for value in values:        top = chk >> 25        chk = (chk & 0x1ffffff) << 5 ^ value        for i in range(5):            chk ^= generator[i] if ((top >> i) & 1) else 0    return chkdef bech32_hrp_expand(hrp):    \"\"\"Expand the HRP into values for checksum computation.\"\"\"    return [ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp]def bech32_verify_checksum(hrp, data):    \"\"\"Verify a checksum given HRP and converted data characters.\"\"\"    const = bech32_polymod(bech32_hrp_expand(hrp) + data)    if const == 1:        return Encoding.BECH32    if const == BECH32M_CONST:        return Encoding.BECH32M    return Nonedef bech32_create_checksum(hrp, data, spec):    \"\"\"Compute the checksum values given HRP and data.\"\"\"    values = bech32_hrp_expand(hrp) + data    const = BECH32M_CONST if spec == Encoding.BECH32M else 1    polymod = bech32_polymod(values + [0, 0, 0, 0, 0, 0]) ^ const    return [(polymod >> 5 * (5 - i)) & 31 for i in range(6)]def bech32_encode(hrp, data, spec):    \"\"\"Compute a Bech32 string given HRP and data values.\"\"\"    combined = data + bech32_create_checksum(hrp, data, spec)    return hrp + '1' + ''.join([CHARSET[d] for d in combined])def bech32_decode(bech):    \"\"\"Validate a Bech32/Bech32m string, and determine HRP and data.\"\"\"    if ((any(ord(x) < 33 or ord(x) > 126 for x in bech)) or            (bech.lower() != bech and bech.upper() != bech)):        return (None, None, None)    bech = bech.lower()    pos = bech.rfind('1')    if pos < 1 or pos + 7 > len(bech) or len(bech) > 90:        return (None, None, None)    if not all(x in CHARSET for x in bech[pos+1:]):        return (None, None, None)    hrp = bech[:pos]    data = [CHARSET.find(x) for x in bech[pos+1:]]    spec = bech32_verify_checksum(hrp, data)    if spec is None:        return (None, None, None)    return (hrp, data[:-6], spec)def convertbits(data, frombits, tobits, pad=True):    \"\"\"General power-of-2 base conversion.\"\"\"    acc = 0    bits = 0    ret = []    maxv = (1 << tobits) - 1    max_acc = (1 << (frombits + tobits - 1)) - 1    for value in data:        if value < 0 or (value >> frombits):            return None        acc = ((acc << frombits) | value) & max_acc        bits += frombits        while bits >= tobits:            bits -= tobits            ret.append((acc >> bits) & maxv)    if pad:        if bits:            ret.append((acc << (tobits - bits)) & maxv)    elif bits >= frombits or ((acc << (tobits - bits)) & maxv):        return None    return retdef decode(hrp, addr):    \"\"\"Decode a segwit address.\"\"\"    hrpgot, data, spec = bech32_decode(addr)    if hrpgot != hrp:        return (None, None)    decoded = convertbits(data[1:], 5, 8, False)    if decoded is None or len(decoded) < 2 or len(decoded) > 40:        return (None, None)    if data[0] > 16:        return (None, None)    if data[0] == 0 and len(decoded) != 20 and len(decoded) != 32:        return (None, None)    if data[0] == 0 and spec != Encoding.BECH32 or data[0] != 0 and spec != Encoding.BECH32M:        return (None, None)    return (data[0], decoded)def encode(hrp, witver, witprog):    \"\"\"Encode a segwit address.\"\"\"    spec = Encoding.BECH32 if witver == 0 else Encoding.BECH32M    ret = bech32_encode(hrp, [witver] + convertbits(witprog, 8, 5), spec)    if decode(hrp, ret) == (None, None):        return None    return ret",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 12, 2023, 05:43:30 AM",
+      "body": "Quote from: Drawesome on November 11, 2023, 09:20:36 PMThis is my doubt. If anyone can derive a Bitcoin wallet directly from a Nostr public key (npub) so that they are natively linked. It would be simpler (and perhaps safer) to post a message on Nostr, publishing and signing with any Bitcoin address, but my question is more theoretical than practical.I did a few searches and it seems like it's not possible to get a standard Bitcoin address from the \"npub\" alone.It appears that Nostr's public key (decoded npub) resembles the \"compressed pubKey\" of Bitcoin but without the 1byte prefix that identifies if the y coordinate is odd or even.It's exclusively the x coordinate, so without any information on the y coordinate, you'll have to guess which prefix to use.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "November 12, 2023, 07:39:51 PM",
+      "body": "QuoteI did a few searches and it seems like it's not possible to get a standard Bitcoin address from the \"npub\" alone.It appears that Nostr's public key (decoded npub) resembles the \"compressed pubKey\" of Bitcoin but without the 1byte prefix that identifies if the y coordinate is odd or even.It's exclusively the x coordinate, so without any information on the y coordinate, you'll have to guess which prefix to use.Why would anyone need to guess about y coordinates if they already have the private key? Nostr is something entirely different, as it has nothing to do with addresses. OP is also confused about signing messages, he thinks Bitcoin addresses are used to sign a message, while the only thing used to do that is the private key. Though we can encrypt messages with public keys.So even if you don't know which y coordinates to use, you can access 4 public keys with only 1 private key, first pair of public keys are supposedly +n, then you could subtract the private key from n to access -n pair. In practice, every time we generate 1 private key, we are essentially burning *4 Bitcoin addresses without knowing it.*= legacy version.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 13, 2023, 10:11:27 AM",
+      "body": "Quote from: digaran on November 12, 2023, 07:39:51 PMWhy would anyone need to guess about y coordinates if they already have the private key? Nostr is something entirely different, as it has nothing to do with addresses. OP is also confused about signing messages, he thinks Bitcoin addresses are used to sign a message, while the only thing used to do that is the private key. Though we can encrypt messages with public keys.He specifically asked about using the npub (bech32 encoded) directly without mentioning the private key.So I've explained that it's not possible with it alone.Plus we already mentioned that it is possible with the private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Drawesome",
+      "created_time": "November 13, 2023, 12:03:23 PM",
+      "body": "Quote from: nc50lc on November 12, 2023, 05:43:30 AMIt's exclusively the x coordinate, so without any information on the y coordinate, you'll have to guess which prefix to use.Thanks for the clue.That won't be a problem in order to verify that a a npub nostr match with a BTC Address since you just need to check 2 paths. Quote from: digaran on November 12, 2023, 07:39:51 PMWhy would anyone need to guess about y coordinates if they already have the private key? Sorry if I didn't express myself well: anyone should be able to verify that a particular nostr npub is the owener of the BTC address. Thanks to both of you for your comments",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 14, 2023, 09:06:25 AM",
+      "body": "I was going to write that you can just place the Nostr private key inside a SHA256 hash function to create a brainwallet of sorts which will give you a Bitcoin address, but then the requirements changed Quote from: Drawesome on November 13, 2023, 12:03:23 PMQuote from: digaran on November 12, 2023, 07:39:51 PMWhy would anyone need to guess about y coordinates if they already have the private key? Sorry if I didn't express myself well: anyone should be able to verify that a particular nostr npub is the owener of the BTC address. In that case the private key (if you have it) of the Nostr public key can also create a Bitcoin private key, since they use the same elliptic curve algorithm (secp256k1), but you won't be able to verify an address, because the Schnorr signatures used by Nostr inhibit any sort of public key recovery.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Drawesome",
+      "created_time": "November 16, 2023, 12:13:52 AM",
+      "body": "Quote from: NotATether on November 14, 2023, 09:06:25 AMIn that case the private key (if you have it) of the Nostr public key can also create a Bitcoin private key, since they use the same elliptic curve algorithm (secp256k1), but you won't be able to verify an address, because the Schnorr signatures used by Nostr inhibit any sort of public key recovery.Thanks for the comment. I need to study and understand more. When using a BTC taproot address you also use a Schnorr signature right? And my thought was that in order to do what I ask, the BTC public Key will be public as you can guess it from the nostr pubkey, so you will use a type signature for the nostr protocol, and another for the BTC (always from the same private key).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 16, 2023, 07:30:11 AM",
+      "body": "Quote from: Drawesome on November 16, 2023, 12:13:52 AMThanks for the comment. I need to study and understand more. When using a BTC taproot address you also use a Schnorr signature right? And my thought was that in order to do what I ask, the BTC public Key will be public as you can guess it from the nostr pubkey, so you will use a type signature for the nostr protocol, and another for the BTC (always from the same private key).Yes, Taproot addresses also use Schnorr signatures.People don't normally exchanging Bitcoin public keys, so you will usually be getting the Nostr public key and using that as a BTC public key for the purposes of hashing an address.The payloads that Nostr and Taproot sign using Schnorr are entirely different though. Taproot signs a binary transaction, whereas Nostr signs some JSON data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "November 16, 2023, 07:54:19 AM",
+      "body": "How does Schnorr algorithm hide the public key, and if it does how would the verifying process go without the public key?I thought taproot reveals the public key even without having any output transaction. Do you happen to know of any script well implemented and secure which I can use to generate taproot addresses?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 16, 2023, 08:50:02 AM",
+      "body": "Quote from: digaran on November 16, 2023, 07:54:19 AMHow does Schnorr algorithm hide the public key, and if it does how would the verifying process go without the public key?I thought taproot reveals the public key even without having any output transaction. Do you happen to know of any script well implemented and secure which I can use to generate taproot addresses?Because the signing algorithm takes the public key X and Y, and runs it through a hash function and a XOR to get the multiplicand for the r-value, and then runs the r-value along with some other point and the message through another round of hashing to make the s-value. Since both of these values are hashed, it is impossible to use the conventional equation to retrieve the public key from the signature.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Drawesome",
+      "created_time": "November 16, 2023, 04:12:16 PM",
+      "body": "Quote from: NotATether on November 16, 2023, 07:30:11 AMYes, Taproot addresses also use Schnorr signatures.People don't normally exchanging Bitcoin public keys, so you will usually be getting the Nostr public key and using that as a BTC public key for the purposes of hashing an address.The payloads that Nostr and Taproot sign using Schnorr are entirely different though. Taproot signs a binary transaction, whereas Nostr signs some JSON data.Thanks for the info. Showing off a BTC public key seems like it could be a security issue, kinda like reusing addresses. Plus, I guess people aren't too keen on tying their identity to a BTC address (this isn't Ethereum, right? haha). I think there might be some cool uses for it, though",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

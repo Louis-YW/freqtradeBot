@@ -1,0 +1,45 @@
+{
+  "id": "topic_5415438",
+  "title": "cdoug",
+  "author": "cdoug",
+  "created_time": "September 30, 2022, 03:35:30 AM",
+  "content": "I have a BTC lighting channel that's DISCONNECTED. I've never closed a BTC lightning channel before and want to know how to recover the unspent funds. I've looked far and wide, but can't find anything useful that explains this. I see \"Force-close channel\" as an option, but is that safe to use? And if so, how long does it usually take to recover those funds?Background: I've had an open BTC lightning channel with coingate for almost two years that I've been making a monthly subscription payment from. Electrum hasn't been running for probably a week. In the meantime coingate has apparently quietly withdrawn from using the lightning network--the option to pay invoices with the lightning wallet has been removed from their interface, they haven't responded to queries about it (so far), and I guess they've closed their end of lightning channels (or whatever they've done has caused an electrum indication of DISCONNECTED on my end).Thank you for your help,Chris",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415438",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "September 30, 2022, 04:09:20 AM",
+      "body": "Force-close is safe as long as your channel isn't outdated (e.g. from old-oudated wallet file backup with non-static channel backup)It's been a long time since I forced-closed a channel but my latest test in testnet resulted in 144blocks (approx. 1 day).After force-closing it, you'll not directly get the fundsbut a local transaction labeled \"our_ctx_to_local\" will be saved and will be automatically broadcast after the set locktime (if the wallet is running).Quote from: cdoug on September 30, 2022, 03:35:30 AM-snip- and I guess they've closed their end of lightning channels.If they forced-closed it at their end, you should have received your part of the channel's funds to your 'On-chain' funds and the channel's status should change to \"REDEEMED\".Is there any new inbound transaction appeared when you opened your Electrum after being offline for a week?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cdoug",
+      "created_time": "September 30, 2022, 11:51:33 PM",
+      "body": "Thank you for your reply.Earlier today I received a reply from coingate that included: \"We are aware of the performance issues on the LN network. Our team are working on a resolution for this and will have it solved ASAP.\".Within the last few hours the ability to select the lightning network for bitcoin payments on their web interface was returned, and I was able to complete my payment (acknowledged by the vendor) using the lightning network.Quote from: nc50lc on September 30, 2022, 04:09:20 AMForce-close is safe as long as your channel isn't outdated (e.g. from old-oudated wallet file backup with non-static channel backup)I'm using electrum 4.2.2, however the channel was created with version 4.0.9. How do I know if the backup file it creates uses a non-static backup? Or, what does it mean that the backup is \"non-static\"? The application says that the channel type is STATIC_REMOTEKEY. There's also notation that says \"This channel cannot be recovered from seed. You must manually back it up.\" Do any of things definitively tell you if it is of the non-\"safe\" type for performing a force close?Is there any advantage, since the channel connection is now active, in force-closing the channel, upgrading, and then establishing a new channel?Thank you again for your help,Chris",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 01, 2022, 04:32:37 AM",
+      "body": "Quote from: cdoug on September 30, 2022, 11:51:33 PMI'm using electrum 4.2.2, however the channel was created with version 4.0.9. How do I know if the backup file it creates uses a non-static backup? Or, what does it mean that the backup is \"non-static\"? The application says that the channel type is STATIC_REMOTEKEY. There's also notation that says \"This channel cannot be recovered from seed. You must manually back it up.\" Do any of things definitively tell you if it is of the non-\"safe\" type for performing a force close?Wallet file backups created via menu \"File->Save backup\", will contain static channel backups;While creating a backup by directly copying your wallet file from \"electrum/wallets\" directory will backup active channels.The former which has a static backup will only have one option: \"Request force-close\", which is \"safe\" even if it's outdated bec. the remote node will initiate the force-close.A restored wallet from the latter \"could\" have an issue if Force-closed when there's at least one lightning transaction done after that backup bec. it will broadcast with outdated channel funds.For wallets that's actively used (not restored from a backup), there shouldn't be any issue with force-close.Basically, the to-be-closed channel should be at its latest state for you to safely initiate force-close.Quote from: cdougEarlier today I received a reply from coingate that included: \"We are aware of the performance issues on the LN network. Our team are working on a resolution for this and will have it solved ASAP.\".Within the last few hours the ability to select the lightning network for bitcoin payments on their web interface was returned, and I was able to complete my payment (acknowledged by the vendor) using the lightning network.It's good to know that the issue is at their end and you don't have to force-close your channel.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cdoug",
+      "created_time": "October 01, 2022, 11:29:32 AM",
+      "body": "Thanks again to nc50lc and to this forum for your help!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

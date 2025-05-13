@@ -1,0 +1,53 @@
+{
+  "id": "topic_5447485",
+  "title": "digaran",
+  "author": "digaran",
+  "created_time": "April 04, 2023, 04:22:37 AMLast edit: January 20, 2024, 07:34:34 AM by digaran",
+  "content": "🖤",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5447485",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "April 04, 2023, 05:20:05 AM",
+      "body": "QuoteCould anyone please be so kind and provide the information needed?It depends on your algorithm. Those values can be different, it depends for example if you use CPU, GPU, FPGA or ASIC, and what is your software. Because in case of SHA-256, there are ASICs that can compute 2^32 hashes in seconds, but on CPUs it will take something between 10 minutes and 1 hour (if you use fast enough implementation). But in general, if you have some program for doing that, then you can measure it with \"time\" command.Code:$ time sha256sum empty.txte3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  empty.txtreal 0m0,001suser 0m0,001ssys 0m0,000sBut usually, you don't want to measure a single operation, but N operations instead.Code:$ cat counter.sh#!/bin/bashfor ((i = 0 ; i < 100000 ; i++)); do    echo $i > empty.txt    sha256sum empty.txt > empty.txtdone$ time ./counter.shreal 2m6,745suser 1m21,960ssys 0m41,309sAs you can see, this bash script is very slow, it can do 100k hashes in 2 minutes, so it cannot even mine blocks at difficulty one. And those numbers for other hashes and algorithms will be different, because it depends on your hardware, and your implementation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "April 04, 2023, 08:32:50 AM",
+      "body": "Quote from: garlonicon on April 04, 2023, 05:20:05 AMIt depends on your algorithm. Those values can be different, it depends for example if you use CPU, GPU, FPGA or ASIC, and what is your software. Because in case of SHA-256, there are ASICs that can compute 2^32 hashes in seconds, but on CPUs it will take something between 10 minutes and 1 hour (if you use fast enough implementation). But in general, if you have some program for doing that, then you can measure it with \"time\" command.Code:$ time sha256sum empty.txte3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  empty.txtreal 0m0,001suser 0m0,001ssys 0m0,000sYou actually should not be using time to benchmark these operations if you're running them on GPUs and other specialized silicon, because (and you probably know this as well) it only logs CPU time, whereas these operations when used on CPUs are limited to verifying other transactions and blocks.Quote from: digaran on April 04, 2023, 05:29:04 AMOk, thanks for the reply, to make it easier, software is the fastest vanity search engine, and hardware is the latest GPU/ fastest.For NVIDIA GPUs, you can start by using nvbench: https://github.com/NVIDIA/nvbench",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "April 04, 2023, 10:30:20 AM",
+      "body": "Quote from: garlonicon on April 04, 2023, 05:20:05 AMQuoteCould anyone please be so kind and provide the information needed?It depends on your algorithm. Those values can be different, it depends for example if you use CPU, GPU, FPGA or ASIC, and what is your software.--snip--FWIW newer x86[1] and ARMv8[2] CPU also have instruction set specifically set for SHA algorithm.Quote from: digaran on April 04, 2023, 05:29:04 AM--snip--if there is a formula to calculate them, I'd appreciate it.By any chance, do you mean something like this https://stackoverflow.com/a/11005919 ?[1] https://en.wikipedia.org/wiki/Intel_SHA_extensions[2] https://en.wikichip.org/wiki/arm/armv8",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "April 04, 2023, 12:38:27 PM",
+      "body": "Quote from: garlonicon on April 04, 2023, 05:20:05 AMIt depends on your algorithm.It also depends on the programming language you used to implement the algorithm. sha256sum is written in C, so you should expect maximum performance. Other implementations require more time.Quote from: NotATether on April 04, 2023, 08:32:50 AMFor NVIDIA GPUs, you can start by using nvbench: https://github.com/NVIDIA/nvbenchNot sure if it's the same, but for measuring GPU performance, NVIDEA recommends Visual Profiler: https://docs.alliancecan.ca/wiki/Nvprof",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "April 05, 2023, 05:05:39 PM",
+      "body": "QuoteDo any of you know which operation is the most expensive one?Probably ECDSA-related things, so going from private to public key. Hashing is usually fast, because that part is heavily optimized for speed. However, you cannot optimize ECDSA that easily. And also there are reasons why OP_CHECKSIG alone (without hashing public keys) is costly, and there is \"sigops limit\", but you have no \"hashops limit\". Even recently we had a block that exceeded those limits, and was rejected for that reason: https://bitcointalk.org/index.php?topic=5447129.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

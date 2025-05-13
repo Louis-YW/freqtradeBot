@@ -1,0 +1,69 @@
+{
+  "id": "topic_5486451",
+  "title": "DisabledAF",
+  "author": "DisabledAF",
+  "created_time": "February 24, 2024, 10:46:57 PM",
+  "content": "In today's article, we will look into the technical side of Bitcoin and its transaction fees, where I am going to try my best to show you how you can quickly and elegantly solve the problem of a stuck transaction caused by a low transaction fee for miners through the CPFP method (Child Pays For Parent).There's nothing worse than feeling helpless when your payment gets stuck in 'digital limbo' because you decided to save on fees for miners. Today, we'll explore why sometimes it's better to invest a little more to keep your transactions smoother.We often desire to minimize costs and set the lowest possible fees for our transactions. However, reality often punishes us because this tactic may not always be the best option. When your transaction gets stuck, it demands not only time but also financial losses in the form of additional overpayments. Miners are happy to let you pay for the resolution of your mistakes.Sometimes this can happen despite all your efforts to prevent it. In a situation where fees are at 15 sat/vB, and you set it to 18 sat/vB, immediately after sending your transaction, network congestion may increase, and fees can rise to 40 sat/vB or more. There have even been cases, especially with the introduction of BRC-20 tokens on the Bitcoin network (NFT), where fees reached up to 300 sat/vB. This situation persisted for weeks, even months, leaving many transactions in the network waiting long for confirmation.So, how to proceed correctly if your transaction gets stuck in the network? My goal is to provide you with valuable advice to minimize the risk of a stuck transaction. First and foremost, it must be said:Do not skimp on fees! It can backfire!I read somewhere wisdom regarding transaction fees in Bitcoin: \"You can pay less, but you risk time and nerves. Or you can pay a reasonable fee and have peaceful sleep.\"However, if you are already at a point where it's too late to say not to skimp on fees, let's tackle the solution using the CPFP method. The simplest method is RBF (Replace-By-Fee), but this can only be done if you chose the option to use RBF for the original stuck payment. However, this particular method won't be our focus for today.PROBLEM AND ITS SOLUTIONImagine a situation where you consolidate balances in your wallet, and this transaction does not go through for a long time due to increased transaction fees for miners.You send a transaction (T1) from address \"A1\" to address labeled \"A2,\" and this transaction (parent) gets stuck. However, you want to expedite the transaction because it's stuck due to a lower fee. So, you send a transaction (T2) from a new address \"A3\" with, for example, 100 000 satoshis and send it with a high fee to the target address of the stuck transaction (T1), i.e., to address \"A2.\" Transaction (T2) arrives at the target address \"A2.\" Then, you generate a new address \"A4,\" and then choose the total balance from address \"A2,\" and send a transaction (T3) to the newly generated address \"A4\" with a double recommended fee at that moment, which you can check at www.mempool.space.To simplify the process as much as possible, it would look like this:      1. You have the original transaction (T1) sent from address A1 to address A2 with a low fee, which gets stuck in the network.      2. You create a new transaction (T2), where you send, for example, 100 000 satoshis from the new address A3 with a higher fee to address A2.      3. This transaction (T2) from address A3 arrives at the target address A2, thereby replenishing resources for another transaction needed in the next step.      4. Then, you create a new transaction (T3), where you send all satoshis from address A2 (now there are resources from the previous step) to the new address A4 with a double recommended fee, and in this case, the transaction is considered a \"child\" of the original transaction.      5. When transaction (T3) to address A4 is confirmed, it causes the original stuck transaction (T1) heading to address A2 to also be confirmed because miners were motivated to mine both transactions (T1 and T3) due to the higher fees.I firmly believe I have explained it the best way I could and helped you better understand the CPFP method.Thank you for reading the article to the end, and I wish you smooth and fast transactions in the future.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5486451",
+  "comments": [
+    {
+      "author": "odolvlobo",
+      "created_time": "February 24, 2024, 11:19:16 PMLast edit: February 25, 2024, 02:54:15 AM by odolvlobo",
+      "body": "There is no need to send more coins to A2. That does not \"replenish\" anything. Here is how it is done, assuming coins were sent from A1 to A2, but the amount of the transaction fee was too low:1. Send the entire balance of A2 (including the unconfirmed transaction) to an address in your wallet (A4), and pay a transaction fee that is enough to pay for both the A1→A2 and A2→A4 transactions.There may be a complication. Some wallets don't allow you to send unconfirmed coins and CPFP does just that. The solution is to look in you wallet settings for an option to send unconfirmed coins and enable it just for this transaction.Generally, you use CPFP when you are the receiver of the coins because you must control A2. However, if you don't control A2, you may still be able to use CPFP. When you send from A1 to A2 and the amount in A1 is greater than A2, then the remainder will be sent to a change address (C) in your wallet. It looks like this:A1 → A2 + CIn this case:1. Send the balance of C (including the unconfirmed transaction) to an address in your wallet (A4), and pay a transaction fee that is enough to pay for both the A1→A2+C and C→A4 transactions.Also, sending from a specific address may require something called coin control, which is an advanced feature. If you don't want to use coin control just do this:1. Send the entire balance of your wallet (including the unconfirmed amounts) to an address in your wallet (A4), and pay a transaction fee that is enough to pay for both the A1→A2 and everything→A4 transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DisabledAF",
+      "created_time": "February 25, 2024, 12:22:03 AM",
+      "body": "Quote from: odolvlobo on February 24, 2024, 11:19:16 PMThere is no need to send more coins to A2. That does not \"replenish\" anything. Here is how it is done, assuming coins were sent from A1 to A2, but the amount of the transaction fee was too low:1. Send the entire balance of A2 (including the unconfirmed transaction) to an address in your wallet (A4), and pay a transaction fee that is enough to pay for both the A1→A2 and A2→A4 transactions.There may be a complication. Some wallets don't allow you to send unconfirmed coins and CPFP does just that. The solution is to look in you wallet settings for an option to send unconfirmed coins and enable it just for this transaction.Generally, you use CPFP when you are the receiver of the coins because you must control A2. However, if you don't control A2, you may still be able to use CPFP. When you send from A1 to A2 and the amount in A1 is greater than A2, then the remainder will be sent to a change address (C) in your wallet. It looks like this:A1 → A2 + CIn this case:1. Send the balance of C (including the unconfirmed transaction) to an address in your wallet (A4), and pay a transaction fee that is enough to pay for both the A1→A2+C and C→A4 transactions.Also, sending from a specific address may require something called coin control, which is an advanced feature. If you don't want to use coin control just do this:1. Send the entire balance of your wallet (including the unconfirmed change) to an address in your wallet (A4), and pay a transaction fee that is enough to pay for both the A1→A2 and everything→A4 transactions.Well, in some cases, your approach may work, but not when consolidating while there are no satoshis at the destination address in a stuck transaction. That is the reason why you need to first send satoshis from address A3 to A2.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "February 25, 2024, 01:56:05 AM",
+      "body": "|<-                           parent                                 ->|<-                          child                       ->|fund-origins 0.01000000 -> destination 0.00970000                                                  change 0.00029500    change 0.00029500 -> change 0.00024500                                                              (fee 500)                                                    (fee 5000)you dont need to mess with destination(other person) you can use the change as your child",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "February 25, 2024, 02:34:42 AMLast edit: February 25, 2024, 02:59:53 AM by odolvlobo",
+      "body": "Quote from: DisabledAF on February 25, 2024, 12:22:03 AMWell, in some cases, your approach may work, but not when consolidating while there are no satoshis at the destination address in a stuck transaction. That is the reason why you need to first send satoshis from address A3 to A2.I think you are getting Bitcoin confused with Ethereum. In Ethereum, you must have enough ether in the wallet to pay the fee to send tokens. Bitcoin doesn't work that way. In Bitcoin, the fee is the sum of the source UTXOs minus the amount being sent.For example, A1 has 100000 sats and you send it to A2 with a fee of 100 sats:A1 (100000 sats) → A2 (99900 sats)  + 100 sats feeStuck. So, CPFP:A2 (99900 sats) → A4 (89900 sats) + 10000 sats feeA change address example in which A1 has 100000 sats and you send 50000 to A2 and the rest to a change address C with a fee of 100 sats:A1 (100000 sats) → A2 (50000 sats)  + C (49900 sats) + 100 sats feeStuck. So, CPFP:C (49900 sats) → A4 (39900 sats) + 10000 sats fee",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "OcTradism",
+      "created_time": "February 25, 2024, 03:43:17 AM",
+      "body": "Quote from: odolvlobo on February 25, 2024, 02:34:42 AMI think you are getting Bitcoin confused with Ethereum. In Ethereum, you must have enough ether in the wallet to pay the fee to send tokens. Bitcoin doesn't work that way. In Bitcoin, the fee is the sum of the source UTXOs minus the amount being sent.Wallet allows user to do adjustments for a transaction like Replace By Fee with two options if initially, the initial transaction was broadcasted to send all bitcoins (all UTXOs) in that wallet.- Deduct a transaction value by taking a new fee (bump fee) and decrease the transaction value.- Preserve a transaction value and with this option, it will show errod (don't have enough bitcoin to pay fee). The user will have to manually decrease the transaction value to have enough for fee or change to a first option.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Don Pedro Dinero",
+      "created_time": "February 25, 2024, 06:25:20 AM",
+      "body": "Quote from: odolvlobo on February 24, 2024, 11:19:16 PMThere is no need to send more coins to A2. That does not \"replenish\" anything. Here is how it is done, assuming coins were sent from A1 to A2, but the amount of the transaction fee was too low:1. Send the entire balance of A2 (including the unconfirmed transaction) to an address in your wallet (A4), and pay a transaction fee that is enough to pay for both the A1→A2 and A2→A4 transactions.That's what I thought when I saw the OP's explanation. He wanted to give a master class on how to do CPFP and he did it incorrectly, when in fact it is very simple. In my case when I did it, instead of sending the balance of the unconfirmed transaction to another address in my wallet, what I did was to take advantage of the fact that I had to make a transaction to pay for something and make the CPFP to do it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "February 25, 2024, 07:14:26 AM",
+      "body": "Quote from: DisabledAF on February 24, 2024, 10:46:57 PMI firmly believe I have explained it the best way I could and helped you better understand the CPFP method.You didn't. odolvlobo is right.All you need to do for doing CPFP is spend the fund received in the unconfirmed transaction with a high fee.Also note that, for doing CPFP, you should spend the coin received in the unconfirmed transaction and it's not that you can spend any coin you want from the receiving address. Therefore, it's not accurate to say you should make a transaction from A2 to do CPFP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

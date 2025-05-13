@@ -1,0 +1,165 @@
+{
+  "id": "topic_5408809",
+  "title": "Kostelooscoin",
+  "author": "Kostelooscoin",
+  "created_time": "August 05, 2022, 10:50:51 AMLast edit: August 05, 2022, 11:04:00 AM by Kostelooscoin",
+  "content": "Good morning,I would like to know if it is possible to redesign the bitcoins addresses like this:base58 = 123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyzcreation of the private key base58(privkey)base57 = 123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxy 'z' removedbase57(address(privkey))1st) is this possible?2nd) if the generated private key gives a bitcoin address that must contain a 'z' how will this be interpreted?3rd) for a generated private key would it be possible to scan only the bitcoin addresses that do not contain the 'z'?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408809",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "August 05, 2022, 11:14:31 AM",
+      "body": "1) Yes. But certain addresses will be invalid because they will fail the checksum for the address generated.2) Base58 goes from 0 to 57. Base57 goes from 0 to 56. Hypothetically, if there is a value with 57, then it would be considered 5 and 7 instead of 57 because it doesn't exist.3) Not sure what you mean but you can easily create addresses without certain characters if you intentionally search for it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kostelooscoin",
+      "created_time": "August 05, 2022, 11:22:06 AM",
+      "body": "In fact I am trying to create this with the above example: ex privkey : 5JdeC9P7Pbd1uGdFVEsJ41EkEnADbbHGq6p1BwFxm6txNBsQnswaddress : 12AKRNHpFhDSBDD9rSn74VAzZSL3774PxQI would like this address to be passed in this example because the address contains a forbidden character 'z'.this private key must not exist because it returns a false address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 05, 2022, 11:38:17 AM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 11:22:06 AMIn fact I am trying to create this with the above example: ex privkey : 5JdeC9P7Pbd1uGdFVEsJ41EkEnADbbHGq6p1BwFxm6txNBsQnswaddress : 12AKRNHpFhDSBDD9rSn74VAzZSL3774PxQI would like this address to be passed in this example because the address contains a forbidden character 'z'.this private key must not exist because it returns a false address.Not possible. You can remove and change more characters for the checksum to be valid but that would be too much work and you won't be able to see the private key.You cannot modify or remove any of the address to any degree and expect it to be valid. Due to the avalanche effect, any modification to the private key will result in the address being completely different. You have to specifically search for an address that does not include your desired character from the onstart.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "August 05, 2022, 11:44:11 AM",
+      "body": "May I ask what the purpose is to use \"your\" base57 encoding of public addresses (omitting \"z\" from allowed characters)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kostelooscoin",
+      "created_time": "August 05, 2022, 11:50:13 AM",
+      "body": "5KYZdU0o39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjsshowever this private key will not be generated because the 0 character is forbidden and therefore will not be generatedwhy is it not possible for this address : 13YaqD5gGC79Jgzgt23eEMwscHBxuXdPhU not to be generated because 'z' is forbidden ?and if this 'z' was removed from the address and the private key, could it avoid generating addresses and private keys without 'z' ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kostelooscoin",
+      "created_time": "August 05, 2022, 11:52:39 AM",
+      "body": "Quote from: Cricktor on August 05, 2022, 11:44:11 AMMay I ask what the purpose is to use \"your\" base57 encoding of public addresses (omitting \"z\" from allowed characters)?I'm just trying to find a faster way to generate only addresses with some characters but avoiding vanitygen and modifying the base58 for the address while keeping the base58 for the private key",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 05, 2022, 12:21:01 PM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 11:52:39 AMI'm just trying to find a faster way to generate only addresses with some characters but avoiding vanitygen and modifying the base58 for the address while keeping the base58 for the private keyIt wont work.By forcing to encode the PubKeyHash with \"base58check (-z)\" encoding, it will produce a non-standard address.It will produce an address with the correct code, yes; but the standard clients that use base58 simply wont be able to decode your addresses correctly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 05, 2022, 12:37:02 PMLast edit: August 05, 2022, 12:52:10 PM by ranochigo",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 11:50:13 AMwhy is it not possible for this address : 13YaqD5gGC79Jgzgt23eEMwscHBxuXdPhU not to be generated because 'z' is forbidden ?and if this 'z' was removed from the address and the private key, could it avoid generating addresses and private keys without 'z' ?Each of your addresses consists of checksums. When you generate that specific address, the last few byte corresponds to the checksum. Removing or otherwise changing any characters in the address will result in a checksum mismatch. If you deliberately remove z from addresses without doing anything else, then your checksum will most likely be mismatching because your wallets always uses base58 to check for the address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 05, 2022, 12:52:31 PM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 11:52:39 AMI'm just trying to find a faster way to generate only addresses with some characters but avoiding vanitygenThere's no other way to do it. You can only generate addresses with specific characteristics by brute forcing. You can't say \"I don't want this to have the letter z\" in the same way you can't say \"I want this to begin with these 30 characters\". There are addresses that don't fit your filters; you have to search for the rest. Quote from: Kostelooscoin on August 05, 2022, 11:52:39 AMand modifying the base58 for the address while keeping the base58 for the private keyEach private key gives only one address of the same type (e.g., P2PKH). Therefore, you can't have the address modified, but the private key kept the same.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 05, 2022, 01:30:24 PM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 11:52:39 AMI'm just trying to find a faster way to generate only addresses with some characters but avoiding vanitygen and modifying the base58 for the address while keeping the base58 for the private keyYou are changing the encoding itself by invalidating any result that contain `z`. If you want to change the encoding then why not use another one that is simpler than Base58 like Base32 so that there is no division (only shifts) that are much faster. In fact Bech32 addresses introduced in SegWit are using the same principle and are much faster to encode.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "August 05, 2022, 02:09:53 PM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 11:52:39 AMQuote from: Cricktor on August 05, 2022, 11:44:11 AMMay I ask what the purpose is to use \"your\" base57 encoding of public addresses (omitting \"z\" from allowed characters)?I'm just trying to find a faster way to generate only addresses with some characters but avoiding vanitygen and modifying the base58 for the address while keeping the base58 for the private keyWhat you say makes no sense.Base58 is just a representation of values which are hidden behind (hash160 bytes). So, you have some given value and to make it readable by others, you translate it to other representation (base58). Now, the whole world expects that base58 decoding is needed to retrieve the original content.What you propose is to use another representation. But that representation will not give the original content!Think about it that way. Let's say we have a content in Japanese. As it is difficult to interpret Japanese alphabet/signs, content is translated to English for easy use. But if you want to operate on content, you must first translate it back to Japanese.Now, another person comes and says that instead of using English, he will use Spanish as a \"temporary\" language for Japanese content he produces. Do you see problem now? The rest of the world will expect to have \"English->Japanese\" work to do, while it will crash, because Spanish words are not in English->Japanese dictionary. Even if sometimes it will work, it would be just a luck, not a rule.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 05, 2022, 03:05:14 PM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 11:52:39 AMQuote from: Cricktor on August 05, 2022, 11:44:11 AMMay I ask what the purpose is to use \"your\" base57 encoding of public addresses (omitting \"z\" from allowed characters)?I'm just trying to find a faster way to generate only addresses with some characters but avoiding vanitygen and modifying the base58 for the address while keeping the base58 for the private keyI guess the question is why?Vanitygen and others work well enough and you can from there just eliminate the addresses that have characters you don't want.You could easily even automate the process for 1000s of addresses per hours with even a low power CPU.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kostelooscoin",
+      "created_time": "August 05, 2022, 05:52:48 PM",
+      "body": "Quote from: pooya87 on August 05, 2022, 01:30:24 PMQuote from: Kostelooscoin on August 05, 2022, 11:52:39 AMI'm just trying to find a faster way to generate only addresses with some characters but avoiding vanitygen and modifying the base58 for the address while keeping the base58 for the private keyYou are changing the encoding itself by invalidating any result that contain `z`. If you want to change the encoding then why not use another one that is simpler than Base58 like Base32 so that there is no division (only shifts) that are much faster. In fact Bech32 addresses introduced in SegWit are using the same principle and are much faster to encode.we can make base 32 by keeping a bitcoin address starting with '1' ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 06, 2022, 01:51:50 AM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 05:52:48 PMwe can make base 32 by keeping a bitcoin address starting with '1' ?No. Because legacy addresses are always encoded in base58, so there is no way for you to encode in base32 and expect it to be valid.Bech32 uses a special encoding and you don't have to use base58 to get a valid address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 06, 2022, 02:55:00 AM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 05:52:48 PMwe can make base 32 by keeping a bitcoin address starting with '1' ?If you change the encoding and introduce a new algorithm, then yes. 1 is just the version indicator, all you have to do is to use 1 as your first digit (1234567890abcdef...), after converting HASH160 to 5 bit groups, you would prepend the version byte 0 (legacy address versions) and it encodes to 1.But note that nobody else would recognize your algorithm unless you get others to adopt it.Bech32 is slightly different. It has 4 parts:1. The data part for example the HASH160 which is converted to 5 bit groups (converting to base32)2. A version byte that is prepended to the start of the data indicating the witness version3. A separator that is always one to separate data+version from hrp4. A human readable part which is a string indicating the type of string like bc which is for SegWit addresses or lnbc that is used in Lightning Network",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 06, 2022, 08:43:42 AM",
+      "body": "Quote from: Kostelooscoin on August 05, 2022, 05:52:48 PMwe can make base 32 by keeping a bitcoin address starting with '1' ?To be clear, the '1' doesn't come from the Base58 encoding, it comes from the 0x00 prefix you add to whatever input you put in, before you feed it all into the encoder.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "August 11, 2022, 01:33:41 PMLast edit: August 13, 2022, 03:23:38 PM by DannyHamilton",
+      "body": "EDIT: Fixed misplaced comma and missing 1 in binary data per correction pointed out by PowerGlove in subsequent post.The first thing you need to understand is that addresses generally do not actually exist in Bitcoin.What exists is a script (a small computer program) that \"locks\" value in the output of a transaction. You use wallet software to create the script, and the wallet software needs three important pieces of information from you to be able to create that script.It needs to know how many satoshis you want locked up with a script in a transaction outputIt needs to know what type of script you want it to use (P2PK, P2PKH, P2SH, P2WPKH, etc) when it locks up the output.It needs to know about any binary (ones and zeros) data that is needed as defined by that particular script typeSo, you can tell a wallet:\"Please create a transaction for me which locks up 137,540 satoshis in an output using the P2PKH script type. The 160 bits of binary data needed for the creation of that script is as follows: 0100101110100010001011010100010010010101110101000100010001110110101110100101010 0101101010101010011010111010010101110101010111010101001010101010010101010100001 00\"However, as you can perhaps see, this is not a very user friendly way for humans to interact with software.Therefore, we humans have standardized a simpler way to say that exact same thing to each other and then to provide that information to the software that we interact with.Step1: We all agree together that since binary data is effectively just a base2 number, we can convert that number into some other larger base so that we don't need to remember, write, or speak quite so many \"digits\" when communicating that data portion to each other. We could have chosen base8 and used octal notation, but that still results in a lot of digits.  We decided to go with a larger base.  We could have chosen base16 and used hexadecimal notation, but again we felt we could go with a larger base and reduce the number of digits.  In the end, base58 was chosen. This allows us to use most of the alphanumeric digits, while avoiding some of the digits that are easily confused with others.  Note that this representation ONLY has meaning if everyone involved in the communication agrees on the representation being used.  For example, if I send you the value 15 and you don't know what base I'm using, then you don't know how much that is. If we agree ahead of time that we'll use base 8, then that 15 represents a binary value of 1101. However if we agree ahead of time that we'll use base 16, then it represents 10101, and if we agree ahead of time to use base58, then it represents 111111.  In the end, it's the BINARY data that matters, and we can only get to that from our representation if we agree on what representation we are using.Step 2: We agree to use a digit (or set of digits) to represent the type of script to create. So, we choose \"1\" to represent P2PKH, and 3 to represent P2SH, and bc1 to represent P2WPKH, and so on. Now we have two of the 3 pieces of information \"encoded\" into shorter easier things to say and to write.  We can just agree to concatenate those two pieces of information together and then use the word \"address\" to decribe this representation.Step3: We agree to move the decimal over 8 places to the left in the quantity of satoshis (divide by 100,000,000) and call it \"bitcoins\" instead of \"satoshis\".Now we have a quick and simple way to communicate that much longer phrase I used earlier in this discussion.So when someone asks me to send 1.2 \"bitcoins\" and gives me an address like \"1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2\", I know that I can split off that first character in the \"address\" (the \"1\") and look up which \"script\" that represents. I can also multiply the quantity of \"bitcoins\" by 100,000,000 to determine the quantity of \"satoshis\". Doing that, I know that I'm being asked to \"create a transaction which locks up 120,000,000 satoshis in an output using the P2PKH script type, and that the data that will be needed for that script is the binary representation of the base58 value \"BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2\".If you give me a base57 value instead, without telling me that you've done that, then when I use base58 conversion to convert your base57 value to it's binary represenation I'm going to get the WRONG binary representation. Maybe you can see that will be a problem?So, now that we humans have all agreed that we'll use base58 representation for that exchange of the data, the next thing we decided was that, since we're already using software to create the transaction itself, it would probably be best to have that software handle the conversion from base58 to binary. No sense in requiring every human to do that by hand and then enter in a bunch of ones and zeros.  Computers are much faster and more reliable at that.  So, every creator of every bitcoin wallet software (knowing that we all agreed we'd use base58 for communication with each other) built in a process whereby the human can just type in the thing they think of as an \"address\", and the quantity of \"bitcoins\". Then the wallet software will handle determining which type of script from the first digit (or leading set of digits), will multiply the quantity of \"bitcoins\" by 100,000,000 to determine the quantity of \"satoshis\", and will convert the remaining portion of the \"address\" to binary using a base58 converter.As such, even if you tell someone that the address you've given them is in base57, they won't have any way of telling their wallet software that it should use a base57 converter when it converts that portion of the address to binary.  The wallet software is written to assume that the address is being provided in base58. So, when it converts that data to binary, it will get the wrong data.If you want this to work, you'll need not only to create base57 addresses, but you'll need to convince anyone that's trying to send transactions with your base57 addresses to ALSO use special wallet software that you've written that knows to use base57 conversion when using those addresses to create the actual transactions. Since the transaction data is stored in binary (and only converted to \"addresses\" for us humans to see at the time of display), the recipient of the transaction will ALSO need to be using your special wallet software that knows to use base57 conversion when looking at those transactions. Otherwise (since they'll be incorrectly converting that binary data to a base58 address for display) the recipient isn't going to be able to find their transactions in the blockchain. So, the simple answer to your question is, \"No, it isn't going to work the way you want it to\".The full answer to your question is, \"If you can convince BOTH the recipient and sender of the transaction to use specially written wallet software that knows how to convert your custom address type into the proper transaction output scripts, then you can use any encoding you can imagine (base58, base57, base347298, the super-special kostelooscoin encoding scheme that doesn't even use a numeric base at all), and it will work just fine (as long as you don't have any bugs or security holes in your software).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "August 13, 2022, 07:05:27 AM",
+      "body": "Quote from: DannyHamilton on August 11, 2022, 01:33:41 PM{...}Thanks for posting that, it was well worth the read!It's a good reminder that a lazy conceptualization of what an \"address\" is can prevent you from understanding the technology more deeply.Not that it's important, but you have a misplaced comma in \"12,0000,000\". Also, I think your conversion of 15 from base 58 into binary is missing a leading 1 (i.e. 1×581+5×580 = 63 = 1111112).I really appreciate fleshed out posts like these, thanks for taking the time to write it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "August 13, 2022, 12:09:45 PM",
+      "body": "Quote from: PowerGlove on August 13, 2022, 07:05:27 AMNot that it's important, but you have a misplaced comma in \"12,0000,000\".Also, I think your conversion of 15 from base 58 into binary is missing a leading 1 (i.e. 1×581+5×580 = 63 = 1111112).Fixed it. Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "id": "topic_5455800",
+  "title": "RickDeckard",
+  "author": "RickDeckard",
+  "created_time": "June 08, 2023, 10:02:49 PMLast edit: January 20, 2024, 12:55:28 AM by RickDeckard",
+  "content": "After some failed attempts in using Powershell to make a backup of the files (I'm bad I know), I managed to get a working setup in Windows using a combination of wget and Task Scheduler. If anyone is interested in making regular backups of the files provided by @joker_josue (and isn't very tech savy) you can use the following guide for Windows (thank you TryNinja for an alternative path) and Linux (thank you @LoyceV!):WINDOWSPrerequisites: Grab wget.exe from here[1]. The code that I'll be using for creating the task can be one of these:Code:wget --progress=bar:force -r -c -nd -A.zip -np <URL>Resuming each command:--progress=bar:force : Displays a progress bar for each file that you will eventually download;-r : Recursive downloading. This option is responsible for downloading each file from the given URL;-c : Checks if the files already exist on the folder. If they do, they aren't downloaded again. If they exist, the download continues from where it ended;-nd : Prevents creating subfolders in the directory where the files are being saved;-A.zip : Will only look for files ending in \".zip\";-np : Wget won't go up in the directory that is currently browsing/using;If you'd like to have a different output folder for your files, there's a slightly variation of the code that you may use:Code:wget --progress=bar:force -r -c -nd -A.zip -np -P <Path to folder> <URL>The new argument (-P) will force wget to download the files to the directory that is provided by you.As for creating the task:Open Task SchedulerThis can be done by pressing the Windows Key and typing \"Task Scheduler\"Creating and setting up the taskClick in \"Create Basic Task\" in the main window that opens as soon as you complete the previous step:In the new menu that appears, name your task. I've named it \"TalkImg Backup\" and didn't provided an optional description (which is fine). Click \"Next\":In this new menu you're free to choose how often this task will trigger. Considering that the website makes weekly backups (of the previous week), I've selected \"Weekly\". Click \"Next\":I'm assuming that the backups will always be updated on a Sunday (as per last updated package). As such, select \"Monday\". You can also choose at which time the download occurs (for this example I've selected 08:00 (am)). When you're done setting up, click \"Next\":On the next menu click on \"Start a program\" and then \"Next\":On this new menu you get two important fields that need to be filled out:Program/script: This is where you should type the path to the wget executable provided earlier[1]. As an example I've added \"D:\\wget.exe\" Add arguments (optional): This will be the command line that you'll \"feed\" to wget shared previously[1]. Since I want the output files to be downloaded to a different directory, I've chosen the following command line:Code:wget --progress=bar:force -r -nd -A.zip -np -P \"D:\\TalkImg Backup\" https://talkimg.com/tempbackups/When you're done, press \"Next\".In the next menu you'll be able to review your task settings. For this example, the script will run \"Weekly; At 08:00 every Monday of every week, starting 08/06/2023\". If everything looks OK, just go ahead and click on \"Finish\":TryNinja CMD methodQuote from: TryNinja on June 10, 2023, 07:25:14 AMTo whoever prefers using the command line, you can also create the task with this command:QuoteSCHTASKS /Create /TN \"TalkImg Backup\" /SC WEEKLY /D MON /ST 08:00 /TR \"C:\\path\\to\\wget.exe --progress=bar:force -r -nd -A.zip -np -P \\\"D:\\TalkImg Backup\\\" https://talkimg.com/tempbackups/\"Just make sure to change the path to where wget.exe is located and also where to save the files (i.e D:\\TalkImg Backup\\).LINUXQuote from: LoyceV on June 09, 2023, 06:19:44 PMI use this on Linux in a cronjob:Code:#!/bin/bashcd /data/backup_talkimgsleep $(( $RANDOM % 22 ))h; sleep $(( $RANDOM % 59 ))m      # Random time each daywget -q --no-parent -rcA.zip https://www.talkimg.com/tempbackups/There's one flaw: if joker_josue would replace an old .zip by something else with the same name, it would overwrite my local file. But my local \"Time Machine\" backups make sure I won't lose files that way.I use a random time to spread server bandwidth. It takes only a second to run again, so it doesn't matter to use daily checks for new data.Congratulations! You've created you task and you are now acting as a backup agent for the images hosted on TalkImg. Horray!CHANGELOG10/06/2023: Added \"-c\" argument in the command.11/06/2023: Added Linux guide and alternative method for Windows. Thank you both LoyceV and TryNinja![1]https://eternallybored.org/misc/wget/",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5455800",
+  "comments": [
+    {
+      "author": "joker_josue",
+      "created_time": "June 09, 2023, 06:55:29 AM",
+      "body": "Thanks for making this tutorial.If that's okay, I'll share it in the OP of the TalkImg thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RickDeckard",
+      "created_time": "June 09, 2023, 11:44:42 AM",
+      "body": "Quote from: joker_josue on June 09, 2023, 06:55:29 AMThanks for making this tutorial.If that's okay, I'll share it in the OP of the TalkImg thread. Thank you for the words. Sure you can, I appreciate your efforts. Any way that we can show awareness to other forum users about ways to backup the files on your server is always a great advantage from my perspective.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "rdluffy",
+      "created_time": "June 09, 2023, 12:22:51 PM",
+      "body": "Good job RickDeckard  I have 2 questions:1 - In this case of making the weekly backup, it will make the complete backup everytime, right? Would it be possible to backup only the new files of that week, or do you have to download everything again every week?2 - Has anyone already done the backup? How many GBs of pictures are there?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RickDeckard",
+      "created_time": "June 09, 2023, 12:44:08 PM",
+      "body": "Quote from: rdluffy on June 09, 2023, 12:22:51 PMGood job RickDeckard  I have 2 questions:1 - In this case of making the weekly backup, it will make the complete backup everytime, right? Would it be possible to backup only the new files of that week, or do you have to download everything again every week?I may be wrong, but joker_josue always updates all 3 links,you can see that from the filenames (they have the date of when the backup is made). In that case you will always have new files with new information. Since the backups include the new images from the previous week, you will always have to download the new .zip files that are posted on the url provided. Quote from: rdluffy on June 09, 2023, 12:22:51 PM2 - Has anyone already done the backup? How many GBs of pictures are there?backup_20230527103002.zip -> 3,94 GBbackup_20230528000001.zip -> 106 MBbackup_20230604000002.zip -> 5560 MB",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 09, 2023, 05:56:01 PM",
+      "body": "Quote from: RickDeckard on June 09, 2023, 12:44:08 PMQuote from: rdluffy on June 09, 2023, 12:22:51 PMGood job RickDeckard  I have 2 questions:1 - In this case of making the weekly backup, it will make the complete backup everytime, right? Would it be possible to backup only the new files of that week, or do you have to download everything again every week?I may be wrong, but joker_josue always updates all 3 links,you can see that from the filenames (they have the date of when the backup is made). In that case you will always have new files with new information. Since the backups include the new images from the previous week, you will always have to download the new .zip files that are posted on the url provided. Quote from: rdluffy on June 09, 2023, 12:22:51 PM2 - Has anyone already done the backup? How many GBs of pictures are there?backup_20230527103002.zip -> 3,94 GBbackup_20230528000001.zip -> 106 MBbackup_20230604000002.zip -> 5560 MBJust a note: Backup zip files are only available for 15 days.That is, today's zip, 15 days later will be deleted. And each new backup only has images from the last week.Therefore, someone who wants to keep all the backups should copy the first zip by this weekend. For he must be eliminated.The system is all automatic, so I recommend that attention.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 09, 2023, 06:19:44 PM",
+      "body": "Quote from: RickDeckard on June 09, 2023, 12:44:08 PMQuote from: rdluffy on June 09, 2023, 12:22:51 PM1 - In this case of making the weekly backup, it will make the complete backup everytime, right? Would it be possible to backup only the new files of that week, or do you have to download everything again every week?I may be wrong, but joker_josue always updates all 3 links,you can see that from the filenames (they have the date of when the backup is made). In that case you will always have new files with new information. Since the backups include the new images from the previous week, you will always have to download the new .zip files that are posted on the url provided.If you run the same wget command again right after downloading, does it redownload everything? If so, you should add the \"-c\" option:Code:       -c       --continue           Continue getting a partially-downloaded file.  This is useful when           you want to finish up a download started by a previous instance of           Wget, or by another program.I use this on Linux in a cronjob:Code:#!/bin/bashcd /data/backup_talkimgsleep $(( $RANDOM % 22 ))h; sleep $(( $RANDOM % 59 ))m      # Random time each daywget -q --no-parent -rcA.zip https://www.talkimg.com/tempbackups/There's one flaw: if joker_josue would replace an old .zip by something else with the same name, it would overwrite my local file. But my local \"Time Machine\" backups make sure I won't lose files that way.I use a random time to spread server bandwidth. It takes only a second to run again, so it doesn't matter to use daily checks for new data.Lol@Windows task scheduler. So much more complicated than a cronjob",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "June 09, 2023, 06:37:43 PM",
+      "body": "Quote from: LoyceV on June 09, 2023, 06:19:44 PMThere's one flaw: if joker_josue would replace an old .zip by something else with the same name, it would overwrite my local file. But my local \"Time Machine\" backups make sure I won't lose files that way.I use a random time to spread server bandwidth. It takes only a second to run again, so it doesn't matter to use daily checks for new data.But my system doesn't rewrite an existing zip. It always creates a new one, with the new name, containing the new images since the last execution of the task (7 days).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 09, 2023, 06:44:30 PM",
+      "body": "Quote from: joker_josue on June 09, 2023, 06:37:43 PMBut my system doesn't rewrite an existing zip. It always creates a new one, with the new name, containing the new images since the last execution of the task (7 days).I assumed nothing less  It's just me being thorough: always make sure a new backup can't accidentally overwrite your old backup and destroy your only copy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 09, 2023, 08:13:12 PM",
+      "body": "Quote from: RickDeckard on June 08, 2023, 10:02:49 PMCongratulations! You've created you task and you are now acting as a backup agent for the images hosted on TalkImg. Horray!So you are just assuming most of the people are using wInD0ws 0S?  How about tutorials for Mac and Linux users?  Luckily LoyceV already posted above how this can be done with Linux, and there is also GUI for everyone who prefers that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 10, 2023, 07:14:15 AM",
+      "body": "Quote from: dkbit98 on June 09, 2023, 08:13:12 PMSo you are just assuming most of the people are using wInD0ws 0S?  How about tutorials for Mac and Linux users?  I'm assuming you didn't assume he may be assuming Linux users don't need a tutorial  I mean: 2 lines vs 4 pages",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "June 10, 2023, 07:25:14 AM",
+      "body": "To whoever prefers using the command line, you can also create the task with this command:QuoteSCHTASKS /Create /TN \"TalkImg Backup\" /SC WEEKLY /D MON /ST 08:00 /TR \"C:\\path\\to\\wget.exe --progress=bar:force -r -nd -A.zip -np -P \\\"D:\\TalkImg Backup\\\" https://talkimg.com/tempbackups/\"Just make sure to change the path to where wget.exe is located and also where to save the files (i.e D:\\TalkImg Backup\\).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RickDeckard",
+      "created_time": "June 10, 2023, 09:39:50 AM",
+      "body": "Quote from: LoyceV on June 09, 2023, 06:19:44 PMIf you run the same wget command again right after downloading, does it redownload everything? If so, you should add the \"-c\" option:Code:       -c       --continue           Continue getting a partially-downloaded file.  This is useful when           you want to finish up a download started by a previous instance of           Wget, or by another program.Just tested this and it does redownload everything that is on the folder, without making any check if previous files (with the same name) were downloaded before. I'll add that argument in the original code to prevent this. Thank you!Quote from: LoyceV on June 09, 2023, 06:19:44 PMLol@Windows task scheduler. So much more complicated than a cronjob It's Windows, what can I do ¯\\_(ツ)_/¯.Quote from: dkbit98 on June 09, 2023, 08:13:12 PMQuote from: RickDeckard on June 08, 2023, 10:02:49 PMCongratulations! You've created you task and you are now acting as a backup agent for the images hosted on TalkImg. Horray!So you are just assuming most of the people are using wInD0ws 0S?  How about tutorials for Mac and Linux users?  Luckily LoyceV already posted above how this can be done with Linux, and there is also GUI for everyone who prefers that.Ahah I didn't assumed anything. It's just that I use Windows and I wouldn't feel comfortable typing a guide for any other OS that I couldn't try it before.Quote from: LoyceV on June 09, 2023, 06:19:44 PMI use this on Linux in a cronjob:Code:#!/bin/bashcd /data/backup_talkimgsleep $(( $RANDOM % 22 ))h; sleep $(( $RANDOM % 59 ))m      # Random time each daywget -q --no-parent -rcA.zip https://www.talkimg.com/tempbackups/Quote from: TryNinja on June 10, 2023, 07:25:14 AMTo whoever prefers using the command line, you can also create the task with this command:QuoteSCHTASKS /Create /TN \"TalkImg Backup\" /SC WEEKLY /D MON /ST 08:00 /TR \"C:\\path\\to\\wget.exe --progress=bar:force -r -nd -A.zip -np -P \\\"D:\\TalkImg Backup\\\" https://talkimg.com/tempbackups/\"Just make sure to change the path to where wget.exe is located and also where to save the files (i.e D:\\TalkImg Backup\\).If both of you allow me, can I add these entries in the OP? @LoyceV would cover Linux users and @TryNinja is great alternative for those that are comfortable with cmd.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 10, 2023, 04:57:51 PM",
+      "body": "Quote from: RickDeckard on June 10, 2023, 09:39:50 AMIf both of you allow me, can I add these entries in the OP?Of course, quoting public posts is always allowed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "June 10, 2023, 09:32:29 PM",
+      "body": "Quote from: LoyceV on June 10, 2023, 04:57:51 PMQuote from: RickDeckard on June 10, 2023, 09:39:50 AMIf both of you allow me, can I add these entries in the OP?Of course, quoting public posts is always allowed.Same for me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RickDeckard",
+      "created_time": "June 11, 2023, 01:56:16 PM",
+      "body": "Quote from: TryNinja on June 10, 2023, 09:32:29 PMQuote from: LoyceV on June 10, 2023, 04:57:51 PMQuote from: RickDeckard on June 10, 2023, 09:39:50 AMIf both of you allow me, can I add these entries in the OP?Of course, quoting public posts is always allowed.Same for me.Thank you both. I've edited the OP and managed to add both of your suggestions to it. Here's hoping we're able to cover more users and increase the reach of TalkImg backups.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

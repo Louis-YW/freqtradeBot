@@ -1,0 +1,165 @@
+{
+  "id": "topic_5507824",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "August 30, 2024, 01:14:25 PM",
+  "content": "[← Previous Question] Missed me? Time for another quiz.- What's this?Quote from: BlackHatCoiner on March 31, 2024, 12:48:15 PMBitcoin quizzes are technical questions of educational character that improve the average user's knowledge on Bitcoin, and help him rank up. You can read more about it in here. Answer the question correctly and earn merits.Alice wants to construct a Bitcoin script, which can be validated only if the spender provides a solution to the equation: SHA256(2x + 8) = 0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7. In other words, Alice wants to send a bitcoin to an address, which is a script. In order for Bob to claim the bitcoin, he needs to find a 32-bit value for x, such that once you double it, add 8 to it, and pass that result into SHA256, the hash would be equal with Alice's hash.Can you construct this script? You might find the following links useful:https://ide.scriptwiz.app/https://en.bitcoin.it/wiki/Script",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5507824",
+  "comments": [
+    {
+      "author": "Mia Chloe",
+      "created_time": "August 30, 2024, 02:32:49 PM",
+      "body": "Nice one Blackhatcoiner.Well I have an idea of what to do however my phyton scripting skills are quite low anyways I was able to write these two scripts I don't know if they'll do. I tried running them on my mobile phone with a phyton compiler but it seems I'll need more computational power to run the test however Im not with my PC now. Hopefully the script is correct.Code:import hashlibdef find_x():    target_hash = \"df3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7\"    for x in range(2**32):        result = 2*x + 8        hash_result = hashlib.sha256(str(result).encode()).hexdigest()        if hash_result == target_hash:            print(f\"x = {x}\")            breakfind_x()Code:import hashlibdef find_x():    target_hash = \"0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7\"    for x in range(2**32):        if x % 100000 == 0:  # Print progress            print(f\"Trying x = {x}\")        result = 2*x + 8        hash_result = hashlib.sha256(str(result).encode()).hexdigest()        if hash_result == target_hash:            print(f\"x = {x}\")            breakfind_x()",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 30, 2024, 03:06:47 PM",
+      "body": "Quote from: Mia Chloe on August 30, 2024, 02:32:49 PM[...]Remember that the script we're talking about is a Bitcoin script, not a python script. You need to construct a script based on Script.Also, please note that I'm not asking you to solve the equation, which is what you're doing in your python script. I'm asking you to construct a script that would check if the equation is solved. For example, check out these scripts. There, the equation is hash(x) = hash(y) for x != y, or in English, \"find two different inputs which produce the same hash\". You obviously can't find which these inputs are (hereby the bounty), but you can construct scripts that can validate this condition.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mia Chloe",
+      "created_time": "August 30, 2024, 03:42:52 PM",
+      "body": "Quote from: BlackHatCoiner on August 30, 2024, 03:06:47 PMQuote from: Mia Chloe on August 30, 2024, 02:32:49 PM[...]Remember that the script we're talking about is a Bitcoin script, not a python script. You need to construct a script based on Script.Also, please note that I'm not asking you to solve the equation, which is what you're doing in your python script. I'm asking you to construct a script that would check if the equation is solved. For example, check out these scripts. There, the equation is hash(x) = hash(y) for x != y, or in English, \"find two different inputs which produce the same hash\". You obviously can't find which these inputs are (hereby the bounty), but you can construct scripts that can validate this condition. Alright no problems I'll try creating a bitcoin script this time. However it's not going to be an easy task for me though since I really haven't created a bitcoin script before. Anyways with the resources you have shared I'll try my best to see if I can create a bitcoin script that would be the correct answer to this quiz. Till then I'll just proceed to reading through the articles hopefully I'll get something nice out of it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "coinlary",
+      "created_time": "August 30, 2024, 05:08:34 PM",
+      "body": "tried with JSnever wrote a script before so it might be wrongused node, installed the package along Code:const bitcoin = require('bitcoinjs-lib');// Defines the hash value Alice wants to matchconst targetHash = Buffer.from('df3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7', 'hex');// Creates the locking scriptconst script = bitcoin.script.compile([  bitcoin.opcodes.OP_DUP,  bitcoin.opcodes.OP_2,  bitcoin.opcodes.OP_MUL,  bitcoin.opcodes.OP_8,  bitcoin.opcodes.OP_ADD,  bitcoin.opcodes.OP_SHA256,  targetHash,  bitcoin.opcodes.OP_EQUAL]);// Creates a P2SH address from the scriptconst { address } = bitcoin.payments.p2sh({  redeem: { output: script, network: bitcoin.networks.testnet },  network: bitcoin.networks.testnet});console.log('P2SH Address:', address);// Create a new transactionconst psbt = new bitcoin.Psbt({ network: bitcoin.networks.testnet });// Add input (replace with actual transaction details)//must be 32 bitpsbt.addInput({  hash: 'your-transaction-hash', // Replace with actual transaction hash  index: 0, // Replace with actual index  nonWitnessUtxo: Buffer.from('your-raw-transaction-hex', 'hex') // Replace with actual raw transaction hex});// Add output to the P2SH addresspsbt.addOutput({  address: address,  value: 1000 // Value in satoshis});// Sign the transaction (replace with actual keyPair)const keyPair = bitcoin.ECPair.makeRandom({ network: bitcoin.networks.testnet });psbt.signInput(0, keyPair);// Finalize and build the transactionpsbt.finalizeAllInputs();const tx = psbt.extractTransaction();console.log('Transaction Hex:', tx.toHex());",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 30, 2024, 05:30:19 PM",
+      "body": "Friends, a script. A Bitcoin script.  Like this one:Code:OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIGThis one is taken from bitcoin.it/Script, and it is the standard script used when sending bitcoin. When locking bitcoin to that script, the unlocking script requires the spender to provide a valid signature and public key in the stack of elements. This is a step-by-step description of what happens in each opcode:OpcodeStack<sig> <pubKey>OP_DUP<sig> <pubKey> <pubKey>OP_HASH160<sig> <pubKey> <hashed_pubKey>Adding <pubKeyHash> to stack<sig> <pubKey> <hashed_pubKey> <pubKeyHash>OP_EQUALVERIFY<sig> <pubKey> (removes the top two items if they are equal, otherwise it fails)OP_CHECKSIG1 (returns 1 if the signature is valid, otherwise 0)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mia Chloe",
+      "created_time": "August 30, 2024, 08:11:51 PMLast edit: August 30, 2024, 08:28:37 PM by Mia Chloe",
+      "body": "Code:OP_DUPOP_2DUPOP_ADDOP_8OP_ADDOP_SHA256OP_SWAPOP_EQUALVERIFYOP_CHECKSIG`Code:`OP_DATA_32 <target_hash> OP_SWAP OP_DUP OP_2 OP_MUL OP_8 OP_ADD OP_SHA256 OP_EQUALVERIFY OP_CHECKSIG`After my long reading and multiple tries, I was able to come up with the two scripts above. The script actually takes two inputs which are `x` (this is the  solution to the equation) `target_hash` (which  is the expected hash value)- `OP_DATA_32 <target_hash>` from my understanding so far this pushes the target_hash onto the stack (32 bytes)- `OP_SWAP` while this swaps the top two stack items (x and target_hash)- `OP_DUP` this part is supposed to duplicate the top stack item which  is 'x'- `OP_2` this one is supposed to push the number 2 onto the stack- `OP_MUL` this multiplies x by 2- `OP_8` this one pushes the number 8 onto the stack- `OP_ADD` adds 8 to the result ( 2x + 8 )- `OP_SHA256` from my understanding so far this one calculates the SHA256 hash of the result- `OP_EQUALVERIFY` I think this should check if the hash equals to the target hash and  If not the script should fail- `OP_CHECKSIG` this actually checks the signatureAlright Blackhatcoiner I think this is the best I can  come up with from what I've read so far.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 30, 2024, 09:20:04 PM",
+      "body": "Let's test this, opcode by opcode. (You can verify your scripts yourself, btw, by using https://ide.scriptwiz.app/)OpcodeStack<0xdf39...d8b7> 1000OP_DUP<0xdf39...d8b7> 1000 1000OP_2DUP<0xdf39...d8b7> 1000 1000 1000 1000OP_ADD<0xdf39...d8b7> 1000 1000 2000OP_8<0xdf39...d8b7> 1000 1000 2000 8OP_ADD<0xdf39...d8b7> 1000 1000 2008OP_SHA256<0xdf39...d8b7> 1000 1000 <0xc91d...dc80>OP_SWAP<0xdf39...d8b7> 1000 <0xc91d...dc80> 1000OP_EQUALVERIFY<0xdf39...d8b7> 1000 <0xc91d...dc80> 1000, Stack failed an OP_VERIFY operation. Top two items are not equal.OP_CHECKSIGThis one will abort. By the way, why did you put an OP_CHECKSIG? There is no signature, nor public key to check. It's just an equation. If you solve it, you get the coins. That's it. Quote from: Mia Chloe on August 30, 2024, 08:11:51 PM- `OP_DATA_32 <target_hash>` from my understanding so far this pushes the target_hash onto the stack (32 bytes)I'm not aware of an OP_DATA_32 op code. If you want to put Alice's hash in the stack, just enter it with no opcodes, like this: <target_hash>OP_EQUALVERIFY will fail the script. You're that close! Copy and paste your code into the Script Wiz (with OP_CHECKSIG deducted), and find your mistake:Code:<0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7>OP_SWAPOP_DUPOP_2OP_MULOP_8OP_ADDOP_SHA256OP_EQUALVERIFY(In stack elements, just use a random number, like <1000>)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mia Chloe",
+      "created_time": "August 30, 2024, 09:34:34 PMLast edit: August 30, 2024, 09:45:33 PM by Mia Chloe",
+      "body": "Code:`OP_DATA_32 <target_hash> OP_SWAP OP_DUP OP_2 OP_MUL OP_8 OP_ADD OP_SHA256 OP_EQUAL`I removed the `OP_CHECKSIG` command  since I think its not necessary for the script like you said. I also replaced `OP_EQUALVERIFY` with `OP_EQUAL`, this should prevent the script from failing if the equation is not solved but rather it should simply return false instead.Code:OP_2 OP_MUL OP_8 OP_ADD OP_SHA256 OP_DATA_32 <target_hash> OP_EQUALI'm not sure though but `OP_DUP` may not be needed too since  the input `x` is already on the stack.Code:OP_DUP OP_2 OP_MUL OP_8 OP_ADD OP_SHA256 OP_DATA_32 <target_hash> OP_EQUALIn this other one I tried removing the `OP_SWAP` command",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Ambatman",
+      "created_time": "August 31, 2024, 12:41:05 AM",
+      "body": "I think am getting there. This is the first am quite understanding Bitcoin scripts. Let's see Code:<target hash > OP_SWAP OP_DUP OP_8 OP_ADD OP_SHA256 OP_EQUALNot quite conversant with much but I did draw some inspiration from Mia Chloe work and tried mine. Though couldn't use the site that was recommended to check but This is how I ended with this. I removed OP _DATA_32 because like you said I couldn't find it. Removed OP_MUL because it has been disabled Removed OP _2 because there's no need for pushing two since we already used OP _ DUP to duplicate x ( the top stack) and used OP _EQUAL because it's the only one I saw that supports an output been either True or false without a SIG. Where OP _EQUALVERIFY would make the transaction as invalid if it's not true The question one that requires the result to be true which doesn't quite require OP _ VERIFY. This is the little I can gather..... Would improve more since I just learnt a preamble from this thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dansus021",
+      "created_time": "August 31, 2024, 05:51:30 AM",
+      "body": "hI BlackHatCoineri actually dont know how to solve your question but I just want to say I put your question in ChatGPT and the bot answered all the detail? I don't know if the answer is correct answer or not but don't you think there will be a member that use AI for the answer. You know that AI getting crazy nowadays",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Ambatman",
+      "created_time": "August 31, 2024, 07:59:06 AM",
+      "body": "Quote from: dansus021 on August 31, 2024, 05:51:30 AMhI BlackHatCoineri actually dont know how to solve your question but I just want to say I put your question in ChatGPT and the bot answered all the detail? I don't know if the answer is correct answer or not but don't you think there will be a member that use AI for the answer. You know that AI getting crazy nowadays Wow AI has gotten this Far I guess I underestimated their capabilities since ain't quite fond of having a dependence on something that isn't quite mine. The essence of this questions if I ain't mistaken is to help beginners or individuals interested improve their knowledge. If a person do rely on ChatGPT, there's no way they can truly grow. For instance if it wasn't for Mia Chloe mistakes and corrections from BlackHatCoiner I wouldn't know anything close to the preliminary I have learnt.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "promise444c5",
+      "created_time": "August 31, 2024, 03:39:40 PM",
+      "body": "I went through it and i tried  giving it a shot, it was challenging for me because i have no experience about it but firstly i had to go through https://en.bitcoin.it/wiki/Script  then i went through https://bitcoindev.network/bitcoin-script-101/ and read a little from https://learnmeabitcoin.com/technical/cryptography/hash-function/from the https://ide.scriptwiz.app/ i tried testing and got 0, then i need to test for true which is \"1\" so i used the target hash of <0x4307fbbb7e5b7c8f0339b060d171c49c881901d78ab712e60d805af9f9dc4ca1> and i got 1 (using 496 on stack element ) . i don't know if i'm right thoughCode:OP_DUPOP_2OP_MULOP_8OP_ADDOP_SHA256<0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7>OP_EQUAL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 31, 2024, 04:27:31 PM",
+      "body": "For anyone who wants the solution, it's x=10499996. For that value, 2x + 8 = 21000000, and SHA256(21000000) = 0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7.Quote from: Mia Chloe on August 30, 2024, 09:34:34 PMCode:OP_2 OP_MUL OP_8 OP_ADD OP_SHA256 OP_DATA_32 <target_hash> OP_EQUALReally close. It'd be correct if OP_MUL was enabled, but it's disabled. You need to replace it with another opcode (or more than one). (And of course, you need to remove OP_DATA_32 as it does not exist.)Quote from: Ambatman on August 31, 2024, 12:41:05 AMCode:<target hash > OP_SWAP OP_DUP OP_8 OP_ADD OP_SHA256 OP_EQUALThis one is incorrect. I think that you've misunderstood what OP_DUP does, because you're just one placement away from the solution. Put your code into Script Wiz, using <10499996> as the only stack element, and see what you get:Code:<0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7>OP_SWAPOP_DUPOP_8OP_ADDOP_SHA256OP_EQUALHint: You need to add just one more opcode, somewhere. Quote from: dansus021 on August 31, 2024, 05:51:30 AMi actually dont know how to solve your question but I just want to say I put your question in ChatGPT and the bot answered all the detail? I don't know if the answer is correct answer or not but don't you think there will be a member that use AI for the answer.You can paste the answer. I have crafted these questions in such a way that ChatGPT would most likely fail in all of them.Quote from: promise444c5 on August 31, 2024, 03:39:40 PM[...]You're close as well. Just read what I've said to the others.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "promise444c5",
+      "created_time": "August 31, 2024, 05:33:50 PM",
+      "body": "Quote from: BlackHatCoiner on August 31, 2024, 04:27:31 PM edited outHow about this :Code:OP_2OP_SWAPOP_DUPOP_ADDOP_8OP_ADDOP_SHA256<0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7>OP_EQUALfound out that OP_MUL was dissabled so i had to swap then duplicate the top stack item since that's the way it works ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mia Chloe",
+      "created_time": "August 31, 2024, 06:00:15 PM",
+      "body": "Quote from: BlackHatCoiner on August 31, 2024, 04:27:31 PMQuote from: Mia Chloe on August 30, 2024, 09:34:34 PMCode:OP_2 OP_MUL OP_8 OP_ADD OP_SHA256 OP_DATA_32 <target_hash> OP_EQUALReally close. It'd be correct if OP_MUL was enabled, but it's disabled. You need to replace it with another opcode (or more than one). (And of course, you need to remove OP_DATA_32 as it does not exist.)Code:`OP_DUP OP_ADD OP_8 OP_ADD OP_SHA256 OP_PUSHDATA <target_hash> OP_EQUAL`Here is my modification.I replaced the OP_2 OP_MUL which if run on the script does the job of multiplying the target value 'x' by 2 to give the equivalent of '2x ' in the data stack. To modify the script I used OP_DUP which would duplicate the target value 'x'  then I also added 'OP_ADD ' to add the target value 'x' so instead of getting 2*x to give 2x like in the old code, we  now get ( x +x ) which is still equivalent to 2x. I also replaced Code: 'OP_DATA_32 <target_hash> OP_EQUAL' with Code:'OP_PUSHDATA <target_hash> OP_EQUAL` since it doesn't exist.I hope I'm right this time",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Ambatman",
+      "created_time": "August 31, 2024, 07:24:58 PMLast edit: September 01, 2024, 12:27:30 AM by Ambatman",
+      "body": "Quote from: BlackHatCoiner on August 31, 2024, 04:27:31 PMQuote from: Ambatman on August 31, 2024, 12:41:05 AMCode:<target hash > OP_SWAP OP_DUP OP_8 OP_ADD OP_SHA256 OP_EQUALThis one is incorrect. I think that you've misunderstood what OP_DUP does, because you're just one placement away from the solution. Put your code into Script Wiz, using <10499996> as the only stack element, and see what you get: Using scriptwiz was really hard at first since there's always a pre existing script but have gotten the hang of it. Code:OP_DUP OP_ADD OP_8 OP_ADD OP_SHA256 <target hash > OP_EQUALNow I understand especially while using it with scriptwizOP DUP duplicates doesn't mean it automatically adds the duplicates OP _ ADD helps with that which I did And found out that OP_SWAP felt out of place. Used the above code and the values I got were getting similar to yours until I used OP_EQUAL and I was given this It's showing stack data must include min 2 data and I don't know what to place there at part from <10499996>NGL scriptwiz requires a manual. Edit Added <10499996> to the stack making it two And the error message seized and replaced  by zero",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "promise444c5",
+      "created_time": "August 31, 2024, 09:27:40 PM",
+      "body": "Quote from: Ambatman on August 31, 2024, 07:24:58 PMIt's showing stack data must include min 2 data and I don't know what to place there at part from <10499996>NGL scriptwiz requires a manual. not also good in this but i think you  are equating two values here and you didn't add the <target hash> that you included in your codeuse the hash(SHA256) from the question itself,it should be fixed",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 01, 2024, 02:17:47 PM",
+      "body": "Quote from: promise444c5 on August 31, 2024, 05:33:50 PM[...]Correct. However, with x=10499996, you're left with two items in the stack. That doesn't make the script incorrect, but it's better for your understanding to always be left with only one non-zero item. Quote from: Mia Chloe on August 31, 2024, 06:00:15 PMCode:`OP_DUP OP_ADD OP_8 OP_ADD OP_SHA256 OP_PUSHDATA <target_hash> OP_EQUAL`Without OP_PUSHDATA, that's the correct one! Quote from: Ambatman on August 31, 2024, 07:24:58 PMCode:OP_DUP OP_ADD OP_8 OP_ADD OP_SHA256 <target hash > OP_EQUALThis one is correct as well. You should have replaced OP_MUL with OP_DUP and OP_ADD, as you did. The reason you're getting the error in the first image, is that you haven't entered the <target hash>, which is <0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7>.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Ambatman",
+      "created_time": "September 01, 2024, 03:14:47 PM",
+      "body": "Quote from: BlackHatCoiner on September 01, 2024, 02:17:47 PMQuote from: promise444c5 on August 31, 2024, 05:33:50 PM[...]Correct. However, with x=10499996, you're left with two items in the stack. That doesn't make the script incorrect, but it's better for your understanding to always be left with only one non-zero item. Quote from: Mia Chloe on August 31, 2024, 06:00:15 PMCode:`OP_DUP OP_ADD OP_8 OP_ADD OP_SHA256 OP_PUSHDATA <target_hash> OP_EQUAL`Without OP_PUSHDATA, that's the correct one! Quote from: Ambatman on August 31, 2024, 07:24:58 PMCode:OP_DUP OP_ADD OP_8 OP_ADD OP_SHA256 <target hash > OP_EQUALThis one is correct as well. You should have replaced OP_MUL with OP_DUP and OP_ADD, as you did. The reason you're getting the error in the first image, is that you haven't entered the <target hash>, which is <0xdf3984c3d89ec61f93f2d3060263bbb960a885ffa5d41ca1eb9c2692de71d8b7>. Thanks for your time and question. With this few I can say I'm quite confident in using the various scripts that we implemented in the above question. Is there any site or app that can help in testing my knowledge? Tried searching via web but most are just single questions on Githubs. Quote from: promise444c5 on August 31, 2024, 09:27:40 PMQuote from: Ambatman on August 31, 2024, 07:24:58 PMIt's showing stack data must include min 2 data and I don't know what to place there at part from <10499996>NGL scriptwiz requires a manual. not also good in this but i think you  are equating two values here and you didn't add the <target hash> that you included in your codeuse the hash(SHA256) from the question itself,it should be fixed Didn't quite understand this last time but now I do. Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "topic_5409730",
+  "title": "akaki",
+  "author": "akaki",
+  "created_time": "August 13, 2022, 10:45:52 AM",
+  "content": "Let's assume we try to mine the next block after block No.749256 whose hash is : 00000000000000000009b06cb40e4302fc0dab3f8031f058351e904e14be2b45.  --> current difficulty is 19 leading zeros (76 zero bits=19*4) out of 256  --> the size of the population is N=2^256In big-endian representation, double_sha256 outcome should have 76 ending zeros. This is equivalent to saying that the leading 180 bits can be any number  --> total number of possible solution is K=2^180Let's assume we use one Antminer S19 PRO with a hashpower of 110TH/s for 10 min  --> total number of attempts is n=66*10^15One double_sha256 outcome that fulfills the difficulty requirement is sufficient --> k=1To sum up the mining problem, here are the parameters to calculate the probability of mining a block in 10 min :  N is the population size                                                            =  2^256  n is the number of draws (double_SHA256 checks)                     = 66*10^15  K is the number of known success states in the population          = 2^180  k is the number of wanted successes                                         = 1This problem is dealt with in probability theory and statistics by the hypergeometric distribution (definition from wikipedia): Quoteis a discrete probability distribution that describes the probability of k successes (random draws for which the object drawn has a specified feature) in n draws, without replacement, from a finite population of size N that contains exactly K objects with that feature, wherein each draw is either a success or a failure. The formula for the calculation is available on wikipedia : https://en.wikipedia.org/wiki/Hypergeometric_distributionIs anyone able to calculate the result for the example I have given ? The values seem too big using Python or Matlab.We find references to this early post regarding the difficulty of mining but it doesn't give a rigourous answer https://bitcointalk.org/index.php?topic=1682.0.Kind regards",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5409730",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "August 13, 2022, 11:40:19 AM",
+      "body": "No floating-point software will be able to calculate with those two numbers, because one is an order of magnitude larger than the other.Try using a fixed-point library - it shouldn't use up so much memory, but the execution time will become longer.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "a1 Hashrate LLC2022",
+      "created_time": "August 13, 2022, 02:33:40 PM",
+      "body": "Fuck formulas in this case and in many other they are simply not practical.This problem is far easier to solver without complex formulas.First all diff is set in stone for about 2 weeks.So look up difficulty.Quotehttps://www.bitrawr.com/difficulty-estimatorLatest Block:   749281  (24 minutes ago)Current Pace:   103.0868%  (1346 / 1305.70 expected, 40.3 ahead)Previous Difficulty:   27692567959233.59                            Current Difficulty:   28174668481289.41                           Next Difficulty:   between 28994797585876 and 29099973073459Next Difficulty Change:   between +2.9109% and +3.2842%Previous Retarget:   August 4, 2022 at 8:29 AM  (+1.7409%)Next Retarget (earliest):   Wednesday at 10:26 PM  (in 4d 12h 19m 22s)Next Retarget (latest):   Wednesday at 11:32 PM  (in 4d 13h 26m 3s)Projected Epoch Length:   between 13d 13h 56m 19s and 13d 15h 3m 0sso current diff is a fixed number 28.17tyou hash rate is a fixed number 100ththe actual unknown number is the net works current hashrate.  And now that the network is huge no one ever knows the exact size of the gear hashing = Factso look up 'current' hash rate chart's  which are always approximatehttps://www.coinwarz.com/mining/bitcoin/hashrate-chartand from Aug 6 to Aug 13 the lowest 'guess' was  186.7288ehthe highest 'guess' was 253.9883ehSo the answer to your question is 100th/186728800th on the low hashrateto 100th/253988300th on the high hashrate end1867288 to 1 shot ranging to 2539883 to 1 shotAn easy way to see it is below:Last jump the world had 1ph of gear10 s19's that do 100thSo what are the odds for 1 machine to hit next block1 of 10 easy peasy if the net work stays at 1ph.but a large expansion alters the hash rateand now even though diff is frozen for 2 weeks. hash is not so  4 new units mean 1.4 ph gear and the 1 s19 has a 1/14 shot to hit the block.\" ... To sum up the mining problem, here are the parameters to calculate the probability of mining a block in 10 min :  N is the population size                                                            =  2^256  n is the number of draws (double_SHA256 checks)                     = 66*10^15  K is the number of known success states in the population          = 2^180  k is the number of wanted successes                                         = 1... \"My solve is not a true solve of your problem as you are setting the 10 minute limit and you want to know 2 things your machine getting the next block and doing it in 10 minutesMy solve is only for my 100 th s19 getting the next block on 0 time to endless timeReality is who really cares about the 10 minutes if you gear makes the block in 9 minutes or 11 minutes you still make the block.I get a range 1/1867288-1/2539883 that I win the \"next block\" with my lone s19  and I do not care if I do it in 10 minutes.Still your question is interesting",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "August 21, 2022, 09:20:57 AMLast edit: August 21, 2022, 09:33:19 AM by kano",
+      "body": "Simple math.What's the expected chance a miner of X TH/s getting a block in 10 minutes.Miner does: D = X * 10^12 / (2^32) Diff per secondIn 10 minutes it does D10 = D * 600 DiffWhat is the current Network Diff? (i.e. the 'expected' amount of total network Diff per 10 minutes)ND = 28351606743493.8(which you can calculate from the hex value which is \"0x1709ed88\")So what is your expected chance of getting a block in 10 minutes? D10 / NDOr 1 in (ND / D10)However, your question suggests that the 10 minute figure affects the result.The only effect it has is to increase D -> D10 i.e. multiply D by 600.Mining is a simple random occurrence with simple calculations:Blocks are expected every: 'Number of Attempts' / (ND*(2^32))Since 1Diff = 2^32 attemptsHowever, if that 'every' is more than 2 weeks then no it doesn't work.Since ND is no longer a constant.You cannot determine even the next value of ND in advance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "akaki",
+      "created_time": "August 21, 2022, 10:14:30 AM",
+      "body": "Thanks @kano, @a1 Hashrate LLC2022, @NotATether.My intention was also to have a post that anyone googling mining difficulty can find.I recommend these two articles that studied statistically the mining difficulty problem :- https://www.zora.uzh.ch/id/eprint/173483/1/SSRN-id3399742-2.pdf- https://doi.org/10.2139/ssrn.3399742Conclusion is that the Hypergeometric Distribution is the correct model and not Poisson Distribution as commonly accepted (also assumed in Satochi's white paper).Nevetheless, I agree that the way I stated the problem is incomplete. We should also do the calculation \"knowing that\" there is competition with X hash power.Overall, I agree that the ratio of own hash power to the network hash power can be a good approximation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "August 21, 2022, 10:20:19 AMLast edit: August 21, 2022, 12:11:13 PM by kano",
+      "body": "Quote from: akaki on August 21, 2022, 10:14:30 AM...Overall, I agree that the ratio of own hash power to the network hash power can be a good approximation.My calc is the exact expected result, not an approximation.The reason it is, is because the question is exactly the same as asking what is the expected number of 6's rolled on a dice.The answer is: 'attempts' / 6Same for mining: 'attempts' / (ND * (2^32))ND is currently f(0x1709ed88) where f(x) uses only constants (other than x)So yeah there is no difference except the size of the numbers.--Edit: oh one more thing, competition plays no part in block finding probability.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GR Sasa",
+      "created_time": "August 21, 2022, 04:05:21 PM",
+      "body": "Hey guys,i've been always trying to figure out how exactly the mining process works with bitcoin but always failed to understand it.All i know that the block hash should have a lot of zeros but what hashes what to get this value is what i am trying to understand. I have googled, watched YouTube, but still i can't get it well enough.i would really be thankful if someone can explain to me in a easy way on how the mining process works with the following example block number 750452:It's block hash is: 0000000000000000000420d2e347f016f63d9045b7895589e5eff33893cf833fMerkle root: ef108a25a975f6c2f5528e0e1b2d4162686a8f878a0ca9b40e59d1845d8c9798 Nonce: 263795775previous block hash: 000000000000000000084d88e5ac59edd7c34c20d6b5addf18aae6f1040ac215Now can anyone explain for me please?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "akaki",
+      "created_time": "August 21, 2022, 08:59:57 PMLast edit: August 21, 2022, 09:19:55 PM by akaki",
+      "body": "Quote from: GR Sasa on August 21, 2022, 04:05:21 PMHey guys,i've been always trying to figure out how exactly the mining process works with bitcoin but always failed to understand it.All i know that the block hash should have a lot of zeros but what hashes what to get this value is what i am trying to understand. I have googled, watched YouTube, but still i can't get it well enough.i would really be thankful if someone can explain to me in a easy way on how the mining process works with the following example block number 750452:It's block hash is: 0000000000000000000420d2e347f016f63d9045b7895589e5eff33893cf833fMerkle root: ef108a25a975f6c2f5528e0e1b2d4162686a8f878a0ca9b40e59d1845d8c9798 Nonce: 263795775previous block hash: 000000000000000000084d88e5ac59edd7c34c20d6b5addf18aae6f1040ac215Now can anyone explain for me please?Simply the concatenation of (version+previous_hash+merkle_root+tim_stamp+target_difficulty+nonce) called candidate block header should give the right target number of leading zeros after applying double_sha256.If you are asking about the theory, here is a link to understand step by step how to build a header. I've never found anything giving a better explanation to start with : https://medium.com/fcats-blockchain-incubator/understanding-the-bitcoin-blockchain-header-a2b0db06b515It's just the theory behind the process for bitcoin. In reality folks use dedicated hardware (asics) and thousands of them to have any chance of succeeding before the others. The discussion in this post was about the probability of success.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

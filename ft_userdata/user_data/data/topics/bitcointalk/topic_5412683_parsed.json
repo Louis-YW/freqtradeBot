@@ -1,0 +1,69 @@
+{
+  "id": "topic_5412683",
+  "title": "witcher_sense",
+  "author": "witcher_sense",
+  "created_time": "September 07, 2022, 06:21:15 AMLast edit: September 08, 2022, 05:18:49 AM by witcher_sense",
+  "content": "Most likely, this question has been asked a thousand times, but my Google search did not give me a clear answer to this simple question.As far as I know, all GitHub repositories follow the same URL structure, namely https://github.com/{userid}/{reponame}, where{reponame} - is a name of a directory containing files related to a particular project, a.k.a a repository.{userid} - is an owner of {reponame}, and according to https://docs.github.com/en/get-started/learning-about-github/types-of-github-accounts, it can be an individual, an organization, or an enterprise managing many organizations.Now let's take Bitcoin Core, a bitcoin system reference implementation that represents the standard of how things in the bitcoin network should be implemented to be compatible with the consensus rules. Its GitHub link is the following: https://github.com/bitcoin/bitcoin. As we learned above, the second \"bitcoin\" in the URL is the name of a repository, while the first \"bitcoin\" represents the owner of the bitcoin repository. So, my question is simple: who is behind this account? Is it an individual or organization account? If it is an organization, who the organization owners are? Doesn't this account have complete control over all repositories it contains? Doesn't the owner of this account have ultimate power over Bitcoin Core (at least over the version hosted on this platform)? How in this case the process of development can be decentralized if every change in the Bitcoin Core codebase needs to be \"approved\" by the owner of the bitcoin repository?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412683",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "September 07, 2022, 06:39:17 AM",
+      "body": "Quote from: witcher_sense on September 07, 2022, 06:21:15 AMSo, my question is simple: who is behind this account? Is it an individual or organization account? If it is an organization, who the organization owners are?This thread is going to be political later on so I'll just leave this link here to answer that specific question.These are the people behind \"bitcoin\" organization account in GitHub: https://github.com/orgs/bitcoin/people",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 07, 2022, 07:15:54 AMLast edit: September 07, 2022, 05:55:08 PM by NotATether",
+      "body": "It is split into two parts: The Bitcoin Core reference implementation, and BIPs.As regards to the first, the members of the Bitcoin organization have the highest control over the software, but they cannot make decisions by themselves without the consent of the rest of the group.Authority for the BIP numbering process, on the other hand, rests on two people: Luke Dashjr* and Kalle Alm (although the entire bitcoin-dev mailing list can have a say in the BIP, which can only be numbered with a majority consensus).Actions like softforks are managed by this category and not the Bitcoin Core developers.*Spelling typo, I'm 99% sure my autocorrect caused it though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 07, 2022, 11:38:12 AM",
+      "body": "Quote from: NotATether on September 07, 2022, 07:15:54 AMIt is split into two parts: The Bitcoin Core reference implementation, and BIPs.As regards to the first, the members of the Bitcoin organization have the highest control over the software, but they cannot make decisions by themselves without the consent of the rest of the group.Authority for the BIP numbering process, on the other hand, rests on two people: Like Dashjr and Kalle Alm (although the entire bitcoin-dev mailing list can have a say in the BIP, which can only be numbered with a majority consensus).Actions like softforks are managed by this category and not the Bitcoin Core developers.In any of that, I would never count out the Bitcoin community running their own personal nodes, though.If anyone were to bribe all Bitcoin Core devs and / or all BIP people into making a change to Bitcoin that's bad for it and that the rest of the network will reject, there will be a hardfork and the longer chain ('controlled' by thousands of independent community nodes) will win.As for further development, in such a worst-case scenario, new GitHub organizations and repositories can easily be created.All in all, yes: these people do have 'control' over the repository, but they can't meaningfully use that to go against the Bitcoin community, as it would just refuse to update their nodes / signal a bad BIP.I'm not too involved with altcoins, but I do believe that's kind of what happened with Ethereum and Ethereum Classic. 'The developers' who had control over the repository, the name and tons of coins (that's one thing making it a bit different from this situation here) forked their coin to remove a badly coded smart contract.The people who called bullshit on that, just continued running the older version at first, and then continued development based on that version, under the new name 'Ethereum Classic'.Do keep in mind that in case of ETH, there's an influential influencer (Buterin) who heavily shifted the public opinion towards going with his malicious chain; we don't really have that in Bitcoin, gladly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "September 07, 2022, 02:14:44 PM",
+      "body": "For Bitcoin Core, there are two relevant GitHub organizations: bitcoin, and bitcoin-core. Both of these contain the same members, and are owned by the same people. The owners are current and former maintainers. As these are organization accounts, there are a number of additional permissions that members may have, such as issue editing and closing, and commit access. The newer maintainers have the ability to merge pull requests, although they are not owners. These permissions can be restricted to specific repositories. The owners do not need to approve every change as they are not the sole committers, Any committer (i.e. maintainer) can approve and merge pull requests. Additionally, new owners can be added, and old owners can be removed.For Bitcoin Core itself, there are additional protections. Each merge commit must be GPG signed by the maintainer who merged it. There is a nightly CI job that will execute a script which verifies the signatures of the most recent merges (typically the past day). Developers can also run this script locally and verify all signatures in the commit history. This means that there is an audit trail for every change added, and it will be obvious if it is broken.If anyone who has commit access were to push code that were malicious, it would be noticed as it would be commits to the head of a branch that either were not merge commits, or were not part of a pull request. In either case, it would be easy to revert. While they could also use a force push to try to hide the change in some other commit in history, this would be detected by pretty much every developer as pulling from the remote would result in git returning an error as the pull is not just a fast-forward. Git would detect that the remote commit history differs from locally and refuse the pull unless explicitly told to switch to the remote's history. GitHub's Protected Branches feature also makes it not possible for non-owners to do a force push (obviously owners can, by just disabling the protections and then doing it), in addition to several other protections that may or may not be enabled.Of course that's just the software, and software can be forked. And not everyone has to run every release. A change can be made to the software, but if the node operators do not switch to using the software implementing that change, then it doesn't become part of Bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "September 07, 2022, 05:49:17 PM",
+      "body": "Quote from: witcher_sense on September 07, 2022, 06:21:15 AMSo, my question is simple: who is behind this account?It doesn't much matter, but you can see the answer in some of the posts above.Quote from: witcher_sense on September 07, 2022, 06:21:15 AMIs it an individual or organization account?It doesn't much matter, but you can see the answer in the posts above.Quote from: witcher_sense on September 07, 2022, 06:21:15 AMIf it is an organization, who the organization owners are?It doesn't much matter, but you can see the answer in the posts above.Quote from: witcher_sense on September 07, 2022, 06:21:15 AMDoesn't this account have complete control over all repositories it contains?Of those specific repositories? Sure.  Why should I care?Quote from: witcher_sense on September 07, 2022, 06:21:15 AMDoesn't the owner of this account have ultimate power over Bitcoin Core (at least over the version hosted on this platform)?Over the version of Bitcoin Core that is hosted in the bitcoin account on GitHub? Sure. But again, why should I care?Quote from: witcher_sense on September 07, 2022, 06:21:15 AMHow in this case the process of development can be decentralized if every change in the Bitcoin Core codebase needs to be \"approved\" by the owner of the bitcoin repository?Only the codebases in that particular repository need be approved by the owner of that repository. It's open source, so there are other repositories under the control of others. Here are just a few examples:https://github.com/DannyHamilton/bitcoinhttps://github.com/bitcoinknotshttps://github.com/btcsuite/btcdYou can create your own repository and be in control of all updates to it if you want to.  If you can convince enough people that your implementation is superior and the vast majority of users start using your implementation, then your implementation becomes the reference implementation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlockChainMentor",
+      "created_time": "September 09, 2022, 01:03:03 PM",
+      "body": "I goggled right now it is showing that many developers who loves bitcoin developed bitcoin software  and around 18000 active developers are working on cryptocurrency platform and i think it is a organisation who owns this github repository of bitcoin",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "September 09, 2022, 01:19:36 PM",
+      "body": "Quote from: witcher_sense on September 07, 2022, 06:21:15 AMMost likely, this question has been asked a thousand times, but my Google search did not give me a clear answer to this simple question.Simple answer: mICrOSoFt.They own the github so they are controlling everything hosted there, and they can ban anything they want.I am not sure they would dare doing that any time soon with Bitcoin, but maybe recent incident with tornadocash was just a testing ground for them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

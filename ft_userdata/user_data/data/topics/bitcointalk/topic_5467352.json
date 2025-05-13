@@ -1,0 +1,85 @@
+{
+  "id": "topic_5467352",
+  "title": "cygan",
+  "author": "cygan",
+  "created_time": "September 19, 2023, 05:30:23 PM",
+  "content": "today i would like to present you 4 slides about 'child-pays-for-parent'. this cpfp method can be used when the transaction is not accepted by the miner from the sender (due to a very small fee) and gets stuck in the mempool for a few hours or even days. how this works, you can see from the slides belowin addition, i have a few useful links on this topic for you:QuoteIf your Bitcoin transaction is stuck, and you're the recipient, you can clear it using CPFP (child-pays-for-parent). This is alternative to the sender's ability to do so with RBF.https://github.com/BlockchainCommons/Learning-Bitcoin-from-the-Command-Line/blob/master/05_3_Funding_a_Transaction_with_CPFP.mdQuoteChild-Pays-for-Parent is a transaction mechanism with a similar purpose as Replace-by-Fee (RBF). While RBF allows the sender to speed up a transaction’s confirmation, Child-Pays-for-Parent allows the recipient to speed up the transaction’s confirmation.https://river.com/learn/terms/c/child-pays-for-parent-cpfp/CPFP Calculatorhttps://cpfp.djbooth007.com/  https://twitter.com/BTCillustrated",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5467352",
+  "comments": [
+    {
+      "author": "philipma1957",
+      "created_time": "September 19, 2023, 05:50:41 PM",
+      "body": "I have done this method when I was running some group buys for Avalon gear a fee buyers sent tiny fees. I was able to fix them and combine all of it with a large fee to the seller cannon.io",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "September 19, 2023, 07:30:23 PM",
+      "body": "FWIW, miners don't ignore it--- it's there at the bottom of the ranking, waiting for a time when there aren't higher paying fees above it to get confirmed and it's not stuck, its waiting in the queue.  But if there is an influx of higher paying transactions it could wait arbitrarily long.When a txn pays fees so low that miners ignore it then CPFP won't work because a they won't process the child at all unless the parent is in their mempool.  This becomes an issue when mempool size management increases the minimum feerate, since a parent that has been evicted due to size management then can't have children considered.The illustration doesn't explain how it's considered.  Basically when building the mempool the miner effectively considers combined bundle like a separate transaction, and if that ranks higher in the mempool then it will include it.This all becomes very complicated because a set of unconfirmed transaction can have a whole graph of unconfirmed children, multiple layers deep.  Just figuring out which order to consider a set of related transactions to get the best fees has exponential complexity so today miners use a very rough approximation that means that the improvement of a new child is sometimes ignored when its part of a complicated web of unconfirmed transactions.The approximation handles the trivial example in the comic okay, but anything even somewhat more complicated like two siblings share the cost of one parent, isn't handled well at all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "September 20, 2023, 10:40:04 AM",
+      "body": "Bob's sentiment towards Alice give me a bit chuckle, considering there are some people (on different board) who feel angry or feel helpless their incoming transaction never got confirmed.Quote from: cygan on September 19, 2023, 05:30:23 PMThere's small mistake in this image. You mentioned \"Alice, Bob and Carol\" while other image only mention Alice and Bob.Quote from: cygan on September 19, 2023, 05:30:23 PMDescription on 3rd panel could be improved. Miner ideally decide to include both transaction if average/median TX fee rate of both transaction is high/expensive enough. It's possible Alice's TX has big size/weight, while Bob's TX has small size/weight.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "September 20, 2023, 10:55:18 AM",
+      "body": "Quote from: ETFbitcoin on September 20, 2023, 10:40:04 AM✂There's small mistake in this image. You mentioned \"Alice, Bob and Carol\" while other image only mention Alice and Bob.✂yes, that's right - Carol doesn't appear at all in the whole thing. therefore the third name is superfluous in the introduction - very well done Quote from: ETFbitcoin on September 20, 2023, 10:40:04 AM✂Description on 3rd panel could be improved. Miner ideally decide to include both transaction if average/median TX fee rate of both transaction is high/expensive enough. It's possible Alice's TX has big size/weight, while Bob's TX has small size/weight.could be done, but ultimately isn't that the same as it's mapped (that's honestly my understanding)?the important thing is that the two fees (low & high) in total represent a relatively acceptable 'total' fee for the miners, which they can then confirmi experienced this for example a few weeks ago with my bundesliga pools, that the participants sent off their stake with a very small fee. but since the whole pool lasts almost a year, the transaction would have enough time to be confirmed in the mempool (which then already happened)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "September 20, 2023, 09:18:12 PMLast edit: September 20, 2023, 10:40:50 PM by gmaxwell",
+      "body": "Quote from: cygan on September 20, 2023, 10:55:18 AMcould be done, but ultimately isn't that the same as it's mapped (that's honestly my understanding)?the important thing is that the two fees (low & high) in total represent a relatively acceptable 'total' fee for the miners, which they can then confirmThe important thing isn't the absolute value of fees, but the \"fee rate\"-- the amount of fee per unit weight.Ignoring dependencies and boundary conditions miners will make the maximum amount of income if they fill their blocks highest-fee-rate first until the block is full.But dependencies matter: a block can't include a child transaction without including its parent.  Before CPFP the transaction selection code would just consider all transactions that could be included ordered by feerate and take the highest one until the block was full. And so it didn't matter how high a fee the child transaction paid, it wouldn't improve the parents poor position.  CPFP logic makes the mining code view the composition of the child and parent as a single virtual transaction with the total fees and total weight of its components, so its sorted by their total feerate (total_fee/total_weight).It's important to keep this in mind because if the parent transaction has a high weight the fee paid by the child will need to be correspondingly large even if the child is low weight itself, if the child is to meaningfully improve the parent txn's mining priority.  This is particularly relevant because one way people end up underpaying is that they (or their software) misunderstood how fees works and set their fees without paying attention to the txn's weight then produced a high rate transaction that had a very low feerate even though the absolute value of fee would have been reasonable on a smaller transaction.The boundary conditions also matter somewhat.  If the fee the child pays is only good enough to raise the combination's feerate to the very end of the block there may not be enough room there for both the parent and child.  Room for the child alone or the parent alone isn't enough.  The feerate needs to be high enough to raise the bundle of transactions early enough in the selection process so that there is room for the whole thing.It wouldn't be economically rational for someone to prioritize the parent when they can't also fit the child that made it worthwhile (and would even open up the network to attacks).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cloxy",
+      "created_time": "February 13, 2024, 08:17:39 PM",
+      "body": "I'm using this thread to share a new CPFP calculator I made:https://bitaccelerate.com/cpfp-calculator/It works in a different way. Unlike others, it does not require the child transaction to be published in advance and then increase its fee through RBF. It directly calculates what fee should be used for the child transaction.The only requirement is that the child transaction has only one input and one output for the calculations to be accurate. This is not complicated to do, and the benefits are much easier to work with when using the tool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "foggyb",
+      "created_time": "February 19, 2024, 07:57:37 PM",
+      "body": "Question: could CPFP lead to exploitation, eg. not including transaction fees if they know the parent will be forced to pay those fees if they ever want to see their money?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cloxy",
+      "created_time": "February 26, 2024, 04:51:48 PM",
+      "body": "Quote from: foggyb on February 19, 2024, 07:57:37 PMQuestion: could CPFP lead to exploitation, eg. not including transaction fees if they know the parent will be forced to pay those fees if they ever want to see their money?Yes, we accept Bitcoin payments in several different projects and it happens regularly. Especially with larger amounts, then we are forced to use CPFP to get our money.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "February 26, 2024, 07:29:26 PM",
+      "body": "Quote from: foggyb on February 19, 2024, 07:57:37 PMQuestion: could CPFP lead to exploitation, eg. not including transaction fees if they know the parent will be forced to pay those fees if they ever want to see their money?If the parent pays 1 sat/vb, and the equally-sized child pays 10 sat/vb, then both as a whole pay the average, 5.5 sat/vb. The child has to take into account the parent's transaction size, and that's why CPFP might be expensive sometimes. If the parent is extremely large in size, as a big consolidation, then the child has to account that.The formula is demonstrated in here by hosseinimr93:Quote from: hosseinimr93 on May 05, 2022, 01:39:29 PMSA = Size of the unconfirmed transactionSB = Size of the new transaction (the transaction you will make for doing CPFP)fA = The fee rate used for the unconfirmed transaction.fB = The fee rate you should use for the new transaction.f = the fee rate required for a fast confirmation. fB = (f*(SA+SB) - SA*fA) / SBBoth transactions' fee rate is: f = (fB*SB + fA*SB)/(SA + SB).You can try playing with it in this python program:Code:fA, fB = PARENT_FEE_RATE, CHILD_FEE_RATEsA, sB = PARENT_SIZE, CHILD_SIZEf = (fB*sB + fA*sA)/(sA + sB)print(f)You can change PARENT_SIZE, CHILD_SIZE, PARENT_FEE_RATE, CHILD_FEE_RATE to your values.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

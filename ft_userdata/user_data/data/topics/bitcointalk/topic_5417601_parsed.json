@@ -1,0 +1,101 @@
+{
+  "id": "topic_5417601",
+  "title": "BTCapsule",
+  "author": "BTCapsule",
+  "created_time": "October 19, 2022, 02:01:51 AM",
+  "content": "I have created a program that uses getblockchaininfo to record the timestamp from Bitcoin Core. I have been asked several times if someone could create a fake Bitcoin blockchain and fake this information. I personally don’t know how to do this, but if someone has information that could help me try it, I would be willing to test it out.My program requires using 127.0.01 IP address and port 8332, and this cannot be changed so that testnet is not an option.What would be required to fake this information. Is it easy to do?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417601",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "October 19, 2022, 03:11:31 AM",
+      "body": "Half asleep here but is there any information given with the getblockchaininfo call that shows it is indeed bitcoin and not some other alt.It's just one line in the config file to tell it what port to listen in on, so any coin can respond on port 8332. I know that you can query what the coin SAYS it is, but that can be changed in the source before you compile it.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 19, 2022, 04:01:20 AM",
+      "body": "I feel like this may be an https://xyproblem.info/.Do you have a Bitcoin Core installation that you don't trust to be legitimate?Creating a fake software that prints you some arbitrary information if you call it bitcoin-cli and execute it using ./bitcoin-cli getblockchaininfo, is trivial.Code:#!/bin/shecho {echo '  \"chain\": \"main\",'echo '  \"blocks\": 21000000,'echo '  \"headers\": 21000000,'echo '  \"bestblockhash\": \"0000000000000000000000000000000000000000000000000000000000000000\",'echo '  \"difficulty\": 00000000000001.00,'echo '  \"mediantime\": 6666666666,'echo '  \"verificationprogress\": 42.9999987017667371,'echo '  \"initialblockdownload\": false,'echo '  \"chainwork\": \"0000000000000000000000000000000000000000000000000000000000000000\",'echo '  \"size_on_disk\": 666666666666,'echo '  \"pruned\": false'echo '  \"softforks\": {'echo '    \"bip34\": {'echo '      \"type\": \"buried\",'echo '      \"active\": true,'echo '      \"height\": 227931'echo '    },'echo '    \"bip66\": {'echo '      \"type\": \"buried\",'echo '      \"active\": true,'echo '      \"height\": 363725'echo '    },'echo '    \"bip65\": {'echo '      \"type\": \"buried\",'echo '      \"active\": true,'echo '      \"height\": 388381'echo '    },'echo '    \"csv\": {'echo '      \"type\": \"buried\",'echo '      \"active\": true,'echo '      \"height\": 419328'echo '    },'echo '    \"segwit\": {'echo '      \"type\": \"buried\",'echo '      \"active\": true,'echo '      \"height\": 481824'echo '    },'echo '    \"taproot\": {'echo '      \"type\": \"bip9\",'echo '      \"bip9\": {'echo '        \"status\": \"active\",'echo '        \"start_time\": 1619222400,'echo '        \"timeout\": 1628640000,'echo '        \"since\": 709632,'echo '        \"min_activation_height\": 709632'echo '      },'echo '      \"height\": 709632,'echo '      \"active\": true'echo '    }'echo '  },'echo '  \"warnings\": \"\"'echo }Just paste this into a new file called bitcoin-cli.Then execute:Code:chmod +x ./bitcoin-cli./bitcoin-cli getblockchaininfo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 19, 2022, 04:16:25 AM",
+      "body": "Quote from: BTCapsule on October 19, 2022, 02:01:51 AMI have been asked several times if someone could create a fake Bitcoin blockchain and fake this information.These are two different and unrelated questions.When you make the getblockchaininfo call, you are using your own full node not someone else's node. So you are trusting the software you have that is enforcing the Bitcoin consensus rules that ensure that the blockchain you have is the \"real\" bitcoin blockchain, so it is not possible to have \"fake blockchain\" in first place.The answer to the other question depends on what you mean by \"fake\". An invalid blockchain that breaks bitcoin consensus rules is already available out there in form of many altcoins. An invalid blockchain that doesn't follow any rule (eg. no PoW/not mined) is some arbitrary data not a blockchain. And again it is full nodes that have to accept this chain and they don't accept arbitrary/invalid data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 19, 2022, 09:34:45 AM",
+      "body": "Quote from: n0nce on October 19, 2022, 04:01:20 AMDo you have a Bitcoin Core installation that you don't trust to be legitimate?OP has created software which encrypts your private key until a certain date. It was pointed out that pulling the date from a website was a single point of failure, requires complete trust in a third party, and was trivial for a third party to fake in order to decrypt the back up earlier than was allowed. He is now proposing pulling the time from Bitcoin Core instead, but again, it is trivial to alter your client to run your own chain with any timestamp you like or indeed just write software to spit out any timestamp you want, as you have done.This allows an attacker with access to your encrypted back up to fake the time and therefore unlock your back up at any time they like.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 19, 2022, 09:53:31 AM",
+      "body": "Quote from: ETFbitcoin on October 19, 2022, 08:50:43 AMShort script which support JSON-RPC protocol and return fixed JSON file should do the job. I'm not web developer, but i'll share the script if i managed to create it within 1 hour.It's much easier than expected. After read a tutorial[1] and library GitHub page[2], i managed to create one in less than 10 minutes. The fake data is based on testnet data with changed median time, but it can be changed to any JSON data.Code:from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServerimport jsonrpclibjsonrpclib.config.version = 1.0def getblockchaininfo(*args):    return {        \"result\": {            \"chain\": \"test\",            \"blocks\": 2377252,            \"headers\": 2377252,            \"bestblockhash\": \"000000000000001116b19fd67c291a7fdf87810b2ff47b7d313940ee42f5c1b5\",            \"difficulty\": 67108864,            \"time\": 1666169543,            # fake mediantime            \"mediantime\": 9999999999,            \"verificationprogress\": 0.9999993333482174,            \"initialblockdownload\": False,            \"chainwork\": \"0000000000000000000000000000000000000000000007d7c718524bc0ba7e52\",            \"size_on_disk\": 31445472022,            \"pruned\": False,            \"warnings\": \"Unknown new rules activated (versionbit 28)\"        },        \"error\": None,        \"id\": \"curltest\"    }server = SimpleJSONRPCServer(('localhost', 8332))server.register_function(getblockchaininfo)server.serve_forever()I tested it with curl and it works properly. FYI, the user and password could be any string.Code:$ curl --user random_text --data-binary '{\"jsonrpc\": \"1.0\", \"id\": \"curltest\", \"method\": \"getblockchaininfo\", \"params\": []}' -H 'content-type: text/plain;' http://127.0.0.1:8332/Enter host password for user 'random_text':{\"result\": {\"result\": {\"chain\": \"test\", \"blocks\": 2377252, \"headers\": 2377252, \"bestblockhash\": \"000000000000001116b19fd67c291a7fdf87810b2ff47b7d313940ee42f5c1b5\", \"difficulty\": 67108864, \"time\": 1666169543, \"mediantime\": 9999999999, \"verificationprogress\": 0.9999993333482174, \"initialblockdownload\": false, \"chainwork\": \"0000000000000000000000000000000000000000000007d7c718524bc0ba7e52\", \"size_on_disk\": 31445472022, \"pruned\": false, \"warnings\": \"Unknown new rules activated (versionbit 28)\"}, \"error\": null, \"id\": \"curltest\"}, \"id\": \"curltest\", \"error\": null}[1] https://www.tutorialspoint.com/python_network_programming/python_rpc_json_server.htm[2] https://github.com/joshmarshall/jsonrpclib",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 19, 2022, 12:39:15 PM",
+      "body": "Quote from: ETFbitcoin on October 19, 2022, 09:53:31 AMQuote from: ETFbitcoin on October 19, 2022, 08:50:43 AMShort script which support JSON-RPC protocol and return fixed JSON file should do the job. I'm not web developer, but i'll share the script if i managed to create it within 1 hour.It's much easier than expected. After read a tutorial[1] and library GitHub page[2], i managed to create one in less than 10 minutes. The fake data is based on testnet data with changed median time, but it can be changed to any JSON data.Well that was a lot simpler then what I was thinking.I wonder if this can be done at all without an external service, which would then mean the OP would have to write the other side and have the user configure it to their liking when they create the lock / encryption. Not sure how that would work, but if it's self created it does bring back the fact that someone could beat the information out of you.That or you would have to keep the executable updated as time goes on to query external services that may come and go. Along with making sure that it only connects to SSL / encrypted remote sites that you have the fingerprint stored in the executable.Turning into an interesting puzzle.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 19, 2022, 12:56:15 PM",
+      "body": "All you need is mock API that returns static or randomly generated data for this RPC call in JSON-RPC format, with all the required keys and values inside the returned JSONRPC response. There are many Github projects in the popular languages for spinning up a mock API.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 19, 2022, 02:22:10 PM",
+      "body": "Quote from: DaveF on October 19, 2022, 12:39:15 PMTurning into an interesting puzzle.Given all this, it is why I suggested in OP's other thread that his method provides no benefits over using a timelocked transaction. There are too many ways to spoof the timestamp for his software and allow an heir or an attacker to access the coins early, which is completely impossible with a timelocked transaction outside a major fork in the bitcoin network. Additionally, a timelocked transaction is completely transparent and completely trustless, and does not require the use or trust of any third party software.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 19, 2022, 03:10:21 PM",
+      "body": "Quote from: BTCapsule on October 19, 2022, 02:01:51 AMWhat would be required to fake this information. Is it easy to do?It is trivial, as you must have already understood. You can just alter the Bitcoin Core source code, build the malicious binaries, and replace those with the authentic.Is this related with your capsule software that's supposed to help on inheritance? If you're trying to figure out how you can avoid the risk of faking timestamp here's an idea: use Locktime.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "October 19, 2022, 06:22:13 PM",
+      "body": "Quote from: ETFbitcoin on October 19, 2022, 09:53:31 AMQuote from: ETFbitcoin on October 19, 2022, 08:50:43 AMShort script which support JSON-RPC protocol and return fixed JSON file should do the job. I'm not web developer, but i'll share the script if i managed to create it within 1 hour.It's much easier than expected. After read a tutorial[1] and library GitHub page[2], i managed to create one in less than 10 minutes. The fake data is based on testnet data with changed median time, but it can be changed to any JSON data.Code:from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServerimport jsonrpclibjsonrpclib.config.version = 1.0def getblockchaininfo(*args):    return {        \"result\": {            \"chain\": \"test\",            \"blocks\": 2377252,            \"headers\": 2377252,            \"bestblockhash\": \"000000000000001116b19fd67c291a7fdf87810b2ff47b7d313940ee42f5c1b5\",            \"difficulty\": 67108864,            \"time\": 1666169543,            # fake mediantime            \"mediantime\": 9999999999,            \"verificationprogress\": 0.9999993333482174,            \"initialblockdownload\": False,            \"chainwork\": \"0000000000000000000000000000000000000000000007d7c718524bc0ba7e52\",            \"size_on_disk\": 31445472022,            \"pruned\": False,            \"warnings\": \"Unknown new rules activated (versionbit 28)\"        },        \"error\": None,        \"id\": \"curltest\"    }server = SimpleJSONRPCServer(('localhost', 8332))server.register_function(getblockchaininfo)server.serve_forever()I tested it with curl and it works properly. FYI, the user and password could be any string.Code:$ curl --user random_text --data-binary '{\"jsonrpc\": \"1.0\", \"id\": \"curltest\", \"method\": \"getblockchaininfo\", \"params\": []}' -H 'content-type: text/plain;' http://127.0.0.1:8332/Enter host password for user 'random_text':{\"result\": {\"result\": {\"chain\": \"test\", \"blocks\": 2377252, \"headers\": 2377252, \"bestblockhash\": \"000000000000001116b19fd67c291a7fdf87810b2ff47b7d313940ee42f5c1b5\", \"difficulty\": 67108864, \"time\": 1666169543, \"mediantime\": 9999999999, \"verificationprogress\": 0.9999993333482174, \"initialblockdownload\": false, \"chainwork\": \"0000000000000000000000000000000000000000000007d7c718524bc0ba7e52\", \"size_on_disk\": 31445472022, \"pruned\": false, \"warnings\": \"Unknown new rules activated (versionbit 28)\"}, \"error\": null, \"id\": \"curltest\"}, \"id\": \"curltest\", \"error\": null}[1] https://www.tutorialspoint.com/python_network_programming/python_rpc_json_server.htm[2] https://github.com/joshmarshall/jsonrpclibI am trying to hack my program with your code. It’s displaying some odd behavior, but I’m unable to view the private keys. If I run the code by itself and open BTCapsule, I get this message in the console:Code:127.0.0.1 - - [19/Oct/2022 13:35:47] \"POST / HTTP/1.1\" 200 -BTCapsule opens and says “Please Open Bitcoin Core and Restart BTCapsule”. So I open Bitcoin Core while your code is still running, and when I restart BTCapsule, it continues to alert me that I need to open Bitcoin Core. Every time I open BTCapsule, a new message is printed to the console like the one above.So I started Bitcoin Core first, and then ran your code. If I do that, I get an error:Code:Permission Error: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissionsSo BTCapsule is definitely talking to your program, but it’s not recognizing it as a valid Bitcoin Core implementation. I have tried this with and without internet enabled.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 20, 2022, 08:53:22 PM",
+      "body": "Quote from: ETFbitcoin on October 20, 2022, 08:39:51 AMIt's because Bitcoin Core and my script try to listen on same port.Exactly. For successful exploitation, make your code execute bitcoin-cli stop and alter the bitcoin.conf to use a different port; then tunnel everything except the getblockchaininfo call, which will obviously still use your current implementation, sending fake data.But I think your code is completely good enough as a PoC; the rest is simple and not required to show that this timestamping method is insecure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

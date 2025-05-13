@@ -1,0 +1,165 @@
+{
+  "id": "topic_5401730",
+  "title": "n0nce",
+  "author": "n0nce",
+  "created_time": "June 07, 2022, 07:58:47 PMLast edit: June 08, 2022, 01:56:50 AM by n0nce",
+  "content": "Miner Install GuideThis is part of my Futurebit Apollo BTC Custom Linux install guide.See here for the prerequisites.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5401730",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "June 07, 2022, 08:00:34 PM",
+      "body": "GPIO Setup[1] Download WiringOP to get access to GPIO of the Orange Pi 4.Code:cd /home/admingit clone https://github.com/orangepi-xunlong/WiringOPcd WiringOP[2] Build the softwareCode:./build clean./build[3] Verify you have GPIO access.Code:cd && gpio -v && gpio readall[4] The above command should output something like this.Code:gpio version: 2.46Copyright (c) 2012-2018 Gordon HendersonThis is free software with ABSOLUTELY NO WARRANTY.For details type: gpio -warranty   * Device tree is enabled.   *--> OrangePi 4 +------+-----+----------+------+---+OrangePi 4+---+---+--+----------+-----+------+ | GPIO | wPi |   Name   | Mode | V | Physical | V | Mode | Name     | wPi | GPIO | +------+-----+----------+------+---+----++----+---+------+----------+-----+------+ |      |     |     3.3V |      |   |  1 || 2  |   |      | 5V       |     |      | |   64 |   0 | I2C2_SDA |   IN | 1 |  3 || 4  |   |      | 5V       |     |      | |   65 |   1 | I2C2_SCL |   IN | 1 |  5 || 6  |   |      | GND      |     |      | |  150 |   2 |     PWM1 | ALT2 | 1 |  7 || 8  | 1 | ALT2 | I2C3_SCL | 3   | 145  | |      |     |      GND |      |   |  9 || 10 | 1 | ALT2 | I2C3_SDA | 4   | 144  | |   33 |   5 | GPIO1_A1 |   IN | 0 | 11 || 12 | 1 | IN   | GPIO1_C2 | 6   | 50   | |   35 |   7 | GPIO1_A3 |  OUT | 1 | 13 || 14 |   |      | GND      |     |      | |   92 |   8 | GPIO2_D4 |   IN | 0 | 15 || 16 | 0 | IN   | GPIO1_C6 | 9   | 54   | |      |     |     3.3V |      |   | 17 || 18 | 0 | IN   | GPIO1_C7 | 10  | 55   | |   40 |  11 | SPI1_TXD | ALT3 | 0 | 19 || 20 |   |      | GND      |     |      | |   39 |  12 | SPI1_RXD | ALT3 | 1 | 21 || 22 | 0 | IN   | GPIO1_D0 | 13  | 56   | |   41 |  14 | SPI1_CLK | ALT3 | 1 | 23 || 24 | 1 | ALT3 | SPI1_CS  | 15  | 42   | |      |     |      GND |      |   | 25 || 26 | 0 | IN   | GPIO4_C5 | 16  | 149  | |   64 |  17 | I2C2_SDA |   IN | 1 | 27 || 28 | 1 | IN   | I2C2_SCL | 18  | 65   | |      |     |  I2S0_RX |      |   | 29 || 30 |   |      | GND      |     |      | |      |     |  I2S0_TX |      |   | 31 || 32 |   |      | I2S_CLK  |     |      | |      |     | I2S0_SCK |      |   | 33 || 34 |   |      | GND      |     |      | |      |     | I2S0_SI0 |      |   | 35 || 36 |   |      | I2S0_SO0 |     |      | |      |     | I2S0_SI1 |      |   | 37 || 38 |   |      | I2S0_SI2 |     |      | |      |     |      GND |      |   | 39 || 40 |   |      | I2S0_SI3 |     |      | +------+-----+----------+------+---+----++----+---+------+----------+-----+------+ | GPIO | wPi |   Name   | Mode | V | Physical | V | Mode | Name     | wPi | GPIO | +------+-----+----------+------+---+OrangePi 4+---+---+--+----------+-----+------+[5] Download the DTS file that comes with the 'Apollo OS'. Yes, this is a binary file I'm providing, but the apollo miner binary is, too, and I'm trying to figure out a better way for this as we speak.Code:wget https://github.com/iamthen0nce/apollo-dtb/raw/main/rk3399-orangepi-4.dtb[6] Move it into the right directory.Code:sudo mv rk3399-orangepi-4.dtb /boot/dtb/rockchip/rk3399-orangepi-4.dtb[7] Edit the /etc/rc.local file.Code:sudo vim /etc/rc.local[8] Replace 'exit 0' line with the following.Code:#configure gpiosgpio mode 1 outgpio write 1 0gpio mode 0 outgpio write 0 1[9] Reboot the unit.Code:sudo reboot",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 07, 2022, 08:00:56 PMLast edit: December 18, 2022, 01:19:57 PM by n0nce",
+      "body": "Miner setupGet latest binaries from: https://bitcointalk.org/index.php?topic=5340015.msg57091051#msg57091051Log into your admin account.[1] Download and unpack binary. Replace the URL below with whatever is latest at time of reading.Code:sudo mkdir /opt/miner && cd /opt/minersudo wget https://github.com/jstefanop/Apollo-Miner-Binaries/releases/download/1.1/Apollo-Miner_linux-aarch64.tar.xzsudo tar xf Apollo-Miner_linux-aarch64.tar.xz[2] Edit the miner_start.sh file.Code:cd linux-aarch64/sudo vim miner_start.sh[3] Input the following content. This is very much inspired by what the 'original Futurebit OS' ships.Code:#!/bin/bashsettings='-host stratum.kano.is -port 3333 -user username.worker -pswd x -brd_ocp 48 -osc 30 -fan_temp_low 70 -fan_temp_hi 90'start_hashboards(){        while [ $1 ];                do                screen -dmS miner ./apollo-miner -comport $1 -ao_mode 1 $settings                sleep 1                shift        done}#reset internal hashboardgpio write 0 0sleep .5gpio write 0 1sleep 30#start internal hashboardscreen -dmS miner ./apollo-miner -comport /dev/ttyS1 -ao_mode 1 $settings#find and start external hashboardsports=$(ls /dev/ttyACM*)start_hashboards $portsecho \"Started\"[4] Configure the 'settings' line of this file correctly, to point to your user account and worker name on a pool of your choice. Then hook up the hashboard to the SBC using a Micro-USB to USB-A cable. [TO-DO: this won't be needed later when I figure out the UART connection]Make sure that stratum.kano.is is replaced with your pool's URL and that username.worker is your username on that pool concatenated with a worker name.[5] Make the file executable.Code:sudo chmod +x ./miner_start.sh[6] To test everything's working, execute it and give it some time to start up the hashboard and perform some hashes.Code:sudo ./miner_start.sh[7] Create the file for stopping all hashboards.Code:sudo vim ./miner_stop.sh[8] Add this content. Full credit to jstefanop.Code:#!/bin/bashreset_hashboards(){        while [ $1 ];                do                python -c 'import termios; termios.tcsendbreak(3, 0)' 3>$1                sleep .5                shift        done}#quit all mining proccessesfor scr in $(screen -ls | awk '{print $1}'); do screen -S $scr -X quit; done#reset internal hashboardgpio write 0 0sleep .5gpio write 0 1#find and reset external hashboardsports=$(ls /dev/ttyACM*)reset_hashboards $portsecho \"Stopped\"[9] Make it executable.Code:sudo chmod +x ./miner_stop.sh[10] Stop the miner for now.Code:sudo ./miner_stop.sh",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 07, 2022, 08:01:09 PM",
+      "body": "Service setup[1] Create miner service file:Code:sudo vim /usr/lib/systemd/system/miner.service[2] Contents should be like shown:Code:[Unit]Description=Apollo MinerAfter=network.target[Service]WorkingDirectory=/opt/miner/linux-aarch64ExecStart=/opt/miner/linux-aarch64/miner_start.shExecStop=/opt/miner/linux-aarch64/miner_stop.sh# Make sure the config directory is readable by the service userPermissionsStartOnly=true# Process management####################Type=forkingRestart=on-failure# Directory creation and permissions##################################### Run as root:root#User=admin#Group=sudo# Hardening measures##################### Provide a private /tmp and /var/tmp.PrivateTmp=true# Mount /usr, /boot/ and /etc read-only for the process.# Mounts everything read-only with the exception of /dev, /proc and /sys.ProtectSystem=full# Disallow the process and all of its children to gain# new privileges through execve().NoNewPrivileges=true# Deny the creation of writable and executable memory mappings.MemoryDenyWriteExecute=true## More hardeningProtectControlGroups=yesProtectHostname=yesProtectKernelLogs=yesProtectKernelModules=yesProtectKernelTunables=yesProtectProc=yesRestrictNamespaces=yesRestrictRealtime=yesLockPersonality=yesSystemCallArchitectures=nativeSystemCallFilter=~@privileged @resourcesSystemCallFilter=@system-serviceCapabilityBoundingSet=CAP_SYS_ADMINCapabilityBoundingSet=CAP_SYS_RAWIOCapabilityBoundingSet=CAP_MKNOD[Install]WantedBy=multi-user.target[3] Enable & start serviceCode:sudo systemctl enable miner.servicesudo service miner start[4] Check that the miner is running fine.Code:sudo service miner status[5] after a few minutes or hours you can also see activity in your pool's dashboard.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 07, 2022, 08:01:46 PMLast edit: June 13, 2022, 02:48:34 AM by n0nce",
+      "body": "GUI setupTo get the nice Web UI, we can just install it from GitHub, since jstefanop made it open source! \\o/https://github.com/jstefanop/apollouiAttention: As of now, you need to actually get the apolloapi repo instead, since it handles the authentication to the web UI. Also the project(s) require a very old, potentially insecure version of NodeJS; namely NodeJS 9.x - use at your own risk. Do note that you can mine and run your nodes without any web UI at all..Quote from: n0nce on June 07, 2022, 08:00:56 PM[3] Input the following content. This is very much inspired by what the 'original Futurebit OS' ships.Code:#!/bin/bashsettings='-host stratum.kano.is -port 3333 -user username.worker -pswd x -brd_ocp 48 -osc 30 -fan_temp_low 70 -fan_temp_hi 90'[...]Just set desired mining speed and fan speed / temperature in the settings=... line of step 3 from above.[1] Move to admin user account and clone the repo.Code:cd /home/admingit clone https://github.com/jstefanop/apolloui.gitcd apolloui[2] Install nodeJS, npm and yarn.Code:sudo apt install python -ysudo apt install nodejs npm -ysudo npm install yarn -g[3] Build the software.Code:yarn",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 07, 2022, 08:01:51 PMLast edit: December 16, 2022, 07:51:47 PM by n0nce",
+      "body": "Some notes by MrMilk who followed my guide in December 2022; I feel they could come in very handy to whoever reads this! Quote from: MrMik on December 16, 2022, 07:49:55 AMLessons learned:- the OS might take much longer to load than expected. I etched Armbian_22.11.1_Orangepi4-lts_jammy_current_5.15.80_gnome_desktop.img.xzto an SD card and it took over 3 minutes before any signs of life showed up on the HDMI-connected monitor. On second reboot, it too about 4 minutes before showing it is running. I assume that maybe my failed attempts to use an Ubuntu version were due to my impatience, I never waited that long to see if it would boot.- for some reason, the Armbian_22.11.1_Orangepi4-lts_jammy_current_5.15.80_gnome_desktop.img.xz OS has no issues when connecting to GitHub to download the wiringOP thingamajigg (just like my Ubuntu laptop OS). Not asking for a password, just doing it like n0nce's instructions suggest. So for some reason, that previously tried bullseye-minimal armbian has some issue that will not be easy to solve for a noob when following n0nce's instructions.- cannot use the binary file that n0nce has linked to, because I'm using a different OS than n0nce used. At least, I assume that is the case. I got around that issue by accessing the Apollo SD card with the FutureBit OS on it (in a card reader on my laptop). Find the appropriate file for the specific OS flavour, copy it to a USB memory stick, stick it into the Apollo and copy it into the /home folder. Then (for this specific case only):  Code:sudo mv rk3399-orangepi-4-lts.dtb /boot/dtb/rockchip/rk3399-orangepi-4-lts.dtb Such fun typing this stuff without any typo's! - that vim text editor will drive you nuts, unless you just use the few commands needed for the task: type 'i' to get it into insert mode, then edit the file as instructed by n0nce, then Esc button to end the insert mode, then :x! to save and exit. I got that tidbit of geek-speak from here: https://www.geeksforgeeks.org/getting-started-with-vim-editor-in-linux/- whatever you do, do not try to use the built-in help of that vim editor unless you want to spend a lot of time getting nowhere while then fan is still howling!   The creator of vim must be some evil genius type of person.....",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 07, 2022, 08:01:56 PM",
+      "body": "Reserved",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "itshig",
+      "created_time": "November 19, 2022, 05:02:33 AM",
+      "body": "Alright n0nce, getting this tackled.  I have Umbrel installed onto Armbian, trying to get the miner setup now.  I'm getting the error that the system can't access /dev/ttyACM.  When or where was this created?  I don't see it in the instructions and I don't have this file structure.  Thanks!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 19, 2022, 11:51:57 AM",
+      "body": "Quote from: itshig on November 19, 2022, 05:02:33 AMI'm getting the error that the system can't access /dev/ttyACM.  When or where was this created?  I don't see it in the instructions and I don't have this file structure.  That's not a problem; this code is just in case you have standard units connected through USB. It should still pick up and start mining on your full unit's integrated hash board.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "itshig",
+      "created_time": "November 19, 2022, 07:08:35 PM",
+      "body": "Quote from: n0nce on November 19, 2022, 11:51:57 AMQuote from: itshig on November 19, 2022, 05:02:33 AMI'm getting the error that the system can't access /dev/ttyACM.  When or where was this created?  I don't see it in the instructions and I don't have this file structure.  That's not a problem; this code is just in case you have standard units connected through USB. It should still pick up and start mining on your full unit's integrated hash board.This is what it's returning: Code:$ sudo service miner start$ sudo service miner status○ miner.service - Apollo Miner     Loaded: loaded (/lib/systemd/system/miner.service; enabled; vendor preset: enabled)     Active: inactive (dead) since Sat 2022-11-19 14:04:25 EST; 5s ago    Process: 43175 ExecStart=/opt/miner/linux-aarch64/miner_start.sh (code=exited, status=0/SUCCESS)    Process: 44155 ExecStop=/opt/miner/linux-aarch64/miner_stop.sh (code=exited, status=0/SUCCESS)   Main PID: 44152 (code=exited, status=0/SUCCESS)        CPU: 736msNov 19 14:03:53 orangepi4 systemd[1]: Starting Apollo Miner...Nov 19 14:04:24 orangepi4 miner_start.sh[44153]: ls: cannot access '/dev/ttyACM*': No such file or directoryNov 19 14:04:24 orangepi4 miner_start.sh[43175]: Apollo Miner StartedNov 19 14:04:24 orangepi4 systemd[1]: Started Apollo Miner.Nov 19 14:04:24 orangepi4 miner_stop.sh[44160]: No screen session found.Nov 19 14:04:24 orangepi4 miner_stop.sh[44161]: No screen session found.Nov 19 14:04:25 orangepi4 miner_stop.sh[44166]: ls: cannot access '/dev/ttyACM*': No such file or directoryNov 19 14:04:25 orangepi4 miner_stop.sh[44155]: Apollo Miner StoppedNov 19 14:04:25 orangepi4 systemd[1]: miner.service: Deactivated successfully.It stays apollo miner was stopped (I added \"apollo miner\" to start and finish for my own clarity lol) and my pool isn't picking up a mining status.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 19, 2022, 07:17:48 PM",
+      "body": "Quote from: itshig on November 19, 2022, 07:08:35 PMIt stays apollo miner was stopped (I added \"apollo miner\" to start and finish for my own clarity lol) and my pool isn't picking up a mining status. Can you try manually starting /opt/miner/linux-aarch64/miner_start.sh and checking what errors it throws?It's possible that it needs sudo privileges and the following lines need to be uncommented. I'm not 100% sure right now, why I had them commented out.Code:#User=admin#Group=sudo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "itshig",
+      "created_time": "November 19, 2022, 08:28:33 PM",
+      "body": "Quote from: n0nce on November 19, 2022, 07:17:48 PMQuote from: itshig on November 19, 2022, 07:08:35 PMIt stays apollo miner was stopped (I added \"apollo miner\" to start and finish for my own clarity lol) and my pool isn't picking up a mining status. Can you try manually starting /opt/miner/linux-aarch64/miner_start.sh and checking what errors it throws?It's possible that it needs sudo privileges and the following lines need to be uncommented. I'm not 100% sure right now, why I had them commented out.Code:#User=admin#Group=sudoCode:user@machine: /opt/miner/linux-aarch64$ sudo ./miner_start.shls: cannot access '/dev/ttyACM*': No such file or directoryApollo Miner Starteduser@machine: /opt/miner/linux-aarch64$ sudo service miner status○ miner.service - Apollo Miner     Loaded: loaded (/lib/systemd/system/miner.service; enabled; vendor preset: enabled)     Active: inactive (dead) since Sat 2022-11-19 14:12:38 EST; 1h 13min ago    Process: 51417 ExecStart=/opt/miner/linux-aarch64/miner_start.sh (code=exited, status=0/SUCCESS)    Process: 52588 ExecStop=/opt/miner/linux-aarch64/miner_stop.sh (code=exited, status=0/SUCCESS)   Main PID: 52586 (code=exited, status=0/SUCCESS)        CPU: 658msNov 19 14:12:06 orangepi4 systemd[1]: Starting Apollo Miner...Nov 19 14:12:37 orangepi4 miner_start.sh[51417]: Apollo Miner StartedNov 19 14:12:37 orangepi4 systemd[1]: Started Apollo Miner.Nov 19 14:12:37 orangepi4 miner_stop.sh[52593]: No screen session found.Nov 19 14:12:37 orangepi4 miner_stop.sh[52594]: No screen session found.Nov 19 14:12:38 orangepi4 miner_stop.sh[52599]: ls: cannot access '/dev/ttyACM*': No such file or directoryNov 19 14:12:38 orangepi4 miner_stop.sh[52588]: Apollo Miner StoppedNov 19 14:12:38 orangepi4 systemd[1]: miner.service: Deactivated successfully.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 19, 2022, 09:03:38 PM",
+      "body": "Quote from: itshig on November 19, 2022, 08:28:33 PM~Seems to start fine as sudo. Try uncommenting those lines and reload the service. Code:sudo systemctl daemon-reloadsudo service miner restart",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "itshig",
+      "created_time": "November 19, 2022, 10:03:29 PM",
+      "body": "It seems like it's still not running even though it appears to start.  My fan is still racing (as if the miner was off) and the lights on the front aren't doing anything (though that may be normal given the custom route). Also, my pool still isn't picking up my miner as being active.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 22, 2022, 04:02:13 PM",
+      "body": "Quote from: itshig on November 19, 2022, 10:03:29 PMIt seems like it's still not running even though it appears to start.  My fan is still racing (as if the miner was off) and the lights on the front aren't doing anything (though that may be normal given the custom route). Also, my pool still isn't picking up my miner as being active.  Is your config fine? Maybe try rebooting? The fan should not race when the miner is off; instead it should do that when mining.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "itshig",
+      "created_time": "November 24, 2022, 04:07:06 PM",
+      "body": "Quote from: n0nce on November 22, 2022, 04:02:13 PMQuote from: itshig on November 19, 2022, 10:03:29 PMIt seems like it's still not running even though it appears to start.  My fan is still racing (as if the miner was off) and the lights on the front aren't doing anything (though that may be normal given the custom route). Also, my pool still isn't picking up my miner as being active.  Is your config fine? Maybe try rebooting? The fan should not race when the miner is off; instead it should do that when mining.I've rebooted a bunch.  I took a few days off from this though and back at it.  Fan has always raced when not mining (on the factor sd/nvme) until I power it down.  As soon as it starts mining, the fan slows down.  I've gone back through the instructions and now I'm getting:Code:miner_start.sh[1599]: gpio: Must be root to run. Program should be suid root. This is an error.miner_start.sh[1630]: gpio: Must be root to run. Program should be suid root. This is an error.I've gone through the config file a few times and everything looks ok.  This is frustrating! Lol I appreciate all of your help, to me and the community as a whole!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 24, 2022, 08:26:42 PM",
+      "body": "Quote from: itshig on November 24, 2022, 04:07:06 PMI've gone back through the instructions and now I'm getting:Code:miner_start.sh[1599]: gpio: Must be root to run. Program should be suid root. This is an error.miner_start.sh[1630]: gpio: Must be root to run. Program should be suid root. This is an error.Ok, this is very helpful! Indeed, the miner needs to be executed as root to get GPIO access.If you're working with the systemd service, make sure to uncomment these lines, as I explained before.Code:#User=admin#Group=sudoI.e., you want to remove the '#' signs in the front so it reads:Code:User=adminGroup=sudoThe default root user may be called 'umbrel' actually. Maybe try that, instead.If you're logged in as 'umbrel' (check with command: whoami), try the groups command to see whether you're in sudo group. If so, use User=umbrel and Group=sudo.Whole file then at follows:Code:[Unit]Description=Apollo MinerAfter=network.target[Service]WorkingDirectory=/opt/miner/linux-aarch64ExecStart=/opt/miner/linux-aarch64/miner_start.shExecStop=/opt/miner/linux-aarch64/miner_stop.sh# Make sure the config directory is readable by the service userPermissionsStartOnly=true# Process management####################Type=forkingRestart=on-failure# Directory creation and permissions##################################### Run as root:rootUser=umbrelGroup=sudo# Hardening measures##################### Provide a private /tmp and /var/tmp.PrivateTmp=true# Mount /usr, /boot/ and /etc read-only for the process.# Mounts everything read-only with the exception of /dev, /proc and /sys.ProtectSystem=full# Disallow the process and all of its children to gain# new privileges through execve().NoNewPrivileges=true# Deny the creation of writable and executable memory mappings.MemoryDenyWriteExecute=true## More hardeningProtectControlGroups=yesProtectHostname=yesProtectKernelLogs=yesProtectKernelModules=yesProtectKernelTunables=yesProtectProc=yesRestrictNamespaces=yesRestrictRealtime=yesLockPersonality=yesSystemCallArchitectures=nativeSystemCallFilter=~@privileged @resourcesSystemCallFilter=@system-serviceCapabilityBoundingSet=CAP_SYS_ADMINCapabilityBoundingSet=CAP_SYS_RAWIOCapabilityBoundingSet=CAP_MKNOD[Install]WantedBy=multi-user.targetIf you're running from command line, execute: sudo ./miner_start.sh <rest of parameters>.Quote from: itshig on November 24, 2022, 04:07:06 PMI appreciate all of your help, to me and the community as a whole!Very welcome.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "itshig",
+      "created_time": "November 26, 2022, 12:11:57 AM",
+      "body": "Quote from: n0nce on November 24, 2022, 08:26:42 PMOk, this is very helpful! Indeed, the miner needs to be executed as root to get GPIO access.If you're working with the systemd service, make sure to uncomment these lines, as I explained before.Code:#User=admin#Group=sudoI.e., you want to remove the '#' signs in the front so it reads:Code:User=adminGroup=sudoThe default root user may be called 'umbrel' actually. Maybe try that, instead.If you're logged in as 'umbrel' (check with command: whoami), try the groups command to see whether you're in sudo group. If so, use User=umbrel and Group=sudo.Whole file then at follows:Getting closer I think?  Can I just pay you to hop on ssh and figure this out?     It looks like it's running according to sudo service miner status as seen below.  However, it's displaying those other errors with regard to sudo.  Further, my fan is still loud af (no change from not mining to mining).  And it's not registering on my pool as being an active miner; about 10 min in according to active (running) results on the latest miner status report.  all private info changed (ie user/password, etc)Code:● miner.service - Apollo Miner     Loaded: loaded (/lib/systemd/system/miner.service; enabled; vendor preset: enabled)     Active: active (running) since Fri 2022-11-25 19:01:17 EST; 2min 23s ago    Process: 1567 ExecStart=/opt/miner/linux-aarch64/miner_start.sh (code=exited, status=0/SUCCESS)   Main PID: 3938 (screen)      Tasks: 3 (limit: 4451)     Memory: 2.7M        CPU: 4.950s     CGroup: /system.slice/miner.service             ├─3938 SCREEN -dmS miner ./apollo-miner -comport /dev/ttyS1 -ao_mode 1 -host stratum+tcp://us-east.stratum.braiins.com -port 3333 -user my.worker -pswd password123 -brd>             └─3952 ./apollo-miner -comport /dev/ttyS1 -ao_mode 1 -host stratum+tcp://us-east.stratum.braiins.com -port 3333 -user my.worker -pswd password123 -brd_ocp 48 -osc 30 -f>Nov 25 19:00:45 orangepi4 systemd[1]: Starting Apollo Miner...Nov 25 19:00:46 orangepi4 miner_start.sh[1608]: sudo: The \"no new privileges\" flag is set, which prevents sudo from running as root.Nov 25 19:00:46 orangepi4 miner_start.sh[1608]: sudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.Nov 25 19:00:47 orangepi4 miner_start.sh[1632]: sudo: The \"no new privileges\" flag is set, which prevents sudo from running as root.Nov 25 19:00:47 orangepi4 miner_start.sh[1632]: sudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.Nov 25 19:01:17 orangepi4 miner_start.sh[1567]: Apollo Miner StartedNov 25 19:01:17 orangepi4 systemd[1]: Started Apollo Miner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "itshig",
+      "created_time": "November 26, 2022, 01:06:16 AM",
+      "body": "Meh, miner shut down on its own and won't start back up.  I have to keep rebooting in order to get it to load.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 26, 2022, 03:51:33 PM",
+      "body": "Quote from: itshig on November 26, 2022, 12:11:57 AMGetting closer I think?  Can I just pay you to hop on ssh and figure this out?  I really hope that your SSH interface is not accessible from the internet (closed port in local and / or router firewall)! Quote from: itshig on November 26, 2022, 12:11:57 AMCode:~snip~Nov 25 19:00:46 orangepi4 miner_start.sh[1608]: sudo: The \"no new privileges\" flag is set, which prevents sudo from running as root.Nov 25 19:00:46 orangepi4 miner_start.sh[1608]: sudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.Nov 25 19:00:47 orangepi4 miner_start.sh[1632]: sudo: The \"no new privileges\" flag is set, which prevents sudo from running as root.Nov 25 19:00:47 orangepi4 miner_start.sh[1632]: sudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.As far as I know, this error relates to sandboxing; now it dawns on me: Umbrel heavily relies on Docker containers. Virtualization and sandboxing like this is great for security, but it clashes heavily with my bare-metal approaches and guides. I'm very sorry; should have catched that earlier. I have to get into Umbrel myself and make a dedicated guide for setting the Apollo miner up in Docker to run on Umbrel. That will definitely take some time, I'm afraid.Umbrel requires installing everything through Docker, as explained here:https://github.com/getumbrel/umbrel-apps/blob/master/README.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

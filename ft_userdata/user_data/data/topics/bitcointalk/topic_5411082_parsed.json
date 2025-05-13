@@ -1,0 +1,93 @@
+{
+  "id": "topic_5411082",
+  "title": "traderjoe",
+  "author": "traderjoe",
+  "created_time": "August 24, 2022, 07:31:23 PM",
+  "content": "I'm using v.22 of the bitcoin core client on an old Windows box.  I have the data directory set to use my NAS and have used it successfully in this configuration for several years.The debug.log contains the following:-------------------------------------------------------------------------------------2022-08-24T19:06:30Z Opening LevelDB in F:\\Bitcoin\\blocks\\index2022-08-24T19:06:30Z Fatal LevelDB error: IO error: F:\\Bitcoin\\blocks\\index/CURRENT: Access is denied.\\x0d2022-08-24T19:06:30Z You can use -debug=leveldb to get more complete diagnostic messages2022-08-24T19:06:30Z Fatal LevelDB error: IO error: F:\\Bitcoin\\blocks\\index/CURRENT: Access is denied.\\x0d2022-08-24T19:06:30Z : Error opening block database.-------------------------------------------------------------------------------------I have tried deleting the CURRENT file but that caused some other kind of early abnormal termination of the bitcoin client program so I replaced it.  I also tried rolling the data directory back in time a couple months using an incremental backup from my NAS, to no avail:  I get the same error afterwards.  I also tried the -reindex option but that also errors out with the same message.  I see the following in debug.log after trying with the -reindex option:-------------------------------------------------------------------------------------2022-08-24T19:25:01Z init message: Loading block index…2022-08-24T19:25:01Z Switching active chainstate to Chainstate [ibd] @ height -1 (null)2022-08-24T19:25:01Z Opening LevelDB in F:\\Bitcoin\\blocks\\index2022-08-24T19:25:01Z Fatal LevelDB error: Corruption: 53 missing files; e.g.: F:\\Bitcoin\\blocks\\index/001702.ldb2022-08-24T19:25:01Z You can use -debug=leveldb to get more complete diagnostic messages2022-08-24T19:25:01Z Fatal LevelDB error: Corruption: 53 missing files; e.g.: F:\\Bitcoin\\blocks\\index/001702.ldb2022-08-24T19:25:01Z : Error opening block database.Please restart with -reindex or -reindex-chainstate to recover.2022-08-24T19:25:08Z init message: Loading block index…2022-08-24T19:25:08Z should not be overwriting a chainstate2022-08-24T19:25:08Z Error: Error opening block database2022-08-24T19:25:09Z Shutdown: In progress...2022-08-24T19:25:09Z scheduler thread exit2022-08-24T19:25:09Z Shutdown: done-------------------------------------------------------------------------------------Can anyone suggest a way that might let me recover from this error?  For whatever reason, I'm pretty sure it will take my hardware days or more likely, months, to re-download the blockchain.  That's why I keep it on the NAS with multiple generations of backups.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5411082",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "August 24, 2022, 07:48:33 PM",
+      "body": "Quote from: traderjoe on August 24, 2022, 07:31:23 PMCan anyone suggest a way that might let me recover from this error?Have you checked the drive and file system on the NAS? It could be hardware failure.QuoteFor whatever reason, I'm pretty sure it will take my hardware days or more likely, months, to re-download the blockchain.If you have enough disk space, you can just try a new download. If you put chainstate on a local SSD, set dbcache to 4096, have enough RAM (at least 8 GB but more is better of course), and have enough bandwidth, any modern computer should be able to download the Bitcoin blockchain within a day.If your \"old Windows box\" is indeed so old it lacks RAM, SSD and processing power, then it may take quite a while.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "August 24, 2022, 10:46:03 PM",
+      "body": "From your old Windows Box would you mind telling us the whole system specs of your unit because the newer Bitcoin core always has bugs on an old version of the OS?The issue could be your OS, Ram or the HDD you currently using I suggest check the required specs from this link below lower than that will always have bugs. - https://bitcoin.org/en/bitcoin-core/features/requirements",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "traderjoe",
+      "created_time": "August 25, 2022, 08:06:19 PM",
+      "body": "Thank you for the numerous list of suggestions of other things for me to investigate (rather than asking for assistance with the bitcoin core client here.)  My PC has 6 Gb of RAM, it does have a SSD (which all programs, including the Bitcoin Core, run from), the OS is Windows 7.  The NAS works fine with all the other devices connected to it.  Someday I guess I will benchmark it in my spare time.  There surely must be some other detail(s) some of you could find for me to not expect the bitcoin core software to work and give up on the question I asked?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "August 25, 2022, 11:33:27 PMLast edit: August 25, 2022, 11:51:22 PM by BitMaxz",
+      "body": "Quote from: traderjoe on August 25, 2022, 08:06:19 PMThank you for the numerous list of suggestions of other things for me to investigate (rather than asking for assistance with the bitcoin core client here.)  My PC has 6 Gb of RAM, it does have a SSD (which all programs, including the Bitcoin Core, run from), the OS is Windows 7.  The NAS works fine with all the other devices connected to it.  Someday I guess I will benchmark it in my spare time.  It seems the specs are fine but you didn't mention other specs like CPU and if you are using 32bit or 64bit I have experienced before when using Bitcoin core with 32bit which is too buggy and can't able to use it. Anyway, have you recently force to shut down your PC without closing Bitcoin core while syncing? It will always end up with data corruption if you didn't properly shut down your core. The logs are suggesting to use -reindex it must be work but since you already tried it how did you perform -reindex?Did you edit the bitcoin core shortcut under target add -reindex? Or you run bitcoin core through command prompt with -reindex?Adding this if you are using 32bit read this https://bitcointalk.org/index.php?topic=5139689.msg50915664#msg50915664 posted by Achow101 you might need to build a 32bit one to make your core work properly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "August 26, 2022, 05:34:46 AM",
+      "body": "What do you have in your bitcoin.conf file or command line parameters?Because AFAIK, Bitcoin Core wont work if you set its datadir to a NAS due to leveldb incompatibility.I don't know how you managed to make it work before but try to set only the \"blocksdir\" to your NAS and leave the \"datadir\" to your local disk.Quote from: traderjoe on August 25, 2022, 08:06:19 PMThere surely must be some other detail(s) some of you could find for me to not expect the bitcoin core software to work and give up on the question I asked?Feels like you already expecting an answer and just want to make sure...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "traderjoe",
+      "created_time": "August 27, 2022, 03:12:34 PM",
+      "body": "Thank you for the additional suggestions.I know my Windows is a 64 bit version.  I'm away from that PC until next week but I will find more of the system specs (such as the CPU Model) and try your suggestion ETFbitcoin. Personally, I have always thought the slow performance with the bitcoin core client was due to it being behind 2 firewalls with no port forwarding to accept incoming connections from the bitcoin network. I'm not willing to change that for the workstation the bitcoin core client runs on so I didn't see a way to research the slow performance downloading blocks.  But I have noticed depending on the day, that the client would have problems accessing peers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 29, 2022, 08:19:58 AM",
+      "body": "Quote from: traderjoe on August 27, 2022, 03:12:34 PMPersonally, I have always thought the slow performance with the bitcoin core client was due to it being behind 2 firewalls with no port forwarding to accept incoming connections from the bitcoin network. I'm not willing to change that for the workstation the bitcoin core client runs on so I didn't see a way to research the slow performance downloading blocks.  But I have noticed depending on the day, that the client would have problems accessing peers.Firewalls are not the usual cause for slow machines, as those only interfere with connection opening. It's often network latency and speed, CPU and disk which weight the client down.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "traderjoe",
+      "created_time": "September 02, 2022, 07:25:20 PMLast edit: September 02, 2022, 10:32:15 PM by Mr. Big",
+      "body": "Quote from: BitMaxz on August 25, 2022, 11:33:27 PMQuote from: traderjoe on August 25, 2022, 08:06:19 PMThank you for the numerous list of suggestions of other things for me to investigate (rather than asking for assistance with the bitcoin core client here.)  My PC has 6 Gb of RAM, it does have a SSD (which all programs, including the Bitcoin Core, run from), the OS is Windows 7.  The NAS works fine with all the other devices connected to it.  Someday I guess I will benchmark it in my spare time.  It seems the specs are fine but you didn't mention other specs like CPU and if you are using 32bit or 64bit I have experienced before when using Bitcoin core with 32bit which is too buggy and can't able to use it. Anyway, have you recently force to shut down your PC without closing Bitcoin core while syncing? It will always end up with data corruption if you didn't properly shut down your core. The logs are suggesting to use -reindex it must be work but since you already tried it how did you perform -reindex?Did you edit the bitcoin core shortcut under target add -reindex? Or you run bitcoin core through command prompt with -reindex?Adding this if you are using 32bit read this https://bitcointalk.org/index.php?topic=5139689.msg50915664#msg50915664 posted by Achow101 you might need to build a 32bit one to make your core work properly. BitMaxz -- CPU is AMD Phenom II X4 960T 3.4 GigaHz, 64 bit W7.  Sometimes I have shut it down by accident before closing bitcoin core.  I performed -reindex by adding it as a flag to the Windows shortcut that opens bitcoin core.  So, I use the flags:   -datadir=F:\\Bitcoin -reindex tacked onto the bitcoin-qt.exe call in the shortcut.  My W7 box connects to the NAS this way -- F is a samba share. Quote from: ETFbitcoin on August 26, 2022, 12:27:05 PMQuote from: traderjoe on August 25, 2022, 08:06:19 PMThere surely must be some other detail(s) some of you could find for me to not expect the bitcoin core software to work and give up on the question I asked?We already mention almost all option. Parameter -reindex and -reindex-chainstate are the only option Bitcoin Core provide when your blockchain file is corrupted. Besides, I/O error and missing files usually related with your hardware.Normally i DO NOT recommend this, but you could try remove all files inside \"index\" folder, then run Bitcoin Core with -reindex parameter. If your NAS has slow I/O speed, it could take few days. And if you still see same LevelDB error message, you definitely you should check your hardware.ETFbitcoin -- thanks for the suggestion.  I tried moving all the files inside the \"index\" folder then running Bitcoin Core with -reindex but it immediately abended with the same error as before.  Here is the log created by my attempt to follow your suggestion:-------------------------------------------2022-09-02T17:45:39Z Bitcoin Core version v22.0.0 (release build)2022-09-02T17:45:39Z Qt 5.12.11 (static), plugin=windows (static)2022-09-02T17:45:39Z Static plugins:2022-09-02T17:45:39Z  QWindowsIntegrationPlugin, version 3307522022-09-02T17:45:39Z  QWindowsVistaStylePlugin, version 3307522022-09-02T17:45:39Z Style: windowsvista / QWindowsVistaStyle2022-09-02T17:45:39Z System: Windows 7 SP 1 (6.1), x86_64-little_endian-llp642022-09-02T17:45:39Z Screen: \\\\.\\DISPLAY1 1920x1200, pixel ratio=1.02022-09-02T17:45:41Z Assuming ancestors of block 00000000000000000008a89e854d57e5667df88f1cdef6fde2fbca1de5b639ad have valid signatures.2022-09-02T17:45:41Z Setting nMinimumChainWork=00000000000000000000000000000000000000001fa4663bbbe19f82de9102802022-09-02T17:45:41Z Using the 'standard' SHA256 implementation2022-09-02T17:45:41Z GUI: \"registerShutdownBlockReason: Successfully registered: Bitcoin Core didn't yet exit safely…\"2022-09-02T17:45:41Z Default data directory C:\\Users\\Ted\\AppData\\Roaming\\Bitcoin2022-09-02T17:45:41Z Using data directory F:\\Bitcoin2022-09-02T17:45:41Z Config file: F:\\Bitcoin\\bitcoin.conf2022-09-02T17:45:41Z Command-line arg: datadir=\"F:\\\\Bitcoin\"2022-09-02T17:45:41Z Command-line arg: reindex=\"\"2022-09-02T17:45:41Z Using at most 125 automatic connections (2048 file descriptors available)2022-09-02T17:45:41Z Using 16 MiB out of 32/2 requested for signature cache, able to store 524288 elements2022-09-02T17:45:41Z Using 16 MiB out of 32/2 requested for script execution cache, able to store 524288 elements2022-09-02T17:45:41Z Script verification uses 3 additional threads2022-09-02T17:45:41Z scheduler thread start2022-09-02T17:45:41Z Using wallet directory F:\\Bitcoin2022-09-02T17:45:41Z init message: Verifying wallet(s)…2022-09-02T17:45:41Z init message: Loading banlist…2022-09-02T17:45:41Z SetNetworkActive: true2022-09-02T17:45:41Z Using /16 prefix for IP bucketing2022-09-02T17:45:41Z Cache configuration:2022-09-02T17:45:41Z * Using 2.0 MiB for block index database2022-09-02T17:45:41Z * Using 8.0 MiB for chain state database2022-09-02T17:45:41Z * Using 290.0 MiB for in-memory UTXO set (plus up to 286.1 MiB of unused mempool space)2022-09-02T17:45:41Z init message: Loading block index…2022-09-02T17:45:41Z Switching active chainstate to Chainstate [ibd] @ height -1 (null)2022-09-02T17:45:41Z Wiping LevelDB in F:\\Bitcoin\\blocks\\index2022-09-02T17:45:41Z boost::filesystem::status: Access is denied: \"F:\\Bitcoin\\blocks\\index\"2022-09-02T17:45:41Z Error: Error opening block database2022-09-02T17:45:45Z Shutdown: In progress...2022-09-02T17:45:45Z scheduler thread exit2022-09-02T17:45:45Z Shutdown: doneQuote from: nc50lc on August 26, 2022, 05:34:46 AMWhat do you have in your bitcoin.conf file or command line parameters?Because AFAIK, Bitcoin Core wont work if you set its datadir to a NAS due to leveldb incompatibility.I don't know how you managed to make it work before but try to set only the \"blocksdir\" to your NAS and leave the \"datadir\" to your local disk.Quote from: traderjoe on August 25, 2022, 08:06:19 PMThere surely must be some other detail(s) some of you could find for me to not expect the bitcoin core software to work and give up on the question I asked?Feels like you already expecting an answer and just want to make sure...The whole idea of leaving the datadir on the NAS was to not need to re-download the entire blockchain WHEN something like this happened.  I'm pretty disappointed with the Bitcoin Core program.  For lack of alternatives, I will probably have to delete the blocks and start all over.  Given my experience, I probably won't use the NAS next time and eventually, I will try to navigate away from needing Bitcoin Core because it creates problems for me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 02, 2022, 07:47:45 PM",
+      "body": "Quote from: traderjoe on September 02, 2022, 07:32:53 PMThe whole idea of leaving the datadir on the NAS was to not need to re-download the entire blockchain WHEN something like this happened.  I'm pretty disappointed with the Bitcoin Core program.If you can't roll back your backup, I don't think Bitcoin Core is at fault.I've had the occasional redownload of the entire blockchain, which is annoying but completed in a day (on my old laptop).QuoteFor lack of alternatives, I will probably have to delete the blocks and start all over.  Given my experience, I probably won't use the NAS next timeTry to at least put the chainstate directory on a local SSD, that makes a huge difference on performance.Quoteand eventually, I will try to navigate away from needing Bitcoin Core because it creates problems for me.I've used different wallets, depending on what I need. Bitcoin Core is for instance great for privacy, but Electrum is much easier to use with an online watch-only wallet and offline wallet for signing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 03, 2022, 05:06:03 PM",
+      "body": "Quote from: ETFbitcoin on September 03, 2022, 09:21:26 AMQuote from: traderjoe on September 02, 2022, 07:25:20 PMETFbitcoin -- thanks for the suggestion.  I tried moving all the files inside the \"index\" folder then running Bitcoin Core with -reindex but it immediately abended with the same error as before.  Here is the log created by my attempt to follow your suggestion:Quote from: traderjoe on September 02, 2022, 07:25:20 PM2022-09-02T17:45:41Z init message: Loading block index…2022-09-02T17:45:41Z Switching active chainstate to Chainstate [ibd] @ height -1 (null)2022-09-02T17:45:41Z Wiping LevelDB in F:\\Bitcoin\\blocks\\index2022-09-02T17:45:41Z boost::filesystem::status: Access is denied: \"F:\\Bitcoin\\blocks\\index\"2022-09-02T17:45:41Z Error: Error opening block databaseWhile all logs have same error message \"Error: Error opening block database\", it's caused by different reason. Last time it was caused by \"Fatal LevelDB error\", but this time is \"boost::filesystem::status: Access is denied\".Try editing the NAS partitions access control settings and selecting for the group \"Everyone\": \"Read\" and \"Write\" permissions (I think there is a \"Full control\" mode that should be used instead of those previous two, that will solve all access control problems).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

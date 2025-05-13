@@ -1,0 +1,37 @@
+{
+  "id": "topic_5452530",
+  "title": "keystroke",
+  "author": "keystroke",
+  "created_time": "May 12, 2023, 06:54:01 PMLast edit: May 12, 2023, 07:06:54 PM by keystroke",
+  "content": "I recently experienced a power failure while performing the Initial Block Download onto a Samsung T7 solid state drive, which was partitioned for ext4 and mounted with the default data=ordered journaling option. My node was running with the following parameters: -txindex=1 -blockfilterindex=1 peerblockfilters=1.The node started back up without any issues. However, I am concerned about the possibility of data corruption (blocks, indexes, etc.) due to the power failure. To be on the safe side, I've decided to restart the node with -checkblocks=0 -checklevel=3 options to verify the integrity of the stored data.Is this enough to ensure that no data has been corrupted due to the power failure? Or should I consider taking additional steps to verify the integrity of my node data?Thank you in advance for your help!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5452530",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "May 13, 2023, 03:54:10 AM",
+      "body": "Quote from: keystroke on May 12, 2023, 06:54:01 PMIs this enough to ensure that no data has been corrupted due to the power failure? Or should I consider taking additional steps to verify the integrity of my node data?-checklevel can be set up to level 4, see if you need the highest level of verification: https://github.com/bitcoin/bitcoin/blob/9d85c03620bf660cfa7d13080f5c0b191579cbc3/src/validation.cpp#L92-L99In case there's a corrupted data due to power-failure, it's usually those latest block, block index, chainstate that are being written before the power failure.So ideally, Bitcoin Core should be able to detect those with the default parameters.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mendace",
+      "created_time": "May 15, 2023, 07:52:58 PM",
+      "body": "If the node restarts successfully without reporting errors or data corruption, that's a good sign that data integrity has been preserved.  However, for added security, you might consider performing additional verifications or checks, for example by using specific verification tools such as \"bitcoin-cli verifychain\" or \"bitcoin-cli -checklevel=4\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 16, 2023, 05:43:16 AM",
+      "body": "Quote from: mendace on May 15, 2023, 07:52:58 PM-snip-  for example by using specific verification tools such as \"bitcoin-cli verifychain\" or \"bitcoin-cli -checklevel=4\".-checklevel is a command line option that should be added to your node, not an rpc command.It has to be used with either bitcoind or bitcoin-qt.It's also worth mentioning that both will use the default which will only check the last 6 blocks,So to mimic OP's procedure, you'll need to add \"0\" value 'nBlocks' arg to verifychain command to verify everything.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

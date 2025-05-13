@@ -1,0 +1,69 @@
+{
+  "id": "topic_5408560",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "August 03, 2022, 09:26:36 AMLast edit: August 03, 2022, 01:09:55 PM by NotATether",
+  "content": "When calculating coordinates from an ECDSA (r,s) signature, or when computing the public key with specific odd/even Y, we usually do something like this:Code:x = x^3 + 7 mod py = x^((p+1)/4) mod pWhy are we taking the square root of y instead of just y?EDIT: I should be clear that I was expecting this operation to take the square root of (y^2) not its fourth root.Later, when we are attempting to identify the value of y that is even or odd, we take the recID, which tells us whether the Y coordinate is supposed to be even or odd, and subtract the square root of y minus 0 or 1 respectively.And the last bit of the result tells us whether this is the even or odd part of sqrt(y) (doing p-y gives us the y coordinate of opposite parity). But how does this tell us anything about y itself?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408560",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "August 03, 2022, 11:50:55 AM",
+      "body": "Quote from: NotATether on August 03, 2022, 09:26:36 AMCode:x = x^3 + 7 mod py = x^((p+1)/4) mod pThe first one looks like the Elliptic Curve equation (correct form is y2=x3 + ax + b with a=0 and b=7 for secp256k1) when you only have x and want to find y you have to compute square root of the right side (sqrt of x3 +7).To find square root mod p when p%4 = 3 (prime of secp256k1 curve is like that) you can compute x(p+1)/4 (mod p) instead.Quoteand subtract the square root of y minus 0 or 1 respectively.0 or 1 is subtracted from the recid not the square root.QuoteBut how does this tell us anything about y itself?When signing the message hash the recid is computed by adding 1 to it if y was odd and adding 0 if it were even. So when recovering public keys if that 1 existed in recid we have to return the odd y.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 03, 2022, 12:54:55 PMLast edit: August 03, 2022, 01:07:40 PM by NotATether",
+      "body": "Quote from: pooya87 on August 03, 2022, 11:50:55 AMTo find square root mod p when p%4 = 3 (prime of secp256k1 curve is like that) you can compute x(p+1)/4 (mod p) instead.I'm trying to grok my head around this.We have y^2 = x^3 + 7 so before I wrote this topic I had the idea that the next statement took the 4th root of Right Hand Side (power by p+1 is equivalent to just 1, and I had the belief that coord^((p+1)/2) was equivalent to taking the square root - since we clearly cannot raise by the fractional power 1/2, but (p+1)/2 is equivalent to that).In other words, (y^2)^((p+1)/4) would've been sqrt(y) not y. It's like in algebra how you apply the first sqrt and then you have (y)^((p+1)/2).But apparently the p+1 is to ensure that modulus is zero, i.e. (p+1) % 4 = 0, and then the division by 4 is done. So how is dividing this shifted prime by 4 equivalent to a square root?Is it because we are now taking the modular power by a whole number? Then why 4 specifically and not some other number?Quote0 or 1 is subtracted from the recid not the square root.No look, bitcoinsig.js that is used in the \"brainwallet.github.io\" sites has this in the verificaiton algo:Code:function verify_message(signature, message, addrtype) {    try {        var sig = Crypto.util.base64ToBytes(signature);    } catch(err) {        return false;    }    if (sig.length != 65)        return false;    // extract r,s from signature    var r = BigInteger.fromByteArrayUnsigned(sig.slice(1,1+32));    var s = BigInteger.fromByteArrayUnsigned(sig.slice(33,33+32));    // get recid    var compressed = false;    var nV = sig[0];    if (nV < 27 || nV >= 35)        return false;    if (nV >= 31) {        compressed = true;        nV -= 4;    }    var recid = BigInteger.valueOf(nV - 27);    var ecparams = getSECCurveByName(\"secp256k1\");    var curve = ecparams.getCurve();    var a = curve.getA().toBigInteger();    var b = curve.getB().toBigInteger();    var p = curve.getQ();    var G = ecparams.getG();    var order = ecparams.getN();    var x = r.add(order.multiply(recid.divide(BigInteger.valueOf(2))));    var alpha = x.multiply(x).multiply(x).add(a.multiply(x)).add(b).mod(p);    var beta = alpha.modPow(p.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), p);    // It's subtracting recID from Y here, i.e. it is effectively subtracting 0 or 1 from it (ignoring the higher bit) - NotATether    var y = beta.subtract(recid).isEven() ? beta : p.subtract(beta);    var R = new ECPointFp(curve, curve.fromBigInteger(x), curve.fromBigInteger(y));    var e = BigInteger.fromByteArrayUnsigned(msg_digest(message));    var minus_e = e.negate().mod(order);    var inv_r = r.modInverse(order);    var Q = (R.multiply(s).add(G.multiply(minus_e))).multiply(inv_r);    var public_key = Q.getEncoded(compressed);    var addr = new Bitcoin.Address(Bitcoin.Util.sha256ripe160(public_key));    addr.version = addrtype ? addrtype : 0;    return addr.toString();}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "j2002ba2",
+      "created_time": "August 03, 2022, 01:16:06 PM",
+      "body": "Quote from: NotATether on August 03, 2022, 12:54:55 PMQuote from: pooya87 on August 03, 2022, 11:50:55 AMTo find square root mod p when p%4 = 3 (prime of secp256k1 curve is like that) you can compute x(p+1)/4 (mod p) instead.I'm trying to grok my head around this.We have y^2 = x^3 + 7 so before I wrote this topic I had the idea that the next statement took the 4th root of Right Hand Side (power by p+1 is equivalent to just 1, and I had the belief that coord^((p+1)/2) was equivalent to taking the square root - since we clearly cannot raise by the fractional power 1/2, but (p+1)/2 is equivalent to that).In other words, (y^2)^((p+1)/4) would've been sqrt(y) not y. It's like in algebra how you apply the first sqrt and then you have (y)^((p+1)/2).But apparently the p+1 is to ensure that modulus is zero, i.e. (p+1) % 4 = 0, and then the division by 4 is done. So how is dividing this shifted prime by 4 equivalent to a square root?Is it because we are now taking the modular power by a whole number? Then why 4 specifically and not some other number?It all comes from Fermat's little theorem:yp = y (mod p)thenyp+1 = y2 (mod p)y(p+1)/4 = y1/2 (mod p)You could do similar stuff for cube roots as well:xp+2 = x3 (mod p)x(p+2)/9 = x1/3 (mod p)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 03, 2022, 02:28:54 PM",
+      "body": "Code:    // It's subtracting recID from Y here, i.e. it is effectively subtracting 0 or 1 from it (ignoring the higher bit) - NotATether    var y = beta.subtract(recid).isEven() ? beta : p.subtract(beta);I gotta admit, that is weird! Maybe it is done like this to shorten the code and not need multiple branches.Since the result of subtraction (beta-recid) is not used anywhere else, it is just a temporary variable used inside the ternary conditional operator to check if computed y (or beta) is even or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "August 03, 2022, 02:43:09 PM",
+      "body": "Since I barely understand elliptic curve cryptography and can't say something smart, I will simply quote a someone else's answer:Quote from: https://bitcoin.stackexchange.com/questions/109617/how-to-get-y-from-xThe secp256k1 curve equation is:    Points (x,y) for which y2 = x3 + 7 mod p, where p = 2256-232-977If we solve this for y, we get y = ±√(x3 +7) mod p.Of course, this is not a normal square root, but a square root for the field of integers modulo p, but otherwise this equation is correct. To compute such a modular square root, the Tonelli-Shanks algorithm is used. It can deal with many cases, depending on the structure of the modulus, but for our p modulus it simplifies to just:    √a mod p = a(p+1)/4 mod p (for any prime p for which p+1 is a multiple of 4).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "j2002ba2",
+      "created_time": "August 03, 2022, 05:31:31 PM",
+      "body": "Quote from: NotATether on August 03, 2022, 12:54:55 PMNo look, bitcoinsig.js that is used in the \"brainwallet.github.io\" sites has this in the verificaiton algo:verify_message follows this algorithm ECDSA Public key recovery.The function calling verify_message sets the first byte of signature to 27..34.This corresponds to the eight cases, two for x (x or x+n, bit zero of recid), and two for y (y or p-y, bit 1, zero for even y, one for odd y), uncompressed or compressed (if first byte is >= 31).At the end it returns the address of decoded public key.You could see how Bitcoin Core does sign here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 03, 2022, 05:44:41 PMLast edit: August 04, 2022, 03:48:47 AM by NotATether",
+      "body": "Quote from: j2002ba2 on August 03, 2022, 01:16:06 PMIt all comes from Fermat's little theorem:yp = y (mod p)thenyp+1 = y2 (mod p)y(p+1)/4 = y1/2 (mod p)You could do similar stuff for cube roots as well:xp+2 = x3 (mod p)x(p+2)/9 = x1/3 (mod p)Thanks, that's exactly what I needed!EDIT: in other words, it's not doing (y^2)^(1/4), but actually ((y^2)^2)*1/4. The variable is the square of y, but we take the temporary square of it before we take its 4th root (sqrt of sqrt).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

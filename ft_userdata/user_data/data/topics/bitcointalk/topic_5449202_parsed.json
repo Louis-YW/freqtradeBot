@@ -1,0 +1,45 @@
+{
+  "id": "topic_5449202",
+  "title": "ecdsa123",
+  "author": "ecdsa123",
+  "created_time": "April 17, 2023, 06:24:48 PMLast edit: August 31, 2024, 02:48:49 PM by ecdsa123",
+  "content": "del",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5449202",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "April 18, 2023, 06:46:37 AM",
+      "body": "Am I the only one whose having a hard time figuring out what this script is supposed to do?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "April 18, 2023, 07:10:43 AM",
+      "body": "Quote from: ecdsa123 on April 18, 2023, 07:06:13 AMrun in SAGEMATH - https://sagecell.sagemath.org/if you like it you can thanks me via send some BTC for cofee or whisky on address: 1AB2Mv64tdbaK1m29dXp4Sntn82qDosWWfCan you answer my question first?Quote from: NotATether on April 18, 2023, 06:46:37 AMAm I the only one whose having a hard time figuring out what this script is supposed to do?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "April 25, 2023, 04:53:12 PM",
+      "body": "Quote from: ecdsa123 on April 18, 2023, 07:06:13 AMrun in SAGEMATH - https://sagecell.sagemath.org/if you like it you can thanks me via send some BTC for cofee or whisky on address: 1AB2Mv64tdbaK1m29dXp4Sntn82qDosWWfCode:p = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141E = EllipticCurve(GF(p), [0, 7])G = E.point( (0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8))   # Base pointdef egcd(a, b):    if a == 0:        return (b, 0, 1)    else:        g, y, x = egcd(b % a, a)        return (g, x - (b // a) * y, y)def modinv(a, m):    g, x, y = egcd(a, m)    if g != 1:        raise Exception('modular inverse does not exist')    else:        return x % m    def verify(r, s,z,public_key):    w = int(modinv(s, n))    u1 = int((z * w) % n)    u2 = int((r * w) % n)    D=u1*G + u2*public_key    x,y=D.xy()    x=int(x)    if (r % n) == (x % n):        print( \"signature matches\")        return 1    else:        print(\"invalid signature\",r,x%n,hex(int(x%n)))        return -1  def sign(privkey,nonce,message):    z=message    nonceG=nonce*G    rx,rye=nonceG.xy()    rx=int(rx)    s=(z+int(rx)*privkey)*modinv(nonce,n)%n    return int(rx), int(s), int(z)def make_minus(k_minus,r,s,z,pub):    w = int(modinv(s, n)%n)    u1 = int((z * w) % n)    u2 = int((r * w) % n)         D=u1*G + u2*pub         du= D-k_minus*G    x,y=du.xy()    r_new=Integer(x)    #c = E.lift_x(Integer(r)) - k_minus * G    #print(\"c\",du)       s_new = s * modinv(r,n) * r_new % n    h_new = (z - s * k_minus) * modinv(r,n) * r_new % n    return int(r_new),int(s_new),int(h_new)def make_divide(r,s,z,how_much,pub):    w = int(modinv(s, n)%n)    u1 = int((z * w) % n)    u2 = int((r * w) % n)         D=u1*G + u2*pub    R=D*modinv(how_much,n)    r_new=int(R.xy()[0])    #with the same pubkey    dsa=int(s*modinv(r,n)%n)   # dsa = s * 1/r        dma= int(z*modinv(r,n)%n)  # dma = z * 1/m         dsa = dsa*how_much *r_new%n     m=dma*r_new%n         s_new=dsa    z_new=m    return r_new,int(s_new),int(z_new)# input values:private=100pub=private*Gnonce=200message=11111111111111111111111111111111# first transactionr,s,z = sign(private,nonce,message)#test 1#test for plus and minus nonce in transactionk_minus = 100 #output must be nonce=100 with the same pubkeyr1,s1,z1=make_minus(k_minus,r,s,z,pub)#verify new transactionverify(r1,s1,z1,pub)k=(r1*private+z1)*modinv(s1,n)%nprint(\"new nonce==\",k)# test 2#test for divide nonce in transaction#output must be nonce=100 with the same pubkeyhow_much=2 #we divide by 2 nonce in transaction r2,s2,z2=make_divide(r,s,z,how_much,pub)#verify new transactionverify(r2,s2,z2,pub)k=(r2*private+z2)*modinv(s2,n)%nprint(\"new nonce==\",k)what say blockcain to your transaction ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Sha256explorer",
+      "created_time": "April 25, 2023, 06:49:52 PMLast edit: April 25, 2023, 07:45:58 PM by Sha256explorer",
+      "body": "I  decided to invest two minutes running this script in SAGEMATH.I didn't understand what the script was for, I don't know SAGEMATH and I got this result:Code:signature matchesnew nonce== 100signature matchesnew nonce== 100I don't undertand what that means!I edited this post because, rereading it, it didn't seem respectful enough, which I'm sorry for",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

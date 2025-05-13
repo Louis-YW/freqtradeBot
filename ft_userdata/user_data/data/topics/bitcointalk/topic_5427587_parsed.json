@@ -1,0 +1,53 @@
+{
+  "id": "topic_5427587",
+  "title": "krashfire",
+  "author": "krashfire",
+  "created_time": "December 09, 2022, 07:46:00 PMLast edit: December 10, 2022, 12:29:14 AM by krashfire",
+  "content": "Hi, I was wondering whether anyone had tried Nonce Reuse fault attack on SECP256K1.It seems so much easier to crack any wallet with this attack. Read here> https://asecuritysite.com/ecdsa/ecd7I had tried lattice attack on my wallet address for 5 weeks now. It works but really slow. I am considering starting a new attack for my research. Your inputs are greatly appreciated. How can i modify this script to accept my R,S,H and public keys ? Please help. Thank You so much.  Code is here. Quoteimport ecdsaimport randomimport libnumimport hashlibimport sysG = ecdsa.SECP256k1.generatororder = G.order()priv1 = random.randrange(1,order) Public_key = ecdsa.ecdsa.Public_key(G, G * priv1)d = ecdsa.ecdsa.Private_key(Public_key, priv1)k = random.randrange(1, 2**127)msg=\"Hello\"if (len(sys.argv)>1):   msg=(sys.argv[1])h = int(hashlib.sha256(msg.encode()).hexdigest(),base=16)sig = d.sign(h, k)r,s = sig.r,sig.s# Now generate a faultrf = sig.r+1sf=(libnum.invmod(k,order)*(h+priv1*rf)) % orderk = h*(s-sf) * libnum.invmod(sf*r-s*rf,order)valinv = libnum.invmod( (sf*r-s*rf),order)dx =(h*(s-sf)* valinv) % orderprint(f\"Message: {msg}\")print(f\"k: {k}\")print(f\"Sig 1 (Good): r={r}, s={s}\")print(f\"Sig 2 (Faulty): r={rf}, s={sf}\")print (f\"\\nGenerated private key: {priv1}\")print (f\"\\nRecovered private key: {dx}\")Result is here. Quote#python fault.pyMessage: Hellok: 2377122631336757091406456643105226705197917127899304611236234685727643570878493 8957571817458862979584232284037410229596452277879610955286764320595345098952800 839149842089242517072957658427855833009982523662157423292631792006806365Sig 1 (Good): r=41552918092331466876589119583071324014922831660434505150350778883250206623908, s=103219685505031464720805837014021801697332755430913759423777864063262658295904Sig 2 (Faulty): r=41552918092331466876589119583071324014922831660434505150350778883250206623909, s=30990528248984818891301551608571623728524592243310248921245102910474460702403Generated private key: 89452984132331904393121726602673115409896713988677951449044374033056235521792Recovered private key: 89452984132331904393121726602673115409896713988677951449044374033056235521792",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5427587",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "December 09, 2022, 08:22:59 PM",
+      "body": "Fault attacks means you induce hardware faults during the creation of the wallet/keys/signatures. It is completely useless for attacking pre-existing wallets/transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "December 09, 2022, 08:32:50 PMLast edit: December 10, 2022, 12:45:12 AM by krashfire",
+      "body": "Yeah. Agreed. I was thinking the same thing.. Click the link. The author too call it fault attack. Hmm maYbe I should edit the subject of this topic.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "December 09, 2022, 08:41:55 PM",
+      "body": "You said \"crack any wallet\" though. Fault attacks can not be used to crack any wallet. They can only be used when you have some amount of control over the system that signs/creates a wallet at the moment of signing/creation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "December 09, 2022, 11:51:33 PM",
+      "body": "Quote from: ymgve2 on December 09, 2022, 08:41:55 PMYou said \"crack any wallet\" though. Fault attacks can not be used to crack any wallet. They can only be used when you have some amount of control over the system that signs/creates a wallet at the moment of signing/creation.Alright... Are you here to argue with me on what's the word used or would you like to blame the author for the word used?  Have you actually tried this method? I understand your meaning and the general meaning of fault attack.HOWEVER, that's what the author of this website claim it is.SO... despite of the choice of words used..What or how can I modify this script so that it accepts my r, s, h and public key inputs? Quote#python fault.pyMessage: Hellok: 2377122631336757091406456643105226705197917127899304611236234685727643570878493 8957571817458862979584232284037410229596452277879610955286764320595345098952800 839149842089242517072957658427855833009982523662157423292631792006806365Sig 1 (Good): r=41552918092331466876589119583071324014922831660434505150350778883250206623908, s=103219685505031464720805837014021801697332755430913759423777864063262658295904Sig 2 (Faulty): r=41552918092331466876589119583071324014922831660434505150350778883250206623909, s=30990528248984818891301551608571623728524592243310248921245102910474460702403Generated private key: 89452984132331904393121726602673115409896713988677951449044374033056235521792Recovered private key: 89452984132331904393121726602673115409896713988677951449044374033056235521792",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "December 10, 2022, 12:56:31 AM",
+      "body": "Do you know what the word \"fault\" implies?Take a closer look at the code, especially this part:Code:# Now generate a faultrf = sig.r+1sf=(libnum.invmod(k,order)*(h+priv1*rf)) % orderTo do this attack with this example code, you need to already know the private key to generate the faulty sf value.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

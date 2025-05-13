@@ -1,0 +1,69 @@
+{
+  "id": "topic_5431352",
+  "title": "yoshimitsu777",
+  "author": "yoshimitsu777",
+  "created_time": "December 25, 2022, 08:33:44 AM",
+  "content": "i want to create bech32 address in bit.Quote>>> from bit import Key>>> key = Key()>>> print(key)<PrivateKey: 1Q42mvgDhLYYD4hEcLbpwXNheKKUFDupxa>the output is the address not privkey.Comparison here:Quote>>> print(key.address)1Q42mvgDhLYYD4hEcLbpwXNheKKUFDupxaWhy does bit not output the privkey as expected?I have to use this command to get the privkey displayed as expectedQuote>>> print(key.to_hex())57d706092c69dbdd7275caaf594163368d0d05af2e56aed55e48df5eeab5e6dfthere is a command to output tje segwit address that begins with '3'Quote>>> print(key.segwit_address)3744W6xs6musQKTGhLYTrr3VffphdG5E8fbut how do I output the bech32 address that begins with 'bc1' ?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5431352",
+  "comments": [
+    {
+      "author": "seoincorporation",
+      "created_time": "December 26, 2022, 03:27:23 AM",
+      "body": "Quote from: yoshimitsu777 on December 25, 2022, 08:33:44 AMi want to create bech32 address in bit.Quote>>> from bit import Key>>> key = Key()>>> print(key)<PrivateKey: 1Q42mvgDhLYYD4hEcLbpwXNheKKUFDupxa>the output is the address not privkey.Comparison here:Quote>>> print(key.address)1Q42mvgDhLYYD4hEcLbpwXNheKKUFDupxaWhy does bit not output the privkey as expected?I have to use this command to get the privkey displayed as expectedQuote>>> print(key.to_hex())57d706092c69dbdd7275caaf594163368d0d05af2e56aed55e48df5eeab5e6dfthere is a command to output tje segwit address that begins with '3'Quote>>> print(key.segwit_address)3744W6xs6musQKTGhLYTrr3VffphdG5E8fbut how do I output the bech32 address that begins with 'bc1' ?the only way I know to do that with python is by getting the hash160 from the address, and then get the bench32 address from the hash160Code:>>> import binascii, hashlib, base58>>> hash160 = binascii.hexlify(base58.b58decode_check(b'1Q42mvgDhLYYD4hEcLbpwXNheKKUFDupxa')).decode()[2:]>>> hash160'fcdd9f4c0f347a5ded0419466ed585395b669646'So, now we have the hash160 we get the bench32 address:Code:>>> import bech32>>> witprog = bytes.fromhex('fcdd9f4c0f347a5ded0419466ed585395b669646')>>> witver = 0x00>>> hrp = 'bc'>>> address = bech32.encode(hrp, witver, witprog)>>> print(address)bc1qlnwe7nq0x3a9mmgyr9rxa4v989dkd9jxa0uwqfAnd to prove the data is right, you can verify it in the next link:https://privatekeys.pw/address/bitcoin/1Q42mvgDhLYYD4hEcLbpwXNheKKUFDupxaI hope these commands help you because as AlexanderCurl mentioned, it isn't possible to do it directly from bit library.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "December 26, 2022, 04:55:14 AM",
+      "body": "I haven't found a way to generate a native SegWit address directly from 'user Interface', but you certainly can create it using internal functionality of this library. All the necessary functions for proper bech32 encoding are present there.The following piece of code that I come up with works as intended:Code:import bitfrom bit.crypto import ripemd160_sha256from bit.base32 import encodepublic_key = bit.PrivateKey(    'L4YRXnWPJx1QbXrf1c8cYeXZ1XSAChHP2vHao86PmfsBwhaogSxq').public_keypublic_key = ripemd160_sha256(public_key)segwit_addr = encode('bc', 0, public_key)print(segwit_addr)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yoshimitsu777",
+      "created_time": "January 02, 2023, 09:39:54 AM",
+      "body": "thank you witcher_sense",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "January 03, 2023, 04:03:12 AM",
+      "body": "Quote from: witcher_sense on December 26, 2022, 04:55:14 AMI haven't found a way to generate a native SegWit address directly from 'user Interface', but you certainly can create it using internal functionality of this library. All the necessary functions for proper bech32 encoding are present there.The following piece of code that I come up with works as intended:Code:import bitfrom bit.crypto import ripemd160_sha256from bit.base32 import encodepublic_key = bit.PrivateKey(    'L4YRXnWPJx1QbXrf1c8cYeXZ1XSAChHP2vHao86PmfsBwhaogSxq').public_keypublic_key = ripemd160_sha256(public_key)segwit_addr = encode('bc', 0, public_key)print(segwit_addr)How's the performance vs generating legacy addresses? I would expect it to be significantly lower but I guess that's something to test out.  When I say performance, I mean like generating 1 million addresses, how fast can it do it...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 03, 2023, 05:46:37 AM",
+      "body": "Quote from: larry_vw_1955 on January 03, 2023, 04:03:12 AMHow's the performance vs generating legacy addresses? I would expect it to be significantly lower but I guess that's something to test out.  When I say performance, I mean like generating 1 million addresses, how fast can it do it...I haven't measured the performance (Legacy vs Native SegWit), but I also think that generation of bech32 addresses is more costly in terms of system resources than that of legacy addresses. Anyway, this approach is not suitable for the fast generation of addresses because in order to calculate a million of bitcoin addresses, you need to create the same number of instances of PrivateKey class, which is an extremely inefficient way and consumes too much computer memory. And after conducting a small test where I try to calculate just 10000 addresses without printing them or writing them to a file, I can conclude that it is a very slow method. Here is the result:Code:$ time python test_bit.pyreal    0m4,321suser    0m4,291ssys     0m0,028sIt took more than 4 seconds on my laptop to perform 10000 calculations (private-public-address).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "January 03, 2023, 11:43:02 PM",
+      "body": "Quote from: witcher_sense on January 03, 2023, 05:46:37 AMAnyway, this approach is not suitable for the fast generation of addresses because in order to calculate a million of bitcoin addresses, you need to create the same number of instances of PrivateKey class, which is an extremely inefficient way and consumes too much computer memory.you don't have to store them you just have to store one at a time. so there are no memory requirements.QuoteAnd after conducting a small test where I try to calculate just 10000 addresses without printing them or writing them to a file, I can conclude that it is a very slow method. what's faster?QuoteIt took more than 4 seconds on my laptop to perform 10000 calculations (private-public-address).how long does it take your laptop to generate 10000 legacy addresses? in my small test, I find that generating legacy addresses using the bit package is about twice as fast as generating bech32 ones.Code:Number of addresses processed: 1000Bech32 addresses onlyTotal conversion time: 0.8630490303039551Number of addresses processed: 1000COMPRESSED addresses onlyTotal conversion time: 0.4350249767303467Uncompressed addresses only followed a similar time. So I'd say based on this I'd say that if bit is considered fast and efficient method of generating legacy addresses, then it probably is about the fastest way for bech32 also. and if what you say is true that bech32 is more cpu intensive then you probably can't do any better.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 04, 2023, 06:36:12 AM",
+      "body": "Quote from: larry_vw_1955 on January 03, 2023, 11:43:02 PMyou don't have to store them you just have to store one at a time. so there are no memory requirements.You're right, I guess. In my initial solution, I created a for loop with required number of iterations and was reassigning a calculated result to the same variable 'address'. So, I never stored more than one address in memory.Quotewhat's faster?You should probably check this thread where guys are experimenting with different solutions. It's fascinating. Quotehow long does it take your laptop to generate 10000 legacy addresses? in my small test, I find that generating legacy addresses using the bit package is about twice as fast as generating bech32 ones.My tests:Code:from bit import PrivateKeyfrom bit.crypto import ripemd160_sha256from bit.base32 import encodefrom time import perf_counterfor i in range(1, 6):    iter_num = 10 ** i    print('Number of iterations: ', iter_num)    start = perf_counter()    for j in range(iter_num):        segwit_addr = encode(            'bc', 0, ripemd160_sha256(PrivateKey().public_key))    print('SegWit: ', perf_counter() - start)    start = perf_counter()    for j in range(iter_num):        legacy_address = PrivateKey().address    print('Legacy: ', perf_counter() - start)Output:Code:Number of iterations:  10SegWit:  0.0063117869995039655Legacy:  0.0020405309996931464Number of iterations:  100SegWit:  0.05483400899993285Legacy:  0.02829396699962672Number of iterations:  1000SegWit:  0.41739839000001666Legacy:  0.17173332600032154Number of iterations:  10000SegWit:  4.043536178000068Legacy:  1.609283795999545Number of iterations:  100000SegWit:  39.641901613999835Legacy:  16.043936938000115",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

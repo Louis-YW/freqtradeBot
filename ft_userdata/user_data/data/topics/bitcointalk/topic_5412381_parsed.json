@@ -1,0 +1,61 @@
+{
+  "id": "topic_5412381",
+  "title": "pbies",
+  "author": "pbies",
+  "created_time": "September 05, 2022, 03:38:59 AMLast edit: September 10, 2022, 03:29:41 PM by pbies",
+  "content": "I've made a script and tested it for some time:Code:#!/usr/bin/env python3from subprocess import check_outputfrom tqdm import tqdmimport base58import binasciiimport bitcoinimport hashlibimport subprocessoutfile = open(\"output.txt\",\"wb\")cnt=int(check_output([\"wc\", \"-l\", \"input.txt\"]).split()[0])with open(\"input.txt\",\"rb\") as f: for line in tqdm(f, total=cnt, unit=\" lines\"):  x=line.rstrip(b'\\n')  b=hashlib.sha256(x).digest()  f=b'\\x80'+b  h=base58.b58encode_check(f)  i=h+b\" 0 # \"+x+b'\\n'  outfile.write(i)outfile.close()This is Python 3 script. Works on Windows and decent Linux.You put it into empty folder, name it \"text2wif.py\" and put in the same folder \"input.txt\" file with your brain wallets. One per line. Accepted line endings are only \\n. If you have \\r or \\r\\n you need to convert the file with dos2unix or other editor which changes line endings to Linux (\\n).Then you run the script. \"wc\" is needed, it is available in GNU CoreUtils for Windows.You get progress bar and very high speed (I get 80k lines/s).Some imports are not needed. You may need to install some imports by \"pip install ...\".The result you get in \"output.txt\" file.This file is ready to import in Bitcoin Core with \"importwallet\" command.Script may be helpful to recall forgotten brain wallet phrases.EDIT: fixed 3 lines to 1 line when adding 0x80 at the beginning.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412381",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "September 05, 2022, 03:59:03 AM",
+      "body": "What's the point of this specially since importing lots of keys in bitcoin core takes a lot of time? If you have an address (or a list of them) you should just compare it in the script itself.Also why are you storing the hex alongside the WIF (h+b)? While importing keys, all you need is the base58 WIF string (h) alone, there is no need to also provide the hexadecimal string.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "September 05, 2022, 04:04:46 AM",
+      "body": "Quote from: pooya87 on September 05, 2022, 03:59:03 AMWhat's the point of this specially since importing lots of keys in bitcoin core takes a lot of time? If you have an address (or a list of them) you should just compare it in the script itself.Also why are you storing the hex alongside the WIF (h+b)? While importing keys, all you need is the base58 WIF string (h) alone, there is no need to also provide the hexadecimal string.If you don't know the brain wallet phrase, listing them in hundreds is an option for person which does not have only few of them. Manually it would be easier to add private keys in Bitcoin Core console one by one and then rescan.Brain wallet beside WIF is for recalling the exact brain wallet phrase. It can be taken out then easily. Only WIF does not work, you need at least a date after it, which I have chosen as \"0\" which is from the beginning of the blockchain for all WIFs.Brain wallet does not need to be only a hexadecimal number, phrases are welcome.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 05, 2022, 05:47:59 AM",
+      "body": "Quote from: pbies on September 05, 2022, 04:04:46 AMIf you don't know the brain wallet phrase, listing them in hundreds is an option for person which does not have only few of them. Manually it would be easier to add private keys in Bitcoin Core console one by one and then rescan.Most people do not make hundreds of brainwallets for themselves so my guess is that you're using this for mass-adding leaked brainwallet phrases to Bitcoin Core.I should tell you that Core's RPC system is not optimized for that, it would be better if you directly add these to the wallet.data file. You'll get better results if the format is SQLite3 instead of the poorly-documented Berkely DB format.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "September 05, 2022, 06:36:15 AM",
+      "body": "What is the real purpose of that tool? Import brainwallets or check if address is founded?Very old brainwallets were used to produce \"uncompressed\" addresses, the same I see in your code. But as you create a tool for conversion, it would be good to have an option to create compressed WIFs too (with '01' before checksum).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 05, 2022, 11:21:28 AM",
+      "body": "Quote from: PawGo on September 05, 2022, 06:36:15 AMWhat is the real purpose of that tool? Import brainwallets or check if address is founded?My guess is that it is the later which is why I suggested that instead of importing those keys into a wallet (like bitcoin core) they should be checked against a list or database. That way it is so much faster and you don't need to rescan the whole blockchain for any possible history of a large number of imported addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "September 06, 2022, 05:42:31 PMLast edit: September 12, 2022, 11:26:55 AM by pbies",
+      "body": "Quote from: pooya87 on September 05, 2022, 11:21:28 AMMy guess is that it is the later which is why I suggested that instead of importing those keys into a wallet (like bitcoin core) they should be checked against a list or database. That way it is so much faster and you don't need to rescan the whole blockchain for any possible history of a large number of imported addresses.There is such a list and there is one command to check for one or more keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

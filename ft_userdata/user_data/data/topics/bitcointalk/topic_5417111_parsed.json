@@ -1,0 +1,61 @@
+{
+  "id": "topic_5417111",
+  "title": "BitcoinCanSaveUsAll",
+  "author": "BitcoinCanSaveUsAll",
+  "created_time": "October 14, 2022, 03:34:04 PM",
+  "content": "Hello everyone,One of the big concerns I've had with adopting some of the newer address types has been that (from my understanding) there has never been a standardized way of signing messages from these newer (SEGWIT et al) address types.  While I understand that there have been other wallets that have implemented their own signing schemes, as far as I'm aware there has never been one that has been standardized nor that provides one with non-repudiation outside of the P2PKH legacy message signing option that is build into most reputable wallets of today.  If anyone has any feedback on this that would be much appreciated.  As for now I like holding onto the legacy P2PKH address so that I can prove ownership as desired with a standardized way that doesn't involve moving any sats.  TIA",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417111",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "October 14, 2022, 03:44:15 PM",
+      "body": "It has turned into a common misconception that people think message signing is not \"standardized\". As a matter of fact there are two standards for it among the improvement proposals called BIP-137 and BIP-322 where wallets mostly implement BIP-137.The fact that some implementations of Bitcoin haven't bothered fully implementing message signing algorithms is a different discussion.In any case this issue is just like wanting to withdraw your bitcoins from a centralized service to a bech32 address. A lot of services didn't used to support that a couple of years ago so people were forced to use a \"workaround\" (legacy or wrapped addresses).So similar to that, you have to find a workaround. If the wallet software you use or the service you want to send the signed message to has limited options you have to choose from those. Most wallets have easy features for switching between wallets so storing a P2PKH one for signing purposes shouldn't be a problem.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 14, 2022, 03:52:28 PM",
+      "body": "Quote from: pooya87 on October 14, 2022, 03:44:15 PMIt has turned into a common misconception that people think message signing is not \"standardized\". As a matter of fact there are two standards for it among the improvement proposals called BIP-137 and BIP-322 where wallets mostly implement BIP-137.BIP-137 has been Final since a few years ago, but BIP-322 is still a draft. There is literally no work or discussion being done on it at this time, despite my best efforts to stimulate some a few months ago.BIP-322 is a future-proof method of signing a message in such a way that we won't have to create a new BIP for each address format which is introduced. Unfortunately, there is no wallet software I know of that supports these messages - not even Bitcoin Core can parse them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 15, 2022, 09:41:20 AM",
+      "body": "I would say the most common way that people sign from a segwit address is via Electrum, given that it is such a ubiquitous wallet that many people are familiar with. You can easily import a seed phrase or individual private key to it in order to sign a message, and can easily do all this offline for added security, and the other party can easily install it in under a minute if they don't already have it for the sole purpose of verifying your signature. Or if they know what they are doing they can always pull the pubkeyhash out of the segwit address to generate a legacy address and use an online tool such as https://brainwalletx.github.io/#verifyAlternatively, just use segwit for the majority of things since it has a host of other benefits, and keep a legacy wallet on hand on the rare occasion you need to sign from an address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "October 15, 2022, 06:10:40 PM",
+      "body": "Thank you for the feed back all.Hello @NotATether,I hope that somehow this can be brought back into the spotlight soon. While admittedly I'm not familiar with all of the technical details for the draft of BIP-322, from what I gather it would be an incredible addition to be able to avoid worrying about message signing from the different address formats etc.  Not sure how to raise the bar on it's priority but it definitely has my vote for what its worth.  Hi @ o_e_l_e_o,If it's not too much work, would you be able to outline how one would go about pulling the public key hash out of a segwit address?  Admittedly I've never heard of this before and would be very interested if this could effectively produce a non-repudiation equivalent signature.  Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 15, 2022, 07:12:44 PMLast edit: October 15, 2022, 07:41:26 PM by o_e_l_e_o",
+      "body": "Quote from: BitcoinCanSaveUsAll on October 15, 2022, 06:10:40 PMIf it's not too much work, would you be able to outline how one would go about pulling the public key hash out of a segwit address?You simply convert the data part (after the 1) from Bech32 back in to hex, and then drop the version byte at the start and the checksum at the end. What you will be left with is the witness program, which for standard segwit addresses will simply be the pubkeyhash. There are multiple implementations you can use to do this available here: https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki#reference-implementations. Alternatively, you can use this site: https://bitcoin.sipa.be/bech32/demo/demo.html. Just paste in your segwit address and it will spit out your program (which as I mentioned, for standard addresses will be your pubkeyhash).Since message signing is done via the private key and not an address, and message verification is done via recovering (usually) two public keys from the message and signature, you can use this pubkeyhash to verify any message if you know what you are doing. If you turn that pubkeyhash in to a legacy address via adding a network byte to the start, a checksum to the end, and converting to Base58, you can then verify a message signed with a segwit address against the equivalent legacy address.For example:Code:-----BEGIN BITCOIN SIGNED MESSAGE-----BitcoinCanSaveUsAll test-----BEGIN SIGNATURE-----bc1qa87h0k4dey7d5q8u302pd3mqh3p8chg2j2mgafHx0d8zJdUM5WMoLkCNl4FDZAW+UNRP6hcz9v+d5cRXexaAo3r6SkArHG24qVSYnfiKWFoxOB5E5XOecBcjjgT+4=-----END BITCOIN SIGNED MESSAGE-----If you paste the above in to this site (https://brainwalletx.github.io/#verify), the message will fail to verify.Now, take the segwit address in that signature, and use the method described above to extract the pubkeyhash - e9fd77daadc93cda00fc8bd416c760bc427c5d0a.Now, take that pubkeyhash and turn it in to a legacy address - 1NLE5yWwTjRyMe8Jd6JdUzSE9RLikH79cn.Now, replace the segwit address in the signature above with this legacy address.You'll find the message now verifies correctly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "October 15, 2022, 07:39:15 PM",
+      "body": "Wow the rabbit hole is truly endless!  Thank  you very much for taking the time to spell it out for me.  Honestly I will have to dig into this a bit later this week but I certainly appreciate you sharing your knowledge.  Thank you!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

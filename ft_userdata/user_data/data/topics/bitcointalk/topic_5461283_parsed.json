@@ -1,0 +1,93 @@
+{
+  "id": "topic_5461283",
+  "title": "apogio",
+  "author": "apogio",
+  "created_time": "July 28, 2023, 06:54:31 AM",
+  "content": "Hello. Yesterday, I saw this block: https://mempool.space/block/00000000000000000002645fd352bc274f017d8473992018dfd5326a52de2d53It seems strange, since it's empty. I have observed that it was mined just 1 minute after the previous block was mined.Mempool.space give this description for empty blocks:QuoteWhen a new block is found, mining pools send miners a block template with no transactions so they can start searching for the next block as soon as possible. They send a block template full of transactions right afterward, but a full block template is a bigger data transfer and takes slightly longer to reach miners.In this intervening time, which is usually no more than 1-2 seconds, miners sometimes get lucky and find a new block using the empty block template.I don't understand though, does that mean that miners' mempools were totally empty and they didn't include any transactions? Or the interval time between the blocks was just 1-2 seconds and therefore, there wasn't enough time to include transactions?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5461283",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "July 28, 2023, 07:00:01 AM",
+      "body": "When a block is mined, miners will verify the block and check the transactions, removing transactions that were included in the mined block. In the meantime, pool would generally send a template that contains the prev block hash, block height with a merkle tree that only contains the hash for the generation transaction. This way, the miners won't risk mining for an invalid block.The practices differ for each mining pool and setup, but generally they would remove the transactions from the mempool rather than repopulating it again.In addition, such practices are prevalent among SPV miners. They receive the hash of the block header and immediately send the new template to the miners without validating prior to that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 28, 2023, 07:47:16 AM",
+      "body": "Quote from: apogio on July 28, 2023, 06:54:31 AMI don't understand though, does that mean that miners' mempools were totally empty and they didn't include any transactions? Or the interval time between the blocks was just 1-2 seconds and therefore, there wasn't enough time to include transactions?Miners, as in the large ASIC farms you are probably thinking of, don't have mempools. Nodes have mempools.When the node belonging to a mining pool operator receives a block, it must validate that block and every transaction in it. Once it has done that, it must remove all the transactions in that block from its mempool. Then it must construct a new candidate block from its updated mempool, before calculating the Merkle root and then sending that block header to miners to be worked on. All this takes some time. Rather than having thousands of ASICs sitting idle during this time (and therefore wasting money), it will have them work on an empty block for the few seconds it takes for this process to happen. Occasionally they get lucky and mine an empty block.If mining pools immediately created candidate blocks which were full, then chances are they would end up including transactions which were already confirmed in the block they just received but had not yet validated. This would result in this candidate block being invalid. So instead they create empty candidate blocks, and then update them to full candidate blocks a few seconds later once they have fully validated the last block.Also note the timestamps on blocks are not actually accurate enough to tell you how long it took between mining blocks. The timestamps give an average time over days to weeks, but are inaccurate at the individual block level.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "FatFork",
+      "created_time": "July 28, 2023, 10:13:59 AM",
+      "body": "Just to add to everything that o_e_l_e_o has already explained, keep in mind that the next candidate block is constantly being updated, just as it is visually represented on mempool.space. New transactions are added, while some others are dropped, only to be included again in subsequent blocks, all with the aim of optimizing the use of block space, primarily to maximize profit from transaction fees. This process takes some time to be processed, but it doesn't mean that miners will stay idle during that time, as that would be an inefficient use of time and resources. It is logical to conclude that mining even an empty block is better than mining none at all. That's why nodes first send an empty block with the correct header to the miners. This way, the miners have something to work on immediately, as they compete with each other to solve the puzzle first.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 28, 2023, 11:13:06 AM",
+      "body": "Quote from: ICYNOTE2023 on July 28, 2023, 09:30:46 AMPlease be careful with mempool.space, because they cannot see our bitcoin balance under 2012 transactions. please prove it.I assume you are talking about old P2PK outputs, in which case mempool.space displays them correctly. Some explorers show these outputs as belonging to the address derived from the relevant public key, but this is not accurate, since the coins are bot locked by the address at all, but by the pubkey.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "paid2",
+      "created_time": "July 28, 2023, 11:47:39 AM",
+      "body": "Quote from: apogio on July 28, 2023, 06:54:31 AMHello. Yesterday, I saw this block: https://mempool.space/block/00000000000000000002645fd352bc274f017d8473992018dfd5326a52de2d53It seems strange, since it's empty. I have observed that it was mined just 1 minute after the previous block was mined.Mempool.space give this description for empty blocks:QuoteWhen a new block is found, mining pools send miners a block template with no transactions so they can start searching for the next block as soon as possible. They send a block template full of transactions right afterward, but a full block template is a bigger data transfer and takes slightly longer to reach miners.In this intervening time, which is usually no more than 1-2 seconds, miners sometimes get lucky and find a new block using the empty block template.I don't understand though, does that mean that miners' mempools were totally empty and they didn't include any transactions? Or the interval time between the blocks was just 1-2 seconds and therefore, there wasn't enough time to include transactions?This subject was discussed many times here on the forum.o_e_l_e_o already gave you all the necessary informations, but if you want, you can still read the following topics if you want more informations and details about it :0 transaction block which is one of the most recent topic talking about empty blocks.Why not to mine on pools mining empty blocks, and why do pools mine empty blocks  : this topic from kano is very informative from a technical point of viewWhy did miners waste much block space when there is need",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "July 28, 2023, 12:04:37 PM",
+      "body": "Thank you all. I am more than satisfied with all your responses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "July 28, 2023, 12:27:54 PM",
+      "body": "Quote from: apogio on July 28, 2023, 06:54:31 AMHello. Yesterday, I saw this block: https://mempool.space/block/00000000000000000002645fd352bc274f017d8473992018dfd5326a52de2d53It seems strange, since it's empty. I have observed that it was mined just 1 minute after the previous block was mined.I don't understand though, does that mean that miners' mempools were totally empty and they didn't include any transactions? Or the interval time between the blocks was just 1-2 seconds and therefore, there wasn't enough time to include transactions?Here is the ELI5 explanation: When a new block is received, a miner must spend time processing it and selecting a new set of transactions for the next block. The miner wastes time if it does nothing while setting up the new block, so the miner instead immediately starts on an empty block and switches to a full block when it is set up. Occasionally, the miner solves the empty block.Also, note that block timestamps aren't required to be accurate so the 1 minute difference was probably not really 1 minute.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 29, 2023, 12:37:01 AM",
+      "body": "Quote from: o_e_l_e_o on July 28, 2023, 07:47:16 AMSo instead they create empty candidate blocks, and then update them to full candidate blocks a few seconds later once they have fully validated the last block.I have seen quite a few blocks which were half filled if they were mined a few seconds after. Some of them might be included in the block template gradually after. I believe not all of the mining pool updates the block headers immediately either, there is a short delay in between full validation and sending a new work request.Pool should drop this behavior regardless, the SPV mining problem demostrated that mining without prior full validation can have pretty big repercussions. The miniscule extra profits isn't worth it for the safety of the network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 29, 2023, 07:36:29 AM",
+      "body": "Quote from: ranochigo on July 29, 2023, 12:37:01 AMPool should drop this behavior regardless, the SPV mining problem demostrated that mining without prior full validation can have pretty big repercussions. The miniscule extra profits isn't worth it for the safety of the network.Ideally, they wouldn't mine these half full or empty blocks at all, and the whole network would just agree to wait the few seconds it takes to fully validate the previous block. But then you end up with the classic prisoner's dilemma problem - it is in each individual mining pool's interests to break this agreement and attempt to mine empty blocks for a few seconds, and as soon as one starts doing it all the others are at a disadvantage if they also don't start doing it.Still, it's not a huge problem - in the last month there were only 9 empty blocks, and there were zero blocks which were otherwise under filled.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 30, 2023, 04:25:01 AM",
+      "body": "Quote from: o_e_l_e_o on July 29, 2023, 07:36:29 AMIdeally, they wouldn't mine these half full or empty blocks at all, and the whole network would just agree to wait the few seconds it takes to fully validate the previous block. But then you end up with the classic prisoner's dilemma problem - it is in each individual mining pool's interests to break this agreement and attempt to mine empty blocks for a few seconds, and as soon as one starts doing it all the others are at a disadvantage if they also don't start doing it.Still, it's not a huge problem - in the last month there were only 9 empty blocks, and there were zero blocks which were otherwise under filled.Ditto on the game theoric approach. The main issue occurs mainly because the miner now trusts someone to verify their block for them first and thus risking building a ontop of an invalid chain. That would be detrimental to the network as we have observed previously.Generally, miners are fairly well-connected now and validating the blocks would probably only take a couple hundred milliseconds (bitcoind takes 200ms but you can probably reduce overheads). The whole issue comes when we decide whether we should just save a couple of hundred milliseconds and sacrificing validation in the process. SPV wallets will always trust the longest chain, so they are responsible for their security.Empty block isn't the problem, but the issue comes when they go along with it without validation at all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

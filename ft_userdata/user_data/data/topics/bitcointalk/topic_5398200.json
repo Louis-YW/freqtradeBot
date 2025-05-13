@@ -1,0 +1,165 @@
+{
+  "id": "topic_5398200",
+  "title": "laminar_hash",
+  "author": "laminar_hash",
+  "created_time": "May 11, 2022, 04:48:47 PM",
+  "content": "Dear Bitcointalkers,I apologize if this question has been dealt with, but I haven't found a good answer to it:Why is it not a terrible idea to rely on a single hash function (i.e. SHA256)?Supposing that SHA256 was broken, wouldn't the entire accumulated Proof-of-Work become irrelevant all at once? And thus, wouldn't the entire transaction history be at immediate risk of being replaced by a longer chain?I am sure there must be a good reason, but why not use at least two hash functions? Say, using function 1 for even numbered blocks, and function 2 for odd numbered blocks. That way, if function 1 is broken, it can be switched out with a better one, and during this time the transaction history is still protected by the accumulated PoW of function 2. I can see a drawback with this scheme: specialized hardware for function 1 may be utilized only 50% of the time, likewise for function 2. Perhaps a scheme in which two chains are constructed in parallel, one chain per function, but 'braided' together (a new block referring to the latest block of each chain) could avoid this problem.I can certainly see potential issues in either case, it would complicate the design, and KISS is a good principle in general. However, what of the fundamental danger? Am I missing something? (Probably).Humbly,LH",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398200",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 11, 2022, 04:55:57 PM",
+      "body": "Hmm... Doesn't the danger remain?Alright, so let's say we used SHA-256 for even blocks and Keccak-256 for odd blocks. Now let's assume SHA-256 is broken. Now all the even blocks can be generated at will, without (the same) work. The attacker can still use half of his computational power to reverse transactions. In fact, he can still cheat the entire bitcoin economy by solving blocks within seconds, censoring/emptying the block's content.Edit: He can actually reverse transactions with much less hashrate than half of it. If he's broken SHA-256, he can create one block whose work equals thousands'.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 11, 2022, 06:04:28 PM",
+      "body": "The crux idea is about pre-image resistance of SHA256 but a bigger issue would be a collision resistance, which is weaker than the pre-image.Any breaks in a pre-image resistance is incremental and slow over time it is simply too difficult and unrealistic to expect the entire algorithm to be broken overnight. In addition, because we require the inputs to be a specific format and also ensures that it is valid at the current state, it wouldn't be a stretch to think that the pre-image wouldn't necessarily result in a valid Bitcoin block.Having alternate PoW schemes would provide no additional tangible security benefits while making it more complicated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "laminar_hash",
+      "created_time": "May 11, 2022, 06:13:14 PM",
+      "body": "Quote from: BlackHatCoiner on May 11, 2022, 04:55:57 PMHmm... Doesn't the danger remain?Alright, so let's say we used SHA-256 for even blocks and Keccak-256 for odd blocks. Now let's assume SHA-256 is broken. Now all the even blocks can be generated at will, without (the same) work. The attacker can still use half of his computational power to reverse transactions. In fact, he can still cheat the entire bitcoin economy by solving blocks within seconds, censoring/emptying the block's content.Edit: He can actually reverse transactions with much less hashrate than half of it. If he's broken SHA-256, he can create one block whose work equals thousands'. Yes true, there doesn't seem to be any possible immunity from someone using a break for adding blocks very profitably.However, they could only add *new* transactions, and not rewrite the entire blockchain from genesis to suit their fancy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "laminar_hash",
+      "created_time": "May 11, 2022, 06:18:55 PM",
+      "body": "Quote from: ranochigo on May 11, 2022, 06:04:28 PMThe crux idea is about pre-image resistance of SHA256 but a bigger issue would be a collision resistance, which is weaker than the pre-image.Any breaks in a pre-image resistance is incremental and slow over time it is simply too difficult and unrealistic to expect the entire algorithm to be broken overnight. In addition, because we require the inputs to be a specific format and also ensures that it is valid at the current state, it wouldn't be a stretch to think that the pre-image wouldn't necessarily result in a valid Bitcoin block.Having alternate PoW schemes would provide no additional tangible security benefits while making it more complicated.Thank you, I will now spend a few days learning the concepts required to understand your response",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "May 11, 2022, 09:16:53 PM",
+      "body": "Quote from: BlackHatCoiner on May 11, 2022, 04:55:57 PMEdit: He can actually reverse transactions with much less hashrate than half of it. If he's broken SHA-256, he can create one block whose work equals thousands'. Not until they substantially raise difficulty; which requires mining 2016 blocks in 1/2 week (4x faster than expected) for every quadrupling of difficulty. So a 1000-fold increase requires over 10,000 blocks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skybuck",
+      "created_time": "May 11, 2022, 09:56:48 PM",
+      "body": "Interesting question. When could also invert the question: why use multiple hashes ?Anyway PascalCoin does use multiple hashes. It re-hashes the existing hashes, it also has something called random hash.There are some obvious down sides to using multiple hash algorithms:1. More code required, thus:1.1 More possibility of code bugs.1.2 Slower compile time.1.3 More disk usage to store source files.1.4 More places to hide malicious code.1.5 Almost impossible to check every hash algorithm/code for a single programmer, lot's of work to-do.Point 1.5 is pretty heavy weighing. Here a single hash algorithm and single code base has some adventages and at least can be verified to function/work correctly.I worry that with PascalCoin and randomhash one comprise of one hash function might make the rest of the hashing weaker, though currently I have seen no evidence of this.Ultimately the final hash is still sha256.Other more practical reasons might be:2. There were no alternatives ready/available at the time, maybe no access to code.2.1 Or security of other hashes less well studied, less confidence in them.Other problems also illustrated by RandomHash / multiple hashes of PascalCoin:3. Slower verification. I believe this was solved somehow, not exactly sure how.Adventages of having multiple hashes:4. Can more easily switch to another hash, since code base already there, used and tested over time.The hash function is probably not the main weakness of bitcoin.The main weakness of bitcoin could be the ecliptic curve algorithm which is used/involved in the generation of private keys.If there is a pattern in this generation process then that is bad news for bitcoin.Even as much as 1 bit pattern in the \"keys\" could comprise it, though still difficult.At 2, 3 or 4 bits of patterns in the keys it's game over for bitcoin.So holders of bitcoins are literally a few bits away from bankruptcy.What needs to happen is more analysis of ecliptic curve algorithm, especially with fourrier transform analysis algorithms and such to determine/detect if there are any patterns in the \"signals\" where keys can be thought as signals. At least that is my take from all of this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 12, 2022, 03:29:17 AM",
+      "body": "First of all it depends on what \"broken\" means. For example we call SHA1 broken and you can't reverse it or find a collision if you can't control the message, also it is still used in git for integrity of commits without any problem.Secondly, I'd say if something is \"broken\" it has to be replaced instead of creating a band-aid where it still is used alongside something else. Adding the secondary hash requires a hard fork so why not just replace it?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zilon",
+      "created_time": "May 12, 2022, 06:44:44 AM",
+      "body": "If Hashes are irreversible will there be any means of having a successful brute force certainly not. But lets assume we choose to use a double hash function may be SHA256 and SHA224 all we get is a more complicated hashing and  will consume more storage and retrieval space for effective data mapping.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 12, 2022, 08:33:04 AM",
+      "body": "Quote from: tromp on May 11, 2022, 09:16:53 PMNot until they substantially raise difficulty; which requires mining 2016 blocks in 1/2 week (4x faster than expected) for every quadrupling of difficulty. So a 1000-fold increase requires over 10,000 blocks.But time, if it's ruled by one entity, can be faked. The Proof-of-Work timestamp cannot be cheated if there are other miners and you don't control most of the hash rate. For example, say you want to fake your block's timestamp, to benefit yourself from lowering difficulty, by setting it 10 hours ahead. Since the median time of the past 11 blocks isn't complied with it, your block is going to be rejected. But, if you're the one who chooses the median time of the past 11 blocks, since you mine them, you can fake things out.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 13, 2022, 04:26:23 AM",
+      "body": "Quotewhy not use at least two hash functions?As my friend always said: \"we can do everything, the question is: should we?\". And here you have the same situation: if you really want to add some hash function, then of course you can. You always can protect things by more restrictive rules, and make it a soft-fork or no-fork. You can start with no-fork, so your node will keep everything and will warn you that you have a block where SHA-256 is broken.Technically, all you need is re-hashing everything with your hash function, and then add commitments for that. You can even hide your commitments in r-values of your signatures, then they still will be hashed by SHA-256, and you can always un-wrap them later, and then easily show that you have some additional Proof of Work protection that can be deployed immediately. Because it will give you no coins, there will be no problem with \"mining without other people\", as you will only hash some old blocks.So, to use two hash functions, you have to:1) build some re-hashed chain2) create a new block hash for each block of this re-hashed chain3) create your commitment as some random hash4) increment a nonce in your commitment to get it below your own targetThen, you are still in the same network, because the only difference is that you tweak your own r-value in a signature, when you send your own transaction every sometimes, so you include your commitment for no additional on-chain bytes. For other nodes, it is still random, and they have no idea, which node can use this re-hashed chain, and where are those commitments (and, more importantly, how to read them, because the basic r-value should be random, and then tweaked by your commitment).To reveal your commitment, you have to:1) reveal your block header, hashed by your own function2) reveal a proof that it is attached, by replacing SHA-256 with your own functionThat revealing can use the same format as in Taproot. Just replace SHA-256 with your own function and push your own block header as a commitment. Also, in the same way it is possible to run any merge-mined altcoin, just by having some nodes that will move bitcoins every sometimes and push the current state of your chain as commitments, and then reveal them in their own network to push things forward.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 13, 2022, 07:37:51 AM",
+      "body": "Quote from: garlonicon on May 13, 2022, 04:26:23 AMSo, to use two hash functions, you have to:1) build some re-hashed chain2) create a new block hash for each block of this re-hashed chain3) create your commitment as some random hash4) increment a nonce in your commitment to get it below your own targetHow would you increment a nonce to get it below the target?Sice the hash is random, you now have the additional problem of finding some nonce that will hash into a valid target.According to my understanding, it's like computing SHA256d(YourHash(x), nonce) but that might be completely wrong.I just don't see how custom hashes can be masqueraded as a SHA256d hash that is within target, in a feasible amount of time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 13, 2022, 01:48:55 PM",
+      "body": "QuoteHow would you increment a nonce to get it below the target?Simple. You form a commitment as a block header of the rehashed chain. It contains all fields, including your own nonce, because the old nonce makes sense only in the old chain.QuoteSice the hash is random, you now have the additional problem of finding some nonce that will hash into a valid target.If you have two different hash functions, then you have two different difficulties. And the second one will be quite low, unless more people will adopt that two-hash scheme, then we could switch, and then miners will raise that second difficulty. There is no point in creating very low hashes if you are alone. But there is a point in doing some hashing, because if the first hash function will be fully broken, then you will have a valid Proof of Work for the second hash function that will protect you (and all people that will accept your soft-fork).QuoteAccording to my understanding, it's like computing SHA256d(YourHash(x), nonce) but that might be completely wrong.Let's explore all fields we have for each block header:1) version: you can keep it the same as in the original chain2) previous block hash: it could be \"previous commitment hash\", for example SHA-3(previousCommitment)3) merkle root: exactly the same as in the original chain, but every SHA-256 could be replaced with SHA-34) time: the same as in the original chain5) difficulty: completely new and separated value, valid only for rehashed chain, there will be two difficulties6) nonce: new and sepatated, there will be two noncesSo, you take the original Genesis Block, you rehash everything, and you form a new Genesis Block. From that point, you rehash the whole chain, by applying that rehashing procedure for every single block, just by replacing SHA-256 with SHA-3 everywhere. In this way, everything will be hashed by some new hash function. All signatures, all transactions, all witnesses, just everything. And all you need is to keep that rehashed chain somewhere, maybe even optimized to not store the same things twice, and then you can just attach SHA-3 commitments, in the same way as you can attach SHA-256 commitments, you just replace one 256-bit number with another 256-bit number, it will work.To sum up, you can do that as a no-fork, then you are safe. Or you can also propose it as a soft-fork, but then you need to reach consensus and convince the whole network for accepting that rules. But you should start with protecting yourself and forming some working proposal, because it is easier to change the rules where you have some complete code and some BIP for that. And if those changes will be rejected, then you can still protect yourself, just in case, if you are really worried about SHA-256. You can even enforce new rules automatically, if some coins from SHA-256 preimages or collisions will be moved, but I think getting some alert is better, because then you will be notified and decide, what to do next.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "May 14, 2022, 12:07:45 AM",
+      "body": "Quote from: BlackHatCoiner on May 11, 2022, 04:55:57 PMHmm... Doesn't the danger remain?Alright, so let's say we used SHA-256 for even blocks and Keccak-256 for odd blocks.Just use both hashes on all blocks. That way if one of them is broken, you can still rely on the other one. Extend it to 3 hashes or however many hash types you want in order to give you the security level you require.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 14, 2022, 01:27:40 AM",
+      "body": "Quote from: larry_vw_1955 on May 14, 2022, 12:07:45 AMJust use both hashes on all blocks. That way if one of them is broken, you can still rely on the other one. Extend it to 3 hashes or however many hash types you want in order to give you the security level you require.I fail to see how this sort of redundancy would be beneficial if at all. If somehow you can generate any valid SHA256 hash at will (highly impossible), then the attacker would be able to dominate and reduce the work done for each block in the SHA256 part. If there is a collision in any of the hash for any set of data, how does the client handle it? Does the client consider both as valid? If it uses the other hash as a check, then isn't it better to just shift to a new algorithm when the need arise?IMO implementing additional strain on the current resource constraint that we have is unnecessary and wouldn't provide any benefits over the cost.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 14, 2022, 03:45:03 AM",
+      "body": "Quote from: garlonicon on May 13, 2022, 01:48:55 PMQuoteHow would you increment a nonce to get it below the target?Simple. You form a commitment as a block header of the rehashed chain. It contains all fields, including your own nonce, because the old nonce makes sense only in the old chain.Got it.QuoteSo, you take the original Genesis Block, you rehash everything, and you form a new Genesis Block. From that point, you rehash the whole chain, by applying that rehashing procedure for every single block, just by replacing SHA-256 with SHA-3 everywhere. In this way, everything will be hashed by some new hash function. All signatures, all transactions, all witnesses, just everything. And all you need is to keep that rehashed chain somewhere, maybe even optimized to not store the same things twice, and then you can just attach SHA-3 commitments, in the same way as you can attach SHA-256 commitments, you just replace one 256-bit number with another 256-bit number, it will work.To sum up, you can do that as a no-fork, then you are safe. Or you can also propose it as a soft-fork, but then you need to reach consensus and convince the whole network for accepting that rules. But you should start with protecting yourself and forming some working proposal, because it is easier to change the rules where you have some complete code and some BIP for that. And if those changes will be rejected, then you can still protect yourself, just in case, if you are really worried about SHA-256. You can even enforce new rules automatically, if some coins from SHA-256 preimages or collisions will be moved, but I think getting some alert is better, because then you will be notified and decide, what to do next.I guess we could also merely add this \"nested commitment\" inside new and subsequent blocks. I don't see how a no-fork will be accomplished if we are overwriting the Genesis block and old blocks. A soft fork would be more practical but would probably get more hostility, so maybe we can set a reserved bit to indicate there is a nested commitment after this one, like what TCP packets do. And of course, we make sure we reserve some bits in the nested commitment as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 14, 2022, 04:09:48 AMLast edit: May 14, 2022, 06:20:27 AM by garlonicon",
+      "body": "QuoteI don't see how a no-fork will be accomplished if we are overwriting the Genesis block and old blocks.Nothing is overwritten in the existing SHA-256 chain. You form a new chain by replacing SHA-256 with SHA-3, and then you only attach commitments to your rehashed chain to prove that it existed at a given point in time. And because SHA-3 is used to form a commitment, you can later take some old signature and prove that your rehashed chain was attached correctly.So, if you have some old client, you will see different r-values in some signatures, but because they are random, you will see no difference, unless people that use such commitments will reveal them somewhere. To sum up:no-fork: the rehashed chain is committed to the SHA-256 chain, nothing is enforcedsoft-fork: that chain is committed and enforced (it could be always connected to the coinbase transaction, with no additional on-chain bytes)QuoteA soft fork would be more practical but would probably get more hostility, so maybe we can set a reserved bit to indicate there is a nested commitment after this one, like what TCP packets do.If it would be a soft-fork, then it should be in the coinbase transaction, and it is possible to create some standard for attaching all commitments, always store them sorted, and if you have a sorted merkle tree, then you can prove that there is some commitment (you hash it, and find it in the tree) or there is no commitment (you explore the tree logarithmically and find two leaves with the most matching prefix bits, and there is a proof that nothing is between them, because you reach data, so you cannot go deeper in this tree). So, if you have unsorted binary tree, you need to check everything to make sure that something is or is not a part of that tree. But if it is always sorted, then each data has its own position, and you can find it logarithmically, based on the hash of that data.Edit:QuoteIf there is a collision in any of the hash for any set of data, how does the client handle it?no-fork: the client does nothing, it can also send some kind of alert or stop working, it depends on the local configurationsoft-fork: the client will switch to the rehashed chain automatically and will enforce new rules in a soft-fork wayQuoteDoes the client consider both as valid?It will try to find some commitments, and if there are none, then it could consider both as valid or use first-seen-safe rule. It could be handled in the same way as handling different blocks on the same height equal to one, when you run your Bitcoin Core client locally and attach some ASIC to flood your node with a lot of blocks on the same height. You can also see how it is handled in regtest, where many miners will mine many blocks on the same height, instead of creating a very long chain of blocks.QuoteIf it uses the other hash as a check, then isn't it better to just shift to a new algorithm when the need arise?It is better, but that would be a hard-fork. It is easier to convince the community to form a consensus over some soft-fork than over some hard-fork.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "May 15, 2022, 02:14:03 AM",
+      "body": "Quote from: ranochigo on May 14, 2022, 01:27:40 AMQuote from: larry_vw_1955 on May 14, 2022, 12:07:45 AMJust use both hashes on all blocks. That way if one of them is broken, you can still rely on the other one. Extend it to 3 hashes or however many hash types you want in order to give you the security level you require.I fail to see how this sort of redundancy would be beneficial if at all. If somehow you can generate any valid SHA256 hash at will (highly impossible), then the attacker would be able to dominate and reduce the work done for each block in the SHA256 part. I see your point. But the assumption is that if sha256 or any of the other hashes being used was broken then everyone would be able to reduce the work done for each block. Thus everyone would still be on a level playing field. OTOH, if just one attacker was breaking sha256 and no one else was then yeah, i see the problem. but wouldn't that be detectable and maybe a feature in the code could then disable the compromised hash function.QuoteIf there is a collision in any of the hash for any set of data, how does the client handle it? Does the client consider both as valid? If it uses the other hash as a check, then isn't it better to just shift to a new algorithm when the need arise?a collission would mean all the hashes matched. not just \"any\" of them. we're talking about not relying on a single hash function. to me that seems reasonable. gives a bit of backup redundancy. but yeah there is a cost. and maybe an entirely new algo would be better but that's a way different topic.QuoteIMO implementing additional strain on the current resource constraint that we have is unnecessary and wouldn't provide any benefits over the cost.well, i think the overall amount of work would remain the same. just the difficulty target on each individual hash might be adjusted.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 15, 2022, 04:31:34 AM",
+      "body": "Quotewell, i think the overall amount of work would remain the sameNo, because if you have two hashes, then you need to perform all SHA-256 hashing as today, and also add all SHA-3 (or whatever) hashing on top of that. So, of course the performance will always be slower than today. But if some user wants to use two hashes instead of one, then they definitely can put some overhead on their own nodes. In case of no-fork, it is safe, you can put 100 additional hash functions if you really want. In case of soft-fork, you need to reach consensus, so I think most users will disagree, and will stick with plain, old, SHA-256-only version.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "May 15, 2022, 05:13:17 AM",
+      "body": "Quote from: garlonicon on May 15, 2022, 04:31:34 AMQuotewell, i think the overall amount of work would remain the sameNo, because if you have two hashes, then you need to perform all SHA-256 hashing as today, and also add all SHA-3 (or whatever) hashing on top of that. So, of course the performance will always be slower than today.For example, lets say you used 10 hashes. Each hash should only take about 1 minute to find - 10 minutes total. Whereas if you were using just one hash, it would need to take the entire 10 minutes to find it. Same amount of work either way.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

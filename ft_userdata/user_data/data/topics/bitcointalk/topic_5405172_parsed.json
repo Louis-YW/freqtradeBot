@@ -1,0 +1,69 @@
+{
+  "id": "topic_5405172",
+  "title": "tainted_love",
+  "author": "tainted_love",
+  "created_time": "July 04, 2022, 06:24:19 PMLast edit: July 08, 2022, 04:17:39 AM by tainted_love",
+  "content": "Hello forum,When I import private keys into my core wallet I get three receiving addresses for each private key.  I only want the one receiving address that I used from my old hierarchical wallets.  Is there a way to import only the segwit or only the legacy or only the p2sh-p2wpkh without the other two?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5405172",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 04, 2022, 07:19:25 PM",
+      "body": "Use importmulti instead.In the console on Bitcoin Core, use the following command, replacing the \"address\" field with either the P2PKH or P2WPKH address you want to import, and the \"key\" field with the relevant private key:Code:importmulti '[{ \"scriptPubKey\": { \"address\": \"1DJzqVWae3V7Qff8B5ep5BK9TJf9r9ayT9\" }, \"timestamp\":1656962234, \"keys\": [ \"KwFvTne8vjodvyGm8RdDFFsqdnQC2fxi4F7yJtvj2WbSnDBJXWGb\" ]}]'You'll want to change the timestamp field to a Unix epoch time before those keys were created so Core knows how far back to rescan. If you aren't sure, just set it to 0 to perform a full rescan.If you want to import a P2SH or P2SH-P2WPKH address, then you'll also need  to include the redeemscript field, as explained in https://bitcoincore.org/en/doc/22.0.0/rpc/wallet/importmulti/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tainted_love",
+      "created_time": "July 04, 2022, 09:13:00 PM",
+      "body": "Quote from: o_e_l_e_o on July 04, 2022, 07:19:25 PMUse importmulti instead.In the console on Bitcoin Core, use the following command, replacing the \"address\" field with either the P2PKH or P2WPKH address you want to import, and the \"key\" field with the relevant private key:Code:importmulti '[{ \"scriptPubKey\": { \"address\": \"1DJzqVWae3V7Qff8B5ep5BK9TJf9r9ayT9\" }, \"timestamp\":1656962234, \"keys\": [ \"KwFvTne8vjodvyGm8RdDFFsqdnQC2fxi4F7yJtvj2WbSnDBJXWGb\" ]}]'You'll want to change the timestamp field to a Unix epoch time before those keys were created so Core knows how far back to rescan. If you aren't sure, just set it to 0 to perform a full rescan.If you want to import a P2SH or P2SH-P2WPKH address, then you'll also need  to include the redeemscript field, as explained in https://bitcoincore.org/en/doc/22.0.0/rpc/wallet/importmulti/Thank you for the help I hope I did it right.  I have each type of address to import.  For redeemscript I used the address as the string, is that correct?  Here is the example of what I did.Code:bitcoin-cli importmulti '[{ \"scriptPubKey\": { \"address\": \"1DJzqVWae3V7Qff8B5ep5BK9TJf9r9ayT9\" }, \"label\": \"The Pit and the Pendulum\", \"timestamp\":0, \"keys\": [ \"KwFvTne8vjodvyGm8RdDFFsqdnQC2fxi4F7yJtvj2WbSnDBJXWGb\" ]}, { \"scriptPubKey\": { \"address\": \"bc1qel5xqtf3eqn5qx6awmxkq6znspcsn24s3slssv\" }, \"label\": \"The Tell-Tale Heart\", \"timestamp\":0, \"keys\": [ \"L4PcFcFYJwsLmGWzerApmLFnwRzzS8VUC2xhJJjLap5QcHaNr77G\" ]}, { \"scriptPubKey\": { \"address\": \"3E1cyAbo6X3QG8RmpF7vNUn2sWSxaFVZck\" }, \"redeemscript\": \"3E1cyAbo6X3QG8RmpF7vNUn2sWSxaFVZck\", \"label\": \"The Mureders in the Rue Morgue\", \"timestamp\":0, \"keys\": [ \"KyvxDGMHHPf5aomJowLENyHtgpVjbz8gsmmxgbaQ6U2BXfdjp4w2\" ]}]'Core is rescanning now, so I'll know if a few hours.  I don't know the time stamps for the addresses so I used 0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 05, 2022, 04:27:24 AM",
+      "body": "Quote from: tainted_love on July 04, 2022, 09:13:00 PM-snip- For redeemscript I used the address as the string, is that correct?No, it should be a hex string, some wallets have an option to export it alongside the PrvKey.There should be a message showing \"success: false\" along with a message regarding the redeem script when you tried to import it, but only for that specific address.The other two should be successful.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "July 05, 2022, 04:49:58 AM",
+      "body": "Quote from: tainted_love on July 04, 2022, 09:13:00 PMFor redeemscript I used the address as the string, is that correct?I don't think that will work.  The only way I know of to find the redeemscript is from Electrum.  On the address tab, right click on the address you want and click \"Details,\" here's what I found for the address in your example above:Using the script below I was able to import your example address.  I used a very recent time stamp to accelerate synchronization time.  If you want to speed up synch time, use a time stamp that's just a few minutes before the first transaction that address received.  Code:importmulti '[{ \"scriptPubKey\": { \"address\": \"3E1cyAbo6X3QG8RmpF7vNUn2sWSxaFVZck\" }, \"label\": \"The Mureders in the Rue Morgue\", \"timestamp\": 1656995753, \"redeemscript\": \"0014756d4690fa13589cac0d0790178e9562acb18be2\", \"keys\": [ \"KyvxDGMHHPf5aomJowLENyHtgpVjbz8gsmmxgbaQ6U2BXfdjp4w2\" ]}]'PS; I like the Edgar Allen Poe references.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 05, 2022, 07:21:11 AM",
+      "body": "Quote from: tainted_love on July 04, 2022, 09:13:00 PMFor redeemscript I used the address as the string, is that correct?  Here is the example of what I did.As the above two posters have noted, redeemscript needs to be the actual script itself, and not just the address.Since you've said that the script in question is a straight forward nested segwit script, then you can follow DireWolfM14's instructions to grab the script from Electrum. You could also import the private key in to another Core wallet using importprivkey, and then get the script by using getaddressinfo on the P2SH address. Or if the address has ever been spent from, then you could look it up on mempool.space and extract the script from that transaction. Here's a recent example where if you click on details you can see the necessary data listed under \"ScriptSig\" on the left: https://mempool.space/tx/bb283826e76e5454d5e8bd26edbfe326aead40ca0af5393baf3b0790565a71d0For nested segwit, the script will take the format 0x0014, followed by 20 bytes (40 characters) of hex.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HCP",
+      "created_time": "July 06, 2022, 10:56:08 PM",
+      "body": "Quote from: tainted_love on July 04, 2022, 06:24:19 PMI only want the one receiving address that I used from my old hierarchical wallets. Can I ask way? I don't really see any issue with having the other types of addresses stored in your wallet... it's simple enough to add a label that says \"do not use\" if you're concerned about accidentally using the incorrect type.At the end of the day, they're just different representations of the same private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tainted_love",
+      "created_time": "July 08, 2022, 04:16:18 AM",
+      "body": "Quote from: HCP on July 06, 2022, 10:56:08 PMQuote from: tainted_love on July 04, 2022, 06:24:19 PMI only want the one receiving address that I used from my old hierarchical wallets. Can I ask way? I don't really see any issue with having the other types of addresses stored in your wallet... it's simple enough to add a label that says \"do not use\" if you're concerned about accidentally using the incorrect type.At the end of the day, they're just different representations of the same private key.You can ask.   jaja j/k  Just because I don't want to make a mistake and breach my privacy.  I used labels and just thought to ask for a better way.Quote from: o_e_l_e_o on July 05, 2022, 07:21:11 AMQuote from: tainted_love on July 04, 2022, 09:13:00 PMFor redeemscript I used the address as the string, is that correct?  Here is the example of what I did.As the above two posters have noted, redeemscript needs to be the actual script itself, and not just the address.Since you've said that the script in question is a straight forward nested segwit script, then you can follow DireWolfM14's instructions to grab the script from Electrum. You could also import the private key in to another Core wallet using importprivkey, and then get the script by using getaddressinfo on the P2SH address. Or if the address has ever been spent from, then you could look it up on mempool.space and extract the script from that transaction. Here's a recent example where if you click on details you can see the necessary data listed under \"ScriptSig\" on the left: https://mempool.space/tx/bb283826e76e5454d5e8bd26edbfe326aead40ca0af5393baf3b0790565a71d0For nested segwit, the script will take the format 0x0014, followed by 20 bytes (40 characters) of hex.Thank you again.  I found it using tt]getaddressinfo[/tt] but it wasn't named \"redeemscript\" it was named \"hex\" and \"scriptPubKey\".  Good thing I first used the example address and matched the script to the one DireWolfM14 shows.Thanks to everyone for the help, issue solved.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

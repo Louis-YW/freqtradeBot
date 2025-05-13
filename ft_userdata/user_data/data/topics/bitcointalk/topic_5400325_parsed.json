@@ -1,0 +1,53 @@
+{
+  "id": "topic_5400325",
+  "title": "Skot",
+  "author": "Skot",
+  "created_time": "May 26, 2022, 08:21:14 PM",
+  "content": "Hello Bitcoin mining hardware enthusiasts!I've been (slowly) working on a Bitmain BM1387 (the chip in the Antminer S9) based bitcoin miner. TBH it's not completely working yet, but I put my design files up on GitHub in case anyone is interested in hacking on it.https://github.com/skot/bitaxelet me know what you think!-Skot",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400325",
+  "comments": [
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "May 27, 2022, 12:38:02 AMLast edit: May 27, 2022, 01:53:52 AM by NotFuzzyWarm",
+      "body": "Kano and/or Sidehack would have to chime in to confirm, but I think yer main problem in communicating is the lack of a driver that speaks the chips language. The driver is a chip makers Secret Sauce. I do know that Bitmains S9 source code *is* on the internet somewhere so hopefully it would have the driver code as well. Drivers for the early sticks that Sidehack produced were all using drivers and code that Bitmain (eventually) released and was reused by -vh for early Compaq's.Kano wrote the driver for Sidehack's Compaq'F' (S17 chip) after Sidehack was able to trace/figure out the signaling going on in a working S17 and then refreshed -vh's earlier code as part of the Compaq'F' work and cgminer update to include all the drivers.Just how are you interfacing with it? trying a simple JTAG serial connection into some IDE?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "May 27, 2022, 01:50:34 AM",
+      "body": "hi NotFuzzyWarm!There is a S9 \"repair guide\" (https://www.zeusbtc.com/manuals/repair-guide/Antminer-S9-hash-board-Repair-guide.pdf) that explains how all of the BM1387 chips are connected end-to-end. They cascade async serial (UART) to one another. I can communicate with the BM1387's using a simple 1.8V USB-Serial adapter and a serial terminal.What I haven't seen is any documentation about the protocol (or register map at least) of the BM1387. If that's out there, I'd love to see it! I have seen the BM1385 datasheet, (https://bits.media/images/asic-miner-antminer-s7/BM1385_Datasheet_v2.0.pdf) but I haven't been able to decipher it yet and/or determine how close it is to the BM1387.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "M_h_MDark",
+      "created_time": "July 25, 2023, 01:31:38 PM",
+      "body": "hey skot, I need the pinouts and possibly the datasheets for BM1387 and also the register map, would you be able to help?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "rapsacw",
+      "created_time": "July 25, 2023, 08:56:32 PM",
+      "body": "Quote from: M_h_MDark on July 25, 2023, 01:31:38 PMhey skot, I need the pinouts and possibly the datasheets for BM1387 and also the register map, would you be able to help?The closest thing to a register map I found is thisCode:package axi_bm13xx_pkg;    // ---------------------------------------------------------------------------------------------    // clock parameter    time CLK_PERIOD = 20ns;    // ---------------------------------------------------------------------------------------------    // Definition of IP core AXI interface    // ---------------------------------------------------------------------------------------------    // IP Core Version Register, read-only    parameter VERSION          = 32'h0000;    // Build ID Register, read-only    parameter BUILD_ID         = 32'h0004;    // Control Register, read/write    parameter CTRL_REG         = 32'h0008;    // Status Register - reserved, read-only    parameter STAT_REG         = 32'h000C;    // Baudrate Divisor Register, read/write    parameter BAUD_REG         = 32'h0010;    // Work Time Delay Register, read/write    parameter WORK_TIME        = 32'h0014;    // Error Counter Register, read-only    parameter ERR_COUNTER      = 32'h0018;    // Command Receive Interface FIFO, read-only    parameter CMD_RX_FIFO      = 32'h1000;    // Command Transmit Interface FIFO, write-only    parameter CMD_TX_FIFO      = 32'h1004;    // Command Control Register, read/write    parameter CMD_CTRL_REG     = 32'h1008;    // Command Status Register, read-only    parameter CMD_STAT_REG     = 32'h100C;    // Work Receive Interface FIFO, read-only    parameter WORK_RX_FIFO     = 32'h2000;    // Work Receive Control Register, read/write    parameter WORK_RX_CTRL_REG = 32'h2008;    // Work Receive Status Register, read-only    parameter WORK_RX_STAT_REG = 32'h200C;    // Work Transmit Interface FIFO, write-only    parameter WORK_TX_FIFO     = 32'h3004;    // Work Transmit Control Register, read/write    parameter WORK_TX_CTRL_REG = 32'h3008;    // Work Transmit Status Register, read-only    parameter WORK_TX_STAT_REG = 32'h300C;    // Work Transmit IRQ Threshold, read/write    parameter WORK_TX_IRQ_THR  = 32'h3010;    // Work Transmit Last Work ID, read-only    parameter WORK_TX_LAST_ID  = 32'h3014;    // ---------------------------------------------------------------------------------------------    // Control Registers    // ---------------------------------------------------------------------------------------------    // Enable support for chips BM1391, BM1397    parameter CTRL_BM139X = 32'h10;    // Enable, read/write    parameter CTRL_ENABLE = 32'h8;    // Number of midstates per work, encoded as log2 of values: 1, 2, 4, read/write    parameter CTRL_MIDSTATE_1 = 32'h0;    parameter CTRL_MIDSTATE_2 = 32'h2;    parameter CTRL_MIDSTATE_4 = 32'h4;    // Clear error counter, write-only    parameter CTRL_ERR_CNT_CLEAR = 32'h1;    // Enable interrupt, read/write    parameter CTRL_IRQ_EN = 32'h4;    // Reset/clear Transmit FIFO, write-only    parameter CTRL_RST_TX_FIFO = 32'h2;    // Reset/clear Receive FIFO, write-only    parameter CTRL_RST_RX_FIFO = 32'h1;    // ---------------------------------------------------------------------------------------------    // Status Registers - read-only    // ---------------------------------------------------------------------------------------------    // Interrupt pending for Work Receive FIFO    parameter STAT_IRQ_PEND = 32'h10;    // Work Interface Transmit FIFO Full    parameter STAT_TX_FULL  = 32'h08;    // Work Interface Transmit FIFO Empty    parameter STAT_TX_EMPTY = 32'h04;    // Work Interface Receive FIFO Full    parameter STAT_RX_FULL  = 32'h02;    // Work Interface Receive FIFO Empty    parameter STAT_RX_EMPTY = 32'h01;endpackage : axi_bm13xx_pkg",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "M_h_MDark",
+      "created_time": "July 26, 2023, 08:10:40 AM",
+      "body": "thanks I appreciate it",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

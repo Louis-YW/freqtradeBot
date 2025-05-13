@@ -1,0 +1,165 @@
+{
+  "id": "topic_5411159",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "August 25, 2022, 01:52:57 PMLast edit: August 25, 2022, 02:09:28 PM by NotATether",
+  "content": "Yesterday this message came to the mailing list: https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2022-August/020887.htmlIt's a BIP from Craig Raw of Sparrow Wallet that specifies a human readable export format for wallet labels (in CSV), and how users should write such files so they can be imported into wallets. It has received some discussion already.IMO the draft needs some refining. What do you guys think?QuoteHi all,I would like to propose a BIP that specifies a format for the export andimport of labels from a wallet. While transferring access to funds acrosswallet applications has been made simple through standards such as BIP39,wallet labels remain siloed and difficult to extract despite their value,particularly in a privacy context.The proposed format is a simple two column CSV file, with the reference toa transaction, address, input or output in the first column, and the labelin the second column. CSV was chosen for its wide accessibility, especiallyto users without specific technical expertise. Similarly, the CSV file maybe compressed using the ZIP format, and optionally encrypted using AES.The full text of the BIP can be found athttps://github.com/craigraw/bips/blob/master/bip-wallet-labels.mediawikiand also copied below.Feedback is appreciated.Thanks,Craig Raw---<pre>  BIP: wallet-labels  Layer: Applications  Title: Wallet Labels Export Format  Author: Craig Raw <craig at sparrowwallet.com>  Comments-Summary: No comments yet.  Comments-URI:https://github.com/bitcoin/bips/wiki/Comments:BIP-wallet-labels  Status: Draft  Type: Informational  Created: 2022-08-23  License: BSD-2-Clause</pre>==Abstract==This document specifies a format for the export of labels that may beattached to the transactions, addresses, input and outputs in a wallet.==Copyright==This BIP is licensed under the BSD 2-clause license.==Motivation==The export and import of funds across different Bitcoin wallet applicationsis well defined through standards such as BIP39, BIP32, BIP44 etc.These standards are well supported and allow users to move easily betweendifferent wallets.There is, however, no defined standard to transfer any labels the user mayhave applied to the transactions, addresses, inputs or outputs in theirwallet.The UTXO model that Bitcoin uses makes these labels particularly valuableas they may indicate the source of funds, whether received externally or asa result of change from a prior transaction.In both cases, care must be taken when spending to avoid undesirable leaksof private information.Labels provide valuable guidance in this regard, and have even becomemandatory when spending in several Bitcoin wallets.Allowing users to export their labels in a standardized way ensures thatthey do not experience lock-in to a particular wallet application.In addition, by using common formats, this BIP seeks to make manual or bulkmanagement of labels accessible to users without specific technicalexpertise.==Specification==In order to make the import and export of labels as widely accessible aspossible, this BIP uses the comma separated values (CSV) format, which iswidely supported by consumer, business, and scientific applications.Although the technical specification of CSV in RFC4180 is not alwaysfollowed, the application of the format in this BIP is simple enough thatcompatibility should not present a problem.Moreover, the simplicity and forgiving nature of CSV (over for exampleJSON) lends itself well to bulk label editing using spreadsheet and textediting tools.A CSV export of labels from a wallet must be a UTF-8 encoded text file,containing one record per line, with records containing two fieldsdelimited by a comma.The fields may be quoted, but this is unnecessary, as the first comma inthe line will always be the delimiter.The first line in the file is a header, and should be ignored on import.Thereafter, each line represents a record that refers to a label applied inthe wallet.The order in which these records appear is not defined.The first field in the record contains a reference to the transaction,address, input or output in the wallet.This is specified as one of the following:* Transaction ID (<tt>txid</tt>)* Address* Input (rendered as <tt>txid<index</tt>)* Output (rendered as <tt>txid>index</tt> or <tt>txid:index</tt>)The second field contains the label applied to the reference.Exporting applications may omit records with no labels or labels of zerolength.Files exported should use the <tt>.csv</tt> file extension.In order to reduce file size while retaining wide accessibility, the CSVfile may be compressed using the ZIP file format, using the <tt>.zip</tt>file extension.This <tt>.zip</tt> file may optionally be encrypted using either AES-128 orAES-256 encryption, which is supported by numerous applications includingWinzip and 7-zip.In order to ensure that weak encryption does not proliferate, importersfollowing this standard must refuse to import <tt>.zip</tt> files encryptedwith the weaker Zip 2.0 standard.The textual representation of the wallet's extended public key (as definedby BIP32, with an <tt>xpub</tt> header) should be used as the password.==Importing==When importing, a naive algorithm may simply match against any reference,but it is possible to disambiguate between transactions, addresses, inputsand outputs.For example in the following pseudocode:<pre>  if reference length < 64    Set address label  else if reference length == 64    Set transaction label  else if reference contains '<'    Set input label  else    Set output label</pre>Importing applications may truncate labels if necessary.==Test Vectors==The following fragment represents a wallet label export:<pre>Reference,Labelc3bdad6e7dcd7997e16a5b7b7cf4d8f6079820ff2eedd5fcbb2ad088f767b37b,Transaction1A69TXnEM2ms9fMaY9UuiJ7415X7xZaUSg,Addressc3bdad6e7dcd7997e16a5b7b7cf4d8f6079820ff2eedd5fcbb2ad088f767b37b<0,Inputc3bdad6e7dcd7997e16a5b7b7cf4d8f6079820ff2eedd5fcbb2ad088f767b37b>0,Outputc3bdad6e7dcd7997e16a5b7b7cf4d8f6079820ff2eedd5fcbb2ad088f767b37b:0,Output(alternative)</pre>==Reference Implementation==TBD",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5411159",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "August 25, 2022, 03:01:15 PM",
+      "body": "Quote from: NotATether on August 25, 2022, 01:52:57 PMYesterday this message came to the mailing list: https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2022-August/020887.htmlIt's a BIP from Craig Raw of Sparrow Wallet that specifies a human readable export format for wallet labels (in CSV), and how users should write such files so they can be imported into wallets. It has received some discussion already.IMO the draft needs some refining. What do you guys think?The idea sounds great to me! It's actually something I'd thought about a lot in the past, when switching applications. Some wallets do allow to export this information, but it's only really useful for importing into the same wallet on a new / other machine.I think I've manually 'translated' one application's format into another one's once, but a standard would be really great.If the application prefers to have something more complex with more information, it can still use that for backing up and restoring to the same software, but also offer a 'default format export' option that generates this 2-column version from their own internal data representation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 25, 2022, 03:19:18 PM",
+      "body": "Quote from: n0nce on August 25, 2022, 03:01:15 PMThe idea sounds great to me! It's actually something I'd thought about a lot in the past, when switching applications. Some wallets do allow to export this information, but it's only really useful for importing into the same wallet on a new / other machine.Keep in mind that it does not export private keys or other secret data, so you can't use it to migrate between wallets by itself - it only exports the labels. It is a security hazard to leave private keys lying around in a spreadsheet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 25, 2022, 03:32:01 PM",
+      "body": "Quote from: NotATether on August 25, 2022, 03:19:18 PMQuote from: n0nce on August 25, 2022, 03:01:15 PMThe idea sounds great to me! It's actually something I'd thought about a lot in the past, when switching applications. Some wallets do allow to export this information, but it's only really useful for importing into the same wallet on a new / other machine.Keep in mind that it does not export private keys or other secret data, so you can't use it to migrate between wallets by itself - it only exports the labels. It is a security hazard to leave private keys lying around in a spreadsheet.Yes, I know! But you can export this 'metadata' already in some wallets; on Sparrow it's in JSON format, and includes sender, receiver and a lot more information for each transaction. But it should be easy to implement a parser that strips everything and formats it like proposed in the BIP.That way I can import a seed phrase into a new wallet (or not; when used with a hardware wallet) and 'patch' the transaction labels using the standardized CSV.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "August 25, 2022, 05:12:39 PM",
+      "body": "Quote from: NotATether on August 25, 2022, 01:52:57 PMIt's a BIP from Craig Raw of Sparrow Wallet that specifies a human readable export format for wallet labels (in CSV), and how users should write such files so they can be imported into wallets. It has received some discussion already.Sparrow wallet is my first alternative option for Electrum wallet, I love it's design, functionality and support for various devices and hardware wallets.Exporting Labels already exist in Electrum wallet, but turning this into BIP and making labels import/exports for all different supported wallets is a great idea.I am not sure how exactly BIPs get approved and accepted, but I don't see why anyone would be against this proposition, unless there are some disadvantages ands risks I am not aware of.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "coinlatte",
+      "created_time": "August 25, 2022, 05:16:37 PM",
+      "body": "So far, I used the most portable format I can think of: the command-line-based format:Code:importdescriptors \"[{\\\"desc\\\":\\\"tr(cMahea7zqjxrtgAbB7LSGbcQUr1uX1ojuat9jZodMN87JcbXMTcA)#tnrke5yz\\\",\\\"timestamp\\\":\\\"now\\\",\\\"label\\\":\\\"taproot\\\"}]\"importdescriptors \"[{\\\"desc\\\":\\\"tr(cMahea7zqjxrtgAbB7LSGbcQUr1uX1ojuat9jZodMN87K7XCyj5v)#xpd75frm\\\",\\\"timestamp\\\":\\\"now\\\",\\\"label\\\":\\\"taproot2\\\"}]\"It is standardized across wallets, it is extensible, and it is reasonably-compatible between different versions of Bitcoin Core. Also, in case of incompatibility, it is quite easy to fix it, and convert into another version of Bitcoin Core.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 25, 2022, 09:31:56 PM",
+      "body": "Quote from: coinlatte on August 25, 2022, 05:16:37 PMSo far, I used the most portable format I can think of: the command-line-based format:Code:importdescriptors \"[{\\\"desc\\\":\\\"tr(cMahea7zqjxrtgAbB7LSGbcQUr1uX1ojuat9jZodMN87JcbXMTcA)#tnrke5yz\\\",\\\"timestamp\\\":\\\"now\\\",\\\"label\\\":\\\"taproot\\\"}]\"importdescriptors \"[{\\\"desc\\\":\\\"tr(cMahea7zqjxrtgAbB7LSGbcQUr1uX1ojuat9jZodMN87K7XCyj5v)#xpd75frm\\\",\\\"timestamp\\\":\\\"now\\\",\\\"label\\\":\\\"taproot2\\\"}]\"It is standardized across wallets, it is extensible, and it is reasonably-compatible between different versions of Bitcoin Core. Also, in case of incompatibility, it is quite easy to fix it, and convert into another version of Bitcoin Core.Huh? If I'm not missing something, this has nothing to do with the topic at hand. We're talking about adding labels to transactions.Like: 'paid 10 bucks to my nephew for mowing the lawn', 'got paid from signature campaign', 'bought new wifi card' etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "August 26, 2022, 12:55:19 PM",
+      "body": "Quote from: NotATether on August 25, 2022, 01:52:57 PMWhat do you guys think?It's good idea to use CSV format since the main goal is human-readable format and easily processed by average user. But i question the decision where first field (called \"Reference\" on test vector) may contain multiple types of data. If i'm going to use Excel, i'd rather see additional field which tell type of the data so i could filter/sort it with less effort.Code:Type,Reference,LabelTransaction,c3bdad6e7dcd7997e16a5b7b7cf4d8f6079820ff2eedd5fcbb2ad088f767b37b‎,\"Withdraw from Binance at 01-01-2021\"Address,1A69TXnEM2ms9fMaY9UuiJ7415X7xZaUSg,\"Withdraw address for Binance account\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "August 26, 2022, 08:23:50 PM",
+      "body": "Quote from: ETFbitcoin on August 26, 2022, 12:55:19 PMBut i question the decision where first field (called \"Reference\" on test vector) may contain multiple types of data. If i'm going to use Excel, i'd rather see additional field which tell type of the data so i could filter/sort it with less effort.That's what I've been also thinking: without more info that \"one field that can contain anything\" can become overly confusing.Then I've seen he uses/proposes different formatting for different types of data.But.. why not different field for each of those types?? Instead of having pretty much a syntax, we could just have the tx on the tx column and the input on the input column, for example (and leaving the not needed columns empty).Then something more: I've learned that best is that a file contains - in a way or another - the version of the protocol/documentation, to allow in the future, if anything is changed/added, still handle everything correctly or know from start it's not a supported version. Of course, then the use-in-excel may no longer work. On the other hand, I would suggest enforcing (or \"strongly suggesting\") the use of a password when exporting those files, for the sake of one's privacy...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 27, 2022, 07:49:12 AM",
+      "body": "Quote from: coinlatte on August 25, 2022, 05:16:37 PMSo far, I used the most portable format I can think of: the command-line-based format:Code:importdescriptors \"[{\\\"desc\\\":\\\"tr(cMahea7zqjxrtgAbB7LSGbcQUr1uX1ojuat9jZodMN87JcbXMTcA)#tnrke5yz\\\",\\\"timestamp\\\":\\\"now\\\",\\\"label\\\":\\\"taproot\\\"}]\"importdescriptors \"[{\\\"desc\\\":\\\"tr(cMahea7zqjxrtgAbB7LSGbcQUr1uX1ojuat9jZodMN87K7XCyj5v)#xpd75frm\\\",\\\"timestamp\\\":\\\"now\\\",\\\"label\\\":\\\"taproot2\\\"}]\"It is standardized across wallets, it is extensible, and it is reasonably-compatible between different versions of Bitcoin Core. Also, in case of incompatibility, it is quite easy to fix it, and convert into another version of Bitcoin Core.Descriptors are great but they're not human-readable, which is probably why the BIP doesn't make use of them.Of course, it is a good idea to make the first column of the CSV records a descriptor instead of an assorted collection of addresses/transactions which require another column to differentiate. In fact, if descriptors are used, we can completely do away with the 3rd \"type\" column.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "coinlatte",
+      "created_time": "August 27, 2022, 08:51:08 AM",
+      "body": "QuoteDescriptors are great but they're not human-readable, which is probably why the BIP doesn't make use of them.What is not readable?Code:importdescriptors \"[{\\\"desc\\\":\\\"addr(1A69TXnEM2ms9fMaY9UuiJ7415X7xZaUSg)#d5ts4kht\\\",\\\"timestamp\\\":\\\"now\\\",\\\"label\\\":\\\"Withdraw address for Binance account\\\"}]\"Also note that in Bitcoin Core, there is \"Export\" button, and you can get CSV file in your output, so the whole format for that is already established:Code:\"Confirmed\",\"Date\",\"Type\",\"Label\",\"Address\",\"Amount (BTC)\",\"ID\"\"true\",\"2015-02-14T13:26:20.000\",\"Sent to\",\"Withdraw from Binance at 01-01-2021\",\"1A69TXnEM2ms9fMaY9UuiJ7415X7xZaUSg\",\"-21.61679877\",\"c3bdad6e7dcd7997e16a5b7b7cf4d8f6079820ff2eedd5fcbb2ad088f767b37b‎\"However, importing labels for transactions is not implemented. You can change them, if you set them for addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 27, 2022, 09:10:35 AM",
+      "body": "Quote from: coinlatte on August 27, 2022, 08:51:08 AMQuoteDescriptors are great but they're not human-readable, which is probably why the BIP doesn't make use of them.What is not readable?Code:importdescriptors \"[{\\\"desc\\\":\\\"addr(1A69TXnEM2ms9fMaY9UuiJ7415X7xZaUSg)#d5ts4kht\\\",\\\"timestamp\\\":\\\"now\\\",\\\"label\\\":\\\"Withdraw address for Binance account\\\"}]\"Well, for addresses they are easy to see, but I was mainly referring to transactions, inputs, outputs etc. which have a non-trivial representation. In fact, the first two don't even have descriptors of their own if I recall correctly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "craigraw",
+      "created_time": "August 29, 2022, 01:29:34 PM",
+      "body": "Thanks all for the useful feedback - it's particularly useful to hear from users, as opposed to just developers. As noted, the main reason I didn't use descriptors is because txids and inputs aren't supported. In addition, it's less than user friendly to read and edit them.Quote from: ETFbitcoin on August 26, 2022, 12:55:19 PMIf i'm going to use Excel, i'd rather see additional field which tell type of the data so i could filter/sort it with less effort.This an interesting point. When designing this I considered it to be more work for everyone manually editing files to add a 3rd field, which in addition increases the export file size without aiding the parsing of the file in any material way (given it's currently possible to disambiguate from the reference alone). Further, it creates additional complexity and increases the potential for mistakes due to typos. But easily sorting to differentiate between types is a good counterpoint - I'm just not sure it's worth the cost.Quote from: NeuroticFish on August 26, 2022, 08:23:50 PMThen something more: I've learned that best is that a file contains - in a way or another - the version of the protocol/documentation, to allow in the future, if anything is changed/added, still handle everything correctly or know from start it's not a supported version. Of course, then the use-in-excel may no longer work.This is generally good advice and has been suggested elsewhere. However, the 'use-in-excel' goal makes this tricky. If such a version must be specified but is not present (and all other data is fine), should the import fail? In general users won't know which version number to use, even if it is readily possible to add it (say in the column headers). Also, it's difficult to see how this format could be extended in a way that required a version number to differentiate, so again I'm not sure it's worth the cost.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "August 29, 2022, 01:52:15 PM",
+      "body": "Quote from: craigraw on August 29, 2022, 01:29:34 PMQuote from: NeuroticFish on August 26, 2022, 08:23:50 PMThen something more: I've learned that best is that a file contains - in a way or another - the version of the protocol/documentation, to allow in the future, if anything is changed/added, still handle everything correctly or know from start it's not a supported version. Of course, then the use-in-excel may no longer work.This is generally good advice and has been suggested elsewhere. However, the 'use-in-excel' goal makes this tricky. If such a version must be specified but is not present (and all other data is fine), should the import fail? In general users won't know which version number to use, even if it is readily possible to add it (say in the column headers). Also, it's difficult to see how this format could be extended in a way that required a version number to differentiate, so again I'm not sure it's worth the cost.Indeed, if use-in-excel is so important, this can become tricky (there can be a column with the version, but it's imho more a hack than a proper solution).If the version is missing - again, it depends.. one direction would be that the \"version info\" could also contain something (a name) that will ensure one really imports what he expects, not just a random csv.Another direction could be to assume it's at least version 1 (if version info is missing). Of course, this kind of approach may just \"pass the responsibility\" for finding a solution to those proposing an extension (or a new version).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "craigraw",
+      "created_time": "August 30, 2022, 10:58:28 AM",
+      "body": "Quote from: ETFbitcoin on August 30, 2022, 09:40:06 AMDo you mean wallet developer or user?I mean user. For example, typos like 'Addres' would mean labels are skipped on import, which might be difficult to detect in a file with many labels. Of course the wallet could try to determine what the user meant from the reference itself, but then we are back at square one (and some implementations might not do this).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "August 31, 2022, 02:20:34 AM",
+      "body": "Quote from: craigraw on August 29, 2022, 01:29:34 PMQuote from: ETFbitcoin on August 26, 2022, 12:55:19 PMIf i'm going to use Excel, i'd rather see additional field which tell type of the data so i could filter/sort it with less effort.This an interesting point. When designing this I considered it to be more work for everyone manually editing files to add a 3rd field, which in addition increases the export file size without aiding the parsing of the file in any material way (given it's currently possible to disambiguate from the reference alone). Further, it creates additional complexity and increases the potential for mistakes due to typos. But easily sorting to differentiate between types is a good counterpoint - I'm just not sure it's worth the cost.Have you tried 'coding' the rather simple parsing logic in Excel? I'm not a very skilled Excel user, but just tried it and it works like a charm.Code:=IF(LEN(A2)<64; \"address\"; IF(LEN(A2)=64; \"transaction\"; IF(ISNUMBER(SEARCH(\"<\";A2)); \"input\"; \"output\")))No need to add an extra column for this, indeed!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 31, 2022, 07:12:18 AM",
+      "body": "Quote from: n0nce on August 31, 2022, 02:20:34 AMHave you tried 'coding' the rather simple parsing logic in Excel? I'm not a very skilled Excel user, but just tried it and it works like a charm.Code:=IF(LEN(A2)<64; \"address\"; IF(LEN(A2)=64; \"transaction\"; IF(ISNUMBER(SEARCH(\"<\";A2)); \"input\"; \"output\")))No need to add an extra column for this, indeed!I highly doubt the average Excel user with no programming language background whatsoever will be able to reproduce this query or understand what it does.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 01, 2022, 12:14:24 AM",
+      "body": "Quote from: NotATether on August 31, 2022, 07:12:18 AMQuote from: n0nce on August 31, 2022, 02:20:34 AMHave you tried 'coding' the rather simple parsing logic in Excel? I'm not a very skilled Excel user, but just tried it and it works like a charm.Code:=IF(LEN(A2)<64; \"address\"; IF(LEN(A2)=64; \"transaction\"; IF(ISNUMBER(SEARCH(\"<\";A2)); \"input\"; \"output\")))No need to add an extra column for this, indeed!I highly doubt the average Excel user with no programming language background whatsoever will be able to reproduce this query or understand what it does.Then it can just be added into the BIP and that's it. It could even be exported with the data as a comment at the end of the file.A third column would instead increase the file size by 50% as you'll add a 3rd field for each dataset.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 01, 2022, 07:42:48 AM",
+      "body": "Quote from: n0nce on September 01, 2022, 12:14:24 AMQuote from: NotATether on August 31, 2022, 07:12:18 AMQuote from: n0nce on August 31, 2022, 02:20:34 AMHave you tried 'coding' the rather simple parsing logic in Excel? I'm not a very skilled Excel user, but just tried it and it works like a charm.Code:=IF(LEN(A2)<64; \"address\"; IF(LEN(A2)=64; \"transaction\"; IF(ISNUMBER(SEARCH(\"<\";A2)); \"input\"; \"output\")))No need to add an extra column for this, indeed!I highly doubt the average Excel user with no programming language background whatsoever will be able to reproduce this query or understand what it does.Then it can just be added into the BIP and that's it. It could even be exported with the data as a comment at the end of the file.A third column would instead increase the file size by 50% as you'll add a 3rd field for each dataset.I have actually sent an email related to this a few days ago, commenting that a 3rd column can be obsoleted by simply prefixing the different data formats with its own name. Such as: \"address:\" for addresses, \"transaction:\" for transactions, and so on. Eliminates what I view as \"dirty tricks\" which you need to check for to identify a data type.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "craigraw",
+      "created_time": "September 01, 2022, 10:48:45 AM",
+      "body": "Quote from: NotATether on September 01, 2022, 07:42:48 AMI have actually sent an email related to this a few days ago, commenting that a 3rd column can be obsoleted by simply prefixing the different data formats with its own name. Such as: \"address:\" for addresses, \"transaction:\" for transactions, and so on. Eliminates what I view as \"dirty tricks\" which you need to check for to identify a data type.This just changes the algorithm from character and length matching, to string matching. Also, similar to as I pointed out above, you introduce the possibility of typos causing difficult to detect omissions in data imports, and resultant variations in how implementations handle this. Canonical representations of references are preferred for this reason.The proposed algorithm is complete and non-ambiguous for all considered data types. If new types need to be added in future, a new BIP would required in any case.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

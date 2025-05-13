@@ -1,0 +1,125 @@
+{
+  "id": "topic_5460264",
+  "title": "serveria.com",
+  "author": "serveria.com",
+  "created_time": "July 18, 2023, 09:49:49 PM",
+  "content": "I wonder where I can find a list of wallets affected by low entropy mnemonic hack? Are they all bip39 wallets? Are hardware wallets affected? I've heard some older versions of Electrum are using something similar to bip39? Can someone point me to such a list online?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5460264",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "July 18, 2023, 11:29:19 PM",
+      "body": "I never heard that there is a list of hacked wallets with low entropy so I can't provide any links. The same goes for hardware wallets that are affected by this, Hardware wallets is generating offline mnemonic seeds like Ledger they have their own Quality of randomness to generate unique mnemonic seed and they also encrypted with passphrase and unique derivation path.About older versions of Electrum, they do support BIP39 but Electrum does not generate seed with BIP39 it only generate seed phrase using BIP32. You can only import BIP39 to Electrum if you enable the extended key BIP39 while importing seed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 19, 2023, 06:22:09 AM",
+      "body": "Quote from: serveria.com on July 18, 2023, 09:49:49 PMI wonder where I can find a list of wallets affected by low entropy mnemonic hack? Are they all bip39 wallets? Are hardware wallets affected? I've heard some older versions of Electrum are using something similar to bip39? Can someone point me to such a list online?The only \"low entropy mnemonic hack\" I have heard of is this one: Crypto flaws in Blockchain Android app sent bitcoins to the wrong address. In a nutshell, Blockchain.info's android version of Bitcoin wallet had a very \"sophisticated\" way of private key generation: it contacted random.org website to obtain a pseudorandom number that was further used as a part of entropy. Sometimes, it was the only supplier of random data, sometimes it used an uncrypted HTTP connection to exchange data, which naturally led to many people losing their Bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 19, 2023, 06:58:36 AM",
+      "body": "OP is talking about this incident: https://twitter.com/klever_io/status/1679267565434986501There is no inherent flaw in BIP39. This tweet explains that the affected seed phrases were generated using insecure Javascript PRNGs.No good wallet should be using Javascript. Electrum and Sparrow certainly don't. I'm not aware of any hardware wallet which uses Javascript. Notably, any web based generator such as bitaddress or iancoleman are built on Javascript and should be avoided for the purposes of key generation.Quote from: witcher_sense on July 19, 2023, 06:22:09 AMSometimes, it was the only supplier of random data, sometimes it used an uncrypted HTTP connection to exchange data, which naturally led to many people losing their Bitcoin.It's actually worse than that. It tried to connect via HTTP, but random.org only allowed HTTPS, so it returned an error page. Blockchain.com then incorrectly tried to use this error page as a source of entropy, resulting in multiple users generating the exact same entropy and therefore the exact same address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "July 19, 2023, 08:26:03 AM",
+      "body": "Quote from: serveria.com on July 18, 2023, 09:49:49 PMI wonder where I can find a list of wallets affected by low entropy mnemonic hack? In 2018 IOTA wallets have suffered from low entropy mnemonic and as a result lose millions of dollars.    The lesson from IOTA incident is crucial for folk dealing with crypto - never use online tools to generate your seed phrase. Such tools may be intentionally malicious, compromised or suffer poor RNG.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 19, 2023, 08:50:20 AM",
+      "body": "Entropy is involved in signature signing as well. Though not directly involved in the generation of address, using low entropy of nonces when signing signatures can result in the private key being derived from the signature with relative ease. A notable incident was with the Android Bitcoin wallet as well.Most wallets gathers multiple sources of entropy when generating randomness, and for the nonce required when signing signature, it is by and large an non-issue given how a lot of wallets have transitioned to deterministic nonce.Quote from: o_e_l_e_o on July 19, 2023, 06:58:36 AMNo good wallet should be using Javascript. Electrum and Sparrow certainly don't. I'm not aware of any hardware wallet which uses Javascript. Notably, any web based generator such as bitaddress or iancoleman are built on Javascript and should be avoided for the purposes of key generation.Is there still a problem even if they're using Crypto.getRandomValues? IIRC, most browsers are implementing it as a CSPRNG and further seeding it with urandom amongst other things. Not really familiar with cryptography in JS, but I think if implemented correctly, it is perfectly fine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 19, 2023, 09:06:29 AM",
+      "body": "Quote from: ranochigo on July 19, 2023, 08:50:20 AMit is by and large an non-issue given how a lot of wallets have transitioned to deterministic nonce.I simply wouldn't touch any wallet that doesn't use RFC 6979. There is no reason not to, and failing to do so only introduces more risk.Quote from: ranochigo on July 19, 2023, 08:50:20 AMIs there still a problem even if they're using Crypto.getRandomValues?I actually had this exact conversation just a few weeks ago on another thread here: https://bitcointalk.org/index.php?topic=5458206.msg62488420#msg62488420There is also a post from Greg Maxwell discussing this here: https://bitcointalk.org/index.php?topic=5324030.msg56590276#msg56590276The bottom line as I see it is maybe it is secure, but there is no way to be sure, there is no way to test it, and there are a lot more things that can go wrong using some browser based javascript generator over using something like Core or Electrum which properly source from /dev/urandom. It's simply not worth the risk.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "July 19, 2023, 10:58:26 AM",
+      "body": "In 2013, it was revealed Android PRNG[1] has some security vulnerability. It affected all Bitcoin wallet which generate it's private key on Android device itself[2].[1] http://armoredbarista.blogspot.com/2013/03/randomly-failed-weaknesses-in-java.html[2] https://bitcoin.org/en/alert/2013-08-11-android",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kryptowerk",
+      "created_time": "July 19, 2023, 08:52:30 PM",
+      "body": "Quote from: o_e_l_e_o on July 19, 2023, 09:06:29 AMQuote from: ranochigo on July 19, 2023, 08:50:20 AMit is by and large an non-issue given how a lot of wallets have transitioned to deterministic nonce.I simply wouldn't touch any wallet that doesn't use RFC 6979. There is no reason not to, and failing to do so only introduces more risk.[...]What an interesting yet alarming topic.Tbh never heard of RFC 6979 - is there any way to quickly check which wallet does make use of it or doesn't?Quote from: satscraper on July 19, 2023, 08:26:03 AMQuote from: serveria.com on July 18, 2023, 09:49:49 PMI wonder where I can find a list of wallets affected by low entropy mnemonic hack? In 2018 IOTA wallets have suffered from low entropy mnemonic and as a result lose millions of dollars.    The lesson from IOTA incident is crucial for folk dealing with crypto - never use online tools to generate your seed phrase. Such tools may be intentionally malicious, compromised or suffer poor RNG.Oh wow, I never heard of that. Not too suprsing, given they inveted their own crypto and used that strange base3-bit-thing If I remember correctly.My guess is a ton of noob-software for random shitcoins would suffer from problems including their entropy generation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 20, 2023, 02:48:53 AM",
+      "body": "Quote from: Kryptowerk on July 19, 2023, 08:52:30 PMWhat an interesting yet alarming topic.Tbh never heard of RFC 6979 - is there any way to quickly check which wallet does make use of it or doesn't?No one has compiled a list yet. You would probably have to look through the source code and see how they implement it and if its done according to standard. Note that this only ensures that your nonce will be unique for every signature but it by no means guarantee the security of your wallet. In fact, you already have to ensure that the entropy used for your seed/address is sufficient before even thinking about this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 20, 2023, 05:25:04 AM",
+      "body": "Quote from: ranochigo on July 20, 2023, 02:48:53 AMNo one has compiled a list yet. You would probably have to look through the source code and see how they implement it and if its done according to standard. A quick way to determine if a wallet is not using deterministic signing is to sign a transaction twice and see if the hash changes. If it did, the wallet is not using RFC6979 but if it didn't you still have to check the code to make sure.Message signing should also work since the process is the same.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 20, 2023, 06:45:33 AM",
+      "body": "Quote from: Kryptowerk on July 19, 2023, 08:52:30 PMWhat an interesting yet alarming topic.Tbh never heard of RFC 6979 - is there any way to quickly check which wallet does make use of it or doesn't?If you are interested, check this RFC6979 implementation in Python: https://bitcointalk.org/index.php?topic=5435882.msg61657011#msg61657011",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 20, 2023, 07:35:16 AM",
+      "body": "Quote from: Kryptowerk on July 19, 2023, 08:52:30 PMTbh never heard of RFC 6979 - is there any way to quickly check which wallet does make use of it or doesn't?Not really. You would simply have to examine the source code to know for sure. Alternatively, sign a transaction in your chosen wallet and sign the exact same transaction in a wallet which is known to use RFC 6979 such as Electrum, and ensure the signatures are identical.As with all technical things like this - weak javascript PRNGs, RFC 6979, and so on - the safest thing for the vast majority of users is to stick to reputable, well known, and open source wallets such as Core or Electrum. When people start playing around with closed source trash like Trust wallet or Coinomi, random websites like blockchain.com, or completely unheard of wallets like the Klever wallet that OP was discussing, that is when you run in to trouble. There is a very good reason that all the technical users on this forum use the former and avoid the latter.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kryptowerk",
+      "created_time": "July 20, 2023, 12:50:35 PM",
+      "body": "Quote from: o_e_l_e_o on July 20, 2023, 07:35:16 AMQuote from: Kryptowerk on July 19, 2023, 08:52:30 PMTbh never heard of RFC 6979 - is there any way to quickly check which wallet does make use of it or doesn't?Not really. You would simply have to examine the source code to know for sure. Alternatively, sign a transaction in your chosen wallet and sign the exact same transaction in a wallet which is known to use RFC 6979 such as Electrum, and ensure the signatures are identical.As with all technical things like this - weak javascript PRNGs, RFC 6979, and so on - the safest thing for the vast majority of users is to stick to reputable, well known, and open source wallets such as Core or Electrum. When people start playing around with closed source trash like Trust wallet or Coinomi, random websites like blockchain.com, or completely unheard of wallets like the Klever wallet that OP was discussing, that is when you run in to trouble. There is a very good reason that all the technical users on this forum use the former and avoid the latter.Okay, I see. Entropy in seed generation of the wallets is a concerning topic that I haven't thought about too much so far. Regarding tokens and random shitcoins, I still don't see many options that are working well and open-source. I guess sticking to Trezor or similar is the only way to go right now?A follow-up thought, if the entropy created by a wallet is in some way skewed - I guess it's still very hard to find out in what way exactly it is skewed and then create an algo based on that info to take advantage to narrow down the actual seed-scope. Also it greatly depends on how many bits are lost if it will fall into a range that can be exploited or not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 20, 2023, 01:06:15 PM",
+      "body": "Quote from: Kryptowerk on July 20, 2023, 12:50:35 PMRegarding tokens and random shitcoins, I still don't see many options that are working well and open-source. I guess sticking to Trezor or similar is the only way to go right now?Personally, I would say sticking to bitcoin is the way to go. But yeah, if you want to buy random shitcoins, then chances are any wallets supporting said shitcoins are going to be similarly shit. Multi-coin hardware wallets are your best bet, but I wouldn't recommend either Ledger or Trezor given recent events from both companies. I have no idea which other hardware wallets are reputable and also support shitcoins.Quote from: Kryptowerk on July 20, 2023, 12:50:35 PMI guess it's still very hard to find out in what way exactly it is skewed and then create an algo based on that info to take advantage to narrow down the actual seed-scope.Well, it depends. In the case OP is discussing here, that is exactly what happened and multiple users had their funds stolen. If the RNG is weak but not weak enough to be compromised, we likely never hear of it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

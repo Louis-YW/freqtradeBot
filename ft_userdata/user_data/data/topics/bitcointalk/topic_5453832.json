@@ -1,0 +1,141 @@
+{
+  "id": "topic_5453832",
+  "title": "mixoftix",
+  "author": "mixoftix",
+  "created_time": "May 24, 2023, 06:01:43 AMLast edit: October 05, 2023, 10:28:47 PM by mixoftix",
+  "content": "Hi therebeing GDPR compliance in EU privacy law [1] is going to make trouble with decentralized systems based on blockchain and all suggested solutions till now just could mitigate the scope of problem [2]. but it seems there could be a concrete solution that we need to discuss it first:Just talking about a new command in messaging protocol across peer-to-peer network of nodes, as a subset of \"reorg\" situation. in other words, when we are talking about Article 17 of the GDPR [3] - the right to erasure - when a user decides to be forgotten, in fact a very special fork is happening in the platform that calls the nodes they should \"reorg\". now if we label the new fork situation by command \"reorg_gdpr\", then our upgraded nodes should remove the targeted data under its mentioned hash value of an old tx, that exists as a new request in the mempool, and as you could see, nothing with the integrity of ex-blocks changes and the whole blockchain remains trusted in continue..however blockchains that contain numeric values and their balances (like bitcoin) need more jobs to do, but blockchains with general data could simply cover it. all you need is a request from the owner of an old tx value, that has the same sign (hold the same private key) and asks the nodes to run a \"reorg_gdpr\" command on a specific tx record. so we save the users \"reorg_gdpr\" request in new block and erase the data that belongs to its tx value in the targeted old block.any feedback welcome.[1] https://gdpr-info.eu/[2] https://cointelegraph.com/innovation-circle/zkp-could-help-resolve-blockchain-tensions-with-gdpr[3] https://gdpr-info.eu/art-17-gdpr/",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5453832",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "May 24, 2023, 06:30:50 AM",
+      "body": "See chapter 10 in the whitepaper: https://bitcoin.org/bitcoin.pdfQuoteThe traditional banking model achieves a level of privacy by limiting access to information to the parties involved and the trusted third party. The necessity to announce all transactions publicly precludes this method, but privacy can still be maintained by breaking the flow of information in another place: by keeping public keys anonymous. The public can see that someone is sending an amount to someone else, but without information linking the transaction to anyone. This is similar to the level of information released by stock exchanges, where the time and size of individual trades, the \"tape\", is made public, but without telling who the parties were.That means, if you have a bank account, then you need to reveal personal data. However, when it comes to blockchains, there is no need for that in the first place. You have to reveal a random address, and nothing else behind that.Quotethen our upgraded nodes should remove the targeted data under its verified tx values that exists in the mempool, and as you could see, nothing with the integrity of ex-blocks changes and the whole blockchain remains trusted in continue1. If you want to change your transaction on mempool-level, then full-rbf is the way to go. It is already implemented in the latest 24.1 version.2. When it comes to removing data from confirmed blocks, then you should consider pruning.3. Removing data from full archival nodes is a backward-incompatible change, because then it will no longer be possible to do Initial Blockchain Download, because every transaction has to be fully verified.4. As pointed out in chapter 10 of the whitepaper, placing any personal data in a transaction is a misuse of the system. If you want to attach any data to your transaction, and have an option to remove it in the future, then you should use commitments, instead of putting your data on-chain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 24, 2023, 06:58:33 AM",
+      "body": "appreciate garlonicon,Quote from: garlonicon on May 24, 2023, 06:30:50 AMThat means, if you have a bank account, then you need to reveal personal data. However, when it comes to blockchains, there is no need for that in the first place. You have to reveal a random address, and nothing else behind that.some lawyers aren't agree with this, part of them say this could get broken by advances in cryptanalysis and processing power, other part of them express that just because people reveal their addresses in social media, their businesses or exhcnages, this is going to make trouble with GDPR compliance policy. I know this is too strict, but arises disputes.Quote1. If you want to change your transaction on mempool-level, then full-rbf is the way to go. It is already implemented in the latest 24.1 version.True, working on GDPR in mempool-level is important. but as you see the article 17 is going to affect the whole blockchian from the genesis block to the last confirmed. so the question here is, when we should code our nodes to run the suggested \"reorg_gdpr\" command for old record on confirmed blocks? while the request is still in mempool or after write it down in the new block?Quote2. When it comes to removing data from confirmed blocks, then you should consider pruning.while this is not a classic fork situation, I hope each node could handle it as a queued series of local maintenance jobs whithin their idle time.Quote3. Removing data from full archival nodes is a backward-incompatible change, because then it will no longer be possible to do Initial Blockchain Download, because every transaction has to be fully verified.unfortunately this is exactly what GDPR needs to do - they need the initial blockchain be forgotten-able. but by running a \"reorg_gdpr\" command, in fact the original data of a specific record in a confirmed block will remove but its reflected tx hash value still remains for getting fully verified. we know this makes trouble with blockchains like bitcoin with numeric balances and needs more jobs to do but could be a solution for other blockchains that hold general data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 24, 2023, 08:47:39 AM",
+      "body": "Quotepart of them say this could get broken by advances in cryptanalysis and processing powerIf you will get some private key, then it will be just some random 256-bit number. You won't get someone's name, e-mail, and other data from that.Quoteother part of them express that just because people reveal their addresses in social media, their businesses or exhcnages, this is going to make trouble with GDPR compliance policyThen still, there are ways to remove your personal data from those sites, while leaving that random number on-chain. Because on-chain, you cannot see instantly that address tb1qvfkf65m7tew5346j9zktyqt83hevkhzr24h8qy belongs to John Doe. And even if you get that private key cSyvAnMep159RfnV6USq7HWmpo1fZKhXu1MBTFweTT7KrGrCcYvJ, then you still don't know that. Because \"John Doe\" is mentioned only on those social media sites, it is not stored on-chain, unless you create an explicit output in your transaction \"OP_RETURN <I am John Doe.>\" (but then, see chapter 10, you shouldn't do that on-chain, if you want to have an option to remove it later).Quotewhen we should code our nodes to run the suggested \"reorg_gdpr\" command for old record on confirmed blocks?You should enable pruning, if you don't want to store data in historical blocks.Quotewhile the request is still in mempool or after write it down in the new block?Just enable full-rbf, and pruning. That will allow removing things from mempool, and from historical blocks. Of course, then your node will no longer be full archival node.Quotewhile this is not a classic fork situation, I hope each node could handle it as a queued series of local maintenance jobs whithin their idle time.Forget about forking the network. All what you can do, is to remove data from your own node. You won't track all computers in the world that potentially could store some information, that should be removed. There could always be some of them outside EU, that will still store removed data, even if developers will introduce all changes you want. Also note that even if developers would do what you want, then it would be backward-incompatible, and then people could just stick with the old version. That means, the solution is not to remove the data, but to avoid putting personal details on-chain in the first place, if you need them to be removable in the future.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 24, 2023, 04:16:30 PMLast edit: May 24, 2023, 04:32:38 PM by mixoftix",
+      "body": "Quote from: garlonicon on May 24, 2023, 08:47:39 AMIf you will get some private key, then it will be just some random 256-bit number.you know how lawmakers think! they say there could be an encrypted database in a firm that holds the equivalent of some bitcoin addresses to personal data of its customers for KYC, and one day this could get broken and publish in the internet! but please also consider that the GDPR is not just for anonymous blockchains, there may be a blockchain (permissioned) which uses people's SSN as address and their published records should be erasure by the article 17.. no way to flee - garlonicon   QuoteJust enable full-rbf, and pruning. That will allow removing things from mempool, and from historical blocks. Of course, then your node will no longer be full archival node.this could be practical in some cases. for example if one company that analysis some personal data / activity of customers with its own bitcoin full node and needs to be GDPR compliance, so enables those features and could continue under EU regulation. but still broadcasting such requests to the entire network could be useful that makes every nodes informed around the globe about a personal GDPR-compliance request - despite of they approve it or not. this could show its impact on crypto price, etc..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 24, 2023, 04:31:28 PM",
+      "body": "appreciate etf! your are always here available for help.Quote from: ETFbitcoin on May 24, 2023, 10:17:10 AM1. GDPR doesn't apply to individual who run full node node (for personal or household activity).2. Reorg/fork isn't realistic option. Who wants to use coin which frequently perform reorg or sometimes perform deep re-org?3. As @garlonicon said, what you or other node (which run by/belong to certain company) is delete specific data on your own node either by pruning or custom/in-house full node software which only delete specific data.1. when you decide to perform an analysis among some local databases and a full node, afraid GDPR applies.2. true. just pointing to the FORK in confronting GDPR is because of its classic definition where we say if you have problem with the main root of a blockchain, fork it and begin your own root. so when you say: \"I want my records between 2010-2015 get forgotten in a blockchain X\", this could get called as a very special micro-fork within a chain. therefore, its \"reorg\" should now be a special one too, which have called it \"reorg_gdpr\"..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 24, 2023, 04:50:14 PM",
+      "body": "Quote from: mixoftix on May 24, 2023, 04:16:30 PMyou know how lawmakers think! they say there could be an encrypted database in a firm that holds the equivalent of some bitcoin addresses to personal data of its customers for KYC, and one day this could get broken and publish in the internet! but please also consider that the GDPR is not just for anonymous blockchains, there may be a blockchain (permissioned) which uses people's SSN as address and their published records should be erasure by the article 17..You can put your full personal data as OP_RETURN in the blockchain, or with the crazy image uploading nowadays you could even add your picture. GDPR can say whatever they want, from Bitcoin's perspective, this is the reality:Quote from: theymos in 2017I intend to ignore all stupidity coming out of the EUSSR.The only way to remove a certain OP_RETURN that's in the blockchain 50,000 blocks is by creating a longer chain starting from an earlier block. It's not going to happen.Quote from: mixoftix on May 24, 2023, 04:31:28 PM2. true. just pointing to the FORK in confronting GDPR is because of its classic definition where we say if you have problem with the main root of a blockchain, fork it and begin your own root. so when you say: \"I want my records between 2010-2015 get forgotten in a blockchain X\", this could get called as a very special micro-fork within a chain. therefore, its \"reorg\" should now be a special one too, which have called it \"reorg_gdpr\"..Creating your own Fork doesn't change the main chain. It's as futile as deleting your local copy of the blockchain and pretending all data is gone.You can't just edit some data in some old block, without that data the rest of the chain can no longer be verified.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "May 25, 2023, 12:12:53 AMLast edit: May 25, 2023, 12:31:07 AM by odolvlobo",
+      "body": "I'm not a lawyer or an expert, but I believe that the GDPR is flawed in regard to the rights of someone who makes their personal data public.For example: J.K. Rowling has sold about 600 million copies of her books. If she decides that she wants her personal data removed from these copies, would owners of the books be required by Article 17 to do so? Would all non-journalistic mentions of her association with her books (e.g. awards) have to be removed?The relevance here is that someone who makes a transaction is intentionally and actively broadcasting that transaction and all of the information contained within to the entire world. I think that demanding that the entire world destroy that information is unreasonable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 25, 2023, 05:32:31 AM",
+      "body": "Quote from: odolvlobo on May 25, 2023, 12:12:53 AMThe relevance here is that someone who makes a transaction is intentionally and actively broadcasting that transaction and all of the information contained within to the entire world.Someone could broadcast someone else's dox.QuoteI think that demanding that the entire world destroy that information is unreasonable.Not only that, it's futile. The whole point of decentralization is that no single institution has a say in it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 25, 2023, 07:33:45 AMLast edit: May 25, 2023, 08:01:24 AM by mixoftix",
+      "body": "Appreciate LoyceV,Quote from: LoyceV on May 24, 2023, 04:50:14 PMGDPR can say whatever they want, from Bitcoin's perspective, this is the reality:Quote from: theymos in 2017I intend to ignore all stupidity coming out of the EUSSR.I just try to look at the GDPR from other point of views. when article 17 published it was targeting facebook and other social medias to make them abide by the rights of their users - there was no intention in banning blockchain project like bitcoin. what happened in continue that is more amazing could be about spreading the importance of being and living decentralized, so GDPR is confronting blockchains based on quick development of technology. therefore, this is something good - I think, and this is why just try to consider it as a puzzle or a scientific problem and try to solve it as a research to respect the curiosity of my own mind - not being GDPR compliance.QuoteThe only way to remove a certain OP_RETURN that's in the blockchain 50,000 blocks is by creating a longer chain starting from an earlier block. It's not going to happen.this is exactly what I try to assess in this post. the possibility of removing a certain record without re-creating 50'000 blocks! the best way to understand it is work with examples:so imagine we have a blockchain that ONLY holds people's EMAIL address in its block's payload. and I've been an employee in organization X for the last 5 years but now I'm going to work in organization Y, so I have to change my email address in that blockchain and somehow for some unknown \"abuse-preventing\" reasons no body should see my previous email address anymore. in this case I could add my new address to the new incoming block, but have to remove the old one. therefore, this is not about change a record, this is totally impossible and need to re-create those 50'000 blocks as you mentioned above.as you could see a blockchian for emails doesn't need to verify user's balance and her historical transactions, so could simply remove the pure text under its hash on merkle tree. in this scenario, your blockchain just acts as a static repository - so no need to re-create all those 50'000 blocks before my old email address.but things could get more complex in blockchains like bitcoin that work with numeric data and their balances based on historical transactions to verify. in these types of blockchains using a ZKP layer to find a solution is inevitable - but I'm not going to discuss it in this post at all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 25, 2023, 07:42:47 AM",
+      "body": "Quote from: mixoftix on May 25, 2023, 07:33:45 AMso imagine we have a blockchain that ONLY holds people's EMAIL address in its block's payload. and I've been an employee in organization X for the last 5 years but now I'm going to work in organization Y, so I have to change my email addressThat's what databases are for. I know it's been a hype to try to use a blockchain for everything, but it's much better not to use a blockchain for anything that can be done without it.A blockchain is simply very good at one thing: making sure data can't get edited. If you want to edit things, you shouldn't use a blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 25, 2023, 07:57:21 AM",
+      "body": "Appreciate odolvlobo,Quote from: odolvlobo on May 25, 2023, 12:12:53 AMI'm not a lawyer or an expert, but I believe that the GDPR is flawed in regard to the rights of someone who makes their personal data public.Agree. GDPR is an old law that doesn't fit the reality behind new advances in technology and even breaks other rules like AML [1]. in other discussion with a good lawyer, have mentioned a subtle conflict among Article 16 of GDPR – Right to rectification - [2] and AML, because this section demands: \"the controller has to edit data without undue delay\", which means I could fabricate an identity, break the law and ask for rectification! at least blockchain never ever let you change anything and by removing data your fingerprint remains that one day you ask for removing something - on the historical blocks. so just offered there should be a 7-days of \"data preserve guaranty\" just like 7-days of \"money back guaranty\" we have in e-commerce! in other world, just think if we look better to the concept and behavior of the system, blockchains are more GDPR compliance than other centralized databases. [1] https://en.wikipedia.org/wiki/Money_laundering[2] https://gdpr-info.eu/art-16-gdpr/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 25, 2023, 01:42:24 PM",
+      "body": "QuoteDo you mean company and certain individual (who perform analysis) could pretend they comply with GDPR by creating new fork which ignored by all nodes?Why people want to fork the chain at all? Forking will just create another altcoin, for no reason. You can for example remove historical data, and make a fork, where Initial Blockchain Download is done only for N latest blocks, and everything else is trusted. But in that case, you can just enable pruning, and stay with the original chain, without forking anything. So, why people want to fork Bitcoin, when no fork is needed to achieve their goals?Also, using pruning is easier, because this option is already implemented. And even if developers would release a version, where all nodes use pruning during IBD, then still, people can stick with the old version, so those transactions will never be removed. To delete everything, you have to check every computer in the world, and remove that data from it. Note that people can even have some offline backups of the chain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d5000",
+      "created_time": "May 25, 2023, 08:08:35 PM",
+      "body": "I do not agree with the OP, for the reasons @garlonicon already mentioned. Addresses should never be regarded as personal data. There are only some unlikely cases where a problem could emerge (e.g. an European company which has to comply with GDPR storing personal information of a person on a blockchain - this company could get into serious trouble).However, I wanted to point out that there are already some blockchain models which enable a kind of \"right to be forgotten\". Perhaps the most prominent is the \"mini-blockchain scheme\" (Bruce, 2014) [1], where all old transactions which have been completely spent can be pruned. Compared to Bitcoin, however, it has however some additional attack vectors. There is also Ardor [2], which could be described as a \"partial\" mini-blockchain, as pruning is possible for sub-chains or child-chains, but not for the mainchain which should only contain financial, no personal data (Ardor has no scripting language which allows something like OP_RETURN or Ordinals).A third way could be the way Grin [3] operates. Grin stores data in a way only a few bytes per transaction could be used for arbitrary (like personal) data, and if you wanted to use these bytes to store data you'd have to publish a \"scheme\" somewhere else, and then the scheme would be the place where the personal data were stored. We have discussed this in the thread about Ordinals.[1] https://cryptonite.info/files/mbc-scheme-rev3.pdf[2] https://www.allcryptowhitepapers.com/wp-content/uploads/2018/05/Jelurida-ardor-Whitepaper.pdf[3] https://forum.grin.mw/t/ordinals-on-grin/10336",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 25, 2023, 08:14:53 PMLast edit: May 25, 2023, 08:47:33 PM by mixoftix",
+      "body": "Quote from: ETFbitcoin on May 25, 2023, 12:41:35 PMBut in first place, many individual Bitcoiner who run full node would never perform any kind of analysis. So ideally, those individual shouldn't have to worry about GDPR. Although i suppose i should ask what counts as analysis.excluding bitcoin from this general topic on all blockchains really could help.but what I could count quickly as analysis by bitcoin node: tracking transaction data, credit assessment by reserve of coins on-chain, custody crypto by neo-banks for loans, etc..QuoteDo you mean company and certain individual (who perform analysis) could pretend they comply with GDPR by creating new fork which ignored by all nodes?this is not a new fork. I wish we had this ability here to share my whiteboard, but please be informed, what this \"reorg_gdpr\" or \"prune_gdpr\" command among nodes provides us would be something like \"Simplified Payment Verification\" in whitepaper. by this command we do not begin a new fork, just simplifies payload of an old block (removes a record) on all nodes based on a REQUEST that writes down in a new block.. if this new command gets its approval by an Improvement Proposal and find its legitimacy in the protocol, then the main chain could consider as the GDPR compliance.. so existing a copy of the original data in other nodes that doesn't follow the new improvement in the protocol, do not cause banning the main network in GDPR zone.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 25, 2023, 08:26:58 PM",
+      "body": "Quote from: garlonicon on May 25, 2023, 01:42:24 PMeven if developers would release a version, where all nodes use pruning during IBD, then still, people can stick with the old version, so those transactions will never be removed.what my good lawyer tells about being GDPR compliance in decentralized system, is something like this quote you have provided above - where the consensus on an improvement proposal get affected in the main protocol, which shows the main chain is permitted all around the GDPR zone.. so as you could see, the problem is the consensus on protocol.what other people do with versions before the improvement or offline data, does not consider.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 25, 2023, 08:43:59 PM",
+      "body": "Appreciate d5000,Quote from: d5000 on May 25, 2023, 08:08:35 PMAddresses should never be regarded as personal data. There are only some unlikely cases where a problem could emerge (e.g. an European company which has to comply with GDPR storing personal information of a person on a blockchain - this company could get into serious trouble).let me give you an actual attack by hackers on paychecks from HBR [1]:QuoteMany companies provide systems that allow employees to maintain and update their personal information, such as home address, telephone, and banking details for direct deposit of their monthly paycheck.Criminals have broken into the accounts of some well-paid employees and, the day before the payment was to be sent, changed the bank details. Then, the day after, they changed the bank details back to normal, so nothing would be noticed to be out of order.now the problem that you should solve as the security manager of such organization is about:1- providing a database that doesn't let anybody change its data (for example, a local one-node blockchain)2- and this DB also should be GDPR compliance!so as you could see, all those solutions that you have mentioned above will be useful, while a \"reorg_gdpr\" or \"prune_gdpr\" command could get considered as a solution in such sensitive data bases. in fact this is a \"data structure\" problem that we are going to solve it..[1] https://hbr.org/2023/04/cyber-thieves-are-getting-more-creative",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

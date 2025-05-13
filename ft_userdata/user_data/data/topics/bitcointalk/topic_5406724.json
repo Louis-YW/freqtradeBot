@@ -1,0 +1,61 @@
+{
+  "id": "topic_5406724",
+  "title": "vinshet",
+  "author": "vinshet",
+  "created_time": "July 18, 2022, 02:14:31 PM",
+  "content": "Hi,Does anyone know if we can run multiple hidden services on 1 bitcoin node? I am planning to set up a bitcoin node with 10's of hidden services.I know that I would manually have to create them, but I am not clear on the port situation for these services.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5406724",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "July 18, 2022, 03:54:04 PM",
+      "body": "Quote from: vinshet on July 18, 2022, 02:14:31 PMHi,Does anyone know if we can run multiple hidden services on 1 bitcoin node? I am planning to set up a bitcoin node with 10's of hidden services.I know that I would manually have to create them, but I am not clear on the port situation for these services.Yes you can!Feel free to check out my [Guide] FULL NODE OpenSUSE 15.3: bitcoind + electrs + c-lightning + RTL, where I set up the Electrum server software as well as Core Lightning and Ride The Lightning all through Tor. Every service gets its own hidden service and its own Tor v3 onion address.The same process I use in there can be applied to other software, too.I would recommend sticking to this 'more manual' approach instead of the 9051 control port type stuff.Quote from: n0nce on October 21, 2021, 01:13:17 PM[6] Add the following contents, preferably in the right section (somewhere where there's HiddenServiceDir stuff commented out).Code:HiddenServiceDir /var/lib/tor/electrs_hidden_service/HiddenServiceVersion 3HiddenServicePort 50001 127.0.0.1:50001ExitPolicy reject *:* # no exits allowedBasically, you select a name you like for the 'HiddenServiceDir' (where you can later retrieve the corresponding onion address).And you specify the port your software usually runs on, that you'd like to tunnel through Tor as HiddenServicePort.Just add one of these 3-line blocks (last line only needed once) for each program, with chosen name and port to tunnel, to /etc/tor/torrc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "July 18, 2022, 07:27:06 PM",
+      "body": "Also keep in mind if it gets a lot of hits that depending on what you are doing it will handle some requests in the order they are received NOT in a multi-threaded simultaneous way.For the most part you should not care or even notice if you are only running 10s of services, but if you do something that is intensive it may cause other calls to wait.Been there.....done that.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 19, 2022, 06:49:01 AM",
+      "body": "Quote from: DaveF on July 18, 2022, 07:27:06 PMAlso keep in mind if it gets a lot of hits that depending on what you are doing it will handle some requests in the order they are received NOT in a multi-threaded simultaneous way.Bitcoind uses a worker pool to divide up the incoming RPC calls, which has a size of 4 workers by default, can be changed from the command line. So actually by default it will be handling 4 RPCs at a time (assuming there are indeed 4 cores on the system).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "July 19, 2022, 12:30:22 PM",
+      "body": "Quote from: NotATether on July 19, 2022, 06:49:01 AMQuote from: DaveF on July 18, 2022, 07:27:06 PMAlso keep in mind if it gets a lot of hits that depending on what you are doing it will handle some requests in the order they are received NOT in a multi-threaded simultaneous way.Bitcoind uses a worker pool to divide up the incoming RPC calls, which has a size of 4 workers by default, can be changed from the command line. So actually by default it will be handling 4 RPCs at a time (assuming there are indeed 4 cores on the system).Talking about workers size, i just remember Bitcoin Core also has option to configure queue size of RPC work. By default it's 16, which may not sufficient since OP plan to utilize 10 hidden services.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "July 19, 2022, 01:03:37 PM",
+      "body": "Quote from: NotATether on July 19, 2022, 06:49:01 AMQuote from: DaveF on July 18, 2022, 07:27:06 PMAlso keep in mind if it gets a lot of hits that depending on what you are doing it will handle some requests in the order they are received NOT in a multi-threaded simultaneous way.Bitcoind uses a worker pool to divide up the incoming RPC calls, which has a size of 4 workers by default, can be changed from the command line. So actually by default it will be handling 4 RPCs at a time (assuming there are indeed 4 cores on the system).Quote from: ETFbitcoin on July 19, 2022, 12:30:22 PMQuote from: NotATether on July 19, 2022, 06:49:01 AMQuote from: DaveF on July 18, 2022, 07:27:06 PMAlso keep in mind if it gets a lot of hits that depending on what you are doing it will handle some requests in the order they are received NOT in a multi-threaded simultaneous way.Bitcoind uses a worker pool to divide up the incoming RPC calls, which has a size of 4 workers by default, can be changed from the command line. So actually by default it will be handling 4 RPCs at a time (assuming there are indeed 4 cores on the system).Talking about workers size, i just remember Bitcoin Core also has option to configure queue size of RPC work. By default it's 16, which may not sufficient since OP plan to utilize 10 hidden services.Yes, what I typed was not what I thought. But AFAIK and from what @NotATether  said it's number of cores limited.  And I could be wrong on this once the call is in the queue it's there so even if the request is no longer needed it there will be no way to stop it from happening. I have not tested it since I tend to keep the number of things going on with my nodes low but I think that is the way it works.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 20, 2022, 05:53:00 AM",
+      "body": "Quote from: DaveF on July 19, 2022, 01:03:37 PMYes, what I typed was not what I thought. But AFAIK and from what @NotATether  said it's number of cores limited.  And I could be wrong on this once the call is in the queue it's there so even if the request is no longer needed it there will be no way to stop it from happening. I have not tested it since I tend to keep the number of things going on with my nodes low but I think that is the way it works.-Dave I actually have not attempted to experiment with the RPC worker pools switch to test whether indeed Core forbids such a configuration, but it should be obvious that if you create more workers than there are hardware threads, you will not truly have N workers, only 4, or 8, or however many threads are present on your system - and it will actually slow the entire processing down as more time is wasted in the kernel's software scheduler.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

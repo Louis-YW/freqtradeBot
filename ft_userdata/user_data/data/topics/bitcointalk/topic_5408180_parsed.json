@@ -1,0 +1,53 @@
+{
+  "id": "topic_5408180",
+  "title": "boosblock",
+  "author": "boosblock",
+  "created_time": "July 30, 2022, 08:52:38 PM",
+  "content": "i'd like to find a tool that would allow me to take two separate batches of addresses, cross reference them, and see if they've ever interacted with one another, either directly or indirectly. would be willing to pay for tool if not readily available.  does anyone have any ideas? thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408180",
+  "comments": [
+    {
+      "author": "aliashraf",
+      "created_time": "July 31, 2022, 12:04:07 AM",
+      "body": "Some assumptions:1- We are testing Whether Y has ever released/moved coins such that they are collected by X. 2- Neither X nor Y are not coinbase addresses, i.e. they are not used by miners to claim block reward. 3- We cover output script types with a distinguished unlocking address, identifiable.  Now I'm going to show that how complicated and resource intensive it is to avoid false negatives for the test results because in its general form this problem ends to an exhaustive search..We have  Address X Which appears in a number of txns as the lock address of one or more outputs, where each transaction has a number of inputs which are unlocked by a number of addresses. Omitting coinbase addresses, if any, from the list of input addresses we get are a set I1 which has m addresses where m is typically greater than 1. If Y is not in I1 now number of the test subjects are m and the serach should be run m times and continue untill it halts. In each loop we should take care of recurring addresses by removing them. Halt conditions: 1- Y is spotted.2- All the new candidates are omitted early because of them being coinbase addresses. 3- The search space is exhausted, proving no links between the two.We ignore the trivial positive case, i.e., yes, Y has financed X! The last two conditions are actually the same: coinbase txns as the halting factor, and both result into a True negative result, still they are very unlikely to reach in practice.Firstly, the Second halt condition is not reachable unless we are talking about a very special X address directly linked to a miner, for normal addresses it is not happening.Secondly, bitcoin ledger has ordered 750,000,000 txns right now, exhausting the total search space is very likely to involve a considerable portion of this ledger, if not all of it, before we are out of non coinbase inputs. For each candidate address, the list of all transactions toward it should be queried and for each transaction to be examined it should be located then fetched from the HDD and the list of inputs should be preserved on the HDD as well (to prevent recurring addresses and loops) with a unique index applied, it is a very resource consuming process almost comparable to syncing the whole blockchain. Conclusion:I'd improve the question like this: Is  address X financed by address Y in 10 or fewer hopes? It is also notable that \"indirect\" involvement in funds transfered to an address losses its informatic importance when it is 'too' indirect.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 31, 2022, 04:28:57 AM",
+      "body": "You should trace the transaction histories of the first batch of addresses, startng from the beginning, and see if any of the second batch of addresses are contained in outputs or co-inputs in those same transactions.It looks easy on paper provided that you already have a fast datastore of transactions (blockchain.com is quite slow), especially since you are not crawling through transaction outputs as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "July 31, 2022, 12:03:15 PM",
+      "body": "Quote from: boosblock on July 30, 2022, 08:52:38 PMwould be willing to pay for tool if not readily available.  does anyone have any ideas? I don't know any tool which accept 2 batch of address as input. But if you don't mind workaround, you could do this1. Use publicly available tool (which usually show address group). Few example that i know,https://www.breadcrumbs.app/https://www.walletexplorer.com/https://ethonym.com/https://blockpath.com2. Enter each address of an batch.3. Download the result for each address.4. See whether the result contain address from another batch.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 31, 2022, 12:43:26 PM",
+      "body": "This tool will do it, but only for two addresses at a time: https://learnmeabitcoin.com/tools/path/Enter the two addresses you are interested in, and it will show you the shortest path (if one exists) between those addresses. Be patient once you hit the \"Connect\" button - as you can imagine it can take quite some time to scan all possible transactions to find a link. The more transactions each address has been involved in, or the longer the path between the addresses, then the longer it will take.On the results it returns to you, the green circles are addresses, the grey squares are outputs, and the blue circles are transactions. It can take a bit of time to understand exactly how to follow the link. Bear in mind that it might be looking backwards as well as forward.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "boosblock",
+      "created_time": "July 31, 2022, 10:51:06 PM",
+      "body": "thanks for everyone's help. this is far more labor intensive than i would have hoped but i'm plugging away.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "topic_5430506",
+  "title": "BoyFromDubai",
+  "author": "BoyFromDubai",
+  "created_time": "December 20, 2022, 12:11:16 PMLast edit: December 20, 2022, 12:38:23 PM by BoyFromDubai",
+  "content": "I know that LevelDB stores information about UTXOs in the way like txid->utxos. And when all utxos are spent in this transaction, it is removed from DB. But is it an instant action after new block was created, where the last unspent vout becomes spent?I mean when the last unspent vout is in DB for txid X and it is spent in the block N, it will be removed from DB after block N instantly?And also I can’t understand the thing about the structure of value in LevelDB which is in chainstate/ folderI’ve seen smth that it stores data like hight, number of vout, is this vout spent or not, and smth else but I don’t remember what. If I’m not right, correct me please.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5430506",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "December 20, 2022, 02:19:56 PM",
+      "body": "I can't imagine LevelDB being called that frequently because updating the database after each transaction becomes spent will thrash the database every ~10 mins or constantly (depending on whether LevelDB is updated when a block is received or a transaction is received).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoyFromDubai",
+      "created_time": "December 20, 2022, 02:22:46 PM",
+      "body": "Oh, no. Not after each transaction, ofc. The question was about updating it every block and deleting spent transactions with all spent utxos after each new block. Does it work that way or it deletes spent transactions every 5 blocks for example",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "December 20, 2022, 07:09:17 PM",
+      "body": "Quote from: BoyFromDubai on December 20, 2022, 12:11:16 PMI know that LevelDB stores information about UTXOs in the way like txid->utxos.Not anymore.The database is used like an in-memory object. It's a key-value store, so it's basically just an enormous map or dict. So when a block removes a UTXO, it's removed from the database. When one is added, it's added to the database. Of course, there are database transactions and batching so that all of these updates occur atomically, either a block and all of its changes went through, or it didn't. Additionally, LevelDB will cache things in memory with changes only being written out to disk when the cache is full, or at periodic intervals.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

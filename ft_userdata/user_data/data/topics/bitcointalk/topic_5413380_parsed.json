@@ -1,0 +1,61 @@
+{
+  "id": "topic_5413380",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "September 13, 2022, 08:45:33 AMLast edit: September 13, 2022, 12:16:10 PM by NotATether",
+  "content": "Yesterday I upgraded my Ubuntu system to 22.04.1 LTS (from 20.04.5 LTS). In the process, I had to restart my PC, which brought out some problems that were previously hidden, so this must be one of them.There is a v0.21.1 bitcoind process running from /usr/local/bin/bitcoind that is being spawned by systemd. I can't stop it through the corresponding bitcoin-cli binary because it says there's no connection at 127.0.0.1:8332. And if I try to SIGKILL the process, systemd just recreates it again. Seeing as some systemd unit must be responsible for this, I immediately combed my services folder and got rid of all the bitcoin-related services and then ran systemctl daemon-reload. Alarmingly, some are still listed in a call to systemctl list-units though as \"not-found\". I am trying to upgrade Bitcoin Core on Linux by overwriting the binaries but this problem precludes this from happening since it is earing up my load average.Screenshot from a terminal:Temporary workaround:Send SIGSTOP to the parent bitcoind process. It will no longer process any data and your load average will go down, if you're fine with about 80MB residue in your RAM (maybe it can be offloaded to the otherwise useless swap space, I'm not sure). Rebooting will not help you in this case! It will just come back again.Resolution:You probably have bitcoin core running in a Docker container. Specifically, as part of a BTCPayServer installation. You should run btcpay-down and btcpay-clean scripts as I demonstrate here.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5413380",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "September 13, 2022, 09:17:47 AM",
+      "body": "My interpretation from stackexchange:Does this help?Code:sudo update-rc.d bitcoind disable",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 13, 2022, 09:56:52 AM",
+      "body": "Quote from: LoyceV on September 13, 2022, 09:17:47 AMMy interpretation from stackexchange:Does this help?Code:sudo update-rc.d bitcoind disableThat doesn't seem to work, probably because I completely removed the service from systemd's config.I managed to figure out that the process is owned by systemd-coredump uid and gid, so not systemd. I wonder what that is supposed to mean, Bitcoind is stuck in a crash loop?FWIW, the last entry of my debug.log says <some other instance> has shut down long ago.It's not responding to SIGSTOP either (This signal can't be blocked!)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 13, 2022, 09:58:26 AM",
+      "body": "Quote from: NotATether on September 13, 2022, 09:56:52 AMBitcoind is stuck in a crash loop?Try to temporarily rename it?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 13, 2022, 10:03:47 AM",
+      "body": "Quote from: LoyceV on September 13, 2022, 09:58:26 AMQuote from: NotATether on September 13, 2022, 09:56:52 AMBitcoind is stuck in a crash loop?Try to temporarily rename it?I just tried that and killed the process, but astoundingly, systemd-coredump spawned it again from the exact same (original) file name, supposedly non-existant. Maybe it's not bitcoin core related code, but something that generates a core dump...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 13, 2022, 10:17:33 AM",
+      "body": "Quote from: NotATether on September 13, 2022, 10:03:47 AMI just tried that and killed the process, but astoundingly, systemd-coredump spawned it again from the exact same (original) file name, supposedly non-existant. Linux allows files to be (re)moved while in use. They're not actually removed until the program that uses it lets go. I assume that's the case here too.If you reboot (I know, such a Windows term), for sure it won't start the renamed bitcoind again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 13, 2022, 10:24:00 AMLast edit: September 13, 2022, 12:13:07 PM by NotATether",
+      "body": "Quote from: LoyceV on September 13, 2022, 10:17:33 AMQuote from: NotATether on September 13, 2022, 10:03:47 AMI just tried that and killed the process, but astoundingly, systemd-coredump spawned it again from the exact same (original) file name, supposedly non-existant. Linux allows files to be (re)moved while in use. They're not actually removed until the program that uses it lets go. I assume that's the case here too.If you reboot (I know, such a Windows term), for sure it won't start the renamed bitcoind again.I'm trying to save rebooting as a last resort as it means I have to manually start up all my services and workspaces. Update:It appears to be caused by an Ubuntu service called Apport (this is a red herring, it's being driven entirely by a service ironically called \"whoopsie\"!) that must have been enabled while I was upgrading Ubuntu. https://wiki.ubuntu.com/ApportHow do I stop this service? systemctl stop/disable/mask apport don't seem to be working.SOLVED.That bitcoind instance was not running directly on my system, it was running in a docker container as part of a leftover and long-abandoned BTCPayServer installation. That's why killing it kept respawning the same process. So it actually had nothing to do with Apport or whoopsie.Running sudo btcpay-down.sh followed by sudo btcpay-clean.sh did the trick. Saved me from an unnecessary reboot (BTW that probably would not have helped anyway, since BTCPayServer Docker containers autostart with the system).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

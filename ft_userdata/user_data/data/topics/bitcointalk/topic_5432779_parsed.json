@@ -1,0 +1,85 @@
+{
+  "id": "topic_5432779",
+  "title": "DireWolfM14",
+  "author": "DireWolfM14",
+  "created_time": "January 02, 2023, 08:53:22 PMLast edit: May 27, 2023, 01:33:07 PM by DireWolfM14",
+  "content": "Due to an ongoing discussion about the private use of bitcoin with HD wallets and the advantages that running your own node provides, I've decided to create a really simple guide to help those who are less experienced with Linux.  During the discussion some members expressed their desire to run their own node, but were intimidated by having to learn a new OS.  Well, rest assured, this guide takes the path of least resistance and is intended for you.The node system I've chosen for this guide is Umbrel, largely because of how easy it is to install and operate, the options it provides, and because it can be installed on just about anything that can run on a Linux kernel.  Disclosure: Keep in mind that Umbrel is not \"Open Source\" software.  It is transparent, available for peer review, can be forked, modified, and redistributed, but commercial use of Umbrel is limited.  It also offers applets that may not be open-source.  More information here: https://github.com/getumbrel/umbrel/blob/master/LICENSE.mdWhile writing this guide I have made some assumptions:You're a Windows user, with a PC or Laptop running Windows and connected to the local network.Your node will be running on separate hardware dedicated to the node, (we'll call this hardware the \"node server\").You will interact with the node server remotely.One of the advantages of Umbrel is that it can be managed remotely by using your favorite web browser from any device that's connected to the same local network, even a phone.  This is what makes Umbrel so easy to use and such a practical solution for those who don't care to develop Linux system management skills, but still want to run a full node.PreparationWe'll get started with a list of what you'll need:A USB drive with 4GB capacity.A very basic computer with these minimum requirements2-core processor (CPU)4GB of RAM (8GB recommended)1TB of storage space (a SSD is recommended, a fast HDD will work fine)Internet connectionA temporary terminal (a monitor and a keyboard)Step 1: Prepare the USB drive:To keep this as simple as possible, I've chosen to use Ubuntu Server as my base OS.  Other Linux operating systems will work fine (in fact I prefer Debian,) but out-of-the-box Ubuntu comes configured with all settings which will make this super easy for a newbie.  Umbrel will provide the graphical interface, so to keep the install as light as possible all we need is the server package, which does not include a desktop environment.  A Linux distro with a desktop environment will also work, but I find this to be redundant and will tax our hardware unnecessarily.Download the latest stable (LTS) version of Ubuntu Server's ISO: https://ubuntu.com/download/serverUse an imaging tool (balenaEtcher, for example) to write the ISO file onto the USB drive.Step 2: Install the base OS:Next, we'll install a minimized Ubuntu Server as our base OS for the node server.Insert the USB drive into an open USB port on the node server.Boot the node server to the BIOS boot options page.For most Intel mother boards press F8 while the bios is loading, F12 for most Dell machines.Once the boot option page loads select the USB drive which contains Ubuntu Server.Select \"Try or Install Ubuntu Server\".Follow the guided install to choose your language and region preferences.Select \"Ubuntu Server (minimized)\".Enter your profile information.[Optional, recommended] Install SSH Server if you want to be able to manage the base OS remotely.Do not install any of the \"Featured Server Snaps,\" Umbrel will install the required versions of it's dependencies, including Docker.Wait for the base OS to finish installing, then reboot the node server.Login with the profile credentials you created.Update and upgrade the server's new install with the following command:Code:sudo apt update && sudo apt upgradeStep 3: Install and launch Umbrel:If you've gotten this far, you have concluded the most difficult part of our adventure.  The rest is smooth sailing.Umbrel provides a script that will perform the install automatically, start Umbrel, and create a service process that will start Umbrel automatically whenever the node server reboots.Before we install Umbrel, we'll need to note the IP address of the node server.  There are plenty of ways to obtain the IP address, here's one way:  Once logged into the server type the following command and note the IP address of the machine:Code:ip addThe response should look something like this:My example above looks a bit funny because I'm using a virtual machine for demonstration purposes.  Typically the hardware issuing your local IP address will be entry number 2 and labeled eno1, and typical local IPs will be 192.168.x.x or 172.16.x.x, not 10.0.2.15 as in my example.Now that we have all the information we need, we can install Umbrel.  To do so simply type the following command into your command line, and hit enter (Installing Umbrel requires admin privileges, you will be asked for your password):Code:curl -L https://umbrel.sh | bashThe install will take a few minutes.  Once Umbrel is finished installing give it a couple of more minutes for the docker containers to get up and running.  After a few minutes it should be ready to use.  From another device connected to the same network, open a browser window and type in the IP address or the name we assigned to the node server.  In my example above I named my node server \"umbrel-node\" so I would set this as my URL:Code:http://umbrel-node:80Or you can use the IP address you obtained by running ip add, for example:Code:http://192.168.100.105:80That's it!  Now with a single click you can install applications such as Bitcoin Core, Electrs SPV server, Mempool, and much more using Umbrel's graphical interface.Happy (private) Bitcoining! Why this is a self-moderated thread:Please keep the discussion on the topic of Full Node Operating Systems, including Umbrel, MyNode, RoninDojo, and other full node systems I have not mentioned, and how to run them on a machine with a Linux base OS (including Raspberry Pi.)  Any posts deriding Windows users, shaming people for using Windows, or shaming people for not knowing more about Linux will be deleted without warning.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432779",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "January 03, 2023, 12:53:33 PM",
+      "body": "Quote from: ETFbitcoin on January 03, 2023, 12:16:54 PMQuote from: DireWolfM14 on January 02, 2023, 08:53:22 PMDownload the latest Ubuntu Server ISO: https://ubuntu.com/download/serverDo you have any specific reason to suggest latest version (22.10) rather than LTS (22.04) version? I expect LTS version is more friendly to less-experienced user due to longer support and better stability.LTS version also has less bugs, due to less moving parts inside the OS being upgraded. With that being said, you could even use Debian as a better option, if that is supported by Umbrel. Unlike in Ubuntu, using the latest Debian is perfectly fine because its release snapshot is frozen.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "January 03, 2023, 02:24:42 PM",
+      "body": "Quote from: ETFbitcoin on January 03, 2023, 12:16:54 PMDo you have any specific reason to suggest latest version (22.10) rather than LTS (22.04) version? I expect LTS version is more friendly to less-experienced user due to longer support and better stability.You are 100% correct, the LTS version is what I recommend.  My semantics were off (fixed now,) but the link I provided actually pointed to the LTS version (22.04.)  Thanks for bringing it up.Quote from: ETFbitcoin on January 03, 2023, 01:02:00 PMQuote from: NotATether on January 03, 2023, 12:53:33 PMQuote from: ETFbitcoin on January 03, 2023, 12:16:54 PMQuote from: DireWolfM14 on January 02, 2023, 08:53:22 PM~~LTS version also has less bugs, due to less moving parts inside the OS being upgraded. With that being said, you could even use Debian as a better option, if that is supported by Umbrel. Unlike in Ubuntu, using the latest Debian is perfectly fine because its release snapshot is frozen.Debian is definitely more stable, but it's less user friendly than Ubuntu and has smaller community/online discussion. For example, do you expect average people can find and choose correct ISO which meets their needs?I agree that Debian is lighter, and more stable due to being lighter.  Having had servers running with both Ubuntu and Debian simultaneously it becomes obvious just how much more stable Debian really is. Since I maintain my severs regularly, i.e. perform updates and upgrades at least once a month, I noticed all the bloat on Ubuntu requires many more upgrades on a regular basis.  Being significantly lighter makes Debian lack some of the packages needed to install Umbrel.  Specifically; sudo and curl.  But there's also the way Debian sets up user accounts that make it a bit more cumbersome to set up for use with Umbrel.  All of that can be configured during install if one chooses \"expert install,\" or modified later, of course.  But since this guide is designed for those with limited Linux skills I figured it's best to recommend the most convenient method.Since we're on the subject it's worth noting that Umbrel's official Raspberry Pi image uses Debian 10 as the core OS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "lloll",
+      "created_time": "January 23, 2025, 08:02:09 AM",
+      "body": "Do you still recommend umbrel in 2025? Thank you!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 23, 2025, 08:52:41 AM",
+      "body": "You may not even need the USB if you've got a LAN that's connected to the internet (WiFi will not work here, it requires Etherenet). You can just use PXE boot to load any Linux distro you want and then start the installation process. netboot.xyz has a guide for it here: https://netboot.xyz/docs/booting/ipxeYou can also load netboot onto the USB to load any operating system you want, even Arch Linux and Proxmox. https://netboot.xyz/docs/booting/usb",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "January 23, 2025, 09:09:34 AM",
+      "body": "Quote from: lloll on January 23, 2025, 08:02:09 AMDo you still recommend umbrel in 2025? Thank you!Yes. But take note some things have changed since OP created this thread, because1. Umbrel is no longer alpha/beta software.2. Umbrel have become umbrelOS, where you install their OS rather than running installation script on your current linux OS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "January 23, 2025, 12:28:53 PMLast edit: January 23, 2025, 01:02:53 PM by DireWolfM14",
+      "body": "Quote from: lloll on January 23, 2025, 08:02:09 AMDo you still recommend umbrel in 2025? Thank you!Yes, I do.  Unless you like punishing yourself with difficult to maintain Linux packages, of course.As ABCbits mentioned, this guide was for the older version, and no longer applies.  The newer version, UmbrelOS is a lot easier to install, but it's best suited for a dedicated machine with one hard drive that's large enough for the whole Bitcoin blockchain, electrs, and possibly other blockchains like Monero.  I recommend 2TB.  The core of the OS is Debian 12, and all the services run in Docker containers.  UmbrelOS provides a shell interface where you can interact with each container, which is kind of nifty if you want to snoop around and learn more about Docker containers, or make some changes.If you don't want to dedicate a machine to the UmbrelOS, you can install it in a VM but make sure to give it plenty of drive space.Quote from: ABCbits on January 23, 2025, 09:09:34 AMYes. But take note some things have changed since OP created this thread, because1. Umbrel is no longer alpha/beta software.2. Umbrel have become umbrelOS, where you install their OS rather than running installation script on your current linux OS.They went and made this guide obsolete.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "January 24, 2025, 07:53:34 AM",
+      "body": "Very easy guide indeed DireWolfM14 and thanks for writing it.I 'd like to try it on a spare Raspberry Pi 4B+ that I have, but just for educational purposes. Because, I think that Umbrel has a dedicated OS for Raspberry PIs that can be burnt in an SD card, without needing to use another linux OS. Am I wrong?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "January 24, 2025, 09:40:33 AM",
+      "body": "Quote from: DireWolfM14 on January 23, 2025, 12:28:53 PMQuote from: ABCbits on January 23, 2025, 09:09:34 AMYes. But take note some things have changed since OP created this thread, because1. Umbrel is no longer alpha/beta software.2. Umbrel have become umbrelOS, where you install their OS rather than running installation script on your current linux OS.They went and made this guide obsolete.Indeed, but it's good thing since there's development burden (such as handling error/bug on specific distro).Quote from: apogio on January 24, 2025, 07:53:34 AMVery easy guide indeed DireWolfM14 and thanks for writing it.I 'd like to try it on a spare Raspberry Pi 4B+ that I have, but just for educational purposes. Because, I think that Umbrel has a dedicated OS for Raspberry PIs that can be burnt in an SD card, without needing to use another linux OS. Am I wrong?You're right. In fact, these days they only provide OS build. But take note they don't recommend using microSD[1][1] https://github.com/getumbrel/umbrel/wiki/Install-umbrelOS-on-a-Raspberry-Pi-5",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "January 24, 2025, 12:01:31 PM",
+      "body": "Quote from: ABCbits on January 24, 2025, 09:40:33 AMYou're right. In fact, these days they only provide OS build. But take note they don't recommend using microSD[1][1] https://github.com/getumbrel/umbrel/wiki/Install-umbrelOS-on-a-Raspberry-Pi-5Yeah, this must be new, because I remember in the past they advised installing it on SD cards. Obviously, because of the fact that SD cards are less stable for long-term usage, they advise otherwise now, which is correct.To be honest, I am running my Raspberry OS straight on my SSD, which makes it more durable than SD or flash storage.Anyway, thanks for the info.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

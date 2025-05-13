@@ -1,0 +1,93 @@
+{
+  "id": "topic_5407083",
+  "title": "BrutalBear",
+  "author": "BrutalBear",
+  "created_time": "July 21, 2022, 02:27:49 AM",
+  "content": "Hi guys, does anyone know the best way to figure out the time and date of a specific HTLC commitment transaction?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5407083",
+  "comments": [
+    {
+      "author": "Zilon",
+      "created_time": "July 21, 2022, 07:16:04 AM",
+      "body": "They are entirely done off-chain using multi-sig and scripting which allows for decentralized contracts. HTLC allows the two parties involved in the transaction  to update the balances in the channel instead of broadcasting on the blockchain making it impossible to figure out the time and date any HTLC commitment transaction was done since it wasn't hashed on the blockchain which means each commitment has two versions of the same output and each can only broadcast their own version of the transaction.With the use of this nLockTime this transaction can remain open indefinitely and the final output locked via sequential number",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BrutalBear",
+      "created_time": "July 21, 2022, 07:27:13 AM",
+      "body": "Quote from: Zilon on July 21, 2022, 07:16:04 AMThey are entirely done off-chain using multi-sig and scripting which allows for decentralized contracts. HTLC allows the two parties involved in the transaction  to update the balances in the channel instead of broadcasting on the blockchain making it impossible to figure out the time and date any HTLC commitment transaction was done since it wasn't hashed on the blockchain which means each commitment has two versions of the same output and each can only broadcast their own version of the transaction.With the use of this nLockTime this transaction can remain open indefinitely and the final output locked via sequential numberIf I ask the two parties to provide these HTLCs to me, is there a way to figure out exact time/date?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zilon",
+      "created_time": "July 21, 2022, 07:43:45 AM",
+      "body": "Quote from: BrutalBear on July 21, 2022, 07:27:13 AMIf I ask the two parties to provide these HTLCs to me, is there a way to figure out exact time/date?In lightening network an escrow keeps a DB that tracks the recent channel-state and for this to be effective it comes with a timestamp so definitely if either of the parties decides to share the HTLCs to you then you can get the exact date and time of the transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BrutalBear",
+      "created_time": "July 21, 2022, 02:53:24 PM",
+      "body": "Thank you!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 21, 2022, 09:20:01 PM",
+      "body": "Quote from: Zilon on July 21, 2022, 07:43:45 AMQuote from: BrutalBear on July 21, 2022, 07:27:13 AMIf I ask the two parties to provide these HTLCs to me, is there a way to figure out exact time/date?In lightening network an escrow keeps a DB that tracks the recent channel-state and for this to be effective it comes with a timestamp so definitely if either of the parties decides to share the HTLCs to you then you can get the exact date and time of the transaction. Wait what? If I open a Lightning channel with you, it's just between us, without any kind of escrow.Or are you trying to say it would be possible to construct such an escrow? It's not 100% clear to me what you're trying to say.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zilon",
+      "created_time": "July 22, 2022, 05:53:35 AM",
+      "body": "Quote from: n0nce on July 21, 2022, 09:20:01 PMWait what? If I open a Lightning channel with you, it's just between us, without any kind of escrow.Or are you trying to say it would be possible to construct such an escrow? It's not 100% clear to me what you're trying to say.The escrow here reduces counter party risk. This is achieved by utilizing a cryptographic passphrase. In essence this time-based escrow  ensures the receiver of the payment acknowledges it with a given period of time and once this time elapses the receiver forfeits the payment. This receiver performs two tasks to access the fund.Input the right passphraseThen claim the paymentAnd this is done within a certain time frame in which if the receiver inputs an incorrect passphrase and cannot claim the payment within that time bound the receiver loses the payment",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "May 23, 2023, 09:33:33 AM",
+      "body": "i would like to BTCump this topic up again, because there are now the following 5 slides, which explain this kind of payments (where hashlocks and timelocks are used) visually a little easier. and i hope that it will be more understandable for one or the other user now",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 23, 2023, 05:39:22 PM",
+      "body": "Quote from: cygan on May 23, 2023, 09:33:33 AMIt may be just me right now, but isn't this sketch wrong? As far as I can see, Alice sends 1 BTC to Bob; she use Carol as an intermediary node to route her transaction to Bob. When Bob tells the secret to Carol, he doesn't need Alice to take the bitcoin. Alice has given him a transaction that grants Carol the bitcoin, given Carol has the preimage. If Bob does not respond to Carol's preimage request, nothing happens. Carol cannot take the money, because he doesn't meet Alice's condition.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "May 24, 2023, 05:37:46 AM",
+      "body": "Quote from: BlackHatCoiner on May 23, 2023, 05:39:22 PMQuote from: cygan on May 23, 2023, 09:33:33 AMIt may be just me right now, but isn't this sketch wrong? ✂️ nope the channel in which the intermediary node participates must have the necessary liquidity to forward the payment. in this case, 1BTC should be available on Bob's side of the Alice<->Bob channel to ensure the successful routing of the tx. if Alice has a payment channel with Carol and wants to pay Bob, Carol acts as a node, charges a fee, and enables payment",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 24, 2023, 11:56:17 AM",
+      "body": "Quote from: cygan on May 24, 2023, 05:37:46 AMif Alice has a payment channel with Carol and wants to pay Bob, Carol acts as a node, charges a fee, and enables paymentI don't disagree with Carol being an intermediary, and for the liquidity requirement. It just seems to me that even if Bob is unresponsive, Carol doesn't have anything to worry about. He will only transfer the bitcoin if Bob has given him the preimage. Otherwise, the condition in their script is not met. In the sketch, I see Carol asking Alice to give him his bitcoin back, but that payment has never happened. In fact, Carol never gives Alice bitcoin, he receives from Alice, and sends it to Bob. (That, assuming Alice wants to send Bob a bitcoin, and the path looks like this: Alice <-> Carol <-> Bob)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

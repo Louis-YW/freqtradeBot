@@ -1,0 +1,77 @@
+{
+  "id": "topic_5478177",
+  "title": "ltcltcltc",
+  "author": "ltcltcltc",
+  "created_time": "December 16, 2023, 07:07:00 PM",
+  "content": "Some days ago I asked for help with the building of a trusted clock using BTC. I got a few replies that helped a lot and led me to a solution to the problem. But my true goal is to code a program that acts like a time capsule. Its task is to safely encrypt data during a set period of time and decrypt it afterwards. Here it is in a more detailed form.Input (at t=now): release_date (UNIX time value), encrypt=True (bool).Output (at t=now): encrypt_key (type key).Input (at t≥release_date): encrypt_key (type key), encrypt=False (bool).Output (at t≥release_date): decrypt_key (type key).Take some data you want to send to the future. Give the program a release date, encrypt your data with encrypt_key and throw the raw data and the encryption key away. Safely store the encrypted data. Wait. After the specified date, give the program back its encrypt_key and get back your decrypt_key to decrypt your data with.Everything must be run locally.Critical assumption: the user is good-intentioned right until they throw away the raw data, after which they feel an immense regret and become malicious.The problem: make it as hard as possible to get decrypt_key before release_dateFirst idea (which led to the previous post): 1) make the program get the current date from a trusted source and compare it to release_date; 2) if time is up proceed to outputting decrypt_key.This can be beautifully solved by BTC (or any other PoW-based cryptocurrency, really): after release_date, give the program the longest chain of block headers; the program will check the PoW, that the difficulty increase is coherent and that the time intervals are not suspicious (i.e. 10 mins on average, also if the last time interval is 2 days, it might suggest that a malicious user mined their own last block and faked the timestamp... a few details should be taken into account despite compromising accuracy). The beauty for me is that the program doesn't care if the chain is the longest or whether it's been confirmed by the network: it only wants the proof of work; and the good-intentioned user doesn't need to bother about calculating that PoW: miners do that for them!This already makes for long-term reliable (though potentially very rough) time-checking method, but my task is to build a time capsule. I still face the issue of having to obfuscate the code responsible for producing decrypt_key. Sadly there is no way to avoid the threat of reverse engineering, especially for locally run programs. If a machine can follow the instructions in your executable, so can a talented enough human.Second idea (here you BTC geeks might help out): using the lock_time parameter. The program can issue a transaction that's time-locked to release_date. How could I exploit this feature? Or to put it another way: what kind of information does the user gain when a transaction is processed by the network?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5478177",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "December 16, 2023, 07:48:08 PM",
+      "body": "https://gwern.net/self-decrypting",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "December 16, 2023, 08:00:31 PM",
+      "body": "You know, now that I think about it, this could be useful for many things, one thing is to build a system that could only allow the original owner of a key to spend from the key, something like: you'd receive an encrypted message from the person you are sending coins to, then only that person could spend from their key by providing the decryption solution to the network.That way we could eliminate any chance of \"hacking\" a key by an outsider.To answer the question, what info can someone get by transacting? A : public key, amount, receiver's address/public key and all previous transaction data.Ps, I'm not a geek, just a curious soul.😉",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "December 16, 2023, 08:12:58 PM",
+      "body": "Quotethen only that person could spend from their key by providing the decryption solution to the networkYes, it is possible. If you use any hash-based address, then you can use just your public key, as the key to encrypt your message. Then, if you ever move those coins, you will reveal your public key, and your signature, and then people will grab this public key, and decrypt the message you broadcasted outside Bitcoin.For example, if the puzzle creator would want to give a hint after seeing solution for puzzle #66, he could use the public key from 13zb1hQbWVsc2S7ZTZnP2G4undNNpdh5so as the encryption key, and post encrypted message anywhere. Then, it is guaranteed that when people will break that key, the message will be also decrypted.The same trick can be used on public keys, just by forming the proper commitment, and attaching it to the TapScript.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "December 16, 2023, 08:27:47 PM",
+      "body": "Of course, that is also what ECC is for, I meant it for a second solution, where you would include the encrypted message of the receiver in your output, then only they could spend from it by providing the solution other than their ECDSA initial proof/signature. However the second solution could not be open source or decentralized, because if ECC becomes vulnerable in the coming decade, then any other system based on ECC would be equally vulnerable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "December 16, 2023, 08:42:11 PM",
+      "body": "Quoteif ECC becomes vulnerable in the coming decade, then any other system based on ECC would be equally vulnerableAs long as hash functions are safe, this will not break time-lock encryption schemes. Which means, if ECC will be broken, but for example RIPEMD-160 will still work as intended, then the public key behind that hash will remain unknown. And also note, that if you will have some message, encrypted for example with AES, then you will need the exact key, and not just any key, which will give you the proper hash. And then, if RIPEMD-160 will be broken, but AES will remain safe, it is possible to reach a scenario, where coins will be moved, but the message will be left unencrypted, if you hack it, and get \"a key\" instead of reaching \"the key\".But of course, if ECC will be broken, then we will have more serious problems, and working time-lock encryption will not be enough to remain safe, because other problems will hit us significantly. The same with hash functions, for example fully breaking SHA-256 on preimage level means that it will be trivial to fake ECC signatures as well (but it is unlikely scenario, as we cannot currently reach preimage attacks even for MD5, no matter how easy it is to make collisions).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BTCapsule",
+      "created_time": "December 18, 2023, 01:02:00 PM",
+      "body": "I created BTCapsule about a year ago, and it might not be exactly what you’re looking for, but maybe it will be helpful. At first, BTCapsule used the Network Time Protocol (NTP), and when a certain date was met, the information would decrypt. However, I discovered I could trick my computer into thinking it was getting the time from Google while I’m offline.Then I tried making an executable and storing the encryption key directly into the code. Terrible idea. Someone found it.Now BTCapsule uses timelock to create two paper wallets. One wallet has a private key that can broadcast the tx immediately, and the other wallet must wait for the timelock to expire before broadcasting. This allows the original owner to always have access, and the recipient to have access in the future if anything happens to the original owner.I’m not sure about arbitrary data, but I’m sure something could be configured.BTCapsule for PC:https://github.com/BTCapsule/BTCapsuleBTCapsule for Android:https://github.com/BTCapsule/BTCapsule_Android",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "December 20, 2023, 08:10:30 PM",
+      "body": "Quote from: BTCapsule on December 18, 2023, 01:02:00 PMI created BTCapsule about a year ago, and it might not be exactly what you’re looking for, but maybe it will be helpful. At first, BTCapsule used the Network Time Protocol (NTP), and when a certain date was met, the information would decrypt. However, I discovered I could trick my computer into thinking it was getting the time from Google while I’m offline.I think this is the main problem about time locking, the program needs to read the time from somewhere, and if you use the time direct from your system or you can get it from a web page, but both ways can get rigged, you can change your time on the PC or create a site on your local host to provide some date from the future. On linux you can use the UNIX date:Code:date +%s1357004952Knowing that you can create a simple script:Code:if $(date +%s) < 1357004952; then echo(\"YourPrivateKey\"); fi;To encrypt the script you only put the text on a file and save it as capsule.sh, then use shc.Code:shc -f capsule.shNow you can delete the capsule.sh file an run the script with the .x file.Code:./capsule.sh.xJust wanted to share my way to OP, maybe you can get some ideas from here for the next version of your software. By the way, shc let us prunt an expiration message, that's another easy way to get the private key even with an empty script :pCode:shc -e <date> -m <message> -f <script_name>",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ltcltcltc",
+      "created_time": "December 20, 2023, 10:04:20 PM",
+      "body": "Quote from: seoincorporation on December 20, 2023, 08:10:30 PMQuote from: BTCapsule on December 18, 2023, 01:02:00 PMI created BTCapsule about a year ago, and it might not be exactly what you’re looking for, but maybe it will be helpful. At first, BTCapsule used the Network Time Protocol (NTP), and when a certain date was met, the information would decrypt. However, I discovered I could trick my computer into thinking it was getting the time from Google while I’m offline.I think this is the main problem about time locking, the program needs to read the time from somewhere, and if you use the time direct from your system or you can get it from a web page, but both ways can get rigged, you can change your time on the PC or create a site on your local host to provide some date from the future. On linux you can use the UNIX date:Code:date +%s1357004952Knowing that you can create a simple script:Code:if $(date +%s) < 1357004952; then echo(\"YourPrivateKey\"); fi;To encrypt the script you only put the text on a file and save it as capsule.sh, then use shc.Code:shc -f capsule.shNow you can delete the capsule.sh file an run the script with the .x file.Code:./capsule.sh.xJust wanted to share my way to OP, maybe you can get some ideas from here for the next version of your software. By the way, shc let us prunt an expiration message, that's another easy way to get the private key even with an empty script :pCode:shc -e <date> -m <message> -f <script_name>Yeah, good but that's easy to rev engineer. Decompiling that code should be straightforward. @garlonicon link is so accurate, thanks! And @BTCapsule: it's cool that someone else thought the same thing as me. Cognitive convergence...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

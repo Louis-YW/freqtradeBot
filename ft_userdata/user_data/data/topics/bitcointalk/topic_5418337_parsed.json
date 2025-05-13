@@ -1,0 +1,165 @@
+{
+  "id": "topic_5418337",
+  "title": "Mobber",
+  "author": "Mobber",
+  "created_time": "October 25, 2022, 09:29:59 PM",
+  "content": "I setup a full node a few weeks ago and successfully connected sparrow wallet from a different PC but on same network. It connected fine until yesterday and now sparrow won't connect. When I setup the node I followed the tutorial on bitcoin.org and did the port forwarding. The node I still receiving incoming connections fine. I followed the sparrow tutorial and all info is still correct.The node is running on a PC with windows 10 and sparrow is on a pc with windows 11. I haven't changed anything but sparrow just won't connect now. Any suggestions?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5418337",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "October 26, 2022, 01:07:51 AM",
+      "body": "Quote from: Mobber on October 25, 2022, 09:29:59 PMI setup a full node a few weeks ago and successfully connected sparrow wallet from a different PC but on same network. It connected fine until yesterday and now sparrow won't connect. When I setup the node I followed the tutorial on bitcoin.org and did the port forwarding. The node I still receiving incoming connections fine. I followed the sparrow tutorial and all info is still correct.The node is running on a PC with windows 10 and sparrow is on a pc with windows 11. I haven't changed anything but sparrow just won't connect now. Any suggestions? Since you mention port forwarding, I assume you set up your node in a home network behind NAT. Such networks sometimes get their IP address reassigned by the ISP.Can you check whether your external IP address has changed?Otherwise, I generally recommend against port forwarding and for Tor tunneling instead. Sparrow has built-in Tor support, so you just need to install tor on the node machine and tunnel the Bitcoin port through it.Something like this (change port number and hidden service name):Quote from: n0nce on June 08, 2022, 01:55:51 AM[5] Log back out into your sudo account, and open the Tor config file.Code:exitsudo nano /etc/tor/torrc[6] Add the following contents, preferably in the right section (somewhere where there's HiddenServiceDir stuff commented out).Code:HiddenServiceDir /var/lib/tor/electrs_hidden_service/HiddenServiceVersion 3HiddenServicePort 50001 127.0.0.1:50001ExitPolicy reject *:* # no exits allowed[7] Start up Tor and fetch your electrs Tor hostname. The hostname can then be entered in wallets like Wasabi and BlueWallet settings.Code:sudo systemctl enable tor.servicesudo service tor restartsudo cat /var/lib/tor/electrs_hidden_service/hostnameIf you followed this guide, you just port forwarded port 8333 though, which shouldn't give you remote access from Sparrow. That should require access to the 8332 RPC port, which you should never port forward to the internet. That's why I'm wondering that your setup ever worked in the first place.I'd recommend to install electrs and tunnel it through Tor as described above, for better security.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 26, 2022, 04:40:31 AM",
+      "body": "Quote from: Mobber on October 25, 2022, 09:29:59 PMWhen I setup the node I followed the tutorial on bitcoin.org and did the port forwarding. The node I still receiving incoming connections fine. I followed the sparrow tutorial and all info is still correct.The node is running on a PC with windows 10 and sparrow is on a pc with windows 11. I haven't changed anything but sparrow just won't connect now. Any suggestions? How about the guide above it about setting a static IP: bitcoin.org/en/full-node#configuring-dhcp?By saying \"still receiving incoming connections\", do you mean you're still getting \"Inbound\" Peers or not?Because if not, my best guess is your set 'rpcbind' IP address didn't match after getting a new IP address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 26, 2022, 12:04:04 PM",
+      "body": "Also make sure any anti-virus software didn't wake up and decide that the incoming connection is an attack.This has nothing to do with the firewall. Even after you opened the port and said 'let connections in' some AV software will STILL think that it knows better then you.I have had this happen at times when a definition update changes something. And then, a while later after the next update, it starts working again with no issues.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 26, 2022, 05:56:27 PM",
+      "body": "Let's clear out something: Your full node has synced. Right in top. Initial block download has finished, and it now verifies chain tips. Correct?In Windows 11, the Sparrow application directory should be in %APPDATA%/Sparrow. Can you see a sparrow.log there? Please remove any potentially sensitive information (such as WAN IP addresses) and post it here so we can see the problem.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 26, 2022, 07:09:58 PMLast edit: October 26, 2022, 10:27:05 PM by Mr. Big",
+      "body": "Quote from: nc50lc on October 26, 2022, 04:40:31 AMQuote from: Mobber on October 25, 2022, 09:29:59 PMWhen I setup the node I followed the tutorial on bitcoin.org and did the port forwarding. The node I still receiving incoming connections fine. I followed the sparrow tutorial and all info is still correct.The node is running on a PC with windows 10 and sparrow is on a pc with windows 11. I haven't changed anything but sparrow just won't connect now. Any suggestions? How about the guide above it about setting a static IP: bitcoin.org/en/full-node#configuring-dhcp?By saying \"still receiving incoming connections\", do you mean you're still getting \"Inbound\" Peers or not?Because if not, my best guess is your set 'rpcbind' IP address didn't match after getting a new IP address.The node is definitely receiving incoming connections. It has 21 inbound right now and bitnodes shows it as accepting incoming. The WAN ip is automatic and has changed since I setup the node. But it looks like the internal ip's for the two PC's are static. Should I change that WAN ip to static?Quote from: ETFbitcoin on October 26, 2022, 11:39:21 AMQuote from: Mobber on October 25, 2022, 09:29:59 PMI setup a full node a few weeks ago and successfully connected sparrow wallet from a different PC but on same network. It connected fine until yesterday and now sparrow won't connect. When I setup the node I followed the tutorial on bitcoin.org and did the port forwarding. The node I still receiving incoming connections fine. I followed the sparrow tutorial and all info is still correct.The node is running on a PC with windows 10 and sparrow is on a pc with windows 11. I haven't changed anything but sparrow just won't connect now. Any suggestions? By same network, do you mean both PC is on same LAN/local area network? If yes, either try1. Configure DHCP (which already suggested) and make sure you entered correct local IP of your node on your sparrow wallet.2. Check firewall configuration on both device. There's rare case where Windows Firewall broken or it's rule changed after Windows update.Yes same LAN network. I configured the DHCP on the node PC. The local ip's are correct according to my router. The WAN ip is changing though. The firewall has allowances for both Bitcoin core and sparrow. Do I need do more indepth config than just the \"add program\" option? I also just tried installing sparrow on the node PC and it won't connect to node either.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 26, 2022, 11:12:35 PM",
+      "body": "Quote from: Mobber on October 26, 2022, 07:09:58 PMQuote from: nc50lc on October 26, 2022, 04:40:31 AMQuote from: Mobber on October 25, 2022, 09:29:59 PMWhen I setup the node I followed the tutorial on bitcoin.org and did the port forwarding. The node I still receiving incoming connections fine. I followed the sparrow tutorial and all info is still correct.The node is running on a PC with windows 10 and sparrow is on a pc with windows 11. I haven't changed anything but sparrow just won't connect now. Any suggestions? How about the guide above it about setting a static IP: bitcoin.org/en/full-node#configuring-dhcp?By saying \"still receiving incoming connections\", do you mean you're still getting \"Inbound\" Peers or not?Because if not, my best guess is your set 'rpcbind' IP address didn't match after getting a new IP address.The node is definitely receiving incoming connections. It has 21 inbound right now and bitnodes shows it as accepting incoming. The WAN ip is automatic and has changed since I setup the node. But it looks like the internal ip's for the two PC's are static. Should I change that WAN ip to static?Which IP do you use to connect Sparrow to Bitcoin Core? Your external / WAN IP or your local IP (192.xx... or similar)?Again; opening ports in your router improves your node, since it can now accept incoming connections - by other Bitcoin Core nodes, speaking Bitcoin protocol. Not by light clients trying to do RPC.Sparrow can use the RPC interface running on 8332 to connect to a Bitcoin node but you don't (or at least definitely shouldn't) expose that to the public internet, as it would give everyone full access to your node (e.g. spending funds).Therefore, Sparrow connection to a Bitcoin node (without Electrum) works when both are on the same machine and also if they're on a LAN & the 8332 port is opened in the node's own firewall. Then you can access it through its local IP.Here are the official instructions by the Sparrow team: https://www.sparrowwallet.com/docs/connect-node.htmlNotice how they always mention local IPs; since connecting to Bitcoin Core's RPC interface remotely is basically completely out of the picture, anyway, they don't even mention that.More on this here: https://bitcoin.stackexchange.com/a/88948/119879Quote from: Mobber on October 26, 2022, 07:09:58 PMI also just tried installing sparrow on the node PC and it won't connect to node either.That's very weird. Is Bitcoin Core still running, fully synced and has the settings in its config file that are mentioned in the official guide?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 27, 2022, 03:02:19 AM",
+      "body": "Quote from: BlackHatCoiner on October 26, 2022, 05:56:27 PMLet's clear out something: Your full node has synced. Right in top. Initial block download has finished, and it now verifies chain tips. Correct?In Windows 11, the Sparrow application directory should be in %APPDATA%/Sparrow. Can you see a sparrow.log there? Please remove any potentially sensitive information (such as WAN IP addresses) and post it here so we can see the problem. The node should be all synced. It's been running for a few weeks now. How do I confirm it verifies chain tips and the initial block download has finished?Here is the last two logs from sparrow.2022-10-26 19:52:04,426 ERROR [JavaFX Application Thread] c.s.s.p.ServerPreferencesController [null:-1] Connection errorcom.sparrowwallet.sparrow.net.ServerException: Check if Bitcoin Core is running, and the authentication details are correct.   at com.sparrowwallet.sparrow@1.6.6/com.sparrowwallet.sparrow.net.ElectrumServer$ConnectionService$1.call(Unknown Source)   at com.sparrowwallet.sparrow@1.6.6/com.sparrowwallet.sparrow.net.ElectrumServer$ConnectionService$1.call(Unknown Source)   at javafx.graphics@18/javafx.concurrent.Task$TaskCallable.call(Unknown Source)   at java.base/java.util.concurrent.FutureTask.run(Unknown Source)   at javafx.graphics@18/javafx.concurrent.Service.lambda$executeTask$6(Unknown Source)   at java.base/java.security.AccessController.doPrivileged(Unknown Source)   at javafx.graphics@18/javafx.concurrent.Service.lambda$executeTask$7(Unknown Source)   at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)   at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)   at java.base/java.lang.Thread.run(Unknown Source)2022-10-26 19:52:35,664 ERROR [JavaFX Application Thread] c.s.s.n.ElectrumServer [null:-1] Failed to start BWTdev.bwt.libbwt.BwtException: JSON-RPC error: JSON decode error: missing field `keypoololdest` at line 1 column 334   at com.sparrowwallet.merged.module@1.6.6/dev.bwt.libbwt.daemon.NativeBwtDaemon.start(Native Method)   at com.sparrowwallet.sparrow@1.6.6/com.sparrowwallet.sparrow.net.Bwt.start(Unknown Source)   at com.sparrowwallet.sparrow@1.6.6/com.sparrowwallet.sparrow.net.Bwt.start(Unknown Source)   at com.sparrowwallet.sparrow@1.6.6/com.sparrowwallet.sparrow.net.Bwt$ConnectionService$1.call(Unknown Source)   at com.sparrowwallet.sparrow@1.6.6/com.sparrowwallet.sparrow.net.Bwt$ConnectionService$1.call(Unknown Source)   at javafx.graphics@18/javafx.concurrent.Task$TaskCallable.call(Unknown Source)   at java.base/java.util.concurrent.FutureTask.run(Unknown Source)   at javafx.graphics@18/javafx.concurrent.Service.lambda$executeTask$6(Unknown Source)   at java.base/java.security.AccessController.doPrivileged(Unknown Source)   at javafx.graphics@18/javafx.concurrent.Service.lambda$executeTask$7(Unknown Source)   at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)   at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)   at java.base/java.lang.Thread.run(Unknown Source)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 27, 2022, 03:12:06 AM",
+      "body": "Quote from: DaveF on October 26, 2022, 12:04:04 PMAlso make sure any anti-virus software didn't wake up and decide that the incoming connection is an attack.This has nothing to do with the firewall. Even after you opened the port and said 'let connections in' some AV software will STILL think that it knows better then you.I have had this happen at times when a definition update changes something. And then, a while later after the next update, it starts working again with no issues.-DaveThis would make sense that AV is causing an issue. I just have windows defender. How would I check that is causing an issue? And any way to resolve apart from waiting for a new windows update to fix?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 27, 2022, 06:35:45 AM",
+      "body": "Quote from: n0nce on October 26, 2022, 11:12:35 PMQuote from: Mobber on October 26, 2022, 07:09:58 PMQuote from: nc50lc on October 26, 2022, 04:40:31 AMQuote from: Mobber on October 25, 2022, 09:29:59 PMWhen I setup the node I followed the tutorial on bitcoin.org and did the port forwarding. The node I still receiving incoming connections fine. I followed the sparrow tutorial and all info is still correct.The node is running on a PC with windows 10 and sparrow is on a pc with windows 11. I haven't changed anything but sparrow just won't connect now. Any suggestions? How about the guide above it about setting a static IP: bitcoin.org/en/full-node#configuring-dhcp?By saying \"still receiving incoming connections\", do you mean you're still getting \"Inbound\" Peers or not?Because if not, my best guess is your set 'rpcbind' IP address didn't match after getting a new IP address.The node is definitely receiving incoming connections. It has 21 inbound right now and bitnodes shows it as accepting incoming. The WAN ip is automatic and has changed since I setup the node. But it looks like the internal ip's for the two PC's are static. Should I change that WAN ip to static?Which IP do you use to connect Sparrow to Bitcoin Core? Your external / WAN IP or your local IP (192.xx... or similar)?Again; opening ports in your router improves your node, since it can now accept incoming connections - by other Bitcoin Core nodes, speaking Bitcoin protocol. Not by light clients trying to do RPC.Sparrow can use the RPC interface running on 8332 to connect to a Bitcoin node but you don't (or at least definitely shouldn't) expose that to the public internet, as it would give everyone full access to your node (e.g. spending funds).Therefore, Sparrow connection to a Bitcoin node (without Electrum) works when both are on the same machine and also if they're on a LAN & the 8332 port is opened in the node's own firewall. Then you can access it through its local IP.Here are the official instructions by the Sparrow team: https://www.sparrowwallet.com/docs/connect-node.htmlNotice how they always mention local IPs; since connecting to Bitcoin Core's RPC interface remotely is basically completely out of the picture, anyway, they don't even mention that.More on this here: https://bitcoin.stackexchange.com/a/88948/119879Quote from: Mobber on October 26, 2022, 07:09:58 PMI also just tried installing sparrow on the node PC and it won't connect to node either.That's very weird. Is Bitcoin Core still running, fully synced and has the settings in its config file that are mentioned in the official guide?Here is all that is in my bitcoin core config fileserver=1rpcuser=bitcoinrpcpassword=yourpassword[main]rpcbind=127.0.0.1rpcbind=node iprpcallowip=127.0.0.1rpcallowip=sparrow ipI've triple checked these are correct and they worked before. It's so strange that even sparrow on the same pc as the node won't connect. I might try just reinstalling bitcoin core and see if that fixes it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "October 27, 2022, 03:19:32 PM",
+      "body": "OP you can try updating Sparrow wallet that just released new version 1.7.0 few hours ago, with lot of bug fixes and new features.I am not sure if this will fix all your issues, but you could also contact developers or write your issue on their github page.This is a cool wallet and best alternative for Electrum I found so far:https://github.com/sparrowwallet/sparrow/releases",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 27, 2022, 07:57:58 PM",
+      "body": "Quote from: dkbit98 on October 27, 2022, 03:19:32 PMOP you can try updating Sparrow wallet that just released new version 1.7.0 few hours ago, with lot of bug fixes and new features.I am not sure if this will fix all your issues, but you could also contact developers or write your issue on their github page.This is a cool wallet and best alternative for Electrum I found so far:https://github.com/sparrowwallet/sparrow/releasesI just updated sparrow and still won't connect. I think I'm going to try completely uninstalling Bitcoin core and sparrow and then reinstalling them and see if that works.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 28, 2022, 07:36:08 AM",
+      "body": "An update:I uninstalled sparrow and Bitcoin core and deleted all associated files. I then reinstalled them and sparrow is now connecting to the node perfectly. I guess we'll see if this issue comes up again in a few weeks. Maybe something got corrupted in Bitcoin core? Idk but thank you everyone for the suggestions!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 28, 2022, 08:24:45 PM",
+      "body": "Quote from: n0nce on October 26, 2022, 01:07:51 AMQuote from: Mobber on October 25, 2022, 09:29:59 PMI setup a full node a few weeks ago and successfully connected sparrow wallet from a different PC but on same network. It connected fine until yesterday and now sparrow won't connect. When I setup the node I followed the tutorial on bitcoin.org and did the port forwarding. The node I still receiving incoming connections fine. I followed the sparrow tutorial and all info is still correct.The node is running on a PC with windows 10 and sparrow is on a pc with windows 11. I haven't changed anything but sparrow just won't connect now. Any suggestions? Since you mention port forwarding, I assume you set up your node in a home network behind NAT. Such networks sometimes get their IP address reassigned by the ISP.Can you check whether your external IP address has changed?Otherwise, I generally recommend against port forwarding and for Tor tunneling instead. Sparrow has built-in Tor support, so you just need to install tor on the node machine and tunnel the Bitcoin port through it.Something like this (change port number and hidden service name):Quote from: n0nce on June 08, 2022, 01:55:51 AM[5] Log back out into your sudo account, and open the Tor config file.Code:exitsudo nano /etc/tor/torrc[6] Add the following contents, preferably in the right section (somewhere where there's HiddenServiceDir stuff commented out).Code:HiddenServiceDir /var/lib/tor/electrs_hidden_service/HiddenServiceVersion 3HiddenServicePort 50001 127.0.0.1:50001ExitPolicy reject *:* # no exits allowed[7] Start up Tor and fetch your electrs Tor hostname. The hostname can then be entered in wallets like Wasabi and BlueWallet settings.Code:sudo systemctl enable tor.servicesudo service tor restartsudo cat /var/lib/tor/electrs_hidden_service/hostnameIf you followed this guide, you just port forwarded port 8333 though, which shouldn't give you remote access from Sparrow. That should require access to the 8332 RPC port, which you should never port forward to the internet. That's why I'm wondering that your setup ever worked in the first place.I'd recommend to install electrs and tunnel it through Tor as described above, for better security.Eventually I'd like to setup a private electrum server. Is that viable to run on a windows PC? And do you have any recommended guides to setup an electrum server? I also have no experience with tor so any recommendations for that? I'm assuming that's a straight forward verify and install?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 28, 2022, 08:47:22 PM",
+      "body": "Quote from: Mobber on October 28, 2022, 08:24:45 PMQuote from: n0nce on October 26, 2022, 01:07:51 AMI'd recommend to install electrs and tunnel it through Tor as described above, for better security.Eventually I'd like to setup a private electrum server. Is that viable to run on a windows PC? And do you have any recommended guides to setup an electrum server? I also have no experience with tor so any recommendations for that? I'm assuming that's a straight forward verify and install?Sure! I'd probably point you to this guide: https://bitcointalk.org/index.php?topic=5367296.0It actually makes you run it inside WSL, which is a Linux subsystem running on your Windows PC. I think that's a very good way to do it, because doing such things straight in Windows is usually a huge pain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 30, 2022, 06:29:39 AM",
+      "body": "Quote from: Mobber on October 28, 2022, 07:36:08 AMAn update:I uninstalled sparrow and Bitcoin core and deleted all associated files. I then reinstalled them and sparrow is now connecting to the node perfectly. I guess we'll see if this issue comes up again in a few weeks. Maybe something got corrupted in Bitcoin core? Idk but thank you everyone for the suggestions!So I had a very brief power outage today and now sparrow won't connect to the node again. So strange. My only guess is that because bitcoin core didn't shutdown properly it's causing some issue. Am I just going to have to reinstall bitcoin core everytime my pc shuts down abruptly?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 30, 2022, 07:11:02 AM",
+      "body": "Quote from: Mobber on October 30, 2022, 06:29:39 AMSo I had a very brief power outage today and now sparrow won't connect to the node again. So strange. My only guess is that because bitcoin core didn't shutdown properly it's causing some issue. Am I just going to have to reinstall bitcoin core everytime my pc shuts down abruptly? If the issue only a corrupted file brought by the abrupt shutdown and only in Bitcoin Core, then --reindex might solve the issue.It's a command-line option and not a command so; to use it, Bitcoin Core should be started with that parameter (instructions).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 30, 2022, 11:45:18 PM",
+      "body": "Quote from: Mobber on October 30, 2022, 06:29:39 AMSo I had a very brief power outage today and now sparrow won't connect to the node again. So strange. My only guess is that because bitcoin core didn't shutdown properly it's causing some issue. Am I just going to have to reinstall bitcoin core everytime my pc shuts down abruptly? Especially with a spinning drive, in my experience, a harsh shutdown / power cut, doesn't leave the system enough time to write everything to disk and corrupts your blockchain data.Bitcoin Core can't recover from that by itself and will give you an error log on the next startup. You will need to reindex the whole blockchain to fix this.Without Bitcoin Core starting properly, obviously there's no way for Sparrow to connect to it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mobber",
+      "created_time": "October 31, 2022, 07:00:23 AM",
+      "body": "Quote from: nc50lc on October 30, 2022, 07:11:02 AMQuote from: Mobber on October 30, 2022, 06:29:39 AMSo I had a very brief power outage today and now sparrow won't connect to the node again. So strange. My only guess is that because bitcoin core didn't shutdown properly it's causing some issue. Am I just going to have to reinstall bitcoin core everytime my pc shuts down abruptly? If the issue only a corrupted file brought by the abrupt shutdown and only in Bitcoin Core, then --reindex might solve the issue.It's a command-line option and not a command so; to use it, Bitcoin Core should be started with that parameter (instructions).Ran the reindex but sparrow still wouldn't connect. Also tried rescan also with no luck. I was able to get sparrow to connect again by deleting the sparrow wallet folder in Bitcoin core.C:\\Users\\username\\AppData\\Roaming\\Bitcoin/wallet/sparrowAfter deleting that and restarting Bitcoin core sparrow is connected again. I've also ordered an ups battery backup to run the node and router/modem off of so hopefully this problem is resolved now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 31, 2022, 10:39:25 AM",
+      "body": "Quote from: Mobber on October 31, 2022, 07:00:23 AMQuote from: nc50lc on October 30, 2022, 07:11:02 AM-snip-Ran the reindex but sparrow still wouldn't connect. Also tried rescan also with no luck. I was able to get sparrow to connect again by deleting the sparrow wallet folder in Bitcoin core.I tried to reproduce this by purposely corrupting the wallet.dat inside \"bitcoin/wallets/sparrow\" folder and it indeed failed to connect.Got this line in sparrow's log file:Code:...JSON-RPC error: RPC error response: RpcError { code: -4, message: \"Wallet file verification failed. \\\"M:\\\\Bitcoin\\\\wallets\\\\sparrow\\\\wallet.dat\\\" corrupt.Try using the wallet tool bitcoin-wallet to salvage or restoring a backup.\", data: None }So, it appears that sparrow is reliant to a mirrored watching-only wallet.dat file in Bitcoin Core.But that doesn't mean that your block index/chainstate wasn't corrupted by the abrupt shutdown as well (it's fixed by reindex).Anyway, since the core issue is the frequent power loss, then a UPS with big backup battery is indeed the best solution.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

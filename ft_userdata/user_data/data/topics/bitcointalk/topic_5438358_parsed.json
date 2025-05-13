@@ -1,0 +1,37 @@
+{
+  "id": "topic_5438358",
+  "title": "0x_doomday",
+  "author": "0x_doomday",
+  "created_time": "February 06, 2023, 01:00:15 PM",
+  "content": "How does lite clients (SVP) can know the most PoW chain in 2 conflicting fork with just knowing the headers of all block ?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5438358",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "February 06, 2023, 01:25:47 PMLast edit: February 06, 2023, 02:46:50 PM by DaveF",
+      "body": "Quote from: 0x_doomday on February 06, 2023, 01:00:15 PMHow does lite clients (SVP) can know the most PoW chain in 2 conflicting fork with just knowing the headers of all block ?They don't; they rely on the server they are talking to.The client itself knows it's addresses and a few other things but for everything else it's querying a server that gives it the info it needs / wants.That is point of a lite client, it needs very little itself to operate, all the heavy data storage work is done elsewhere.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "February 06, 2023, 05:57:17 PM",
+      "body": "The SPV client doesn't even know if there's a fork. The Bitcoin node won't share the height until there is a reorg in that case. For example, say we're at block 700,000. If two miners mine block 700,001 simultaneously, and create a disruption in the network, SPV servers will not share that particular block header, until the reorg occurs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "February 07, 2023, 05:04:45 AM",
+      "body": "Quote from: 0x_doomday on February 06, 2023, 01:00:15 PMHow does lite clients (SVP) can know the most PoW chain in 2 conflicting fork with just knowing the headers of all block ?There are two ways of looking at this. What SPV (short for Simplified Payment Verification) clients do and what they can do.There are different implementations of SPV protocol, some are very centralized and what we can all \"server dependent\". These usually work on phones. In this type they heavily depends on what the single centralized server tells them. So they don't really connect to the bitcoin network directly to know much about it and any possible forks.But there are other implementations that connect to multiple \"servers\" (that are full nodes with the chain indexed so that it can be searched) like Electrum which performs more verifications on headers they receive hence are capable detecting chain-splits, etc.Technically when a full node wants to sync with the network they connect to other random full nodes (multiple peers) and after a handshake they send a \"locator\" in a getheaders message to download their block headers. They receive a reply containing the headers the \"locator\" was missing ie. any new header that were mined recently.This is what a SPV client can do too.Then the full node performs a series of verification on these headers (version, time, PoW using target, verify target itself using difficulty adjustment, etc.) that way they make sure the headers are actually valid (put simply they are mined correctly).This is what a SPV client can do too.Finally they check each batch of headers with what they've stored locally so that they can know what headers (and blocks) they are missing, what they already have and if there is any kind of chain-split, stale block, orphan, etc.This is what a SPV client can do too.The only thing that the SPV client doesn't do is the full node's next step which is to download the block itself to verify the transactions and update the chainstate (ie. UTXO database). Which has nothing to do with chain-splits, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

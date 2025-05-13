@@ -1,0 +1,157 @@
+{
+  "id": "topic_5421165",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "November 15, 2022, 08:18:06 PMLast edit: November 15, 2022, 08:31:24 PM by citb0in",
+  "content": "Is there any tool or python snippet available out there that can split a defined range into equal n parts and outputs the results in hex (omitting the 0x prefix for hex values) but as well as decimal ? It should also work vice-versa, so it should allow inputs in hex or in decimals. When entering 0x it should treat the user input as hex value, in all other cases as decimal value.Example:1st argument = start of the range2nd argument = end of the range3rd argument = create n equal partsCode:./split_range.py 0x1000000 0x2000000 2QuoteUser Input RangeStart (Hex): 1000000End (Hex): 2000000Span (Hex): 1000000Start (Dec): 16777216End (Dec): 33554432Span (Dec): 167772162 Slices for that rangeSlice1:Start (Hex): 1000000End (Hex): 1800000Span (Hex): 800000Start (Dec): 16777216End (Dec): 25165824Span (Dec): 8388608Slice2:Start (Hex): 1800000End (Hex): 2000000Span (Hex): 800000Start (Dec): 25165824End (Dec): 33554432Span (Dec): 8388608",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5421165",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "November 15, 2022, 08:31:40 PM",
+      "body": "Since splitting a range into equal parts means that the first number in the next subrange is the last number of the previous subrange plus one, means you just need to divide (end-start) / n to get the size of subranges and add it over and over again to get the start of the next subrange.Example:Start = 0x1000 = 4096End = 0x2000 = 8192n = 2Calculate subrange size: (0x2000-0x1000)/2 = 2048.Meaning the first subrange goes from 4096+0*2048 to 4096+1*2048, and the second subrange goes from 4096+1*2048 to 4096+2*2048 = 0x2000.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 15, 2022, 08:31:40 PM",
+      "body": "That looks like something that can be easily written in a single Python file. Unfortunately I do not know of any existing implementations.in the wild. If you are knowledgeable in Python then you can make your own script without even knowledge of cryptography being required.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 15, 2022, 08:32:57 PM",
+      "body": "@n0nce: we cross-posted  I was still editing. See my posting again@NotATether: I'm sure, yes. Unfortunately I'm not good in Python (yet). I have written two small bash scripts that allow me to do dec<>hex conversions using linux command 'bc'. I wish I would be knowledgeable in Python, but it's still on my to-do-list  that's why I am asking if anyone is aware of such a small python snippet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 15, 2022, 08:43:11 PMLast edit: November 15, 2022, 08:56:20 PM by n0nce",
+      "body": "Code:start = 0x1000end = 0x2000n = 2size = (end-start)/nprint(list(map(lambda x: (hex(int(start+x*size)), hex(int(start+size*(x+1)))), range(n))))As script with hex and int parameters:Code:import systry: start = int(sys.argv[1])except:  try: start = int(sys.argv[1], 16)  except: exit(-1)try: end = int(sys.argv[2])except:  try: end = int(sys.argv[2], 16)  except: exit(-1)try: n = int(sys.argv[3])except:  try: n = int(sys.argv[3], 16)  except: exit(-1)size = (end-start)/nprint(list(map(lambda x: (hex(int(start+x*size)), hex(int(start+size*(x+1)))), range(n))))Code:$ python3 test.py 0x1000 0x2000 2[('0x1000', '0x1800'), ('0x1800', '0x2000')]$ python3 test.py 0x1000 0x2000 4[('0x1000', '0x1400'), ('0x1400', '0x1800'), ('0x1800', '0x1c00'), ('0x1c00', '0x2000')]$ python3 test.py 0x1000 0x2000 6[('0x1000', '0x12aa'), ('0x12aa', '0x1555'), ('0x1555', '0x1800'), ('0x1800', '0x1aaa'), ('0x1aaa', '0x1d55'), ('0x1d55', '0x2000')]$ python3 test.py 0x1000 0x2000 8[('0x1000', '0x1200'), ('0x1200', '0x1400'), ('0x1400', '0x1600'), ('0x1600', '0x1800'), ('0x1800', '0x1a00'), ('0x1a00', '0x1c00'), ('0x1c00', '0x1e00'), ('0x1e00', '0x2000')]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 15, 2022, 09:04:00 PM",
+      "body": "Thanks a bunch @n0nce !!! Will try it soon ... meanwhile I stumbled over this, maybe it is helpful, maybe not ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 16, 2022, 04:04:44 AM",
+      "body": "Based on SO posts it seems like you want to iterate over those numbers (key cracking?!) in which case you shouldn't create them like that, you should instead parallelize the process. It all takes one line in C# or two if you want to set the number of cores to use:Code:ParallelOptions op = new() { MaxDegreeOfParallelism = 2 };Parallel.For(start, end, op, Action);",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 16, 2022, 06:44:40 AM",
+      "body": "Thanks for the hint, which certainly has meaning and may seem useful for parallel processing. In my case, however, I only need this in a small Python snippet to quickly build some ranges and manually feed a spreadsheet with them. The snippet shown by n0nce helped me already, I just have to see how to rebuild it so that it still does INT and HEX output and also displays more info, but I have to learn Python first. The output formatting I would like to improve then, so that not everything is spit out in a line with commas but in a kind of matrix (with INC and DEC values accordingly).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "November 16, 2022, 07:55:22 AM",
+      "body": "sliser https://github.com/albertobsd/sscodes/issues/1",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 16, 2022, 08:36:31 AMLast edit: November 16, 2022, 09:12:45 AM by citb0in",
+      "body": "@COBRAScan you be more specific please? what do you mean by the link you posted?EDIT: Oh I understood now. You were referring to the range slicer written in C++ by AlbertoBSD. There it is. Will try it ... thanks for pointing outI slightly changed the output format of the python script that n0nce provided, so I get pairwise ranges per each line. I added two small functions for later use (converting dec<>hex).Code:#!/usr/bin/python3import systry: start = int(sys.argv[1])except:  try: start = int(sys.argv[1], 16)  except: exit(-1)try: end = int(sys.argv[2])except:  try: end = int(sys.argv[2], 16)  except: exit(-1)try: n = int(sys.argv[3])except:  try: n = int(sys.argv[3], 16)  except: exit(-1)size = (end-start)/n# output in hex#print(list(map(lambda x: (hex(int(start+x*size)), hex(int(start+size*(x+1)))), range(n))))# output in decimal#print(list(map(lambda x: (int(start+x*size), int(start+size*(x+1))), range(n))))for x in range(n):    print((hex(int(start+x*size)), hex(int(start+size*(x+1)))))def hex2int(hexdigits):    return int(hexdigits, 16)def int2hex(number):    return hex(number)When I compare the output of both snippets, they differ. I have no clue what the reason therefore is. See here ..Quote$ ./split_range.py 1 255 4('0x1', '0x40')('0x40', '0x80')('0x80', '0xbf')('0xbf', '0xff')Quote$ ./slicer 1 255 4Range start: 0x1Range end: 0xffnumber: 0x4slice value: 0x3f1:4040:7f7f:bebe:fdfd:13cWhen user input is 2 slices the result matches between both programs:Quote$ ./split_range.py 1000 2000 2('0x3e8', '0x5dc')('0x5dc', '0x7d0')Quote$ ./slicer 1000 2000 2Range start: 0x3e8Range end: 0x7d0number: 0x2slice value: 0x1f43e8:5dc5dc:7d0Some more examples ...Quote$ ./split_range.py 1000 2000 7('0x3e8', '0x476')('0x476', '0x505')('0x505', '0x594')('0x594', '0x623')('0x623', '0x6b2')('0x6b2', '0x741')('0x741', '0x7d0')Quote$ ./slicer 1000 2000 7Range start: 0x3e8Range end: 0x7d0number: 0x7slice value: 0x8e3e8:476476:504504:592592:620620:6ae6ae:73c73c:7ca7ca:858here the output matches...Quote$ ./split_range.py 1000 2000 8('0x3e8', '0x465')('0x465', '0x4e2')('0x4e2', '0x55f')('0x55f', '0x5dc')('0x5dc', '0x659')('0x659', '0x6d6')('0x6d6', '0x753')('0x753', '0x7d0')Quote$ ./slicer 1000 2000 8Range start: 0x3e8Range end: 0x7d0number: 0x8slice value: 0x7d3e8:465465:4e24e2:55f55f:5dc5dc:659659:6d66d6:753753:7d0I thought it might be the case when n is even or odd, but I find no relationship between odd/even numbers. See here, n=12 leads to different range pairsQuote$ ./split_range.py 1000 2000 12('0x3e8', '0x43b')('0x43b', '0x48e')('0x48e', '0x4e2')('0x4e2', '0x535')('0x535', '0x588')('0x588', '0x5dc')('0x5dc', '0x62f')('0x62f', '0x682')('0x682', '0x6d6')('0x6d6', '0x729')('0x729', '0x77c')('0x77c', '0x7d0')Quote$ ./slicer 1000 2000 12Range start: 0x3e8Range end: 0x7d0number: 0xcslice value: 0x533e8:43b43b:48e48e:4e14e1:534534:587587:5da5da:62d62d:680680:6d36d3:726726:779779:7cc7cc:81fIt seems that alberto's slicer tool sometimes creates one more additional range than user input was. Only the first range pair matches always between both programs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 16, 2022, 02:27:40 PM",
+      "body": "Quote from: pooya87 on November 16, 2022, 04:04:44 AMBased on SO posts it seems like you want to iterate over those numbers (key cracking?!) in which case you shouldn't create them like that, you should instead parallelize the process. It all takes one line in C# or two if you want to set the number of cores to use:Code:ParallelOptions op = new() { MaxDegreeOfParallelism = 2 };Parallel.For(start, end, op, Action);Parallelism is not needed for that particular operation because the action of splitting ranges is usually only done after some other range full of private keys has already been exhausted, so it will not be running frequently.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CoinMagus",
+      "created_time": "November 17, 2022, 01:22:05 PM",
+      "body": "If I understand correctly you are trying to do this:https://github.com/geokomplo/PubHunter/blob/4157d8e46902ebed3562a4ab3560e85eb69129b2/address.py#L44",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "November 25, 2022, 07:32:02 AM",
+      "body": "Quote from: citb0in on November 16, 2022, 08:36:31 AMWhen I compare the output of both snippets, they differ. I have no clue what the reason therefore is. See here ..The differences in output you're finding between the programs you're comparing is (mostly) due to how the slice length is being calculated.One is doing this (in Python):Code:size = (end-start)/nAnd the other is doing this (in C/C++):Code:mpz_fdiv_q(slice_value,diff,number_of_ranges);The first way is using floating point division and the second way is using integer floor division (via GMP), so most combinations of input range arguments will lead to outputs that disagree.You can tweak n0nce's script to do floor division by changing the / into a // (and maybe remove the two int() calls further on, which will then be unnecessary). This will also have the effect of letting it work with much bigger ranges (right now you'll run into problems if you try it with ranges that strain the limited precision of Python's float type; for example, if you run it with these arguments: 0 0x22222222222222222 2, it will produce \"truncated\" slices). However, by making this change you'll also ruin a nice property that this script has (automatically sizing the slices so that they always cover the entire input range); try running it with these arguments: 1 10 5, both before and after making the change and you'll see what I mean.I'm curious about the way the slices overlap in the examples you've shared — are you sure that's what you want? Wouldn't you prefer non-overlapping slices? By that, I mean, shouldn't each slice begin \"ahead of\" (instead of \"on\") the previous slice's end value? For example, if I had to divide the (inclusive) range {1..10} into 5 parts, I think it makes more sense to go: {1..2} {3..4} {5..6} {7..8} {9..10}.In cases where the input range doesn't evenly divide, there's also the issue of what to do with the \"remainder\". This issue solves itself when using floating point (by automatically distributing it over the slices), but when doing integer divides, you have to decide yourself what to do with the remainder (e.g. ignore it, put it in the last slice, overshoot the input range like that C/C++ program sometimes does, etc.)I also think it makes more sense to calculate the length of a slice like this:Code:size = ((end-start)+1)//nBut that interacts with other design choices and I don't want to overwhelm you with too many considerations. I've given you some stuff to think about, but if you get stuck or would like a more verbose script to look at, let me know and I'll put something together for you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 25, 2022, 01:02:23 PM",
+      "body": "Quote from: citb0in on November 16, 2022, 08:36:31 AMIt seems that alberto's slicer tool sometimes creates one more additional range than user input was. Only the first range pair matches always between both programs.The parameters need to have the prefix 0x for hexadecimal numbers.the ranges need to be divisible by the given number, if not it will create an extra range with some values outside of the given range.And yes I spotted some bug in the ranges, I will solve it",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 02, 2022, 08:18:23 PM",
+      "body": "Hi PowerGlove. Sorry for late reply.Quote from: PowerGlove on November 25, 2022, 07:32:02 AMThe first way is using floating point division and the second way is using integer floor division (via GMP), so most combinations of input range arguments will lead to outputs that disagree.Thanks for pointing that out.Quote from: PowerGlove on November 25, 2022, 07:32:02 AMYou can tweak n0nce's script to do floor division by changing the / into a // (and maybe remove the two int() calls further on, which will then be unnecessary). This will also have the effect of letting it work with much bigger ranges (right now you'll run into problems if you try it with ranges that strain the limited precision of Python's float type; for example, if you run it with these arguments: 0 0x22222222222222222 2, it will produce \"truncated\" slices). However, by making this change you'll also ruin a nice property that this script has (automatically sizing the slices so that they always cover the entire input range); try running it with these arguments: 1 10 5, both before and after making the change and you'll see what I mean.I did so and I understand what you mean, you're right. Also, as far as the big numbers are concerned, it behaves as you said. So I really need to get away from the normal float division and focus on floor division. For this I had studied various help pages on Python floor division. There are several libraries, especially in 'math' that allow to round up or down (e.g. math.ceil, math.floor) or round() and some more. However, I always prefer clean code so that you don't always have to rely on other libraries. So if there is an elegant way without additional libraries, I would prefer it. I stumbled over and noticed the speciality of how floor division behaves with negative numbers and I thought I could possibly take advantage of this to round up (eg (10-1)/5 to get \"2\" as solution. My initial approach was this one:Code:size = floor((end-start)*-1//n)*-1But unfortunately I was completely wrong, it doesn't work like that. So I searched further and found various solutions that can effectively and simply determine ranges. My desired goal is that all ranges should have as identical sizes as possible. . The last range can be of any size and should serve as a residual container in which the rest can be placed.Quote from: PowerGlove on November 25, 2022, 07:32:02 AMI'm curious about the way the slices overlap in the examples you've shared — are you sure that's what you want? Wouldn't you prefer non-overlapping slices? By that, I mean, shouldn't each slice begin \"ahead of\" (instead of \"on\") the previous slice's end value? For example, if I had to divide the (inclusive) range {1..10} into 5 parts, I think it makes more sense to go: {1..2} {3..4} {5..6} {7..8} {9..10}.You're basically right, of course. However, I would still prefer this range size for visual reasons, because it is simply clearer and easier to understand for the human eye. With decimal numbers this doesn't seem to be such a big problem, but with hex representation you may not always recognize at first glance whether the range runs without gaps.Example:Quote55519 - 6551965520 - 75520Here in decimal form you can easily separate and see that there are no gaps. With the hex notation however ...D8DF - FFEFFFF0 - 12700not everyone recognizes at first sight that FFEF <--> FFF0 is also gapless. And it is not unusual that one notes such range lists somewhere (e.g. Spreadsheet) and therefore I prefer the variantQuote55519 - 6551965519 - 7551975519 - 85519D8DF - FFEFFFEF - 126FF126FF - 14E0FHowever, in my following revised Python program, I have included the ability to use the range handling you suggest. I commented it out in the program (line 27) and if desired this can be easily activated.Quote from: PowerGlove on November 25, 2022, 07:32:02 AMIn cases where the input range doesn't evenly divide, there's also the issue of what to do with the \"remainder\". This issue solves itself when using floating point (by automatically distributing it over the slices), but when doing integer divides, you have to decide yourself what to do with the remainder (e.g. ignore it, put it in the last slice, overshoot the input range like that C/C++ program sometimes does, etc.) I also think it makes more sense to calculate the length of a slice like this: Code:size = ((end-start)+1)//nBut that interacts with other design choices and I don't want to overwhelm you with too many considerations. I've given you some stuff to think about, but if you get stuck or would like a more verbose script to look at, let me know and I'll put something together for you.I have tried a few things and ended up with a solution that evenly distributes the values across the ranges. I also changed the parameter query, the suggestion of n0nce was great but I like it a bit cleaner in the code to get rid of the repeating try: except: lines. Pythons' argument parser fitted perfectly. I have therefore modified the program as far as possible and created a first version. My current program allows two ways of execution. The range is mandatory and must always be entered as a parameter so that the program has something to do. By default, the program will use the \"n slices\" mode, where n is the number of slices desired. If no input is made for 'n', the default value 2 is used.However, there are also cases where the user wants a certain size of the slices to be generated and doesn't care about the total number of slices to be generated. I integrated this \"chunks\" mode that can be used with the command line switch -c (for chunks).Examples:Range 20 - 90 will be sliced into 15 equal partsCode:./range_slicer.py -r 20 90 -n 15Range 20 - 95 will be sliced into chunks with size 10 Code:./range_slicer.py -r 20 95 -c -n 10The current program version is not yet compatible with hex but only with decimal input. I will soon rebuild this so that interoperability is also ensured and so that the user can enter either decimal or hex and can even mix among themselves. I repeat and emphasize that I am an absolute Python beginner and want to make my first learning steps and gain experience. I also tried to create an account on github so that I can upload and manage code there in the future. Please bear with me if I have made mistakes and bad programming syntax, correct me accordingly so that I can learn and get better. Of course I am open for suggestions and corrections and constructive criticism is very welcome.==> range_slicer by citb0in @github <==",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "December 03, 2022, 01:54:52 AM",
+      "body": "@citb0in: Nice job. It's (very) impressive how quickly you're learning Python!I like the solution you came up with, using the argparse module is sensible, and using the divmod function is a smart choice, too. I think it's clear that you're past the point of needing help (at least with this project). I'm sure that there are a few combinations of command-line arguments that will produce unexpected results (there always are), but I think you're capable of finding/fixing them all on your own (maybe a few assert statements, or similar, after parsing the arguments would help; making sure that some invariants hold, like: start >= 0, end > start, number > 0, number <= (end-start)+1, etc.)Quote from: citb0in on December 02, 2022, 08:18:23 PMPlease bear with me if I have made mistakes and bad programming syntax, correct me accordingly so that I can learn and get better. Of course I am open for suggestions and corrections and constructive criticism is very welcome.You're doing great. For a conscientious and self-reliant type like you, my only suggestions are to keep doing what you're doing and to be selective about the feedback that you internalize. Programmers are a dogmatic bunch and like to over-critique each other's code — only the really experienced ones seem to be able to restrict themselves to truly meaningful feedback. If someone has a whole bunch of stuff to say about your code then remember to pick and choose what's useful to you and ignore the rest; there's some kind of Dunning-Kruger effect where the least experienced programmers tend to be the ones who are brimming with the most advice.If you ever get stuck on a programming-related problem and don't feel like posting about it, feel free to PM me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 03, 2022, 08:17:44 AMLast edit: December 03, 2022, 09:52:05 AM by citb0in",
+      "body": "@PowerGloveThanks a bunch! Really appreciate your feedback, as well as your offered assistance here and also for future questions. That's not a given and so I appreciate it very much. Thank you for your motivating words, which are very helpful.Yes, absolutely right. I still need to validate the input to avoid weird effects and error messages. EDIT: Done! Thanks for pointing to Python's assertion [1] [2] which was helpful. I am not sure if I did according to best-practice, especially following paragraph in [1] has made me a bit puzzled:QuoteAssertions should *not* be used to test for failure cases that can occur because of bad user input or operating system/environment failures, such as a file not being found. Instead, you should raise an exception, or print an error message, or whatever is appropriate. One important reason why assertions should only be used for self-tests of the program is that assertions can be disabled at compile time.but it seems to work  As I said, I'm still in my infancy and there is still a lot to learn.[1] https://pythongeeks.org/assertion-in-python/[2] https://wiki.python.org/moin/UsingAssertionsEffectively",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "December 03, 2022, 03:15:20 PM",
+      "body": "Quote from: citb0in on December 03, 2022, 08:17:44 AMEDIT: Done! Thanks for pointing to Python's assertion [1] [2] which was helpful. I am not sure if I did according to best-practice, especially following paragraph in [1] has made me a bit puzzled:QuoteAssertions should *not* be used to test for failure cases that can occur because of bad user input or operating system/environment failures, such as a file not being found. Instead, you should raise an exception, or print an error message, or whatever is appropriate. One important reason why assertions should only be used for self-tests of the program is that assertions can be disabled at compile time.Yup, that's the kind of dogma that I was referring to previously. Programmers love saying: \"Don't *ever* do this/that\" but often what they're talking about amounts to an inconsequential issue (in practice).If you run your script like this:Code:python3 -O range_slicer.pyThen the assert statements won't make it into the compiled bytecode. So, to make sure that your input validation remains intact, regardless of how your script is invoked, you should replace the assert statements with something more resilient (like if statements that lead to an error message, or maybe your own fail_if function that raises an exception when it's passed something that evaluates to True, etc.)I often don't bother to do this with my own scripts, but lots of people seem to think it's mightily important, so if you agree with their thinking or you don't want to be nagged about it in the future then you should probably do it.Don't ignore \"best practice\", but also remember to cultivate a healthy disregard for it, too; it can easily become a crutch that prevents you from thinking deeply and developing your own style.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 03, 2022, 03:30:19 PM",
+      "body": "That was my thought about it, too. A normal user would not use the switch -O or -OO or the PYTHONOPTIMIZE environment variable and if he does, then he knows the consequences and hopefully knows exactly what he is doing.Thanks for your feedback.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

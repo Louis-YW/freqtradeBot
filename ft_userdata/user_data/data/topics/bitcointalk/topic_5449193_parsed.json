@@ -1,0 +1,101 @@
+{
+  "id": "topic_5449193",
+  "title": "BoyFromDubai",
+  "author": "BoyFromDubai",
+  "created_time": "April 17, 2023, 05:47:22 PM",
+  "content": "I know, that LevelDB stores information about all UTXOs. The pairs in there are key + value, where keys is txid + number of vout. But if one man has some UTXOs and has lost his password, then these UTXOs will be in the DB forever? If i have created a new tx with the same txid that this man had, then my transaction won't be added to the blockchain ever?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5449193",
+  "comments": [
+    {
+      "author": "un_rank",
+      "created_time": "April 17, 2023, 06:09:31 PM",
+      "body": "LevelDB is a key value store used for blockchain information, there are others which are used by nodes.Quote from: BoyFromDubai on April 17, 2023, 05:47:22 PMBut if one man has some UTXOs and has lost his password, then these UTXOs will be in the DB forever? If i have created a new tx with the same txid that this man had, then my transaction won't be added to the blockchain ever? If a pair of outputs are never spent, due to lost password or some other reason, they would remain on the data base (whichever is used by the different nodes) as they are valid UTXOs, but would remain unspent. You cannot just create another tx with a UTXO that you do not own i.e, have the private keys to the address. The nodes would verify and reject the transaction. This action is uncorrelated to LevelDB or any other blockchain data base.- Jay -",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoyFromDubai",
+      "created_time": "April 17, 2023, 06:38:48 PM",
+      "body": "I understand this, but I'm talking about absolutely different transaction with the same txid because it's possible due to collisions cause it's not possible that every transaction will have the absolutely unique txid. I mean, that I have created a new tx with spending my own UTXO and the tx got the txid of a tx that is owned by a man who has lost his password, but one his UTXO if from the tx with the same txid.So, my transaction will not be ever added to the blockchain?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zaguru12",
+      "created_time": "April 17, 2023, 07:49:41 PM",
+      "body": "Quote from: BoyFromDubai on April 17, 2023, 06:38:48 PMI understand this, but I'm talking about absolutely different transaction with the same txid because it's possible due to collisions cause it's not possible that every transaction will have the absolutely unique txid. Right now it is not possible to have two different transactions with same transaction ID although this collision had actually happen to the Coinbase Transaction (first transaction) but currently BIP 30 prevents a block from a transaction ID of an already existing transaction. Before this improvement it could have been possible to have same ID and it’s effect is having your transaction unspendable.You can read it up here  https://github.com/bitcoin/bips/blob/master/bip-0030.mediawiki",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "April 18, 2023, 04:56:21 AMLast edit: April 20, 2023, 04:25:58 AM by pooya87",
+      "body": "Quote from: Zaguru12 on April 17, 2023, 07:49:41 PMthis collision had actually happen to the Coinbase TransactionThat is not collision, that was creating the same exact coinbase transaction ergo having the same exact hash. That was easy to happen too in the past since block fees weren't full in 2012 and fees were sometimes zero so the amount field of the output were the same, if the miner were the same too and reused address the whole tx would have been the same.BIP34 mandated blocks to include the height (which is different for each block) in the coinbase script which means even if the coinbase of 2 blocks are exactly the same in everything else, they will be different in at least one place ergo have guaranteed different hashes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoyFromDubai",
+      "created_time": "April 18, 2023, 08:43:19 AM",
+      "body": "But what happens to the transaction if the same txid already exists? Cause it can’t be 100% impossible of creating transaction with the unique txid, can it? This transaction will be be waiting in the mempool for the moment when existing txid will be deleted from the LevelDB?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "April 18, 2023, 09:55:40 AMLast edit: April 18, 2023, 10:06:12 AM by odolvlobo",
+      "body": "Quote from: BoyFromDubai on April 18, 2023, 08:43:19 AMBut what happens to the transaction if the same txid already exists? Cause it can’t be 100% impossible of creating transaction with the unique txid, can it? This transaction will be be waiting in the mempool for the moment when existing txid will be deleted from the LevelDB?It is possible that there could be a txid collision (and in fact they have occurred in the past due to a specific oversight in the protocol), but normally they are extremely unlikely because like private keys, they are effectively 256-bit random numbers. However, collisions are avoided by rejecting new txids duplicating txids of any transactions with unspent outputs (see BIP-30).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoyFromDubai",
+      "created_time": "April 18, 2023, 10:18:40 AM",
+      "body": "Quote from: odolvlobo on April 18, 2023, 09:55:40 AMIt is possible that there could be a txid collision (and in fact they have occurred in the past due to a specific oversight in the protocol), but normally they are extremely unlikely because like private keys, they are effectively 256-bit random numbers. However, collisions are avoided by rejecting new txids duplicating txids of any transactions with unspent outputs (see BIP-30). Are these transactions actually rejected and deleted from mempool or these transactions are skipped and still waiting for the moment when the previous transaction with the same txid will be deleted from LevelDB?I'm actually asking this question cause I've seen somewhere that when the UTXO is spent, it would be deleted from DB, am I right about it?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "April 18, 2023, 10:48:59 AM",
+      "body": "Quote from: BoyFromDubai on April 18, 2023, 10:18:40 AMQuote from: odolvlobo on April 18, 2023, 09:55:40 AMIt is possible that there could be a txid collision (and in fact they have occurred in the past due to a specific oversight in the protocol), but normally they are extremely unlikely because like private keys, they are effectively 256-bit random numbers. However, collisions are avoided by rejecting new txids duplicating txids of any transactions with unspent outputs (see BIP-30). Are these transactions actually rejected and deleted from mempool or these transactions are skipped and still waiting for the moment when the previous transaction with the same txid will be deleted from LevelDB?I'm actually asking this question cause I've seen somewhere that when the UTXO is spent, it would be deleted from DB, am I right about it?If a transaction's output is spent, then it is no longer a UTXO and so it must be removed from the UTXO set.I don't know the details about the various node implementations, but I would guess that, in general, transactions with duplicated txids would be rejected and not stored in the mempool and not forwarded to other nodes. There is no rule against keeping transactions with duplicated txids around for possible use later, but I don't know why any implementation would do that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoyFromDubai",
+      "created_time": "April 18, 2023, 11:04:07 AM",
+      "body": "Thank you a lot! You've really helped me",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "April 18, 2023, 12:53:50 PM",
+      "body": "Quote from: odolvlobo on April 18, 2023, 10:48:59 AMI don't know the details about the various node implementations, but I would guess that, in general, transactions with duplicated txids would be rejected and not stored in the mempool and not forwarded to other nodes. There is no rule against keeping transactions with duplicated txids around for possible use later, but I don't know why any implementation would do that.I don't think nodes check or update the UTXO set for transactions in their mempool which means the transaction with a duplicate txid should not be rejected from the mempool. They update the UTXO set after they receive the mined block and after verification by which time the tx and the block containing it would be rejected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "April 19, 2023, 11:44:55 AMLast edit: April 19, 2023, 12:10:38 PM by hosseinimr93",
+      "body": "Quote from: Zaguru12 on April 17, 2023, 07:49:41 PMRight now it is not possible to have two different transactions with same transaction ID although this collision had actually happen to the Coinbase Transaction (first transaction) but currently BIP 30 prevents a block from a transaction ID of an already existing transaction. In theory, it's still possible that two transactions have the same ID.According to BIP30, a block can't include a transaction with the same ID as a not-fully-spent transaction. Quote from: bips/bip-0030.mediawikiBlocks are not allowed to contain a transaction whose identifier matches that of an earlier, not-fully-spent transaction in the same chain.Therefore, in the case all the outputs of a transaction have been spent, it's possible that in the future we will have a transaction with the same ID as that transaction. Of course, it's very unlikely that two transactions have the same transaction ID, especially after implementing BIP34.Quote from: pooya87 on April 18, 2023, 04:56:21 AMBIP30 mandated blocks to include the height (which is different for each block) in the coinbase script which means even if the coinbase of 2 blocks are exactly the same in everything else, they will be different in at least one place ergo have guaranteed different hashes.That's BIP34, not BIP30.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

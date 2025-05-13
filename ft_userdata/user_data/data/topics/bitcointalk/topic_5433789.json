@@ -1,0 +1,53 @@
+{
+  "id": "topic_5433789",
+  "title": "Brook Buddy",
+  "author": "Brook Buddy",
+  "created_time": "January 10, 2023, 02:03:59 PM",
+  "content": "Hi, dear Bitcoiners! Please help me.     I want to create TX in coinb.in and to sign it in Electrum command line. My Electrum is Mac 4.3.2 version.    1) I created new TX in Coinb.in service. Details: sending address - bc1qstkm3r7r2jmu74zykmz37pz3zse3qw3vhvrvj2, recipient address - bc1qxqmrj93x8u6pqp9dsqytk5w4lnxwjxj826v3fh, amount - 0.00028 BTC, fee - 0.000008 BTC. Both of these addresses are in my Electrum wallet, I have private keys from them.     2) Coinb.in returned this message \" The transaction below has been generated and encoded. It can be broadcasted once it has been signed. \" And hex data: 01000000011f285eb767c9d60fca4235b6b4b8bc2b39b565b46f92fa873731223c50fcb7ef00000 0001f1482edb88fc354b7cf5444b6c51f04511433103a2c00088070000000000000fdffffff0160 6d00000000000016001430363916263f341004ad8008bb51d5fccce91a4700000000     3) So next my step is signing in command line. Which command should I use - \"signtransaction\" or  \"signtransaction_with_privkey\" ?? And how to use the command correctly ? I mean that I have to put as argument something else besides hex data from p.2, because Electrum shows errors.     Thank you a lot for your time!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5433789",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "January 11, 2023, 07:26:39 AM",
+      "body": "It should be converted to PSBT first before you can sign it in Electrum.One way to convert it is to use Bitcoin Core and use the command converttopsbt \"RAW_TXN\"The output should be compatible with Electrum, either sign command should work, but the latter needs to specify a prvKey.You can use newly installed Bitcoin Core, offline; it doesn't need the blockchain to use that command.Another workaround is to utilize Electrum's rbf (instructions below need GUI).\"Workaround\" since it's not a proper way and involves replacing the transaction to force Electrum to rebuild it,here's how:Import your Coinb.in transaction to Electrum using \"Tools->Load transaction->From...\"Since it's not PSBT, Electrum will think that it's final and sign wont be available, for that, click \"Save\" instead.Go to the history tab and it should be listed there as a local transaction, right-click on it and select \"Increase fee\".Set a fee slightly higher than what you've set in coinb.in (at least additional 1sat/vB), click \"OK\".Now, in the transaction preview, you should be able to click \"Sign\" then after that \"Broadcast\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Brook Buddy",
+      "created_time": "January 13, 2023, 12:20:05 PM",
+      "body": "Okay! The second way ( I thought the easiest) doesnt work. When I try to increase the fee and sign TX a little window with \"!\" just comes and thats all... TX can not be signed. I ll try the 1 st way.Can you tell me please, is anywhere full guide for electrum command line using with description of all commands ( like in case with Bitcoin Core) ? Because electrum.org website has a pretty poor description...Also another one question - can electrum be operated with Bitcoin Core's commands?Thank you!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "January 13, 2023, 08:53:46 PM",
+      "body": "Quote from: Brook Buddy on January 13, 2023, 12:20:05 PMCan you tell me please, is anywhere full guide for electrum command line using with description of all commands ( like in case with Bitcoin Core) ? Because electrum.org website has a pretty poor description...Yes, the list of commands can be obtained by referencing Electrum's --help command.  For example:From the command line:Code:electrum --offline --helpOr, from the GUI console:Code:help()Here's the list of commands:Code:[    \"add_peer\",    \"add_request\",    \"addtransaction\",    \"broadcast\",    \"bumpfee\",    \"changegaplimit\",    \"clear_invoices\",    \"clear_ln_blacklist\",    \"clear_requests\",    \"close_channel\",    \"close_wallet\",    \"commands\",    \"convert_xkey\",    \"create\",    \"createmultisig\",    \"createnewaddress\",    \"decode_invoice\",    \"decrypt\",    \"delete_request\",    \"deserialize\",    \"dumpgraph\",    \"dumpprivkeys\",    \"enable_htlc_settle\",    \"encrypt\",    \"export_channel_backup\",    \"freeze\",    \"freeze_utxo\",    \"get\",    \"get_channel_ctx\",    \"get_ssl_domain\",    \"get_tx_status\",    \"get_watchtower_ctn\",    \"getaddressbalance\",    \"getaddresshistory\",    \"getaddressunspent\",    \"getalias\",    \"getbalance\",    \"getconfig\",    \"getfeerate\",    \"getinfo\",    \"getmasterprivate\",    \"getmerkle\",    \"getminacceptablegap\",    \"getmpk\",    \"getprivatekeyforpath\",    \"getprivatekeys\",    \"getpubkeys\",    \"getrequest\",    \"getseed\",    \"getservers\",    \"gettransaction\",    \"getunusedaddress\",    \"help\",    \"import_channel_backup\",    \"importprivkey\",    \"inject_fees\",    \"is_synchronized\",    \"ismine\",    \"lightning_history\",    \"list_channels\",    \"list_invoices\",    \"list_peers\",    \"list_requests\",    \"list_wallets\",    \"listaddresses\",    \"listcontacts\",    \"listunspent\",    \"lnpay\",    \"load_wallet\",    \"make_seed\",    \"nodeid\",    \"normal_swap\",    \"notify\",    \"onchain_history\",    \"open_channel\",    \"password\",    \"payto\",    \"paytomany\",    \"rebalance_channels\",    \"removelocaltx\",    \"request_force_close\",    \"reset_liquidity_hints\",    \"restore\",    \"reverse_swap\",    \"searchcontacts\",    \"serialize\",    \"setconfig\",    \"setlabel\",    \"signmessage\",    \"signrequest\",    \"signtransaction\",    \"signtransaction_with_privkey\",    \"stop\",    \"sweep\",    \"unfreeze\",    \"unfreeze_utxo\",    \"validateaddress\",    \"verifymessage\",    \"version\",    \"version_info\"]Quote from: Brook Buddy on January 13, 2023, 12:20:05 PMAlso another one question - can electrum be operated with Bitcoin Core's commands?Yes and no, but not exactly.  Some commands will work for both Bitcoin Core and Electrum, but that's merely coincidence.  For example getinfo is a command recognized by both programs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "January 14, 2023, 05:28:30 AM",
+      "body": "Quote from: Brook Buddy on January 13, 2023, 12:20:05 PMCan you tell me please, is anywhere full guide for electrum command line using with description of all commands ( like in case with Bitcoin Core) ? Because electrum.org website has a pretty poor description...You mean same as bitcoin-cli help command or bitcoincore.org/en/doc/24.0.0/rpc/blockchain/getblockchaininfo/?AFAIK, there's none, only the list of commands and the short info about the command.But some commands have \"longer\" descriptions if you used them improperly, or read those docstrings from here: github.com/spesmilo/electrum/blob/master/electrum/commands.pyThis site has description of some commands but not all are covered and some examples aren't useful: bitzuma.com/posts/an-introduction-to-the-electrum-python-console/Quote from: Brook Buddy on January 13, 2023, 12:20:05 PMAlso another one question - can electrum be operated with Bitcoin Core's commands?No, Bitcoin Core's commands wont work in Electrum. Some are similar though.For the second option, I've tested it before posting that reply.Did \"!\" appear just for a split second? If so, your set transaction fee isn't enough to be a valid replacement.It should be at least 1sat/vB higher than what is set in coinb.in; manually compute from the size and total fee to see its original \"fee rate\", then increase it by at least 1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Brook Buddy",
+      "created_time": "January 25, 2023, 06:50:28 AM",
+      "body": "Okay, guys! Thanks to everybody. The issue was solved.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

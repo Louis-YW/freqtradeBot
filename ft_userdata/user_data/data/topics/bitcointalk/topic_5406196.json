@@ -1,0 +1,149 @@
+{
+  "id": "topic_5406196",
+  "title": "BrutalBear",
+  "author": "BrutalBear",
+  "created_time": "July 14, 2022, 01:38:11 AM",
+  "content": "I am learning lightning network and I encountered an issue.Purpose: We need to prove someone owns a certain amount of BTCs.When the BTCs are in Bitcoin's original network (layer 1). If a person claims he owns 1BTC, we can simply have the person digitally sign a message for the related addresses (to prove ownership) and then we can check through a bitcoin node (using an indexer) to find the BTC balance as of a specific block height. The problem is that with the proliferation of the lightning network (or other off-chain state channels), we now are unable to simply “go to the blockchain” to find the balances at a specific block height. Given this person could have his lightning channels available stored on his own node, and this person is not objective (and could be lying). Is there a way to compile lightning channel balances from an objective source? What would be the best way to prove this person owns the BTCs while these BTCs are being used in the lightning network?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5406196",
+  "comments": [
+    {
+      "author": "bitmover",
+      "created_time": "July 14, 2022, 01:58:07 AM",
+      "body": "Quote from: BrutalBear on July 14, 2022, 01:38:11 AMThe problem is that with the proliferation of the lightning network (or other off-chain state channels), we now are unable to simply “go to the blockchain” to find the balances at a specific block height. This is not true. Anyone can just close the channel and make an on-chain transaction to get his balance on-chain in the next block.Then he can just sign a message.IMO, this is the best way.QuoteGiven this person could have his lightning channels available stored on his own node, and this person is not objective (and could be lying). Is there a way to compile lightning channel balances from an objective source? What would be the best way to prove this person owns the BTCs while these BTCs are being used in the lightning network?Good question.I never tried to do this, but looks like there is a way to sign a message from your node private key using eclair:https://acinq.github.io/eclair/#signmessage",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BrutalBear",
+      "created_time": "July 14, 2022, 02:26:09 AM",
+      "body": "QuoteI never tried to do this, but looks like there is a way to sign a message from your node private key using eclair:https://acinq.github.io/eclair/#signmessageThank you! Let me dive into this! I appreciate it!QuoteThis is not true. Anyone can just close the channel and make an on-chain transaction to get his balance on-chain in the next block.Then he can just sign a message.IMO, this is the best way.Right, if the channel is closed, the final balances between the two parties will be published on the Bitcoin Blockchain. This is indeed the best way. However, I am trying to proof balances when the channel is open.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "July 14, 2022, 03:03:39 AM",
+      "body": "Quote from: BrutalBear on July 14, 2022, 02:26:09 AMHowever, I am trying to proof balances when the channel is open. This isn't publicly available (unless one of the participating nodes makes it - like by publishing it on a website).All a signed message proves is that you control an address with a certain amount of bitcoin on it. You'd either have to close the channel, sign an old address that funded the channel or sign the new one that is used in part of the channel.For standard wallets, you might also be able to test inbound capacity but it's not possible to know if someone's using a \"standard\" wallet.Also, you could just get them to send a payment to prove ownership (even with a code in the amount of coins they send).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BrutalBear",
+      "created_time": "July 14, 2022, 03:15:08 AM",
+      "body": "QuoteAlso, you could just get them to send a payment to prove ownership (even with a code in the amount of coins they send).Hi Jackg, could you please elaborate on this?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Oshosondy",
+      "created_time": "July 14, 2022, 08:04:24 AMLast edit: July 14, 2022, 08:14:50 AM by Oshosondy",
+      "body": "I do not know much about how to sign a message using lightnings network, but if you are having your own node, you should be able to sign a message. I have not done this before, but let us find out if it is helpful for you. https://lightningnetwork.plus/sign_messagesAs for me, I will still prefer to just use my bitcoin address to sign a message. You can use light client like electrum. You can just close the channel and sign the message with your bitcoin address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 14, 2022, 01:10:53 PM",
+      "body": "There's no objective way for an outsider to prove the balance of a Lightning channel. That is only known by the two parties who own the latest not-yet-revoked commitment. Parties may choose to reveal it, but they can't prove it's the latest.Relevant thread: https://bitcointalk.org/index.php?topic=5382451Quote from: bitmover on July 14, 2022, 01:58:07 AMhttps://acinq.github.io/eclair/#signmessageQuote from: Oshosondy on July 14, 2022, 08:04:24 AMhttps://lightningnetwork.plus/sign_messagesThese only prove ownership of Lightning node. Quote from: jackg on July 14, 2022, 03:03:39 AMThis isn't publicly available (unless one of the participating nodes makes it - like by publishing it on a website).They don't publish a proof, though. You have to take their word that what they say is true.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BrutalBear",
+      "created_time": "July 14, 2022, 03:55:06 PM",
+      "body": "I am thinking I can request the owner of the lightning node to first sign a message via node's secret key to proof ownership of the node. Then, I can request the node owner to provide all the \"commitment transactions\" so far and since these transactions use HTLC, these transactions are pretty much \"linked\" via secrets and hashes. Hence, when we need to proof ownership/balances in a channel at a specific time, I can request the node owner to create a new \"commitment transaction\" and use the previous \"commitment transactions\" to proof it is not just a random or a fake \"commitment transaction\".Do you guys think this is feasible?-----------------------------------------------------------------------------------------------------------------------I just found a channel tool (https://github.com/guggero/chantools). This might be helpful.This tool provides helper functions that can be used to rescue funds locked in lnd channels in case lnd itself cannot run properly anymore. It has a command called dumpchannels (dump all channel information from an lnd channel database).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Rath_",
+      "created_time": "July 14, 2022, 05:29:11 PM",
+      "body": "Quote from: BrutalBear on July 14, 2022, 03:55:06 PMDo you guys think this is feasible?No, that would be too dangerous.You could broadcast someone's revoked commitment transaction which would allow their channel partner to publish a penalty transaction and claim all of the funds locked up in the channel.The Lightning Network was designed to be more private than the first layer - I don't think there is a reasonable way to prove one's Lightning balance as it is contrary to the LN's principles.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BrutalBear",
+      "created_time": "July 14, 2022, 06:07:19 PM",
+      "body": "@RathQuoteNo, that would be too dangerous.You could broadcast someone's revoked commitment transaction which would allow their channel partner to publish a penalty transaction and claim all of the funds locked up in the channel.If all the \"commitment transactions\" information provided by the lightning node owner was open to public. Yes, someone who is malicious would be able to do the replay attack and the channel partner would publish a penalty transaction. What if the \"commitment transactions\" information was sent to me only (assuming I am honest and trustworthy). Do you think this is the best way to proof ownership of funds in a lightning channel?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 14, 2022, 06:18:07 PM",
+      "body": "Quote from: BrutalBear on July 14, 2022, 06:07:19 PMDo you think this is the best way to proof ownership of funds in a lightning channel?No. Suppose we have 3 commitment transactions. (Amounts represent sending capacities)Code:Commitment #0: (Channel opening transaction, revoked)Alice: 0.10000000 BTC, Bob: 0.00000000 BTC--------------------------------------------------------------------Commitment #1: (Revoked)Alice: 0.50000000 BTC, Bob: 0.50000000 BTC--------------------------------------------------------------------Commitment #2: (Revoked)Alice: 0.20000000 BTC, Bob: 0.80000000 BTC--------------------------------------------------------------------Commitment #3: (Not revoked)Alice: 0.10000000 BTC, Bob: 0.90000000 BTC--------------------------------------------------------------------Alice chooses to give you the transaction of the revoked commitment #2, without the revocation keys, hereby telling you it's the latest state of their channel. Can you prove otherwise? As I said,QuoteYou have to take their word that what they say is true.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BrutalBear",
+      "created_time": "July 14, 2022, 06:37:28 PM",
+      "body": "Quote from: BlackHatCoiner on July 14, 2022, 06:18:07 PMQuote from: BrutalBear on July 14, 2022, 06:07:19 PMDo you think this is the best way to proof ownership of funds in a lightning channel?No. Suppose we have 3 commitment transactions. (Amounts represent sending capacities)Code:Commitment #0: (Channel opening transaction, revoked)Alice: 0.10000000 BTC, Bob: 0.00000000 BTC--------------------------------------------------------------------Commitment #1: (Revoked)Alice: 0.50000000 BTC, Bob: 0.50000000 BTC--------------------------------------------------------------------Commitment #2: (Revoked)Alice: 0.20000000 BTC, Bob: 0.80000000 BTC--------------------------------------------------------------------Commitment #3: (Not revoked)Alice: 0.10000000 BTC, Bob: 0.90000000 BTC--------------------------------------------------------------------Alice chooses to give you the transaction of the revoked commitment #2, without the revocation keys, hereby telling you it's the latest state of their channel. Can you prove otherwise? As I said,QuoteYou have to take their word that what they say is true.That's right. If I just simply ask Alice to provide latest state of their channel, I cannot prove the true state. How about this, I would ask Alice to make a specific commitment transaction, for example I would require Alice to transfer 0.0012345 btc between 22:00 and 22:05 on 07/15/2022.And provide this commitment transaction to me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 14, 2022, 06:49:24 PM",
+      "body": "Quote from: BrutalBear on July 14, 2022, 06:37:28 PMHow about this, I would ask Alice to make a specific commitment transaction, for example I would require Alice to transfer 0.0012345 btc between 22:00 and 22:05 on 07/15/2022.That can only prove that Alice sent 0.00123450 BTC to Bob at some point. Time can be faked. Alice and Bob can cooperate and sign a transaction wherein Alice transfers the bitcoin at this specific time you've asked her for, and then, afterwards, Bob can send her the money back, before 22:00, resulting in faked balance. It somewhat reminds of the double-spending problem.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 14, 2022, 11:35:10 PM",
+      "body": "I agree with the others: [1] No, you cannot prove ownership of a certain amount of BTC like you can on L1.[2] I wouldn't recommend anyone to send channel state commitments to anyone else than their channel partner.Quote from: BrutalBear on July 14, 2022, 06:07:19 PMWhat if the \"commitment transactions\" information was sent to me only (assuming I am honest and trustworthy). Do you think this is the best way to proof ownership of funds in a lightning channel?That's a pretty big assumption that could cost channel partners their whole balance if you were to (mistakenly or not - Bitcoin don't care, and it's irreversible, immutable, right..) publish one of those commitments.Also do keep in mind it will be a pretty annoying TOCTOU problem. Sure, even on L1, you could check someone's balance and just 10 minutes later it could be different. However in Lightning, this can change hundreds of times per minute or maybe even per second. I could lend 1BTC from someone through Lightning, make a snapshot of my channel states, immediately return the funds and send you the (now outdated) channel state, making you believe I own 1BTC while I don't. There's just no way to check if the channel state was updated, since this information is private by design.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Rath_",
+      "created_time": "July 15, 2022, 07:41:19 AM",
+      "body": "Quote from: BrutalBear on July 14, 2022, 06:07:19 PMDo you think this is the best way to proof ownership of funds in a lightning channel?No, you could try probing channels instead. It is not an ideal solution, but again, the LN was designed to make your channel balance as private as possible.Quote from: n0nce on July 14, 2022, 11:35:10 PM[2] I wouldn't recommend anyone to send channel state commitments to anyone else than their channel partner.You shouldn't send your commitment transactions even to your channel partner. They are asymmetrical: each party holds a different commitment for the same channel state.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "July 15, 2022, 01:47:14 PM",
+      "body": "Quote from: n0nce on July 14, 2022, 11:35:10 PMAlso do keep in mind it will be a pretty annoying TOCTOU problem. Sure, even on L1, you could check someone's balance and just 10 minutes later it could be different. However in Lightning, this can change hundreds of times per minute or maybe even per second. I could lend 1BTC from someone through Lightning, make a snapshot of my channel states, immediately return the funds and send you the (now outdated) channel state, making you believe I own 1BTC while I don't. This is exactly the point. That \"proof\" wouldn't prove anything.What @BrutalBear is trying to do is to give a proof of some BTC he owns, but in fact he doesn't own any BTC on the blockchain yet.If someone want to make a proof of funds, those funds must be on blockchain, with at least 3-6 confirmations. That is the only way.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 15, 2022, 03:54:36 PMLast edit: July 15, 2022, 05:09:30 PM by garlonicon",
+      "body": "Well, it is possible to prove that, if some channel is unidirectional. So, if Alice and Bob are in the same channel, it is possible to prove that you have at least N coins, if the channel can function only in one direction. And that's another reason, why two channels working in one direction are sometimes better than a single bidirectional channel. But of course, the cost is rebalancing the channel more often, because bidirectional channels can be left open for weeks, months or even years, while unidirectional channels are, well, unidirectional, so after filling them once in some direction, they have to be closed on-chain, to make them useful again (channel refresh can be done in a single transaction, because it is technically possible to close and open channels in one shot).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BrutalBear",
+      "created_time": "July 18, 2022, 02:44:21 AM",
+      "body": "Quote from: BlackHatCoiner on July 14, 2022, 06:18:07 PMQuote from: BrutalBear on July 14, 2022, 06:07:19 PMDo you think this is the best way to proof ownership of funds in a lightning channel?No. Suppose we have 3 commitment transactions. (Amounts represent sending capacities)Code:Commitment #0: (Channel opening transaction, revoked)Alice: 0.10000000 BTC, Bob: 0.00000000 BTC--------------------------------------------------------------------Commitment #1: (Revoked)Alice: 0.50000000 BTC, Bob: 0.50000000 BTC--------------------------------------------------------------------Commitment #2: (Revoked)Alice: 0.20000000 BTC, Bob: 0.80000000 BTC--------------------------------------------------------------------Commitment #3: (Not revoked)Alice: 0.10000000 BTC, Bob: 0.90000000 BTC--------------------------------------------------------------------Alice chooses to give you the transaction of the revoked commitment #2, without the revocation keys, hereby telling you it's the latest state of their channel. Can you prove otherwise? As I said,QuoteYou have to take their word that what they say is true.@BlackHatCoinerWhat if they gave us commitment #2 (revoked), which we can prove them and channel peer signed. And then they gave us commitment #3 (not revoked), which we can prove the channel peer signed. And commit 3 can be proved be to the next commitment after commit 2. We could prove commit 3 and “roll back” to commit 2 to prove balances at that time?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

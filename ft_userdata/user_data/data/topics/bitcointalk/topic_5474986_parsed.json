@@ -1,0 +1,109 @@
+{
+  "id": "topic_5474986",
+  "title": "BitMaxz",
+  "author": "BitMaxz",
+  "created_time": "November 21, 2023, 11:30:23 PM",
+  "content": "Anyone here know how to turn non-RBF transactions into RBF-enabled?Some people having issues bumping unconfirmed transactions from TrustWallet and I want to help them fix their issue that is why I tried to search for a solution.We know the transactions made from TrustWallet are non-RBF and only CPFP is the solution but how about rebuilding the transaction and enabling RBF?Is there someone here who tested https://coinb.in/#newTransaction to rebuild a non-RBF transaction and enable the RBF?Coinb.in has an advanced option where you can check/uncheck RBF.I'd like to test this but the problem is I don't have BTC I already exchange them into other crypto.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5474986",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "November 21, 2023, 11:34:19 PM",
+      "body": "As far as I know most nodes will reject the new TX since they saw the old non RBF tx 1st.You might get some to accept it but I don't think it will propagate.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 22, 2023, 12:10:26 AMLast edit: November 22, 2023, 07:59:32 PM by hosseinimr93",
+      "body": "There is no way to turn a non-RBF transaction to a RBF transaction. With changing any part of the transaction data, the signature becomes invalid and it must be signed again. Of course, this doesn't mean there is no solution if you have a non-RBF transaction and you want to replace that with a new one. There are many nodes that have enabled full RBF and accept the replacement transaction even if the original transaction has not been flagged as RBF. So, if you have an unconfirmed non-RBF transaction, you can broadcast a new transaction including the same input(s) and hope that the replacement transaction is included by a miner.For making the replacement transaction using coinb.in, click on \"New\" at top of the page and then go to \"Transaction\". - Paste your transaction ID and click on \"Load\". - Add/remove addresses if you want to change the receiving addresses. - For changing the transaction fee, you should change the value of outputs. (The transaction fee is the inputs value minus outputs value.)- Click on \"submit\". - Copy the unsigned raw transaction- Click on \"Sign\" at top of the page. - Enter your private key and paste the unsinged raw transaction and click on \"Submit\". It's recommend to do this step offline (preferably on an air-gapped device) For making the replacement transaction, you can also use electrum. - Create a new wallet using your private key.- Let your wallet get synced and then disconnect your computer from the internet. - Go to \"console\" tab and use this command to remove the transaction you want to be replaced from your wallet: wallet.adb.remove_transaction(\"TXID\")- Close electrum and open it again.- Make the replacement transaction and export the raw transaction. Now you have the singed raw transaction and you can broadcast it. The problem now is that for broadcasting the replacement transaction, you need a node that has enabled full RBF. So, you should try different transaction broadcasting tools until you find a one allowing you to do so and doesn't reject your transaction.  For broadcasting the replacement transaction, you can also use electrum. To do so, you should change servers until you connect to a server which allows you to broadcast your replacement transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "November 22, 2023, 12:25:14 AM",
+      "body": "Quote from: hosseinimr93 on November 22, 2023, 12:10:26 AM...There are many nodes that have enabled full RBF and accept the replacement transaction even if the original transaction has not been flagged as RBF....Many? I would sat a good number possibly do. But in the end it really does not matter what nodes do if pools don't accept the TXUnless the pool operators tell us what they are accepting then we could only hope that TXs like that would be mined.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 22, 2023, 12:43:44 AM",
+      "body": "Quote from: DaveF on November 22, 2023, 12:25:14 AMMany? I would sat a good number possibly do. But in the end it really does not matter what nodes do if pools don't accept the TXThere are mining pools that include the replacement transaction even if the original transaction has not been flagged as RBF. Click here to see such transactions on mempool.space. Since those transactions have been received by miners, I think at least we can say that there are enough number of nodes that have enabled full RBF.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Catenaccio",
+      "created_time": "November 22, 2023, 02:07:07 AM",
+      "body": "Replace-by-Fee (RBF) Bitcoin Optech.Replace-by-Fee is a node policy and there are many Bitcoin nodes that can set up own rules for their mempools.There are Opt-in RBF and Full RBF. Opt-in RBF uses BIP 125 and usually we have to broadcast our transactions with opt-in RBF to bump fee later.There are nodes and mempools that accept Full RBF that does not use BIP 125. They will accept Full RBF unconfirmed transactions to be replaced. But to avoid troubles, using opt-in RBF is better.Opt-in RBF is enabled by default and there is proposal to enable Full RBF by default too.https://bitcoinops.org/en/newsletters/2023/08/09/#full-rbf-by-default",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 22, 2023, 06:40:25 AM",
+      "body": "Quote from: BitMaxz on November 21, 2023, 11:30:23 PMAnyone here know how to turn non-RBF transactions into RBF-enabled?It's not possible to do to existing transactions in mempools since the field that signals for opt-in RBF is in each input's nSequence field.Changing it into 0xfffffffd or lower will result with \"mandatory-script-verify-flag-failed\" error.Changing nSquence will also result with a different txid.Applying those changes to an existing unconfirmed transaction to flag opt-in rbf will result with a different transaction,basically replacement that even full-rbf nodes will reject for having the same fee as the original.Quote from: BitMaxz on November 21, 2023, 11:30:23 PMSome people having issues bumping unconfirmed transactions from TrustWallet and I want to help them fix their issue that is why I tried to search for a solution.The suggested full-rbf above is the solution since it doesn't require that flag to be replacedbut the replacement need to follow replace-by-fee rules like paying for its own and the original transaction's bandwidth.(e.g.: if size are the same; +1sat/vB minimum by default)To try in mainnet, you need to find a way to connect to nodes that enabled full-rbf to broadcast the replacement transaction.Example (Needs a Bitcoin Node): https://petertodd.org/2023/why-you-should-run-mempoolfullrbf#full-rbf-peeringQuote from: BitMaxz on November 21, 2023, 11:30:23 PMI'd like to test this but the problem is I don't have BTC I already exchange them into other crypto.Use testnet on a wallet that can create transactions with disabled opt-in rbf flag.However, you may not be able to accurately test full-rbf's behavior in testnet because the number of nodes that enabled -mempoolfullrbf is entirely different in mainnet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 22, 2023, 02:53:58 PM",
+      "body": "Quote from: Catenaccio on November 22, 2023, 02:07:07 AMOpt-in RBF is enabled by default and there is proposal to enable Full RBF by default too.That's probably the safest approach. Full RBF is the standard state of the network. According to Peter, 17% of 24.x listening nodes run full rbf. Nobody should treat opting-out RBF signal as non-replaceable. It is currently trivial even for a newbie to simply broadcast the replacement transaction to nodes that support that policy.Quote from: DaveF on November 22, 2023, 12:25:14 AMUnless the pool operators tell us what they are accepting then we could only hope that TXs like that would be mined.Probably what grants them the most profit. So, I suppose, they support full rbf.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "November 22, 2023, 03:12:41 PM",
+      "body": "Quote from: hosseinimr93 on November 22, 2023, 12:10:26 AMFor making the replacement transaction using coinb.in, click on \"New\" at top of the page and then go to \"Transaction\". - Paste your transaction ID and click on \"Load\". - Add/remove addresses if you want to change the receiving addresses. - For changing the transaction fee, you should change the value of outputs. (The transaction fee is the inputs value minus outputs value.)- Click on \"submit\". - Copy the unsigned raw transaction- Click on \"Sign\" at top of the page. - Enter your private key and paste the unsinged raw transaction and click on \"Submit\". It's recommend to do this step offline (preferably on an air-gapped device) For making the replacement transaction, you can also use electrum. This part is actually my method on rebuilding transactions and saw that you can uncheck or check the RBF(that makes me wonder if there is a hope for non-rbf transaction) but for replacing the transaction I think I'm going to try this on Bitcoin core and run it with \"-mempoolfullrbf\".I got the idea during research yesterday about the solution for non-rbf transaction and I came across  to this post below and they mentioned about -mempoolfullrbf(added on Bitcoin core v24.0) which accept transaction replacement without the original transaction replaceability signal.- https://bitcoin.stackexchange.com/questions/115360/is-it-possible-to-set-rbf-as-always-on-in-bitcoindDo you think this would work on my own node instead of doing it to Electrum?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 22, 2023, 04:10:48 PMLast edit: November 22, 2023, 04:33:56 PM by hosseinimr93",
+      "body": "Quote from: BitMaxz on November 22, 2023, 03:12:41 PMDo you think this would work on my own node instead of doing it to Electrum?If you are running your own node, you don't need electrum or other tools for broadcasting your transaction at all and you can broadcast your transaction by yourself. I haven't done that myself and there may be other users who can guide you better, but I think you should have a good chance of connecting to at least one node that has enabled full RBF and your transaction being propagated to the network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 22, 2023, 07:31:21 PM",
+      "body": "Quote from: BitMaxz on November 22, 2023, 03:12:41 PMI got the idea during research yesterday about the solution for non-rbf transaction and I came across  to this post below and they mentioned about -mempoolfullrbf(added on Bitcoin core v24.0) which accept transaction replacement without the original transaction replaceability signal.Running a full node at the moment means you're probably already connected with someone who's running mempoolfullrbf=1, so broadcasting a replacement of a no-rbf transaction should probably pass. Note that if you don't run your own full node, then probably blockstream's block explorer will accept Full RBF: https://blockstream.info/tx/push (connect there via Tor). That being said, I don't know if the Electrum server ignores policy rules, or if your Electrum client will allow you to do that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 23, 2023, 07:06:44 AMLast edit: January 15, 2024, 06:50:10 AM by nc50lc",
+      "body": "Quote from: BlackHatCoiner on November 22, 2023, 07:31:21 PMThat being said, I don't know if the Electrum server ignores policy rules, or if your Electrum client will allow you to do that. I tried it in testnet Electrum that is connected to their server: electrum.blockstream.info:60002;And it does accept replacement transactions even without the opt-in RBF flag.Considering Electrum mainet and testnet works similarly, it may actually work depending on blockstream server's node in mainnet.Creating the replacement transaction for full-rbf cannot be done in Electrum GUI though. (for now)Here's the test transaction: https://mempool.space/testnet/tx/85161f67da19ab4715e6ade401ecedb5fdda2eceb84ac4b9d2663e6952ca6aa8Didn't opted-in for RBF but tagged in mempool space as \"full-RBF\",BUT, despite being broadcasted successfully, the lower fee rate transaction is the one that's mined,probably because it didn't made it in or rejected by the miner of the next block's mempool.-edit-I've tried it and their mainnet counterpart accepts full rbf as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 23, 2023, 08:59:27 AMLast edit: November 23, 2023, 10:42:46 AM by o_e_l_e_o",
+      "body": "Quote from: hosseinimr93 on November 22, 2023, 04:10:48 PMI haven't done that myself and there may be other users who can guide you better, but I think you should have a good chance of connecting to at least one node that has enabled full RBF and your transaction being propagated to the network.You can manually add other nodes which have enabled full RBF to ensure you get good propagation. Peter Todd's nodes are probably a good place to start: https://petertodd.org/2023/why-you-should-run-mempoolfullrbf#full-rbf-peeringQuote from: BlackHatCoiner on November 22, 2023, 07:31:21 PMNote that if you don't run your own full node, then probably blockstream's block explorer will accept Full RBF: https://blockstream.info/tx/push (connect there via Tor).mempool.space definitely accept full RBF replacements for propagation:https://mempool.space/tx/pushhttp://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion/tx/pushQuote from: BlackHatCoiner on November 22, 2023, 07:31:21 PMThat being said, I don't know if the Electrum server ignores policy rules, or if your Electrum client will allow you to do that.Electrum will happily attempt to broadcast any full RBF replacements, but whether or not it is successful depends on whether the server it is connected to has full RBF enabled or not. If it does not you will be shown an error, but you can easily just manually swap your server until you find one which will accept your replacement.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

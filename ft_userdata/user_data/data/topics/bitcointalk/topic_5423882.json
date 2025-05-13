@@ -1,0 +1,117 @@
+{
+  "id": "topic_5423882",
+  "title": "GiladLeef",
+  "author": "GiladLeef",
+  "created_time": "November 28, 2022, 06:40:10 AM",
+  "content": "So, the only way to get the private key of a public key, is simple guessing it/brute forcing it - Which can take forever to compute at some key ranges.But What if we could reduce the key range? For example, if a public key is even, you can multiply it by 57896044618658097711785492504343953926418782139537452191302581570759080747169And get a new public key, which is in the original range -1-bit range, which its private key is / 2 the value of the original private key.And you can also use other methods to reduce the public key ranges even more, using only pure math.I'd like this topic to be a home for new math tricks for making secp256k1 easier to brute force, mainly for the bitcoin puzzle transaction.Thanks! Gilad.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5423882",
+  "comments": [
+    {
+      "author": "Cruxleo",
+      "created_time": "November 28, 2022, 07:57:56 AM",
+      "body": "Quote from: GiladLeef on November 28, 2022, 06:40:10 AMSo, the only way to get the private key of a public key, is simple guessing it/brute forcing it - Which can take forever to compute at some key ranges.But What if we could reduce the key range? For example, if a public key is even, you can multiply it by 57896044618658097711785492504343953926418782139537452191302581570759080747169And get a new public key, which is in the original range -1-bit range, which its private key is / 2 the value of the original private key.And you can also use other methods to reduce the public key ranges even more, using only pure math.I'd like this topic to be a home for new math tricks for making secp256k1 easier to brute force, mainly for the bitcoin puzzle transaction.Thanks! Gilad.In as much as the public key is formed from the private key. The algebraic expressions used to form this cannot be reserved to make for the former. This is because the process goes through a hash before it creates public address. It is therefore not visible for any mathematical \"trick\" to perform such hack.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GiladLeef",
+      "created_time": "November 28, 2022, 08:26:34 AM",
+      "body": "Of course.But I didn't talk about that.Reducing the keyspace is possible, and I can prove it.One way to do it, is the following way:Say we have these keys:0000000000000000000000000000000000000000000000002000000000000000 // HEX Private Key, Hidden from us.02ae86eeea252b411c1cdc36c284482939da1745e5a7e4da175c9d22744b7fd72d // Compressed Public Key, Known By us.We can do some math on the curve with the public key, to help us brute force it faster - because we will brute force another key, in a smaller range.Let's multiply the public key by 57896044618658097711785492504343953926418782139537452191302581570759080747169.We get this new Public Key:0206f9d9b803ecf191637c73a4413dfa180fddf84a5947fbc9c606ed86c3fac3a7And, this new public key's private key, is:0000000000000000000000000000000000000000000000001000000000000000.So, if we would like to brute force 02ae86eeea252b411c1cdc36c284482939da1745e5a7e4da175c9d22744b7fd72d, we could make it 2x faster, using this method, on even keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stanner.austin",
+      "created_time": "November 28, 2022, 08:53:01 AMLast edit: November 28, 2022, 11:43:28 AM by stanner.austin",
+      "body": "@GiladLeefThis been discuss here before if i remember correctly .0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a1 is just (order_N //2 + 1 )This don't help on bruteforce for example your private key is still in 64bit and your half part is still in 64bit. also test with odd number you will see negative results.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "November 28, 2022, 11:16:00 AM",
+      "body": "Isn't there a remainder function used somewhere to make the whole thing less linear and guessable.I think if your theory was true there'd be a much easier way to break ANY key knowing the public key merely by doing something similar to a merge sort (binary search) where you determine if your private key is higher or lower than the one you've forced based on half the range and half it again in the direction of finding a key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GiladLeef",
+      "created_time": "November 28, 2022, 11:41:10 AM",
+      "body": "@stanner.austinWhat do you mean?These two Private Keys:00000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001000000000000000Are definitely in two different ranges.You can see that by converting them into binary, you will see that one is longer than the other.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stanner.austin",
+      "created_time": "November 28, 2022, 11:58:41 AM",
+      "body": "@GiladLeefHelloIn case anyone bruteforce 64bit wallet or public key, he may use BSGS algo, it's sufficient up to 10 bytes 80bits full range.For you example if you don't had private key of this you may start bruteforce with starting point 0x01ffffffffffffff to 0xffffffffffffffff to match public key or his half point still result time near to same if used random instead of liner attack. liner may be fast but no one use liner due to random bruteforce is most recommend. (0x2000000000000000 or 0x1000000000000000 i mean.)Also half point not useful on 256 bit key or near to him because it will always give you same bit range as half.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 29, 2022, 06:06:03 PM",
+      "body": "Quote from: AlexanderCurl on November 28, 2022, 03:17:50 PMThere are a lot of tricks if you do them in the  additive group of integers modulo secp256k1 N. But we are given a public key(point) at the start so all that magic vanishes rapidly.The only thing there could be if one finds a way to determine in which half of the range the point is.And that's basically impossible to do by dividing the pubkey by 2, since the remainder is being thrown away.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "arulbero",
+      "created_time": "November 29, 2022, 07:39:26 PM",
+      "body": "Quote from: GiladLeef on November 28, 2022, 06:40:10 AMSo, the only way to get the private key of a public key, is simple guessing it/brute forcing it - Which can take forever to compute at some key ranges.But What if we could reduce the key range? For example, if a public key is even, you can multiply it by 57896044618658097711785492504343953926418782139537452191302581570759080747169And get a new public key, which is in the original range -1-bit range, which its private key is / 2 the value of the original private key.It is like: guess a number between 1 and 10.     If the correct key is 8, and you divide it by 2, you have to perform only 4 steps: 1,2,3,4 -> found!But you don't know if the correct key is even or odd.  Knowing that is equal to have an additional information that let you to reshrink the search space.But again you don't have this information, then you cannot reduce the key range.If you divide each key by 2:  [1 ... 10] -> [1/2, 2/2, 3/2, ... , 8/2, 9/2, 10/2] your range has the same size, it is not 'smaller'! Each of these 10 keys may be the correct one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GiladLeef",
+      "created_time": "November 30, 2022, 05:30:12 AM",
+      "body": "Yeah, everything i said is in case the key IS even.Anyways,About reusing the same nonce twice? This can break the security.I found some python 2.7 scripts on GitHub named \"R-Scanner\" that can search addresses for this type of vulnerabilities.But they all do not work (They all forks of https://github.com/ca333/rng-scanner) even when i tried to migrate to Python 3 and debug.Think about it, If anyone would have a simple script that searches a blockchain API for this type of transactions...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "arulbero",
+      "created_time": "November 30, 2022, 01:48:56 PM",
+      "body": "Quote from: GiladLeef on November 30, 2022, 05:30:12 AMYeah, everything i said is in case the key IS even.Quote from: AlexanderCurl on November 30, 2022, 07:19:53 AMIf there existed such method to determine whether point is even or odd that would break ecdsa security.Or if there existed a method to know if a key is 'greater' than a certain key that would break ecdsa security.If I search a key x in the range [1, ..., 2^80] and I know that the key x is greater than 2^79 too, then I can work only on range [2^79,..., 2^80].Better: if I know that the key x is a multiple of 3 (it is divisible by 3), then I can remove 2/3 of the possible values. Quote from: AlexanderCurl on November 29, 2022, 08:15:00 PMwhere one can find your renowned ecc fast library code base?\"renowned\"  ?I wrote that library 5 years ago to build my version of vanitygen and BSGS.It's a library tailored to generate a bunch of public keys with same distance very quickly,like:1G , 2G, 3G ,4G, ...or5G, 15G, 25G, 35G, ...where G is the generator of the curve.Each public key is an array of 4 x 64 bit. Each operation is mod p.I have to clean the code before I can make it public. If I'll have time, maybe by the end of the year.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 30, 2022, 11:08:03 PM",
+      "body": "Quote from: ecdsa123 on November 30, 2022, 09:38:19 PMAdmin, please delete last post of AlexanderCurl  , the reason: offering pay-to-buy bulshit software aka link: https://github.com/demining/CryptoDeepToolsif someone looking \"public\" scripts : link here : https://github.com/jvdsn/crypto-attacksIf you want to report a post, use the \"report to moderator\" button at the bottom of each post.PS. Python is not going to get you really far in terms of performance, so I hope that someone is thinking about porting these attacks to C++, where it can easily be GPU accelerated as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btc-room101",
+      "created_time": "December 01, 2022, 01:10:12 PM",
+      "body": "Quote from: GiladLeef on November 28, 2022, 06:40:10 AMSo, the only way to get the private key of a public key, is simple guessing it/brute forcing it - Which can take forever to compute at some key ranges.But What if we could reduce the key range? For example, if a public key is even, you can multiply it by 57896044618658097711785492504343953926418782139537452191302581570759080747169And get a new public key, which is in the original range -1-bit range, which its private key is / 2 the value of the original private key.And you can also use other methods to reduce the public key ranges even more, using only pure math.I'd like this topic to be a home for new math tricks for making secp256k1 easier to brute force, mainly for the bitcoin puzzle transaction.Thanks! Gilad.There are three ways to hack BTCThe worse way is your 'brute force' recall that 2**256 is bigger number than the number of electrons in the known universe, so if your looking for that lost pin in a haystack that you'll never find, try finding a lost electron in the unbounded unknown universe.Now how to hack btc1.) The EC256kp1 algo is NSA they don't do algos that don't have backdoors, study the discrete math lit on the subject and you will see the path, a hint the subject is called enomorphisms2.) Like the GU-Hacker here https://github.com/room101-dev/Grand-Ultimate-BTC-Hacker/projects?query=is%3Aopen&type=classic, where instead of doing one at a tme 'brute force' your randomly hopping baby-step, giant-step all over the place inteliligently, but also on each hit comparing all known btc addresses with value on each cycle, so your scope of search falls to 2**40 from 2**256, like we say easy-peasy3.) The third way is to use modern prime number factoring tools to crack an explicity virgin high value address and gets its private-key, these problems are doable, but you need heavy computation power and a firm understanding of the state of the art tools, see 'sage math' discrete inverse log problem tools there are lots of PHD's works on this subjectSo in summary the worst of the worst is this abby-normal bullcrap of brute force that you see 99% of the tools posted, and note anybody that talks real on this subject on this forum has their post deleted asap, as only blind fools leading blind fools are tolerated on bitcoin-con talk dot orgy",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 01, 2022, 05:50:29 PM",
+      "body": "Quote from: AlexanderCurl on December 01, 2022, 02:12:22 PMQuote from: btc-room101 on December 01, 2022, 01:10:12 PM~snipSome total crap. Was any of those true there would be no more btc to hack.Well this proves you were right about all public secp crackers being BS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

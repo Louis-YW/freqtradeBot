@@ -1,0 +1,165 @@
+{
+  "id": "topic_5432954",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "January 04, 2023, 08:43:43 AMLast edit: April 27, 2024, 09:47:02 PM by PowerGlove",
+  "content": "Anyone else notice that if you wrap something that contains really long lines with [code] tags, that it'll look okay in the actual post, but if you browse your post history afterwards, it'll render much wider than the surrounding posts and throw everything out?Here's an example of what I mean: I recently posted some code that contained a few really long lines, here. If you look at that post, it renders without issue (i.e. that post doesn't render wider than the other posts in that thread). But, if you look (currently) at the first page of my post history, you'll see that the posts on that page are rendering strangely, making them difficult to read without lots of horizontal scrolling.I messed around for a few (very frustrating) hours trying to get to the bottom of this, and managed to come up with the following SMF patch:Code:--- /var/www/baseline/Themes/default/Profile.template.php 2007-02-03 15:55:14.000000000 +0000+++ /var/www/modified/Themes/default/Profile.template.php 2023-01-06 00:15:50.000000000 +0000@@ -341,42 +341,45 @@  if (!empty($context['posts']))  {   // Page numbers.   echo '    <tr class=\"catbg3\">     <td colspan=\"3\">      ', $txt[139], ': ', $context['page_index'], '     </td>    </tr>   </table>';    // Button shortcuts   $quote_button = create_button('quote.gif', 145, 'smf240', 'align=\"middle\"');   $reply_button = create_button('reply_sm.gif', 146, 146, 'align=\"middle\"');   $remove_button = create_button('delete.gif', 121, 31, 'align=\"middle\"');   $notify_button = create_button('notify_sm.gif', 131, 125, 'align=\"middle\"');    // For every post to be displayed, give it its own subtable, and show the important details of the post.   foreach ($context['posts'] as $post)   {+   // style=\"table-layout: fixed;\" was added to each subtable as a partial fix for code sometimes rendering too wide (see https://bitcointalk.org/index.php?topic=5432954).+   // This could also have been done further up the hierarchy, but this is a more natural place to apply the fix, and (surprisingly) produces slightly superior results, too.+   // There's a second (progressive enhancement) part to this fix, after this foreach.    echo '-  <table border=\"0\" width=\"85%\" cellspacing=\"1\" cellpadding=\"0\" class=\"bordercolor\" align=\"center\">+  <table border=\"0\" width=\"85%\" cellspacing=\"1\" cellpadding=\"0\" class=\"bordercolor\" align=\"center\" style=\"table-layout: fixed;\">    <tr>     <td width=\"100%\">      <table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"4\" class=\"bordercolor\" align=\"center\">       <tr class=\"titlebg2\">        <td style=\"padding: 0 1ex;\">         ', $post['counter'], '        </td>        <td width=\"75%\" class=\"middletext\">         &nbsp;<a href=\"', $scripturl, '#', $post['category']['id'], '\">', $post['category']['name'], '</a> / <a href=\"', $scripturl, '?board=', $post['board']['id'], '.0\">', $post['board']['name'], '</a> / <a href=\"', $scripturl, '?topic=', $post['topic'], '.', $post['start'], '#msg', $post['id'], '\">', $post['subject'], '</a>        </td>        <td class=\"middletext\" align=\"right\" style=\"padding: 0 1ex; white-space: nowrap;\">         ', $txt[30], ': ', $post['time'], '        </td>       </tr>       <tr>        <td width=\"100%\" height=\"80\" colspan=\"3\" valign=\"top\" class=\"windowbg2\">         <div class=\"post\">', $post['body'], '</div>        </td>       </tr>       <tr>@@ -391,40 +394,67 @@    if ($post['can_reply'])     echo '      <a href=\"', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '\">', $reply_button, '</a>', $context['menu_separator'], '      <a href=\"', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], ';sesc=', $context['session_id'], '\">', $quote_button, '</a>';    if ($post['can_reply'] && $post['can_mark_notify'])     echo '         ', $context['menu_separator'];    if ($post['can_mark_notify'])     echo '      <a href=\"' . $scripturl . '?action=notify;topic=' . $post['topic'] . '.' . $post['start'] . '\">' . $notify_button . '</a>';     echo '        </span></td>       </tr>      </table>     </td>    </tr>   </table>';   } +  // This is the second part of the fix for code sometimes rendering too wide (the first part is at the top of the preceding foreach).+  // The first part only prevents the problem from affecting surrounding posts, but when JavaScript is available, a more complete fix can be made.+  // This code visits each eligible element and (defensively) sets the width to the same computed value.+  // The width is computed once and then reused, not because of performance considerations (that's a nice consequence), but because that approach fixed some (rare) problem cases that came up in testing.+  // The initial version of this code didn't account for the presence of <pre> elements being browser-dependent (that's what the \"target\" variable now does).+  echo '+  <script language=\"JavaScript\" type=\"text/javascript\"><!-- // --><![CDATA[+   window.addEventListener(\"load\", fix_wide_code_elements, false);+   function fix_wide_code_elements() {+    var all_code_elements = document.body.getElementsByClassName(\"code\");+    var same_computed_width = 0;+    for(var i = 0; i < all_code_elements.length; i++) {+     var element = all_code_elements[i];+     if(element.tagName.toLowerCase() == \"div\") {+      if(same_computed_width == 0) {+       var target = element.firstElementChild && element.firstElementChild.tagName.toLowerCase() == \"pre\" ? element.firstElementChild : element;+       element.style.width = \"\";+       target.style.whiteSpace = \"pre-wrap\";+       same_computed_width = element.clientWidth;+       target.style.whiteSpace = \"\";+      }+      element.style.width = same_computed_width != 0 ? same_computed_width + \"px\" : \"\";+     }+    }+   }+  // ]]></script>';+   // Show more page numbers.   echo '   <table border=\"0\" width=\"85%\" cellspacing=\"1\" cellpadding=\"4\" class=\"bordercolor\" align=\"center\">    <tr>     <td colspan=\"3\" class=\"catbg3\">      ', $txt[139], ': ', $context['page_index'], '     </td>    </tr>   </table>';  }  // No posts? Just end the table with a informative message.  else   echo '    <tr class=\"windowbg2\">     <td>      ', $txt[170], '     </td>    </tr>   </table>'; }Edit: Updated to account for browser differences pointed out by shahzadafzal.@theymos: Please consider merging this fix, or applying your mind to the problem and coming up with something better. Thanks!So, I ended up sinking more time into this problem and coming up with a (much) better patch... (Thanks to PX-Z for the script they left here, those particular DOM modifications weren't the ones I ended up using, but, the final fix I arrived at was definitely influenced by that post.)Code:--- baseline/Themes/default/Profile.template.php 2007-02-03 15:55:14.000000000 +0000+++ modified/Themes/default/Profile.template.php 2024-04-27 20:51:35.000000000 +0000@@ -346,43 +346,48 @@     <td colspan=\"3\">      ', $txt[139], ': ', $context['page_index'], '     </td>    </tr>   </table>';    // Button shortcuts   $quote_button = create_button('quote.gif', 145, 'smf240', 'align=\"middle\"');   $reply_button = create_button('reply_sm.gif', 146, 146, 'align=\"middle\"');   $remove_button = create_button('delete.gif', 121, 31, 'align=\"middle\"');   $notify_button = create_button('notify_sm.gif', 131, 125, 'align=\"middle\"'); +  // Controls whether or not an effort is made to prevent \"wide\" content from breaking the layout (e.g. code blocks containing really long lines).+  $with_wide_fix = true;+   // For every post to be displayed, give it its own subtable, and show the important details of the post.   foreach ($context['posts'] as $post)   {    echo '   <table border=\"0\" width=\"85%\" cellspacing=\"1\" cellpadding=\"0\" class=\"bordercolor\" align=\"center\">    <tr>     <td width=\"100%\">      <table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"4\" class=\"bordercolor\" align=\"center\">       <tr class=\"titlebg2\">        <td style=\"padding: 0 1ex;\">         ', $post['counter'], '        </td>        <td width=\"75%\" class=\"middletext\">         &nbsp;<a href=\"', $scripturl, '#', $post['category']['id'], '\">', $post['category']['name'], '</a> / <a href=\"', $scripturl, '?board=', $post['board']['id'], '.0\">', $post['board']['name'], '</a> / <a href=\"', $scripturl, '?topic=', $post['topic'], '.', $post['start'], '#msg', $post['id'], '\">', $post['subject'], '</a>        </td>        <td class=\"middletext\" align=\"right\" style=\"padding: 0 1ex; white-space: nowrap;\">         ', $txt[30], ': ', $post['time'], '        </td>-      </tr>+      </tr>', $with_wide_fix ? '+     </table>+     <table style=\"table-layout: fixed;\" border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"4\" class=\"bordercolor\" align=\"center\">' : '', '       <tr>        <td width=\"100%\" height=\"80\" colspan=\"3\" valign=\"top\" class=\"windowbg2\">         <div class=\"post\">', $post['body'], '</div>        </td>       </tr>       <tr>        <td colspan=\"3\" class=\"windowbg2\" align=\"', !$context['right_to_left'] ? 'right' : 'left', '\"><span class=\"middletext\">';     if ($post['can_delete'])     echo '      <a href=\"', $scripturl, '?action=profile;u=', $context['current_member'], ';sa=showPosts;start=', $context['start'], ';delete=', $post['id'], ';sesc=', $context['session_id'], '\" onclick=\"return confirm(\\'', $txt[154], '?\\');\">', $remove_button, '</a>';    if ($post['can_delete'] && ($post['can_mark_notify'] || $post['can_reply']))I also came up with a patch that fixes this problem when previewing PMs and when replying to PMs:Code:--- baseline/Themes/default/PersonalMessage.template.php 2006-12-01 15:43:03.000000000 +0000+++ modified/Themes/default/PersonalMessage.template.php 2024-04-27 20:51:50.000000000 +0000@@ -855,29 +855,32 @@    <tr>     <td class=\"windowbg\">';   foreach ($context['send_log']['sent'] as $log_entry)    echo '<span style=\"color: green\">', $log_entry, '</span><br />';   foreach ($context['send_log']['failed'] as $log_entry)    echo '<span style=\"color: red\">', $log_entry, '</span><br />';   echo '     </td>    </tr>   </table><br />';  } + // Controls whether or not an effort is made to prevent \"wide\" content from breaking the layout (e.g. code blocks containing really long lines).+ $with_wide_fix = true;+  // Show the preview of the personal message.  if (isset($context['preview_message']))  echo '   <br />-  <table border=\"0\" width=\"80%\" cellspacing=\"1\" cellpadding=\"3\" class=\"bordercolor\" align=\"center\">+  <table ', $with_wide_fix ? 'style=\"table-layout: fixed;\" ' : '', 'border=\"0\" width=\"80%\" cellspacing=\"1\" cellpadding=\"3\" class=\"bordercolor\" align=\"center\">    <tr class=\"titlebg\">     <td>', $context['preview_subject'], '</td>    </tr>    <tr>     <td class=\"windowbg\">      ', $context['preview_message'], '     </td>    </tr>   </table><br />';   // Main message editing box.  echo '@@ -985,30 +988,30 @@   </table>';   // Some hidden information is needed in order to make the spell checking work.  if ($context['show_spellchecking'])   echo '   <form name=\"spell_form\" id=\"spell_form\" method=\"post\" accept-charset=\"', $context['character_set'], '\" target=\"spellWindow\" action=\"', $scripturl, '?action=spellcheck\"><input type=\"hidden\" name=\"spellstring\" value=\"\" /></form>';   // Show the message you're replying to.  if ($context['reply'])   echo '   <br />   <br />-  <table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"4\" class=\"bordercolor\">+  <table ', $with_wide_fix ? 'style=\"table-layout: fixed;\" ' : '', 'width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"4\" class=\"bordercolor\">    <tr>     <td colspan=\"2\" class=\"windowbg\"><b>', $txt[319], ': ', $context['quoted_message']['subject'], '</b></td>    </tr>    <tr>-    <td class=\"windowbg2\">+    <td ', $with_wide_fix ? 'colspan=\"2\" ' : '', 'class=\"windowbg2\">      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">       <tr>        <td class=\"windowbg2\">', $txt[318], ': ', $context['quoted_message']['member']['name'], '</td>        <td class=\"windowbg2\" align=\"right\">', $txt[30], ': ', $context['quoted_message']['time'], '</td>       </tr>      </table>     </td>    </tr>    <tr>     <td colspan=\"2\" class=\"windowbg\">', $context['quoted_message']['body'], '</td>    </tr>   </table>';",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432954",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "January 04, 2023, 08:50:37 AM",
+      "body": "Quote from: PowerGlove on January 04, 2023, 08:43:43 AMAnyone else notice that if you wrap something that contains really long lines with [code] tags, that it'll look okay in the actual post, but if you browse your post history afterwards, it'll render much wider than the surrounding posts and throw everything out?Although it doesn't happen to me too often, I know very well what you're talking about!And I hoped that someday it'll get fixed.Quote from: PowerGlove on January 04, 2023, 08:43:43 AMI messed around for a few (very frustrating) hours trying to get to the bottom of this, and managed to come up with the following SMF patch:Thank you!I am sure that this will be added. It's, after all, a bugfix (and, no offense, but I find this more useful than the \"OP\" patch).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shahzadafzal",
+      "created_time": "January 04, 2023, 09:16:08 AM",
+      "body": "Quote from: PowerGlove on January 04, 2023, 08:43:43 AMAnyone else notice that if you wrap something that contains really long lines with [code] tags, that it'll look okay in the actual post, but if you browse your post history afterwards, it'll render much wider than the surrounding posts and throw everything out?Yes that's true here another example and see how wide is the page But i guess below small update in css should fix the issue https://bitcointalk.org/Themes/custom1/style.cssLine: 151: white-space: nowrap;   ==>  white-space: normal; Code:.code{ color: #000000; background-color: #fff; font-family: \"courier new\", \"times new roman\", monospace; font-size: 12px; line-height: 1.3em; /* Put a nice border around it. */ border: 1px solid #000000; padding: 5px; margin: 1px 3px 4px 6px; width: 93%; /* Don't wrap its contents, and show scrollbars. */ white-space: nowrap;   <------------------------------------- white-space: normal; overflow: auto; /* Stop after about 24 lines, and just show a scrollbar. */ max-height: 24em;}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "January 04, 2023, 10:48:10 AM",
+      "body": "Quote from: PowerGlove on January 04, 2023, 08:43:43 AMAnyone else notice that if you wrap something that contains really long lines with [code] tags, that it'll look okay in the actual post, but if you browse your post history afterwards, it'll render much wider than the surrounding posts and throw everything out?It happened to me several times before and I never understood the reason why this is happening.People who are mostly affected with this glitch are probably members who are creating many ANN topics and adding codes for signature and stuff like that.Quote from: PowerGlove on January 04, 2023, 08:43:43 AM@theymos: Please consider merging this fix, or applying your mind to the problem and coming up with something better. Thanks!Majority of people will never notice this but I still think it would be a good idea to apply this fix, so nice work again PowerGlove.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "January 04, 2023, 10:54:33 AM",
+      "body": "Quote from: shahzadafzal on January 04, 2023, 09:16:08 AMBut i guess below small update in css should fix the issue https://bitcointalk.org/Themes/custom1/style.cssLine: 151: white-space: nowrap;   ==>  white-space: normal; That worked! I'm using it through the Stylus browser extension.Hopefully this is fixed forum-wide, though. I remember actually trimming my code a few times so that page doesn't break.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "January 04, 2023, 05:47:32 PM",
+      "body": "Quote from: shahzadafzal on January 04, 2023, 09:16:08 AMBut i guess below small update in css should fix the issue https://bitcointalk.org/Themes/custom1/style.cssLine: 151: white-space: nowrap;   ==>  white-space: normal; Yep. That's the first thing I tried, too (on the <pre> element though, not the <div>; I'm surprised doing that on the <div> had any effect for you). The problem with that approach (i.e. just adding white-space: normal; to the CSS) is that it collapses whitespace (in a browser-dependent way), which is obviously not ideal for preformatted stuff (like source code). white-space: pre-wrap; is a little better, but that still introduces line breaks, which I'm not convinced won't end up sometimes affecting copy/paste on particular configurations/systems.So, the approach I took was to leave the default white-space: nowrap; on <pre> elements alone (so that content is presented exactly as authored) but still find a way to size them as if white-space: pre-wrap; was being used (see the patch for details).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 04, 2023, 06:35:01 PM",
+      "body": "Yes please! I hit this wall way too often especially with long code snippets. I previously messed around with the CSS trying to figure out the problem but all I managed to do was break the layout.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shahzadafzal",
+      "created_time": "January 05, 2023, 06:38:35 PMLast edit: January 16, 2023, 04:15:07 AM by shahzadafzal",
+      "body": "Quote from: PowerGlove on January 04, 2023, 05:47:32 PMYep. That's the first thing I tried, too (on the <pre> element though, not the <div>; I'm surprised doing that on the <div> had any effect for you). I see what's the problem... actually in chrome based browsers (Chrome and Edge) <pre> tag is not present. The code appears directly in the div.So this solution should work in Chrome and Edge white-space: normal; or white-space: pre-wrap;But for firefox there's is <pre> tag that's why parent div is not getting effected, in this case additional css should solve the issue.Adding below CSS anywhere in the style page should solve the issue for both Chrome and Firefox.Code:pre, .code{white-space: pre-wrap !important;}I agree with your first solution of patching the profile template. Here I'm just giving an alternate solution for theymos to choose.Edited",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "January 05, 2023, 11:02:12 PMLast edit: January 06, 2023, 03:31:38 AM by PowerGlove",
+      "body": "Quote from: shahzadafzal on January 05, 2023, 06:38:35 PMI see what's the problem... actually in chrome based browsers (Chrome and Edge) <pre> tag is not present. The code appears directly in the div.Nice catch! I'm always on Tor, so I've never seen the forum's HTML on other browsers.I'll tweak the patch to account for this, and update the topic when I'm done. Edit: Okay, all done.The approach that this patch takes may seem a little complicated to some (when compared to simply changing the CSS forum-wide to use white-space: pre-wrap; on the relevant elements), but I think the extra complexity is justified. I considered, tested, and then abandoned that (much) easier approach early on, because although it works (superficially), I don't like the line breaks that it inserts into code (I'd prefer to stick to the established way of presenting \"wide\" code on Bitcointalk, with scroll bars instead of text wrapping).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 14, 2023, 08:37:45 AM",
+      "body": "Bumping! I just checked OP's last topic history to see if this was fixed (after all, theymos Merited this topic), but it isn't.I often check someone's post history, and this has always been annoying. It makes me maximize my browser and scroll horizontally. It must be even more annoying for campaign managers who manually check users' posts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shahzadafzal",
+      "created_time": "January 16, 2023, 04:13:05 AM",
+      "body": "Quote from: LoyceV on January 14, 2023, 08:37:45 AMBumping! I just checked OP's last topic history to see if this was fixed (after all, theymos Merited this topic), but it isn't.I often check someone's post history, and this has always been annoying. It makes me maximize my browser and scroll horizontally. It must be even more annoying for campaign managers who manually check users' posts.You bet! I have been checking this almost everyday at least once to check if the patch solution is applied or the css solution.Even to double check I will open it in incognito mode to see if the cache is preventing CSS updates.In my example post which I linked above from my show post history is not valid any more because that time it was on page 26 and now its on Page 31 Since I'm here I will slightly update the above code with css parameter important to make sure it is not conflicting with existing code cssclass.Quote from: shahzadafzal on January 05, 2023, 06:38:35 PMCode:pre, .code{white-space: pre-wrap !important;}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "January 16, 2023, 01:24:20 PM",
+      "body": "Quote from: LoyceV on January 14, 2023, 08:37:45 AMI often check someone's post history, and this has always been annoying. It makes me maximize my browser and scroll horizontally. It must be even more annoying for campaign managers who manually check users' posts.Yup, that's part of the reason I set time aside for this, I'm looking to apply soon (probably to the ChipMixer campaign, if slots ever open up) and I don't want my post history to look like a mess, when I do.I'm not sure what the delay is, but I'm guessing theymos has a good reason. I diff my patches (out of necessity) against SMF 1.1.19, so I imagine that it takes some effort on theymos' side to work around the differences between stock SMF and his heavily-modified version. I'm planning on submitting a 2FA patch soon, and that one will probably take substantial effort to massage into place.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 16, 2023, 02:44:36 PM",
+      "body": "Quote from: PowerGlove on January 16, 2023, 01:24:20 PMI'm looking to apply soon (probably to the ChipMixer campaign, if slots ever open up) and I don't want my post history to look like a mess, when I do.That's part of the reason I have my convenient service, and as this sample shows, horizontal scrolling isn't needed. (dislaimer: there may be a problem with very wide images without width-tags, but that barely happens)Of course, a real fix is much better. Even without managing a campaign I often check someone's post history (including my own) to find back a post.What I should have said: lol@Full member  Rank up first",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "January 16, 2023, 11:10:01 PM",
+      "body": "Quote from: LoyceV on January 16, 2023, 02:44:36 PMWhat I should have said: lol@Full member  Rank up first How's that lol-worthy? I mean, DarkStar_ announces openings rarely, so by the time I apply, I'll (probably) have made up the missing 16 activity, no?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 17, 2023, 06:20:58 AM",
+      "body": "Quote from: PowerGlove on January 16, 2023, 11:10:01 PMHow's that lol-worthy?Don't take it too seriously, I think you have a good chance, like n0nce did right before he became Sr. Member.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "January 17, 2023, 09:21:22 AM",
+      "body": "Quote from: LoyceV on January 17, 2023, 06:20:58 AMDon't take it too seriously, I think you have a good chance, like n0nce did right before he became Sr. Member.Yeah, sorry for the humorless response. Your comment touched a nerve because I feel a certain amount of pressure to advance quickly, given how late I've left joining in the fun (both Bitcointalk and Bitcoin itself).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "February 02, 2023, 04:56:01 PM",
+      "body": "@theymos: Please merge this patch, or PM me with feedback so that I can improve it. I'd really like to see this fixed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "The Sceptical Chymist",
+      "created_time": "February 04, 2023, 07:38:19 PM",
+      "body": "Quote from: PowerGlove on January 17, 2023, 09:21:22 AMQuote from: LoyceV on January 17, 2023, 06:20:58 AMDon't take it too seriously, I think you have a good chance, like n0nce did right before he became Sr. Member.Yeah, sorry for the humorless response. Your comment touched a nerve because I feel a certain amount of pressure to advance quickly, given how late I've left joining in the fun (both Bitcointalk and Bitcoin itself).PowerGlove, I don't know how old you are but I'm assuming you're a young man--probably younger than I was when I registered here, though that's just an assumption based on another assumption that most members here are in their 20s (or even younger) to their early 30s.  If that is indeed true, you've got plenty of time and ought not feel pressured to do anything, achieve anything....you get my point.And on top of all that, you're working your way up faster than probably 99% of members and I think you'll probably have a great shot at getting into Chipmixer whenever it is you're eligible to.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fivestar4everMVP",
+      "created_time": "February 04, 2023, 10:21:36 PM",
+      "body": "This is something I've noticed a long time ago, so when I came across this topic, I quickly understood what OP meant, it is an issue I personally never considered to be an issue by the way, so I saw no importance in reporting it, cus I know that I'm probably not the only one that have noticed this and kept quiet about it.Maybe the not seeing it as an issue was because I lack the technical know how fix it, so ignoring seems the best option since reporting without proffering possible solutions was kind of useless.I am glad OP brought this up and also provided a fix, a job well done indeed, now, lets wait on theymos to have it implemented.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "February 05, 2023, 01:07:48 AM",
+      "body": "Quote from: The Sceptical Chymist on February 04, 2023, 07:38:19 PMPowerGlove, I don't know how old you are but I'm assuming you're a young man--probably younger than I was when I registered here, though that's just an assumption based on another assumption that most members here are in their 20s (or even younger) to their early 30s.  If that is indeed true, you've got plenty of time and ought not feel pressured to do anything, achieve anything....you get my point.And on top of all that, you're working your way up faster than probably 99% of members and I think you'll probably have a great shot at getting into Chipmixer whenever it is you're eligible to.Yup, thanks TP. I should cool my jets.It's not rational, but I just feel like I have to make up for lost time. It feels like I've missed out on all the good stuff, you know?I marvel at the quality of some of the technical discussion from years ago, and I'm sad that I missed that era of the forum.It also seems like my kind of contributions (i.e. programming-related) would have found more fertile soil 6 or 7 years ago.I'm also a little salty that (with more foresight) I could've been quietly stacking sats all this time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

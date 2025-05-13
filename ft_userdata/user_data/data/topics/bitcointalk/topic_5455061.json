@@ -1,0 +1,69 @@
+{
+  "id": "topic_5455061",
+  "title": "FP91G",
+  "author": "FP91G",
+  "created_time": "June 04, 2023, 03:23:06 PM",
+  "content": "mendace (OP)  в своей теме:Hardware wallet low costhttps://bitcointalk.org/index.php?topic=5450550.0приводит ссылки на 3 девайса за 8, 20 и 40 долларов после прошивки которых по инструкции получается аппаратный кошелек.Девайс за 8 долларов и гайд для установки Jade кошелька.STICK PLUS  за 20 долларов иe BASIC CORE за 40 долларов.Демонстрационное видео:https://www.youtube.com/watch?v=PeqP6oVnlIsВзломать такой девайс сложно потому что он не похож на аппаратный кошелек!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5455061",
+  "comments": [
+    {
+      "author": "mendace",
+      "created_time": "June 04, 2023, 04:26:39 PMLast edit: June 04, 2023, 07:23:31 PM by Xal0lex",
+      "body": "Quote from: FP91G on June 04, 2023, 03:23:06 PMmendace (OP)  в своей теме:Hardware wallet low costhttps://bitcointalk.org/index.php?topic=5450550.0приводит ссылки на 3 девайса за 8, 20 и 40 долларов после прошивки которых по инструкции получается аппаратный кошелек.Девайс за 8 долларов и гайд для установки Jade кошелька.STICK PLUS  за 20 долларов иe BASIC CORE за 40 долларов.Демонстрационное видео:https://www.youtube.com/watch?v=PeqP6oVnlIsВзломать такой девайс сложно потому что он не похож на аппаратный кошелек!Я прошу прощения, я не понимаю русский язык, и не могу перевести всё, что вы написали. Ссылка на топик, которую вы разместили ведёт на итальянский раздел. Я перевёл этот топик на английский язык. Оставляю вам ссылку на англоязычный топик.https://bitcointalk.org/index.php?topic=5450647.msg62169741#msg62169741I'm sorry I don't understand Russian and I can't translate everything you wrote, but the link points to the Italian board post while I translated the thread in the international board.  I'll leave you the link.https://bitcointalk.org/index.php?topic=5450647.msg62169741#msg62169741Также в демонстрационном ролике на YouTube не очень понятная инфо, так как в нём не говорится о субмодулях, которые необходимы для сборки прошивки. В то же время, если вы используете руководство, где я рекомендую использовать Docker, все будет очень просто, и у вас будет рабочий кошелек через несколько минут.Also the demonstration video on YouTube is not very clear because it doesn't talk about the submodules needed to build the firmware. While if you use the guide I posted where I recommend the use of Docker everything will be very simple and you will have a working wallet in a few minutes",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mendace",
+      "created_time": "June 04, 2023, 10:16:17 PMLast edit: June 05, 2023, 12:14:46 PM by Xal0lex",
+      "body": "Ну и конечно же вам нужно будет установить docker (в интернете есть десятки руководств)Obviously you have to install docker (for that search on the net that there are dozens of guides) Code: git clone https://github.com/Blockstream/Jade.git CD Jade sudo docker-compose up -d sudo docker-compose exec dev bash git submodule update --init --recursive cp configs/sdkconfig_display_m5stickplus.defaults sdkconfig.defaults idf.py flash Только для флэшки, плюс последняя команда: Only for usb stick plus the last command is  Code:idf.py -b 115200 flash monitorЕсли вы хотите сделать ещё одну установку или установка по каки либо причинам не удалась, не забудьте удалить контейнер с помощью команды \"sudo docker-compose down\", а также удалить папку Jade с помощью команды \"sudo rm -r Jade\" и потом перезапуститься с помощью команд git. If you have to do another installation on another device or it was not successful, remember to delete the container with sudo docker-compose down and delete the Jade folder with sudo rm -r Jade and restart from the commands with gitКак я уже говорил в другом месте, у меня были некоторые трудности с core basic, но ничего такого, что нельзя было бы исправить, проблема была в порте, который в отличие от stick plus, который был виден на /dev/ttyUSB0 core basic был на /dev/ttyACM0, поэтому достаточно было переназначить его в docker-compose и делать это всегда в папке Jade, введя эти команды: As I said elsewhere I had some difficulties with core basic but nothing that can't be fixed, the problem was in the port which unlike the stick plus which was seen on /dev/ttyUSB0 core basic was on /dev/ttyACM0 so it was enough to remap it on docker-compose and to do this always in the Jade folder, give these commands:  Code:sudo nano docker-compose.yml (or if you use Vim) vim docker-compose.ymlто, что он вам покажет, будет редактором для изменения файла, и он должен быть именно таким what he will present to you will be an editor to modify the file and it must be exactly like this  Code:version: \"3.7\" services: dev: builds: context: . dockerfile: Dockerfile.dev volumes: - type: bind source: .git target: /host/jade/.git devices: - \"/dev/ttyACM0:/dev/ttyUSB0\" privileged: true tty:trueИзмените в пункте devices точно так, как показано выше, если это не сработает, то вам придется проверить, на каком порту видно ваше устройство с помощью команды sudo dmesg, после чего измените файл с правильным портом Modify under the item devices exactly as shown above if it doesn't work then you will have to check on which port your device is seen with the sudo dmesg command at that point modify the file with the correct port",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "June 05, 2023, 08:55:05 AMLast edit: June 05, 2023, 12:15:48 PM by satscraper",
+      "body": "^Не для новичкови и тем более не для  холдеров.Модель не содержит в своём составе security element и  безопасность средств  основывается на доверии пользователя к проприетарному  PIN серверу, что лично у меня вызывало бы  вопросы.Можно запустить  кастомный PIN сервер, но опять же не для новичков и заморочливо.\"мы не слишком богаты, чтобы доверять дешевым поделкам\" ©Для поиграться с мелочью  дивайс сгодится, но не для сколь-нибудь значущих сумм.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Xal0lex",
+      "created_time": "June 05, 2023, 12:21:29 PM",
+      "body": "Quote from: mendace on June 04, 2023, 10:16:17 PMObviously you have to install docker (for that search on the net that there are dozens of guides)-snip-So, let's agree, if you are going to continue to post in English in this thread, find yourself an interpreter or arrange for translation of your posts from the OP. Since he made the announcement of your topic, let him continue to translate your posts. I will not do it all the time. Your posts in English are in violation of forum rules.Так, давайте договоримся, если вы и дальше собираетесь размещать свои посты в этом топике на английском языке, то найдите себе переводчика или договоритесь о переводе ваших постов с ОП. Так как он сделал анонс вашего топика, то пусть и дальше переводит ваши посты. Я этим постоянно заниматься не буду. Ваши посты на английском языке нарушают правила форума.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mendace",
+      "created_time": "June 05, 2023, 12:25:41 PM",
+      "body": "Quote from: satscraper on June 05, 2023, 08:55:05 AM^Не для новичкови и тем более не для  холдеров.Модель не содержит в своём составе security element и  безопасность средств  основывается на доверии пользователя к проприетарному  PIN серверу, что лично у меня вызывало бы  вопросы.Можно запустить  кастомный PIN сервер, но опять же не для новичков и заморочливо.\"мы не слишком богаты, чтобы доверять дешевым поделкам\" ©Для поиграться с мелочью  дивайс сгодится, но не для сколь-нибудь значущих сумм.Quote from: Xal0lex on June 05, 2023, 12:21:29 PMQuote from: mendace on June 04, 2023, 10:16:17 PMObviously you have to install docker (for that search on the net that there are dozens of guides)-snip-So, let's agree, if you are going to continue to post in English in this thread, find yourself an interpreter or arrange for translation of your posts from the OP. Since he made the announcement of your topic, let him continue to translate your posts. I will not do it all the time. Your posts in English are in violation of forum rules.Так, давайте договоримся, если вы и дальше собираетесь размещать свои посты в этом топике на английском языке, то найдите себе переводчика или договоритесь о переводе ваших постов с ОП. Так как он сделал анонс вашего топика, то пусть и дальше переводит ваши посты. Я этим постоянно заниматься не буду. Ваши посты на английском языке нарушают правила форума.Извините, я воспользуюсь переводчиком, но я poatato на английском языке, потому что я думаю, что часть о cosice более понятна на английском языке.  То, что вы говорите, частично верно, в нем нет элемента безопасности, но он основан на ПИН-коде, который в данном случае имеет только проприетарный на устройстве, а не часть в хранилище на сервере Oracle.  Да, вы также можете разместить PIN-код для большей безопасности, но я не рекомендую это делать.  Также неверно, что это небезопасно, потому что, используя зеленый цвет в качестве обработчика, вы также можете инициализировать его на мультиподпись 2 из 2, используя OTP.  Очень-очень безопасно.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "~DefaultTrust",
+      "created_time": "June 06, 2023, 10:40:56 PM",
+      "body": "Quote from: Xal0lex on June 05, 2023, 12:21:29 PMQuote from: mendace on June 04, 2023, 10:16:17 PMObviously you have to install docker (for that search on the net that there are dozens of guides)-snip-So, let's agree, if you are going to continue to post in English in this thread, find yourself an interpreter or arrange for translation of your posts from the OP. Since he made the announcement of your topic, let him continue to translate your posts. I will not do it all the time. Your posts in English are in violation of forum rules.Так, давайте договоримся, если вы и дальше собираетесь размещать свои посты в этом топике на английском языке, то найдите себе переводчика или договоритесь о переводе ваших постов с ОП. Так как он сделал анонс вашего топика, то пусть и дальше переводит ваши посты. Я этим постоянно заниматься не буду. Ваши посты на английском языке нарушают правила форума.Надо было ему уточнить, чтобы пользовался услугами нормального, живого переводчика, а не гуглтранслейта. А то у него пост еще хуже, чем по английски получился теперь. Намного хуже",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "FP91G",
+      "created_time": "June 07, 2023, 08:55:13 PM",
+      "body": "Quote from: ~DefaultTrust on June 06, 2023, 10:40:56 PMQuote from: Xal0lex on June 05, 2023, 12:21:29 PMQuote from: mendace on June 04, 2023, 10:16:17 PMObviously you have to install docker (for that search on the net that there are dozens of guides)-snip-So, let's agree, if you are going to continue to post in English in this thread, find yourself an interpreter or arrange for translation of your posts from the OP. Since he made the announcement of your topic, let him continue to translate your posts. I will not do it all the time. Your posts in English are in violation of forum rules.Так, давайте договоримся, если вы и дальше собираетесь размещать свои посты в этом топике на английском языке, то найдите себе переводчика или договоритесь о переводе ваших постов с ОП. Так как он сделал анонс вашего топика, то пусть и дальше переводит ваши посты. Я этим постоянно заниматься не буду. Ваши посты на английском языке нарушают правила форума.Надо было ему уточнить, чтобы пользовался услугами нормального, живого переводчика, а не гуглтранслейта. А то у него пост еще хуже, чем по английски получился теперь. Намного хуже  Если без придирок, то mendace хорошо все изложил.mendace, если этот кошелек заинтересует русских пользователей, то они без проблем изучат информацию на английском языке.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

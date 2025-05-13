@@ -1,0 +1,69 @@
+{
+  "id": "topic_5457887",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "June 28, 2023, 01:52:39 PM",
+  "content": "Here is what a raw, unsigned transaction is supposed to look like:Code:+------------+-----------------+-----------+-------------------+--------------+-----------+----------+|   Version  |  Input Count    |  Inputs   | Output Count       |  Outputs     | Locktime  ||   (4 bytes)|   (4 bytes)      |           |   (4 bytes)         |              | (4 bytes) |+------------+---------+-------+-----------+---------+---------+--------------+-----------+          |   |         |                  |   |         |          v   v         v                  v   v         v+--------+-----+---------+----+-----------+----+-----------+--------+|   Input 1      |   Input 2      |   Input 3   |  ...  |              ||   (Variable)   |   (Variable)   |   (Variable)|       |              |+--------+-----+---------+----+-----------+----+-----------+--------+          |   |         |                  |   |         |          v   v         v                  v   v         v+---------------------------------------------------------------+|                             Input                              ||            OutPoint Hash            | OutPoint Index | ...   ||         (32 bytes)                |  (4 bytes)        | ...   ||                                 |                           |       ||           Script Length           |   Script Sig     | ...   ||           (1 byte)                   |  (Variable)         | ...   ||                                 |                           |       ||            Sequence                   | ...                     |         ||         (4 bytes)                    |                             |         ||                                 |                           |       ||                             Witness                           ||                       (Variable Size)                      |+---------------------------------------------------------------+          |   |         |                  |   |         |          v   v         v                  v   v         v+--------+-----+---------+----+-----------+----+-----------+--------+|   Output 1     |   Output 2    |   ...         |              |              ||   (Variable)  |   (Variable) |                |              |              |+--------+-----+---------+----+-----------+----+-----------+--------+          |   |         |                  |   |         |          v   v         v                  v   v         v+---------------------------------------------------------------+|                             Output                             ||                Value                 | PK Script Len | ...   ||         (8 bytes)                 |  (1 byte)           | ...   ||                                 |                           |       ||           PK Script                  | ...                     |         ||         (Variable)                  |                             |         |+---------------------------------------------------------------+(disclaimer: I asked chatgpt to make it - but had to reprompt it over and over again and had to feed it with info from https://bitcoin.stackexchange.com/questions/77180/what-is-the-witness-and-what-data-does-it-contain to get it right. Boxes look crappy for this reason).Specifically, is the Witness part of the transaction in the correct place, and are the sizes all good?Should Witness be in the Inputs section or in it's own place in the transactions struct?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5457887",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "June 28, 2023, 03:27:19 PM",
+      "body": "QuoteI asked chatgpt to make itI guess that is the reason why those things are not properly aligned. Usually, in human-generated ASCII-arts, there are proper amount of spaces or tabs in all places. Also, usually too high temperature can dramatically change those things.Quotebut had to reprompt it over and over again and had to feed it with info from https://bitcoin.stackexchange.com/questions/77180/what-is-the-witness-and-what-data-does-it-contain to get it rightThere are places that can explain it better, for example: https://en.bitcoin.it/wiki/Transaction#General_format_of_a_Bitcoin_transaction_.28inside_a_block.29Also, you can look at some BIPs, there are also better examples than that, for example here: https://github.com/bitcoin/bips/blob/master/bip-0143.mediawikiQuoteBoxes look crappy for this reasonNot necessarily. Even in simple cases like \"draw me a sample sudoku\" or \"write a xor table for hexadecimal characters\", it is quite easy to get non-aligned rectangles, not to mention that you can play some simple game with 4x4 boxes, and it can suddenly become 4x5, because those bots don't understand those things at all. It is similar case as with 6 fingers. Not to mention that if you try some basic maths like \"5a827999^2\", multiplied in a traditional way, as taught in school, then those AI models simply explode with random results.QuoteSpecifically, is the Witness part of the transaction in the correct place, and are the sizes all good?Definitely not.1. Input Count (4 bytes) - not really, it is VarInt2. Output Count (4 bytes) - the same as above3. Script Length (1 byte) - also VarInt4. Witness (Variable Size) - yes, it is present, but not in inputs, it is placed before locktime5. PK Script Len (1 byte) - not necessarily public key, and also VarIntQuoteShould Witness be in the Inputs section or in it's own place in the transactions struct?Start from this: https://en.bitcoin.it/wiki/Transaction#General_format_of_a_Bitcoin_transaction_.28inside_a_block.29There are two places you have to check. One is \"Flag\", always set to \"0001\", and another is \"Witnesses\", just before locktime.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 29, 2023, 05:55:49 AM",
+      "body": "Witness is part of the inputs, it should also be the same count as the number of inputs (eg. 3 inputs needs 3 witnesses) or be omitted entirely if the transaction isn't spending any SegWit outputs. Only its position inside the serialized transaction is before the locktime.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 29, 2023, 06:24:03 AM",
+      "body": "Quote from: pooya87 on June 29, 2023, 05:55:49 AMWitness is part of the inputs, it should also be the same count as the number of inputs (eg. 3 inputs needs 3 witnesses) or be omitted entirely if the transaction isn't spending any SegWit outputs. Only its position inside the serialized transaction is before the locktime.When you say that, you mean 1 witness per input, all of which are placed before the locktime, and only if the flag bytes indicating presence of witness data are present and set, right?Why are the flag bytes even optional anyway? What's to prevent an implementation from accidentally reading the n_inputs bytes as part of the flags?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "June 29, 2023, 07:32:41 AM",
+      "body": "QuoteOnly its position inside the serialized transaction is before the locktime.True, but AI cannot understand that difference.QuoteWhen you say that, you mean 1 witness per input, all of which are placed before the locktime, and only if the flag bytes indicating presence of witness data are present and set, right?Yes.QuoteWhy are the flag bytes even optional anyway?Because Segwit is a soft-fork, and it has to be backward-compatible with legacy transactions.QuoteWhat's to prevent an implementation from accidentally reading the n_inputs bytes as part of the flags?Value \"0001\" would mean \"zero inputs\" after reading \"00\". That would be obviously invalid.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 29, 2023, 07:37:33 AM",
+      "body": "Quote from: NotATether on June 29, 2023, 06:24:03 AMWhen you say that, you mean 1 witness per input, all of which are placed before the locktime, and only if the flag bytes indicating presence of witness data are present and set, right?Yes. 1 witness for each input only if there were at least one SegWit output being spent. The non-SegWit witnesses are going to be empty witness. The order is the same as the input order, all placed before locktime.QuoteWhy are the flag bytes even optional anyway?Flag byte is mandatory not optional. It must exist if the transaction contains any witness and it must not exist if the transaction doesn't contain any witnesses.It should not be confused with \"stripped transaction\" that we sent to old clients that can not interpret SegWit at all. In those cases we strip everything (flag and witnesses).QuoteWhat's to prevent an implementation from accidentally reading the n_inputs bytes as part of the flags? Flag is a fixed size value (2 bytes) that starts with zero. That makes it impossible to interpret it any other way. The interpreter seeing the first 0x00 byte can not interpret it as input count (that would be 0 inputs and the tx will be invalid and rejected). It has to see the next byte and it must be 0x01 hence completing the flag. Then it reads the input count as a variable length integer.Edit: For compatibility sake the BIP calls the 0x00 a \"marker\" and the flag to be \"0x01\" while in my comment I refer to the 2 byte (0x0001) to be the flag since there is no alternative.https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#specification",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 29, 2023, 07:46:25 AM",
+      "body": "Quote from: pooya87 on June 29, 2023, 07:37:33 AMQuoteWhat's to prevent an implementation from accidentally reading the n_inputs bytes as part of the flags? Flag is a fixed size value (2 bytes) that starts with zero. That makes it impossible to interpret it any other way. The interpreter seeing the first 0x00 byte can not interpret it as input count (that would be 0 inputs and the tx will be invalid and rejected). It has to see the next byte and it must be 0x01 hence completing the flag. Then it reads the input count as a variable length integer.So pre-Segwit, in early versions of the network eg. Bip16 p2sh deployment, there was a flag field after the version field but its two bytes were reserved for a future use?That's the only way I see the transaction format as still being backward-compatible, since they can't just squash a new field or two in between other fields for new deployments.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 29, 2023, 07:57:18 AM",
+      "body": "Quote from: NotATether on June 29, 2023, 07:46:25 AMSo pre-Segwit, in early versions of the network eg. Bip16 p2sh deployment, there was a flag field after the version field but its two bytes were reserved for a future use?That's the only way I see the transaction format as still being backward-compatible, since they can't just squash a new field or two in between other fields for new deployments.No, there were no flag+marker bytes before SegWit in the transactions. Immediately after the 4 byte version were the input count. After SegWit these two bytes were introduced.The way we stay backward compatible is by stripping the transactions of their \"new fields\" before sending them to old clients.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

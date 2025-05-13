@@ -1,0 +1,165 @@
+{
+  "id": "topic_5461057",
+  "title": "0n0t0le",
+  "author": "0n0t0le",
+  "created_time": "July 25, 2023, 10:41:48 PM",
+  "content": "Hi everyone!In this post I’d like to discuss a very strange situation that happened on July 12 this year with my (and it seems not only mine) bitcoin wallet.Some input about my setupSince 2018, I've been using a Bitcoin Core wallet (full node, but slightly cut down with a log block limit of about 30 GB + headers, etc.) on my own server (Ubuntu 16.04). The wallet was used not only to store BTC, but also periodically to deposit and withdraw BTC. Interacted with the node locally on my server.The mnemonic for the current wallet was generated in 2020 using this library:bitcore-mnemonic + bitcore-lib . The mnemonic was stored on the server, and also in my encrypted file with keys (strongbox), I did not decrypt it and did not use it in open form from the moment it was generated and placed in the wallet, because there was no need for it. Several backups of wallet.dat also resided on the server and never left it.Only I exclusively had access to the server via SSL, it was done from reliable places and with all precautions, and no extraneous activity on the server was recorded before, during or after the situation.I have used the following wallet versions in chronological order:#ENV BITCOIN_VERSION 0.16.0#ENV BITCOIN_VERSION 0.16.3#ENV BITCOIN_VERSION 0.18.0#ENV BITCOIN_VERSION 0.20.0 — was used at the time of the leakENV BITCOIN_VERSION 0.25.0 — the current version, which I rolled out right afterAlso, I somehow used the following libraries on this server:bip39bitcoin-corebitcoinjs-libbitcoin-opspushdata-bitcoinvaruint-bitcoinAbout the situation that occurred on July 12Nothing out of the ordinary has happened to date. On the afternoon of July 12, precisely at 12:38 (UTC), without my knowledge from my wallet was carried out a transaction to withdraw 0.25211065 BTC to an unknown address — 3D2mKf28exn26v7BCVe9AXrrg4BY7qvYcvThe transaction itself is very interesting, so let's take a closer look, here is its hash:a22b33a9a4ca0de2f56ef166298c186c5d71e56b944a255c2ecc52748f8f774bThis transaction performed a withdrawal from 1207 (!) ADDRESSES for a total amount of 14.846758BTC (of which 4 addresses are mine with 0.25211065 BTC of belongings), apparently to the attacker's wallet, which is indicated above.I found out that my address had less BTC (surprisingly, after an unauthorized withdrawal 1.05328237 BTC remained in the wallet) only in the evening, and at first I thought that maybe those bitcoins were stuck somewhere on the address for change, which had not yet been pulled up by the wallet. I decided to download Bitcoin core to my work PC and import wallet.dat in there (it only left the server for the first time after I discovered my diminished balance) to check everything again. Furthermore, I also resynchronized cli-wallet on the server, but the balance did not visually change and the missing 0.25 BTC did not appear. After Bitcoin core synced on my PC, I saw a transaction with a withdrawal of 0.25 BTC dated July 12, see the screenshots below.Withdrawal transaction data:Code:Status: 1193 confirmationsDate: 12.07.2023 12:38Debit: -0.01522098 BTCDebit: -0.01081528 BTCDebit: -0.17609659 BTCDebit: -0.04997780 BTCNet amount: -0.25211065 BTCTransaction ID: a22b33a9a4ca0de2f56ef166298c186c5d71e56b944a255c2ecc52748f8f774bTransaction total size: 180334 bytesTransaction virtual size: 91507 bytesOutput index: 0At that moment, I finally realized that BTC wasn’t stuck anywhere, but was withdrawn (stolen) by someone to an address unknown to me, and therefore I decided to withdraw the remaining 1.05 BTC from my wallet to another safe address, assuming that my wallet could be compromised. Please note: I withdrew 1.05 BTC to a secure address only on July 19 - a week after the event, but the BTC from the allegedly compromised wallet was waiting for me in there all this time - don't you find this strange?I personally find it very strange that the attacker withdrew only a part of bitcoins from my wallet, not all of them. Upon closer examination, I found that all bitcoins were withdrawn from bech32(segwit) addresses, which were automatically created by the wallet as addresses for receiving change after the outgoing transactions I made (addresses created on June 30, 2023, May 29, 2022, June 15, 2023, June 30, 2023, respectively). At the same time, all the addresses that I created as part of using the wallet remained untouched.In addition, the fact that this withdrawal affected more than 1200 addresses within one transaction (!)  led me to the assumption that this was some kind of a planned event, which may be the result of a vulnerability in some library, or even a bakcdoor that was used by an attacker to carry out this theft.I would very much like to discuss this situation with the members of the forum in order to understand the details and exactly where and how my wallet was compromised (along with a large number of others), and, importantly, how to avoid this in the future. Ready to answer your questions.QuoteI consider the version with obtaining unauthorized access to the server untenable, because there were also nodes with other crypto on the server, but fortunately they remained untouched. I also very much doubt that the mnemonics could leak from my key holder, because there were many more interesting things for a thief, but nothing like this happened anywhere else.QuoteP.S. It may be that you or your friends own one of 1200+ addresses that have also been hacked - in this case, do not hesitate to share your version of what happened, so we can get to the truth as quickly as possible.QuoteP.S.2 for some unknown reason, my similar post on reddit was deleted by moderatorsThanks for your attention.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5461057",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "July 26, 2023, 06:23:35 AM",
+      "body": "By default, Bitcoin Core doesn't use a mnemonic, and in general storing it online (even when encrypted) is considered bad practice.That doesn't explain why someone took only part of your funds though, and it also doesn't explain why many wallets were emptied at the same time. Maybe it's a hacker who didn't need all money but only wanted to show his skills and take a part of the coins. It doesn't make much sense.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 26, 2023, 07:37:45 AM",
+      "body": "Quote from: 0n0t0le on July 25, 2023, 10:41:48 PMI have used the following wallet versions in chronological order:Incidentally, there was a post in Trustwallet's support page with the same problem and TXID.Luckily, Google still has the cached copy: community.trustwallet.com/t/topic/806521&cd (Russian)If it's a legitimate post, this could be unrelated to any of your old Bitcoin Core versions.Finding the cause isn't going to be easy though, start from listing all possible attack vectors in your setup.Quote from: 0n0t0le on July 25, 2023, 10:41:48 PMQuoteP.S.2 for some unknown reason, my similar post on reddit was deleted by moderatorsMust be the title.It more sounds like an FUD than a technical support topic, try something neutral.Also, do not use \"accounts\" when talking about addresses, it may have been contributed to their decision to delete the thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaCryptoRaccoon",
+      "created_time": "July 26, 2023, 09:43:51 AM",
+      "body": "Just spotted this for a few months back on the dev list.libsecp256k1 bug?  This flew under the radar a bit.Could be related?https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2023-April/021553.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 26, 2023, 09:49:30 AM",
+      "body": "Do you have the access logs to your Ubuntu Server? Are you certain that nothing has accessed it, not even via hypervisor or anything similar? Things like these tends to go unnoticed when doing cyber forensics for most. I have my doubts that the generation of your seeds is the problem, I don't see any vulnerabilities in recent times for those wallets that you've listed and they are fairly well vetted unless it is zero day.I highly doubt that Bitcoin Core would be the issue, other than the fact that RPC functions could be the culprit. That leaves both your server and seed generation to be weak, I'm not aware of any concurrent vulnerability affecting it but it is not maintained at all. Is there any RPC connection visible in your debug.log?Anyways, it's not over 1000 addresses, a quick look indicates that a good portion of the funds belongs to this: https://blockchair.com/bitcoin/address/bc1qxs3ugdgda5ljt20uuqegljzlq8rnjcxnjrjj6h. Weirdly enough, the amounts being sent to the wallets are regular and around the same size before the attack.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 27, 2023, 11:30:40 AM",
+      "body": "You mentioned the attacker only targeted Segwit UTXOs. So maybe the malware was using a block explorer that checks the balances of different types of addresses and displays them separately (i.e. not by private key), and that's what lead the hacker to go out and only steal from bech32 addresses.Then again, I find the outgoing transactions suspicious too, because they are being sent to 100+ receipients.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Findingnemo",
+      "created_time": "July 27, 2023, 12:09:36 PM",
+      "body": "Quote from: NotATether on July 27, 2023, 11:30:40 AMYou mentioned the attacker only targeted Segwit UTXOs. So maybe the malware was using a block explorer that checks the balances of different types of addresses and displays them separately (i.e. not by private key), and that's what lead the hacker to go out and only steal from bech32 addresses.Then again, I find the outgoing transactions suspicious too, because they are being sent to 100+ receipients.This can't be the reason because I found Legacy and Segregated Witness (SegWit) Addresses (P2SH-P2WPKH) too in the senders list from the hast that OP shared so it doesn't make any sense that the hacker just stole a part of the money from wallets and more interestingly he left them unspent 3D2mKf28exn26v7BCVe9AXrrg4BY7qvYcvBut usually, they will try to convert them ASAP to cut the traces.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "0n0t0le",
+      "created_time": "July 27, 2023, 10:24:33 PM",
+      "body": "Quote from: ranochigo on July 26, 2023, 09:49:30 AMDo you have the access logs to your Ubuntu Server? Are you certain that nothing has accessed it, not even via hypervisor or anything similar? Things like these tends to go unnoticed when doing cyber forensics for most. I have my doubts that the generation of your seeds is the problem, I don't see any vulnerabilities in recent times for those wallets that you've listed and they are fairly well vetted unless it is zero day.I highly doubt that Bitcoin Core would be the issue, other than the fact that RPC functions could be the culprit. That leaves both your server and seed generation to be weak, I'm not aware of any concurrent vulnerability affecting it but it is not maintained at all. Is there any RPC connection visible in your debug.log?Anyways, it's not over 1000 addresses, a quick look indicates that a good portion of the funds belongs to this: https://blockchair.com/bitcoin/address/bc1qxs3ugdgda5ljt20uuqegljzlq8rnjcxnjrjj6h. Weirdly enough, the amounts being sent to the wallets are regular and around the same size before the attack.I understand that in the first place you can think about the vulnerability of the server, but besides bitcoin, there was still a lot of things that could be stolen, but nothing was stolen, moreover, not even all of the bitcoin was stolen, so this is anything but not a server vulnerability. Perhaps the problem is indeed in weak entropy, but what exactly in my case, I don’t understand.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 28, 2023, 03:48:06 AM",
+      "body": "Quote from: 0n0t0le on July 27, 2023, 10:24:33 PMI understand that in the first place you can think about the vulnerability of the server, but besides bitcoin, there was still a lot of things that could be stolen, but nothing was stolen, moreover, not even all of the bitcoin was stolen, so this is anything but not a server vulnerability. Perhaps the problem is indeed in weak entropy, but what exactly in my case, I don’t understand.Fair point, but I was eliminating various possibilities before coming to this conclusion. If you're talking about weak entropy, the only possible point of failure lies with BitPay, Bitcoin Core does have a pretty robust system when it comes to RNG by taking randomness from multiple sources. It would be hard to imagine that it would be a point of failure and besides the there are no address reuse (I presume) and it would eliminate the possibility signature nonce re-use (nonces are deterministic anyways).Taking in mind that the possibility of Bitcoin Core being flawed is fairly low, the only two possible factors would be any vulnerabilities within your server or BitPay. Regardless, eliminating possibility based on the possible psychological thinking of the attacker wouldn't be effective in determining the actual cause. Perhaps they are only interested in those, perhaps they didn't want to draw attention to themselves, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "July 28, 2023, 11:26:06 AM",
+      "body": "1) Where are you hosting this locally or someplace else: https://www.bleepingcomputer.com/news/security/critical-ami-megarac-bugs-can-let-hackers-brick-vulnerable-servers/2) If you are not hosting is on your own hardware keep in mind Meltdown and Spectre are still a thing https://meltdownattack.com/ if your provider did not apply patches which many have not even now 5 1/2 years later3) Ubuntu 16.04 has been out of support for a while now and had known vulnerabilities4) Since Ubuntu 16.04 is out of support there are probably other things on it that have not been updated: https://thehackernews.com/2023/07/new-openssh-vulnerability-exposes-linux.html5) The PC you connect FROM could have some compromise on it.6) There is no such thing as a secure location if I know you are there and have the time to plan. MITM attacks and such are a real thing and can be targeted.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joniboini",
+      "created_time": "July 29, 2023, 08:32:39 AM",
+      "body": "Quote from: ICYNOTE2023 on July 28, 2023, 10:30:41 AMI don't know, is it because my core wallet hasn't been active for a long time.It doesn't matter whether you open your wallet regularly or not, as long as your private key is secure and not exposed you should be fine. If you are sure your case is similar to OP then you can provide more details. Saying that you might get hacked doesn't really help much. A lot of people got hacked and quickly blame their wallet app, even though it was their fault for storing keys on the cloud, downloading malware, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "serveria.com",
+      "created_time": "July 30, 2023, 05:21:07 PM",
+      "body": "Quote from: DaveF on July 28, 2023, 11:26:06 AM1) Where are you hosting this locally or someplace else: https://www.bleepingcomputer.com/news/security/critical-ami-megarac-bugs-can-let-hackers-brick-vulnerable-servers/2) If you are not hosting is on your own hardware keep in mind Meltdown and Spectre are still a thing https://meltdownattack.com/ if your provider did not apply patches which many have not even now 5 1/2 years later3) Ubuntu 16.04 has been out of support for a while now and had known vulnerabilities4) Since Ubuntu 16.04 is out of support there are probably other things on it that have not been updated: https://thehackernews.com/2023/07/new-openssh-vulnerability-exposes-linux.html5) The PC you connect FROM could have some compromise on it.6) There is no such thing as a secure location if I know you are there and have the time to plan. MITM attacks and such are a real thing and can be targeted.-DaveGood points but it doesn't explain why only some part of funds were stolen. That's very weird. Frankly, I haven't heard of any other such case. As soon as the bad guys gain access to your wallet they normally empty it dry asap.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "August 01, 2023, 09:52:27 PM",
+      "body": "Quote from: 0n0t0le on July 27, 2023, 10:24:33 PMI understand that in the first place you can think about the vulnerability of the server, but besides bitcoin, there was still a lot of things that could be stolen, but nothing was stolen, moreover, not even all of the bitcoin was stolen, so this is anything but not a server vulnerability. Perhaps the problem is indeed in weak entropy, but what exactly in my case, I don’t understand.If you generated keys online there is a chance some of them got leaked, but maybe you can tell us what did you use for generating entropy?Being a little paranoid during this entropy generation is not a bad thing, and I am even starting to suspect in entropy generated by closed source hardware wallets like ledger.I think you should always do this part offline, and I would never keep keys online or cloud, aka other people computers, even if it has additional encryption.I am sure there is a way for exchange to use some kind of multisig setup to prevent hacks like this happening in future.If you are interested how Seed Generation works in Hardware Wallets check out one of my topics:https://bitcointalk.org/index.php?topic=5317199.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 10, 2023, 10:15:06 AMLast edit: August 10, 2023, 10:29:09 AM by NotATether",
+      "body": "In light of recent events, I think we may have an idea as to what happened.After libbitcoin explorer was found to have an extremely insecure seed generation command called bx seed, it must be concluded that the OP used bx seed to create the mnemonic. Particularly after following instructions from the Mastering Bitcoin book (which has instructions for using bx seed).Personally, if I was a normal user, I would not had suspected anything wrong with using that.The real scummy part was that in 2016 (probably after the book was publish since A.A. would have done his due diligence before publishing anything), the devs changed the secure random generator to a Mersenne Twister pseudorandom generator, which is no better than ordinary Python random numbers - and according to source code comments, they were considering even using rand(3) and srand(3), only backing out because the functions were not thread safe!(hurr durr so cryptographic safety is not as important then. )The OP's July 12 theft date coincides with what is shown on the MilkSad homepage. It must be concluded that the attacker was using libbitcoin command-line software in order to carry out the theft.How they managed to use that software is incredulous, because building libbitcoin is an arse. But anyway, this must be what happened.Note: OP says they used bitcore libraries to generate the mnemonic, but from this: https://milksad.info/disclosure.html it says the researchers confirmed that that mnemonic was somehow generated using bx seed or at least a pseudorandom generator (mt19937).Bitcore also has insecure pseudorandom key generators, but I could not verify whether any of them are actually called when making the mnemonic.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 10, 2023, 12:04:44 PM",
+      "body": "Quote from: NotATether on August 10, 2023, 10:15:06 AMIn light of recent events, I think we may have an idea as to what happened.After libbitcoin explorer was found to have an extremely insecure seed generation command called bx seed, it must be concluded that the OP used bx seed to create the mnemonic. Particularly after following instructions from the Mastering Bitcoin book (which has instructions for using bx seed).Personally, if I was a normal user, I would not had suspected anything wrong with using that.The real scummy part was that in 2016 (probably after the book was publish since A.A. would have done his due diligence before publishing anything), the devs changed the secure random generator to a Mersenne Twister pseudorandom generator, which is no better than ordinary Python random numbers - and according to source code comments, they were considering even using rand(3) and srand(3), only backing out because the functions were not thread safe!(hurr durr so cryptographic safety is not as important then. )The OP's July 12 theft date coincides with what is shown on the MilkSad homepage. It must be concluded that the attacker was using libbitcoin command-line software in order to carry out the theft.How they managed to use that software is incredulous, because building libbitcoin is an arse. But anyway, this must be what happened.Note: OP says they used bitcore libraries to generate the mnemonic, but from this: https://milksad.info/disclosure.html it says the researchers confirmed that that mnemonic was somehow generated using bx seed or at least a pseudorandom generator (mt19937).Bitcore also has insecure pseudorandom key generators, but I could not verify whether any of them are actually called when making the mnemonic.Although what you said is more likely then what I posted about, keep in mind some of the server vulnerabilities I pointed out, and some others that are also out there allow for reading of memory outside of what should be your private VM.If you got a dump of what was in the OPs machine you might not have gotten all the keys just the ones that were doing something at the time.And without knowing more about the physical hosting setup, it's all a guess.A lot of the time it's not the OS / software but the people involved. In theory I have no access to a lot of what my clients have stored on their machines.In reality, it's amazing how much they just give to me when they are having an issue and need help with an issue.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 10, 2023, 04:21:11 PM",
+      "body": "Quote from: NotATether on August 10, 2023, 10:15:06 AMNote: OP says they used bitcore libraries to generate the mnemonic, but from this: https://milksad.info/disclosure.html it says the researchers confirmed that that mnemonic was somehow generated using bx seed or at least a pseudorandom generator (mt19937).Bitcore also has insecure pseudorandom key generators, but I could not verify whether any of them are actually called when making the mnemonic.Possibly unrelated. Bitcore uses crypto.getrandomvalues which should request the browser to seed from urandom. There should be some checks on the bias of the data as well. JS is not great for CSPRNG but I wouldn't expect it to be that much of a security risk. Besides, OP seems to mention that Bitcoin Core generated those addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "August 10, 2023, 06:14:39 PM",
+      "body": "Sorry for your loss.  Just going through your post I have some comments and some suggestions. Quote from: 0n0t0le on July 25, 2023, 10:41:48 PMSince 2018, I've been using a Bitcoin Core wallet (full node, but slightly cut down with a log block limit of about 30 GB + headers, etc.) on my own server (Ubuntu 16.04). The wallet was used not only to store BTC, but also periodically to deposit and withdraw BTC. Interacted with the node locally on my server.I don't like mixing servers and wallets.  If I'm opening a node to the network, even just my local network, I wont ever use it to open a wallet.  Maybe overkill on the paranoid side, but just because I'm paranoid doesn't mean a hacker isn't trying to get at my coins.  Quote from: 0n0t0le on July 25, 2023, 10:41:48 PMThe mnemonic for the current wallet was generated in 2020 using this library:bitcore-mnemonic + bitcore-lib .Unconventional key generation.  I didn't go through this code, but I couldn't help but notice that bitcore-mnemonic is a Java applet.  As far as I know web-browser and Java based seed generators won't provide the same entropy that a python or C++ seed generator can.  Again, to my admittedly limited knowledge this is due to whether the applet can access the CPU's ability to generate randomness, and I don't know if this particular Java app can do so.  If I'm wrong in this instance, this could be a non-issue.Quote from: 0n0t0le on July 25, 2023, 10:41:48 PMThe mnemonic was stored on the server, and also in my encrypted file with keys (strongbox), I did not decrypt it and did not use it in open form from the moment it was generated and placed in the wallet, because there was no need for it. Several backups of wallet.dat also resided on the server and never left it.I don't know if this had anything to do with your hack, but storing seeds digitally, especially on the same machine as the wallet isn't very secure regardless of whether the info is encrypted or not.  Loss of the machine could mean loss of your funds and all the backups.Quote from: 0n0t0le on July 25, 2023, 10:41:48 PMOnly I exclusively had access to the server via SSL, it was done from reliable places and with all precautions, and no extraneous activity on the server was recorded before, during or after the situation.Please correct me if I'm wrong, but this makes me think you were using a third party VPS provider to run your node and wallet.  That's a big security risk in my opinion.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 11, 2023, 02:38:56 AM",
+      "body": "Quote from: DireWolfM14 on August 10, 2023, 06:14:39 PMUnconventional key generation.  I didn't go through this code, but I couldn't help but notice that bitcore-mnemonic is a Java applet.  As far as I know web-browser and Java based seed generators won't provide the same entropy that a python or C++ seed generator can.  Again, to my admittedly limited knowledge this is due to whether the applet can access the CPU's ability to generate randomness, and I don't know if this particular Java app can do so.  If I'm wrong in this instance, this could be a non-issue.Depends. Those CSPRNG generally will still seed their randomness pool with the entropy from OS's CSPRNG and under normal circumstances, this wouldn't be compromised. From what I can tell, they are calling the correct functions. CPU is just one of the many inputs for the entropy pool and there are various other sources for entropy, hardware interrupts, noise, keyboard inputs, etc. The randomness falls on the OS's ability to gather these, not the CPU.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 12, 2023, 01:10:15 PM",
+      "body": "Quote from: ranochigo on August 11, 2023, 02:38:56 AM.... The randomness falls on the OS's ability to gather these, not the CPU. Minor nitpick but it should be 'The randomness falls on the OS's ability to gather these AND USE THEM PROPERLY, not the CPUThere have been a few times when programmers screwed it up and took totally random, non duplicate entropy and gave bad randomness but to bad programming. We have to trust that they did it right, but have seen many times though the decades of computing that they did non.https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "August 12, 2023, 03:04:13 PM",
+      "body": "for the life of me I do not understand why any trusts a computer for a seed.2048 words.make a set of columns32 by 64  as 32 x 64 = 2048next buy 2 bingo machineshttps://www.amazon.com/gp/product/B088CHK7HY/ref=ox_sc_act_title_1?put 64 balls in first 1-64put 32 balls in the other 1-32spin first get a 30spin second get a  3030 x 30 = 900go to 900th word on the list2 spins for one word24 spins for 12 words48 spins for 48 words.are the 2 machines perfectly random not likely but they are very likely random enough that no one will be able to understand the lack of perfect randomness for those 2 machines. Even if they buy 2 of the same make and model. Since they likely not perfectly identical even having 2 of the same units won't help much.In fact if you have a lot of coin buy 4 separate bingo machines from 4 different companies.https://www.amazon.com/s?k=bingo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

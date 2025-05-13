@@ -1,0 +1,133 @@
+{
+  "id": "topic_5421488",
+  "title": "weyrfencing18",
+  "author": "weyrfencing18",
+  "created_time": "November 16, 2022, 07:36:24 PM",
+  "content": "A friend had Bitcoin stored on an old iPhone (back from 2012), in an app called «Bitwallet» (by Sollico software).But when they tried to transfer it out, it complained about the key being \"neither a compressed or uncompressed key\".No software would take the private key in (tried a dozen), and trying a WiF decoder showed it's invalid (even though it \"looks\" right, starts with 5K, right length, etc).So I decoded it using a small nodejs script, and what I found is a key where 15 of the bytes are FF.Something like :80 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff etc... <15 real bytes, kept secret, presumably valid> <checksum>So my guess here would be that somehow the flash on the iphone got corrupted, and half the key is missing.Does that make sense, or am I missing something, and a key with half of it being ffff makes sense in some way I couldn't find?We also have the public key/address. So what we have (if I get this right) is the public address, half the private key, and the checksum. Any reasonable way to get to the coins with this?This is like around 128bits of entropy, which doesn't sound like it can be cracked, but could the checksum and public address help in some way?Any other ideas of what to do? There's 3 BTC on there.Thanks in advance for any ideas.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5421488",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "November 16, 2022, 07:50:33 PM",
+      "body": "bitWallet looks like it's still (somewhat) active:https://apps.apple.com/us/app/bitwallet/id777634714http://www.sollico.com/bitwallet/Did you try reaching out to them for help? If they did something funky in older versions of the wallet they may be the only people who can help you.This was not unheard of in years gone by, everyone wanted to do their own thing to make their wallet different.If it is indeed something corrupted in the wallet itself you are probably not going to be able to retrieve it too easily.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "weyrfencing18",
+      "created_time": "November 16, 2022, 09:17:41 PM",
+      "body": "Quote from: DaveF on November 16, 2022, 07:50:33 PMDid you try reaching out to them for help? I did email them and have not gotten an answer yet, yes.Thanks for the reply!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "casinotester0001",
+      "created_time": "November 16, 2022, 10:31:05 PM",
+      "body": "Quote from: weyrfencing18 on November 16, 2022, 07:36:24 PM80 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff etc... <15 real bytes, kept secret, presumably valid> <checksum>are the <15 real bytes, kept secret, presumably valid> = \"FEBAAEDCE6AF48A03BBF...\"?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 17, 2022, 04:05:19 AM",
+      "body": "Quote from: weyrfencing18 on November 16, 2022, 07:36:24 PMSo I decoded it using a small nodejs script, and what I found is a key where 15 of the bytes are FF.Something like :80 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff etc... <15 real bytes, kept secret, presumably valid> <checksum>So my guess here would be that somehow the flash on the iphone got corrupted, and half the key is missing.A corrupted storage won't have a correct key string like this. You got the first byte correctly (0x80) which means there is no corruption here. Additionally if your checksum was valid, that could be another reason why it is not corrupted.P.S. It's odd that you have so many of these \"friends\" who come into possession of weird looking stuff which you then try to \"crack\" for them...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 17, 2022, 08:13:28 AM",
+      "body": "Quote from: weyrfencing18 on November 16, 2022, 07:36:24 PMNo software would take the private key in (tried a dozen), and trying a WiF decoder showed it's invalid (even though it \"looks\" right, starts with 5K, right length, etc).-snip-Any other ideas of what to do? There's 3 BTC on there.Let me guess, it's: 5Km2kuu7vtFDPpxywn4u3NLpbr5jKpTB3jsuDU2KYEqetwr388P, right?I'm sorry to tell you that it's the prvKey FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 which is out of range, invalid.Sadly, no one can recover those 3.7 BTC that your \"friend\" accumulated: 1FYMZEHnszCHKTBdFZ2DLrUuk3dGwYKQxh",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "weyrfencing18",
+      "created_time": "November 17, 2022, 07:55:58 PM",
+      "body": "Quote from: pooya87 on November 17, 2022, 04:05:19 AMA corrupted storage won't have a correct key string like this.Not if you think about how the wallet would work.If the wallet does not store the WIF key (5f...) but instead stores the \"raw\" private key bytes in a file (flash), and *only* when it is asked to display it, it generates the WiF format, then this would completely make sense.Also, it's possible it's stored as a WiF \"object\", with the prefix, key, and checksum, each stored as separate \"properties\" of an object.Lots of options here that would keep the private key separate and would allow it to get independently corrupted.Looking at the other comments though, looks like that's not what's going on here, but thanks for the comment.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 18, 2022, 04:08:09 AM",
+      "body": "Quote from: weyrfencing18 on November 17, 2022, 07:55:58 PMIf the wallet does not store the WIF key (5f...) but instead stores the \"raw\" private key bytes in a file (flash), and *only* when it is asked to display it, it generates the WiF format, then this would completely make sense.That would be a very weird implementation but it could work.QuoteAlso, it's possible it's stored as a WiF \"object\", with the prefix, key, and checksum, each stored as separate \"properties\" of an object.WIF is a base58 encoded string with a checksum all as one whole string not separate parts. It can't be stored separately and as I said before if one character in it is \"corrupted\" you won't be able to decode it since the checksum would most probably be invalid.Same with prefix, it is not something that is attached later, it can only be decoded. Again if the string is corrupted, after decoding (even if you ignore checksum validation) it is unlikely to get the same prefix.P.S. to be honest, this looks like yet another fake wallet that you have found and are wasting your time on it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 22, 2022, 05:35:20 PM",
+      "body": "Quote from: weyrfencing18 on November 16, 2022, 07:36:24 PMA friend had Bitcoin stored on an old iPhone (back from 2012), in an app called «Bitwallet» (by Sollico software).But when they tried to transfer it out, it complained about the key being \"neither a compressed or uncompressed key\".[...]We also have the public key/address. So what we have (if I get this right) is the public address, half the private key, and the checksum. Any reasonable way to get to the coins with this? Any other ideas of what to do? There's 3 BTC on there.It all sounds a little suspect if you ask me, and the concerns have already been expressed. I don't think this is a \"friend\" of yours and you are concerned about his welfare. Rather, it gives your impression that you are only interested in the balance of this wallet. If it is this address 1FYMZEHnszCHKTBdFZ2DLrUuk3dGwYKQxh, then the question is why your friend is running a 10+ year old wallet on a 10+ year old iphone and is now suddenly interested in withdrawing the funds and even though coins are coming into this wallet on a regular basis (most recently this month).I think there is nothing more to add here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrivatePerson",
+      "created_time": "December 02, 2022, 08:04:05 PM",
+      "body": "Quote from: ecdsa123 on November 17, 2022, 08:47:10 AMSorry @nc50lc but it does'nt matter it is \"out of range\".see:Code:import hashlibg=(0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798,       0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8)p = ZZ( '0xFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE FFFFFC2F'.replace( ' ', '' ) )n = ZZ( '0xFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE BAAEDCE6 AF48A03B BFD25E8C D0364141'.replace( ' ', '' ) )E = EllipticCurve(GF(p), [0, 7])G = E.point( g )def egcd(a, b):    if a == 0:        return (b, 0, 1)    else:        g, y, x = egcd(b % a, a)        return (g, x - (b // a) * y, y) def modinv(a, m):    g, x, y = egcd(a, m)    if g != 1:        raise Exception('modular inverse does not exist')    else:        return x % mdef verify(r, s,z,public_key):            w = modinv(s, n)    u1 = (z * w) % n    u2 = (r * w) % n        D=u1*G + u2*public_key              x,y=D.xy()    x=int(x)            if (r % n) == (x % n):        print( \"signature matches\")            else:        print(\"invalid signature\")        r= 111175281461482630465516451385666215051004681245013976528598462758289754744929s= 70043377187322970975383334126537096260470471254635274932605589652196963378161z= 1x1=65484586321995029360829397682915368247978476961863225607803717802088249892660y1=72074870721525551148484769172216378998698581912792399280515952501346465251009P=E.point((x1,y1))x2=40909554126419277592724504966829837604137845573578049527014144934973709534933y2=87404510172103350666497040794028294741242353586809580318994867241148928032959P2=E.point((x2,y2))verify(r,s,z,P)verify(r,s,z,P2)as you see two differents pubkey are valid for the same transactions.what that means -> need finds \"additional\" pubkey for valid transactions for addres \"0\" or \"n\", then you can spend coins.realy good mathematician can do.Traceback (most recent call last):  File \"2key.py\", line 6, in <module>    p = ZZ( '0xFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE FFFFFC2F'.replace( ' ', '' ) )NameError: name 'ZZ' is not definedwhat am I doing wrong?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 03, 2022, 08:16:43 PM",
+      "body": "Quote from: nc50lc on November 17, 2022, 08:13:28 AMI'm sorry to tell you that it's the prvKey FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 which is out of range, invalid.Sadly, no one can recover those 3.7 BTC that your \"friend\" accumulated: 1FYMZEHnszCHKTBdFZ2DLrUuk3dGwYKQxhIf it's out of range, then how did you generate the public key and end up with this address?Quote from: ecdsa123 on November 17, 2022, 08:47:10 AMSorry @nc50lc but it does'nt matter it is \"out of range\".It does. Any private key greater than 2^256 - 432420386565659656852420866394968145600 is invalid. Quote from: ecdsa123 on November 17, 2022, 08:47:10 AMas you see two differents pubkey are valid for the same transactions.Two things:1. Posting some lines of code doesn't strengthen the argument, especially when you don't describe what it does. 2. That doesn't have to do with a key being out of range.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 03, 2022, 11:20:41 PM",
+      "body": "Quote from: ecdsa123 on December 03, 2022, 09:32:45 PMWhat that means , there are a lot of \"privatekeys\" for the same transactions with differents pubkeyCorrect, provided that the total RIPEMD-160 hashes are 2^160, and the total public keys a little less than 2^256, then there will collisions. However, it's very unlikely to find one, and it's impossible to prove that an output can be spent by two or more private keys unless you find those. Otherwise, it's just highly likely. Quote from: ecdsa123 on December 03, 2022, 09:32:45 PMYou are wrong. do not think there is a range or not. think about it as : there is privatekey somewhere - 2**96 possibilites. that one privatekey in this example is zero it means there are (2**96) - 1 to find. Run abstract thinking about it.I don't understand you. There is no private key with value 0. It's outside the curve's range. Also what do you mean by \"there is privatekey somewhere - 2**96 possibilites\"?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 04, 2022, 10:08:35 AM",
+      "body": "Quote from: ecdsa123 on December 04, 2022, 09:51:41 AMWe are not talking about ripemd! it does'nt have to do with ripemd.Then how is 2**96 resulted from? Quote from: ecdsa123 on December 04, 2022, 09:51:41 AMwhat is problem to make transaction for privatekey as 1 and find second valid pubkey for this new transaction of 1 and substract 1?you will be have :private key1: 1 minus 1 = 0 : not validbut privatekey2 : value x -1 : will be valid..I'm still unsure of what does this have to do with the discussion. In your code, you begin by taking two public keys that have some direct relation (as far as I understand). Have I understood correctly? Then you try to verify r, s, z from both P and P2, and it's valid. However, I don't understand how you ended up to P2 from P at start. I'm sure they weren't randomly chosen, were they?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fennic",
+      "created_time": "December 15, 2022, 07:53:00 PM",
+      "body": "Quote from: weyrfencing18 on November 16, 2022, 07:36:24 PMSomething like :80 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff etc... <15 real bytes, kept secret, presumably valid> <checksum>So my guess here would be that somehow the flash on the iphone got corrupted, and half the key is missing.Does that make sense, or am I missing something, and a key with half of it being ffff makes sense in some way I couldn't find?We also have the public key/address. So what we have (if I get this right) is the public address, half the private key, and the checksum. Any reasonable way to get to the coins with this?Thanks in advance for any ideas.Hi bro looking this key that is 80 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff that is an key that cannot be possible and I still cannot feel that how someone deposit here. And this is a key that cannot be retrieved and your friend also cannot withdraw it. There is no a flash or any kind of error in phone. If you want to check than do it another mobile or computer and it will show these same results too. I am not much of expert but I haven't seen such kind of key anywhere.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 15, 2022, 08:10:31 PM",
+      "body": "That address cannot be spent from. Quote0x00: Uncompressed private key: FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141Uncompressed WIF: 5Km2kuu7vtFDPpxywn4u3NLpbr5jKpTB3jsuDU2KYEqetwr388PUncompressed public key: EMPTYUncompressed address: 1FYMZEHnszCHKTBdFZ2DLrUuk3dGwYKQxhCompressed private key: FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD036414101Compressed WIF: L5oLkpV3aqBjhki6LmvChTCV6odsp4SXM6FfU2Gppt5kFqRzExJJCompressed public key: EMPTYCompressed address: 1FYMZEHnszCHKTBdFZ2DLrUuk3dGwYKQxhsee original post HERE",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "weyrfencing18",
+      "created_time": "January 29, 2023, 01:22:22 AM",
+      "body": "Quote from: citb0in on November 22, 2022, 05:35:20 PMIt all sounds a little suspect if you ask me,I freelance for wallet recovery services. Sometimes they have something they can't figure out, and they present the problem to me. Often this also involves me talking with the customer and doing sleuthing etc.When I can't figure something out, just in case, I'll go to forums/social media and ask around. When I do that, I always say \"my friend asked me for X and Y\", because i don't think anybody cares about the details of exactly why I need help...In this case, after investigating, it turns out the customer's story about a 10 year old iphone is bullshit, and his private key can easily be found just through Googling. Apparently this is pretty common, if you run a wallet recovery service, people will frequently contact you with keys they found randomly on the internet, pretending they are theirs, asking you for help with getting them to work.This is against TOS, but still people do it all the time. It's pretty annoying.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

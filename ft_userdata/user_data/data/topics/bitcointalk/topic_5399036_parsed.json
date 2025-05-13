@@ -1,0 +1,77 @@
+{
+  "id": "topic_5399036",
+  "title": "ecdsa123",
+  "author": "ecdsa123",
+  "created_time": "May 17, 2022, 02:14:18 PMLast edit: August 31, 2024, 02:58:08 PM by ecdsa123",
+  "content": "1",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5399036",
+  "comments": [
+    {
+      "author": "COBRAS",
+      "created_time": "May 17, 2022, 02:58:36 PM",
+      "body": "Try another rsz, after this  talk  aboutit working of this code...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "May 18, 2022, 02:16:57 AM",
+      "body": "Quote from: ecdsa123 on May 17, 2022, 03:09:31 PMCode:private=25k_key = 85r=10368879287274847063683326775245528892741533064032799844366072780982279055029 s=44682668155818600992173137533155827851900045079586924109984745069549131526906 z=65042133943224045035503970676469909507838576791821421761396617141574358581175print(\"k_key=\",calc_k(private,int(r),int(s),int(z)))print(\"private=\",calc_x(k_key,int(r),int(s),int(z)))r2 = 9882445446243370679019973441389370914782298169440461435976781902375353582684 s2 = 2100982064131629085884104838554481736960146626300897659396216122167769160017 z2 = 47314428532420400748220560251084582624892573278639669531863985966394700528682print(\"k_key=\",calc_k(private,int(r2),int(s2),int(z2)))print(\"private=\",calc_x(k_key,int(r2),int(s2),int(z2))) the same r!=r2  but k is still the same. any explanation?Code:k_key= (85, 115792089237316195423570985008687907852837564279074904382605163141518161494252)private= (25, 115792089237316195423570985008687907852837564279074904382605163141518161494312)k_key= (85, 115792089237316195423570985008687907852837564279074904382605163141518161494252)private= (25, 115792089237316195423570985008687907852837564279074904382605163141518161494312)because this i think :private=25kan you make same r with different private ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "May 18, 2022, 02:45:29 AM",
+      "body": "Are you copy pasting correctly? In one of the pastes you write k_key = 85 and get r=10368879287274847063683326775245528892741533064032799844366072780982279055029, but that's for k_key = 115.And I get verification failure with priv=25 anyway, are you sure the signatures are actually valid?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "May 18, 2022, 02:59:15 AM",
+      "body": "making fake pubkey is this vay:original Q = G * kcopy of original Q = randomK1 *(this is a fake G: (modinv(randomK1))*Q )= Q originalI think in this crypt modinv do same operation, and posible to make fake r in this way.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stanner.austin",
+      "created_time": "May 18, 2022, 08:39:57 AM",
+      "body": "HelloBy using 2 same K or weak K is already known weakness of ECDSA nothing new on this. and this happened long time go. Now days K is not only secure random 256 bit but hashed to make sure get valid 256 bit random.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fxsniper",
+      "created_time": "May 18, 2022, 11:55:02 AM",
+      "body": "Quote from: ecdsa123 on May 17, 2022, 02:14:18 PMany explain what and why it is work? , and any attack?What collision did you mean?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "May 18, 2022, 11:40:31 PM",
+      "body": "Quote from: stanner.austin on May 18, 2022, 08:39:57 AMHello By using 2 same K or weak K is already known weakness of ECDSA nothing new on this. and this happened long time go. Now days K is not only secure random 256 bit but hashed to make sure get valid 256 bit random.Exactly; it's also known as nonce reuse vulnerability.Quote from: https://blog.trailofbits.com/2020/06/11/ecdsa-handle-with-care/Therefore, not only does a signer need to keep their secret key secret, but they also must keep all of their nonces they ever generate secret.Anyhow, for a good while now, we've finally transitioned to Schnorr's signature scheme anyway, so I'd focus on that instead.Interestingly, it has the same flaw.Quote from: https://en.wikipedia.org/wiki/Schnorr_signatureJust as with the closely related signature algorithms DSA, ECDSA, and ElGamal, reusing the secret nonce value k on two Schnorr signatures of different messages will allow observers to recover the private key.[2] In the case of Schnorr signatures, this simply requires subtracting s s values:s' − s = (k' − k) − x(e' − e).If k' = k but e' ≠ e then x can be simply isolated. In fact, even slight biases in the value k or partial leakage of k can reveal the private key, after collecting sufficiently many signatures and solving the hidden number problem.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "May 19, 2022, 05:21:29 AM",
+      "body": "Just use some deterministic nonce, derived from the private key and some information around it. For example \"function(privkey,message)\" can be used to produce 256-bit pseudorandom value that will be strong enough for everyday use. The simplest thing would be just \"k=SHA-256d(privkey||SHA-256d(message))\", but I think we can do it better than that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

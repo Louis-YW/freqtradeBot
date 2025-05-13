@@ -1,0 +1,77 @@
+{
+  "id": "topic_5398851",
+  "title": "vinshet",
+  "author": "vinshet",
+  "created_time": "May 16, 2022, 09:43:59 AM",
+  "content": "I was of the idea that the information from bitnodes is reliable. But that changed when I looked closely into the information I get from running my node.There are IP addresses in the addr field for outbound connections appear in the list of nodes they crawl every 6 min, but there are IP addresses in the addr field of inbound connections that do not appear on bitnodes. Does anyone have an idea what these entities are? (if they are not nodes?)Additionally, some peers have the addrlocal field set to 127.0.0.1, while most have my IP address. Any reason why?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398851",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "May 16, 2022, 10:15:34 AM",
+      "body": "The list of IPs in the bitnodes site is not exhaustive. Bitnodes cannot crawl and index all of the nodes that are running Bitcoin clients because there are so many and certain nodes might explicitly block their crawlers or just not accept incoming connections. As such, it is perfectly normal to see nodes that were not indexed on the site.Addrlocal contains your IP and the port as seen by your peer. It can be any arbitrary values because it isn't strictly enforced and certain nodes have it set at 127.0.0.1. If you're interested, the IP address is communicated with the version message in the addr_recv.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 16, 2022, 10:16:03 AM",
+      "body": "Just a note: Bitnodes shows the number reachable nodes on their main page, which means those that allow incoming connections. They have a page for all the nodes (outgoing and incoming). So, back to your topic. Due to decentralization, it's possible for few nodes to not be crawled by bitnodes, but can you point out which one allows incoming connections and isn't shown there?Quote from: vinshet on May 16, 2022, 09:43:59 AMAdditionally, some peers have the addrlocal field set to 127.0.0.1, while most have my IP address. Any reason why?The addrlocal should be a local IP, according to bitcoindeveloper, so it's reasonable to be 127.0.0.1. This is yours locally, and same is to everybody else.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vinshet",
+      "created_time": "May 16, 2022, 11:19:22 AM",
+      "body": "Quote from: BlackHatCoiner on May 16, 2022, 10:16:03 AMThe addrlocal should be a local IP, according to bitcoindeveloper, so it's reasonable to be 127.0.0.1. This is yours locally, and same is to everybody else. Thing is, for some connections it is the IP address of my machine, whereas for others it is the localhost. Just curious to find out what the differences could be.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 16, 2022, 11:27:10 AMLast edit: May 17, 2022, 06:10:37 AM by BlackHatCoiner",
+      "body": "Quote from: vinshet on May 16, 2022, 11:19:22 AMThing is, for some connections it is the IP address of my machine, whereas for others it is the localhost. Just curious to find out what the differences could be.Both localhost and 127.0.0.1 point to the local network machine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "May 16, 2022, 01:42:52 PM",
+      "body": "Quote from: vinshet on May 16, 2022, 09:43:59 AMI was of the idea that the information from bitnodes is reliable. But that changed when I looked closely into the information I get from running my node.It's hard to find reliable source of information for bitcoin nodes, and Bitnodes is certainly not totally accurate, especially when you compare it with Luke Dashjr charts that are showing much more available bitcoin nodes.Historical chart is showing that number of nodes is around 50k, and there is one interesting pie chart showing Taproot nodes is more than 67% currently:https://luke.dashjr.org/programs/bitcoin/files/charts/historical.htmlhttps://luke.dashjr.org/programs/bitcoin/files/charts/taproot.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "May 16, 2022, 11:41:23 PM",
+      "body": "Quote from: BlackHatCoiner on May 16, 2022, 11:27:10 AMQuote from: vinshet on May 16, 2022, 11:19:22 AMThing is, for some connections it is the IP address of my machine, whereas for others it is the localhost. Just curious to find out what the differences could be.Both localhost and 127.0.0.1 point to the local network. Actually they point to the local machine. It's the loopback address: https://en.wikipedia.org/wiki/Loopback_addressI'd also like to add that Bitnodes doesn't list Tor nodes at all; therefore as dkbit98 pointed out, when Bitnodes show ~15,000 nodes, it's probably 3x or higher in reality.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 17, 2022, 02:17:06 AM",
+      "body": "Quote from: n0nce on May 16, 2022, 11:41:23 PMI'd also like to add that Bitnodes doesn't list Tor nodes at all; therefore as dkbit98 pointed out, when Bitnodes show ~15,000 nodes, it's probably 3x or higher in reality.They do: https://bitnodes.io/nodes/?q=Tor%20network. People running Tor node might not want incoming connections so that might have a lower percentage on Bitnodes as compared to the clearnet. However, those that allows incoming connections are still indexed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 17, 2022, 05:06:38 AM",
+      "body": "Since the output from getpeerinfo is accurate and not polluted with loopback addresses, Bitnodes should run a bunch of these surrogate nodes and merely harvest the peer information that continuously comes out of them - maybe it can disconnect from the peers after it records them, so that continuous lists of peers are obtained (also peers request from other peers their own lists, so this has a knock-on effect).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

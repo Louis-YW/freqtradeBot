@@ -1,0 +1,53 @@
+{
+  "id": "topic_5402401",
+  "title": "ArthurY",
+  "author": "ArthurY",
+  "created_time": "June 13, 2022, 10:58:32 AM",
+  "content": "Could you help me guys to show me up an example of RPC call how to import many priv keys in a single queryAs I understood I should use `importmulti` request. But I do not know which kind of script, address etc should place if I just need to import bulk of keysFor example which request should I run to import such of keys?5Jza3odChZ1vfzmRSSK6qJZCuGdXYR4RndFHXx1KEWq9AiDkwCj5JebES9429R4HNFUcX5kFgR7FAoFWxpHZ3XrvAf4bSNNxijzxRB5J4WYCjKqG7JxY3fjj2ukusd36mXMVas42bTh2nesd6HwaFtwh7",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5402401",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 13, 2022, 12:43:24 PM",
+      "body": "Quote from: ArthurY on June 13, 2022, 10:58:32 AMAs I understood I should use `importmulti` request. But I do not know which kind of script, address etc should place if I just need to import bulk of keysIf your private keys start with \"5\", it means their public key is uncompressed. So, it's P2PKH. So make sure your wallet is not descriptor. Quote from: ArthurY on June 13, 2022, 10:58:32 AMFor example which request should I run to import such of keys?Why don't you loop importprivkey?Code:bitcoin-cli importprivkey \"private_key\" \"label\" falseWith RPC, it'd be:Code:curl -u USERNAME:PASSWORD --data-binary '{\"jsonrpc\": \"1.0\", \"id\": \"curltest\", \"method\": \"importprivkey\", \"params\": [\"PRIVATE_KEY\", \"label_x\", false]}' -H 'content-type: text/plain;' http://127.0.0.1:8332/wallet/WALLET_NAMECreate a txt file and insert your private keys there like:Code: (\"foo.txt\")5Jza3odChZ1vfzmRSSK6qJZCuGdXYR4RndFHXx1KEWq9AiDkwCj5JebES9429R4HNFUcX5kFgR7FAoFWxpHZ3XrvAf4bSNNxijzxRB5J4WYCjKqG7JxY3fjj2ukusd36mXMVas42bTh2nesd6HwaFtwh7Now create this bash script. It reads every line of your text file and runs the curl command.Code: (\"test.sh\")#!/bin/bashfor i in `seq 1 3`;do    line=\"`head -$i foo.txt | tail +$i`\"    echo $line;    curl -u USERNAME:PASSWORD --data-binary '{\"jsonrpc\": \"1.0\", \"id\": \"curltest\", \"method\": \"importprivkey\", \"params\": [\"'$line'\", \"any_label\", false]}' -H 'content-type: text/plain;' http://127.0.0.1:8332/wallet/WALLET_NAME;doneReplace USERNAME, PASSWORD and WALLET_NAME accordingly. On linux you can run it with:Code:bash test.shI'd make sure I connect to my Bitcoin server via a secure transfer protocol, because there's sensitive info transferred.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "June 13, 2022, 05:46:00 PMLast edit: June 15, 2022, 12:35:29 PM by seoincorporation",
+      "body": "Just a little observation on the code, that one will work only for 3 Private keys, we could change this line:Code:for i in `seq 1 3`;for:Code:for i in $(cat foo.txt);or another solution is to change the 3 for a variable:Code:z=$(cat foo.txt | wc -l)for i in `seq 1 $z`;This way the script will work for any number of Private keys in the file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 14, 2022, 05:04:05 AM",
+      "body": "Quote from: BlackHatCoiner on June 13, 2022, 12:43:24 PMWhy don't you loop importprivkey?Since this executes the RPC server for each private key though, it's going to slow down once you reach a hundred PKs or so, especially if your node is somewhere far away n the public internet (then latency also has to be considered).QuoteI'd make sure I connect to my Bitcoin server via a secure transfer protocol, because there's sensitive info transferred.The only option would be calling it via an .onion address on Tor, since even the RPC password is sent unencrypted. It is indeed unsafe to issue any RPC call with plain HTTP because of the unencrypted password.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "June 14, 2022, 06:22:21 AM",
+      "body": "QuoteThe only option would be calling it via an .onion address on Tor, since even the RPC password is sent unencrypted. It is indeed unsafe to issue any RPC call with plain HTTP because of the unencrypted password.For me, sending a text file to my server in a secure way, and executing everything on that server was a better option.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 16, 2022, 01:18:03 PM",
+      "body": "Quote from: vjudeu on June 14, 2022, 06:22:21 AMQuoteThe only option would be calling it via an .onion address on Tor, since even the RPC password is sent unencrypted. It is indeed unsafe to issue any RPC call with plain HTTP because of the unencrypted password.For me, sending a text file to my server in a secure way, and executing everything on that server was a better option.That works too (if you use SFTP with at least 2048-bit RSA keypairs, which is pretty much the industry standard anyway) particularly if the server is an ephermal box you lease from some vendor, set up for your needs, and then get rid of it when the lease ends - think services like BitVPS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

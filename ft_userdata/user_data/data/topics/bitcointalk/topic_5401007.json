@@ -1,0 +1,85 @@
+{
+  "id": "topic_5401007",
+  "title": "aar5ad",
+  "author": "aar5ad",
+  "created_time": "June 01, 2022, 04:50:17 PM",
+  "content": "I have a bitcoin node (v23) running on windows 10 Pro; fully synced and a wallet on Spectre (working).  I have 10 outgoing nodes connected (Onion) but no incoming.I have the Tor service installed, its running and some config settings in bitcoin.conf.listenonion=1onlynet=onionproxy=127.0.0.1:9050listenonion=1onlynet=onionproxyrandomize=1server=1listen=1disablewallet=0bind=127.0.0.1blockfilterindex=1[test]bind=127.0.0.1[regtest]bind=127.0.0.1[signet]bind=127.0.0.1I would like to get incoming connections going on tor but if i run [getnetworkinfo] i show no local addresses and no incoming peers.  Anyone help me with that?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5401007",
+  "comments": [
+    {
+      "author": "Pmalek",
+      "created_time": "June 02, 2022, 07:38:02 PM",
+      "body": "I am certainly not an expert in this department but remembered seeing a similar thread in the past about missing incoming peers.https://bitcointalk.org/index.php?topic=5309923.0;allWhen version 0.21.0 came out, it appears that there were incompatibility issues between TOR v2 and v3 addresses. Plenty of time has passed in the meantime, but it could be that nodes with older software versions are trying to connect to your TOR node and they can't because they don't recognize the v3 addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "aar5ad",
+      "created_time": "June 03, 2022, 11:45:03 AM",
+      "body": "I'm aware of the issue between v2 and v3 of Tor but its been quite a while since that change.  I would assume I would get at least 1 Peer.  I was just looking to support the btc network but not looking so likely at this point based on the # of replies.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 03, 2022, 12:22:17 PM",
+      "body": "You still participating in the network even with 10 outbound connections, it just does it in a limited way.My experience with running node fully on Tor is that it always has few or zero inbound connections if I just barely create a new node. It started accepting incoming connections after some time, roughly 1 or 2 weeks in my case.And if you have no reason for only accepting onion nodes, you can remove onlynet=onion, which will make a clearnet node that also runs Tor able to communicate with your nodes. It might help.Quote from: aar5ad on June 01, 2022, 04:50:17 PMbut if i run [getnetworkinfo] i show no local addressesDid you mean that it did not show the output of \"address\": [...].onion?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "aar5ad",
+      "created_time": "June 03, 2022, 03:39:16 PM",
+      "body": "Quote from: vv181 on June 03, 2022, 12:22:17 PMYou still participating in the network even with 10 outbound connections, it just does it in a limited way.My experience with running node fully on Tor is that it always has few or zero inbound connections if I just barely create a new node. It started accepting incoming connections after some time, roughly 1 or 2 weeks in my case.And if you have no reason for only accepting onion nodes, you can remove onlynet=onion, which will make a clearnet node that also runs Tor able to communicate with your nodes. It might help.Quote from: aar5ad on June 01, 2022, 04:50:17 PMbut if i run [getnetworkinfo] i show no local addressesDid you mean that it did not show the output of \"address\": [...].onion?No real reason for [onlynet=onion] other than trying to increase anonymity.  ill try removing it.  Unfortunately i could not get port 8333 open with this node (windows); np with the former Redhat node.  I can try again.  It forwarded properly on my router but wont show as open on the btc node url test. Its been up and sync'd for about 3 weeks now so i would assume i should have some incoming.With regards to output of addresses- no- did not show xxxxxxx.onion address; is blank so i believe without that, the node is unreachable to incoming peers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 03, 2022, 04:34:48 PM",
+      "body": "Quote from: aar5ad on June 03, 2022, 03:39:16 PMNo real reason for [onlynet=onion] other than trying to increase anonymity.  ill try removing it.  Unfortunately i could not get port 8333 open with this node (windows);As long as the proxy and bind configuration is still intact, your node still communicates over Tor. Removing the onlynet=onion will make your node accept connection from/to any network, but it is still through Tor since you have the mentioned configs.Quote from: aar5ad on June 03, 2022, 03:39:16 PMWith regards to output of addresses- no- did not show xxxxxxx.onion address; is blank so i believe without that, the node is unreachable to incoming peers.I also guess it is likely the problem.Just to make sure, did the debug.log show:Code:tor: Got service ID XXXXXXXXXXX, advertising service XXXXXXXXXXX.onion:8333output?And does the default bitcoin data folder, contain the \"onion_private_key\" file?If there is none, I think the node couldn't automatically generate the Tor hidden service. Also, do you install/run Tor using the Windows Expert Bundle or not?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "aar5ad",
+      "created_time": "June 03, 2022, 06:29:34 PM",
+      "body": "Quote from: vv181 on June 03, 2022, 04:34:48 PMQuote from: aar5ad on June 03, 2022, 03:39:16 PMNo real reason for [onlynet=onion] other than trying to increase anonymity.  ill try removing it.  Unfortunately i could not get port 8333 open with this node (windows);As long as the proxy and bind configuration is still intact, your node still communicates over Tor. Removing the onlynet=onion will make your node accept connection from/to any network, but it is still through Tor since you have the mentioned configs.Quote from: aar5ad on June 03, 2022, 03:39:16 PMWith regards to output of addresses- no- did not show xxxxxxx.onion address; is blank so i believe without that, the node is unreachable to incoming peers.I also guess it is likely the problem.Just to make sure, did the debug.log show:Code:tor: Got service ID XXXXXXXXXXX, advertising service XXXXXXXXXXX.onion:8333output?And does the default bitcoin data folder, contain the \"onion_private_key\" file?If there is none, I think the node couldn't automatically generate the Tor hidden service. Also, do you install/run Tor using the Windows Expert Bundle or not?Confirmed that tor: Got service ID XXXXXXXXXXX, advertising service XXXXXXXXXXX.onion:8333 is showing in debug.log file.  Address does not show on getnetworkinfo output.  onion_private_key is present in default data folder.  I may have discovered an (if not the) issue.  My router was blocking Tor traffic (security setting).  I set that to allow and now i have 17 incoming (IPv4) and showing up as \"reachable\" on test site.  Maybe that was the issue?  Should the getinfo output show my address?  Do i need to add my onion address to the .conf file? If yes- what is the format?  Thanks by the way the debug tip is useful, would not have found that otherwise.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 03, 2022, 08:09:38 PM",
+      "body": "Quote from: aar5ad on June 03, 2022, 06:29:34 PMMy router was blocking Tor traffic (security setting).  I set that to allow and now i have 17 incoming (IPv4) and showing up as \"reachable\" on test site.  Maybe that was the issue?  I don't know. I'm not aware if there is such router that blocks Tor traffic.Quote from: aar5ad on June 03, 2022, 06:29:34 PMShould the getinfo output show my address? Yes, it should show your local address. It's weird that the debug tells Tor was working fine but the localaddresses output shows none. You might want to check $ bitcoin-cli -netinfo, I don't know for sure, but see if the onion address showing over there.Quote from: aar5ad on June 03, 2022, 06:29:34 PMDo i need to add my onion address to the .conf file?I don't think so. As long the node is working fine it should be good to go.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "aar5ad",
+      "created_time": "June 03, 2022, 08:25:02 PM",
+      "body": "Awesome thank you kindly.  Was reaching my tolerance limit on this issue.  Yes- my router is a higher end (enterprise) that get very granular with security options so i think that was the issue.  Or- my conf file didnt include my internal ip address (explicitly) as opposed to just the loopback.  Against my better judgement, i changed both (router and binding my internal ip in conf file).  Likely it was the explicit ip vs loopback.  Anyway- ill try the -cli to look for the the .onion address but somehow its working.  Is there a way that i can check external connectivity via .onion address vs ip?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "June 04, 2022, 08:54:27 AM",
+      "body": "Quote from: aar5ad on June 03, 2022, 08:25:02 PMAwesome thank you kindly.  Was reaching my tolerance limit on this issue.You're welcome   Quote from: aar5ad on June 03, 2022, 08:25:02 PMIs there a way that i can check external connectivity via .onion address vs ip?The $ bitcoin-cli -netinfo command should give you that information.Code: (bitcoin-cli -netinfo)         ipv4    ipv6   onion   total   blockin          0       0       5       5out         7       0       3      10       2total       7       0       8      15",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "id": "topic_5420395",
+  "title": "amrraslan",
+  "author": "amrraslan",
+  "created_time": "November 10, 2022, 01:35:36 PM",
+  "content": "hello i have 10000 crypto wallet all of them have defrent 12 backup words how i open all of them in same time from program or something to insert txt file and it open .. its hard to keep open one eveytime",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5420395",
+  "comments": [
+    {
+      "author": "AB de Royse777",
+      "created_time": "November 10, 2022, 01:39:53 PM",
+      "body": "Quote from: amrraslan on November 10, 2022, 01:35:36 PMhello i have 10000 crypto wallet all of them have defrent 12 backup words how i open all of them in same time from program or something to insert txt file and it open .. its hard to keep open one eveytimeGo one by one. When you created those wallet you did not create them using a script, did you?Just interested to know, why or how did you get even those 10,000 wallets? LOL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "November 10, 2022, 01:47:17 PM",
+      "body": "Quote from: amrraslan on November 10, 2022, 01:35:36 PMhello i have 10000 crypto wallet all of them have defrent 12 backup words how i open all of them in same time from program or something to insert txt file and it open .. its hard to keep open one eveytimeDepends what do you want to do. I assume that if you want only check the balance is would be simpler to convert seeds into addresses (depending how many addresses you want to generate and for which derivation path) and import them into single watch-only wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "amrraslan",
+      "created_time": "November 10, 2022, 02:00:41 PM",
+      "body": "how do i convert seeds into addresses ??",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "November 10, 2022, 03:29:08 PM",
+      "body": "Quote from: amrraslan on November 10, 2022, 02:00:41 PMhow do i convert seeds into addresses ??Do you have any idea where you made them? You could try using electrum (from electrum.org) but you might need to get a script using bitcoinj if you find they're bip39 nmemonics and not electrum's native phrases (you can use electrum to import bip39 wallets but bitcoinj would be a lot faster imo for the amount of wallets you need to import).You could also use online tools to convert a nmemonic into an xpub which you can then put into a block explorer. One example of this is https://iancoleman.io/bip39/ but it's risky to use it online. (download a copy of the site and go offline and generate the 1k xpubs if you go that way before coming back online after closing the site).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 10, 2022, 03:57:46 PM",
+      "body": "Quote from: amrraslan on November 10, 2022, 02:00:41 PMhow do i convert seeds into addresses ??Learnmeabitcoin.com explains nicely how addresses are derived from a seed phrase.When you have the addresses, you can relatively easily query their balances from your own node or an online service.Here is a code example in Python, that you could run offline, safely.Quote from: https://stackoverflow.com/a/67808789/3338129Code:from mnemonic import Mnemonicimport bip32utilsmnemon = Mnemonic('english')#words = mnemon.generate(256)#print(words)#mnemon.check(words)#seed = mnemon.to_seed(words)seed = mnemon.to_seed(b'lucky labor rally law toss orange weasel try surge meadow type crumble proud slide century')print(f'BIP39 Seed: {seed.hex()}\\n')root_key = bip32utils.BIP32Key.fromEntropy(seed)root_address = root_key.Address()root_public_hex = root_key.PublicKey().hex()root_private_wif = root_key.WalletImportFormat()print('Root key:')print(f'\\tAddress: {root_address}')print(f'\\tPublic : {root_public_hex}')print(f'\\tPrivate: {root_private_wif}\\n')child_key = root_key.ChildKey(0).ChildKey(0)child_address = child_key.Address()child_public_hex = child_key.PublicKey().hex()child_private_wif = child_key.WalletImportFormat()print('Child key m/0/0:')print(f'\\tAddress: {child_address}')print(f'\\tPublic : {child_public_hex}')print(f'\\tPrivate: {child_private_wif}\\n')You would need to loop over different seed phrases and loop through a set number (e.g. 100) of keys for each seed.Potentially also need to loop through the different derivation paths as well.Code:seed_phrases = open('seeds.txt', 'r').readlines()for phrase in seed_phrases:    seed = mnemon.to_seed(phrase)    root_key = bip32utils.BIP32Key.fromEntropy(seed)    [...]    for i in range(100):        child_key = root_key.ChildKey(0).ChildKey(i)        child_address = child_key.Address()",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 10, 2022, 06:30:18 PM",
+      "body": "Quote from: Royse777 on November 10, 2022, 01:39:53 PMGo one by one. Or at that point, just use AWS servers because OP is now dealing with raw database files and encryption, not bitcoins. BDB and sqlite can easily be exported and stored in a different (RDS) database, and then all you have left to do is decrypt the secret data by yourself. No need to thrash your hard disk over this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "AB de Royse777",
+      "created_time": "November 10, 2022, 07:03:19 PM",
+      "body": "Quote from: NotATether on November 10, 2022, 06:30:18 PMQuote from: Royse777 on November 10, 2022, 01:39:53 PMGo one by one. Or at that point, just use AWS servers because OP is now dealing with raw database files and encryption, not bitcoins. BDB and sqlite can easily be exported and stored in a different (RDS) database, and then all you have left to do is decrypt the secret data by yourself. No need to thrash your hard disk over this.Everything gone over my head. If ever I have something to deal like this then I now know I can reach out to you :-) Let's not damage my brain in it now LOL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "November 11, 2022, 12:17:17 AM",
+      "body": "If it's 10k wallets and all of them have different seed backups, but each of them only has a single used address, then only extract used addresses on each wallet, but the problem is I can't seem to find a tool yet to extract all of those used addresses. Maybe some tools from iancoleman.io can help you, or use their BIP39 tool and open it in 20 tabs and paste your seed phrase into each tab and take private keys then back up. It takes time before you get all the used addresses and then import all keys on a single wallet. Take note, always use iancoleman offline for safety, which only works on BIP39 seed. If your seed backups are generated from Electrum then this won't work. Also, take note of the fake iancoleman tool just recently found a fake one in Google ads this is the domain iancolemanbip39.info. Be careful of that fake one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 11, 2022, 12:24:54 AM",
+      "body": "Quote from: BitMaxz on November 11, 2022, 12:17:17 AMIf it's 10k wallets and all of them have different seed backups, but each of them only has a single used address, then only extract used addresses on each wallet, but the problem is I can't seem to find a tool yet to extract all of those used addresses. The script I posted above will be able to extract the first i addresses from a file filled with one seed phrase per line.Getting the balances will require network calls or RPC calls to Bitcoin core, and there are 100% scripts that do that for a set of addresses, already.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "November 11, 2022, 10:31:33 AM",
+      "body": "OP did not clarify if he has seeds or wallets (and from which program).It would be possible to write a simple program which generates up to X addresses per each seed and compare against local database of active (or ever used) addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "November 12, 2022, 04:44:46 AM",
+      "body": "Quote from: amrraslan on November 10, 2022, 01:35:36 PMhello i have 10000 crypto wallet all of them have defrent 12 backup words how i open all of them in same time from program or something to insert txt file and it open .. its hard to keep open one eveytimeI hope you didn't pay for those. If you did, then you were probably scammed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 12, 2022, 07:11:42 AM",
+      "body": "Quote from: PawGo on November 10, 2022, 01:47:17 PMDepends what do you want to do. I assume that if you want only check the balance is would be simpler to convert seeds into addresses (depending how many addresses you want to generate and for which derivation path) and import them into single watch-only wallet.Most wallets won't like importing a couple hundred thousand addresses.Quote from: Royse777 on November 10, 2022, 01:39:53 PMJust interested to know, why or how did you get even those 10,000 wallets? LOLMaybe he has a very successful phishing site.Or he randomly generated 10,000 seed phrases and hopes he finds someone's wallet. If that's the case, it's a massive waste of time.Quote from: odolvlobo on November 12, 2022, 04:44:46 AMI hope you didn't pay for those. If you did, then you were probably scammed.Or that. I can't think of any legit reason why someone would have that many different used seed phrases.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 12, 2022, 12:23:47 PM",
+      "body": "Quote from: LoyceV on November 12, 2022, 07:11:42 AMQuote from: odolvlobo on November 12, 2022, 04:44:46 AMI hope you didn't pay for those. If you did, then you were probably scammed.Or that. I can't think of any legit reason why someone would have that many different used seed phrases.Another theory: it is an https://xyproblem.info and OP lost 1-2 seed words & wrote a script to generate all possible permutations of known and unknown words. I think better specifying the purpose of what people are trying to achieve, greatly helps in the forum's ability to find the best possible answer. My obligatory reading recommendation: https://stackoverflow.com/help/how-to-ask",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 12, 2022, 12:54:18 PM",
+      "body": "Bitcoin wallet or \"crypto wallet\"? Is this about bitcoin or some altcoin?Quote from: n0nce on November 12, 2022, 12:23:47 PMAnother theory: it is an https://xyproblem.info and OP lost 1-2 seed words & wrote a script to generate all possible permutations of known and unknown words.Could that be the case, but wouldn't he be asking for a number like 2048?Quote from: ETFbitcoin on November 12, 2022, 12:42:00 PMNo way he bought 10K wallet. I won't provide any link, but single fake wallet usually cost $10 to $999.If a single fake wallet costs 0$ to make, what makes you think a phishing site won't sell thousands for a few bucks?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mpufatzis",
+      "created_time": "November 13, 2022, 04:41:07 PM",
+      "body": "How about altering Ian Coleman's code?He could insert the seeds from an Excel fileQuote from: Royse777 on November 10, 2022, 01:39:53 PMQuote from: amrraslan on November 10, 2022, 01:35:36 PMhello i have 10000 crypto wallet all of them have defrent 12 backup words how i open all of them in same time from program or something to insert txt file and it open .. its hard to keep open one eveytimeGo one by one. When you created those wallet you did not create them using a script, did you?Just interested to know, why or how did you get even those 10,000 wallets? LOL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 13, 2022, 06:57:52 PM",
+      "body": "Quote from: ETFbitcoin on November 13, 2022, 09:24:29 AMThat's possible, although i've never seen fake wallet.dat sold at such low price on both this forum and various website from search engine.That's one reason why there could be.Quote from: ETFbitcoin on November 13, 2022, 09:24:29 AMAnd personally i'd say near $0 since they need to fill it with fake data either manually or using script.What's the cost of feeding files with fake, arbitrary data?Quote from: mpufatzis on November 13, 2022, 04:41:07 PMHow about altering Ian Coleman's code?He could insert the seeds from an Excel fileIan Coleman could be altered to return wallets given a seeds.csv, but it doesn't return balances, and I don't know if OP wants that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 14, 2022, 09:26:32 AM",
+      "body": "Quote from: BlackHatCoiner on November 13, 2022, 06:57:52 PMIan Coleman could be altered to return wallets given a seeds.csv, but it doesn't return balances, and I don't know if OP wants that.Once you have a (long) list of addresses, checking the balance is easy. I haven't tried it, but the right CLI code might work to get addresses out of Electrum. Once you get that working, looping through 10,000 wallets (without connecting to a server) is easy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

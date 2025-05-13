@@ -1,0 +1,165 @@
+{
+  "id": "topic_5454229",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "May 27, 2023, 07:51:27 PMLast edit: August 16, 2024, 01:32:34 PM by BlackHatCoiner",
+  "content": "In 22nd of May, Burak Keceli sent an email to the bitcoin-dev mailing list, describing an alternative second layer solution which is far more scalable, private, requires no interactivity and does not introduce liquidity constraints; essentially superior to lightning in every aspect. It consumes much less space on-chain, works like Chaumian eCash without being a central point of failure, and makes use of shared transaction outputs. To enable anonymous, scalable and off-chain transactions, it uses virtual transaction outputs (or vTXO). It is in very early stage, and the team behind desperately needs Bitcoin developers willing to work on it. Overview of Ark: https://arkdev.info/Introductory email: https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2023-May/021694.htmlFAQ thread: https://bitcointalk.org/index.php?topic=5505515.0What do you think.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454229",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "May 28, 2023, 04:35:45 AM",
+      "body": "Quote from: She shining on May 27, 2023, 09:22:52 PMThe developer reason for developing it was as a result of his issue with lightning networkQuoteI’m working on a new lightning wallet. It removes pretty much all friction lightning currently faces:1.Backups2.Interactivity3.Offline receiving4.Receiver privacy5.On-chain footprintwell if that's the case then let's join forces   I am coincidentally also working on a Lightning wallet (as long as it is written in Python as development of the wallet core has already begun).Quote from: She shining on May 27, 2023, 09:22:52 PM QuoteThe only downside is that Ark require users to come online and \"refresh\" their coins every few weeks, otherwise the ASP can sweep the funds. is this the side effect of removing on-chain footprint?Not really a downside as a \"watchtower\" program can be made that inputs your wallet password and the refreshing date in the future, which is stored with AES encryption in memory.The key to this cipher is the time stored in ISO 8601 format as a byte string. It is promptly discarded from memory.Every second, the watchtower will attempt to decrypt the cipher using the current ISO 8601 time looking like \"YYYY-mm-ddTHH:MM:SS\" as the key.Naturally this will only succeed at the requisite time at which the wallet is to be unlocked - following which the coins inside the ASP can be refreshed.If at any point you come online, you can simply terminate the watchtower program, and the encrypted wallet password will be destroyed and nobody will be able to use it unless they also know the unlock time, even if they have hacked the watchtower on a later date after the timer has started. But the unlock time has already been discarded after it was used to encrypt the wallet password, meaning the deleted copy of the encrypted password is now unrecoverable.This particular part is my own design, not Burak's. I haven't told him about this yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "May 28, 2023, 07:04:47 AM",
+      "body": "QuoteEvery second, the watchtower will attempt to decrypt the cipher using the current ISO 8601 time looking like \"YYYY-mm-ddTHH:MM:SS\" as the key.This key would be very weak, you could use 64-bit UNIX timestamp, and it would be as weak as well (but then, at least it will be resistant to timezone issues).Quotenobody will be able to use it unless they also know the unlock time, even if they have hacked the watchtower on a later date after the timer has startedNot really. Your program will need to decrypt it for every second, so your decryption could not take more time than that. The simplest way of getting the current time, and trying to decrypt it, can cause it to never be decrypted, if you will be unlucky, and your process will have a lower priority for a few seconds, when it should be decrypted.Another thing is, any attacker could scan it faster than one decryption per second, it could do 1000 decryptions per second, and reach it sooner. Also, if there will be some default locking time, for example two weeks, and the attacker will know that some file on your server was created one week ago (by checking metadata), then it will use one week offset, and scan only a range of time, and then will get to the solution much faster than the official algorithm.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 28, 2023, 09:54:54 AM",
+      "body": "QuoteNot really a downside as a \"watchtower\" program can be made that inputs your wallet password and the refreshing date in the future, which is stored with AES encryption in memory.If you can use transaction locktime field or OP_CHECKLOCKTIMEVERIFY/OP_CHECKSEQUENCEVERIFY, then it will be better. If not, then this is the proper way of doing that: https://gwern.net/self-decrypting",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cryptosize",
+      "created_time": "May 28, 2023, 07:43:00 PM",
+      "body": "The 1 million dollar question: does it have franky's Seal of Approval? On a serious note, I'm not sure I understood how it works... maybe someone needs to write an ELI5. Lightning is very simple to understand if you know how BGP routing works.Is Ark centralized? I read some caveats about double-spending on their FAQ. Also, the fact they don't accept BTC donations via Ark is a bit worrying... it seems they don't trust it enough yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "paid2",
+      "created_time": "May 29, 2023, 04:14:49 PM",
+      "body": "Quote from: BlackHatCoiner on May 27, 2023, 07:51:27 PMWhat do you think. I find the idea really interesting and good, and if I've understood it correctly it would make it possible to avoid providing liquidity as we do with LN? On the other hand, the fact that there's no public code at the moment, and the lack of responsiveness from the team over the past week, leaves me sceptical as to whether they'll manage to find enough devs to contribute to the project.Quote from: cryptosize on May 28, 2023, 07:43:00 PMI read some caveats about double-spending on their FAQ. Yeah you're right :QuoteUsers need to wait for on-chain confirmations to consider a payment ‘final’.Seems strange, possibility of double-spending could be huge, but isn't it exactly the same process with LN ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cryptosize",
+      "created_time": "May 29, 2023, 05:24:23 PM",
+      "body": "Quote from: iwantmyhomepaidwithbtc2 on May 29, 2023, 04:14:49 PMQuote from: cryptosize on May 28, 2023, 07:43:00 PMI read some caveats about double-spending on their FAQ. Yeah you're right :QuoteUsers need to wait for on-chain confirmations to consider a payment ‘final’.Seems strange, possibility of double-spending could be huge, but isn't it exactly the same process with LN ?LN is prone to double-spending?How so?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cryptosize",
+      "created_time": "May 29, 2023, 05:27:10 PM",
+      "body": "Oops, yet another red flag:https://twitter.com/brqgoo/status/1661396918864424960",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kryptowerk",
+      "created_time": "May 30, 2023, 11:27:14 AM",
+      "body": "As I understand this is currently in the very early concept stages or are there already first implementations running on testnet?From the website: \"Although Ark is a completely new design, it is interoperable with the Lightning Network, which complements it.\" Why would it complement lightning and not - after a period of adoption of course - slowly make it obsolete? Can anyone describe the up- and downsides in layman's terms?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 30, 2023, 12:57:20 PM",
+      "body": "Quote from: cryptosize on May 29, 2023, 05:27:10 PMOops, yet another red flag:https://twitter.com/brqgoo/status/1661396918864424960 How is criticism of the LN and previously supporting big blocks a \"red flag\", as you put it?I do share his criticism for LN inbound capacity, though, which I've previously ranted about here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kryptowerk",
+      "created_time": "May 31, 2023, 10:38:12 PM",
+      "body": "Quote from: Kryptowerk on May 30, 2023, 11:27:14 AMAs I understand this is currently in the very early concept stages or are there already first implementations running on testnet?From the website: \"Although Ark is a completely new design, it is interoperable with the Lightning Network, which complements it.\" Why would it complement lightning and not - after a period of adoption of course - slowly make it obsolete? Can anyone describe the up- and downsides in layman's terms?I noticed there is another (few days older) thread on the same topic.There is also a post answering my first question: https://bitcointalk.org/index.php?topic=5453928.msg62333142#msg62333142I'd suggest to close this topic and continue discussion in the other one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 11, 2024, 01:53:15 PM",
+      "body": "One year after, let's see what has changed. The Ark overview has now changed to the following link: https://arkdev.info/.In June 4th (last week), Ark Labs launches to develop the very first Ark client: https://www.theblock.co/amp/post/298343/ark-labs-launch-bitcoin-layer-2-payments-network.Ark v2 has been introduced: https://brqgoo.medium.com/introducing-ark-v2-2e7ab378e87b. I recommend you to read the previous introduction (v1) in here: https://brqgoo.medium.com/introducing-ark-6f87ae45e272.Roadmap has been published: https://arkdev.info/docs/roadmapA less technical explanation of Ark has been recorded in a BitDev conference: https://bitcointv.com/w/iSg88hQLVGKicujZQvvYc6.If and when implemented via a softfork, covenants will enable non-interactive use of Ark, meaning users do not need to be online constantly to send and receive satoshis. However, Ark can also be implemented without covenants (cl-Ark), although it will require interactivity as an disadvantage, so we better support the upcoming softfork.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "June 12, 2024, 06:21:31 AM",
+      "body": "Quote from: BlackHatCoiner on June 11, 2024, 01:53:15 PM so we better support the upcoming softfork. Which upcoming soft fork, exactly?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 12, 2024, 06:45:29 AM",
+      "body": "Quote from: Kruw on June 12, 2024, 06:21:31 AMWhich upcoming soft fork, exactly?Covenants (when proposed).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "June 12, 2024, 07:11:05 AM",
+      "body": "Quote from: BlackHatCoiner on June 12, 2024, 06:45:29 AMCovenants (when proposed). There are a lot of covenant proposals, which one is the safest & most efficient?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 12, 2024, 07:45:58 AM",
+      "body": "Quote from: Kruw on June 12, 2024, 07:11:05 AMThere are a lot of covenant proposals, which one is the safest & most efficient?I think BIP-119 is the most popular covenant-proposal, but I'm not sure about its efficiency comparably to the rest. I don't know which one is the safest and most efficient, but I've noticed people to propose enabling OP_CAT lately, which can incidentally allow covenants to be implemented: https://bitcoinops.org/en/newsletters/2022/05/18/#when-would-enabling-op-cat-allow-recursive-covenants. In Liquid, they've enabled OP_CHECKSIGFROMSTACK, which is said to be more efficient than OP_CTV: https://blog.blockstream.com/tapscript-new-opcodes-reduced-limits-and-covenants/.Your insights would be appreciated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 13, 2024, 05:51:43 AM",
+      "body": "Quote from: https://brqgoo.medium.com/introducing-ark-v2-2e7ab378e87bArk v2 enables Ark Service Providers (ASPs) to reclaim their liquidity without having to wait for the expiration period (4 weeks) to elapse. It almost sounds too good to be true, ha?Is this basically the only difference between v2 and v1?So you can now basically stop an Ark node at any time you want.But you know what would be really awesome? If there was a way to interact with the Ark network without having to run any sort of node. Just like how some wallets let you use LN via trampolines and submarine swaps.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kruw",
+      "created_time": "June 14, 2024, 06:51:52 PM",
+      "body": "Quote from: BlackHatCoiner on June 12, 2024, 07:45:58 AMI think BIP-119 is the most popular covenant-proposal, but I'm not sure about its efficiency comparably to the rest. I don't know which one is the safest and most efficient, but I've noticed people to propose enabling OP_CAT lately, which can incidentally allow covenants to be implemented: https://bitcoinops.org/en/newsletters/2022/05/18/#when-would-enabling-op-cat-allow-recursive-covenants. In Liquid, they've enabled OP_CHECKSIGFROMSTACK, which is said to be more efficient than OP_CTV: https://blog.blockstream.com/tapscript-new-opcodes-reduced-limits-and-covenants/.Your insights would be appreciated. I've been a supporter of CTV because I feel like I grasp the concept as a whole, but the emergence of competing proposals has made me hesitate. OP_CAT is mostly admired for its other capabilities since doing CAT covenants is a block space disaster. I have little knowledge of OP_CHECKSIGFROMSTACK.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 19, 2024, 09:01:00 AMLast edit: June 20, 2024, 03:25:02 PM by BlackHatCoiner",
+      "body": "A tweet from 2023 explains how Ark can work non less interactively without softfork: https://x.com/SomsenRuben/status/1681442410348576772.In this write-up, he explains Ark in simpler terms: https://gist.github.com/RubenSomsen/a394beb1dea9e47e981216768e007454?permalink_comment_id=4633382#file-_simplest_ark-md. Once you read this, you can scroll down and read the second post, \"Reducing Ark Interactivity Without Soft Fork\". Quote from: https://gist.github.com/RubenSomsen/a394beb1dea9e47e981216768e007454?permalink_comment_id=4633382#gistcomment-4633382As far as I understand, it goes like this:Alice wants to send money to Bob, but Bob is offline.Alice requests from the Server to sign a new REDEEM_TX_AB with script: B+S or A+S or A in 1 month, which is the same as her previous REDEEM_TX_A but with different timelock and the addition of B+S.Alice forfeits REDEEM_TX_A (which means the Server can claim her funds if she ever publishes REDEEM_TX_A)Alice can perform the swap for Bob (since he is offline), and she can get the proof of payment from the Server.The Server is incentivized to be cooperative (i.e., notify both parties that the payment completes) along the way.Please correct me if I've misunderstood. I'm still trying to grasp the concept. Quote from: NotATether on June 13, 2024, 05:51:43 AMBut you know what would be really awesome? If there was a way to interact with the Ark network without having to run any sort of node. Just like how some wallets let you use LN via trampolines and submarine swaps.This will be doable. Ark is just like lightning, with more burden placed on the ASPs, rather than the users. It's just a better tradeoff, IMO. Lightning will still be used for money transfer between the ASPs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 08, 2024, 11:58:33 AM",
+      "body": "FAQ thread created: https://bitcointalk.org/index.php?topic=5505515.0Discussions regarding the protocol should be better made there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

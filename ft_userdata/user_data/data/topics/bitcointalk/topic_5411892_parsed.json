@@ -1,0 +1,93 @@
+{
+  "id": "topic_5411892",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "August 31, 2022, 02:22:37 PM",
+  "content": "Hi all,when I create the Bitcoin address from the passphrase foo I am getting the resultcompressed address 1LEH8BEZgC4onZ4GLm8UpZ3vXGAr6LYKSThowever when I try getting the address with pycoin 's ku utilityQuoteku P:fooI am getting the resultcompressed address = 19Vqc8uLTfUonmxUEZac7fz1M5c5ZZbAiiCan anyone explain why the output differs, please, where is the culprit ? any explanation and help appreciated. Thank you",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5411892",
+  "comments": [
+    {
+      "author": "seoincorporation",
+      "created_time": "August 31, 2022, 06:04:26 PM",
+      "body": "Quote from: citb0in on August 31, 2022, 02:22:37 PMHi all,when I create the Bitcoin address from the passphrase foo I am getting the resultcompressed address 1LEH8BEZgC4onZ4GLm8UpZ3vXGAr6LYKSThowever when I try getting the address with pycoin 's ku utilityQuoteku P:fooI am getting the resultcompressed address = 19Vqc8uLTfUonmxUEZac7fz1M5c5ZZbAiiCan anyone explain why the output differs, please, where is the culprit ? any explanation and help appreciated. Thank youLooks like the passphrase option from pycoin uses a different way to encrypt the passphrase than other brain wallets.From pycoin we get this hex Private key:Code:91880b0e3017ba586b735fe7d04f1790f3c46b818a2151fb2def5f14dd2fd9c3While we get this one from online wallet services:Code:2C26B46B68FFC68FF99B453C1D30413413422D706483BFA0F98A5E886266E7AESource: https://secretscan.org/PrivateKeyBrainwallethttps://brainwalletx.github.io/You will have to find another way to generate that brain wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "August 31, 2022, 06:28:35 PM",
+      "body": "I am not trying to generate a brainwallter for myself as this is susceptible to attacks (see HERE). I am trying to learn and understand. I even do not yet understand that Ryan, the author of Brainflayer, showed in his video and his slides some examples of phrases which led to funded addresses.Here some of the passphrases he mentioned in his article:QuoteThe Quick Brown Fox Jumped Over The Lazy DotDown the Rabbit-Holeone two three four five six sevenwho is john galtI have tried all of them separately. I hash them with sha256sum and then I get the 256bit private key as hex. This key is then piped into pycoins' ku utility and outputs the bitcoin address. But the resulting address has no balance and had no TX in the past, absolutely zeros. Obviously this cannot be the address he mentioned in his demonstration because even it was funded and now has a zero balance it should show some recent transactions. But it don't, no TX at all, all zero. I tested all examples, all show the same result, null values (I mean also TXin and TXout) for the addresses.Then I also triedCode:ku P:'The Quick Brown Fox Jumped Over The Lazy Dot' -aand the result is a different address than the previous example. I checked this address, too but again null values. This address also had not any TX in the past.What kind of passphrases did Ryan generate in his demonstration and PoC-paper ? Can anyone shed some light into?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "franky1",
+      "created_time": "August 31, 2022, 09:09:50 PM",
+      "body": "many wallets just simply SHA the word (foo becomes the sha beginning 2C26B4)where as other wallets treat the word as a seed phase that has other steps inplace to allow multiple addresses to be generated from the same wordthis is where you have to know which wallet supports what type of key entry. as some do straight import privkey. some do simple brainwallet and some do passphrase",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Welsh",
+      "created_time": "August 31, 2022, 09:23:39 PM",
+      "body": "Yeah, basically there's no universal standard that everyone is following, although most do seem to be quite consistent, there will always be outliers which do things a little different, and while that does add to the confusion, especially when using one of the outliers, and you come to realize years later it only works on said application, which could become obsolete or no longer usable. If you're generating a brain wallet, it's probably best to opt for the more universally accepted generation. Any particular reason why you're using pycoin?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 01, 2022, 12:47:13 PM",
+      "body": "Quote from: citb0in on August 31, 2022, 02:22:37 PMCan anyone explain why the output differs, please, where is the culprit ? any explanation and help appreciated. Thank youpycoin's ku P: command's passphrase isn't used to generate a single private key but a BIP32 root key.It's indicated in their \"command-line tools article\": COMMAND-LINE-TOOLS.mdBut the detailed method isn't disclosed.While (as another user has said), 1LEH8BEZgC4onZ4GLm8UpZ3vXGAr6LYKST is just a \"brainwallet\" which is the address generated from SHA256(foo) when used as prvKey.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "September 01, 2022, 01:13:06 PM",
+      "body": "Quote from: nc50lc on September 01, 2022, 12:47:13 PMpycoin's ku P: command's passphrase isn't used to generate a single private key but a BIP32 root key.That explains everything, thanks for pointing out! Would be nice to know what and how exactly this is done by ku.Quote from: Welsh on August 31, 2022, 09:23:39 PMAny particular reason why you're using pycoin?Nope. Why do you ask? Can you suggest something else and for what reason?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "September 01, 2022, 01:18:02 PM",
+      "body": "Quote from: Welsh on August 31, 2022, 09:23:39 PMYeah, basically there's no universal standard that everyone is following, although most do seem to be quite consistent, there will always be outliers which do things a little different, and while that does add to the confusion, especially when using one of the outliers, and you come to realize years later it only works on said application, which could become obsolete or no longer usable. If you're generating a brain wallet, it's probably best to opt for the more universally accepted generation. Any particular reason why you're using pycoin? This statement cannot be stressed enough. Playing around with stuff like this to leard and experiment is fine.But never ever store funds in addresses generated by things like this.Over the years, and a lot in the early days there were a lot more one off and oddball ways of generating private keys.Take these words -> <some math that was not disclosed> -> private key.It was nothing malicious but just people experimenting. But when their github / sourceforge / webpage went away so did the app unless someone saved a copy.So now you have your super secret passphrase and are now digging through archive.org to find how to get your private key again. It's become less common over the years, but you still have people trying to recover wallets that they don't even redeemer how they were generated. Yes some people are scamming, but I'm sure there are many others that just don't remember how they made them in 2011.....-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Welsh",
+      "created_time": "September 01, 2022, 06:15:15 PM",
+      "body": "Yeah, and it always happens. At least, if you use something that's more universally accepted, you have more redundancies, but even then you aren't guaranteed that the standard will be the same in a couple of years. You should be checking somewhat frequently that this standard is still accepted, factor in redundancies, and generally be on top of things when you're operating as your own bank, otherwise you could come to regret it. As an example, but still being a little different a website recently which was very well known, and been operating for something close to 10 years I imagine, recently went offline, and therefore a lot of people missed a service which they might've been checking on the daily for the past decade. So, even what seems reliable today, isn't guaranteed in the future. At least, Bitcoin Core generated, you know there'll be some sort of plan put in place if it ever needs to change for whatever reason. Any brain wallet generator isn't likely going to offer the same sort of contingency plans.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 03, 2022, 03:56:03 PM",
+      "body": "Quote from: nc50lc on September 01, 2022, 12:47:13 PMpycoin's ku P: command's passphrase isn't used to generate a single private key but a BIP32 root key.This is the correct answer. The P argument uses your input to create a BIP32 root key, and then generates an address from that root key, which is not what a brainwallet does. If you want to use pycoin to generate the address 1LEH8BEZgC4onZ4GLm8UpZ3vXGAr6LYKST, which is the same address generated by a brainwallet tool SHA256 hashing the string \"foo\", then first hash the string \"foo\" to get the following outputCode:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7aeAnd then take that output and simply use it with the ku command in pycoin, without the P argument, as follows:Code:ku 2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "September 03, 2022, 07:42:57 PM",
+      "body": "correct. That's what I figured out meanwhile and wrote a small a bash script to perform this automagically. Thank you all",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

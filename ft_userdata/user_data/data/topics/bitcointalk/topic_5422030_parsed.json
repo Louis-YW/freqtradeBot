@@ -1,0 +1,157 @@
+{
+  "id": "topic_5422030",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "November 17, 2022, 09:49:39 PM",
+  "content": "long's 64-bit limitation on 64-bit platforms is proving to be a difficult obstacle. There aren't even hardware-accelerated types for it (the highest I've seen is for 128 bits).Sure, there is libsecp256k1, but it looks very rudimentary - the private keys are hard-to-modify byte arrays, and modinverse is not possible.I made https://github.com/ZenulAbidin/xFD but it grinds to a halt on 256-bit digits. It stores all the base-10 digits in an array.I haven't found many other fixed-point or 256-bit classes. So what are you guys using?It's a shame that all this works flawlessly in Python, but the runtime makes everything prohibitively slow.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5422030",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "November 17, 2022, 10:00:17 PM",
+      "body": "libgmp? https://gmplib.org/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "November 17, 2022, 11:25:16 PM",
+      "body": "Quote from: NotATether on November 17, 2022, 09:49:39 PMIt's a shame that all this works flawlessly in Python, but the runtime makes everything prohibitively slow.ya python makes dealing with huge integers so simple it almost feels like you're cheating. would that every programming language could be like python in that way. \"just use pyhthon\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 18, 2022, 12:29:39 AM",
+      "body": "Quote from: larry_vw_1955 on November 17, 2022, 11:25:16 PMQuote from: NotATether on November 17, 2022, 09:49:39 PMIt's a shame that all this works flawlessly in Python, but the runtime makes everything prohibitively slow.ya python makes dealing with huge integers so simple it almost feels like you're cheating. would that every programming language could be like python in that way. \"just use pyhthon\" Actually I think that Cpython is just using GMP internally to power its \"long\" integer type. So that means it's doable.GMP in its raw form is very powerful but also cumbersome to use, if only I make a wrapper around it like I did for libevent, then that would make this problem much simpler.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "November 18, 2022, 02:09:46 AM",
+      "body": "Quote from: NotATether on November 18, 2022, 12:29:39 AMActually I think that Cpython is just using GMP internally to power its \"long\" integer type. So that means it's doable.In Python 3, there is effectively no limit to how long an integer value can be. Of course, it is constrained by the amount of memory your system has, as are all things, but beyond that an integer can be as long as you need it to be:that's one thing they got right about python.  not sure if they're using the gmp internally or what they're doing but it's nice to know that the only limitations on the size of the number is the amount of ram you have.java you can use BigInteger class library IF you're into java. C/C++ seems to be a bit behind the times definitely not going to be crypto friendly if what you're saying is the case. good luck!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "November 18, 2022, 11:21:05 AM",
+      "body": "Guys from bitcoin are moving (slowly) into 64bit implementation and it requires existence of uint128_t. At the end it seems they decided not to rely on native solution but to implement it manually: https://github.com/bitcoin-core/secp256k1/commit/2914bccbc0913806ee64425a27d38cdc27b288e8 (+next)Maybe it would be the way or you may reuse it to write your own type.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 21, 2022, 05:55:32 AM",
+      "body": "Quote from: PawGo on November 18, 2022, 11:21:05 AMGuys from bitcoin are moving (slowly) into 64bit implementation and it requires existence of uint128_t. At the end it seems they decided not to rely on native solution but to implement it manually: https://github.com/bitcoin-core/secp256k1/commit/2914bccbc0913806ee64425a27d38cdc27b288e8 (+next)uint128_t is provided by GCC, using what I assume to be assembly code. I can only assume a 256-bit type could also be coded in the same way, but as long as Intel cpus don't have native support for 128-bit values, our fastest solution is using the mpz type provided by GMP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "November 21, 2022, 11:03:02 PM",
+      "body": "Quote from: NotATether on November 17, 2022, 09:49:39 PMIt's a shame that all this works flawlessly in Python, but the runtime makes everything prohibitively slow.What exactly are you trying to do ? Generate a billion bitcoin addresses or something?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 22, 2022, 02:24:48 PM",
+      "body": "Quote from: ETFbitcoin on November 22, 2022, 11:35:02 AMQuote from: NotATether on November 17, 2022, 09:49:39 PMIt's a shame that all this works flawlessly in Python, but the runtime makes everything prohibitively slow.Have you tried using tools such as PyPy, Numba or other option mentioned at https://pybenchmarks.org/ to increase performance? I rarely use those option for my use case, but take note those tool might cause weird bug.I don't see the point of using a \"python accelerator\" written in C/C++ when the same tools could have directly been written in C++.Besides, if you got a Cpp program, you can make language ports to it to Node, Rust, ... as well as Python.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "arulbero",
+      "created_time": "November 22, 2022, 09:45:06 PM",
+      "body": "Quote from: NotATether on November 17, 2022, 09:49:39 PMlong's 64-bit limitation on 64-bit platforms is proving to be a difficult obstacle. There aren't even hardware-accelerated types for it (the highest I've seen is for 128 bits).Sure, there is libsecp256k1, but it looks very rudimentary - the private keys are hard-to-modify byte arrays, and modinverse is not possible.I made https://github.com/ZenulAbidin/xFD but it grinds to a halt on 256-bit digits. It stores all the base-10 digits in an array.I haven't found many other fixed-point or 256-bit classes.You can try this (I never used it): https://chronoxor.github.io/CppCommon/class_cpp_common_1_1uint256__t.htmlhttps://chronoxor.github.io/CppCommon/uint256_8cpp_source.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "November 22, 2022, 11:49:37 PM",
+      "body": "Quote from: NotATether on November 17, 2022, 09:49:39 PMIt's a shame that all this works flawlessly in Python, but the runtime makes everything prohibitively slow.i can take 10,000 private keys and turn them into bitcoin addresses in 10 or 15 minutes or so using python. how is that prohibitively slow? thats on an old computer too. who would need to do that anyway and why?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 23, 2022, 01:02:12 AM",
+      "body": "Quote from: larry_vw_1955 on November 22, 2022, 11:49:37 PMQuote from: NotATether on November 17, 2022, 09:49:39 PMIt's a shame that all this works flawlessly in Python, but the runtime makes everything prohibitively slow.i can take 10,000 private keys and turn them into bitcoin addresses in 10 or 15 minutes or so using python. how is that prohibitively slow? thats on an old computer too. who would need to do that anyway and why?It's simply a fact that Python is slow; it's an interpreted language. 10 to 15 minutes may still be acceptable in this case, but what if you need to analyze 1 million private keys? Or do something more complex with fewer keys? The same program in C or Rust can easily run 10-100x faster; so instead of 3 months a program would run for a day. That's quite significant.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "November 23, 2022, 01:46:39 AM",
+      "body": "Quote from: n0nce on November 23, 2022, 01:02:12 AMIt's simply a fact that Python is slow; it's an interpreted language. 10 to 15 minutes may still be acceptable in this case, but what if you need to analyze 1 million private keys?python can handle 1 million private keys. Quote Or do something more complex with fewer keys? like what? what would someone be needing to do exactly? other than make a vanity address or crack a bitcoin address. QuoteThe same program in C or Rust can easily run 10-100x faster; so instead of 3 months a program would run for a day. That's quite significant.i'm sure the cpu makes a difference too. get a high end cpu and run python on it and it will be just as fast as a low end computer running c. there's optimizations to be made everywhere not just in software.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "barrysty1e",
+      "created_time": "November 23, 2022, 02:52:08 AM",
+      "body": "Quote from: larry_vw_1955 on November 23, 2022, 01:46:39 AMQuote from: n0nce on November 23, 2022, 01:02:12 AMIt's simply a fact that Python is slow; it's an interpreted language. 10 to 15 minutes may still be acceptable in this case, but what if you need to analyze 1 million private keys?python can handle 1 million private keys. Quote Or do something more complex with fewer keys? like what? what would someone be needing to do exactly? other than make a vanity address or crack a bitcoin address. QuoteThe same program in C or Rust can easily run 10-100x faster; so instead of 3 months a program would run for a day. That's quite significant.i'm sure the cpu makes a difference too. get a high end cpu and run python on it and it will be just as fast as a low end computer running c. there's optimizations to be made everywhere not just in software.or just use the same types that bitcoin provides:https://github.com/bitcoin/bitcoin/blob/master/src/arith_uint256.hhttps://github.com/bitcoin/bitcoin/blob/master/src/uint256.husable in any c++ program once trimmed down, to 2-3 files.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "November 23, 2022, 04:40:48 AM",
+      "body": "Quote from: n0nce on November 23, 2022, 01:02:12 AMIt's simply a fact that Python is slow; it's an interpreted language. 10 to 15 minutes may still be acceptable in this case, but what if you need to analyze 1 million private keys? Or do something more complex with fewer keys? The same program in C or Rust can easily run 10-100x faster; so instead of 3 months a program would run for a day. That's quite significant.Although compiling programs written in Python doesn't make them run faster, you can still optimize them for speed by using in-built functions written in C. Proper memory allocation via usage of generators instead of lists, list comprehensions instead of for loops, avoiding for loops completely, small tricks like multiple assignments can do the job and significantly decrease the runtime of your programs. But it all won't work if you also don't choose a right tool for the job, namely proper data structure or algorithm. For example, you need to determine whether the number 40 is odd or even. You can write a recursive function that will call itself 40 times until it reaches zero and 40 times back to tell you a correct answer. Or you can just use one modulo operation to find a remainder. Even better, employing of bitwise operators may increase the speed of such a determining by dozens of percents.Code:import timedef is_odd_rec(n):    if n == 0:        return False    else:        return not is_odd_rec(n - 1)def is_odd_mod(n):    return n % 2 == 1def is_odd_bit(n):    return n & 1start_time = time.time()for i in range(1000000):    is_odd_rec(40)print(time.time() - start_time)# output 8.055624008178711start_time = time.time()for i in range(1000000):    is_odd_mod(40)print(time.time() - start_time)# output 0.24014711380004883start_time = time.time()for i in range(1000000):    is_odd_bit(40)print(time.time() - start_time)# output 0.23915982246398926",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "arulbero",
+      "created_time": "November 23, 2022, 03:22:18 PMLast edit: November 25, 2022, 04:39:40 PM by arulbero",
+      "body": "Quote from: NotATether on November 17, 2022, 09:49:39 PMI haven't found many other fixed-point or 256-bit classes. So what are you guys using? The function I use to compute a subtraction between 2 256-bit numbers (mod p):Code:###############################################################compute r = (a - b) mod pvoid sub (uint64_t *r, const uint64_t *a, const uint64_t *b) {    uint64_t a0, a1, a2, a3, b0, b1, b2, b3, p;  a0 = a[0];  a1 = a[1];  a2 = a[2];  a3 = a[3];  b0 = b[0];  b1 = b[1];  b2 = b[2];  b3 = b[3];    size_t borrow = 0;  //compute:   (a0, a1, a2, a3) = (a0, a1, a2, a3) - (b0, b1, b2, b3)  with borrow //  asm(\"subq %5, %1\\n\\t\"   \"sbbq %6, %2\\n\\t\"  \"sbbq %7, %3\\n\\t\" \"sbbq %8, %4\\n\\t\" \"sbbq $0, %0\" : \"+r\" (borrow), \"+r\" (a0),  \"+r\" (a1), \"+r\" (a2), \"+r\" (a3) : \"r\" (b0), \"r\" (b1), \"r\" (b2), \"r\" (b3) : \"cc\");    if(borrow == 0){   //if a >= b    r[0] = a0;    r[1] = a1;    r[2] = a2;    r[3] = a3;    return;  }    //if a < b  p = 0x1000003d1;  //compute:  (a0, a1, a2, a3) = (a0, a1, a2, a3) - p  asm(\"subq %4, %0\\n\\t\"   \"sbbq $0, %1\\n\\t\"  \"sbbq $0, %2\\n\\t\" \"sbbq $0, %3\" : \"+r\" (a0),  \"+r\" (a1), \"+r\" (a2), \"+r\" (a3) : \"r\" (p) : \"cc\");    r[0] = a0;    r[1] = a1;    r[2] = a2;    r[3] = a3;         return; }##################################################################in the main function://a = a0 + a1*(2^64) + a2*(2^128) + a3*(2^196)uint64_t  a =  {0x59f2815b16f81798, 0x029bfcdb2dce28d9, 0x55a06295ce870b07, 0x79be667ef9dcbbac};uint64_t  b =  {0x9c47d08ffb10d4b8, 0xfd17b448a6855419, 0x5da4fbfc0e1108a8, 0x483ada7726a3c465};uint64_t c [4];uint64_t* ptra = &a[0];uint64_t* ptrb = &b[0];uint64_t* ptrc = &c[0];sub(ptrc, ptra, ptrb);  //compute c = a - b mod p",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 23, 2022, 04:28:14 PM",
+      "body": "Quote from: larry_vw_1955 on November 23, 2022, 01:46:39 AMQuote Or do something more complex with fewer keys? like what? what would someone be needing to do exactly? other than make a vanity address or crack a bitcoin address.Anything that does a lot of computations gets noticeably slow; you won't notice a 10ms or 100ms runtime difference, but e.g. a kernel has to be in C or Rust.I don't know why we're having this discussion; Python performance is not something to agree or disagree about, you can also have a look here: https://medium.com/swlh/a-performance-comparison-between-c-java-and-python-df3890545f6dQuote from: larry_vw_1955 on November 23, 2022, 01:46:39 AMQuoteThe same program in C or Rust can easily run 10-100x faster; so instead of 3 months a program would run for a day. That's quite significant.i'm sure the cpu makes a difference too. get a high end cpu and run python on it and it will be just as fast as a low end computer running c. there's optimizations to be made everywhere not just in software.Sure; that doesn't make Python faster, though.  On the same hardware, it's still slower by the same factor as before..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 23, 2022, 06:07:30 PM",
+      "body": "Thank you!Do you happen to have a function for multiplication as well?I mean, I saw somewhere a code from 2013 to regenerate Y with the opposite polarity, possibly in Python, but it would be nice if there was a faster way to do that.Quote from: arulbero on November 23, 2022, 03:22:18 PM The function I use to compute a subtraction between 2 256-bit numbers (mod p):Code:###############################################################compute r = (a - b) mod pvoid sub (uint64_t *r, const uint64_t *a, const uint64_t *b) {    uint64_t a0, a1, a2, a3, b0, b1, b2, b3, p;  a0 = a[0];  a1 = a[1];  a2 = a[2];  a3 = a[3];  b0 = b[0];  b1 = b[1];  b2 = b[2];  b3 = b[3];    size_t borrow = 0;  //compute:   (a0, a1, a2, a3) = (a0, a1, a2, a3) - (b0, b1, b2, b3)  with borrow //  asm(\"subq %5, %1\\n\\t\"   \"sbbq %6, %2\\n\\t\"  \"sbbq %7, %3\\n\\t\" \"sbbq %8, %4\\n\\t\" \"sbbq $0, %0\" : \"+r\" (borrow), \"+r\" (a0),  \"+r\" (a1), \"+r\" (a2), \"+r\" (a3) : \"r\" (b0), \"r\" (b1), \"r\" (b2), \"r\" (b3) : \"cc\");    if(borrow == 0){   //if a >= b    r[0] = a0;    r[1] = a1;    r[2] = a2;    r[3] = a3;    return;  }    //if a < b  p = 0x1000003d1;  //compute:  (a0, a1, a2, a3) = (a0, a1, a2, a3) - p  asm(\"subq %4, %0\\n\\t\"   \"sbbq $0, %1\\n\\t\"  \"sbbq $0, %2\\n\\t\" \"sbbq $0, %3\" : \"+r\" (a0),  \"+r\" (a1), \"+r\" (a2), \"+r\" (a3) : \"r\" (p) : \"cc\");    r[0] = a0;    r[1] = a1;    r[2] = a2;    r[3] = a3;         return; }##################################################################in the main function://a = a0 + a1*(2^64) + a2*(2^128) + a3*(2^196)uint64_t  a =  {0x59f2815b16f81798, 0x029bfcdb2dce28d9, 0x55a06295ce870b07, 0x79be667ef9dcbbac};uint64_t  b =  {0x9c47d08ffb10d4b8, 0xfd17b448a6855419, 0x5da4fbfc0e1108a8, 0x483ada7726a3c465};uint64_t c [4];uint64_t* ptra = &a[0];uint64_t* ptrb = &b[0];uint64_t* ptrb = &c[0];sub(ptrc, ptra, ptrb);  //compute c = a - b mod p",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "arulbero",
+      "created_time": "November 23, 2022, 09:42:36 PMLast edit: November 26, 2022, 02:01:35 PM by arulbero",
+      "body": "Quote from: NotATether on November 23, 2022, 06:07:30 PMThank you!Do you happen to have a function for multiplication as well?Code:#define MultiplyWordsLoHi(low, high, a, b) asm  ( \"mulx  %2, %0, %1;\" : \"=r\"(low), \"=r\"(high) :  \"gr\" (a), \"d\" (b) : \"cc\");// compute a * b = (low, high)#define AccAdd4WordsBy4_wc(a0, a1, a2, a3, b0, b1, b2)  asm  (\"addq %4, %0; adcx %5, %1; adcx %6, %2; adcq $0, %3;\" : \"+r\"(a0), \"+r\"(a1), \"+r\"(a2), \"+r\"(a3) : \"r\"(b0), \"r\"(b1), \"r\"(b2) : \"cc\");// (a0, a1, a2, a3) = (a0, a1, a2, a3) + (b0, b1, b2, 0) without carry#define MulAcc(c, a0, a1, a, b) asm  (\"mulx %3, %3, %4; addq %3, %1; adcq %4, %2; adcq $0, %0;\" : \"+r\"(c), \"+r\"(a0), \"+r\"(a1), \"=a\"(a), \"=d\"(b) : \"a\"(a), \"d\"(b) : \"cc\");#define MulAcc_11(a0, a1, c0, a, b)  asm (\"mulx %3, %0, %1; addq %2, %0; adcq $0, %1;\" : \"+r\"(a0), \"+r\"(a1): \"r\"(c0), \"r\"(a), \"d\"(b) : \"cc\");//compute u * v  = r mod pvoid mul(uint64_t *r, const uint64_t *u, const uint64_t *v) {    uint64_t u0 = u[0];  uint64_t u1 = u[1];  uint64_t u2 = u[2];  uint64_t u3 = u[3];  uint64_t v0 = v[0];  uint64_t v1 = v[1];  uint64_t v2 = v[2];  uint64_t v3 = v[3];  uint64_t r0, r1, r2, r3, r4, r5, r6, r7;  uint64_t z1, z2, z3, z4, z5, z6, z7, z8, z44, z66;  z2 = z3 = z4 = z5 = z6 = z7 = z8 = r1 = r2 = r3 = r4 = r5 = r6 = r7 = 0;  MultiplyWordsLoHi(r0, z1, u0, v0) //x1 --> r0 ok  MultiplyWordsLoHi(z2, z3, u1, v0)  MultiplyWordsLoHi(z4, z5, u2, v0)  MultiplyWordsLoHi(z6, z7, u3, v0)  MultiplyWordsLoHi(z66, z8, u3, v1)//  AccAdd4WordsBy4_wc(z2, z4, z6, z7, z1, z3, z5)  MulAcc_11(r1, z1, z2, u0, v1) //x1 --> r1 ok  MultiplyWordsLoHi(z2, z3, u1, v1)  MultiplyWordsLoHi(z44, z5, u2, v1)  AccAdd4WordsBy4_wc(z1, z3, z5, z8, z4, z6, z7)  AccAdd4WordsBy4_wc(z2, z44, z66, z8, z1, z3, z5)    MulAcc_11(r2, z1, z2, u0, v2) //x1 --> r2 ok  MultiplyWordsLoHi(z2, z3, u1, v2)  MultiplyWordsLoHi(z4, z5, u2, v2)  MultiplyWordsLoHi(z6, z7, u3, v2)  AccAdd4WordsBy4_wc(z1, z3, z5, z7, z44, z66, z8)  AccAdd4WordsBy4_wc(z2, z4, z6, z7, z1, z3, z5)  MulAcc_11(r3, z1, z2, u0, v3) //x1 --> r3 ok  MultiplyWordsLoHi(r4, z3, u1, v3)  MultiplyWordsLoHi(r5, z5, u2, v3)  MultiplyWordsLoHi(r6, r7, u3, v3)  AccAdd4WordsBy4_wc(z1, z3, z5, r7, z4, z6, z7)  AccAdd4WordsBy4_wc(r4, r5, r6, r7, z1, z3, z5) //r4, r5, r6, r7 ok    //Reduction    uint64_t p = 0x1000003d1;  MultiplyWordsLoHi(z3, z4, r5, p)  MultiplyWordsLoHi(z5, z6, r6, p)  MultiplyWordsLoHi(z7, z8, r7, p)    MulAcc_11(z1, z2, r0, r4, p)   AccAdd4WordsBy4_wc(z2, z4, z6, z8, r1, r2, r3)    uint64_t c = 0;  AccAdd4WordsBy4_wc(z3, z5, z7, z8, z2, z4, z6)  MulAcc(c, z1, z3, p, z8)    r[0] = z1;  r[1] = z3;     if(c == 1){  asm (     \"addq $1, %0; adcq $0, %1; \\n\"       : \"=r\" (z5), \"=r\" (z7)        : : \"cc\");  }    r[2] = z5;  r[3] = z7;     }MultiplyWordsLoHi and other functions are here:https://www.cryptopp.com/docs/ref/integer_8cpp_source.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

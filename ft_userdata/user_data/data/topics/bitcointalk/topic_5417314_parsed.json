@@ -1,0 +1,133 @@
+{
+  "id": "topic_5417314",
+  "title": "SamYezi",
+  "author": "SamYezi",
+  "created_time": "October 16, 2022, 03:55:00 PM",
+  "content": "Hello. Got interested recently in Cuda technology for existing Python SECP256K1 code speed up. Installed Nvidia 10.2 toolkit and It seems to be running OK to an extent.I've scrapped a small script for PyCuda that just doubles an integerCode:import pycuda.driver as cudaimport pycuda.autoinitfrom pycuda.compiler import SourceModuleimport numpy#Working with integersa = 126a = numpy.int64(a)a_gpu = cuda.mem_alloc(a.nbytes)cuda.memcpy_htod(a_gpu, a)mod = SourceModule(\"\"\"  __global__ void doublify(int *a)  {    int idx = threadIdx.x + threadIdx.y*4;    a[idx] *= 2;  }  \"\"\")func = mod.get_function(\"doublify\")func(a_gpu, block=(4,4,1))a_doubled = numpy.empty_like(a)cuda.memcpy_dtoh(a_doubled, a_gpu)print(a_doubled)print(a)However, It can't work with big numbers (of 256 bit size). When passing for example:Code:a = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140There's an error:Code:OverflowError: int too big to convertIs there a way to use Big integers in PyCuda, CuPy, just a GPU implementation of Python?Stumbled on Stackoverflow posthttps://stackoverflow.com/questions/68215238/numpy-256-bit-computingbut didn't understand anything in it.I know that in C++, you could use Boost library/dependency to have bigger integer variables. Is there a way to do the same in Python GPU?Also, Does it even make any sense to use Python GPU solutions, since the main calculations are made in \"SourceModule\" kernel that has to be coded in C++ anyway?May be it is just easier to recode the existing python code in C++ with boost library and later add CUDA GPU rendering?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417314",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "October 16, 2022, 07:35:52 PM",
+      "body": "You have to make your own \"fixed width\" decimal class that represents numbers in Base-2 notation if you want to implement some kind of support for 256-bit data.I have a C++ (not python) fixed-width class, but it's in Base-10, sorry.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "_Counselor",
+      "created_time": "October 17, 2022, 06:21:33 AM",
+      "body": "I don't know any ready-to-use 256bit number numpy libraries, but it is possible to create one, using 64 or 32bit numbers for math operations.You cannot just speed up individual operations like point multiplication by using GPU, because single CUDA core is much slower than CPU. You need to divide full computing work into many independent tasks which will run in parallel in order to get the performance gain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 17, 2022, 08:23:55 AM",
+      "body": "Quote from: _Counselor on October 17, 2022, 06:21:33 AMI don't know any ready-to-use 256bit number numpy libraries, but it is possible to create one, using 64 or 32bit numbers for math operations.You cannot just speed up individual operations like point multiplication by using GPU, because single CUDA core is much slower than CPU. You need to divide full computing work into many independent tasks which will run in parallel in order to get the performance gain.I guess you could try using an algorithm that computes multiple point multiplications at once - incrementally, not using threads or CUDA cores. This will safe you time as long as you only batch multiply as many points as it takes to do (according to the paper) 5 serial ECmults.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "SamYezi",
+      "created_time": "October 17, 2022, 06:50:47 PM",
+      "body": "Quote from: _Counselor on October 17, 2022, 06:21:33 AMI don't know any ready-to-use 256bit number numpy libraries, but it is possible to create one, using 64 or 32bit numbers for math operations.You cannot just speed up individual operations like point multiplication by using GPU, because single CUDA core is much slower than CPU. You need to divide full computing work into many independent tasks which will run in parallel in order to get the performance gain.What you are suggesting is that it is just easier to use C++ with boost, while simultaneously implementing a multithreading approach, and everything would be running on a CPU?I mean it could be a better way to think about it, since I also want to port that on laptop or other devices that don't have either a GPU or NVIDIA tool kit installed",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 19, 2022, 12:58:26 PM",
+      "body": "Quote from: SamYezi on October 17, 2022, 06:50:47 PMQuote from: _Counselor on October 17, 2022, 06:21:33 AMI don't know any ready-to-use 256bit number numpy libraries, but it is possible to create one, using 64 or 32bit numbers for math operations.You cannot just speed up individual operations like point multiplication by using GPU, because single CUDA core is much slower than CPU. You need to divide full computing work into many independent tasks which will run in parallel in order to get the performance gain.What you are suggesting is that it is just easier to use C++ with boost, while simultaneously implementing a multithreading approach, and everything would be running on a CPU?I mean it could be a better way to think about it, since I also want to port that on laptop or other devices that don't have either a GPU or NVIDIA tool kit installedWhy the need for Boost? I wouldn't use any of its libraries inside performance-intensive loops, but for things like Program Options that run only once, then it's fine.Boost is known to compromise speed if it makes the interface cleaner.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 26, 2022, 10:05:40 AM",
+      "body": "Quote from: AlexanderCurl on October 26, 2022, 05:47:09 AMIf you bruteforce bitcoin range for example one way of speeding up is not to use scalar multiplication at all. When you go through range just use start scalar and start point. increase scalar and increase start point by point addition. simple as that. I don't think brute-force would be particularly effective in the first place, as private keys that are close to each other in value are so rare that it would have to be artificially created instead of generated by an RNG.Pseudo-random bits could help I.e. bit 0 is generated from a simple mod sequence, bit 1, bit 2 from a different sequence, and so on...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dextronomous",
+      "created_time": "October 27, 2022, 07:17:22 PM",
+      "body": "really would like to try and make it work, could you explain a little where the settingsfile and bloom can be found.Quote from: AlexanderCurl on October 26, 2022, 06:10:45 PMfrom datetime import datetimeimport secp256k1 as icefrom bloomfilter import *bloomfile = 'bloomfile_shiftdown.bf'settingsFile = \"divide_search_point_add.txt\"thanks a lot",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "October 28, 2022, 06:34:34 AM",
+      "body": "Quote from: AlexanderCurl on October 28, 2022, 06:00:16 AMin the settings file first line max range value then goes min range value after goes divide. it will be changed and saved during program work. bloomfilter you can use any. the main thing there is to prepare bloomfilter beforehand so we could load it fast. it is just an example to show what i mean.Hi, how convert this code to c and ecdsa256k1 lib ?divnum is a multiply to mod inversion:Code:from random import randintN =    115792089237316195423570985008687907852837564279074904382605163141518161494337def inv(v): return pow(v, N-2, N)def divnum(a, b): return ( (a * inv(b) ) % N )i=0#input2^^120 = 0x9fd24b3abe244d6c443df56fa494dcinput = 0x5f87 +1delta = 12gamma = 2d1= 80while i < 2**61:    d= (divnum(input,delta))     s = divnum(i,gamma) %N    result = divnum(d,s)        if result <input and result >=0:        print(\"result\",hex(result),\"i\",hex(i),\"input\",hex(input))            i = i +1?Thank you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "October 28, 2022, 07:01:29 AM",
+      "body": "Quote from: AlexanderCurl on October 28, 2022, 06:55:34 AMif you wanna play with numbers in the ring modulo N :N = 115792089237316195423570985008687907852837564279074904382605163141518161494337def modinv(a,n):    lm = 1    hm = 0    low = a%n    high = n    while low > 1:        ratio = high//low        nm = hm-lm*ratio        new = high-low*ratio        high = low        low = new        hm = lm        lm = nm    return lm % ndef inv(a):    return N - a    def add(a,b):    return (a + b) % Ndef sub(a,b):    return (a + inv(b)) % Ndef mul(a,b):    return (a * b) % N    def div(a,b):    return (a * modinv(b,N)) % Nin your case just write c file like this#include <stdio.h>int add_int(int, int);float add_float(float, float);void print_sc(char *ptr);int add_int(int num1, int num2){    return num1 + num2;}and convert you function to cif you are on windows:gcc -c -DBUILD_DLL your_filename.cgcc -shared -o your_filename.dll your_filename.owill get you dll librarythen just use ctypes to load and use it.Thank you for your answer. How to use a import secp256k1 as ice in my code bro ? secp256k1 is more faste. I need fast code.Thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 28, 2022, 08:47:36 AM",
+      "body": "Quote from: COBRAS on October 28, 2022, 07:01:29 AMThank you for your answer. How to use a import secp256k1 as ice in my code bro ? secp256k1 is more faste. I need fast code.ThanksIn Python you can just use the pow() function which is available since 3.8. It's probably based off of native C/C++ but I could be wrong.For older versions of python there is a Euclidean GCD algorithm you can copy/paste from here, but you shouldn't need that as all modern distros have at least Python 3.8.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mikorist",
+      "created_time": "December 10, 2022, 08:27:30 PMLast edit: December 10, 2022, 08:46:26 PM by Mikorist",
+      "body": "Quote from: AlexanderCurl on October 28, 2022, 04:02:07 PMhttps://github.com/iceland2k14/secp256k1 fastest library for python.And fastecdsa......https://github.com/AntonKueltz/fastecdsaCode:from fastecdsa import keys, curveimport secp256k1 as icewhile True:           dec   = keys.gen_private_key(curve.P256)           HEX   = \"%064x\" % dec           wifc  = ice.btc_pvk_to_wif(HEX)           wifu  = ice.btc_pvk_to_wif(HEX, False)           uaddr = ice.privatekey_to_address(0, False, dec)           caddr = ice.privatekey_to_address(0, True, dec)           print(wifu, uaddr)Check how fast this simple generator is....Zillions per second.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mikorist",
+      "created_time": "December 10, 2022, 09:40:58 PM",
+      "body": "Quote from: SamYezi on October 16, 2022, 03:55:00 PMI know that in C++, you could use Boost library/dependency to have bigger integer variables. Is there a way to do the same in Python GPU?There is a way, but there are many readings until the final implementation.https://documen.tician.de/pycuda/array.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mikorist",
+      "created_time": "December 11, 2022, 06:15:33 AMLast edit: December 11, 2022, 04:40:40 PM by Mikorist",
+      "body": "I have no idea how secp256k1 as ice & fastecdsa  optimized for GPU jit, (maybe not at all) but we can test this anyway...Without experimentation there is no progress.You have to install the CUDA Toolkit for this & numba on Linux....Code:conda install numba & conda install cudatoolkitorCode:pip3 install numba numpy fastecdsa (etc...)Code:import numpy as np import numba from numba import cuda, jit from timeit import default_timer as timerfrom fastecdsa import keys, curveimport secp256k1 as ice# Run on CPUdef cpu(a):    for i in range(100000):        dec   = keys.gen_private_key(curve.P256)        HEX   = \"%064x\" % dec        wifc  = ice.btc_pvk_to_wif(HEX)        wifu  = ice.btc_pvk_to_wif(HEX, False)        uaddr = ice.privatekey_to_address(0, False, dec)        caddr = ice.privatekey_to_address(0, True, dec)        a[i]+= 1# Run on GPU@numba.jit(forceobj=True)def gpu(x):    dec   = keys.gen_private_key(curve.P256)    HEX   = \"%064x\" % dec    wifc  = ice.btc_pvk_to_wif(HEX)    wifu  = ice.btc_pvk_to_wif(HEX, False)    uaddr = ice.privatekey_to_address(0, False, dec)    caddr = ice.privatekey_to_address(0, True, dec)    return x+1if __name__==\"__main__\":    n = 100000    a = np.ones(n, dtype = np.float64)    start = timer()    cpu(a)    print(\"without GPU:\", timer()-start)    start = timer()    gpu(a)    numba.cuda.profile_stop()    print(\"with GPU:\", timer()-start)p.s.It is a bad idea to start this test with the print command. So I removed the command...resultwithout GPU: 8.594641929998033-----------It throws errors hereCode:.local/lib/python3.10/site-packages/numba/cuda/cudadrv/devices.py\", line 231, in _require_cuda_context    with _runtime.ensure_context():  File \"/usr/lib/python3.10/contextlib.py\", line 135, in __enter__    return next(self.gen) even with the optionCode: @numba.jit(forceobj=True) I'll try again later...maybe it's my system and drivers - and maybe it's not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Mikorist",
+      "created_time": "December 11, 2022, 04:30:13 PMLast edit: December 11, 2022, 05:04:07 PM by Mikorist",
+      "body": "I had driver problems on Debian 11Code:sudo nano  /etc/modprobe.d/blacklist-nouveau.confblacklist-nouveau.conf :Code:blacklist nouveaublacklist lbm-nouveauoptions nouveau modeset=0alias nouveau offalias lbm-nouveau offThen reboot and reinstall Code:sudo apt -y install  nvidia-cuda-toolkit nvidia-cuda-dev nvidia-driverIt works like this. GPU must be specified as  \"0\" . Or who has more than one of them in the same command.Code:import osos.environ['CUDA_VISIBLE_DEVICES'] = \"0\"import numpy as npimport numbafrom numba import cuda, jitfrom timeit import default_timer as timerfrom fastecdsa import keys, curveimport secp256k1 as ice# Run on CPUdef cpu(a):    for i in range(100000):        dec   = keys.gen_private_key(curve.P256)        HEX   = \"%064x\" % dec        wifc  = ice.btc_pvk_to_wif(HEX)        wifu  = ice.btc_pvk_to_wif(HEX, False)        uaddr = ice.privatekey_to_address(0, False, dec)        caddr = ice.privatekey_to_address(0, True, dec)        a[i]+= 1# Run on GPUnumba.jit()def gpu(x):    dec   = keys.gen_private_key(curve.P256)    HEX   = \"%064x\" % dec    wifc  = ice.btc_pvk_to_wif(HEX)    wifu  = ice.btc_pvk_to_wif(HEX, False)    uaddr = ice.privatekey_to_address(0, False, dec)    caddr = ice.privatekey_to_address(0, True, dec)    return x+1if __name__==\"__main__\":    n = 100000    a = np.ones(n, dtype = np.float64)    start = timer()    cpu(a)    print(\"without GPU:\", timer()-start)    start = timer()    gpu(a)    numba.cuda.profile_stop()    print(\"with GPU:\", timer()-start)Result without GPU: 10.30411118400002with GPU: 0.2935101880000275 p.s. tried using following decorators:Code:@numba.jit(target='cuda')@numba.jit(target='gpu')@numba.cuda.jitIt is even faster without anything as a signature argument.Code:@numba.jit()without GPU: 8.928111962999992with GPU: 0.06683745000009367",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "December 27, 2022, 12:40:20 PMLast edit: December 27, 2022, 01:16:27 PM by citb0in",
+      "body": "@Mikorist:Your code is faulty. For the GPU part you are creating only one single address, you missed the loop for creating the same amount of addresses as you did on the CPU part  that's why you get such unrealistic low time results for the GPU part. Try to modify your code and output the generated keys/addresses/wifs/etc... to a file, each for CPU and GPU part and you will quickly recognize what's happening  Here's the revised code:Code:import osos.environ['CUDA_VISIBLE_DEVICES'] = \"0\"import numpy as npimport numbafrom numba import cuda, jitfrom timeit import default_timer as timerfrom fastecdsa import keys, curveimport secp256k1 as ice# number of addresses to generatenum_generate=100000# Run on CPUdef cpu(a):  with open('bench.cpu', 'w') as f_cpu:    for i in range(num_generate):        prvkey_dec  = keys.gen_private_key(curve.P256)        prvkey_hex  = \"%064x\" % prvkey_dec        wifc        = ice.btc_pvk_to_wif(prvkey_hex)        wifu        = ice.btc_pvk_to_wif(prvkey_hex, False)        uaddr       = ice.privatekey_to_address(0, False, prvkey_dec)        caddr       = ice.privatekey_to_address(0, True, prvkey_dec)        f_cpu.write(f'PrivateKey Hex: {prvkey_hex}\\nWIF compressed: {wifc}\\nWIF uncompressed: {wifu}\\nAddress uncompressed: {uaddr}\\nAddress compressed:{caddr}\\n\\n')        a[i]+= 1# Run on GPUnumba.jit()def gpu(b):  with open('bench.gpu', 'w') as f_gpu:    for i in range(num_generate):        prvkey_dec      = keys.gen_private_key(curve.P256)        prvkey_hex      = \"%064x\" % prvkey_dec        wifc            = ice.btc_pvk_to_wif(prvkey_hex)        wifu            = ice.btc_pvk_to_wif(prvkey_hex, False)        uaddr           = ice.privatekey_to_address(0, False, prvkey_dec)        caddr           = ice.privatekey_to_address(0, True, prvkey_dec)        f_gpu.write(f'PrivateKey Hex: {prvkey_hex}\\nWIF compressed: {wifc}\\nWIF uncompressed: {wifu}\\nAddress uncompressed: {uaddr}\\nAddress compressed:{caddr}\\n\\n')        #return b+1if __name__==\"__main__\":    a = np.ones(num_generate, dtype = np.float64)    startCPU = timer()    cpu(a)    print(\"without GPU:\", timer()-startCPU)    b = np.ones(num_generate, dtype = np.float64)    startGPU = timer()    gpu(b)    numba.cuda.profile_stop()    print(\"with GPU:\", timer()-startCPU)On my system for 100,000 addresses being generated, the result is:Quotewithout GPU: 5.16345653499593with GPU: 11.49221567499626  As I mentioned in the other thread of your posting, the GPU is not utilized at all. You can check the stats of your GPU and you will see that 0% are utilized while the GPU part of that python code is running. I did not dig into the jit part so I cannot tell you what is needed to have this code accelerated on GPU using CUDA.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

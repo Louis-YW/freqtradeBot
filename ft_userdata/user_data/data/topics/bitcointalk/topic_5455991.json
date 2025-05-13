@@ -1,0 +1,165 @@
+{
+  "id": "topic_5455991",
+  "title": "odolvlobo",
+  "author": "odolvlobo",
+  "created_time": "June 10, 2023, 08:58:51 PM",
+  "content": "This paper discloses an interesting vulnerability in an unknown/undisclosed wallet's method of signing transactions. It reminds us again of a major weakness in ECDSA: the nonce.The curious case of the half-half Bitcoin ECDSA noncesBitcoin Core does not have this vulnerability.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5455991",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "June 10, 2023, 09:12:59 PM",
+      "body": "Makes you wonder if this is the cause of some of the hacks and loss of funds that some people have had in certain wallets. No that they're actually been hacked but the fact that the programmers did their job so poorly that it left certain things vulnerable. Would be interesting to actually have them name the wallet, but I understand why they can't. You really do not want to cause that stampede and / or people loosing funds because somebody happened to mention that they were using wallet X and now people know it has certain issues.However, as we have seen, you can light up in 50 foot blinking neon sign saying \"don't use this wallet it has issues\" and people will still use it because either they like it, or it does something they want, or they've been using it for a while and it's just pure inertia.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "June 10, 2023, 10:40:36 PM",
+      "body": "I guess they wanted something that was faster than RFC 6979 so they could frontrun other transactions, but if speed is your point, why not just pre-generate a ton of cryptographically secure nonces in advance?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "June 11, 2023, 05:11:20 AM",
+      "body": "Recently someone was trying to sell a script to halve nonces, maybe it is relates, he might have been russian or something.It could be that some of those addresses are actually puzzle addresses, so taking from them is not considered theft.Though there are still some low range keys with exposed public keys, they are free to break into them and take all the \"loot\" if they can.But you know, it is one of the rules of the universe, the bad guys are destined to fail at the end.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 11, 2023, 08:02:17 AM",
+      "body": "Quote from: DaveF on June 10, 2023, 09:12:59 PMWould be interesting to actually have them name the wallet, but I understand why they can't.It's not a specific wallet - it's a user stealing funds.If you read section 5.1, it explains that most of these peculiar nonces are coming from transaction spending coins from otherwise compromised addresses, such as brainwallets, addresses with previously repeated nonces (and therefore exposed private keys), or addresses with publicly revealed private keys (such as from various libraries). These affected transactions are a user implementing their own script to steal these funds, and inside their own script is this peculiar way of calculating a nonce for their transactions.Interesting that they have linked all this to the forum user amaclin.Quote from: ymgve2 on June 10, 2023, 10:40:36 PMI guess they wanted something that was faster than RFC 6979 so they could frontrun other transactions, but if speed is your point, why not just pre-generate a ton of cryptographically secure nonces in advance?How long does it take on average to calculate a nonce following RFC 6979? Is it really a significant factor in getting your transaction broadcast first against other bots also trying to steal the same funds?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "June 11, 2023, 03:38:27 PM",
+      "body": "Quote from: digaran on June 11, 2023, 05:11:20 AMRecently someone was trying to sell a script to halve nonces, maybe it is relates, he might have been russian or something.This \"half\" thing has nothing to do with the user trying to \"divide\" the nonce integer by two, it's called half-half because the upper 128 bits of the nonce comes straight from the hash of the transaction, while the lower 128 bits comes straight from the private key. Even if that script they tried to sell worked as described, it would be useless when trying to figure out the transactions in this paper.Quote from: o_e_l_e_o on June 11, 2023, 08:02:17 AMHow long does it take on average to calculate a nonce following RFC 6979? Is it really a significant factor in getting your transaction broadcast first against other bots also trying to steal the same funds?RFC 6979 takes at least six SHA256 operations (if I counted correctly) and in a race against other users, any saved CPU cycles count.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 11, 2023, 04:26:24 PMLast edit: June 11, 2023, 05:45:09 PM by o_e_l_e_o",
+      "body": "Quote from: ymgve2 on June 11, 2023, 03:38:27 PMat least sixOf course. I forgot that it loops if the value is not between 1 and q-1, which could result in more operations being required (although this is fairly unlikely). But then having said that, his half and half system would also be vulnerable to the exact same drawback, and could still calculate a nonce outside the required range.So this then loops (heh) back round to your original question - why use any computational function at all? If speed is the most important factor here, then why not just have a nonce pre-calculated?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 12, 2023, 04:50:45 AM",
+      "body": "Quote from: odolvlobo on June 10, 2023, 08:58:51 PMIt reminds us again of a major weakness in ECDSA: the nonce.That's inaccurate since the problem is not the nonce, it is the way they generate nonce. It's the same with private keys, if you don't select it randomly it is just as weak and can be \"leaked\". You can't say \"private key is a major weakness in ECDSA just because eg. an incompetent developer choose number 1 as the key\".In all cases of weak nonce leading to loss of funds, the reason has been developer incompetence. For example blockchain.info using random.org to generate nonce and being incompetent enough to never even check the success state of the respond received from the site (they used the returned error as the nonce!).Quote from: ymgve2 on June 10, 2023, 10:40:36 PMI guess they wanted something that was faster than RFC 6979 so they could frontrun other transactions, but if speed is your point, why not just pre-generate a ton of cryptographically secure nonces in advance?They could just use an RNG to generate it if they wanted to skip RFC6979 which would be faster. The idea of the TaggedHash introduced in Taproot is also interesting and fast while being cryptographically strong.Quote from: ymgve2 on June 11, 2023, 03:38:27 PMRFC 6979 takes at least six SHA256 operations (if I counted correctly) and in a race against other users, any saved CPU cycles count.At least 5 HMACSHA256 hashes (each HMAC is 2 SHA256 hashes under the hood). It only goes up if the final k is not valid (0 or bigger than order) and you'd have to compute 2 more HMACSHA256.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "June 13, 2023, 08:19:09 PM",
+      "body": "Quote from: ymgve2 on June 11, 2023, 03:38:27 PMQuote from: digaran on June 11, 2023, 05:11:20 AMRecently someone was trying to sell a script to halve nonces, maybe it is relates, he might have been russian or something.This \"half\" thing has nothing to do with the user trying to \"divide\" the nonce integer by two, it's called half-half because the upper 128 bits of the nonce comes straight from the hash of the transaction, while the lower 128 bits comes straight from the private key. Even if that script they tried to sell worked as described, it would be useless when trying to figure out the transactions in this paper.Thanks for the intel, I was under the impression that extracting anything related to the private key from a transaction or a signed message is not possible, or at least there is no useful data for extraction( cough, pooya, cough).So indeed there is a way to find something out of a tx, or msg, it just goes back to the randomness and secure ways of generating private keys.However, I would like to know, if it is possible to find something more about the private key from a tx than just having a public key? If there is, could I find something useful about a low range key such as a puzzle transaction challenge key with exposed public key?Thanks again for your time and efforts to respond.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "June 14, 2023, 10:26:36 AM",
+      "body": "Quote from: digaran on June 13, 2023, 08:19:09 PMQuote from: ymgve2 on June 11, 2023, 03:38:27 PMQuote from: digaran on June 11, 2023, 05:11:20 AMRecently someone was trying to sell a script to halve nonces, maybe it is relates, he might have been russian or something.This \"half\" thing has nothing to do with the user trying to \"divide\" the nonce integer by two, it's called half-half because the upper 128 bits of the nonce comes straight from the hash of the transaction, while the lower 128 bits comes straight from the private key. Even if that script they tried to sell worked as described, it would be useless when trying to figure out the transactions in this paper.Thanks for the intel, I was under the impression that extracting anything related to the private key from a transaction or a signed message is not possible, or at least there is no useful data for extraction( cough, pooya, cough).So indeed there is a way to find something out of a tx, or msg, it just goes back to the randomness and secure ways of generating private keys.However, I would like to know, if it is possible to find something more about the private key from a tx than just having a public key? If there is, could I find something useful about a low range key such as a puzzle transaction challenge key with exposed public key?Thanks again for your time and efforts to respond.In normal transactions, it is not possible to extract anything. These are not normal transactions, and use a custom construction that makes them extremely vulnerable to attacks since in practice it's basically an equation with a single unknown variable. This is merely a curiosity and has no impact on anything that uses proper nonce generation procedures.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 14, 2023, 04:27:27 PM",
+      "body": "Quote from: digaran on June 11, 2023, 05:11:20 AMRecently someone was trying to sell a script to halve nonces, maybe it is relates, he might have been russian or something.Nope, you're thinking of the wrong kind of halving.The nonce halving described in the paper is referring to taking the top or bottom half of the message / private bytes and so on. This has nothing to do with ECDSA private key halving by applying modular multiplication.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "June 15, 2023, 01:15:47 AM",
+      "body": "It's not news that thieves do dumb things.Making selecting k faster isn't an interesting optimization when minimizing signing _latency_.  In terms of speed even the slowest way of selecting k you could credibly use is more than fast enough to keep up with the throughput of the entire blockchain.  The signing time is dominated by constructing R, which means that to have low latency you need to select k independently from the message content and do it in advance.  That way generation of R is off the critical path and the entire signature takes only a microsecond or few.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 15, 2023, 04:19:37 AM",
+      "body": "Quote from: digaran on June 13, 2023, 08:19:09 PMcould I find something useful about a low range key such as a puzzle transaction challenge key with exposed public key?You can not find private key range by only having the public key. You can't even verify that the public key the puzzle creators released actually falls in the range they claim without brute forcing the key (ie. checking every private key one way or another) to find the correct one and then checking if it is in that range.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Quickseller",
+      "created_time": "June 15, 2023, 05:49:58 AM",
+      "body": "Quote from: o_e_l_e_o on June 11, 2023, 08:02:17 AMInteresting that they have linked all this to the forum user amaclin.It looks like he was using his own custom software when he was implementing his scans and made some bad choices when signing transactions. It makes sense though. He often needed to monitor the blockchain and take specific action based on particular activity as part of his scams.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "June 18, 2023, 07:03:37 PM",
+      "body": "Quote from: pooya87 on June 15, 2023, 04:19:37 AMQuote from: digaran on June 13, 2023, 08:19:09 PMcould I find something useful about a low range key such as a puzzle transaction challenge key with exposed public key?You can not find private key range by only having the public key. You can't even verify that the public key the puzzle creators released actually falls in the range they claim without brute forcing the key (ie. checking every private key one way or another) to find the correct one and then checking if it is in that range.Incorrect, I can verify the keys or at least the one I'm working on is exactly in the said range, if you subtract for example 2^125 from puzzle #125, you will get a key #1, now if you subtract 2^124 from puzzle key, you will get key #2, and then if you add 1 and 2, you will get 2^124. I know the estimated size of any key related to that puzzle, the thing is, that estimation is as big as 2^123, but nevertheless you could verify the range as long as they tell you the range.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "June 18, 2023, 08:02:37 PM",
+      "body": "You can't validate the range of a private key using the public key without help of someone who knows the key or doing something stupid like constructing the keys as easily guessed offsets.  In the case of the offsets there is only one real secret.If you could determine a meaningful range from the pubkey alone you could use that to solve for the private key.With the help of someone knowing the secret they could prove it was in a range using a confidential-transactions like zero knowledge range proof. (which is exactly what CT does... proves the values are in  a range like [0,2^32) that couldn't overflow.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ripemdhash",
+      "created_time": "July 20, 2023, 09:09:22 AM",
+      "body": "Hi,I have implemented this paper Code:https://eprint.iacr.org/2023/841.pdf?ref=nobsbitcoin.comcalled The curious case of the half-half Bitcoin ECDSA nonces.it works as described but with success rate to 30%how to modify for recentering algorithm? I do not understand the paper. could any of you explain how to modify A and b?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ripemdhash",
+      "created_time": "July 20, 2023, 12:18:56 PM",
+      "body": "Hi -> solved my previous questions.I addedd recentering plus enumeration.I tested on blockchain on years (for testing) and yes, it works.for testing I have design 4 additional algos: it works as below:Code:<built-in method LLL of sage.matrix.matrix_integer_dense.Matrix_integer_dense object at 0x7fd9e037ab90>AAAAAAAAAA[  99402828081251326407460655908809613470   72448897560926370765317227583892116848  170141183460469231731687303715884105728][-136112081596978997124294650883600174461  205674961037246846832891170003178495377                                        0][-345338221534003916107419758301581553950 -106227314724508899589795678469792516729  170141183460469231731687303715884105728]lsb 36709253515727670716833994974790560991msb 278123858598173217598208397587070612225pr 94640644900970784752057702309992798777227949585743974922854828840741969210591alg 3found 94640644900970784752057702309992798777227949585743974922854828840741969210591alg 3found 94640644900970784752057702309992798777227949585743974922854828840741969210591alg 3found 94640644900970784752057702309992798777227949585743974922854828840741969210591alg 3found 94640644900970784752057702309992798777227949585743974922854828840741969210591found res1 works 94640644900970784752057702309992798777227949585743974922854828840741969210591",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "July 20, 2023, 08:11:18 PM",
+      "body": "Quote from: ripemdhash on July 20, 2023, 12:18:56 PMHi -> solved my previous questions.I addedd recentering plus enumeration.I tested on blockchain on years (for testing) and yes, it works.for testing I have design 4 additional algos: it works as below:Code:<built-in method LLL of sage.matrix.matrix_integer_dense.Matrix_integer_dense object at 0x7fd9e037ab90>AAAAAAAAAA[  99402828081251326407460655908809613470   72448897560926370765317227583892116848  170141183460469231731687303715884105728][-136112081596978997124294650883600174461  205674961037246846832891170003178495377                                        0][-345338221534003916107419758301581553950 -106227314724508899589795678469792516729  170141183460469231731687303715884105728]lsb 36709253515727670716833994974790560991msb 278123858598173217598208397587070612225pr 94640644900970784752057702309992798777227949585743974922854828840741969210591alg 3found 94640644900970784752057702309992798777227949585743974922854828840741969210591alg 3found 94640644900970784752057702309992798777227949585743974922854828840741969210591alg 3found 94640644900970784752057702309992798777227949585743974922854828840741969210591alg 3found 94640644900970784752057702309992798777227949585743974922854828840741969210591found res1 works 94640644900970784752057702309992798777227949585743974922854828840741969210591so,screen your btc wallet ballance if it work ?  all my scrypt generate numbers in output too, but it not make any $. numbers in output not equal to workking crack",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "July 20, 2023, 09:26:38 PM",
+      "body": "Quote from: COBRAS on July 20, 2023, 08:11:18 PMso,screen your btc wallet ballance if it work ?  all my scrypt generate numbers in output too, but it not make any $. numbers in output not equal to workking crackSo, are you expecting $ when you come around these woods? I mean what are you after, puzzle prize or people's coins?I don't think anyone should ever help the guys like you, I have seen some of your topics requesting help, it's a bad idea to provide any useful intel to you guys.😉",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

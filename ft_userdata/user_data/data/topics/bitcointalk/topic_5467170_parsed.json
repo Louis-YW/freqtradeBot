@@ -1,0 +1,77 @@
+{
+  "id": "topic_5467170",
+  "title": "Newbienewnewcoin",
+  "author": "Newbienewnewcoin",
+  "created_time": "September 18, 2023, 08:33:57 AM",
+  "content": "Long story short, I have my seed phrase (12 words) out of order, with a few additional words in addition to me not being sure about the address (not sure if it's a bip44 or bip49). I figured one way to make things easier was to get all of the valid seed phrases from permutations/combinations. Now I've got all of them however my issue is that the python script I have is taking forever to get the addresses from the seed phrase( for example a descrambled seed gets about 29 million valid ones and its takes a little over 24 hours to complete. I've tested all of the bitcoin python libraries to see which one was the fastest (bip_utils). Is there any way to speed up that process, or anyone know of a superfast program to help me out?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5467170",
+  "comments": [
+    {
+      "author": "ABCbits",
+      "created_time": "September 18, 2023, 10:42:23 AM",
+      "body": "Short answer, just use btcrecover[1] which have multi CPU and GPU support. Based on comment on it's source code, it's definitely support BIP 44 and 49[2]. If you need specific path, you can use parameter --bip32-path as well[3].[1] https://btcrecover.readthedocs.io/[2] https://github.com/3rdIteration/btcrecover/blob/master/btcrecover/btcrseed.py#L718-L720[3] https://github.com/3rdIteration/btcrecover/blob/master/btcrecover/btcrseed.py#L3149",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 18, 2023, 01:28:11 PM",
+      "body": "Agree with ETFbitcoin - use btcrecover.If your address is BIP44 then it should start with \"1\", and if it's BIP49 then it should start with \"3\". If you don't know the address at all then you'll need to use an address database to check against: https://btcrecover.readthedocs.io/en/latest/Creating_and_Using_AddressDB/If you have already calculated all the possible valid seed phrases from your words, then you can use the --seedlist command to avoid having btcrecover calculate them all again: https://btcrecover.readthedocs.io/en/latest/BIP39_descrambling_seedlists/#seedlists",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "qmeh1981",
+      "created_time": "September 19, 2023, 03:51:32 AM",
+      "body": "share your python codeI can tweak it and add multiprocessing to make it fast and other tweaks if possible also customize it for required seed",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 19, 2023, 10:22:19 AM",
+      "body": "Quote from: qmeh1981 on September 19, 2023, 03:51:32 AMshare your python codeI can tweak it and add multiprocessing to make it fast and other tweaks if possible also customize it for required seed BTCrecover already has multi-cpu code inside it - there is no need to waste time adding your own. Also it includes GPU support which will be better for the OP than multiple CPUs because the recovery will then be several hundreds of times faster.It is not particularly a good idea to use different libraries for recovering seeds if BTCrecover can do it the fastest.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Newbienewnewcoin",
+      "created_time": "September 21, 2023, 12:05:19 PM",
+      "body": "Quote from: qmeh1981 on September 19, 2023, 03:51:32 AMshare your python codeI can tweak it and add multiprocessing to make it fast and other tweaks if possible also customize it for required seed Code:from bip_utils import Bip39MnemonicGenerator, Bip39SeedGenerator, Bip39WordsNum, Bip44Changes, Bip49, Bip49Coins, Bip44, Bip44Coinsarq = open('addresses.txt', 'a')with open('x.txt') as f: for line in f:  mnemonic = line.strip()  seed_bytes = Bip39SeedGenerator(mnemonic).Generate()  bip49_mst_ctx = Bip49.FromSeed(seed_bytes, Bip49Coins.BITCOIN)  bip44_mst_ctx = Bip44.FromSeed(seed_bytes, Bip44Coins.BITCOIN)  bip49_acc_ctx = bip49_mst_ctx.Purpose().Coin().Account(0)  bip49_chg_ctx = bip49_acc_ctx.Change(Bip44Changes.CHAIN_EXT)  bip44_acc_ctx = bip44_mst_ctx.Purpose().Coin().Account(0)  bip44_chg_ctx = bip44_acc_ctx.Change(Bip44Changes.CHAIN_EXT)  bip44_addr_ctx = bip44_chg_ctx.AddressIndex(0)  bip49_addr_ctx = bip49_chg_ctx.AddressIndex(0)  arq.write(\"%s \\n\" % bip44_addr_ctx.PublicKey().ToAddress())  arq.write(\"%s \\n\" % bip49_addr_ctx.PublicKey().ToAddress())",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "qmeh1981",
+      "created_time": "September 21, 2023, 10:16:52 PMLast edit: September 21, 2023, 10:27:41 PM by qmeh1981",
+      "body": "Here is tweaked code belowits depend on the number of CPU your processor have if your processor have 5 CPU it will use 4 i.e cpustotal = cpu_count()-1if you want to use all available cpu you can change it to cpustotal = cpu_count()Code:from bip_utils import Bip39MnemonicGenerator, Bip39SeedGenerator, Bip39WordsNum, Bip44Changes, Bip49, Bip49Coins, Bip44, Bip44Coinsfrom multiprocessing import Pool, cpu_countdef generatemenemonic(listofmenmonic):    arq = open('addresses.txt', 'a')            mnemonic = listofmenmonic    seed_bytes = Bip39SeedGenerator(mnemonic).Generate()    bip49_mst_ctx = Bip49.FromSeed(seed_bytes, Bip49Coins.BITCOIN)    bip44_mst_ctx = Bip44.FromSeed(seed_bytes, Bip44Coins.BITCOIN)    bip49_acc_ctx = bip49_mst_ctx.Purpose().Coin().Account(0)    bip49_chg_ctx = bip49_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_acc_ctx = bip44_mst_ctx.Purpose().Coin().Account(0)    bip44_chg_ctx = bip44_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_addr_ctx = bip44_chg_ctx.AddressIndex(0)    bip49_addr_ctx = bip49_chg_ctx.AddressIndex(0)    arq.write(\"%s \\n\" % bip44_addr_ctx.PublicKey().ToAddress())    arq.write(\"%s \\n\" % bip49_addr_ctx.PublicKey().ToAddress())if __name__ == \"__main__\":    listofmenmonic = []       with open('x.txt') as f:        for line in f:            mnemonic = line.strip()            listofmenmonic.append(mnemonic)                cpustotal = cpu_count()-1    pool = Pool(cpustotal)    print(\"Starting Address Generator on \" +str(cpustotal)+ \" CPU's\")    results = pool.map(generatemenemonic, listofmenmonic)    pool.close()    pool.join()I want to make a note here one seed can have thousands of addresses as well which called Derivation paths address generationlet me add that code as well incase you want something like thatright now below code will get 30 address but you can change this line for i in range(30): to get more change 30 to 1000 may be Code:from bip_utils import Bip39MnemonicGenerator, Bip39SeedGenerator, Bip39WordsNum, Bip44Changes, Bip49, Bip49Coins, Bip44, Bip44Coinsfrom multiprocessing import Pool, cpu_countdef generatemenemonic(listofmenmonic):                mnemonic = listofmenmonic    seed_bytes = Bip39SeedGenerator(mnemonic).Generate()    bip49_mst_ctx = Bip49.FromSeed(seed_bytes, Bip49Coins.BITCOIN)    bip44_mst_ctx = Bip44.FromSeed(seed_bytes, Bip44Coins.BITCOIN)    bip49_acc_ctx = bip49_mst_ctx.Purpose().Coin().Account(0)    bip49_chg_ctx = bip49_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_acc_ctx = bip44_mst_ctx.Purpose().Coin().Account(0)    bip44_chg_ctx = bip44_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    #bip44_addr_ctx = bip44_chg_ctx.AddressIndex(0)    #bip49_addr_ctx = bip49_chg_ctx.AddressIndex(0)    #arq.write(\"%s \\n\" % bip44_addr_ctx.PublicKey().ToAddress())    #arq.write(\"%s \\n\" % bip49_addr_ctx.PublicKey().ToAddress())    tempaddr = []    for i in range(30):        bip44_addr_ctx = bip44_chg_ctx.AddressIndex(i)        bip49_addr_ctx = bip49_chg_ctx.AddressIndex(i)        bip44addr = bip44_addr_ctx.PublicKey().ToAddress()        bip49addr = bip49_addr_ctx.PublicKey().ToAddress()        tempaddr.append(bip44addr)        tempaddr.append(bip49addr)    with open('addresses.txt', 'a') as f:        for line in tempaddr:            f.write(f\"{line}\\n\") if __name__ == \"__main__\":    listofmenmonic = []       with open('x.txt') as f:        for line in f:            mnemonic = line.strip()            listofmenmonic.append(mnemonic)                cpustotal = cpu_count()-1    pool = Pool(cpustotal)    print(\"Starting Address Generator on \" +str(cpustotal)+ \" CPU's\")    results = pool.map(generatemenemonic, listofmenmonic)    pool.close()    pool.join()If you want your to get separate files for both bip44 and bip49 then code is belowCode:from bip_utils import Bip39MnemonicGenerator, Bip39SeedGenerator, Bip39WordsNum, Bip44Changes, Bip49, Bip49Coins, Bip44, Bip44Coinsfrom multiprocessing import Pool, cpu_countdef generatemenemonic(listofmenmonic):    arq = open('addresses_bip44.txt', 'a')    arp = open('addresses_bip49.txt', 'a')        mnemonic = listofmenmonic    seed_bytes = Bip39SeedGenerator(mnemonic).Generate()    bip49_mst_ctx = Bip49.FromSeed(seed_bytes, Bip49Coins.BITCOIN)    bip44_mst_ctx = Bip44.FromSeed(seed_bytes, Bip44Coins.BITCOIN)    bip49_acc_ctx = bip49_mst_ctx.Purpose().Coin().Account(0)    bip49_chg_ctx = bip49_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_acc_ctx = bip44_mst_ctx.Purpose().Coin().Account(0)    bip44_chg_ctx = bip44_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_addr_ctx = bip44_chg_ctx.AddressIndex(0)    bip49_addr_ctx = bip49_chg_ctx.AddressIndex(0)    arq.write(\"%s \\n\" % bip44_addr_ctx.PublicKey().ToAddress())    arp.write(\"%s \\n\" % bip49_addr_ctx.PublicKey().ToAddress())if __name__ == \"__main__\":    listofmenmonic = []       with open('x.txt') as f:        for line in f:            mnemonic = line.strip()            listofmenmonic.append(mnemonic)                cpustotal = cpu_count()-1    pool = Pool(cpustotal)    print(\"Starting Address Generator on \" +str(cpustotal)+ \" CPU's\")    results = pool.map(generatemenemonic, listofmenmonic)    pool.close()    pool.join()There is one more thing that we can add to code i.e compress and uncompressed addresses ( lemme know if u want to add that) Also there is a built-in mnemonic lib for python as well if you want to generate random mnemonicmessage me for that if you need to learncheers !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "qmeh1981",
+      "created_time": "September 22, 2023, 12:01:04 AM",
+      "body": "Minor Improvement to take File opening outside the function Code:from bip_utils import Bip39MnemonicGenerator, Bip39SeedGenerator, Bip39WordsNum, Bip44Changes, Bip49, Bip49Coins, Bip44, Bip44Coinsfrom multiprocessing import Pool, cpu_countarq = open('addresses_bip44.txt', 'a')arp = open('addresses_bip49.txt', 'a')def generatemenemonic(listofmenmonic):            mnemonic = listofmenmonic    seed_bytes = Bip39SeedGenerator(mnemonic).Generate()    bip49_mst_ctx = Bip49.FromSeed(seed_bytes, Bip49Coins.BITCOIN)    bip44_mst_ctx = Bip44.FromSeed(seed_bytes, Bip44Coins.BITCOIN)    bip49_acc_ctx = bip49_mst_ctx.Purpose().Coin().Account(0)    bip49_chg_ctx = bip49_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_acc_ctx = bip44_mst_ctx.Purpose().Coin().Account(0)    bip44_chg_ctx = bip44_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_addr_ctx = bip44_chg_ctx.AddressIndex(0)    bip49_addr_ctx = bip49_chg_ctx.AddressIndex(0)    arq.write(\"%s \\n\" % bip44_addr_ctx.PublicKey().ToAddress())    arp.write(\"%s \\n\" % bip49_addr_ctx.PublicKey().ToAddress())if __name__ == \"__main__\":    listofmenmonic = []       with open('x.txt') as f:        for line in f:            mnemonic = line.strip()            listofmenmonic.append(mnemonic)                cpustotal = cpu_count()-1    pool = Pool(cpustotal)    print(\"Starting Address Generator on \" +str(cpustotal)+ \" CPU's\")    results = pool.map(generatemenemonic, listofmenmonic)    pool.close()    pool.join()",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Newbienewnewcoin",
+      "created_time": "September 22, 2023, 02:14:26 AM",
+      "body": "thank you sooooo much! i really appreciate you!Quote from: qmeh1981 on September 22, 2023, 12:01:04 AMMinor Improvement to take File opening outside the function Code:from bip_utils import Bip39MnemonicGenerator, Bip39SeedGenerator, Bip39WordsNum, Bip44Changes, Bip49, Bip49Coins, Bip44, Bip44Coinsfrom multiprocessing import Pool, cpu_countarq = open('addresses_bip44.txt', 'a')arp = open('addresses_bip49.txt', 'a')def generatemenemonic(listofmenmonic):            mnemonic = listofmenmonic    seed_bytes = Bip39SeedGenerator(mnemonic).Generate()    bip49_mst_ctx = Bip49.FromSeed(seed_bytes, Bip49Coins.BITCOIN)    bip44_mst_ctx = Bip44.FromSeed(seed_bytes, Bip44Coins.BITCOIN)    bip49_acc_ctx = bip49_mst_ctx.Purpose().Coin().Account(0)    bip49_chg_ctx = bip49_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_acc_ctx = bip44_mst_ctx.Purpose().Coin().Account(0)    bip44_chg_ctx = bip44_acc_ctx.Change(Bip44Changes.CHAIN_EXT)    bip44_addr_ctx = bip44_chg_ctx.AddressIndex(0)    bip49_addr_ctx = bip49_chg_ctx.AddressIndex(0)    arq.write(\"%s \\n\" % bip44_addr_ctx.PublicKey().ToAddress())    arp.write(\"%s \\n\" % bip49_addr_ctx.PublicKey().ToAddress())if __name__ == \"__main__\":    listofmenmonic = []       with open('x.txt') as f:        for line in f:            mnemonic = line.strip()            listofmenmonic.append(mnemonic)                cpustotal = cpu_count()-1    pool = Pool(cpustotal)    print(\"Starting Address Generator on \" +str(cpustotal)+ \" CPU's\")    results = pool.map(generatemenemonic, listofmenmonic)    pool.close()    pool.join()",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

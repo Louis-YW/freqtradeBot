@@ -1,0 +1,77 @@
+{
+  "id": "topic_5398213",
+  "title": "kycklingrullen",
+  "author": "kycklingrullen",
+  "created_time": "May 11, 2022, 06:27:49 PM",
+  "content": "I have been playing around a bit with Bitcoin Core (version 23.0), more specifically connecting to different wallets in Bitcoin Core through RPC in Python. I have found this library and tried to connect to my wallet(s) using this code:--------from bitcoinrpc.authproxy import AuthServiceProxyconn = AuthServiceProxy(\"http://myusername:mypassword@127.0.0.1:18332/wallet/testingwallet\")print(conn.getwalletinfo())--------But when running this i get this stacktrace:-----------Traceback (most recent call last):  File \"/home/kebab/Desktop/pron/testing.py\", line 24, in <module>    print(a.getwalletinfo())  File \"/home/kebab/.local/lib/python3.8/site-packages/bitcoinrpc/authproxy.py\", line 141, in __call__    raise JSONRPCException(response['error'])bitcoinrpc.authproxy.JSONRPCException: -18: Requested wallet does not exist or is not loaded-------Though what I have noticed is that if i load the wallet using bitcoin-cli -testnet loadwallet testingwallet. Then i can run RPC commands but only get info from that wallet!And I have created my wallet using: bitcoin-cli -testnet createwallet testingwalletAny help on this would really be appreciated!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398213",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "May 12, 2022, 06:26:38 AM",
+      "body": "Quote from: kycklingrullen on May 11, 2022, 06:27:49 PM-snip-Though what I have noticed is that if i load the wallet using bitcoin-cli -testnet loadwallet testingwallet. Then i can run RPC commands but only get info from that wallet!In bitcoin-cli, you'll have to load all wallets that you want to work with,then specify which wallet to use with each wallet command with -rpcwallet=e.g.:Code:bitcoin-cli -testnet -rpcwallet=testingwallet getwalletinfoCode:bitcoin-cli -testnet -rpcwallet=otherwallet getwalletinfoI don't know how to apply that to \"python-bitcoinrpc\" library though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 12, 2022, 07:33:34 AM",
+      "body": "Quote from: nc50lc on May 12, 2022, 06:26:38 AMIn bitcoin-cli, you'll have to load all wallets that you want to work with,then specify which wallet to use with each wallet command with -rpcwallet=e.g.:Code:bitcoin-cli -testnet -rpcwallet=testingwallet getwalletinfoCode:bitcoin-cli -testnet -rpcwallet=otherwallet getwalletinfoI don't know how to apply that to \"python-bitcoinrpc\" library though.I checked the codebase on Github (a quick check) and I did not see any function for loading wallets. Therefore I don't believe python-bitcoinrpc supports this call at all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kycklingrullen",
+      "created_time": "May 12, 2022, 09:43:48 PM",
+      "body": "Quote from: ETFbitcoin on May 12, 2022, 10:52:55 AMQuote from: kycklingrullen on May 11, 2022, 06:27:49 PMI have been playing around a bit with Bitcoin Core (version 23.0), more specifically connecting to different wallets in Bitcoin Core through RPC in Python.There are at least 4 Python library which name contain \"bitcoinrpc\". Did you mean this library https://pypi.org/project/python-bitcoinrpc/?Quote from: NotATether on May 12, 2022, 07:33:34 AMQuote from: nc50lc on May 12, 2022, 06:26:38 AMIn bitcoin-cli, you'll have to load all wallets that you want to work with,then specify which wallet to use with each wallet command with -rpcwallet=e.g.:Code:bitcoin-cli -testnet -rpcwallet=testingwallet getwalletinfoCode:bitcoin-cli -testnet -rpcwallet=otherwallet getwalletinfoI don't know how to apply that to \"python-bitcoinrpc\" library though.I checked the codebase on Github (a quick check) and I did not see any function for loading wallets. Therefore I don't believe python-bitcoinrpc supports this call at all.Looks like so, there's 0 result for keyword \"wallet\", \"key\", \"hd\" and \"private\" on the source code.Yep thats the library im using! And if you're wondering if it's the library that's making it not work, i tried with just making normal POST requests to the RPC. Still getting the same error:{\"result\":null,\"error\":{\"code\":-18,\"message\":\"Requested wallet does not exist or is not loaded\"},\"id\":null}And this is my test code with requests----import requests, jsonheaders = {'content-type': 'application/json'}payload = json.dumps({\"method\": \"getwalletinfo\", \"params\": [], \"jsonrpc\": \"2.0\"})response = requests.post(\"http://myusername:mypassword@127.0.0.1:18332/wallet/testingwallet\", headers=headers, data=payload)print(response.text)----",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "May 13, 2022, 01:38:41 AM",
+      "body": "@kycklingrullen you have to load the wallet(s) first before you are able to use it on RPC.Code:bitcoin-cli loadwallet testingwalletUse the above command to load wallets that you want to use. And to check if it's been loaded use: $ bitcoin-cli listwallets Quote from: kycklingrullen on May 11, 2022, 06:27:49 PMThen i can run RPC commands but only get info from that wallet!For multiple wallet RPC calls, you need to adjust the HTTP endpoint according to each of the wallet names.e.g. http://myusername:mypassword@127.0.0.1:18332/wallet/{walletname}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kycklingrullen",
+      "created_time": "May 13, 2022, 04:26:05 PM",
+      "body": "Quote from: vv181 on May 13, 2022, 01:38:41 AM@kycklingrullen you have to load the wallet(s) first before you are able to use it on RPC.Code:bitcoin-cli loadwallet testingwalletUse the above command to load wallets that you want to use. And to check if it's been loaded use: $ bitcoin-cli listwallets Quote from: kycklingrullen on May 11, 2022, 06:27:49 PMThen i can run RPC commands but only get info from that wallet!For multiple wallet RPC calls, you need to adjust the HTTP endpoint according to each of the wallet names.e.g. http://myusername:mypassword@127.0.0.1:18332/wallet/{walletname}Oh got it! But im working on a program which will be creating a lot of new wallets etcetera. How would i be able to load all of these when for example starting Bitcoin Core?And how would I about loading the wallet when i create it. All of this should be through RPC ^^.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "May 13, 2022, 04:59:05 PM",
+      "body": "Quote from: kycklingrullen on May 13, 2022, 04:26:05 PMOh got it! But im working on a program which will be creating a lot of new wallets etcetera. How would i be able to load all of these when for example starting Bitcoin Core?And how would I about loading the wallet when i create it. All of this should be through RPC ^^.All RPC commands are already here https://chainquery.com/ and all wallet commands are here https://chainquery.com/bitcoin-cli#walletI think you are planning to create your own version of wallet?What you want is already mentioned above to load a wallet after creating use the bitcoin-cli loadwallet \"WalletName\"But if you mean to load all of the wallets you created at once I don't know if you can able to do that. If your plan is to make a wallet(The version of yours) I think you can try to learn something about blockchain first below- https://github.com/yjjnls/awesome-blockchain#implementation-of-blockchainYou can read the wallet under that link it might help to make a wallet program of yours or maybe it can help you to get some ideas.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kycklingrullen",
+      "created_time": "May 13, 2022, 09:58:04 PM",
+      "body": "Quote from: BitMaxz on May 13, 2022, 04:59:05 PMQuote from: kycklingrullen on May 13, 2022, 04:26:05 PMOh got it! But im working on a program which will be creating a lot of new wallets etcetera. How would i be able to load all of these when for example starting Bitcoin Core?And how would I about loading the wallet when i create it. All of this should be through RPC ^^.All RPC commands are already here https://chainquery.com/ and all wallet commands are here https://chainquery.com/bitcoin-cli#walletI think you are planning to create your own version of wallet?What you want is already mentioned above to load a wallet after creating use the bitcoin-cli loadwallet \"WalletName\"But if you mean to load all of the wallets you created at once I don't know if you can able to do that. If your plan is to make a wallet(The version of yours) I think you can try to learn something about blockchain first below- https://github.com/yjjnls/awesome-blockchain#implementation-of-blockchainYou can read the wallet under that link it might help to make a wallet program of yours or maybe it can help you to get some ideas.My plan is actually creating a transaction system on a third-party software.Im using Bitcoin Core to be able to avoid any ratelimits, downtime, etc.And your answer and the answers above I fixed it!Thanks!!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "May 13, 2022, 11:36:02 PM",
+      "body": "Quote from: kycklingrullen on May 13, 2022, 09:58:04 PMMy plan is actually creating a transaction system on a third-party software.What kind of transaction system?Does BTCPay Server didn't suit your needs? https://docs.btcpayserver.org/UseCase/.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

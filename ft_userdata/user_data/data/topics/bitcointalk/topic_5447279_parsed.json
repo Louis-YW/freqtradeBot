@@ -1,0 +1,29 @@
+{
+  "id": "topic_5447279",
+  "title": "davi1d",
+  "author": "davi1d",
+  "created_time": "April 02, 2023, 04:03:30 PM",
+  "content": "I was looking through ECDSA math and feel like I am missing something related to the x,y coordinates of a public key, searched around but did not find answers so coming here hoping for some help / guidance.My question is:  Is there a private key where the y coordinate of the public key created through the ECDSA secp256k1 curve ever a negative y?  From what I can tell is 'no', but then I wonder why even bring the sign into the bitcoin code as a prefix?  I must be missing or misunderstanding something.What leads me to think this way is how mod function attached to determination of a y coordinate as well as numerous examples and attempts.Thanks",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5447279",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "April 02, 2023, 04:46:13 PM",
+      "body": "Quote from: davi1d on April 02, 2023, 04:03:30 PM why even bring the sign into the bitcoin code as a prefix? We don't use sign for any of the integers used in elliptic curve cryptography because the modular arithmetic is used. In calculations of ECDSA, etc. we may end up with negative values which by contract all numbers should be reported as positives so they are converted to their positive equivalent inside the used group. For example using modulo 7, a negative number like -5 becomes 2 that is -5≡2 (mod 7).It's the same principle for negative a value like -y or when \"negating\" the y coordinate, you'd compute P-y (mod P) to get the positive value between 0 and P.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 02, 2023, 07:48:32 PMLast edit: April 03, 2023, 08:34:49 AM by o_e_l_e_o",
+      "body": "Quote from: davi1d on April 02, 2023, 04:03:30 PMMy question is:  Is there a private key where the y coordinate of the public key created through the ECDSA secp256k1 curve ever a negative y?  From what I can tell is 'no', but then I wonder why even bring the sign into the bitcoin code as a prefix?  I must be missing or misunderstanding something.Given that the secp256k1 curve is defined modulo p, then there are no negative coordinates as anything which would be negative will loop round mod p and end up positive. As pooya87 says, -y = p-y.Given that the curve equation is y2 = x3 + 7, then for every x coordinate there are two valid y coordinates. And because p is an odd prime, negating y by doing p-y as above will change its parity. This means that one y coordinate will always be even, and the other will always be odd. This allows us to compress public keys simply by specifying the parity of the y coordinate as a prefix.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

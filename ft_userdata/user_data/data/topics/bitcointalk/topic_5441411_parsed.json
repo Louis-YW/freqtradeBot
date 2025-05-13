@@ -1,0 +1,101 @@
+{
+  "id": "topic_5441411",
+  "title": "Kostelooscoin",
+  "author": "Kostelooscoin",
+  "created_time": "February 27, 2023, 12:56:56 PM",
+  "content": "Code:#include <cstdint>#include <iostream>#include <cuda_runtime.h>#include <iomanip>#include <openssl/ripemd.h>#include <openssl/sha.h>#define BLOCK_SIZE 1024__global__ void hash160(char *pattern, unsigned char *out, uint32_t *nonce){ uint32_t index = blockIdx.x * blockDim.x + threadIdx.x; unsigned char hash[SHA256_DIGEST_LENGTH]; char str[64]; for (int i = 0; i < 9; i++) {  str[i] = pattern[i]; } for (uint32_t i = *nonce; i < UINT32_MAX; i += gridDim.x * blockDim.x) {  sprintf(&str[9], \"%08x\", i);  SHA256((const unsigned char*)str, strlen(str), hash);  RIPEMD160(hash, SHA256_DIGEST_LENGTH, &out[index * 20]);  if (out[index * 20] == 0x00 && out[index * 20 + 1] == 0x00) {   // Found a match!   *nonce = i;   break;  } }}int main(){ char pattern[10] = \"1abcdefg\"; // 9 characters pattern           // Allocate memory on the host unsigned char *out = new unsigned char[3 * 20]; uint32_t *nonce = new uint32_t; *nonce = 0; // Allocate memory on the device char *dev_pattern; unsigned char *dev_out; uint32_t *dev_nonce; cudaMalloc((void**)&dev_pattern, 10); cudaMalloc((void**)&dev_out, 3 * 20); cudaMalloc((void**)&dev_nonce, sizeof(uint32_t)); // Copy input data to the device cudaMemcpy(dev_pattern, pattern, 10, cudaMemcpyHostToDevice); cudaMemcpy(dev_out, out, 3 * 20, cudaMemcpyHostToDevice); cudaMemcpy(dev_nonce, nonce, sizeof(uint32_t), cudaMemcpyHostToDevice); // Launch the kernel hash160 << < 3, BLOCK_SIZE >> >(dev_pattern, dev_out, dev_nonce); // Copy output data from the device cudaMemcpy(out, dev_out, 3 * 20, cudaMemcpyDeviceToHost); cudaMemcpy(nonce, dev_nonce, sizeof(uint32_t), cudaMemcpyDeviceToHost); // Print the results for (int i = 0; i < 3; i++) {  std::cout << \"Address \" << i + 1 << \": \" << std::setbase(16);  for (int j = 0; j < 20; j++) {   std::cout << std::setw(2) << std::setfill('0') << (int)out[i * 20 + j];  }  std::cout << std::endl; } std::cout << \"Nonce: \" << *nonce << std::endl; // Free memory delete[] out; delete nonce; cudaFree(dev_pattern); cudaFree(dev_out); cudaFree(dev_nonce); return 0;}blockIdx.x * blockDim.x + threadIdx.x undefinited why",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5441411",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "February 27, 2023, 03:00:22 PM",
+      "body": "Those are probably just warnings because Visual Studio doesn't always know about internal CUDA variables. The main issue is that it can't find your OpenSSL header file, that's what's blocking the compile.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kostelooscoin",
+      "created_time": "February 27, 2023, 03:04:06 PM",
+      "body": "I installed openssl but nothing works",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "February 27, 2023, 03:49:04 PM",
+      "body": "Where that code come from, seems that you only copy and paste part of some code.The variables that you are refering don't exist:Code:uint32_t index = blockIdx.x * blockDim.x + threadIdx.x;blockIdx, blockDim and threadIdx  aren't declared anywhere.Regards!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kostelooscoin",
+      "created_time": "February 27, 2023, 04:21:28 PM",
+      "body": "I solved everything but there is still one small problemhash160 << < 3, BLOCK_SIZE >> >(dev_pattern, dev_out, dev_nonce);in red probleme",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "February 27, 2023, 06:01:50 PM",
+      "body": "When you created the project, did you create it as a CUDA project so it uses the CUDA compiler?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kostelooscoin",
+      "created_time": "February 27, 2023, 06:17:02 PM",
+      "body": "yes but it doesn't change anything",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "February 27, 2023, 09:03:50 PMLast edit: February 27, 2023, 10:02:01 PM by NeuroticFish",
+      "body": "Quote from: Kostelooscoin on February 27, 2023, 04:21:28 PMI solved everything but there is still one small problemhash160 << < 3, BLOCK_SIZE >> >(dev_pattern, dev_out, dev_nonce);<<< works in java, not in C++<< < needs something in between (a bitwise shift maybe and then a comparison?)But, since in the first post we have__global__ void hash160(char *pattern, unsigned char *out, uint32_t *nonce)you seem to be calling that void function, hence I would comment that erroneous line (at least for now) and put instead:hash160(dev_pattern, dev_out, dev_nonce);It seems that I was wrong, sorry, see below.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "February 27, 2023, 09:42:03 PM",
+      "body": "Quote from: NeuroticFish on February 27, 2023, 09:03:50 PMQuote from: Kostelooscoin on February 27, 2023, 04:21:28 PMI solved everything but there is still one small problemhash160 << < 3, BLOCK_SIZE >> >(dev_pattern, dev_out, dev_nonce);<<< works in java, not in C++<< < needs something in between (a bitwise shift maybe and then a comparison?)But, since in the first post we haveCode:__global__ void hash160(char *pattern, unsigned char *out, uint32_t *nonce)you seem to be calling that void function, hence I would comment that erroneous line (at least for now) and put instead:Code:hash160(dev_pattern, dev_out, dev_nonce);I have difficulties to understand what you aim for with a code you cannot even read.<<<a,b>>> is an extension to C++ to launch CUDA kernels, it is perfectly valid in CUDA codehttps://medium.com/analytics-vidhya/cuda-compute-unified-device-architecture-part-2-f3841c25375e",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "February 27, 2023, 09:59:43 PM",
+      "body": "Quote from: ymgve2 on February 27, 2023, 09:42:03 PM<<<a,b>>> is an extension to C++ to launch CUDA kernels, it is perfectly valid in CUDA codehttps://medium.com/analytics-vidhya/cuda-compute-unified-device-architecture-part-2-f3841c25375eCUDA I don't know  So the only error is that extra space and should have been Code:hash160 <<< 3, BLOCK_SIZE >>>(dev_pattern, dev_out, dev_nonce);??Or also Visual Studio doesn't handle this well or is missing something?That Medium page also tells (yeah, that guy was installing on Linux) about CUDA Toolkit and so on.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "February 27, 2023, 10:15:03 PM",
+      "body": "Quote from: NeuroticFish on February 27, 2023, 09:59:43 PMQuote from: ymgve2 on February 27, 2023, 09:42:03 PM<<<a,b>>> is an extension to C++ to launch CUDA kernels, it is perfectly valid in CUDA codehttps://medium.com/analytics-vidhya/cuda-compute-unified-device-architecture-part-2-f3841c25375eCUDA I don't know  So the only error is that extra space and should have been Code:hash160 <<< 3, BLOCK_SIZE >>>(dev_pattern, dev_out, dev_nonce);??Or also Visual Studio doesn't handle this well or is missing something?That Medium page also tells (yeah, that guy was installing on Linux) about CUDA Toolkit and so on.The space doesn't matter, Visual Studio autocorrects it to << <a, b >> > and it will still compile fine if everything's set up correctly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kostelooscoin",
+      "created_time": "February 28, 2023, 09:22:41 AM",
+      "body": "hash160 << <3, BLOCK_SIZE >> >(dev_pattern, dev_out, dev_nonce);same error",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

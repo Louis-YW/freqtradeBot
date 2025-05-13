@@ -1,0 +1,165 @@
+{
+  "id": "topic_5399087",
+  "title": "mynonce",
+  "author": "mynonce",
+  "created_time": "May 17, 2022, 08:20:13 PMLast edit: May 19, 2022, 09:47:02 PM by mynonce",
+  "content": "What is the minimum transaction value to be accepted by the nodes?EDIT:I tested it ...1. Took UTXO 2c88d249902586908e55116527ff8cb4c14975bd233cb93a2b759db43a3fe358 vout 0 and created several transactions. Each transaction had 1 input and 18 outputs with increasing values (+1 sat), so a whole range could be tested at once eg. 200 sats - 217 sats, if valid or not.2. Broadcast the transactions via different providers. It wasn't accepted until 546 sat output. Below, you can see the error messages.https://blockchair.comresult: Invalid transaction. Error: dusthttps://blockstream.inforesult: sendrawtransaction RPC error: {\"code\":-26,\"message\":\"dust\"}https://btc.networkresult: Not a valid transaction hash!https://bitaps.comresult: Mempool accept test failed: dust3. The first accepted transaction you can check here:tx hash e849378d3aedb4152aad3ac71f0c15f44ed3e29c90b6e2c1b25a2c8d23d34d62 block 736,966 minimum 546 sats, 18 outputs, each +1 satI also wanted to know if it's 546 or 547 sats that is accepted. Now we know that it's 546 sats for non-segwit addresses.EDIT (2):Quote from: LoyceV on May 19, 2022, 06:54:10 AMTo complete the test, you should do the same to a Bech32 address...Tested it with a TX to the address bc1qwpc320c70sz7mf7v6vyu5v7lzjv3hlsa23d8ew (from a nice bitcointalk user   )This time I made 3 transactions: 293 sats, 294 sats and 295 sats as I knew the limit 294 sats, but didn't know what was the accepted value.Broadcast 293 sats transaction via same providers:https://blockchair.comresult: Invalid transaction. Error: dusthttps://blockstream.inforesult: sendrawtransaction RPC error: {\"code\":-26,\"message\":\"dust\"}https://btc.networkresult: Not a valid transaction hash!https://bitaps.comresult: Mempool accept test failed: dustBroadcast 294 sats transaction ... accepted:tx hash 42bd160a3a473cbe73c4178e126921b45697e810913c8bb21c610025462076bd block 737,081Now we know that the lowest accepted value for segwit addresses is 294 sats.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5399087",
+  "comments": [
+    {
+      "author": "OmegaStarScream",
+      "created_time": "May 17, 2022, 08:26:02 PM",
+      "body": "Quote from: mynonce on May 17, 2022, 08:20:13 PMWhat is the minimum transaction value to be accepted by the nodes?IIRC, the current dust limit is 546 satoshi unless, of course, you're dealing with the lightning network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "May 17, 2022, 08:26:14 PM",
+      "body": "Most nodes: 547 sat for legacy addresses, and a bit less when sending to Segwit.It's quite useless to do, I've seen many transactions that pay more in additional fees than the dust is worth.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mynonce",
+      "created_time": "May 17, 2022, 08:39:57 PM",
+      "body": "Quote from: OmegaStarScream on May 17, 2022, 08:26:02 PMQuote from: mynonce on May 17, 2022, 08:20:13 PMWhat is the minimum transaction value to be accepted by the nodes?IIRC, the current dust limit is 546 satoshi unless, of course, you're dealing with the lightning network.Quote from: LoyceMobile on May 17, 2022, 08:26:14 PMMost nodes: 547 sat for legacy addresses, and a bit less when sending to Segwit.It's quite useless to do, I've seen many transactions that pay more in additional fees than the dust is worth.Thanks, yes I also thought > 546 but then I saw this todaytransaction hash edc38bfb0ee694aa1cca1a050ad002ae390b5c865a8062fa5f8630a9cab014ad0.00000473 BTC to bc1q25unhdrmc0vnkwgg0vjtf6xmny8g0vykek6j8aI didn't know that Legacy and Segwit have different limits.edited:Code:     // \"Dust\" is defined in terms of dustRelayFee,    // which has units satoshis-per-kilobyte.    // If you'd pay more in fees than the value of the output    // to spend something, then we consider it dust.    // A typical spendable non-segwit txout is 34 bytes big, and will    // need a CTxIn of at least 148 bytes to spend:    // so dust is a spendable txout less than    // 182*dustRelayFee/1000 (in satoshis).    // 546 satoshis at the default rate of 3000 sat/kB.    // A typical spendable segwit txout is 31 bytes big, and will    // need a CTxIn of at least 67 bytes to spend:    // so dust is a spendable txout less than    // 98*dustRelayFee/1000 (in satoshis).    // 294 satoshis at the default rate of 3000 sat/kB.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "May 17, 2022, 08:44:04 PM",
+      "body": "Quote from: LoyceMobile on May 17, 2022, 08:26:14 PMMost nodes: 547 sat for legacy addresses, and a bit less when sending to Segwit.It's quite useless to do, I've seen many transactions that pay more in additional fees than the dust is worth.I am kind of confused, I thought nodes validate confirmed transactions, taken from the mempool and included into a block by miner for it to be confirmed and get validated by nodes. Can a transaction not up to the minimum amount of bitcoin be broadcasted into the mempool, included into a block and got confirmed but later got invadated by nodes? I was thinking the transaction will never even be broadcasted into the mempool at all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceMobile",
+      "created_time": "May 17, 2022, 09:07:05 PM",
+      "body": "Quote from: Charles-Tim on May 17, 2022, 08:44:04 PMI am kind of confused, I thought nodes validate confirmed transactions, taken from the mempool and included into a block by miner for it to be confirmed and get validated by nodes. Can a transaction not up to the minimum amount of bitcoin be broadcasted into the mempool, included into a block and got confirmed but later got invadated by nodes? I was thinking the transaction will never even be broadcasted into the mempool at all.Nodes have a mempool filled with unconfirmed transactions, and miners run nodes too. Each node can decide whether or not to reject a transaction that hasn't been confirmed yet.Most of them seem to agree you can't send dust.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "May 17, 2022, 11:58:52 PM",
+      "body": "Quote from: LoyceMobile on May 17, 2022, 09:07:05 PMNodes have a mempool filled with unconfirmed transactions, and miners run nodes too. Each node can decide whether or not to reject a transaction that hasn't been confirmed yet.Most of them seem to agree you can't send dust.Never mind me, node makes up the bitcoin network, even without running full node, no mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 18, 2022, 08:59:06 AM",
+      "body": "Quote from: mynonce on May 17, 2022, 08:39:57 PMThanks, yes I also thought > 546 but then I saw this todayTransactions which create outputs less than the dust limit are still valid transactions. Although you will have great difficulty trying to broadcast such a transaction, there is nothing which says it cannot be mined in to a block. The two most likely ways that this transaction ended up in a block was either that one or more nodes had altered their dustRelayFee setting to accept transactions which create smaller outputs, or a miner decided to include it directly in to the block they were mining.Quote from: Charles-Tim on May 17, 2022, 08:44:04 PMI thought nodes validate confirmed transactionsNodes verify both unconfirmed transactions, which they add to their mempool, and transactions included in the blocks they receive.Quote from: Charles-Tim on May 17, 2022, 08:44:04 PMCan a transaction not up to the minimum amount of bitcoin be broadcasted into the mempool, included into a block and got confirmed but later got invadated by nodes?If a transaction is included in a block, but a node deems that transaction invalid, then the node will reject the entire block as invalid. Creating outputs less than the dust limit does not make a transaction invalid, however.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mynonce",
+      "created_time": "May 18, 2022, 09:01:59 PM",
+      "body": "Tested it!Read the first post (EDIT).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 19, 2022, 06:54:10 AM",
+      "body": "Quote from: mynonce on May 17, 2022, 08:20:13 PMI also wanted to know if it's 546 or 547 sats that is accepted. Now we know that it's 546 sat.I was 1 sat off To complete the test, you should do the same to a Bech32 address. Sweeping from the dust inputs into a new address to make it interesting.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 19, 2022, 11:35:52 AM",
+      "body": "Blockexplorers are not nodes and they usually have weird criteria when relaying TXes as some of them are custom implementations, which may not conform to the rest of the network. One of the blockexplorers that I've tried before actually didn't allow me to push a SegWit non-dust transaction though the reference limit was lower than the 546 threshold. A more accurate representation would be to directly broadcast to the nodes on the network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mynonce",
+      "created_time": "May 19, 2022, 08:09:10 PMLast edit: May 20, 2022, 01:10:52 AM by mynonce",
+      "body": "Quote from: LoyceV on May 19, 2022, 06:54:10 AMTo complete the test, you should do the same to a Bech32 address...Tested it. Read: first post - EDIT(2).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "May 20, 2022, 01:24:26 AM",
+      "body": "Quote from: mynonce on May 17, 2022, 08:20:13 PM~snip~Now we know that the lowest accepted value for segwit addresses is 294 sats. Interesting!This made me think of Muun, since they support lightning through submarine swaps, and in theory all your sats are on-chain:Quote from: https://bitcoin.stackexchange.com/questions/101645/how-does-muun-lightning-wallet-requires-no-trust-and-no-backupsRegarding the lightning aspect of the recovery process, Muun uses super optimized submarine swaps to execute the lightning payments, both incoming and outgoing. This means that your funds are on-chain and thus recoverable by the mechanism I just described.I tested with a 293 sats invoice and it went through perfectly fine.I'm not really sure what is actually happening behind the scenes though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 20, 2022, 04:38:40 AM",
+      "body": "Quote from: nullama on May 20, 2022, 01:24:26 AMInteresting!This made me think of Muun, since they support lightning through submarine swaps, and in theory all your sats are on-chain:Quote from: https://bitcoin.stackexchange.com/questions/101645/how-does-muun-lightning-wallet-requires-no-trust-and-no-backupsRegarding the lightning aspect of the recovery process, Muun uses super optimized submarine swaps to execute the lightning payments, both incoming and outgoing. This means that your funds are on-chain and thus recoverable by the mechanism I just described.I tested with a 293 sats invoice and it went through perfectly fine.I'm not really sure what is actually happening behind the scenes though.Most likely, the Lightning node is combining the final amount in the contract (your invoice) with its own sats to at least meet the minimum L1 tx size.I recall from an earlier post though, that had Bitcoin source code in it that the 294-byte minimum segwit size applied at a 3000 sats/KB fee rate (i.e. 3 sats/byte). I am curious to figure out whether this minimum size would be even smaller if the fee sent was just 1 sat/byte (ditto for the legacy transactions).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "May 20, 2022, 06:02:40 AM",
+      "body": "Quote from: NotATether on May 20, 2022, 04:38:40 AMI recall from an earlier post though, that had Bitcoin source code in it that the 294-byte minimum segwit size applied at a 3000 sats/KB fee rate (i.e. 3 sats/byte). I am curious to figure out whether this minimum size would be even smaller if the fee sent was just 1 sat/byte (ditto for the legacy transactions).It has nothing to do with the fee rates of a transaction.The fees as stated in the code is actually referring to the dust relay fee instead of the actual transaction fee. This is a user-configurable parameter but the standard is kept at 3sat/byte to maintain the 546sat dust limit that was before the introduction of this dust relay fee. But yes, if the user changes the dust relay fee, then their node would see a different dust limit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 20, 2022, 07:12:54 AM",
+      "body": "Quote from: mynonce on May 17, 2022, 08:20:13 PMEDIT (2):Quote from: LoyceV on May 19, 2022, 06:54:10 AMTo complete the test, you should do the same to a Bech32 address...Tested it with a TX to the address bc1qwpc320c70sz7mf7v6vyu5v7lzjv3hlsa23d8ew (from a nice bitcointalk user   )Lol, I thought the dust transaction would have been related to this topic. If I get another dust inputs, I can use them to buy half a day VPN",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mynonce",
+      "created_time": "May 21, 2022, 01:49:15 AM",
+      "body": "@LoyceVI wanted to repeat the same test in 10 years and want to use these addresses. And the title of the test will be:'Ten years ago dust, now a fortune' But I support the 'half a day VPN' idea. One segwit dust was sent to bc1qwpc320c70sz7mf7v6vyu5v7lzjv3hlsa23d8ew, now I tested if 17 segwit dusts can be sent together, it worked. Think of it as the 18 dusts from the legacy addresses, sent as segwit dusts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 21, 2022, 07:46:21 AMLast edit: May 21, 2022, 07:57:26 AM by LoyceV",
+      "body": "Quote from: mynonce on May 21, 2022, 01:49:15 AM'Ten years ago dust, now a fortune'And half the fortune will be spend on fees.QuoteBut I support the 'half a day VPN' idea.It's now a week: do you want it?QuoteI tested if 17 segwit dusts can be sent together, it worked.Do the same to your legacy dust QuoteThink of it as the 18 dusts from the legacy addresses, sent as segwit dusts.That is what I expected, but it hasn't moved yet. I thought c7298be8c111422fd0bc3915d67451ea24fba9b3529126e4bf39ca5db94370ba was from you, but now I'm not sure anymore.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hugeblack",
+      "created_time": "May 21, 2022, 09:39:04 AM",
+      "body": "Quote from: mynonce on May 17, 2022, 08:20:13 PMNow we know that the lowest accepted value for segwit addresses is 294 sats.I don't know, but since the term \"dust TX\" is client-specific and not network protocol, the statement above cannot be accurate.294 sats is the lowest transaction that the Bitcoin Core software can accept and less of it is considered a dust transaction, but does not mean that it is the lowest transaction that can be broadcast in the network?! Overall, thanks for proving that such tx can be broadcast.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 21, 2022, 10:04:30 AM",
+      "body": "Quote from: hugeblack on May 21, 2022, 09:39:04 AMbut does not mean that it is the lowest transaction that can be broadcast in the network?! It could happen, but it's not very likely. Even if you connect to a node that accepts a lower dust limit, that node will also have the same problem so it can't propagate it to other nodes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

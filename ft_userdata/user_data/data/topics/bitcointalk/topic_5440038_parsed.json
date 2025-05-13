@@ -1,0 +1,109 @@
+{
+  "id": "topic_5440038",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "February 16, 2023, 08:43:26 AMLast edit: February 28, 2023, 08:59:04 AM by NotATether",
+  "content": "NOTE: This post is a work in progress and has not been finished yet. First I need to create some ordinals before I can give detailed information about the inscription process. <I cannot create any ordinals until I get back home.>An ordinal is an NFT that exists on the Bitcoin blockchain.Ordinals are made using the software that is available here: https://github.com/casey/ordContrary to popular belief, you can inscribe any content as an Ordinal, and not just multimedia. This can open up a huge number of possibilities, such as selling books in PDF or ePUB format, hosting single-page websites and pastebins, submit proof that you were the first to do something, and maybe even doing anonymous forum posts as well.InstallingThere are binaries for Windows, MacOS, and Linux, which you can download here: https://github.com/casey/ord/releasesOne-click install (puts the binary in $HOME/bin/ folder - it is not in the $PATH by default so if that makes you uncomfortable then just put it in /usr/local/bin):Code:curl --proto '=https' --tlsv1.2 -fsLS https://ordinals.com/install.sh | bash -sCreating a walletFirst you need to have a mainnet Bitcoin Core node running, with txindex=1 in your configuration and that accepts RPC connections. It must use cookie authentication; I could not find a way to make it work with username/password authentication.To create a wallet, you must issue the command ord wallet create (assumes ord is already in the system path).Output:Code:{\"mnemonic\": \"abc def ghi jkl mno pqr stu vwx zya bcd efg hij\"}The mnemonic will have twelve words that form the seed phrase (and look nothing like this example, which was for demonstration purposes only).Creating an inscriptionWORK IN PROGRESSRun ord wallet inscribe FILE_PATH. It will index the blockchain on the first run so be prepared to wait for a few hours (this is independent of Bitcoin Core's block verification process) before your inscription is done. You might want to send funds as soon as the operation starts as it will take a while.Sending inscriptionsWORK IN PROGRESSThere is currently no marketplace for sending and receiving inscriptions online, so you need to use ord for that as well.Run ord wallet send and ord wallet receive respectively.Receiving inscriptionsUse ord wallet receive to generate an address with which you can receive inscriptions on. You can also fund the address so that you can use it to pay transaction fees.Example output:Code:{  \"address\": \"bc1pzefp3s70edy6339ueuys064z9gcw74vgyemgm9d8rlgq42typagsnwycyt\"}If ord is not workingIn case of any error, first you should check your Bitcoin Core node and make sure it is responsive - restart it if necessary.If you are unable to index ord at all, delete the database file at ~/.local/share/ord/index.redb (on Linux - On Windows it's probably inside the AppData/Roaming folder - someone please correct me if this is not true) and possible use a different version of ord and try again.Other tutorials about ordinalsWORK IN PROGRESS - feel free to recommend other pages and threads here.SuggestionsPlease post them below.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440038",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "February 18, 2023, 10:25:01 AM",
+      "body": "Reserved for news(I'm going to have to transfer some funds from my wallet to Bitcoin Core to make this work - I'm still figuring out how this will work in tandem with the Ordinals binary.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fillippone",
+      "created_time": "February 21, 2023, 11:19:30 AM",
+      "body": "I definitely want to play with this. I want to create an inscriptions with my hat, so that I can trade it (just for a scientific purpose, of course).I have other questions, but those are not technical, so I will post them on a different thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "February 24, 2023, 03:12:00 PM",
+      "body": "Quote from: fillippone on February 21, 2023, 11:19:30 AMI definitely want to play with this. I want to create an inscriptions with my hat, so that I can trade it (just for a scientific purpose, of course).I have other questions, but those are not technical, so I will post them on a different thread. I actually don't mind the questions being non-technical as there's a lot to learn about these things and Dev subboard already has a technical thread about ordinal theory.Anyway:It's been abut 3 hours since I started the inscription, however the block indexing is only 40% done.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "February 26, 2023, 02:28:33 PM",
+      "body": "Yeah, I left the indexer on all night but it never got past block 300,000, so I had to shut it off as it was just wasting CPU cycles. Anyone else had better luck inscribing something with this program?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Rizzrack",
+      "created_time": "February 26, 2023, 10:13:31 PM",
+      "body": "This looks interesting. Does it matter if BitcoinCore is running on pruned mode or not ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "February 27, 2023, 05:52:56 AM",
+      "body": "Quote from: Rizzrack on February 26, 2023, 10:13:31 PMThis looks interesting. Does it matter if BitcoinCore is running on pruned mode or not ?It cannot run with a pruned node because you have to set txindex=1 so that the Ordinals program can work properly and find transactions, and that implies that the node must not be pruned.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "February 28, 2023, 08:28:45 AMLast edit: February 28, 2023, 01:19:22 PM by NotATether",
+      "body": "Something appears to be wrong in the `ord` program:Code:RUST_LOG=debug ~/bin/ord wallet balance[2023-02-28T08:00:18Z INFO  ord::index] Connecting to Bitcoin Core RPC server at 127.0.0.1:8332/wallet/ord using credentials from `/home/zenulabidin/.bitcoin/.cookie`# 10 minutes later...# No more outputAt this point, I have blanked my entire bitcoin.conf except for txindex=1, to see if I can get ord to respond to that. I was not successful. I checked Bitcoin Core's debugging output for any hints, and indeed a wallet rescan happened (I do not know which wallet but it's got to be the `ord` wallet since it's the only wallet I even have on Core), but there is no record of RPC calls made anywhere.Maybe I will just file a bug report.EDIT: I downgraded to ord version 0.4.2 and deleted the ord database at ~/.local/share/ord/index.redb and it looks like I can index it again. Just waiting to see whether it actually finishes this time.  EDIT2: It's stuck again at block #325000....EDIT3: It resumed after 15 minutes. But it doesn't matter anymore because I accidentally Ctrl-C'd the program and must start over",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "March 02, 2023, 05:27:09 PM",
+      "body": "I opened a Github issue here and was told to run the following:Code:RUST_LOG=info ord --index-sats indexWell see how that goes. The person who replied to me said it took them 7 days to finish it but it is not memory-intensive - however, it will use an eye-watering 118GB of space, so heads up (and that will only increase in proportions to the mainnet blockchain).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fillippone",
+      "created_time": "March 08, 2023, 09:40:20 PM",
+      "body": "Quote from: NotATether on March 02, 2023, 05:27:09 PMI opened a Github issue here and was told to run the following:Code:RUST_LOG=info ord --index-sats indexWell see how that goes. The person who replied to me said it took them 7 days to finish it but it is not memory-intensive - however, it will use an eye-watering 118GB of space, so heads up (and that will only increase in proportions to the mainnet blockchain).Do you have any updates on this? Is running ord so hardware intensive? Can you give us a few details on the machine you are using to do so?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "March 09, 2023, 07:36:10 AM",
+      "body": "Quote from: fillippone on March 08, 2023, 09:40:20 PMQuote from: NotATether on March 02, 2023, 05:27:09 PMI opened a Github issue here and was told to run the following:Code:RUST_LOG=info ord --index-sats indexWell see how that goes. The person who replied to me said it took them 7 days to finish it but it is not memory-intensive - however, it will use an eye-watering 118GB of space, so heads up (and that will only increase in proportions to the mainnet blockchain).Do you have any updates on this? Is running ord so hardware intensive? Can you give us a few details on the machine you are using to do so? Sure. I restarted the ord indexing yesterday, and it's around block 380,000 now. So at least it is making some progress.Hardware is nothing fancy, the CPU is a \"Intel(R) Xeon(R) CPU E31240 @ 3.30GHz\" with 8 threads and 16GB of memory attached. My load average is around 4.0, which tells me that it's using 4 threads for indexing.Maybe the problem was that there is so little logging done initially that it could be thought the program was stuck.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CookesAg",
+      "created_time": "May 10, 2023, 05:03:36 AM",
+      "body": "commandord wallet balancethen [indexing blocks]but end with below error:thread 'main' panicked at 'internal error: entered unreachable code', /Users/binghe/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/redb-0.13.0/src/tree_store/btree.rs:375:18note: run with RUST_BACKTRACE=1 environment variable to display a backtraceany help will be appreciated. thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 10, 2023, 05:37:08 AM",
+      "body": "Quote from: CookesAg on May 10, 2023, 05:03:36 AMcommandord wallet balancethen [indexing blocks]but end with below error:thread 'main' panicked at 'internal error: entered unreachable code', /Users/binghe/.cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd/redb-0.13.0/src/tree_store/btree.rs:375:18note: run with RUST_BACKTRACE=1 environment variable to display a backtraceany help will be appreciated. thanks Please file an issue for this at https://github.com/casey/ord - I don't understand Rust unfortunately.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

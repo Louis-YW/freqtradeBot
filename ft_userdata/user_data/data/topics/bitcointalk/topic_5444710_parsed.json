@@ -1,0 +1,165 @@
+{
+  "id": "topic_5444710",
+  "title": "Santorini7",
+  "author": "Santorini7",
+  "created_time": "March 13, 2023, 12:19:54 PM",
+  "content": "Greetings! I really ask you to help me with advice in my situation.For a long time I used one wallet and it accumulated more than 10k small transactions. And I know that this is most likely the limit of electrum servers.Electrum, as expected, went into endless synchronization. And I decided to export the private key to bitcoin core, having previously synchronized the entire blockchain.From electrum I received a private key of about this format -p2wsh:L1d*****Blockchain.comAt first I tried to import it into blockchain.com , but when importing , it is not possible to specify \"p2wsh\" before the private key , and without this prefix , an absolutely unfamiliar empty wallet of a different format is importedBitcoin CoreThen I tried to import into Bitcoin core, both in a wallet with and without descriptors. When importing with the prefix ( importprivkey p2wsh:l1d***** ) I get the error - Invalid private key encoding (code -5)2faThis wallet with 2fa from TrustCoin, I have both of these phrases. Code 2fa Google authenticator is also on my hands.How do I withdraw money from my wallet? Thank you in advance",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5444710",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 13, 2023, 12:43:31 PM",
+      "body": "Since this is a 2FA wallet, exporting a raw private key like you are doing is not going to help you, as 2FA wallets in Electrum are 2-of-3 multi-sig and so a single private key is insufficient to either recreate the wallet or to spend the coins.If you already have Bitcoin Core installed and synced, then I would suggest spinning up an Electrum Personal Server on top of Core, and then using that to sync your Electrum wallet. This will bypass the DDoS protections that public servers have in place which are preventing you from syncing your 10,000 or so transactions.Another option would be to skip the Electrum Personal Server and import your Electrum wallet in to Sparrow. Sparrow can connect directly to your own node without having to run an additional server on top. I'm assuming you would first need to recover your 2FA wallet from your seed phrase and disable the 2FA feature, and then import that disabled 2FA wallet in to Sparrow.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "March 13, 2023, 12:50:42 PM",
+      "body": "The command you use importing the private key to bitcoin core is wrong you should remove this p2wsh: check the sample below Code:importprivkey 5KJvsn......If didn't work since your private is starting with L I think you will need to convert it to uncompress private key. You can use  https://www.bitaddress.org/ then go to wallet details then download the page and run it offline paste the private key that starts with L then copy uncompress private key and paste it to your Bitcoin core wallet.Don't forget to use this command below in case your core wallet has a passphrase.Code:walletpassphrase \"YourLongPassphrase\" 600",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "March 13, 2023, 12:57:25 PMLast edit: March 13, 2023, 08:50:53 PM by hosseinimr93",
+      "body": "Quote from: BitMaxz on March 13, 2023, 12:50:42 PMThe command you use importing the private key to bitcoin core is wrong you should remove this p2wsh: check the sample below Code:importprivkey 5KJvsn......OP's electrum wallet is 2FA which is a 2 of 3 multi-signature wallet.As mentioned above by o_e_l_e_o, it's not possible to generate such a wallet with a single private key at all. For generating a 2 of 3 multi-signature address, you need three public keys and for spending fund, you need two of private keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "March 13, 2023, 01:04:04 PMLast edit: March 13, 2023, 01:14:47 PM by BitMaxz",
+      "body": "Quote from: hosseinimr93 on March 13, 2023, 12:57:25 PMOP's electrum wallet is 2FA which is a 2 of 3 multi-signature wallet.As mentioned above by o_e_l_e_o, it's not possible to generate such a wallet with a single private key at all. For generating a 2 of 3 multi-signature address, you need three public keys and for spending fund, you need two of private keys.Yeah, but how did OP get compress private key \"p2wsh:L1d*****\"That is why I think he already extracted the private key from his wallet and forgot to tell us that he already exported the private key using the trustcoin 2fa recovery tool.And take note if you are creating 2FA wallet from Electrum yes it's 2-of-3 multisig but you will only get one seed phrase and 2fa secret key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 13, 2023, 01:07:00 PM",
+      "body": "Quote from: BitMaxz on March 13, 2023, 12:50:42 PMThe command you use importing the private key to bitcoin core is wrong you should remove this p2wsh: check the sample belowThis won't work. OP is exporting a single private key from a 2-of-3 multi-sig. If he does succeed in importing that private key to another wallet, it will not generate the same address from his 2FA wallet.The private key that you extract by right clicking on an address and clicking on \"Private Key\" in a 2FA wallet is the private key used by the first cosigner. You can test this for yourself by deriving the public key for that private key, and also by taking the Zpub from the keystore 1 under Wallet -> Information, and deriving the child public key at m/0'/x/x. They will match.He has extracted one of three private keys for a single address. This is insufficient to recover his wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Santorini7",
+      "created_time": "March 13, 2023, 01:09:07 PM",
+      "body": "Quote from: BitMaxz on March 13, 2023, 01:04:04 PMQuote from: hosseinimr93 on March 13, 2023, 12:57:25 PMOP's electrum wallet is 2FA which is a 2 of 3 multi-signature wallet.As mentioned above by o_e_l_e_o, it's not possible to generate such a wallet with a single private key at all. For generating a 2 of 3 multi-signature address, you need three public keys and for spending fund, you need two of private keys.Yeah, but how did OP get compress private key \"p2wsh:L1d*****\"That is why I think he already extracted the private key from his wallet and forgot to tell us that he already exported the private key using the trustcoin 2fa recovery tool.All right. I restored 2fa and exported this private key from ONE seed phrase.Opening the second seed phrase, that address isn't there, so I guess it is only used for signing",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 13, 2023, 01:13:44 PM",
+      "body": "Quote from: Santorini7 on March 13, 2023, 01:09:07 PMAll right. I restored 2fa and exported this private key from ONE seed phrase.Opening the second seed phrase, that address isn't there, so I guess it is only used for signing2FA wallets only have one seed phrase. If you have a second seed phrase related to the same wallet, then what you have is not a 2FA wallet. It might be a 2-of-3 multi-sig wallet that you set up manually. Or the second seed phrase is from a different wallet entirely.When you go through the wallet creation process and you enter your first seed phrase, what does it say after \"Seed Type\"? \"segwit\" or \"2fa_segwit\"?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Santorini7",
+      "created_time": "March 13, 2023, 01:19:25 PM",
+      "body": "Quote from: o_e_l_e_o on March 13, 2023, 01:13:44 PMQuote from: Santorini7 on March 13, 2023, 01:09:07 PMAll right. I restored 2fa and exported this private key from ONE seed phrase.Opening the second seed phrase, that address isn't there, so I guess it is only used for signing2FA wallets only have one seed phrase. If you have a second seed phrase related to the same wallet, then what you have is not a 2FA wallet. It might be a 2-of-3 multi-sig wallet that you set up manually. Or the second seed phrase is from a different wallet entirely.When you go through the wallet creation process and you enter your first seed phrase, what does it say after \"Seed Type\"? \"segwit\" or \"2fa_segwit\"?2fa_segwit",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "March 13, 2023, 01:21:02 PM",
+      "body": "Quote from: Santorini7 on March 13, 2023, 01:09:07 PMAll right. I restored 2fa and exported this private key from ONE seed phrase.Opening the second seed phrase, that address isn't there, so I guess it is only used for signingIt does not work try this tool https://trustedcoin.com/static/recover/standalone.htmlDownload the page and run it offline and then paste the backup seed phrase and it would generate an unencrypted wallet file.Import it to Electrum and then export the private this time it's unencrypted and try to import it to your Bitcoin core wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 13, 2023, 01:24:37 PM",
+      "body": "Quote from: Santorini7 on March 13, 2023, 01:19:25 PM2fa_segwitIn that case your second seed phrase is completely unrelated. If your first seed phrase says \"2fa_segwit\", and when you restore it Electrum generates the addresses you expect, then you can simply select the option to disable 2FA when you are restoring it and that will let you spend from that wallet without paying TrustedCoin for each transaction. This is probably a good idea since to consolidate 10k inputs you will be making a lot of transactions, and the TrustedCoin fee will add up rapidly.You could try importing this now disabled 2FA wallet in to Sparrow and see if it works, although I've never tried this myself. Or you could run an EPS to sync it directly from Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Santorini7",
+      "created_time": "March 13, 2023, 01:27:53 PM",
+      "body": "Quote from: BitMaxz on March 13, 2023, 01:21:02 PMQuote from: Santorini7 on March 13, 2023, 01:09:07 PMAll right. I restored 2fa and exported this private key from ONE seed phrase.Opening the second seed phrase, that address isn't there, so I guess it is only used for signingIt does not work try this tool https://trustedcoin.com/static/recover/standalone.htmlDownload the page and run it offline and then paste the backup seed phrase and it would generate an unencrypted wallet file.Import it to Electrum and then export the private this time it's unencrypted and try to import it to your Bitcoin core wallet.Electrum: 2fa_segwitTrustedcoin: Not a 2fa seedhttps://i.imgur.com/shyDTAN.pnghttps://i.imgur.com/jALYKxh.png",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 13, 2023, 01:32:20 PM",
+      "body": "Quote from: Santorini7 on March 13, 2023, 01:27:53 PMQuote from: BitMaxz on March 13, 2023, 01:21:02 PMIt does not work try this tool https://trustedcoin.com/static/recover/standalone.htmlDownload the page and run it offline and then paste the backup seed phrase and it would generate an unencrypted wallet file.Import it to Electrum and then export the private this time it's unencrypted and try to import it to your Bitcoin core wallet.Electrum: 2fa_segwitTrustedcoin: Not a 2fa seedThere is absolutely no need to use the tool that BitMaxz has suggested. Once again, his method will not work. You cannot recover a multi-sig wallet by exporting a single private key.If you want to go down the route of importing directly in to Core, then you'll need to manually derive the relevant private and public keys from your seed phrase and third Zpub in your disabled-2FA-wallet, and then use them to create a multi-sig descriptor wallet in Core. The solutions I have given above will be much easier.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Santorini7",
+      "created_time": "March 13, 2023, 01:40:28 PM",
+      "body": "Quote from: o_e_l_e_o on March 13, 2023, 01:32:20 PMQuote from: Santorini7 on March 13, 2023, 01:27:53 PMQuote from: BitMaxz on March 13, 2023, 01:21:02 PMIt does not work try this tool https://trustedcoin.com/static/recover/standalone.htmlDownload the page and run it offline and then paste the backup seed phrase and it would generate an unencrypted wallet file.Import it to Electrum and then export the private this time it's unencrypted and try to import it to your Bitcoin core wallet.Electrum: 2fa_segwitTrustedcoin: Not a 2fa seedThere is absolutely no need to use the tool that BitMaxz has suggested. Once again, his method will not work. You cannot recover a multi-sig wallet by exporting a single private key.If you want to go down the route of importing directly in to Core, then you'll need to manually derive the relevant private and public keys from your seed phrase and third Zpub in your disabled-2FA-wallet, and then use them to create a multi-sig descriptor wallet in Core. The solutions I have given above will be much easier.Do I understand correctly that when restoring, I need to disable 2fa and then export the key? And I guess it will be with the p2wsh handle anyway. How do I import it into btc core?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 13, 2023, 03:03:22 PM",
+      "body": "No.Since you are dead set on import this in to Core, I'll lay out instructions on how to do this below. I will repeat again, however, that running an EPS will be far easier. I've tested this and I can successfully recreate a disabled 2FA wallet in Core. However, I do not have a spare funded multi-sig wallet lying around, so I cannot guarantee that the spending function will work. If it doesn't, you could always export a PSBT back in to Electrum to sign it.This should all be done on an offline computer because you will be handling your raw private keys a lot. There is a large security risk in doing this, so again, you would be better off just running an EPS.The first thing you need to do is recover your 2FA wallet from your seed phrase and disable the 2FA function. Save this new wallet file somewhere you can find it, then go and open it with a text editor. Scroll to the bottom. You will need your two Zprvs and the final Zpub. I'll use ones I have generated for illustration, you should change these to your own.Under \"x1/\", copy the string alongside \"xprv\" which starts \"Zprv\".Under \"x2/\", copy the string alongside \"xprv\" which starts \"Zprv\".Under \"x3/\", copy the string alongside \"xpub\" which starts \"Zpub\".For me, I'll be using the following:Code:ZprvAmBjVZsczw9udGA2adgYqZA2i7VzBH3xEQTLBJ22Z4Uk7MHnJj39RCtPf5QiffHCKuv92be6P58Q7nNKpCEdQKM2KBc6DT4y8cTuDT3iqu4ZprvAmBjVZsczw9ufgr2H9GgyT5mDCk7N6DrDWJkodPRu7WsGLSK2L2ZNn85t4JZE3Y6KLyiszURQJUjmBtoASPWWU8yCpKkxL3wk1ESew4DSHdZpub6vZyhw1ShkEwQEAnMn82VyxEEBqWsWwhNJfbL2spe673exihurbSQZKECiqUu8TuKrFWY6B4W5x75KFikJKarnJfJs5gn1XdfX6o255N6R6Open your Electrum console, and use the following command three times, once for each of those three master keys:Code:convert_xkey(xkey=\"ZprvAmBjVZsczw9udGA2adgYqZA2i7VzBH3xEQTLBJ22Z4Uk7MHnJj39RCtPf5QiffHCKuv92be6P58Q7nNKpCEdQKM2KBc6DT4y8cTuDT3iqu4\",xtype=\"standard\")This will spit out a new key each time you use it. You will now have two xprvs and one xpub. Using the examples above, I now have the following:Code:xprv9vd7kzoM8cWaW6cQyFeKbJdDePAq5gPN5umDhExiRGtaNy6R31Kk5xiBoxY57QkTHAcYf4SraY2oE3XS5aFefMs9k36qeDxzhS4jrJAoizixprv9vd7kzoM8cWaYXJQfmETjCYx9UQxGVZG51ceKaL7mKvhXxEwkcKA3Xwt2wRufo1MGbg8WTHBbmP8sT3uRpQXmWf6dfpWP6wyJpqHHof6ZtTxpub661MyMwAqRbcH4dAkQ5oFjRRATWMmvH7DoyUqypWWJWsvaXLe8t35K92MbxqLswAH6wvAYyphYrWBaQq1gLc7ppnjiaSCnRfELhdewRwk6EHead over to Bitcoin Core, and create a new blank descriptor wallet.Open up the console for this wallet, and enter the following command, replacing my keys for your ones:Code:getdescriptorinfo \"wsh(sortedmulti(2,[00000000/0]xprv9vd7kzoM8cWaW6cQyFeKbJdDePAq5gPN5umDhExiRGtaNy6R31Kk5xiBoxY57QkTHAcYf4SraY2oE3XS5aFefMs9k36qeDxzhS4jrJAoizi/0/*,[00000000/0]xprv9vd7kzoM8cWaYXJQfmETjCYx9UQxGVZG51ceKaL7mKvhXxEwkcKA3Xwt2wRufo1MGbg8WTHBbmP8sT3uRpQXmWf6dfpWP6wyJpqHHof6ZtT/0/*,[00000000/0]xpub661MyMwAqRbcH4dAkQ5oFjRRATWMmvH7DoyUqypWWJWsvaXLe8t35K92MbxqLswAH6wvAYyphYrWBaQq1gLc7ppnjiaSCnRfELhdewRwk6E/0/*))\"Hopefully you will then see something that looks like this:Code:  \"checksum\": \"6530kmqk\",  \"isrange\": true,  \"issolvable\": true,  \"hasprivatekeys\": trueIf that's the case, then run the following command. Again replace my keys with your ones. Replace the xxxxxxxx with your 8 character checksum, and replace the timestamp with the block height you want to scan from. If you aren't sure, then just leave it at 0. Also replace the range of addresses you want to scan - I'm scanning the first 1000 addresses here. If you've generated more than 1000 addresses in Electrum, then change \"999\" to a higher number.Code:importdescriptors '[{ \"desc\": \"wsh(sortedmulti(2,[00000000/0]xprv9vd7kzoM8cWaW6cQyFeKbJdDePAq5gPN5umDhExiRGtaNy6R31Kk5xiBoxY57QkTHAcYf4SraY2oE3XS5aFefMs9k36qeDxzhS4jrJAoizi/0/*,[00000000/0]xprv9vd7kzoM8cWaYXJQfmETjCYx9UQxGVZG51ceKaL7mKvhXxEwkcKA3Xwt2wRufo1MGbg8WTHBbmP8sT3uRpQXmWf6dfpWP6wyJpqHHof6ZtT/0/*,[00000000/0]xpub661MyMwAqRbcH4dAkQ5oFjRRATWMmvH7DoyUqypWWJWsvaXLe8t35K92MbxqLswAH6wvAYyphYrWBaQq1gLc7ppnjiaSCnRfELhdewRwk6E/0/*))#xxxxxxxx\", \"active\":true, \"timestamp\":0, \"internal\":false, \"range\":[0,999], \"active\":true }]'If you also need to import change addresses, then run the following:Code:getdescriptorinfo \"wsh(sortedmulti(2,[00000000/0]xprv9vd7kzoM8cWaW6cQyFeKbJdDePAq5gPN5umDhExiRGtaNy6R31Kk5xiBoxY57QkTHAcYf4SraY2oE3XS5aFefMs9k36qeDxzhS4jrJAoizi/1/*,[00000000/0]xprv9vd7kzoM8cWaYXJQfmETjCYx9UQxGVZG51ceKaL7mKvhXxEwkcKA3Xwt2wRufo1MGbg8WTHBbmP8sT3uRpQXmWf6dfpWP6wyJpqHHof6ZtT/1/*,[00000000/0]xpub661MyMwAqRbcH4dAkQ5oFjRRATWMmvH7DoyUqypWWJWsvaXLe8t35K92MbxqLswAH6wvAYyphYrWBaQq1gLc7ppnjiaSCnRfELhdewRwk6E/1/*))\"And then the following, again replacing xxxxxxxx with your checksum, the timestamp with your desired block height, and the range as needed:Code:importdescriptors '[{ \"desc\": \"wsh(sortedmulti(2,[00000000/0]xprv9vd7kzoM8cWaW6cQyFeKbJdDePAq5gPN5umDhExiRGtaNy6R31Kk5xiBoxY57QkTHAcYf4SraY2oE3XS5aFefMs9k36qeDxzhS4jrJAoizi/1/*,[00000000/0]xprv9vd7kzoM8cWaYXJQfmETjCYx9UQxGVZG51ceKaL7mKvhXxEwkcKA3Xwt2wRufo1MGbg8WTHBbmP8sT3uRpQXmWf6dfpWP6wyJpqHHof6ZtT/1/*,[00000000/0]xpub661MyMwAqRbcH4dAkQ5oFjRRATWMmvH7DoyUqypWWJWsvaXLe8t35K92MbxqLswAH6wvAYyphYrWBaQq1gLc7ppnjiaSCnRfELhdewRwk6E/1/*))#xxxxxxxx\", \"active\":true, \"timestamp\":0, \"internal\":true, \"range\":[0,999], \"active\":true }]'",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "March 13, 2023, 03:14:18 PM",
+      "body": "On a side note: you should probably be more careful with your private keys! Don't just import it into different wallets (including a web wallet for crying out loud)! I assume you used 2FA for a reason: keeping your funds safe. Don't compromise your private key now.Also, if you really have 10k multisig inputs, you're looking at roughly 0.04 BTC in consolidation fees even if you use the minimum fee (of 1 sat/vbyte, which currently isn't enough to confirm any time soon)! You'll also be making about 100 transactions each with 100 inputs, so you have some serious work to do. Good luck, it sounds fun to do Update: you may want to read my topic on How to Consolidate your small inputs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "March 13, 2023, 11:37:45 PM",
+      "body": "Quote from: o_e_l_e_o on March 13, 2023, 01:32:20 PMThere is absolutely no need to use the tool that BitMaxz has suggested. Once again, his method will not work. You cannot recover a multi-sig wallet by exporting a single private key.Yes, it wouldn't work because it's a 2FA segwit as Santorini7 said above but I already tested my method a long time ago to extracted a private key from my 2FA wallet. I don't know about the latest version of Electrum but I tested it a long time ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "March 14, 2023, 07:45:19 AM",
+      "body": "Quote from: BitMaxz on March 13, 2023, 11:37:45 PMYes, it wouldn't work because it's a 2FA segwit as Santorini7 said above but I already tested my method a long time ago to extracted a private key from my 2FA wallet. I don't know about the latest version of Electrum but I tested it a long time ago.No version of electrum can give a single private key that can be used for recovering a multi-signature wallet. As already said, that's not possible that all. Note that even if you disable 2FA, you would still have a multi-signature wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "March 14, 2023, 01:12:48 PM",
+      "body": "Quote from: BitMaxz on March 13, 2023, 11:37:45 PMYes, it wouldn't work because it's a 2FA segwit as Santorini7 said above but I already tested my method a long time ago to extracted a private key from my 2FA wallet. I don't know about the latest version of Electrum but I tested it a long time ago.That tool is designed for claiming Electrum forks from non-SegWit 2fa electrumand since those forks don't support SegWit, there's no reason for Trusted Coin to upgrade the tool to support 2fa-segwit Electrum seed.(or they do not have the time to update it)Also, it's basically the same as restoring your 2fa seed phrase to Electrum except the restored wallet file is in \"skeleton\" statewhich only consist of necessary data to be compatible with all Electrum versions and fork.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 14, 2023, 01:16:58 PM",
+      "body": "Quote from: BitMaxz on March 13, 2023, 11:37:45 PMbut I already tested my method a long time ago to extracted a private key from my 2FA wallet.Is there no possibility you have misremembered?If you right click on an address in a multi-sig wallet and click on \"Details\" instead of \"Private key\", then Electrum will show you the three (or however many) public keys for that address. So you could certainly use those three public keys to recreate a watch only wallet in some other software, but you could not then spend from that wallet without at least 2 of the private keys (in the case of a disabled 2FA 2-of-3 multi-sig).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

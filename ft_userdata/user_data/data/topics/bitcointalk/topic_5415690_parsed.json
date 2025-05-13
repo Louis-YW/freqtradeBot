@@ -1,0 +1,165 @@
+{
+  "id": "topic_5415690",
+  "title": "jordapoulton",
+  "author": "jordapoulton",
+  "created_time": "October 02, 2022, 01:32:53 PM",
+  "content": "(TL:DR at the bottom)The ProblemEvery time you create a new BTC wallet, you’ll get a 12 word 'recovery phrase' that needs to be noted down and hidden somewhere, which - to me at least - seems like a pretty gaping security gap. It doesn’t matter whether you write the words down and hide them in your attic, or stamp them on metal and bury them in your garden, the ‘master key’ to your wallet is still just sat somewhere, hoping that no-one finds it. If someone does find it, they can empty your account, and there’s no way you can stop them.A Quick Definition, for the Uninitiated:A seed phrase, seed recovery phrase or backup seed phrase is a list of words which store all the information needed to recover Bitcoin funds on-chain. Wallet software will typically generate a seed phrase and instruct the user to write it down *on paper*. If the user's computer breaks or their hard drive becomes corrupted, they can download the same wallet software again and use the paper backup to get their bitcoins back. (From: https://en.bitcoin.it/wiki/Seed_phrase, with my emphasis)My InspirationA friend of mine told me about his ingenious technique for storing his recovery phrase, as I will detail below:The ‘key’ here was that the notation he actually 'stored' referred to a favourite book of his, which was *unknown* and *not written down*, neither along with the recovery phrase ‘key’ (which I’m going to call ‘keynote’ to save time from now on) nor anywhere else. For the purposes of the example, let’s say the book was Moby Dick, 1987 edition by Penguin House. Critically, no-one knew the book, so it would be close to impossible for a stranger to crack the code.His keynote looked as follows:17, 12, 448, 6, 8174, 8, 1...and so on…Each line in this key was formed of a triplet that referred to the page, line and word-number of a specific word, which, when looked up (using the exact correct book), was in fact the relevant ‘recovery word’. In 12 lines, he’d noted all 12 of the words in his recovery phrase without actually giving anything away to a casual reader/attacker. So long as the attacker didn’t know the book it referred to, the recovery phrase would be secure.In my mind, this seemed pretty impressive. Feel free to use it, substituting his book (which I in fact made up) for your own. BUT don’t forget it needs to refer to a *specific edition & publisher & date*, because each edition will be different, and will give wildly different outputs for any given keynote.  The downside to this method is, you’ll have to spend some time actually *finding* each of your keywords in your favourite book, and you might have to cross your fingers that the book in fact does contain the word *at all*. It probably will, but it might not, and it might take you a while to actually find it. Either way, it’s a bit of a ball-ache. As you can see, the method still has some weaknesses. A New SolutionI created a secret, unknown Github persona, and this persona has uploaded the *entire* bank of 2048 potential Bitcoin recovery phrase words, in randomised order, in 256 rows of 8, to a repo.  *I* know the name of this account, and the name of the specific repo, but an attacker wouldn’t. My keynote now looks something like this:13, 724, 0…and so on…Each line refers to the ‘line’ and ‘word number’ referring to my unique words in my recovery phrase. This seems pretty secure to me. BUT we’re not quite finished. Firstly, given that I think I might be the only person who’s done this, it probably wouldn’t be too hard for a smart person to find my ’secret’ account and, if they had access to my keynote, steal my Bitcoin.So Why the Post?I want to scale this concept so that everyone can use it *and* improve security even further - for all of us. There’s a couple of ways we could do it:1 - Anyone and everyone could do the same as I did, creating their own repo and pushing a randomised list of recovery words. They could then note their own recovery phrase, in the form of a keynote as described above, secretly referencing their own Github repo. Please feel free to go ahead and do that if you want 🙂.  OR, even easier (but maybe less secure?!), I could do the following:I could link my not-so-secret account below, and anyone and everyone - hopefully lots of people - could fork the repo and make their *own* randomised version of the 2048 seed word list.It would literally just be:* Fork my repo* Run something like ‘randomised_seed_words.shuffle’ locally* Push your new randomised list to your repoThat way, we each wouldn’t necessarily need to use our own account as our personal ‘referent’. In fact, you could pick a random forker and use *their* repo as your referent. No-one would ever know which repo you eventually chose as a referent, so it would make it *pretty damn secure*.NEXT LEVEL SHITHere’s where it could get really cool. I’m sure there’s someone out there in the community who could help build this, as I don’t think it’s particularly complicated technically. Sadly, however, it’s a little above my technical competence.We could extend my repo in the following way:* Have it spin up a micro cloud instance on something like AWS/Google Cloud/Heroku etc (it would need to be free so that lots of people fork it and create their own version without having to spend any money)* Every day, say at midday UTC, the cloud instance would awaken, create a new, randomised version of the 2048 bank of ‘recovery’ words, and push it to my Git repo.Ideally, it would be even further extended so that *anyone* could fork it, and just add their own unique details (their Github name, unique repo address, login details for Git & whichever cloud provider we choose).In this way, we could (hopefully!) have thousands of people all providing their own version of the randomised recovery words, *AND* a new version would be posted to *each* account *every day*, creating *lots* of potential ‘referents’.What this would mean would be that, for *even higher* levels of security, not only could you choose a random account as your referent, you could also choose a random *day* too, so that there would only be 2 ‘keys’ for you to remember - a Github ID and a date, the ‘day of push’ - which you would memorise, never write down, and keep as your truly ‘secret' keys. I hope I’m making sense.If this existed, my secret phrase notes might look very similar as they do now:13, 724, 0…and so on…BUT what the attacker would have a *super* hard time discerning would be that, in fact, this ‘keynote’ refers to ShiftyDude6102’s ‘BTC_randomised_recovery_words' repo, and specifically to the push that was made on the 5th April 1975 . I’m not sure it could get much securer than that. The only risk I can see is that the person whose account/repo/date-of-push you rely on might delete their account, thus making your keynote refer to a non-existent push. I guess we should therefore ask plebs to only fork the code if they commit to never deleting their account. In short, if someone could help me with the cloud infrastructure bit, and we could get just a slice of the users of this forum to fork a version to their own repo, add their own personal account details (git and whatever Cloud service we choose to use) and have it make daily pushes of the randomised bank of recovery words, we’d all have a huge set of potential dictionaries from which to derive our security / to which our keynotes could refer, making it possible to close what *I* believe to be the biggest, most insanely broad attack vector of *how and where to store your recovery phrase*.And, finally, even the people stamping things on metal could take advantage of this, since they could just stamp number pairs instead of entire words onto their thingy-mabobs.I hope that makes sense. Sorry if it was a bit long. Feedback, as always, very welcome.If you got this far, thanks for reading! 🙂--------------------------------------------------------------------------------------------------TL:DR* Rather than store your BTC wallet’s ‘seed recovery phrase’ as brute words, which seems insanely insecure to me, you could pick your favourite book and store 12 triplets of [page, line, word-number], thus massively improving your security* Rather than using a book, you could push a randomised list of the 2048 recovery words to git. In 'real life' you would only need to store 12 number pairs in the format [line, word-number]. It would be even better if you did this with a secret, pseudonymous Github account.* If someone could help me make this into a simple forkable ‘product', that could spin up a micro cloud instance and have it push a new bank of randomised recovery words to the associated repo *every day*, and possibly even allow others to fork it and do the same using their own unqiue credentials, it could become a super secure, broad resource that all Bitcoiners could use as a referent when storing the 12 words of their recovery phrase.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415690",
+  "comments": [
+    {
+      "author": "jordapoulton",
+      "created_time": "October 02, 2022, 03:10:26 PM",
+      "body": "PS discussion also happening on Reddit - https://www.reddit.com/r/Bitcoin/comments/xtp1s3/12_word_recovery_phrase_a_security_weakness_my/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "October 02, 2022, 03:41:18 PM",
+      "body": "I have some remarks:- instead of keeping 1 “item” safe, now you need to take care of 2 “items”. You are dependent on external services github server must be up and running and you must have access to it etc).- each word encodes number, why not to store numbers instead of words, if you really do not like the idea of keeping seed safe- seed is one thing, you may create many different derivation paths using “extra word” (password). To some extend we may say seed means nothing without password (if it was used), so you may even publish your seed if you know that all your coins are accessible using that seed AND password (for example Moby Dick ISBN).- and the last one - that’s great that people try to invent anything new, but what’s wrong with secret sharing using Shamir algorithm? If you like to keep secrets in several places, maybe it would be interesting for you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 02, 2022, 06:33:14 PM",
+      "body": "With the first solution (book), you are now reliant on hiding an entire book rather just a single piece of paper. If you lose your copy of the book, there is no guarantee you would find the exact same edition again and your coins will be lost. So that's a more difficult back up process and a single point of failure.With the second solution (Github), you are now reliant on a third party to continue hosting your repo. If your account is banned, or their servers fail, or they shut down, etc., then your coins will be lost. So again, a more difficult process and a single point of failure.In short, this is unnecessarily complicated and significantly increases the risk of you losing access to your wallets. If you want a set up in which your seed phrase can be compromised without resulting in immediate loss of your funds, then you would be far better off using a standardized method which does not have a single point of failure, such as either an additional passphrase or a multi-sig set up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jordapoulton",
+      "created_time": "October 02, 2022, 07:59:22 PM",
+      "body": "Quote from: o_e_l_e_o on October 02, 2022, 06:33:14 PMWith the first solution (book), you are now reliant on hiding an entire book rather just a single piece of paper. If you lose your copy of the book, there is no guarantee you would find the exact same edition again and your coins will be lost. So that's a more difficult back up process and a single point of failure.With the second solution (Github), you are now reliant on a third party to continue hosting your repo. If your account is banned, or their servers fail, or they shut down, etc., then your coins will be lost. So again, a more difficult process and a single point of failure.In short, this is unnecessarily complicated and significantly increases the risk of you losing access to your wallets. If you want a set up in which your seed phrase can be compromised without resulting in immediate loss of your funds, then you would be far better off using a standardized method which does not have a single point of failure, such as either an additional passphrase or a multi-sig set up.--> Why hide the book?? No-one would know that my keynote refers to it, so it can sit on my shelf with the rest  --> Perhaps, but it seems to me that the chances of Github being shutdown are pretty low... Probably lower than my piece of paper being stolen/lost/burnt in a fire, but perhaps not.--> The additional passphrase is something I've only just learned about, this seems like it would help me feel more secure, so I'll look into it. I still feel uncomfortable just keeping the 12 words written down on paper and hidden, so I'm going to use my Book / my Github repo as a 'key' or 'cypher' for the time being... No worries if others find it 'unnecessarily complicated'",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "October 02, 2022, 10:25:44 PM",
+      "body": "Quote from: jordapoulton on October 02, 2022, 01:32:53 PMEach line in this key was formed of a triplet that referred to the page, line and word-number of a specific word, which, when looked up (using the exact correct book), was in fact the relevant ‘recovery word’. In 12 lines, he’d noted all 12 of the words in his recovery phrase without actually giving anything away to a casual reader/attacker. So long as the attacker didn’t know the book it referred to, the recovery phrase would be secure.A more elegant solution would be to make this a brain wallet. Either via a \"traditional\" brainwallet, or by converting the 12 words to a xprivkey in a non-standard (nor BIP39 compliant) way. This will allow you to generate the words in a way that is actually random. Even if you were to use software that uses flawed RNG, it will not be as big of a problem because you are using a book that your device will never know about. Quote from: o_e_l_e_o on October 02, 2022, 06:33:14 PMWith the first solution (book), you are now reliant on hiding an entire book rather just a single piece of paper. If you lose your copy of the book, there is no guarantee you would find the exact same edition again and your coins will be lost. So that's a more difficult back up process and a single point of failure.This particular solution has issues similar to that of using a brain wallet. For example, if the specific book is not written down anywhere, you may forget which book you are using, or your next of kin will have no way of recovering your coin when you die. You can mitigate your chances of losing access to the particular version of the book by choosing a book that will likely continue being published, like the bible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "October 03, 2022, 06:15:20 AM",
+      "body": "Quote from: PrimeNumber7 on October 02, 2022, 10:25:44 PMYou can mitigate your chances of losing access to the particular version of the book by choosing a book that will likely continue being published, like the bible. You beed much more information than just a title/author. You need publisher, year of publication, release number etc. For book written in different language you need translator name. That’s why ISBN is used, the same book may be published in different formats, font size etc - any change breaks your triplet constraint.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "October 03, 2022, 06:43:15 AM",
+      "body": "Quote from: jordapoulton on October 02, 2022, 01:32:53 PMSolutionWhile it's nice to provide various solutions like this I will throw some ideas:1. There's no universal solution. Some will prefer to \"scramble\" the words in a way or another, some will keep them as they are. Keep in mind that you're complicating an existing solution and this can easily get the funds lost.2. Keep in mind that if we can read and find inspiration in your solution(s), the potential thieves also can do so.3.3.1. The index-in-a-book solution is not original, it's present even in novels and movies (last one I've seen was a Sherlock movie).3.2. The git solution is imho overly complicated. Encryption with a long password and upload to cloud under an inoffensive name would not be significantly different: it's only you who knows the logic of retrieval.I would avoid this kind of solution. Indeed, this makes the words hidden from thieves, but it also makes them hidden from friends and family. If an accident/trauma or a disease gets a bitcoiner into memory loss, he will no longer be able to recover his money, and nobody close to him would also be able to do so. For some this is a real problem, some choose to not care. Again, it depends from person to person.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 03, 2022, 07:46:54 AMLast edit: October 03, 2022, 07:58:06 AM by o_e_l_e_o",
+      "body": "Quote from: jordapoulton on October 02, 2022, 07:59:22 PM--> Why hide the book?? No-one would know that my keynote refers to it, so it can sit on my shelf with the rest Sure, but you still need to keep it safe with no guarantees you could ever find a replacement.Quote from: jordapoulton on October 02, 2022, 07:59:22 PM--> Perhaps, but it seems to me that the chances of Github being shutdown are pretty low...Low, but not zero. It is completely centralized and owned and operated by Microsoft, who could simply decide to discontinue their support for it at any time.Quote from: jordapoulton on October 02, 2022, 07:59:22 PM--> The additional passphrase is something I've only just learned about, this seems like it would help me feel more secure, so I'll look into it.Here you go:https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#from-mnemonic-to-seedhttps://wiki.trezor.io/PassphraseQuote from: jordapoulton on October 02, 2022, 07:59:22 PMI still feel uncomfortable just keeping the 12 words written down on paper and hidden, so I'm going to use my Book / my Github repo as a 'key' or 'cypher' for the time being... No worries if others find it 'unnecessarily complicated' It's not just unnecessarily complicated, but also drastically increase your risk of loss.Quote from: PrimeNumber7 on October 02, 2022, 10:25:44 PMYou can mitigate your chances of losing access to the particular version of the book by choosing a book that will likely continue being published, like the bible.The Bible is probably one of the worst possible choices, actually. There are literally hundreds of different versions, with each version having dozens of editions, and even the same edition of the same version being different due to having multiple publishers and/or printers. Even something as simple as line spacing being slightly different or page size being slightly different and your page/line/word schematic is rendered completely useless and your coins completely inaccessible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "October 03, 2022, 07:51:19 AM",
+      "body": "Quote from: o_e_l_e_o on October 03, 2022, 07:46:54 AMQuote from: PrimeNumber7 on October 02, 2022, 10:25:44 PMYou can mitigate your chances of losing access to the particular version of the book by choosing a book that will likely continue being published, like the bible.The Bible is probably one of the worst possible choices, actually. There are literally hundreds of different versions, with each version having dozens of editions, and even the same edition of the same version being different due to having multiple publishers and/or printers. Even something as simply as line spacing being slightly different or page size being slightly different and your page/line/word schematic is rendered completely useless and your coins completely inaccessible.Any translated book has this problem. If one wants to have a good chance for this, he should pick a widely published writing that was originally written in English.Of course, if you have 100 books in your (non-EN) mother tongue and one in English, that may pretty much stand out...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 03, 2022, 09:41:58 AM",
+      "body": "While i appreciate your time to write and share your idea, this is an example of overcomplicate things. Your idea require some technical knowledge and require specific set of action which could be forgitten easily.Quote from: jordapoulton on October 02, 2022, 07:59:22 PM--> Perhaps, but it seems to me that the chances of Github being shutdown are pretty low... Probably lower than my piece of paper being stolen/lost/burnt in a fire, but perhaps not.GitHub is popular, so i agree it's unlikely GitHub will be shutdown in the future. But there's no guarantee,1. It'll remain free2. Letting free user upload lots of code with little limitation.3. Keep code from inactive user.For reference, GitLab already make some limitation to free user few months ago.Quote from: PawGo on October 03, 2022, 06:15:20 AMQuote from: PrimeNumber7 on October 02, 2022, 10:25:44 PMYou can mitigate your chances of losing access to the particular version of the book by choosing a book that will likely continue being published, like the bible. You beed much more information than just a title/author. You need publisher, year of publication, release number etc. For book written in different language you need translator name. That’s why ISBN is used, the same book may be published in different formats, font size etc - any change breaks your triplet constraint.And if the main reference is e-book, you also need to pay attention of the e-book format. For example, epub file format have dynamic layout where total page depending on font size and screen resolution.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 03, 2022, 10:55:53 AM",
+      "body": "Quote from: NeuroticFish on October 03, 2022, 07:51:19 AMIf one wants to have a good chance for this, he should pick a widely published writing that was originally written in English.I just wouldn't use this method at all. If you are worried about your seed phrase being lost or burnt in a fire, then you should be twice as worried about your book being lost or burnt in a fire. It is trivial to make an additional copy of your seed phrase to store somewhere else (and indeed, having more than one back up should be seen as mandatory). How many people on the other hand have multiple identical copies of the same book, same edition, same print, etc.There is literally no advantage to this set up when compared to using multi-sig or a passphrase, or just plain old encryption.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jordapoulton",
+      "created_time": "October 03, 2022, 03:50:04 PM",
+      "body": "Thanks to everyone that shared their thoughts and feedback - I've learnt a lot",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "October 03, 2022, 06:08:11 PM",
+      "body": "Quote from: o_e_l_e_o on October 03, 2022, 07:46:54 AMQuote from: PrimeNumber7 on October 02, 2022, 10:25:44 PMYou can mitigate your chances of losing access to the particular version of the book by choosing a book that will likely continue being published, like the bible.The Bible is probably one of the worst possible choices, actually. There are literally hundreds of different versions, with each version having dozens of editions, and even the same edition of the same version being different due to having multiple publishers and/or printers. Even something as simple as line spacing being slightly different or page size being slightly different and your page/line/word schematic is rendered completely useless and your coins completely inaccessible.With a bible, you can modify the procedure so that each word is from a particular bible verse. You could give each book an index number, then use the xth word in nth chapter of the book. You still need the right translation, but there is less variety among editions, and translations don’t regularly change",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitbollo",
+      "created_time": "October 03, 2022, 06:16:32 PM",
+      "body": "I have some doubts ... let's keep the example of someone that \"loss\" the memory.how you can remember the book? if you are going to save on your library you must pay a lot of attention to it and you need some notes about your book stored (what was the right book?)how you can remember the sequence? I mean, if you find some number like this , you need always some \"instructions\" about how to decode it... ?!the idea itself is not bad but there are some weakness that increment difficulty for a backup",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 03, 2022, 06:41:42 PM",
+      "body": "Quote from: PrimeNumber7 on October 03, 2022, 06:08:11 PMWith a bible, you can modify the procedure so that each word is from a particular bible verse. You could give each book an index number, then use the xth word in nth chapter of the book.Sure, but that's another layer of added complexity, which means another layer for you to either forget and lose access to your coins, or another layer for you to mess up and lose access to your coins. Additionally, you will want to back up the exact translation and edition to go with your book cypher, and a list of number pairs with \"King James Version (1769)\" written at the top makes it completely obvious that your number list is a book cipher and therefore trivial to decipher.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Synchronice",
+      "created_time": "October 04, 2022, 08:09:10 AM",
+      "body": "Quote from: jordapoulton on October 02, 2022, 01:32:53 PMEvery time you create a new BTC wallet, you’ll get a 12 word 'recovery phrase' that needs to be noted down and hidden somewhere, which - to me at least - seems like a pretty gaping security gap. It doesn’t matter whether you write the words down and hide them in your attic, or stamp them on metal and bury them in your garden, the ‘master key’ to your wallet is still just sat somewhere, hoping that no-one finds it. If someone does find it, they can empty your account, and there’s no way you can stop them.Firstly, many people would probably just throw your piece of paper where 12 word is stored.Secondly, not many people know about Bitcoin or 12 word recovery phrase.Thirdly, if someone wants to rob you and comes at you with knife on your neck, then your method is not gonna help to keep funds safe because in order to save your life, probably you'll have to tell the truth.After all, best way to get safe recovery phrase is to generate it randomly but its weakness is that it's stored by humans who follow their logic to save it in a safe place.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 04, 2022, 08:58:50 AM",
+      "body": "Quote from: Synchronice on October 04, 2022, 08:09:10 AMThirdly, if someone wants to rob you and comes at you with knife on your neck, then your method is not gonna help to keep funds safe because in order to save your life, probably you'll have to tell the truth.All more reason to use a passphrase over the system being proposed here. In the event of being subjected to a $5 wrench attack, then you can reveal your seed phrase to the attacker, and they can steal the small amount of coins that you have stored in the base wallet. However, the majority of your coins which you have stored in additional secret wallets which are hidden behind one or more passphrases remain not only secure, but completely hidden; the attacker has no idea they even exist.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "October 04, 2022, 03:21:39 PM",
+      "body": "Quote from: o_e_l_e_o on October 04, 2022, 08:58:50 AMAll more reason to use a passphrase over the system being proposed here. In the event of being subjected to a $5 wrench attack, then you can reveal your seed phrase to the attacker, and they can steal the small amount of coins that you have stored in the base wallet. However, the majority of your coins which you have stored in additional secret wallets which are hidden behind one or more passphrases remain not only secure, but completely hidden; the attacker has no idea they even exist.As long as attaker has no proof that a given address belongs to you. Otherwise he knows what he is looking for.Similar situation would be with having different coins at the same seed - it would be obvious to find BTC and ETH (+ clones), but having for example Monero (or any other exotic coin) at address generated from the same seed is a different story.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jordapoulton",
+      "created_time": "October 04, 2022, 03:36:08 PM",
+      "body": "Quote from: o_e_l_e_o on October 04, 2022, 08:58:50 AMQuote from: Synchronice on October 04, 2022, 08:09:10 AMThirdly, if someone wants to rob you and comes at you with knife on your neck, then your method is not gonna help to keep funds safe because in order to save your life, probably you'll have to tell the truth.All more reason to use a passphrase over the system being proposed here. In the event of being subjected to a $5 wrench attack, then you can reveal your seed phrase to the attacker, and they can steal the small amount of coins that you have stored in the base wallet. However, the majority of your coins which you have stored in additional secret wallets which are hidden behind one or more passphrases remain not only secure, but completely hidden; the attacker has no idea they even exist.This is really clever, and it only just clicked to me how passphrases can be used in a more exotic defensive strategy. Thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

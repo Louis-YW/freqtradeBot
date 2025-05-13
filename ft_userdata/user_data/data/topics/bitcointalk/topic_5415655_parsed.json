@@ -1,0 +1,69 @@
+{
+  "id": "topic_5415655",
+  "title": "dademagorgin",
+  "author": "dademagorgin",
+  "created_time": "October 02, 2022, 04:30:06 AM",
+  "content": "Just registered here and new to the eco-system.Apologies in advance for stupid questions.I want to programmatically establish a connection to a node using a Go RPC client as outlined here:https://github.com/btcsuite/btcd/blob/master/docs/json_rpc_api.md#9-example-codeHowever, I do not wan't to run my own node.I wan't to connect to someones' already running node.I found some nodes I may wan't to connect to here:https://bitnodes.io/nodes/?q=United%20StatesSo looks like I need a valid:- rpc.cert- rpcuser- rpcpassWhat is the standard procedure for obtaining these for a node that I am not running?Is this even something I can do?Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415655",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "October 02, 2022, 04:51:37 AM",
+      "body": "You can't make RPC calls to someone else's node. The only things accessible to third parties are the messages defined in the P2P protocol (eg. getting block headers, blocks, mempool transactions, etc pushing transactions, new blocks, etc.). https://en.bitcoin.it/wiki/Protocol_documentationIf you tell us what you want to achieve after connecting to someone else's node we may be able to help you better.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "October 02, 2022, 03:12:09 PM",
+      "body": "I could allow you to connect to my node providing valid RPC credentials. But tell me why I should do that, what is the reason you're asking, what's your goal?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dademagorgin",
+      "created_time": "October 02, 2022, 09:39:48 PM",
+      "body": "My goal is to write a small POC app for aggregating metrics like:- count of new wallets created within a particular time range- count of wallets within a particular time range with balances > Xand many more metrics like this for the purpose of gauging global interest/activity in Bitcoin at any given time.The reason I didn't wan't to run a full node on my local machine is because it doesn't stay up and I wanted a node w/reliable uptime so I could get more up-to-date chain data.I realize I can just rent a compute instance from a cloud provider and run a full node on that but then I would have to spend money.It looks like that's going to be the best solution for me and I should just stop being so cheap.Alternatively, do guys know of any online services that already provide this information? What do you guys use?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 03, 2022, 04:07:02 AM",
+      "body": "Quote from: dademagorgin on October 02, 2022, 09:39:48 PM- count of new wallets created within a particular time range- count of wallets within a particular time range with balances > Xand many more metrics like this for the purpose of gauging global interest/activity in Bitcoin at any given time.This is not something that anybody can measure because \"wallets\" don't exist in the protocol. In other words a wallet is something private that contains multiple keys that may not have any connection to each other.The only thing you can measure is number of addresses being used and their balance (which is not something you could do using RPC calls or a regular node for that matter). The problem with this is that one person/wallet can have multiple addresses so the accuracy of the results regarding adoption decrease.The only way to do this is to run your own modified node so that it indexes your database based on addresses so that you can search and analyze it.Quote from: dademagorgin on October 02, 2022, 09:39:48 PMAlternatively, do guys know of any online services that already provide this information? What do you guys use?Block explorers like https://blockchair.com usually have this kind of data which is usually found among their charts.Like this: https://www.blockchain.com/charts/n-unique-addresses",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 03, 2022, 07:21:28 AM",
+      "body": "Quote from: dademagorgin on October 02, 2022, 09:39:48 PMMy goal is to write a small POC app for aggregating metrics like:- count of new wallets created within a particular time range- count of wallets within a particular time range with balances > Xand many more metrics like this for the purpose of gauging global interest/activity in Bitcoin at any given time.Maybe Bitcoin block data: inputs, outputs and transactions is what you're looking for. If you tell me exactly what you need, I can save you the 700 GB download and extract only that data.QuoteThe reason I didn't wan't to run a full node on my local machine is because it doesn't stay up and I wanted a node w/reliable uptime so I could get more up-to-date chain data.Well, there's a problem: my data isn't real-time, updates are only daily.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "October 03, 2022, 07:46:11 AM",
+      "body": "Quote from: dademagorgin on October 02, 2022, 09:39:48 PMMy goal is to write a small POC app for aggregating metrics like:- count of new wallets created within a particular time range- count of wallets within a particular time range with balances > Xand many more metrics like this for the purpose of gauging global interest/activity in Bitcoin at any given time.The reason I didn't wan't to run a full node on my local machine is because it doesn't stay up and I wanted a node w/reliable uptime so I could get more up-to-date chain data.My advice is to start with reading much more about bitcoin. No offense, but you seem to need that.As said, the blockchain doesn't tell anything about wallets, also a \"new\" address is not registered anywhere, so nobody knows (except the owner) that it's created.And if you have missed this, I expect you'd be missing other info too, getting you into various mistakes or even paying big money for a cloud service that won't help you.So: learn more, it may save you money.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 04, 2022, 12:02:15 AM",
+      "body": "Quote from: NeuroticFish on October 03, 2022, 07:46:11 AMQuote from: dademagorgin on October 02, 2022, 09:39:48 PMMy goal is to write a small POC app for aggregating metrics like:- count of new wallets created within a particular time range- count of wallets within a particular time range with balances > Xand many more metrics like this for the purpose of gauging global interest/activity in Bitcoin at any given time.The reason I didn't wan't to run a full node on my local machine is because it doesn't stay up and I wanted a node w/reliable uptime so I could get more up-to-date chain data.My advice is to start with reading much more about bitcoin. No offense, but you seem to need that.As said, the blockchain doesn't tell anything about wallets, also a \"new\" address is not registered anywhere, so nobody knows (except the owner) that it's created.And if you have missed this, I expect you'd be missing other info too, getting you into various mistakes or even paying big money for a cloud service that won't help you.So: learn more, it may save you money.I agree, and suggest starting with: https://aantonop.com/books/mastering-bitcoin/Read for free, directly on GitHub here: https://github.com/bitcoinbook/bitcoinbook/#chaptersAndreas also has some good educational video material:Bitcoin for Beginners Playlist: Intro to Bitcoin, Satoshi, Security, Mining and More",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

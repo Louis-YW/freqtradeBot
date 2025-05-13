@@ -1,0 +1,29 @@
+{
+  "id": "topic_5427387",
+  "title": "Pecheur",
+  "author": "Pecheur",
+  "created_time": "December 09, 2022, 04:36:49 AM",
+  "content": "Hello,I can successfully execute the following curl command locally on a bitcoin-core/lightning node targeting the bitcoin daemon:input:curl --user username:password --data-binary '{\"jsonrpc\":\"2.0\",\"id\":\"curltest\",\"method\":\"getblockchaininfo\",\"params\":[]}'  -H 'content-type:text/plain;' http://localhost:18332 -voutput::[]}'  -H 'content-type:text/plain;' http://localhost:18332 -v*   Trying 1.2.3.4:18332...* TCP_NODELAY set* Connected to localhost (1.2.3.4) port 18332 (#0)* Server auth using Basic with user 'username'> POST / HTTP/1.1> Host: localhost:18332> Authorization: Basic cnBjdXNlcjp3cm9uZ3Bhc312344> User-Agent: curl/7.68.0> Accept: */*> content-type:text/plain;> Content-Length: 74> * upload completely sent off: 74 out of 74 bytes* Mark bundle as not supporting multiuse< HTTP/1.1 200 OK< Content-Type: application/json< Date: Fri, 09 Dec 2022 04:11:58 GMT< Content-Length: 480< {\"result\":{\"chain\":\"test\",\"blocks\":2410457,\"headers\":===removed====\"}* Connection #0 to host localhost left intactBut when trying to target the lightning daemon the connection is being reset by the server:input:curl --user username:password --data-binary '{\"jsonrpc\":\"2.0\",\"id\":\"curltest\",\"method\":\"listpeers\",\"params\":[]}'  -H 'content-type:text/plain;' http://localhost:19735 -voutput:*   Trying 1.2.3.4:19735...* TCP_NODELAY set* Connected to localhost (1.2.3.4) port 19735 (#0)* Server auth using Basic with user 'username'> POST / HTTP/1.1> Host: localhost:19735> Authorization: Basic cnBjdXNlcjpycGN1234> User-Agent: curl/7.68.0> Accept: */*> content-type:text/plain;> Content-Length: 66> * upload completely sent off: 66 out of 66 bytes* Recv failure: Connection reset by peer* Closing connection 0curl: (56) Recv failure: Connection reset by peerI'm using all default settings for lightningd (no config file)What is the reason the host is resetting the connection?Do I need to configure anything to make this work?  Can I use the same RPC credentials as the bitcoin-core node?  Changing the credentials doesn't modify behaviour, same reset error.Any tip or link to documentation would be greatly appreciated.Martin",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5427387",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "December 09, 2022, 02:28:13 PM",
+      "body": "I don't know exactly what you are trying to achieve would you mind sharing the guide that you are following? So that I can get some idea and maybe I can give you some solution.Anyway, for the first suggestion would you mind using IP instead of using localhost? Replace it with this IP 127.0. 0.1 then test it again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pecheur",
+      "created_time": "December 09, 2022, 07:24:17 PM",
+      "body": "I'm trying to connect to the json-rpc interface remotely through another means than through lightning-cli, the cln-prc plugin, pycln library or charge REST API.Just by sending an http POST request in order to get back the json answer.  No dependencies to modules, services etc.  Also the objective is to run my code on a separate web server and keep the bitcoin/lightning config as standard as possible.  Both hosts would run on the same local network and traffic would be secured/encrypted for production.I can do this without any issues when targeting bitcoind but run into the error described when targeting lightningd.Same output when using 127.0.0.1 instead of localhost...curl --user username:password --data-binary '{\"jsonrpc\":\"2.0\",\"id\":\"curltext\",\"method\":\"listpeers\",\"params\":[]}'  -H 'content-type:text/plain;' http://127.0.0.1:19735 -v*   Trying 127.0.0.1:19735...* TCP_NODELAY set* Connected to 127.0.0.1 (127.0.0.1) port 19735 (#0)* Server auth using Basic with user 'username'> POST / HTTP/1.1> Host: 127.0.0.1:19735> Authorization: Basic cnBjdXNlcjpycGN1SSSS> User-Agent: curl/7.68.0> Accept: */*> content-type:text/plain;> Content-Length: 66> * upload completely sent off: 66 out of 66 bytes* Recv failure: Connection reset by peer* Closing connection 0curl: (56) Recv failure: Connection reset by peerHopefully I was able to clarify my question.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

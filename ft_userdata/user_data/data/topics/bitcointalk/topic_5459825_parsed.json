@@ -1,0 +1,117 @@
+{
+  "id": "topic_5459825",
+  "title": "massivescam",
+  "author": "massivescam",
+  "created_time": "July 14, 2023, 04:25:44 PM",
+  "content": "Hello everyone.I am trying to understand how to setup my multisig environment, and I am with some doubts about it. Beforehand, sorry for the naiveness and ignorance of my question, but I am still a newbie. So, I have two native wegwit wallets, let's call them:W1 with the MPK zpubW1; AndW2 with the MPK zpubW2.I was thinking in creating a new segwit wallet W3 with the MPK zpubW3, that would be my multisig wallet, and then I tried to do so by using Electrum 4.0.9. To do so, I followed the steps File > New/Restore >Type \"W3\" > Next > Multi-signature wallet > Next > 2 of 3 > I already have a seed > Type the W3 seed > Options: (Checkmark \"Extend this seed with custom words\"; Checkmark \"BIP39 seed\"; Ok) > Next > Type W3 seed extension > Choose \"native segwit multisig (p2wsh)\" > Choose derivation path \"m/48'/0'/0'/2'\" > Next > Copy the generated W3 Zpub > Next > Enter cosigner key > Type \"zpubW1\" > Next.However, when entering the zpubW1 or zpubW2 in the cosigner MPK field, the message \"Wrong key type p2wpkh\" appears. So, after some hours of duckducking, I dicorevered that, actually, the multisig native segwit cosigner MPK must start with Zpub (upper case) rather than zpub (lower case), and that, in order to \"convert\" my zpub to a Zpub, I have to create a multisig native segwit wallet for each one of the cosigners, that is, I have to follow the aforementioned steps in the Electrum by using the wallets W1 and W2 respective seedphrases, then save the respectively generated Zpubs (let's name them as ZpubW1 and ZpubW2), and finally use these Zpubs as cosigners MPKs.I am not sure if the above process is right, and, honestly speaking, it seems to be quite strange. Is this logic right? Why do I have to generate Zpubs for W1 and W2?Thanks for the attention, and sorry for any crypto vocabulary misuse .",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459825",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "July 14, 2023, 04:39:58 PM",
+      "body": "The MultiSig created using Electrum doesn't allow P2PWKH wallet types and hence you can only use P2WSH Zpubs to generate the Multisig. The reason for this is to avoid ambiguity between the pubkey standards is that they want to avoid the scenario where the public keys for both P2PWKH and P2WSH are reused. To avoid this and further confusion about what type of keys to use, they just used a different version byte for the master key.It has nothing to do with functionality or security but just to make it a more straightforward and less error prone process. You can also use tools to convert them, but going through Electrum is a bit longer but also much safer.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "massivescam",
+      "created_time": "July 14, 2023, 11:18:00 PM",
+      "body": "Quote from: ranochigo on July 14, 2023, 04:39:58 PMThe MultiSig created using Electrum doesn't allow P2PWKH wallet types and hence you can only use P2WSH Zpubs to generate the Multisig. The reason for this is to avoid ambiguity between the pubkey standards is that they want to avoid the scenario where the public keys for both P2PWKH and P2WSH are reused. To avoid this and further confusion about what type of keys to use, they just used a different version byte for the master key.Thanks for the answer. So, if I want to sign a transaction from my W3 (multisig wallet), can I simply do it by signing the transaction with the private keys of W2 and W3? Or is there also another step?Quote from: ranochigo on July 14, 2023, 04:39:58 PMIt has nothing to do with functionality or security but just to make it a more straightforward and less error prone process. You can also use tools to convert them, but going through Electrum is a bit longer but also much safer.Could you cite such tools?Thanks and regards.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 15, 2023, 09:16:14 AM",
+      "body": "Quote from: massivescam on July 14, 2023, 04:25:44 PMI am not sure if the above process is right, and, honestly speaking, it seems to be quite strange. Is this logic right? Why do I have to generate Zpubs for W1 and W2?You are mostly correct.You cannot (or rather, you can but only with a lot of difficulty, and therefore should not) use the seed phrase or xpub/zpub from a standard single signature Electrum wallet to generate a multi-sig wallet. If you want a 2-of-3 multi-sig, then you need to create three new multi-sig wallets, have each one generate a new seed phrase, and export the Zpubs from each one. You should also try to do this on different devices - if you set up the multi-sig on a single device then you still have a single point of failure (the device itself).Quote from: massivescam on July 14, 2023, 11:18:00 PMThanks for the answer. So, if I want to sign a transaction from my W3 (multisig wallet), can I simply do it by signing the transaction with the private keys of W2 and W3? Or is there also another step?If W2 is a standard single signature wallet, then no, it will not be that simple. This is why I said above you should not do this, because you will run in to significant problems trying to access your coins. You need to set up three new wallets, each of which is a multi-sig wallet.Quote from: massivescam on July 14, 2023, 11:18:00 PMCould you cite such tools?Here is one such tool: https://jlopp.github.io/xpub-converter/. Once again though, if you convert your zpub to a Zpub in order to create a multi-sig wallet, you will not actually be able to sign any transactions or access any coins in that wallet without significant difficulty. You should instead create three new multi-sig wallets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "massivescam",
+      "created_time": "July 15, 2023, 12:09:42 PM",
+      "body": "Thank you very much for the support and attention.Quote from: o_e_l_e_o on July 15, 2023, 09:16:14 AMQuote from: massivescam on July 14, 2023, 11:18:00 PMThanks for the answer. So, if I want to sign a transaction from my W3 (multisig wallet), can I simply do it by signing the transaction with the private keys of W2 and W3? Or is there also another step?If W2 is a standard single signature wallet, then no, it will not be that simple. This is why I said above you should not do this, because you will run in to significant problems trying to access your coins. You need to set up three new wallets, each of which is a multi-sig wallet.Ok, thanks. Now I am with another question  . Let's call MW1, MW2, and MW3 the 2-of-3 multisig wallets for W1, W2, and W3 respectively, I can generate MW3 by following the steps outlined at the first comment of this thread by using the Zpubs ZpubW1 and ZpubW2 as cosigners MPK, but, how am I supposed to generate MW1, and MW2? Because, both, MW1 and MW2 will require 2 cosigners, that is two Zpubs each. Should I first generate the Zpubs ZpubW1, ZpubW2, and ZpubW3, and then use them for creating the MW1 and MW2? That is,MW1 <- Cosigned with MW2 and MW3;MW2 <- Cosigned with MW1 and MW3; AndMW3 <- Cosigned with MW2 and MW3.Thank you and regards.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 15, 2023, 12:49:11 PM",
+      "body": "That's correct.So open Electrum and create a new wallet.Select \"Multi-signature wallet\".Select 2 signatures from 3 cosigners.Select \"Create a new seed\".Back up the seed phrase it generates on paper.Extend the seed phrase with custom words if you so choose.Confirm the seed phrase.Copy the Zpub, which you will call ZpubW1.This is as far as you can get with the first wallet for now. For the next steps, you need to choose \"Enter cosigner key\" and then enter ZpubW2 and ZpubW3.So now you have two options. If you are doing all of this on a single device (which as I explained above is not the best idea), you can save that Zpub electronically (with the associated seed phrase +/- custom words written down on paper), close Electrum, and repeat the process twice more so you have three seed phrases and three Zpubs. Once you have three seed phrases and three Zpubs, you can again follow the steps above to create each multi-sig wallet, using one seed phrase and the other two Zpubs each time. Alternatively, if you are doing this on different devices, you can just leave Electrum open at the screen asking for your cosigner key, repeat the process on your other two devices, and then transfer the Zpubs from each wallet to the other devices in order to create the multi-sig wallets.If you want three wallets, each with a single set of private keys, then you need the following:MW1 needs Seed Phrase 1 and ZpubW2 and ZpubW3MW2 needs Seed Phrase 2 and ZpubW1 and ZpubW3MW3 needs Seed Phrase 3 and ZpubW1 and ZpubW2",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 15, 2023, 02:42:29 PM",
+      "body": "Quote from: massivescam on July 14, 2023, 11:18:00 PMQuote from: ranochigo on July 14, 2023, 04:39:58 PMYou can also use tools to convert them, but going through Electrum is a bit longer but also much safer.Could you cite such tools?Electrum has such built-in feature. In the console, use the command convert_xkey()Example:Code:convert_xkey(xkey=\"zpubAWgYBBk7JR8GiiZHRTJ.....hLMW34b5oGr9wCND7HYcZr\",xtype=\"p2wsh\")If you're using the daemon:Code:electrum convert_xkey \"zpubAWgYBBk7JR8GiiZHRTJ.....hLMW34b5oGr9wCND7HYcZr\" \"p2wsh\"Although, I'd not recommend that method aside from recovery purposes like restoring another wallet to Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "massivescam",
+      "created_time": "July 15, 2023, 03:44:29 PM",
+      "body": "Quote from: o_e_l_e_o on July 15, 2023, 12:49:11 PMThat's correct.So open Electrum and create a new wallet.Select \"Multi-signature wallet\".Select 2 signatures from 3 cosigners.Select \"Create a new seed\".Back up the seed phrase it generates on paper.Extend the seed phrase with custom words if you so choose.Confirm the seed phrase.Copy the Zpub, which you will call ZpubW1.This is as far as you can get with the first wallet for now. For the next steps, you need to choose \"Enter cosigner key\" and then enter ZpubW2 and ZpubW3.So now you have two options. If you are doing all of this on a single device (which as I explained above is not the best idea), you can save that Zpub electronically (with the associated seed phrase +/- custom words written down on paper), close Electrum, and repeat the process twice more so you have three seed phrases and three Zpubs. Once you have three seed phrases and three Zpubs, you can again follow the steps above to create each multi-sig wallet, using one seed phrase and the other two Zpubs each time. Alternatively, if you are doing this on different devices, you can just leave Electrum open at the screen asking for your cosigner key, repeat the process on your other two devices, and then transfer the Zpubs from each wallet to the other devices in order to create the multi-sig wallets.If you want three wallets, each with a single set of private keys, then you need the following:MW1 needs Seed Phrase 1 and ZpubW2 and ZpubW3MW2 needs Seed Phrase 2 and ZpubW1 and ZpubW3MW3 needs Seed Phrase 3 and ZpubW1 and ZpubW2Thank you very much. Now it is much more clear. Regards bro  .",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "massivescam",
+      "created_time": "July 15, 2023, 04:15:01 PM",
+      "body": "Quote from: nc50lc on July 15, 2023, 02:42:29 PMQuote from: massivescam on July 14, 2023, 11:18:00 PMQuote from: ranochigo on July 14, 2023, 04:39:58 PMYou can also use tools to convert them, but going through Electrum is a bit longer but also much safer.Could you cite such tools?Electrum has such built-in feature. In the console, use the command convert_xkey()Example:Code:convert_xkey(xkey=\"zpubAWgYBBk7JR8GiiZHRTJ.....hLMW34b5oGr9wCND7HYcZr\",xtype=\"p2wsh\")If you're using the daemon:Code:electrum convert_xkey \"zpubAWgYBBk7JR8GiiZHRTJ.....hLMW34b5oGr9wCND7HYcZr\" \"p2wsh\"Although, I'd not recommend that method aside from recovery purposes like restoring another wallet to Electrum.Thank you man, really appreciate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "massivescam",
+      "created_time": "July 15, 2023, 10:50:18 PM",
+      "body": "Quote from: o_e_l_e_o on July 15, 2023, 12:49:11 PMThat's correct.So open Electrum and create a new wallet.Select \"Multi-signature wallet\".Select 2 signatures from 3 cosigners.Select \"Create a new seed\".Back up the seed phrase it generates on paper.Extend the seed phrase with custom words if you so choose.Confirm the seed phrase.Copy the Zpub, which you will call ZpubW1.This is as far as you can get with the first wallet for now. For the next steps, you need to choose \"Enter cosigner key\" and then enter ZpubW2 and ZpubW3.So now you have two options. If you are doing all of this on a single device (which as I explained above is not the best idea), you can save that Zpub electronically (with the associated seed phrase +/- custom words written down on paper), close Electrum, and repeat the process twice more so you have three seed phrases and three Zpubs. Once you have three seed phrases and three Zpubs, you can again follow the steps above to create each multi-sig wallet, using one seed phrase and the other two Zpubs each time. Alternatively, if you are doing this on different devices, you can just leave Electrum open at the screen asking for your cosigner key, repeat the process on your other two devices, and then transfer the Zpubs from each wallet to the other devices in order to create the multi-sig wallets.If you want three wallets, each with a single set of private keys, then you need the following:MW1 needs Seed Phrase 1 and ZpubW2 and ZpubW3MW2 needs Seed Phrase 2 and ZpubW1 and ZpubW3MW3 needs Seed Phrase 3 and ZpubW1 and ZpubW2Still on this topic, but not so related  . Is it possible to make a \"test\" on-chain transaction? Let me explain what I mean by test. Whenever I setup a wallet W, I send a tiny amount, a dust, of SATs (Satoshis) to an adress of W (input test), and then I send the received SATs to another address (output test), that is, an input and output test. Since I am dealing with a 2 of 3 multisig setup, I would like to perform this input/output test over my three wallets, which would require at least 4 on-chain transactions, for instance:Departing from an address of the Unkown Wallet UW to an address of MW1;From an address of MW1 to an address of MW2;From an address of MW2 to an address of MW3; And finally,From an address of MW3 to an address of MW1.Thus, I would like to know if there is one way of doing this input/output test without spending SATs, what would happen due to the on-chain fees. Furthermore, what happens if I send a wrongly signed transaction? Let's say, for example, that I create a transaction TX of X SATs from MW1 to the Unkown Wallet UW, and that only one of MW2 and MW3 sign TX, or that MW2 and Another Unkown Wallet AUW sign TX. Probably the on-chain would reject such a transaction, but, would the on-chain fees still be discounted?Thanks for the attention, and again, I am sorry for any vocabulary misuse. Regards.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 16, 2023, 06:54:43 AM",
+      "body": "Quote from: massivescam on July 15, 2023, 10:50:18 PMSince I am dealing with a 2 of 3 multisig setup, I would like to perform this input/output test over my three wallets, which would require at least 4 on-chain transactions, for instance:What you have written here is wrong. All three of your multi-sig wallets (MW1, MW2, and MW3) should display the exact same addresses in the exact same order. This is the essence of a multi-sig set up. Each wallet generates the same addresses, but each wallet only holds one private key, so you need at least two wallets to fully sign a transactions. If you are seeing different addresses in each of your multi-sig wallets, then you have done something wrong.To do a test transaction, you should simply send a small amount of sats to the first address. That transaction should then be visible in all three of your multi-sig wallets, since they all contain the same addresses.Quote from: massivescam on July 15, 2023, 10:50:18 PMFurthermore, what happens if I send a wrongly signed transaction?In any scenario, an incorrectly or incompletely signed transaction will be rejected by the network, and so the coins will not move and you will pay no fees.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "massivescam",
+      "created_time": "July 17, 2023, 05:48:34 AM",
+      "body": "Quote from: o_e_l_e_o on July 16, 2023, 06:54:43 AMQuote from: massivescam on July 15, 2023, 10:50:18 PMSince I am dealing with a 2 of 3 multisig setup, I would like to perform this input/output test over my three wallets, which would require at least 4 on-chain transactions, for instance:What you have written here is wrong. All three of your multi-sig wallets (MW1, MW2, and MW3) should display the exact same addresses in the exact same order. This is the essence of a multi-sig set up. Each wallet generates the same addresses, but each wallet only holds one private key, so you need at least two wallets to fully sign a transactions. If you are seeing different addresses in each of your multi-sig wallets, then you have done something wrong.To do a test transaction, you should simply send a small amount of sats to the first address. That transaction should then be visible in all three of your multi-sig wallets, since they all contain the same addresses.Quote from: massivescam on July 15, 2023, 10:50:18 PMFurthermore, what happens if I send a wrongly signed transaction?In any scenario, an incorrectly or incompletely signed transaction will be rejected by the network, and so the coins will not move and you will pay no fees.Thank you very much, I wasn't aware that each multisign wallet should have the same addresses. Regards.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 17, 2023, 07:37:42 AM",
+      "body": "Quote from: massivescam on July 15, 2023, 10:50:18 PMThus, I would like to know if there is one way of doing this input/output test without spending SATs, what would happen due to the on-chain fees.After figuring-out the correct way to set-up, create a MultiSig wallet in Electrum testnet.You can start Electrum with --testnet command line parameter to start it in testnet, then claim testnet bitcoins from testnet faucets to use for your tests.But if you really insist on testing it in mainnet, you'll need a fully synced Bitcoin Core with preferably full blockchain.Create your transactions in Electrum, completely sign it.But instead of broadcasting the transaction(s), open Bitcoin Core and use the command testmempoolaccept to see if your node will accept it without actually broadcasting the transaction.About the command: https://bitcoincore.org/en/doc/24.0.0/rpc/rawtransactions/testmempoolaccept/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "massivescam",
+      "created_time": "July 18, 2023, 06:57:44 AM",
+      "body": "Quote from: nc50lc on July 17, 2023, 07:37:42 AMQuote from: massivescam on July 15, 2023, 10:50:18 PMThus, I would like to know if there is one way of doing this input/output test without spending SATs, what would happen due to the on-chain fees.After figuring-out the correct way to set-up, create a MultiSig wallet in Electrum testnet.You can start Electrum with --testnet command line parameter to start it in testnet, then claim testnet bitcoins from testnet faucets to use for your tests.But if you really insist on testing it in mainnet, you'll need a fully synced Bitcoin Core with preferably full blockchain.Create your transactions in Electrum, completely sign it.But instead of broadcasting the transaction(s), open Bitcoin Core and use the command testmempoolaccept to see if your node will accept it without actually broadcasting the transaction.About the command: https://bitcoincore.org/en/doc/24.0.0/rpc/rawtransactions/testmempoolaccept/Thank you very much, it really helps. Have heard of this testnet before, but never tried, I'll take a look at.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

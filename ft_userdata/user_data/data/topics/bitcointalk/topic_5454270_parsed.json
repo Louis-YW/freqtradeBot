@@ -1,0 +1,157 @@
+{
+  "id": "topic_5454270",
+  "title": "Flail3959",
+  "author": "Flail3959",
+  "created_time": "May 28, 2023, 08:25:42 AM",
+  "content": "Hi folks,Currently I'm trying to gain access to an old wallet of mine of which I saved the mnemonic. Problem is, when I try to import the words into Electrum it shows a total balance of 0 even though I know I transferred funds into one of the addresses a couple of years ago and they are still there when I check on any Blockchain explorers.The address I'm looking for is a P2PKH (starts with \"1.....\").So after trying a few things I ended up using BTCRecover (the one by 3rdIteration https://github.com/3rdIteration/btcrecover) and it is able to find a match between my seed and the expected address.Code:python seedrecovery.py --addrs $MY_ADDRESS --mnemonic $MY_MNEMONIC --wallet-type bip39 --addr-limit 10Initial seed guess has a valid checksum (0.39% chance).Phase 1/4: up to 2 mistakes, excluding entirely different seed words.Wallet Type: btcrseed.WalletBIP39Using 8 worker threadsWill try 23,680 passwords, ETA 1 seconds ...***MATCHING SEED FOUND***, Matched on Address at derivation path: m/84'/0'/0'/0/0Search CompleteSo I'm a bit confused now as to what am I missing or forgetting. Why does BTCRecover always find a match but when I go to Electrum I can't seem to find anything?Is it the derivation path? I tried both m/84' and m/44' to no avail.In summary:Expected behaviour: importing my seed should grant me access to my fundsCurrent behaviour: seed won't even display the expected set of addresses when imported into EthereumEnvironment:- OS: OSX 13- Seed: BIP39- Wallet software: Electrum 4.4.3- BTCRecover 1.11.0",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454270",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "May 28, 2023, 08:52:10 AM",
+      "body": "For addresses that start from 1, it is m/44'/0'/0' which is legacy (p2pkh)Maybe the address funded is beyond the gap limit of 20 addresses. Increase the gap limit.On the Electrum console, use this command to increase the gap limit to 50 addresses:Code:wallet.change_gap_limit(50)Edit the number to increase the gap limit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flail3959",
+      "created_time": "May 28, 2023, 09:30:57 AM",
+      "body": "Tried setting the gap limit to something like 5000 but still the funded address wasn't found.But this made me thinkQuoteFor addresses that start from 1, it is m/44'/0'/0' which is legacy (p2pkh)I was under the same understanding, so why would it show up as a match on m/84'/0'/0' then? (hence I tried importing once with each path)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "May 28, 2023, 09:39:03 AM",
+      "body": "Alternatively, you can use iancoleman to trace the address and its corresponding private key which you can import on wallet, like Electrum to spend from.This first method is not that safe. Click on https://iancoleman.io/bip39/?entropy-type=hexadecimal, close the link. Off the internet connection on your device and click on https://iancoleman.io/bip39/?entropy-type=hexadecimal again. Input the seed phrase and scroll down to see the addresses. They are 20 addresses, immediately beneath the addresses is a space you can edit the numbers of addresses that you want, you can edit it to 100. Look for the address that you funded. If you see the funded address, scroll to the right to get its private key.Second method which is secure and safeTo make use of iancoleman securely, you have to make use of airgapped device for it and run this html file on a text editor: https://github.com/iancoleman/bip39/releases/download/0.5.4/bip39-standalone.html and follow what I included on the first method. Look for the address and get the private key. Import the private key on Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "May 28, 2023, 10:16:09 AM",
+      "body": "How did you generate your seed phrase? What wallet/software did you use for that? Maybe, the address you are looking for has been generated on a different derivation path. Did you try clicking on \"Detect existing accounts\"?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flail3959",
+      "created_time": "May 28, 2023, 11:24:40 AM",
+      "body": "Quote from: Charles-Tim on May 28, 2023, 09:39:03 AMAlternatively, you can use iancoleman to trace the address and its corresponding private key which you can import on wallet, like Electrum to spend from.Thank you for bringing up these methods. Unfortunately I couldn't find the funded address either.Quote from: hosseinimr93 on May 28, 2023, 10:16:09 AMHow did you generate your seed phrase? What wallet/software did you use for that? Maybe, the address you are looking for has been generated on a different derivation path. Did you try clicking on \"Detect existing accounts\"? I generated the seed phrase around April 2021 using a Ledger Nano S that I still have access to, both mnemonic and PIN code.I also tried to use the device import the wallet into Electrum (New wallet > Use hardware device) using all three suggested derivation paths (p2pkh, p2wkph-p2sh and p2wpkh) without any luck. The Ledger app shows different addresses as well.Detecting existing accounts says that no accounts were found.To make matters more interesting, I found another funded address (let's call it A#2) I used to initially test the wallet and BTCRecover says that the seed matches this address on m/84'/0'/0'/0/1. As far as I understand, this would mean A#2 is the address subsequent to A#1 I mentioned in my OP. How can it be? Since m/84' means Native SegWit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "May 28, 2023, 12:36:11 PM",
+      "body": "I am losing myself when reading different response and your posts. Let us summarize what you have done so far.[1.] You tried all three derivation patch [p2pkh, p2wkph-p2sh and p2wpkh] to check all three address format 1xxxxxxxxxxxx, bc1xxxxxxxx, 3xxxxxxxxxxxx[2.] You tried it with Ledger live to see if they bring automatically the funded wallet.If you already used all options then the only possibility is you are doing something wrong when entering your seed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "May 28, 2023, 12:56:44 PM",
+      "body": "Quote from: Flail3959 on May 28, 2023, 11:24:40 AMI generated the seed phrase around April 2021 using a Ledger Nano S that I still have access to, both mnemonic and PIN code.I also tried to use the device import the wallet into Electrum (New wallet > Use hardware device) using all three suggested derivation paths (p2pkh, p2wkph-p2sh and p2wpkh) without any luck. This means that the seed phrase you imported into electrum belongs to a different wallet or you had extended your seed phrase with a passphrase. Didn't you add a passphrase to your seed phrase when creating the wallet on Ledger? Note that with adding a passphrase to your seed phrase, you generate completely different addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "May 28, 2023, 01:40:39 PMLast edit: May 28, 2023, 02:17:09 PM by BitMaxz",
+      "body": "Quote from: Flail3959 on May 28, 2023, 11:24:40 AMI generated the seed phrase around April 2021 using a Ledger Nano S that I still have access to, both mnemonic and PIN code.If it was generated from Ledger then they do have their own tool to scan your wallet with balance. It will help you find the right derivation path of your wallet.Check the tool here https://github.com/LedgerHQ/xpub-scanInstead of using the BTCrecover use their xPub Scanner you should find the right path and wallet address that you funded before.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PX-Z",
+      "created_time": "May 28, 2023, 01:44:22 PM",
+      "body": "Quote from: Flail3959 on May 28, 2023, 11:24:40 AMTo make matters more interesting, I found another funded address (let's call it A#2) I used to initially test the wallet and BTCRecover says that the seed matches this address on m/84'/0'/0'/0/1. As far as I understand, this would mean A#2 is the address subsequent to A#1 I mentioned in my OP. How can it be? Since m/84' means Native SegWit. That's weird, did you double checked your seed,because if there's no funds detected on those derivation paths or no wallet address have the same on your ledger live (with funds), then it could be the very reason, or else there's something else...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "May 28, 2023, 03:09:27 PM",
+      "body": "Quote from: BitMaxz on May 28, 2023, 01:40:39 PMQuote from: Flail3959 on May 28, 2023, 11:24:40 AMI generated the seed phrase around April 2021 using a Ledger Nano S that I still have access to, both mnemonic and PIN code.If it was generated from Ledger then they do have their own tool to scan your wallet with balance. It will help you find the right derivation path of your wallet.Check the tool here https://github.com/LedgerHQ/xpub-scanInstead of using the BTCrecover use their xPub Scanner you should find the right path and wallet address that you funded before.This reminds me another option. Assuming it was created with 24 word seed.In the process of restoring the wallet with Electrum, after entering first 12 words, click option and then check extended seed then select BIP39 seed.It will restore the same wallet that was generated using Ledger Nano S.  But I doubt it's the case with OP as he already said the Nano S does not create account automatically when using Ledger Live.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dimonstration",
+      "created_time": "May 28, 2023, 03:19:03 PM",
+      "body": "I become interested about recovering funds using the seed phrase generated on Ledger. I still didn't try this but is there anyone already tried to import the 24 seed phrase of ledger to an electrum wallet?I’m interested to see if the OP problem is just an isolated or the seed phrase from ledger is very hard to recover using other wallet aside from a ledger device itself. Sorry for a bit off-topic OP. I’ve just become worried if your case is a general case for all leds. I’d start started to doubt them since their latest fiasco.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Abdussamad",
+      "created_time": "May 28, 2023, 06:48:34 PM",
+      "body": "Since it's  a p2pkh address when restoring you have to select p2pkh as the script type and then type in the bip84 derivation path m/84'/0'/0' (not m/84'/0'/0'/0/0). The single quotes are not optional. You can begin again via file > new/restore.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "May 28, 2023, 08:47:56 PM",
+      "body": "This is also what is listed on https://walletsrecovery.org/ for the combination Electrum+Ledger Nono S what @Abdussamad suggests, except for the weird thing of a P2PKH script type in conjunction with a derivation path m/84'/0'/0' which is rather more common for P2WPKH script type addresses bc1q...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 29, 2023, 07:48:13 AM",
+      "body": "Quote from: Flail3959 on May 28, 2023, 08:25:42 AMThe address I'm looking for is a P2PKH (starts with \"1.....\").Code:***MATCHING SEED FOUND***, Matched on Address at derivation path: m/84'/0'/0'/0/0Search CompleteTry to restore it using these options:Restore your BIP39 seed with \"BIP39 seed\" option ticked.Select the script type \"legacy (p2pkh)\" but change the derivation path below from m/44h/0h/0h into m/84h/0h/0hFinish the rest of the steps.Electrum will derive both receiving addresses m/84'/0'/0'/0/0-19 and change addresses m/84'/0'/0'/1/0-9 with it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flail3959",
+      "created_time": "May 31, 2023, 09:02:34 PM",
+      "body": "Thank you @Abdussamad, @Cricktor, @nc50lc and everyone else who chimed in. Selecting legacy (p2pkh) and manually editing the derivation path did the trick. I would have never guessed it.Hopefully this helps whoever has the same issue in the future.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 01, 2023, 09:22:53 PM",
+      "body": "Glad to read you succeeded. I wonder how and why a Ledger NoNo S created a wallet with P2PKH addresses but on a Native Segwit derivation path. Did you create the wallet with Ledger Live or with any other software wallet controlling the Ledger NoNo S?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 02, 2023, 05:31:01 PM",
+      "body": "Quote from: Abdussamad on May 28, 2023, 06:48:34 PMSince it's  a p2pkh address when restoring you have to select p2pkh as the script type and then type in the bip84 derivation path m/84'/0'/0' (not m/84'/0'/0'/0/0). The single quotes are not optional. You can begin again via file > new/restore. Just an addendum for anyone else who stumbles here:The reason why you have to select \"P2PKH\" as the script type even though you also have to enter the p2wpkh derivation path of 84' is because when you decide a seed phrase, it is turned into a master private key and the first few bytes of this MPK correspond to a script type - eg for P2PKH, it's xprv, for P2WPKH it's zprv, and there's a ton of other prefixes for the MPK on SLIP-0132: https://github.com/satoshilabs/slips/blob/master/slip-0132.mdWhen you are deriving any addresses and keys, you are actually hashing the prefix along with the rest of the key, and that's why the addresses look so different from when you use the default script settings for the particular derivation path you've chosen.The prefix actually has a name for it, it's called extended version bytes.When restoring a seed phrase, you also have to remember what extended version bytes and derivation path your old wallet was using. For an open source wallet, it's possible just by looking at the source code.It is my opinion that I believe seed phrases should carry a non-standard and optional 13th word that simply encodes two flags multiple bits wide each, the first indicating which pair of extended version bytes to use, and the second which derivation prefix to use (44', 49', 84', m/0', whatever). A SLIP can then be submitted that standardized all of these combinations of bits, and it becomes a sort of universal standard in Bitcoin and prevent issues like the one in the OP from happening.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 03, 2023, 05:43:58 PM",
+      "body": "That's interesting and I certainly need to dig deeper into this. I have vage memories that you can convert a yprv, zprv or corresponding ypub, zpub into a xprv and xpub respectively and still get the same keys and public addresses derived from that converted xprv or xpub.I stumbled accross this because Bitcoin Core can only use the xprv and xpub representation of the Extended Master Private Key or Extended Master Public Key for use with descriptors. You can of course specify with such Core descriptors what kind of script type and derivation path should be used to derive keys and addresses.Definitely needs more learning, understanding and experiments with it for me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

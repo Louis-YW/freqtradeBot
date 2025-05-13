@@ -1,0 +1,61 @@
+{
+  "id": "topic_5409959",
+  "title": "mu_enrico",
+  "author": "mu_enrico",
+  "created_time": "August 15, 2022, 04:02:12 PMLast edit: December 18, 2023, 07:35:12 PM by mu_enrico",
+  "content": "Panduan kali ini membahas:* Penggunaan template smart contract di OpenZeppelin (https://wizard.openzeppelin.com/)* Compile & Deploy smart contract via remix (https://remix.ethereum.org/)* Berinteraksi dengan smart contract yang sudah dideployBonus karena pakai BSC testnet (tidak harus pakai BSC, jaringan apa aja yang mendukung standar ERC bisa)* Ambil BSC testnet coin (https://testnet.binance.org/faucet-smart)* Setup Metamask BSC testnet0. Setup Metamask (BSC Testnet)Pada Network, masukkan informasi berikut:Quote* Network Name: BSC Testnet* New RPC URL: https://data-seed-prebsc-1-s1.binance.org:8545* ChainID: 97* Symbol: BNB* Block Explorer URL: https://testnet.bscscan.com/Kemudian minta sedikit saldo di https://testnet.binance.org/faucet-smartMetamask pun berisi koin testnet dan siap untuk dipakaiKalau ane dikirim 0.5 BNB Testnet1. Generate Kontrak di OpenZeppelin (Pakai Wizard)Kunjungi https://wizard.openzeppelin.com/ untuk membuat smart contract* Pilih mau ERC20, ERC721, dsb, pada contoh ini pakai ERC20* Inputkan nama token, simbol ticker, premint alias jumlah token awal, dan fitur. Dalam kasus ini ane centang mintable agar bisa dimint, burnable agar bisa diburn, dan pausable agar token tidak bisa berpindah tangan (berguna ketika ada hack dsb) - (1).* Agan bisa copy kodenya di kolom (2) lalu manual paste di remix, atau* Pakai (3) \"Open in Remix\" biar langsung terbuka di sana2. Compile Kode tsb di Remix* Pastikan versinya sama antara compiler dengan kode dari OpenZeppelin, dalam kasus ini pragma solidity ^0.8.4;* Tekem Compile.3. Deploy Hasil Compile* Jangan lupa hubungkan dengan MetaMask di \"Environment\"* Biarkan Gas Limit (Ini kalau live/bukan testnet tergantung kondisi jaringan) dan Value default.* Pastikan Contract yang mau dideploy adalah yang namanya sama dengan jendela yang terbuka. Dalam kasus ini \"SFIToken - .....\"* Tekem tombol \"Deploy\"4. Cek ROY Token di BSCSCAN Testnethttps://testnet.bscscan.com/token/0xd13ded934b2750a041a4d7d0791d6b04c4ce740aIngat alamat kontraknya (0xd13ded934b2750a041a4d7d0791d6b04c4ce740a) untuk berinteraksi lanjutan seperti mint dan burn.5. Coba Mint dan Burn via RemixPada Bagian:QuoteORAt AddressIsikan dengan alamat kontrak 0xd13ded934b2750a041a4d7d0791d6b04c4ce740aMaka akan terbuka opsi-opsi seperti mint, burn, dll.Sesudah input data tinggal tekem \"transact\" ajaPada contoh ane coba mint 1000 token, tapi yang masuk hanya 0.000000000000001 ROYAda yang tahu kenapa? (Berhadiah Merit)Bonus:6. Setup ROY Token di MetaMaskBuat yang belum tau aja kalau token tadi harus diimport dulu di MetaMask agar terbacaKlik ImportIsikan dengan alamat kontrak kita tadi 0xd13ded934b2750a041a4d7d0791d6b04c4ce740aSymbol ROY, Desimal 18",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5409959",
+  "comments": [
+    {
+      "author": "vv181",
+      "created_time": "August 16, 2022, 03:09:08 AM",
+      "body": "Quote from: mu_enrico on August 15, 2022, 04:02:12 PMPada contoh ane coba mint 1000 token, tapi yang masuk hanya 0.000000000000001 ROYAda yang tahu kenapa?Symbol ROY, Desimal 18Karena dalam smart contract tidak mengenal bilangan desimal, hanya bilangan bulat. Token ROY menggunakan desimal 18, maka minting dengan jumlah 1000, itu sama dengan 1000/10^18 = 1E-15, 1E-15 atau 0.000000000000001.jika ROY ingin di-mint sebanyak 1000 tokens, maka jumlah yang harus dimasukan adalah 1000*10^18 = 1E21 atau 1000000000000000000000 (1000 + 0 sebanyak 18x).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mu_enrico",
+      "created_time": "August 16, 2022, 06:00:06 AM",
+      "body": "^Atas ane cepet banget dan betul.Pada \"Premint\" di OpenZeppelin ane memasukkan 1000 dan betul hasilnya 1000 ROY karena:Code:constructor() ERC20(\"SFIToken\", \"ROY\") {        _mint(msg.sender, 1000 * 10 ** decimals());    }Sudah dihitung di smart contract menggunakan syntax di atas, akan tetapi untuk interaksi lanjutan belum diubah alias masih uint256. Maka dari itu untuk mint dan burn yang menggunakan template OpenZeppelin harus menggunakan perhitungan agan @vv181.Gampang banget kan bikin token? Makanya harus benar-benar hati-hati kalau mau beli token.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "August 20, 2022, 12:42:23 PM",
+      "body": "Yap, untuk informasi lengkapnya bisa coba langsung cek aja di halaman dokumentasi OpenZeppelin-nya.Quote from: https://docs.openzeppelin.com/contracts/2.x/erc20#a-note-on-decimalsOften, you’ll want to be able to divide your tokens into arbitrary amounts: say, if you own 5 GLD, you may want to send 1.5 GLD to a friend, and keep 3.5 GLD to yourself. Unfortunately, Solidity and the EVM do not support this behavior: only integer (whole) numbers can be used, which poses an issue. You may send 1 or 2 tokens, but not 1.5.To work around this, ERC20Detailed provides a decimals field, which is used to specify how many decimal places a token has. To be able to transfer 1.5 GLD, decimals must be at least 1, since that number has a single decimal place.How can this be achieved? It’s actually very simple: a token contract can use larger integer values, so that a balance of 50 will represent 5 GLD, a transfer of 15 will correspond to 1.5 GLD being sent, and so on.It is important to understand that decimals is only used for display purposes. All arithmetic inside the contract is still performed on integers, and it is the different user interfaces (wallets, exchanges, etc.) that must adjust the displayed values according to decimals. The total token supply and balance of each account are not specified in GLD: you need to divide by 10^decimals to get the actual GLD amount.You’ll probably want to use a decimals value of 18, just like Ether and most ERC20 token contracts in use, unless you have a very special reason not to. When minting tokens or transferring them around, you will be actually sending the number num GLD * 10^decimals.So if you want to send 5 tokens using a token contract with 18 decimals, the the method to call will actually be:transfer(recipient, 5 * 10^18); Quote from: mu_enrico on August 16, 2022, 06:00:06 AMGampang banget kan bikin token? Makanya harus benar-benar hati-hati kalau mau beli token.Betul. Seingat ane, bahkan dulu pernah sempet liat juga website seperti ini, tetapi untuk template smart contract yang khusus untuk scam, semacam modelan token Squid Game.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "masulum",
+      "created_time": "August 22, 2022, 04:32:42 PM",
+      "body": "Quote from: vv181 on August 20, 2022, 12:42:23 PMBetul. Seingat ane, bahkan dulu pernah sempet liat juga website seperti ini, tetapi untuk template smart contract yang khusus untuk scam, semacam modelan token Squid Game.Apakah templatenya tidak bisa diubah sepenuhnya mas? kan kalau masih dalam bentuk template yang mentah codingnya kan bisa diubah secara keseluruhan, jadi untuk coding-coing yang sifatnya untuk scam bisa diubah ke yang versi normal agar bisa melakukan transaksi sebagaimana mestinya? Terus, bagaimana dengan pembuatan token dari pihak penyedia, apakah tetap aman? Kayanya ada beberapa web yang bisa melakukan pembuatan token instant, tapi harga layanannya cukup mahal sih dibandingkan dengan coding sendiri.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mu_enrico",
+      "created_time": "August 22, 2022, 05:34:48 PM",
+      "body": "Quote from: masulum on August 22, 2022, 04:32:42 PMTerus, bagaimana dengan pembuatan token dari pihak penyedia, apakah tetap aman? Kayanya ada beberapa web yang bisa melakukan pembuatan token instant, tapi harga layanannya cukup mahal sih dibandingkan dengan coding sendiri.Ane pernah lihat beberapa web untuk bikin token, hanya saja selain dari segi biaya, dari segi keamanan masih dipertanyakan. Kalau dari OpenZeppelin katanya \"best practice\" dan \"industry standard,\" dan sudah banyak dipakai di tutorial-tutorial dan web belajar dapp. Hanya saja ane tidak menjamin apapun DYOR & DWYOR karena ane tidak melakukan audit pada library-library mereka.https://github.com/OpenZeppelin/openzeppelin-contracts (sepertinya sudah cukup reputable). Kalau untuk kontrak dasar yang ada di wizard keknya sudah sangat membantu sehingga kita tidak perlu lagi koding dari nol, tidak perlu juga pakai pihak ketiga untuk sekedar bikin token.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "August 23, 2022, 08:58:48 PM",
+      "body": "Quote from: masulum on August 22, 2022, 04:32:42 PMQuote from: vv181 on August 20, 2022, 12:42:23 PMBetul. Seingat ane, bahkan dulu pernah sempet liat juga website seperti ini, tetapi untuk template smart contract yang khusus untuk scam, semacam modelan token Squid Game.Apakah templatenya tidak bisa diubah sepenuhnya mas? kan kalau masih dalam bentuk template yang mentah codingnya kan bisa diubah secara keseluruhan, jadi untuk coding-coing yang sifatnya untuk scam bisa diubah ke yang versi normal agar bisa melakukan transaksi sebagaimana mestinya? Mengenai itu saya kurang tahu pasti, sepertinya masih bisa. Nah, masalahnya ya tujuan pembuatan smart contract ini untuk sekem mas, jadi memang dikhususkan untuk itu.Saya baru inget lagi, untuk istilahnya \"honeypot smart contract\".Quote from: masulum on August 22, 2022, 04:32:42 PMTerus, bagaimana dengan pembuatan token dari pihak penyedia, apakah tetap aman?Untuk kasus seperti di atas, sudah pasti tidak aman. Ada kemungkinan juga pihak penyedialah yang mau ngescam para calon scammer-nya",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

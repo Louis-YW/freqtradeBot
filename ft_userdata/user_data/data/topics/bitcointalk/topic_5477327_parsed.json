@@ -1,0 +1,85 @@
+{
+  "id": "topic_5477327",
+  "title": "bane77",
+  "author": "bane77",
+  "created_time": "December 10, 2023, 04:55:09 PM",
+  "content": "Hi allDoes any one have or know a python script that convert Hex private key to all Bitcoin addresses, example: Private Key HEX: 03902e4f09664bc177fe4e090dcd9906b432b50f15fb6151984475c1c75c35b6Public Address 1: 1Bu6YxH64nfvhdDsYNEP8PftoBMqgusdPS   Public Address 1 compressed: 18i5PtPisxbGiGGEviW7HPcnfNPmcsscwH   Public Address 3: 38dRrGx5YbrnRWuWcJv5i2XHjYUnHE2wvv  Public Address bc1 P2WPKH: bc1q2jxe5azr6zmhk3258av7ul6cqtu4eu4mps8f4p    Public Address bc1 P2WSH: bc1qdveuf0egtfdnd2fnsp0lzfukn2e58czf8323ky6xt8ydew4ecfcqv3ettx  Thanks in advance!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5477327",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "December 10, 2023, 11:04:18 PM",
+      "body": "I tried for a Python script even in GitHub I can't find any Python script that can able to convert private key hex into different types of addresses. However, you can maybe use Bitcoin tools to do that but this is not a Python script.Check this https://github.com/matja/bitcoin-tool",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "December 10, 2023, 11:39:18 PMLast edit: December 11, 2023, 05:11:20 PM by PowerGlove",
+      "body": "Quote from: bane77 on December 10, 2023, 04:55:09 PMDoes any one have or know a python script that convert Hex private key to all Bitcoin addresses (...)Yup, I wrote something like that late last year; here's the post (copy/paste the code from there): Generating addresses from scratch (Python 3.6+).It doesn't cover all of the address types you're after, but I think you'll still find it useful [1] (it'll show compressed-P2PKH and P2WPKH addresses by default, but you can get it to show uncompressed-P2PKH addresses too by going to the top of the script and changing show_p2pkh_uncompressed to True).Here's how you would invoke it (with your example private key):Code:$ python3 make_address.py 0x3902e4f09664bc177fe4e090dcd9906b432b50f15fb6151984475c1c75c35b6And here's the output (after having adjusted show_p2pkh_uncompressed, as described above):       +------+----------------------+       | Type | Legacy, Uncompressed |    +--+------+----------------------+-------------+    | Address | 1Bu6YxH64nfvhdDsYNEP8PftoBMqgusdPS |+---+---------+------------------------------------+----------------+| Private Key | 5HqrbgkWPqBy6dvCE7FoUiMuiCfFPRdtRsyi6NuCM2np8qBZxq5 |+-------------+-----------------------------------------------------+       +------+--------------------+       | Type | Legacy, Compressed |    +--+------+--------------------+---------------+    | Address | 18i5PtPisxbGiGGEviW7HPcnfNPmcsscwH |+---+---------+------------------------------------+-----------------------+| Private Key | p2pkh:KwLdv6T2jmhQbswnYrcL9KZHerTpVyjozp1JNjfP5QuD3GchCwCc |+-------------+------------------------------------------------------------+       +------+---------------+       | Type | Native SegWit |    +--+------+---------------+----------------------------+    | Address | bc1q2jxe5azr6zmhk3258av7ul6cqtu4eu4mps8f4p |+---+---------+--------------------------------------------+----------------+| Private Key | p2wpkh:KwLdv6T2jmhQbswnYrcL9KZHerTpVyjozp1JNjfP5QuD3GchCwCc |+-------------+-------------------------------------------------------------+[1] I mean, you'd probably find it more useful if it already did every address type you're after, but because the code is self-contained and doesn't just pass the problem off to a dependency, you should be able to extend it yourself if you're willing/determined enough.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "December 11, 2023, 02:44:29 AM",
+      "body": "I put one  herehttps://bitcointalk.org/index.php?topic=5465007.msg63292213#new",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bane77",
+      "created_time": "December 11, 2023, 01:26:50 PM",
+      "body": "Quote from: whanau on December 11, 2023, 02:44:29 AMI put one  herehttps://bitcointalk.org/index.php?topic=5465007.msg63292213#newThanks for the code,but when i try to run your code i get an error: ValueError: Traceback (most recent call last):  File \"/Users/bane/allhex/bech32.py\", line 1, in <module>    from bitcoinaddress import Wallet  File \"/usr/local/lib/python3.11/site-packages/bitcoinaddress/__init__.py\", line 7, in <module>    from .key.key import Key  File \"/usr/local/lib/python3.11/site-packages/bitcoinaddress/key/key.py\", line 9, in <module>    import base58  File \"/Users/bane/allhex/base58.py\", line 15, in <module>    key = CBitcoinSecret.from_secret_bytes(x(key_hex))          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  File \"/usr/local/lib/python3.11/site-packages/bitcoin/wallet.py\", line 364, in from_secret_bytes    self.__init__(None)  File \"/usr/local/lib/python3.11/site-packages/bitcoin/wallet.py\", line 372, in __init__    CKey.__init__(self, self[0:32], len(self) > 32 and self[32] == 1)  File \"/usr/local/lib/python3.11/site-packages/bitcoin/wallet.py\", line 338, in __init__    self._cec_key.set_secretbytes(secret)  File \"/usr/local/lib/python3.11/site-packages/bitcoin/core/key.py\", line 261, in set_secretbytes    raise ValueError(\"Secret bytes must be exactly 32 bytes\")ValueError: Secret bytes must be exactly 32 bytesDidn't change anything just copy/paste it, and i m running it on python 3.11?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "December 11, 2023, 05:25:35 PM",
+      "body": "Secret bytes must be exactly 32 bytesyou put in more or less than 32 bytes.Have you included the bitcoinaddress library?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "December 11, 2023, 07:13:23 PM",
+      "body": "Quote from: bane77 on December 10, 2023, 04:55:09 PMHi allDoes any one have or know a python script that convert Hex private key to all Bitcoin addresses, example: Private Key HEX: 03902e4f09664bc177fe4e090dcd9906b432b50f15fb6151984475c1c75c35b6Public Address 1: 1Bu6YxH64nfvhdDsYNEP8PftoBMqgusdPS   Public Address 1 compressed: 18i5PtPisxbGiGGEviW7HPcnfNPmcsscwH   Public Address 3: 38dRrGx5YbrnRWuWcJv5i2XHjYUnHE2wvv  Public Address bc1 P2WPKH: bc1q2jxe5azr6zmhk3258av7ul6cqtu4eu4mps8f4p    Public Address bc1 P2WSH: bc1qdveuf0egtfdnd2fnsp0lzfukn2e58czf8323ky6xt8ydew4ecfcqv3ettx  Thanks in advance!You need to understand the process... Let me give you an example:Quote0 9eb45f32d264da4b551b544cca1ee711d8138cd0076055a30f3dca66b7f4528c Private key Hex (64 characters [0-9A-F])1 04831776c52a60ee2d6c7793bb8bb8fa5fc53e0a22a3e29a8d3d86c3728fa3b56f4e5d7dad489f7 171cef6dee732aead8047ceedcb561b0ad389acb9c201814075 Public Key (130 characters [0-9A-F]). ECDSA(private key): '04 + x + y'130 2 de031b5896be6595e01acb50b3cf8b917425b538cfe3f51c22dddb6ee5845e5b SHA-256 hash64 3 8765cec24ae3bb7f9ee05ad0a3f1e28bf077cce8 RIPEMD-160 hash40 4 008765cec24ae3bb7f9ee05ad0a3f1e28bf077cce8Prefix and RIPEMD-1605 ee380a657fe9cd6f2e22cec64e7b6b6f8a0b96d4cf02c81e69773d443e518990SHA-256 hash1646 5ba69e0fe290f3b10849cc6088897d97827d53b467fe2cfe2faaa5df3e0f2826SHA-256 hash647 5ba69e0fChecksum - First 8 characters Step688 008765cec24ae3bb7f9ee05ad0a3f1e28bf077cce85ba69e0f Prefix + RIPEMD-160 + Checksum50 9 1DLvBcmt8KpGKr7xNJ5CGxm2aP2dAC2tJJ Uncompressed address - Base58 encoding34 As you can see, in the step 3 you can find the RIPEMD-160 hash, and from there you can get the address, but here is the trick, even if you don't know the private key from an address, you can calculate the RIPEMD-160 hash direct from any addres, and that way you can know the different address from the same private key without knowing the private key.Here you will find some python scripts i used in 2022 for this task:Get the P2WPKH(Bech32) using the Public Key Hash (Hash 160) Pythonhttps://bitcointalk.org/index.php?topic=5410851.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bane77",
+      "created_time": "December 12, 2023, 04:01:47 AM",
+      "body": "Quote from: whanau on December 11, 2023, 05:25:35 PMSecret bytes must be exactly 32 bytesyou put in more or less than 32 bytes.Have you included the bitcoinaddress library?Yes i have bitcoinaddress library installed, and as i mention before i just copy/paste the code, didnt change the hex key and i get error.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "December 12, 2023, 05:16:25 PM",
+      "body": "Quote from: bane77 on December 12, 2023, 04:01:47 AMQuote from: whanau on December 11, 2023, 05:25:35 PMSecret bytes must be exactly 32 bytesyou put in more or less than 32 bytes.Have you included the bitcoinaddress library?Yes i have bitcoinaddress library installed, and as i mention before i just copy/paste the code, didnt change the hex key and i get error.Don't know. It works for me by cut & pasting. Code:Private key : 54040cda88ee1ca322feb4bd61c1098224222444f9453637802fe66526674199Public key  : 040090b7d7abb9af40452096988a5bccf45d3b7b8c495dfffbd78a3fe61276c648c0c8d156e6a6f9fc56d247c39c3efb17ea6af0c83dddaed955fa338e21be2a0cAddress     : 1DeXsWkWKm5wb9kYJbvkgAcAck37ozC2ZdWIF         : 5JTHepc4dCX6Dp8Aa5rzEokqdCeQvgovkL2m38hqhn5dbFXLzvRPublic key C: 020090b7d7abb9af40452096988a5bccf45d3b7b8c495dfffbd78a3fe61276c648Address    C: 15Qnkvc3TRQukdFQGiAfuvoMT2T3KnRoCmWIF        C: Kz32Vw7kzmqp3YzdF2TddwNVcnQ8bxi8EEzmNR1FxyySW4STkjcHBC1 P2WSH   : bc1q2sga9a047kxfm7tx7jly53vm45sf6uvth0eepzlf5e0pe6dk6zyq7cycdwBC1 P2WPKH  : bc1qxpsygw7u0wnee98wz8ewkxqvqlx53lr3av29h2P2SH        : 3ATE7p9t2DMhgWKAGCnUgjMuf4LjryUioY",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bane77",
+      "created_time": "December 13, 2023, 12:06:32 PM",
+      "body": "Quote from: whanau on December 12, 2023, 05:16:25 PMQuote from: bane77 on December 12, 2023, 04:01:47 AMQuote from: whanau on December 11, 2023, 05:25:35 PMSecret bytes must be exactly 32 bytesyou put in more or less than 32 bytes.Have you included the bitcoinaddress library?Yes i have bitcoinaddress library installed, and as i mention before i just copy/paste the code, didnt change the hex key and i get error.Don't know. It works for me by cut & pasting. Code:Private key : 54040cda88ee1ca322feb4bd61c1098224222444f9453637802fe66526674199Public key  : 040090b7d7abb9af40452096988a5bccf45d3b7b8c495dfffbd78a3fe61276c648c0c8d156e6a6f9fc56d247c39c3efb17ea6af0c83dddaed955fa338e21be2a0cAddress     : 1DeXsWkWKm5wb9kYJbvkgAcAck37ozC2ZdWIF         : 5JTHepc4dCX6Dp8Aa5rzEokqdCeQvgovkL2m38hqhn5dbFXLzvRPublic key C: 020090b7d7abb9af40452096988a5bccf45d3b7b8c495dfffbd78a3fe61276c648Address    C: 15Qnkvc3TRQukdFQGiAfuvoMT2T3KnRoCmWIF        C: Kz32Vw7kzmqp3YzdF2TddwNVcnQ8bxi8EEzmNR1FxyySW4STkjcHBC1 P2WSH   : bc1q2sga9a047kxfm7tx7jly53vm45sf6uvth0eepzlf5e0pe6dk6zyq7cycdwBC1 P2WPKH  : bc1qxpsygw7u0wnee98wz8ewkxqvqlx53lr3av29h2P2SH        : 3ATE7p9t2DMhgWKAGCnUgjMuf4LjryUioYI have base58.py file in the same directory, thats why it didnt work,...  now working. Thanks again for the script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

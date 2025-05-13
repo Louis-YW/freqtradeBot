@@ -1,0 +1,45 @@
+{
+  "id": "topic_5409026",
+  "title": "PawGo",
+  "author": "PawGo",
+  "created_time": "August 07, 2022, 06:34:46 PMLast edit: August 08, 2022, 06:32:12 AM by PawGo",
+  "content": "HelloHaving a free afternoon I have prepared a very simple mempool watcher, which uses RPC connection to (local) node, checks transactions and if there is any transaction with output to known address, it prepares a transaction which moves amount to destination address.The idea was to have some \"automatic\" transfers when there is payment to given address(es). For example you have tool which generates addresses from seed (for your clients) and after payment you move funds to one single address. Currently it is really very simple app, maybe I will extend it in the future - for example retrieve private keys from seed (now it expects list of WIFs).It connects to node using provided path (http://user:pass@host:port/) or path to .cookie file (then connects to 127.0.0.1:8332).If there is any interest in that kind of projects, I will add new features, for now it is as it is. It was more like an exercise for me, as I did not work with RPC /remote connection/ never before.Sources and the first release:https://github.com/PawelGorny/NodeWatcher",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5409026",
+  "comments": [
+    {
+      "author": "khaled0111",
+      "created_time": "August 08, 2022, 02:28:17 PM",
+      "body": "Quote from: PawGo on August 07, 2022, 06:34:46 PMIf there is any interest in that kind of projects, I will add new features, for now it is as it is. It was more like an exercise for me, as I did not work with RPC /remote connection/ never before.I've been looking for a tool that does exactly this but I didn't find one and am sure many other will be interested in it too. It's gonna be very useful for those whom their addresses got hacked but still receiving transactions.I read the code and it looks like the created transaction will use the default fee rate (correct me if am wrong). So am wondering if it is possible to let the user customize it according to his preferences or use mempool stats to determine the best fee rate for a fast transaction. In most cases, users will need the transaction to get confirmed asap.Also, does the tool allow monitoring multiple addresses?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "August 10, 2022, 03:35:53 PM",
+      "body": "Awesome project PawGo, thanks for share it with the community For my projects i used the 'blocknotify' command to look for new transactions in my core, but i really love the way how you take the transactions direct from the mempool, that's much faster and this way we spend the coins before they confirm, so +1 for that.And now i have a technical question... What would happen if you and other user are running the program at the same time with the same private keys but sending to different address? My prediction is a double spend...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mynonce",
+      "created_time": "August 10, 2022, 06:17:56 PMLast edit: August 10, 2022, 09:41:12 PM by mynonce",
+      "body": "Quote from: seoincorporation on August 10, 2022, 03:35:53 PMAnd now i have a technical question... What would happen if you and other user are running the program at the same time with the same private keys but sending to different address? My prediction is a double spend...Double spend is impossible in the Bitcoin network.If a node accepts a transaction into the mempool, so this node will reject an incoming transction if it has the same tx output & different address and give the error: {\"code\":-26,\"message\":\"txn-mempool-conflict\"}.It is possible that another node, that hasn't received the first transaction collects the second one as valid. In that case the nodes would keep their received transactions in their mempool until a valid block with one of this transactions has been created. As only one of these two transactions can be in the block, the node with the transaction that isn't in the block will be rejected as there is already a tx with that unspent tx output in the block.You can read this thread \"[TESTED IT] Changing the transaction after broadcasting, what happens?\" for further details:https://bitcointalk.org/index.php?topic=5397102.0Quote from: seoincorporation on August 10, 2022, 03:35:53 PMAwesome project PawGo, thanks for share it with the community Yeah.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "August 10, 2022, 07:36:04 PM",
+      "body": "Thanks for your nice words. I'm glad there are people who can make good use of it.Quote from: khaled0111 on August 08, 2022, 02:28:17 PMSo am wondering if it is possible to let the user customize it according to his preferences or use mempool stats to determine the best fee rate for a fast transaction. In most cases, users will need the transaction to get confirmed asap.Currently there is no configuration for that. Fee is calculated as a difference between input and output, maybe it is stupid what I do (I needed any working solution), but I prepare transaction, I check it's length and I subtract length from amount. Electrum showed fee 1.5 for signed transaction prepared that way, so it is not so bad. Of course I may think about any parameter.Quote from: khaled0111 on August 08, 2022, 02:28:17 PMAlso, does the tool allow monitoring multiple addresses? Yes, all is based on list of WIFs (each in new line). With uncompressed/compressed WIF situation is clear, but not to make mess with WIF prefix like it is in case of electrum (no prefix - legacy compressed 1.., different prefixes for bc1..., 3... etc.), I add to pool of known each time all 4 types.Quote from: seoincorporation on August 10, 2022, 03:35:53 PMAnd now i have a technical question... What would happen if you and other user are running the program at the same time with the same private keys but sending to different address? My prediction is a double spend...mynonce already answered, normally the first wins, if somehow it happen that two transactions will be in mempool miner usually takes the one with bigger fee. And that way we come back to the previous question...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "id": "topic_5415861",
+  "title": "nullama",
+  "author": "nullama",
+  "created_time": "October 04, 2022, 05:43:39 AM",
+  "content": "Following my previous guide about how to solo mine testnet bitcoins with an ASIC and cgminer I'm now presenting a guide on how to do the same but without the need of an ASIC. That means that you'll be able to mine testnet bitcoins with any computer that has a CPU and/or a GPU. This should work on pretty much any laptop or desktop, even those with the new M1 chips from Apple. Of course the faster the CPU/GPU, the better chances you'll have to hit some blocks.You might be wondering how is this even possible. The answer is that the difficulty in testnet3 reverts to 1 after 20 minutes have passed with no one finding a block. A difficulty of 1 is so low that any CPU or GPU is capable of hitting a block. Note that this was the difficulty of Bitcoin in the beginning(2009). More details about this can be read here: https://bitcoin.stackexchange.com/questions/18554/how-can-i-find-the-real-difficulty-on-testnetOK, so let's make it happen. First, you need to setup Bitcoin Core in the same way as with the other guide. Here's a copy of it for simplicity:Step 1: Install and run Bitcoin CoreWe're going to use the folder ~/bitcoin_testnet to save everything so that it's easy to remove once you're done and to keep things simple. You can of course use a different path if you want.Inside ~/bitcoin_testnet create a folder called data:Code:mkdir -p ~/bitcoin_testnet/dataDownload the Bitcoin Core for your platform into ~/bitcoin_testnet/ and extract it there.Now let's prepare the configuration file. Create a text file named bitcoin_testnet.conf in ~/bitcoin_testnet/ and put these content in it:Code:testnet=1txindex=1server=1[test]rpcport=5000rpcallowip=YOUR_MINER_IPrpcuser=YOUR_RPC_USERrpcpassword=YOUR_RPC_PASSWORDrpcbind=0.0.0.0The thing that you need to understand here is that you're setting up the Bitcoin node to run in testnet, and you're defining an RPC port(5000 in this case, can be anything), user and password, and whitelisting a specific IP to connect to your node(YOUR_MINER_IP). You'll need these details and your Bitcoin node IP later when connecting from bfgminer.You can now start running your Bitcoin node by doing the following(make sure to change user to your actual user):Code:/home/user/bitcoin_testnet/bitcoin-23.0/bin/bitcoind -conf=/home/user/bitcoin_testnet/bitcoin_testnet.conf -datadir=/home/user/bitcoin_testnet/dataIf you want, you can keep this running in the background with screen:Code:screen -dm -S bitcoin_testnet /home/user/bitcoin_testnet/bitcoin-23.0/bin/bitcoind -conf=/home/user/bitcoin_testnet/bitcoin_testnet.conf -datadir=/home/user/bitcoin_testnet/dataYou can then see what's happening with:Code:screen -r bitcoin_testnetTo detach the screen, simply press Ctrl-A and then Ctrl-D. You'll be back in the console, and the command will continue running in the background.Step 2: Install and run bfgminerSince cgminer removed the CPU/GPU functionality a long time ago, we're going to use bfgminer. You need to compile it from source code to activate these features, so that's what we're going to do. First let's install some dependencies:Code:sudo apt-get install build-essential autoconf automake libtool pkg-config libcurl4-gnutls-dev libjansson-dev uthash-dev libncursesw5-dev libudev-dev libusb-1.0-0-dev libevent-dev libmicrohttpd-dev libhidapi-dev libsensors-devNow we're ready to get, configure, and make bfgminer with support for CPU and GPU mining. Also note that we need to update the git: sources to https: in the .gitmodules file, otherwise it won't work. I'm using sed here to do this, but you can of course do it manually if you prefer.Code:cd ~/bitcoin_testnet/git clone https://github.com/luke-jr/bfgminercd bfgminersed -i 's/git:/https:/g' .gitmodules./autogen.sh./configure --enable-opencl --enable-cpuminingmakeAfter it finished the build, you can now simply start mining your testnet bitcoins:Code:~/bitcoin_testnet/bfgminer/bfgminer -S opencl:auto -S cpu:auto -o http://YOUR_BITCOIN_CORE_IP:5000 -u YOUR_RPC_USER -p YOUR_RPC_PASSWORD --generate-to YOUR_TESTNET_BTC_ADDRESS --coinbase-sig \"Whatever you want to write\"And that's it. Your computer should now be mining with the CPU and the GPU using OpenCL. Leave it overnight and you'll probably see some testnet bitcoins in your address.Some questions you might have:Q: Can I use only the GPU?A: You can use one or the other instead of both by simply not adding it to the command (i.e. just use -S opencl:auto for GPU only or just use -S cpu:auto for CPU only). Q: Why are there two(or more) pools in the dashboard?A: If you are running another instance of Bitcoin Core in the local machine bfgminer will try to mine there as well. If you don't want that to happen, simply add --no-local-bitcoin to the command.Q: Can I use a Raspberry Pi?A: Actually yes, it should work with CPU mining, but extremely slow. You might get lucky though.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415861",
+  "comments": [
+    {
+      "author": "ABCbits",
+      "created_time": "October 04, 2022, 11:24:15 AM",
+      "body": "I managed to compile it after spending some time to find the name of the dependency on my OS. bfgminer doesn't support Bech32 address, but otherwise i didn't experience other problem.I do not run my computer 24/7, so let's see how much block i mined after 3-7 days.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "October 04, 2022, 01:37:50 PM",
+      "body": "Quote from: ETFbitcoin on October 04, 2022, 11:24:15 AMI managed to compile it after spending some time to find the name of the dependency on my OS. bfgminer doesn't support Bech32 address, but otherwise i didn't experience other problem.I do not run my computer 24/7, so let's see how much block i mined after 3-7 days.Ah, yes, I mentioned it in the previous guide but forgot to mention it here again as bfgminer also expects a legacy address:Quote from: https://bitcointalk.org/index.php?topic=5415335.0If you don't have a testnet btc address yet, note that Bitcoin Core now doesn't generate a wallet by default any more so you will need to create one. You can read about it in createwallet. Then you should be able to getnewaddress. Make sure to use the legacy format as that's what cgminer is expecting. You address should start with n or m.Good luck hitting some blocks with a CPU/GPU!, it worked for me but it's noticeably less frequent than using an ASIC, even a tiny USB one like the Compac F.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "October 06, 2022, 01:20:15 AM",
+      "body": "You really should mention that by design the Testnet coins have ZERO monetary value. Purchase and sale of them is strongly discouraged as Testnet and its coins are for testing software -- not making money... Mining them and holding them is also pretty pointless because the Testnet chain is periodically forked to render previously mined Testnet coins unusable.After a development project is over it is expected that all Testnet coins mined during testing are to be donated back to the Faucets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "October 06, 2022, 05:10:31 AM",
+      "body": "Quote from: NotFuzzyWarm on October 06, 2022, 01:20:15 AMYou really should mention that by design the Testnet coins have ZERO monetary value. Purchase and sale of them is strongly discouraged as Testnet and its coins are for testing software -- not making money... Mining them and holding them is also pretty pointless because the Testnet chain is periodically forked to render previously mined Testnet coins unusable.After a development project is over it is expected that all Testnet coins mined during testing are to be donated back to the Faucets.Yeah, I didn't mention it because I thought that was well known for the people reading the Development & Technical Discussion forum. It's basically for people that don't want to depend on faucets to test their projects. Once you know how to do it you can mine some testnet bitcoin for yourself overnight, even if there's no faucets available.But you're right, it might be worth noting it for people that come here from the outside through a search or a link. Yes, testnet bitcoins are only useful for testing, they don't have any other value, and they can even disappear at any time. That's also why I didn't mention any kind of security for the wallet, because it doesn't matter.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 07, 2022, 11:36:40 AM",
+      "body": "After almost 4 days, i managed to mine 4 blocks. But due to relative slow internet connection, 2 of them become stale. Overall it's good experience and i got about ~0.05 tBTC, which probably will be used to try few different OPCODES on scripting or simply donate it to tBTC faucet.On a side note, on 3rd day i tried to mine only with 1 thread CPU since the goal to mine block with difficulty 1. But when i shutdown my PC, i got this error message with >100K occurrence. Quick search on google shows it's due continuous CPU usage for long time, although i'm not 100% sure it's due to bfgminer. Code:kernel: rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { P93622 } 116803 jiffies s: 7173 root: 0x1/.kernel: rcu: blocking rcu_node structures (internal RCU debug): l=1:0-15:0x0/T",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mrpotato98",
+      "created_time": "November 26, 2022, 02:19:00 PM",
+      "body": "I tried to repeat the procedure, but I ran into some issues.Note that MYUSER, MYPASS and MYADDR are replaced by their actual values when running the below commandsI'm able to access the node usingCode:bitcoin-cli -rpcuser=MYUSER -rpcpassword=MYPASS  -rpcport=5000 -rpcconnect=MY.NODE.IP.NR getblocktemplate '{\"rules\": [\"segwit\"], \"capabilities\": [\"coinbasetxn\", \"workid\", \"coinbase/append\"]}'|grep coinbaseo  \"coinbaseaux\": {  \"coinbasevalue\": 3041246,So it seem to be able to connect, but if I try with bfgminer  Code:$ ./bfgminer --text-only --no-getwork --no-stratum -S cpu:auto -o http://MY.NODE.IP.NR:5000 -u MYUSER -p MYPASS  --generate-to MYADDR  --coinbase-sig \"bfgminer test\" [2022-11-25 14:45:14] Started bfgminer 5.5.0-34-g866fd36f [2022-11-25 14:45:14] Probing for an alive pool [2022-11-25 14:45:14] Pool 0 slow/down or URL or credentials invalid [2022-11-25 14:45:15] No servers were found that could be used to get work from. [2022-11-25 14:45:15] Please check the details from the list below of the servers you have input [2022-11-25 14:45:15] Most likely you have input the wrong URL, forgotten to add a port, or have not set up workers [2022-11-25 14:45:15] Pool: 0  URL: http://MY.NODE.IP.NR:5000  User: MYUSER  Password: MYPASSWhile I'm running the above command I observe the following on the console of my node:Code:2022-11-25T13:49:59Z ThreadRPCServer method=getblocktemplate user=MYUSERRunning on the node itself it seem to connect:Code:./bfgminer --no-local-bitcoin --text-only --no-getwork --no-stratum -S cpu:auto -o http://MY.NODE.IP.NR:5000 -u MYUSER -p MYPASS  --generate-to MYADDR  --coinbase-sig \"bfgminer test\" [2022-11-25 15:10:16] Started bfgminer 5.5.0-34-g866fd36f [2022-11-25 15:10:16] No devices detected! [2022-11-25 15:10:16] Waiting for devices [2022-11-25 15:10:16] Probing for an alive pool [2022-11-25 15:10:16] Network difficulty changed to 66M (472.5T) [2022-11-25 15:10:16] Pool 0 http://MY.NODE.IP.NR:5000 alive [2022-11-25 15:10:16] Long-polling activated for http://MY.NODE.IP.NR:5000 (getblocktemplate)20s:  0.0 avg:  0.0 u:  0.0  h/s | A:0 R:0+0(none) HW:0/none [2022-11-25 15:11:38] Longpoll from pool 0 detected new block20s:  0.0 avg:  0.0 u:  0.0  h/s | A:0 R:0+0(none) HW:0/none [2022-11-25 15:17:16] Longpoll from pool 0 detected new block20s:  0.0 avg:  0.0 u:  0.0  h/s | A:0 R:0+0(none) HW:0/noneone [2022-11-25 15:25:48] Longpoll from pool 0 detected new block20s:  0.0 avg:  0.0 u:  0.0  h/s | A:0 R:0+0(none) HW:0/noneAlso running cpuminer from the remote computer on the LAN seem to workCode:$ ./minerd -a sha256d -o http://MY.NODE.IP.NR:5000  -u MYUSER -p MYPASS --coinbase-addr MYADDR --no-getwork --no-stratum --no-redirect [2022-11-25 15:18:35] Binding thread 0 to cpu 0[2022-11-25 15:18:35] 4 miner threads started, using 'sha256d' algorithm.[2022-11-25 15:18:35] Binding thread 1 to cpu 1[2022-11-25 15:18:35] Binding thread 3 to cpu 3[2022-11-25 15:18:35] Binding thread 2 to cpu 2[2022-11-25 15:18:35] Long-polling activated for http://MY.NODE.IP.NR:5000[2022-11-25 15:18:35] thread 0: 2097152 hashes, 6732 khash/s[2022-11-25 15:18:35] thread 1: 2097152 hashes, 6732 khash/s[2022-11-25 15:18:35] thread 2: 2097152 hashes, 6730 khash/s[2022-11-25 15:18:35] thread 3: 2097152 hashes, 6730 khash/s[2022-11-25 15:19:35] LONGPOLL pushed new work[2022-11-25 15:19:35] thread 0: 401725792 hashes, 6729 khash/s[2022-11-25 15:19:35] thread 3: 401732512 hashes, 6730 khash/s[2022-11-25 15:19:35] thread 2: 401754024 hashes, 6730 khash/s[2022-11-25 15:19:35] thread 1: 401665288 hashes, 6728 khash/s[2022-11-25 15:20:35] thread 3: 403777896 hashes, 6731 khash/s[2022-11-25 15:20:35] thread 1: 403706232 hashes, 6729 khash/s[2022-11-25 15:20:35] thread 2: 403799288 hashes, 6731 khash/s[2022-11-25 15:20:35] LONGPOLL pushed new work[2022-11-25 15:20:35] thread 3: 78352 hashes, 7178 khash/s[2022-11-25 15:20:35] thread 0: 403740032 hashes, 6728 khash/s[2022-11-25 15:20:35] thread 2: 70736 hashes, 6729 khash/s[2022-11-25 15:20:35] thread 1: 52128 hashes, 4724 khash/s[2022-11-25 15:21:03] LONGPOLL pushed new work[2022-11-25 15:21:03] thread 3: 187733520 hashes, 6731 khash/s...Does this mean that cpuminer is working as expected while bfgminer does not. I will leave it running for a few days and see if I'm able to solve a block on the test network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "November 28, 2022, 04:10:10 AM",
+      "body": "Quote from: mrpotato98 on November 26, 2022, 02:19:00 PMI tried to repeat the procedure, but I ran into some issues.~snip~You're running bfgminer with different options than what I wrote here. Check those first.In particular, you're disabling getwork and stratum connectivity:Quote--no-stratum                    Disable Stratum detection--no-getwork                    Disable getwork supportTry running it without those options",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mrpotato98",
+      "created_time": "November 28, 2022, 10:06:42 AM",
+      "body": "Quote from: nullama on November 28, 2022, 04:10:10 AMIn particular, you're disabling getwork and stratum connectivity:Thank you, but I did that deliberately. I was pointed to this thread from  https://bitcointalk.org/index.php?topic=5418942.0 entitled What is a good reference for a getblocktemplate based solo miner. Hence I was expecting bfgminer could serve that purpose, which does not seem to be the case. But on the other hand it appears that cpuminer might serve the purpose.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "December 18, 2022, 04:03:20 PM",
+      "body": "Thanks for the tutorial, I'm mining Testnet now! It's CPU only, on a server. Let's see if it catches a block.The only problem I ran into was at this step:Quote from: nullama on October 04, 2022, 05:43:39 AMCode:./autogen.shThe error came down to this:Code:fatal: unable to connect to github.com:And the solution was easy:Code:git config --global url.\"https://\".insteadOf git://",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinSoloMiner",
+      "created_time": "December 19, 2022, 04:12:04 PMLast edit: December 20, 2022, 01:02:02 PM by BitcoinSoloMiner",
+      "body": "Also, I've noticed that bfgminer isn't creating proof with more than 8 zeros. Is there a way to modify so it creates proof with more than 8 zeros?example:Proof: 0000000074f7267c7ed96843de88967a43728be514fee31a6b5dc623bb688291Target: 00000000000000000007f5900000000000000000000000000000000000000000TrgVal? no (false positive; hash > target)I looked in bfgminer/miner.c but couldn't manage to change anything to create 19 leading zero proof",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinSoloMiner",
+      "created_time": "December 22, 2022, 04:31:24 AM",
+      "body": "hey OP, this works:Code:git clone https://bitbucket.org/ckolivas/hashfastcd hashfast/./autogen.shCFLAGS=\"-O2 -Wall -march=native -I/opt/rocm-5.4.1/opencl/include/\" LDFLAGS=\"-L/opt/rocm-5.4.1/opencl/lib/\" ./configure --enable-openclmake./cgminer -o <pool url> -u <user> -p <pass>...for cgminer usage on AMD GPU - valid 22 december 2022",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "December 22, 2022, 05:39:04 PM",
+      "body": "Quote from: LoyceV on December 18, 2022, 04:03:20 PMI'm mining Testnet now! It's CPU only, on a server. Let's see if it catches a block.It's been 4 days, and at 6.33Mh/s, I haven't found a single block. Maybe I did something wrong, or maybe CPU mining is still too slow even when the difficulty is 1. Either way, I gave up for now, and killed the miner. It seems like a waste of CPU. I'll keep Bitcoin Core Testnet running for a while.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 30, 2023, 11:14:41 AM",
+      "body": "Quote from: ETFbitcoin on January 30, 2023, 11:09:22 AMdid you try to mine tBTC on a month without any result?I killed it after a week. I started it again (this morning), and gave n0nce access. Let's see if I missed something.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "January 31, 2023, 02:24:10 AM",
+      "body": "Quote from: LoyceV on January 30, 2023, 11:14:41 AMQuote from: ETFbitcoin on January 30, 2023, 11:09:22 AMdid you try to mine tBTC on a month without any result?I killed it after a week. I started it again (this morning), and gave n0nce access. Let's see if I missed something.Rough numbers: At 300GH/s and difficulty of 1, I should in theory mine one valid block in 3ps (picoseconds), meanwhile at 6MH/s it would take 166ns (nanoseconds).However, in a difficulty=1 scenario, the difference of 165997ps should make no difference at all. Network latency to other nodes will probably be in the single to double-digit ms range. For reference: 1ms (which is a really good network latency) are a million ns.There is a chance that your CPU is overloaded with all cores mining and no core ready to push that packet out to the network asap. Another idea would be making sure that this old CPU miner code doesn't wait for e.g. a whole set of nonce values before returning a valid block or something silly like that. It should return as soon as a block meets the difficulty, but I wouldn't rule out that it waits longer for whatever (legacy?) reason. I will definitely have a look at your bfgminer config and the bfgminer code, too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "January 31, 2023, 09:34:34 AM",
+      "body": "Quote from: n0nce on January 31, 2023, 02:24:10 AMRough numbers: At 300GH/s and difficulty of 1, I should in theory mine one valid block in 3ps (picoseconds), meanwhile at 6MH/s it would take 166ns (nanoseconds).However, in a difficulty=1 scenario, the difference of 165997ps should make no difference at all. Network latency to other nodes will probably be in the single to double-digit ms range. For reference: 1ms (which is a really good network latency) are a million ns.Who decides on those 20 minutes anyway? In Bitcoin, there's no need for exact timestamps. Is this different in testnet?I checked a few of the latest testnet blocks, and found times between blocks of:2418404 > 2418405: 20 minutes and 3 seconds.2418410 > 2418411: 20 minutes and 5 seconds.2418407 > 2418408: 20 minutes and 8 seconds.I checked the last 2 days, and to my surprise only 115 blocks per day get mined. I'm surprised because the total block height is much higher than for Bitcoin. I'm also surprised that several people here have mined several blocks per day at difficulty 1, which means that only a few dozen people can do that per day. I'd expect much more people to be mining testnet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "January 31, 2023, 12:12:45 PM",
+      "body": "Quote from: LoyceV on January 31, 2023, 09:34:34 AMWho decides on those 20 minutes anyway?This is good question. On Bitcoin Wiki, 20 minutes only mentioned since early 2013[1]. But afterwards i found out Gavin Andresen propose this[2] and create pull request some time later[3].Quote from: LoyceV on January 31, 2023, 09:34:34 AMI checked the last 2 days, and to my surprise only 115 blocks per day get mined.Mining difficulty on testnet keep rising which discourage some people to perform mining, where people with CPU/GPU only expect to earn tBTC from 1 difficulty after 20 minutes.Quote from: LoyceV on January 31, 2023, 09:34:34 AMI'm surprised because the total block height is much higher than for Bitcoin.Probably because now we have separate testing network dedicated for newer Bitcoin feature (e.g. signet and segnet) and in past people attempt to attack/stress Bitcoin testnet by mining with tons of ASIC.[1] https://en.bitcoin.it/w/index.php?title=Testnet&oldid=35502[2] https://bitcointalk.org/index.php?topic=50223.msg627957#msg627957[3] https://github.com/bitcoin/bitcoin/pull/686",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "February 03, 2023, 01:30:22 AM",
+      "body": "Quote from: ETFbitcoin on October 07, 2022, 11:36:40 AMAfter almost 4 days, i managed to mine 4 blocks. But due to relative slow internet connection, 2 of them become stale. Overall it's good experience and i got about ~0.05 tBTC, which probably will be used to try few different OPCODES on scripting or simply donate it to tBTC faucet.On a side note, on 3rd day i tried to mine only with 1 thread CPU since the goal to mine block with difficulty 1. But when i shutdown my PC, i got this error message with >100K occurrence. Quick search on google shows it's due continuous CPU usage for long time, although i'm not 100% sure it's due to bfgminer. Code:kernel: rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { P93622 } 116803 jiffies s: 7173 root: 0x1/.kernel: rcu: blocking rcu_node structures (internal RCU debug): l=1:0-15:0x0/TDid you monitor your CPU miner a bit? I just catched an instance where the last block was 20 minutes ago and bfgminer never adjusted the difficulty setting from its '125M' value. Does it take a bit longer to adjust or what is the cause? Or is it just not reflected in the user interface? I expected it to drop to 1 as soon as the 20 minute mark passed, even if it may not end up being first at submitting something to the network. But it simply didn't budge.This is Loyce's machine with 7 threads hashing and 1 core free to submit a block quickly.One thing I just realized is that in the screenshot, the I value (BTC per hour) is set to a question mark. So maybe it did quickly submit a block candidate and was waiting to see if it got accepted by the network? Can you post a log screenshot of what it looks like when bfgminer finds a valid block (whether it is accepted by the network or not - you mention 2 stale blocks)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "February 04, 2023, 02:29:22 AM",
+      "body": "Quote from: ETFbitcoin on February 03, 2023, 09:44:18 AMQuote from: n0nce on February 03, 2023, 01:30:22 AMOne thing I just realized is that in the screenshot, the I value (BTC per hour) is set to a question mark. So maybe it did quickly submit a block candidate and was waiting to see if it got accepted by the network? Can you post a log screenshot of what it looks like when bfgminer finds a valid block (whether it is accepted by the network or not - you mention 2 stale blocks)?What exactly do you mean by log? I checked my Bitcoin Core log and found out older log was wiped. After quick search, Bitcoin Core has config called shrinkdebugfile which enabled by default with 10MB limit. And few days ago i perform reindex which wipe everything from last years.With log, I mean the bfgminer log output as shown here.I am wondering whether it logs / shows whether it found a block at diff 1 here.Trying to work out whether the software even realizes that 20 minutes have passed, reduces the difficulty to 1, hashes a block candidate and tries to submit it or whether this all doesn't even happen.Even just seeing how a successfully mined block is shown in this log, would help, since I can only reference my experience with cgminer whose output looks very different.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "February 04, 2023, 06:56:58 AM",
+      "body": "Quote from: n0nce on February 03, 2023, 01:30:22 AMI just catched an instance where the last block was 20 minutes ago and bfgminer never adjusted the difficulty setting from its '125M' value.It sounds like this could be the reason it doesn't mine any blocks: if it never knows the difficulty is low, it won't find a block at low difficulty.From your screenshot:Quote125M (894.7T)I'm starting to think difficulty=1 doesn't mean it takes picoseconds to mine a block:Quote from: https://en.bitcoin.it/wiki/TestnetMinimum difficulty of 1.0 on testnet is equal to difficulty of 0.5 on mainnet.Quote from: https://en.bitcoin.it/wiki/Difficulty#What_is_the_formula_for_difficulty.3FAt difficulty 1, that is around 7 Mhashes per second.That would explain why ASICs still beat any CPU miner as it would take me about a second, while it takes the ASICs a fraction of a millisecond.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

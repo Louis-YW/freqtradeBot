@@ -1,0 +1,29 @@
+{
+  "id": "topic_5440345",
+  "title": "DireWolfM14",
+  "author": "DireWolfM14",
+  "created_time": "February 18, 2023, 05:55:45 PM",
+  "content": "Anyone else here self-hosting RoboSats?I recently installed it using the Docker method so I can run it locally, and access it from VPN.  Some of the networks I use block TOR, so if I want to access RoboSats from those networks I have to be able to connect to a clearnet IP, but I only want to do so if it's running on my own VPN.  Anyway, RoboSats is running and accessible from other machines on my LAN/VPN via port 12596.  However, I keep getting the notice below in my logs, and I'm reluctant to use it until I understand what's going on.Code:npm-dev      |npm-dev      | > frontend@0.3.4 devnpm-dev      | > webpack --watch --progress --mode developmentnpm-dev      |npm-dev      | sh: 1: webpack: not foundnpm-dev exited with code 127When I check the status of the docker container I see that the npm-dev container keeps restarting:Code:root@node-server:~# docker ps -aCONTAINER ID   IMAGE                     COMMAND                  CREATED          STATUS                            PORTS                                                               NAMESd17f7b384d54   nodeapp-nodeapp           \"docker-entrypoint.s…\"   51 minutes ago   Up 51 minutes                                                                                         nodeapp-dev00f2c72dfe5e   nodeapp-frontend          \"docker-entrypoint.s…\"   51 minutes ago   Restarting (127) 23 seconds ago                                                                       npm-devea751fee0991   nodeapp-tor               \"/root/entrypoint.sh\"    51 minutes ago   Up 51 minutes                     9001/tcp, 9050/tcp, 0.0.0.0:12596->12596/tcp, :::12596->12596/tcp   tor-devTo set it up I followed the very simple instructions for the Frontend Docker container that can be found here:https://github.com/Reckless-Satoshi/robosats/blob/main/setup.md#set-upEnvironment:Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz16GB RAMDebian 11 (5.10.162-1)Docker version 23.0.1, build a5ee5b1I have NPM and Node installed on the system, and they are the latest LTS versions from the nodesource repository.  I doubt that matters since RoboSats is running in it's own container.Is this an issue I need to be worried about, and if so, any advice?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440345",
+  "comments": [
+    {
+      "author": "DireWolfM14",
+      "created_time": "February 24, 2023, 10:02:57 PM",
+      "body": "Just in case anyone wants to try this for themselves; the error code I was getting isn't an issue.  I posed this question on RoboSat's matrix chatroom, and Reckless_Satoshi responded.  He said the error is regarding the fact that I didn't download the webpack, which would be needed if I intended to do any development on the software.  Since that's not my intention, I don't need the webpack and I can disable the npm-dev docker image, or remove it from the docker-compose.yml file before start-up.Anyway, I've had the self-hosted site up for several days now without issue, so I've gained confidence in it's stability and usability.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "March 11, 2023, 10:24:00 PMLast edit: March 20, 2023, 08:53:05 PM by DireWolfM14",
+      "body": "Reckless_Satoshi notified me on Robosats' matrix chat room that he posted an example docker-compose.yml file for starting up the front end without need for the webpack.  The following example is tuned for people who want to host their own front end, so you can access it from your own server.  The new version of the file eliminates the npm-dev image, and no longer produces the error I was receiving.  If you care to set it up, follow these simple instructions:Navigate to the directory where you want the files stored, then:Code:git clone https://github.com/Reckless-Satoshi/robosats.gitNavigate to the nodeapp directory:Code:cd robosats/nodeappStart the docker stack:Code:docker-compose -f docker-compose.yml upTo have it start up automatically on system boot start the docker images using the root account or add sudo to the command:Code:sudo docker-compose -f docker-compose.yml upThe original version with npm-dev for developers can still be started using the docker-compose-dev.yml file instead.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

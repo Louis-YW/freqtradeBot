@@ -1,0 +1,85 @@
+{
+  "id": "topic_5478141",
+  "title": "GaloisField",
+  "author": "GaloisField",
+  "created_time": "December 16, 2023, 02:54:18 PM",
+  "content": "Hello,I post a message today cause I tried multiple ways to manage with my issue but I didn't find any solution. Maybe you can help me ?First my version and OS : Bitcoin Core version v24.0.1 (release build)MacOS 14.0Shell : zsh My Bitcoin full node is running with txindex=1. I'm running `./bitcoind`. Everything what I'm talking is under `./bitcoin-cli` command. I selected a wallet, and listed unspent. I want to merge multiple inputs into one single output. I selected transactions that I want to merge 3 for the test and one address to give the change. I try to build my tx from `rawtransaction` but maybe I should use another. Here I tried also `walletcreatefundedpsbt` but I got the error : Insufficient funds.So, I selected my utxos and build rawtransaction as follow : ./bitcoin-cli -rpcwallet=MY_WALLET createrawtransaction \"[{\\\"txid\\\":\\\"tx_id_1\\\",\\\"vout\\\": 0, \\\"scriptPubKey\\\":\\\"Script_1\\\"}, {\\\"txid\\\":\\\"tx_id_2\\\",\\\"vout\\\": 1, \\\"scriptPubKey\\\":\\\"Script_2\\\"}, {\\\"txid\\\":\\\"tx_id_3\\\",\\\"vout\\\": 1, \\\"scriptPubKey\\\":\\\"Script_3\\\"}]\" \"[{\\\"recipient\\\" : amt}]\"Here I take the output to sign it (with `signrawtransactionwithwallet`), I got the error : {      \"txid\": \"tx_id_1\",      \"vout\": 0,      \"witness\": [      ],      \"scriptSig\": \"\",      \"sequence\": 4294967293,      \"error\": \"Witness program was passed an empty witness\" }This for all utxos.So, I tried to sign manually each ScriptPubKey as message with signmessage but I need the pvkey. When I try dumpvkey I have the error : Only legacy wallets are supported by this commandThe wallet is a taproot wallet (bc1p...). I don't know what step to follow in order to add the witness and be able to sign this raw transaction and send to the network. I think sending on the network is not the hardest part but I didn't find how to handle signatures for this... It's not a multisig wallet and I have the control of it. Do you have any ideas or suggestions ?Thanks for your reading I hope that we can solve this together",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5478141",
+  "comments": [
+    {
+      "author": "Findingnemo",
+      "created_time": "December 16, 2023, 03:48:51 PM",
+      "body": "Make sure UTXOs have spendable funds in it.To get list of all available spendable UTXOs use 'listunspent' in the command console.To create Raw transaction, Use 'createrawtransaction ' command and make sure scriptPubKey provided are correct for each UTXO.Code:./bitcoin-cli -rpcwallet=MY_WALLET createrawtransaction \"[{\\\"txid\\\":\\\"tx_id_1\\\",\\\"vout\\\": 0, \\\"scriptPubKey\\\":\\\"Script_1\\\"}, {\\\"txid\\\":\\\"tx_id_2\\\",\\\"vout\\\": 1, \\\"scriptPubKey\\\":\\\"Script_2\\\"}, {\\\"txid\\\":\\\"tx_id_3\\\",\\\"vout\\\": 1, \\\"scriptPubKey\\\":\\\"Script_3\\\"}]\" \"{\\\"recipient_address\\\": amount, \\\"change_address\\\": change}\"To Sign Raw transaction, use 'signrawtransactionwithwallet'Code:./bitcoin-cli -rpcwallet=MY_WALLET signrawtransactionwithwallet \"hex_of_raw_transaction\"After Signing, verify the signed transaction by 'decoderawtransaction' command.Code:./bitcoin-cli -rpcwallet=MY_WALLET decoderawtransaction \"signed_hex_transaction\"Now Broadcast your transactionCode:./bitcoin-cli -rpcwallet=MY_WALLET sendrawtransaction \"signed_hex_transaction\"To get your private key in bitcoin core, use 'dumpprivkey' followed by the respective address",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GaloisField",
+      "created_time": "December 16, 2023, 04:01:17 PM",
+      "body": "Ok thanks for your answer but I well double checked and info are correct. It's really during the 'signrawtransactionwithwallet' step where the problem cames out caused by Witness program was passed an empty witness.But I don't find how to manage with witness. I followed your previous step to build my first transactioon and it was good. But for this one it doesn't work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "December 16, 2023, 04:22:56 PM",
+      "body": "Are you certain that all of the inputs that you have specified belong to the wallet? You have the correct vout values? When you used listunspent, did it say that those utxos are spendable?Can you also post the output of getwalletinfo?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GaloisField",
+      "created_time": "December 16, 2023, 04:35:29 PM",
+      "body": "> Are you certain that all of the inputs that you have specified belong to the wallet?Yes it's in the output of ./bitcoin-cli -rpcwallet=MY_WALLET listunspent> You have the correct vout values?Yes the vout is the right one. And I think that I should have another error if the problem comes from vout. > When you used listunspent, did it say that those utxos are spendable?Yes each of them are spendable.> Can you also post the output of getwalletinfo?{  \"walletname\": \"cor\",  \"walletversion\": 169900,  \"format\": \"sqlite\",  \"balance\": 0.00071184,  \"unconfirmed_balance\": 0.00000000,  \"immature_balance\": 0.00000000,  \"txcount\": 44,  \"keypoolsize\": 1000,  \"keypoolsize_hd_internal\": 0,  \"paytxfee\": 0.00000000,  \"private_keys_enabled\": false,  \"avoid_reuse\": true,  \"scanning\": false,  \"descriptors\": true,  \"external_signer\": false}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GaloisField",
+      "created_time": "December 16, 2023, 04:37:36 PM",
+      "body": "I don't know if it's important or new but each output looks like this :   {    \"txid\": \"d13...\",    \"vout\": 0,    \"address\": \"bc1p...\",    \"label\": \"\",    \"scriptPubKey\": \"5120...\",    \"amount\": 0.00010000,    \"confirmations\": 43033,    \"spendable\": true,    \"solvable\": true,    \"desc\": \"descriptor\",    \"parent_descs\": [      \"another_descriptor\"    ],    \"reused\": false,    \"safe\": true  }",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "December 16, 2023, 05:31:05 PM",
+      "body": "How did you create this wallet? It does not have private keys enabled, so you will be unable to sign any transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GaloisField",
+      "created_time": "December 16, 2023, 05:47:46 PM",
+      "body": "Aaaaah ! I created with ord command-line",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "December 16, 2023, 09:10:29 PM",
+      "body": "Quote from: GaloisField on December 16, 2023, 05:47:46 PMI created with ord command-lineThen you need to look at ord's documentation, and probably be using it to send as well. The private keys are not in Bitcoin Core so there's nothing that you can do with it directly to send.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GaloisField",
+      "created_time": "December 16, 2023, 10:07:27 PM",
+      "body": "Ok ! Yes totally you're right !Thanks a lot for all your help !!!🙏🙏🙏",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

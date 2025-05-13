@@ -1,0 +1,93 @@
+{
+  "id": "topic_5456909",
+  "title": "DireWolfM14",
+  "author": "DireWolfM14",
+  "created_time": "June 19, 2023, 09:11:29 PMLast edit: October 13, 2024, 05:42:10 PM by DireWolfM14",
+  "content": "I don't know about the rest of you, but I prefer to install Electrum on my Linux machines using the python package tarball.  I recently installed Debian 12 Bookworm on one of my laptops, but was surprised to find an error when attempting to install Electrum.  More info on the error and resolution can be found in the issue I submitted on Github.It appears that Debian isn't the only OS with changes that broke the python installation instructions found on Electrum's website.  Another, earlier issue was reported in regards to Ubuntu 23.Below are the instructions on how to install the Python version of Electrum on newer Linux distros with kernel versions of 6.0 and above.  If you installed the new version of Linux on a freshly formatted hard drive you can proceed with the installation instructions.  If you upgraded from a previous version of Linux you'll want to uninstall Electrum first.  Make sure to backup your wallet files.To uninstall previous versions of Electrum (make sure to backup your wallet files first):Code:sudo apt remove electrumInstall ElectrumIf you have previously used this method to install Electrum and you want to upgrade to a newer version, only steps 4 through 6 are required, and optionally, step 9 to clean up.  Make sure to substitute the file names for the desired package.1. Perform an update.Code:sudo apt update2. Install the required dependencies:Code:sudo apt install -y libsecp256k1-dev python3.11-venv python3-pyqt53. Create the environment folder for Electrum:Code:sudo python3 -m venv --system-site-packages /opt/electrum4. From the user home directory (not important, but cleaner) download the required package and signature files:Code:wget https://download.electrum.org/4.5.5/Electrum-4.5.5.tar.gz https://download.electrum.org/4.5.5/Electrum-4.5.5.tar.gz.asc5. Verify the package (more info here):Code:gpg --verify Electrum-4.5.5.tar.gz.asc6. From the same directory where you downloaded the tarball you can now install Electrum with this command:Code:sudo /opt/electrum/bin/pip install Electrum-4.5.5.tar.gz7. A symlink to the binary is needed for the app drawer launcher and to simplify CLI commands:Code:sudo ln -s /opt/electrum/bin/electrum /usr/bin/electrum8. Create the app drawer launcher file, \"electrum.desktop,\" and update it's link to the icon image location:Code:sudo desktop-file-install /opt/electrum/share/applications/electrum.desktopsudo sed -i -e 's+Icon=electrum+Icon=/opt/electrum/share/icons/hicolor/128x128/apps/electrum.png+' /usr/share/applications/electrum.desktop9. Clean up by removing unneeded files:Code:rm Electrum-4.5.5.tar.gz Electrum-4.5.5.tar.gz.ascAnd that's it.  You should find the Electrum icon in your app drawer or applications list, and it should start Electrum without any issues.  You should also be able to interact with Electrum using the CLI commands.**Note: If you have previously used this method to install Electrum and you want to upgrade to a newer version, only steps 4 through 6 are required, and optionally, step 9 to clean up.  Make sure to substitute the file names for the desired package.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5456909",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "June 20, 2023, 12:08:36 PM",
+      "body": "Very good method that also happens to be very similar to the one I use - the only difference is that I install libsecp256k1 dependencies from APT. Although PyPI also redistributes the compiled wheels for it, so there's no LD_LIBRARY_PATH headaches with these instructions either.PS: --user option to PIP was always a dirty hack, you can only make one \"user\" environment per user obviously, however you can have unlimited venvs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "logfiles",
+      "created_time": "June 20, 2023, 11:46:24 PM",
+      "body": "I also had a similar issue when installing Electrum on them latest Ubuntu 23.04 (Lunar Lobster). The icon that was on the app draw was non-responsive. Not having enough technical knowledge about how to go around this. I just gave up and instead opted for the Appimage file that I could run whenever I wanted to access my wallet.I will try out the new guide and see how it goes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "logfiles",
+      "created_time": "June 26, 2023, 11:40:38 PM",
+      "body": "Update:I followed all the steps, and now I can now open my electrum normally using the icon from the application list. Thanks   Do you think this instruction will be added under the Linux installation guide?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "June 27, 2023, 12:44:17 AMLast edit: June 27, 2023, 01:33:39 AM by DireWolfM14",
+      "body": "Quote from: logfiles on June 26, 2023, 11:40:38 PMDo you think this instruction will be added under the Linux installation guide?I don't think so.  Odds are the dev team will tweak the python package to automatically create the launcher and register the binary in PATH, but I imagine they'll change the instructions on the Electrum website by replacing pip with venv.Glad to hear that you were able to use my instructions successfully.  As you can see I wrote the instructions with version 4.4.4 in mind, and when 4.4.5 came out I was able to upgrade without issue also.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "August 26, 2023, 04:47:12 PMLast edit: August 26, 2023, 07:09:13 PM by DireWolfM14",
+      "body": "I decided to update these instructions to include the latest version of Electrum due to a significant security update in version 4.4.6.  I also decided to make the instructions easier on those who prefer to remain logged in as mere mortals, and I noticed that libsecp256k1-dev is required on a fresh OS.  I neglected to notice when I came up with this method because I had already installed libsecp256k1-dev when I tried the old method first.Added \"sudo\" to the commands that require elevated privilegesAdded \"libsecp256k1-dev\" to the required dependenciesLeveraged the included desktop file instead of creating a new oneAdded instructions to clean unneeded filesHighlighted instructions for upgrades",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "l8orre",
+      "created_time": "September 02, 2023, 01:21:33 AM",
+      "body": "I have been using electrum python (old 3.x.y version) and Appimage on Linux, lately the Appimage of 4.1.2As 4.1.2 is getting a bit old too, maybe I should update to a more recent version.However, I am concerned with security, and having python code would allow me to read it.I know quite a bit of python, but I am no networking Guru- is there maybe a collection of suspicious code fragments to search for in the python code?This seems esp. important because a malware would be hidden in some otherwise networking unrelated module and be called from some unconspicuous function for obfuscation. Like, the typical routines a malware would use, like establishing network connections other than to the electrum servers etc.?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 05, 2023, 07:41:51 AM",
+      "body": "Quote from: l8orre on September 02, 2023, 01:21:33 AMI have been using electrum python (old 3.x.y version) and Appimage on Linux, lately the Appimage of 4.1.2As 4.1.2 is getting a bit old too, maybe I should update to a more recent version.However, I am concerned with security, and having python code would allow me to read it.I know quite a bit of python, but I am no networking Guru- is there maybe a collection of suspicious code fragments to search for in the python code?This seems esp. important because a malware would be hidden in some otherwise networking unrelated module and be called from some unconspicuous function for obfuscation. Like, the typical routines a malware would use, like establishing network connections other than to the electrum servers etc.?  The AppImage is just an archive containing all the binaries and libraries and other supporting files zipped together in one large format. You can extract it by opening the terminal and typing the name and path of the AppImage following by --appimage-extract and there should be some folder in /tmp created where you can see all the Python sources contained inside site_packages.Any of these alternate methods can be used to unzip the appimage too: https://superuser.com/questions/1301583/how-can-i-extract-files-from-an-appimage",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jordibond",
+      "created_time": "October 01, 2024, 09:25:18 PMLast edit: October 02, 2024, 05:00:34 PM by jordibond",
+      "body": "Hi All,Just for the records, i've recently upgraded from Ubuntu 22.04 to 24.04, and electrum said even after follow the instructions:Error: No module named 'qrcode'. Try 'sudo python3 -m pip install <module-name>'Then upgraded to electrum from 4.5.4 to 4.5.5, installation was successfull. Same result.Finally the command type -a electrum showed 3 scripts:$ type -a electrumelectrum és /home/jordi/.local/bin/electrumelectrum és /usr/bin/electrumelectrum és /bin/electrumThe first one gives the error, second and third are links to /opt/electrum/bin/electrum , which works fine.Renaming the first one did the trick.Hope this helps someone, Jordi",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "October 03, 2024, 03:01:36 AM",
+      "body": "Quote from: jordibond on October 01, 2024, 09:25:18 PMHi All,Just for the records, i've recently upgraded from Ubuntu 22.04 to 24.04, and electrum said even after follow the instructions:Error: No module named 'qrcode'. Try 'sudo python3 -m pip install <module-name>'Then upgraded to electrum from 4.5.4 to 4.5.5, installation was successfull. Same result.Finally the command type -a electrum showed 3 scripts:$ type -a electrumelectrum és /home/jordi/.local/bin/electrumelectrum és /usr/bin/electrumelectrum és /bin/electrumThe first one gives the error, second and third are links to /opt/electrum/bin/electrum , which works fine.Renaming the first one did the trick.Hope this helps someone, JordiThank you for posting!  This is seemingly a result of having upgraded from a previous Linux installation where the remnants of Electrum still remained in the user bin.  Something I overlooked when writing my instructions.  I've updated the OP to include instructions for removing previous versions of Electrum when having upgraded the OS from a previous install.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 03, 2024, 06:31:59 AM",
+      "body": "By the way, I thought this might be interesting for some of you, but none of this is applicable to Arch Linux. There's already an AUR package of Electrum that you can install directly without jumping through Python hoops.It tracks the Github repository, so it should always be up to date. (and possibly broken sometimes, depending on what commits are in place, but I imagine you can choose a specific version of packages to install in Arch.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

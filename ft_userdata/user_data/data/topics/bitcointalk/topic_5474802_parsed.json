@@ -1,0 +1,141 @@
+{
+  "id": "topic_5474802",
+  "title": "mcdouglasx",
+  "author": "mcdouglasx",
+  "created_time": "November 20, 2023, 06:30:10 PMLast edit: December 07, 2023, 02:44:44 AM by mcdouglasx",
+  "content": "modules used:Bitcoinpip install bitcoin---------------------------secp256k1download at https://github.com/iceland2k14/secp256k1place files in the same folder as the script.Decimal to Compressed Address Code:import secp256k1 as ice            target = 1A0 = ice.scalar_multiplication(target)A1 = A0.hex()B0 = ice.pubkey_to_address(0,1, A0)A2 = ice.to_cpub(A1)print(\"Pk:\",target)print(\"cPub:\",A2)print(\"Addr:\",B0)addition of two points (publickeys)Code:import secp256k1 as ice#A+BA= \"HERRE COMPRESSED PUBLIC KEY\"B= \"HERRE COMPRESSED PUBLIC KEY\"Upub_A= ice.pub2upub(A)Upub_B= ice.pub2upub(B)A1= ice.point_addition(Upub_A, Upub_B).hex()A2 = ice.to_cpub(A1)print(\"R:\",A2)subtraction of two points (publickeys)Code:import secp256k1 as ice#A-BA= \"HERE COMPRESSED PUBLIC KEY\"B= \"HERE COMPRESSED PUBLIC KEY\"Upub_A= ice.pub2upub(A)Upub_B= ice.pub2upub(B)A1= ice.point_subtraction(Upub_A, Upub_B).hex()A2 = ice.to_cpub(A1)print(\"R:\",A2)multiply (publickey*decimal)Code:import bitcointarget= \"HERE COMPRESSED PUBLIC KEY\"N= 2mult= bitcoin.multiply(target, N)print(mult)division (publickey/decimal)Code:import bitcointarget= \"HERE COMPRESSED PUBLIC KEY\"N= 2Div= bitcoin.divide(target, N)print(Div)edit:Division in Ecc works differently, I attach a division script with mod N that emulates the process in decimals, for your greater understanding.Code:import bitcointarget= 1361129467683753853853498429727072845823Div=2N=115792089237316195423570985008687907852837564279074904382605163141518161494337a=bitcoin.inv(Div,N)b= target*a % Nprint(\"pk:\",b)Upub to CpubCode:import secp256k1 as ice           target = “UNCOMPRESSED PUB HERE”A2 = ice.to_cpub(target)print(\"Cpub:\", A2)",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5474802",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "November 21, 2023, 08:34:44 AM",
+      "body": "Quote from: mcdouglasx on November 20, 2023, 06:30:10 PMdivision (publickey/decimal)Code:import bitcointarget= \"HERE COMPRESSED PUBLIC KEY\"N= 2Div= bitcoin.divide(target, N)print(Div)Division cannot exactly undo multiplication without taking remainders into account, because elliptic curve multiplication is like a \"many-to-one\" function. When you divide like this you get the 0th quotient, but there are always 'i'+1 remainders that can be calculated for a division by 'i' and you get each one by subtracting i*G from the public key before dividing (i.e. inverse multiplying).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "November 22, 2023, 12:50:31 PM",
+      "body": "Sorry, but i try to figure out how to use the private key to public key (compressed), function of iceland2k14 secp256k1, maybe i have a mind block or i can't remember.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 22, 2023, 01:00:26 PM",
+      "body": "OP when i saw the title \"list of simple mathematical operations in ECC secp256k1 (Python).\" I think that those funtions will be implemented directly in python only... I don't see why you get merit just by showing someone else code here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "November 22, 2023, 01:16:28 PM",
+      "body": "Quote from: albert0bsd on November 22, 2023, 01:00:26 PM What do you mean implementing directly? Of course it's not someone else's code, these are mathematical functions and there is no copyrights or anything.Btw, you already have the fastest tools here, no need to overreact. 😉",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "November 22, 2023, 01:28:07 PM",
+      "body": "Quote from: albert0bsd on November 22, 2023, 01:00:26 PMOP when i saw the title \"list of simple mathematical operations in ECC secp256k1 (Python).\" I think that those funtions will be implemented directly in python only... I don't see why you get merit just by showing someone else code here.If I had wanted to put only python code (without modules) it would no longer be \"simple\", but would be expressed in the title \"pure python\", my idea is to make it easy for those looking for simple and quick solutions, excuse me if I receive merits for that, but I don't choose who gives them to me.Simple: \"easily understood or done; presenting no difficulty\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "November 22, 2023, 01:31:56 PM",
+      "body": "Quote from: ElDalmatino on November 22, 2023, 12:50:31 PMSorry, but i try to figure out how to use the private key to public key (compressed), function of iceland2k14 secp256k1, maybe i have a mind block or i can't remember.place files in the same folder as the script.Code:Code:import secp256k1 as ice            target = 1A0 = ice.scalar_multiplication(target)A1 = A0.hex()A2 = ice.to_cpub(A1)print(\"Pk:\",target)print(\"cPub:\",A2)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "November 22, 2023, 04:01:11 PM",
+      "body": "Quote from: albert0bsd on November 22, 2023, 01:00:26 PMOP when i saw the title \"list of simple mathematical operations in ECC secp256k1 (Python).\" I think that those funtions will be implemented directly in python only... I don't see why you get merit just by showing someone else code here.If you want some of these functions in pure Python, I've got some older code that does it:https://gist.github.com/ymgve/efc307e173ed9ea8cb2cac3c7462ed7b(The main code is for claiming some garbage fork coin, but the ECC primitives work the same)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 22, 2023, 04:17:21 PM",
+      "body": "Quote from: mcdouglasx on November 22, 2023, 01:28:07 PMSimple: \"easily understood or done; presenting no difficulty\".It is going to be the same, you only need to create a python file class that use the same functions names and parameters.. that is more educative in that wayThe main code that use those functions its going to be simple, the complex file only need to be importedQuote from: ymgve2 on November 22, 2023, 04:01:11 PMIf you want some of these functions in pure Python, I've got some older code that does it:I don't want them I already have it in C  and C++, but is nice see those in python",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "November 22, 2023, 05:01:47 PM",
+      "body": "Quote from: albert0bsd on November 22, 2023, 04:17:21 PMIt is going to be the same, you only need to create a python file class that use the same functions names and parameters.. that is more educative in that wayThe main code that use those functions its going to be simple, the complex file only need to be importedWhat you ask for is absurd, you criticize from selfishness (or is what it seems):It is the equivalent of asking you instead of using for example:  #include secp256k1.hCreate your own code for secp256k1.Your argument has no basis, especially when it is a post dedicated to simplicity, ease and minimalism.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "November 22, 2023, 05:35:05 PM",
+      "body": "Quote from: mcdouglasx on November 22, 2023, 01:31:56 PMQuote from: ElDalmatino on November 22, 2023, 12:50:31 PMSorry, but i try to figure out how to use the private key to public key (compressed), function of iceland2k14 secp256k1, maybe i have a mind block or i can't remember.place files in the same folder as the script.Code:Code:import secp256k1 as ice            target = 1A0 = ice.scalar_multiplication(target)A1 = A0.hex()A2 = ice.to_cpub(A1)print(\"Pk:\",target)print(\"cPub:\",A2)Thank you  exactly what i search for.I think this is a good thread .. why because its on point .. need some fast short code, here it is, sometimes the script or codecrumbs, dissapear in endless useless discussions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 22, 2023, 05:46:05 PM",
+      "body": "Quote from: mcdouglasx on November 22, 2023, 05:01:47 PMWhat you ask for is absurdNot is not absurd the user ymgve2 already post the python code.Quote from: mcdouglasx on November 22, 2023, 05:01:47 PMIt is the equivalent of asking you instead of using for example:  #include secp256k1.hCreate your own code for secp256k1.I create it in C if you see the C code of the first version of keyhunt i did it from zero... check it hereBut  its ok, if you don't know how to do it, its OK i have no problem with it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "November 22, 2023, 06:28:50 PM",
+      "body": "Quote from: albert0bsd on November 22, 2023, 05:46:05 PMQuote from: mcdouglasx on November 22, 2023, 05:01:47 PMWhat you ask for is absurdNot is not absurd the user ymgve2 already post the python code.Quote from: mcdouglasx on November 22, 2023, 05:01:47 PMIt is the equivalent of asking you instead of using for example:  #include secp256k1.hCreate your own code for secp256k1.I create it in C if you see the C code of the first version of keyhunt i did it from zero... check it hereBut  its ok, if you don't know how to do it, its OK i have no problem with it.It's not that I don't know (the truth is it's not a challenge), I don't know why you can't understand that the focus of the code here is to be easy to use, and friendly to the eye, just like a+b=c.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "November 22, 2023, 08:33:29 PM",
+      "body": "You should also add double point torsion with the possibility to add and subtract the results, you know the one that subtracts 1 divides by 2, it's a groundbreaking simple algorithm. Don't know if anyone has tried to manipulate the keys and try different values or not.Btw, it's a free for all to use, no copyrights.😉And technically ECC is considered advanced mathematics, there is no easy and simple to the eyes. But I get what you mean.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "November 23, 2023, 11:23:25 AM",
+      "body": "Quote from: ecdsa123 on November 23, 2023, 10:05:55 AMyou can add additional operations like on pubkeys but this time as operate on signatures.example:we have r,s,z and pubkey:you can implement :1. Divide transaction by integer to get valid new transaction for this pubkey2. Add nonce to this transaction3. sub the nonce from this transactionand so on..Cool suggestion but that is not what we are after in this community, however for the sake of scientific research, do you have that script or no? If you have gimme it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ElDalmatino",
+      "created_time": "December 06, 2023, 11:32:58 PM",
+      "body": "Hi your list of list of simple mathematical operations in ECC secp256k1 is a big help for me, can i ask you if there is also a code to get the compressed version of a uncompressed public key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "December 07, 2023, 12:15:20 AM",
+      "body": "Quote from: ElDalmatino on December 06, 2023, 11:32:58 PMHi your list of list of simple mathematical operations in ECC secp256k1 is a big help for me, can i ask you if there is also a code to get the compressed version of a uncompressed public key.Code:import secp256k1 as ice            target = “UNCOMPRESSED PUB HERE”A2 = ice.to_cpub(target)print(A2)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

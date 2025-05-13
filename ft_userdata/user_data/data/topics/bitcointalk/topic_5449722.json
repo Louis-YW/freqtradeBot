@@ -1,0 +1,61 @@
+{
+  "id": "topic_5449722",
+  "title": "apogio",
+  "author": "apogio",
+  "created_time": "April 21, 2023, 05:38:24 PM",
+  "content": "Hello! I am running bitcoind using my terminal. I am on a windows machine. When I run Code:bitcoin-cli -netinfo I get the following response:Code:        ipv4    ipv6   onion   total   blockin         0       0       0       0out        8       2       0      10       2total      8       2       0      10I know that in order to get incoming connections I need to do portforwarding and allow connections on my firewall. So, let me say in advance that I can't do this!Could you help me allow anonymous connections? I suppose that in this manner, I won't have to care about port forwarding.Thanks in advance!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5449722",
+  "comments": [
+    {
+      "author": "SamReomo",
+      "created_time": "April 22, 2023, 02:00:38 AM",
+      "body": "Quote from: apogio on April 21, 2023, 05:38:24 PMI know that in order to get incoming connections I need to do portforwarding and allow connections on my firewall. So, let me say in advance that I can't do this!Could you help me allow anonymous connections? I suppose that in this manner, I won't have to care about port forwarding.Thanks in advance!In that case the most suitable option for you is to use tor and run your node on it because it doesn't require port forwarding to allow the connections. You can also run the node on a VPS server where you won't need to forward the ports. You will only need to allow the connections through the firewall of the VPS and that's accessible to you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 22, 2023, 06:54:09 AM",
+      "body": "Quote from: apogio on April 21, 2023, 05:38:24 PMWhen I run Code:bitcoin-cli -netinfo I get the following response:There's an \"onion\" column in the result of -netinfo so I guess you're already running with -proxy=127.0.0.1:9050 and a Tor onion service...If so, just follow the third option in this article about connecting via Tor: https://github.com/bitcoin/bitcoin/blob/master/doc/tor.mdI recommend that manual setup since it's the most simple, just add line to your \"torrc\" file, start Tor, get your external IP from the \"HiddenServiceDir\" that you've setand start Bitcoin Core with your correct -externalip and suggested command line options and your node will be reachable via Tor.You can use: bitnodes.io to see if your node is reachable. (paste your -externalip)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "April 22, 2023, 07:34:21 AMLast edit: April 22, 2023, 09:11:09 AM by apogio",
+      "body": "Quote from: nc50lc on April 22, 2023, 06:54:09 AMThere's an \"onion\" column in the result of -netinfo so I guess you're already running with -proxy=127.0.0.1:9050 and a Tor onion service...If so, just follow the third option in this article about connecting via Tor: https://github.com/bitcoin/bitcoin/blob/master/doc/tor.mdAt the moment my -netinfo is as follows:Code:Bitcoin Core v22.0.0 - 70016/Satoshi:22.0.0/        ipv4    ipv6   onion   total   blockin         0       0       0       0out        9       1       0      10       2total      9       1       0      10Local addresses<my onion address>     port   8333    score      4I have run bitcoin core using:Code: .\\bitcoind.exe -datadir=<bitcoin core path> -externalip=<my onion address> -proxy=\"127.0.0.1:9050\" -debug=\"tor\"  Tor is running as a service on my system.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 22, 2023, 02:37:56 PM",
+      "body": "To force bitcoind to use only Tor I've the following in my bitcoin.conf file:Code:listenonion=1onlynet=onionAnd bitcoin-cli -netinfo yields only incoming and outgoing connections via Tor onion addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 22, 2023, 02:44:08 PM",
+      "body": "Quote from: apogio on April 22, 2023, 07:34:21 AMCode: .\\bitcoind.exe -datadir=<bitcoin core path> -externalip=<my onion address> -proxy=\"127.0.0.1:9050\" -debug=\"tor\"  If you need inbound connections, add -listen=1 command line option or follow the suggestion above, in your \"bitcoin.conf\" file.You'll need it since -proxy disabled listen.Take note that onlynet=onion will prevent you from connecting to nodes on clearnet.Have you tried in bitnodes if your node is reachable?If it is now, you'll eventually get inbound connections after a while.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "April 22, 2023, 03:34:37 PMLast edit: April 22, 2023, 04:16:01 PM by apogio",
+      "body": "Quote from: Cricktor on April 22, 2023, 02:37:56 PMTo force bitcoind to use only Tor I've the following in my bitcoin.conf file:Code:listenonion=1onlynet=onionAnd bitcoin-cli -netinfo yields only incoming and outgoing connections via Tor onion addresses.Quote from: nc50lc on April 22, 2023, 02:44:08 PMIf you need inbound connections, add -listen=1 command line option or follow the suggestion above, in your \"bitcoin.conf\" file.You'll need it since -proxy disabled listen.Take note that onlynet=onion will prevent you from connecting to nodes on clearnet.Have you tried in bitnodes if your node is reachable?If it is now, you'll eventually get inbound connections after a while.Thank you both! I have added -listen=1 option. I haven't added the onlynet=onion option because I want to receive and send all kind of connections.However, it looks like I still don't get incoming transactions. BUT in bitnodes it looks like my onion address is discoverable.----EDIT----I am so happy! Thank you! Look:Code:Bitcoin Core v22.0.0 - 70016/Satoshi:22.0.0/        ipv4    ipv6   onion   total   blockin         0         0       4       4out       10       0       0      10       2total     10       0       4      14Local addresses<my onion address>.onion     port   8333    score      5",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

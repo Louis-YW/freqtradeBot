@@ -1,0 +1,61 @@
+{
+  "id": "topic_5430485",
+  "title": "BlueBoat",
+  "author": "BlueBoat",
+  "created_time": "December 20, 2022, 10:12:42 AM",
+  "content": "Hi all,I'm trying to compile Bitcoin Core but I'm getting an error message.After the following commands, Code:$./autogen.sh$./configure$sudo make I got the the following error message :Quotemake: *** No targets specified and no makefile found.  Stop.A Makefile.am exists in the main folder so I don't see where come from.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5430485",
+  "comments": [
+    {
+      "author": "Edwardard",
+      "created_time": "December 20, 2022, 11:07:34 AM",
+      "body": "My guess is you didn't install build dependencies like autoconf, autoreconf, and automake. Follow this guide and retry: https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md This should solve the issue, hopefully!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlueBoat",
+      "created_time": "December 20, 2022, 11:22:28 AM",
+      "body": "Quote from: Edwardard on December 20, 2022, 11:07:34 AMMy guess is you didn't install build dependencies like autoconf, autoreconf, and automake. Follow this guide and retry: https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md This should solve the issue, hopefully!They were installed.However, I just tried to install them again after your post and below the print of the messages received (confirming that the depencies were already installed) :Code:user1@UBUNTU-DESKTOP:~/bitcoin$ sudo apt-get install build-essential libtool autotools-dev automake pkg-config bsdmainutils python3[sudo] password for bluefalcon:Reading package lists... DoneBuilding dependency treeReading state information... Doneautomake is already the newest version (1:1.16.1-4ubuntu6).autotools-dev is already the newest version (20180224.1).bsdmainutils is already the newest version (11.1.2ubuntu3).libtool is already the newest version (2.4.6-14).pkg-config is already the newest version (0.29.1-0ubuntu4).python3 is already the newest version (3.8.2-0ubuntu2).build-essential is already the newest version (12.8ubuntu1.1).0 upgraded, 0 newly installed, 0 to remove and 22 not upgraded.user1@UBUNTU-DESKTOP:~/bitcoin$ sudo apt-get install libevent-dev libboost-devReading package lists... DoneBuilding dependency treeReading state information... Donelibboost-dev is already the newest version (1.71.0.0ubuntu2).libboost-dev set to manually installed.libevent-dev is already the newest version (2.1.11-stable-1).0 upgraded, 0 newly installed, 0 to remove and 22 not upgraded.user1@UBUNTU-DESKTOP:~/bitcoin$ sudo apt install libsqlite3-devReading package lists... DoneBuilding dependency treeReading state information... Donelibsqlite3-dev is already the newest version (3.31.1-4ubuntu0.5).0 upgraded, 0 newly installed, 0 to remove and 22 not upgraded.user1@UBUNTU-DESKTOP:~/bitcoin$ sudo apt install libminiupnpc-dev libnatpmp-devReading package lists... DoneBuilding dependency treeReading state information... Donelibminiupnpc-dev is already the newest version (2.1.20190824-0ubuntu2).The following NEW packages will be installed:  libnatpmp-dev0 upgraded, 1 newly installed, 0 to remove and 22 not upgraded.Need to get 7036 B of archives.After this operation, 30.7 kB of additional disk space will be used.Do you want to continue? [Y/n] yGet:1 http://archive.ubuntu.com/ubuntu focal/main amd64 libnatpmp-dev amd64 20150609-7build1 [7036 B]Fetched 7036 B in 1s (5178 B/s)Selecting previously unselected package libnatpmp-dev:amd64.(Reading database ... 357018 files and directories currently installed.)Preparing to unpack .../libnatpmp-dev_20150609-7build1_amd64.deb ...Unpacking libnatpmp-dev:amd64 (20150609-7build1) ...Setting up libnatpmp-dev:amd64 (20150609-7build1) ...user1@UBUNTU-DESKTOP:~/bitcoin$ sudo apt install systemtap-sdt-devReading package lists... DoneBuilding dependency treeReading state information... DoneThe following NEW packages will be installed:  systemtap-sdt-dev0 upgraded, 1 newly installed, 0 to remove and 22 not upgraded.Need to get 16.4 kB of archives.After this operation, 75.8 kB of additional disk space will be used.Get:1 http://archive.ubuntu.com/ubuntu focal-updates/universe amd64 systemtap-sdt-dev amd64 4.2-3ubuntu0.1 [16.4 kB]Fetched 16.4 kB in 1s (11.1 kB/s)Selecting previously unselected package systemtap-sdt-dev.(Reading database ... 357022 files and directories currently installed.)Preparing to unpack .../systemtap-sdt-dev_4.2-3ubuntu0.1_amd64.deb ...Unpacking systemtap-sdt-dev (4.2-3ubuntu0.1) ...Setting up systemtap-sdt-dev (4.2-3ubuntu0.1) ...Processing triggers for man-db (2.9.1-1) ...user1@UBUNTU-DESKTOP:~/bitcoin$ sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-toolsReading package lists... DoneBuilding dependency treeReading state information... Doneqttools5-dev is already the newest version (5.12.8-0ubuntu1).qttools5-dev-tools is already the newest version (5.12.8-0ubuntu1).libqt5core5a is already the newest version (5.12.8+dfsg-0ubuntu2.1).libqt5dbus5 is already the newest version (5.12.8+dfsg-0ubuntu2.1).libqt5gui5 is already the newest version (5.12.8+dfsg-0ubuntu2.1).0 upgraded, 0 newly installed, 0 to remove and 22 not upgraded.I'm trying to install Bitcoin Core 22.0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlueBoat",
+      "created_time": "December 20, 2022, 11:38:33 AMLast edit: December 20, 2022, 12:03:09 PM by BlueBoat",
+      "body": "Quote from: ETFbitcoin on December 20, 2022, 11:27:55 AMDid you checkout to specific commit/branch which represent source code of stable Bitcoin Core version before compile?I'm trying to reproduce a bug I was having using Bitcoin Core 22.0.It seems that the issue comes from GCC Autotools. I would like to understand how this last works.I got this issue in Bitcoin Core 22.0 compile but  not in Bitcoin Core 24.0.1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlueBoat",
+      "created_time": "December 20, 2022, 12:27:08 PMLast edit: December 20, 2022, 12:45:26 PM by BlueBoat",
+      "body": "Quote from: ETFbitcoin on December 20, 2022, 12:01:45 PMQuote from: BlueBoat on December 20, 2022, 11:38:33 AMQuote from: ETFbitcoin on December 20, 2022, 11:27:55 AMDid you checkout to specific commit/branch which represent source code of stable Bitcoin Core version before compile?I'm trying to reproduce a bug I was having using Bitcoin Core 22.0.I don't know your goal, but why don't you just update to Bitcoin Core 24.0.1?I'm trying to understand Bitcoin Core and started reading the code on Bitcoin Core 22.0. Quote from: ETFbitcoin on December 20, 2022, 12:01:45 PMQuote from: BlueBoat on December 20, 2022, 11:38:33 AMIt seems that the issue comes from GCC Autotools.Do you mean version of your GCC autotools on your Ubuntu device? Anyway i tried compile Bitcoin Core 22.0 and 24.0.1 on Debian 11 and doesn't see error message you mentioned when you create this thread.I use Ubuntu 20.4 for Windows.Quote from: ETFbitcoin on December 20, 2022, 12:01:45 PMI just notice you installed dependency based on 24.0.1 compile guide, you should check compile guide for 22.0 instead at https://github.com/bitcoin/bitcoin/blob/v22.0/doc/build-unix.md.According to the compile guides, these dependencies are the same than for Bitcoin Core 24  and in fact they are included in Bitcoin Core 24 depencies. Bitcoin Core 24 depencies have in addition User-Space, Statically Defined Tracing (USDT) dependencies and GUI.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlueBoat",
+      "created_time": "December 20, 2022, 01:08:58 PM",
+      "body": "Quote from: ETFbitcoin on December 20, 2022, 12:57:04 PMQuote from: BlueBoat on December 20, 2022, 12:27:08 PMQuote from: ETFbitcoin on December 20, 2022, 12:01:45 PM--snip--I'm trying to understand Bitcoin Core and started reading the code on Bitcoin Core 22.0. I see. You might want to check https://doxygen.bitcoincore.org/ since it's recommended by few Bitcoin Core contributor.Quote from: BlueBoat on December 20, 2022, 12:27:08 PMQuote from: ETFbitcoin on December 20, 2022, 12:01:45 PMI just notice you installed dependency based on 24.0.1 compile guide, you should check compile guide for 22.0 instead at https://github.com/bitcoin/bitcoin/blob/v22.0/doc/build-unix.md.According to the compile guides, these dependencies are the same than for Bitcoin Core 24  and in fact they are included in Bitcoin Core 24 depencies. Bitcoin Core 24 depencies have in addition User-Space, Statically Defined Tracing (USDT) dependencies and GUI.There are few difference though. I didn't compare everything, but here's an exampleQuote from: https://github.com/bitcoin/bitcoin/blob/v22.0/doc/build-unix.mdNow, you can either build from self-compiled depends or install the required dependencies:Code:sudo apt-get install libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-devQuote from: https://github.com/bitcoin/bitcoin/blob/v24.0.1/doc/build-unix.mdNow, you can either build from self-compiled depends or install the required dependencies:Code:sudo apt-get install libevent-dev libboost-devTake notice guide for Bitcoin Core 22.0 include 3 additional development file for Boost C++. Earlier when i tried to compile Bitcoin Core 22.0 without installing those 3 development file, i hit error when running command ./configure.My real issue is based on the fact that I like to have a full understanding of the source code I use. However, while I installed Bitcoin Core 24.0 without issue it still important for me to understand the migration process between the different Bitcoin Core versions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlueBoat",
+      "created_time": "December 21, 2022, 11:07:25 AM",
+      "body": "Quote from: ETFbitcoin on December 21, 2022, 09:30:08 AMAlthough if you have an application which depend on Bitcoin Core, you need to check whether RPC call you used change it's behavior, deprecated or removed on newer version.Yes, I'm presently trying to developing an application using Bitcoin Core, etc. Truthfully, I started looking into Bitcoin Core code just about a month ago.Also, I have to define a clear process in order to do a backup, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

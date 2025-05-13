@@ -1,0 +1,53 @@
+{
+  "id": "topic_5463876",
+  "title": "odolvlobo",
+  "author": "odolvlobo",
+  "created_time": "August 20, 2023, 12:56:02 AM",
+  "content": "I am writing Bitcoin-related software in C/C++ and I need to select a cryptography library that supports the usual stuff -- ECDSA, ECC math, SHA2, RIPEMD, PBKDF2, HMAC, and a secure RNG. Any suggestions?I just assumed that I would be using OpenSSL, but I have discovered that with OpenSSL 3, all of the \"low-level\" functionality has been deprecated, and that is exactly what I was intending to use. Perhaps, I could use the \"high-level\" features, but I don't know how or if they even do what I need. Also, I can't find any examples of anyone using these features anywhere, which is weird.Perhaps sticking with a legacy version of OpenSSL is a good solution.A friend suggested WolfSSL. It does what I need but it has some drawbacks -- it is a pain to integrate and 75% of the API is undocumented.What are you using?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5463876",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "August 20, 2023, 06:57:07 AM",
+      "body": "Using general purpose cryptography libraries is usually not a good idea for Bitcoin. They may not behave in a Bitcoin consensus critical way. Try to stick to Bitcoin specific libraries. Since you said C/C++ your work is cut out for you with https://github.com/bitcoin-core/secp256k1 since it is written in C, developed by and is also used by bitcoin core team. In other programming languages you got to find wrappers or write one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "August 20, 2023, 10:53:53 AM",
+      "body": "Have you checked LibreSSL?Quote from: odolvlobo on August 20, 2023, 12:56:02 AMI just assumed that I would be using OpenSSL, but I have discovered that with OpenSSL 3, all of the \"low-level\" functionality has been deprecated, and that is exactly what I was intending to use. Perhaps, I could use the \"high-level\" features, but I don't know how or if they even do what I need. Also, I can't find any examples of anyone using these features anywhere, which is weird.Perhaps sticking with a legacy version of OpenSSL is a good solution.Looking at CVE list on OpenSSL website[1], it looks like older version (2.X and 1.X) still got security fix. So using legacy version of OpenSSL isn't bad solution. But on long term, i expect you'll need to find way to compile legacy OpenSSL on new system/OS.[1] https://www.openssl.org/news/vulnerabilities.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "August 25, 2023, 08:46:41 PM",
+      "body": "Quote from: pooya87 on August 20, 2023, 06:57:07 AMUsing general purpose cryptography libraries is usually not a good idea for Bitcoin. They may not behave in a Bitcoin consensus critical way. Try to stick to Bitcoin specific libraries. Since you said C/C++ your work is cut out for you with https://github.com/bitcoin-core/secp256k1 since it is written in C, developed by and is also used by bitcoin core team. In other programming languages you got to find wrappers or write one.I don't think consensus is an issue. All the cryptographic functions used by Bitcoin are standardized, and if any implementation deviates from the standard, including Bitcoin's, I assume it will be fixed.It would be a mistake for me to implement my own cryptographic functionality, so I must rely on others. I considered using bitcoin's secp256k1 library and I may still, but right now I am looking for a comprehensive solution.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "August 25, 2023, 11:05:21 PM",
+      "body": "QuoteI don't think consensus is an issue.It was, and it still is. Read about issues with DER encoding, that happened in the past, when it was needed to create stricter rules specifically for Bitcoin, to avoid signature malleability. Do you remember BIP-66? Better read it before touching OpenSSL, to not reintroduce the same bugs in your own code.QuoteAll the cryptographic functions used by Bitcoin are standardized, and if any implementation deviates from the standard, including Bitcoin's, I assume it will be fixed.Every software has some bugs. There is always \"one more not-yet-fixed bug\" in any software you use.Quote from: satoshi on June 17, 2010, 06:46:08 PMI don't believe a second, compatible implementation of Bitcoin will ever be a good idea.  So much of the design depends on all nodes getting exactly identical results in lockstep that a second implementation would be a menace to the network.  The MIT license is compatible with all other licenses and commercial uses, so there is no need to rewrite it from a licensing standpoint.In general, I think you can modify the original software, or use your own settings for your node, but you should be aware that every change can potentially harm you, if you will be the only user that introduced it. Long time ago I also thought about using only my own implementation, but the reality is that currently I send everything through two sources: my own implementation, because I like it, and Bitcoin Core, to double-check that everything works correctly. There are more bugs you can introduce than you can probably imagine before writing code. For example, even huge mining pools lost a lot of coins, because of miscounting sigops.QuoteIt would be a mistake for me to implement my own cryptographic functionality, so I must rely on others.The easiest way to start is to clone the whole Bitcoin Core implementation, and modify only the part you want to change. In this way, you don't have to think about everything you don't care about. For example, if you want to grab all public keys, it is easier to attach to the place in code, where signatures are validated, than reinvent the wheel, and parse everything from scratch. Then, instead of checking \"is it witness?\", \"is it taproot?\", \"is it unexecuted branch?\", \"is it compressed?\", you can simply tell the computer \"I want to dump all public keys\", and you can reuse existing code, to not implement every single case from scratch in your own client.QuoteI considered using bitcoin's secp256k1 library and I may still, but right now I am looking for a comprehensive solution.If you want to cover everything, then use Bitcoin Core. In other case, you can for example be distracted by thinking \"how to improve it\" during implementing things from scratch, and then your implementation will no longer be \"bugward-compatible\". And this case is important, because if we wouldn't be forced to think about backward compatibility, then we could have P2PK as the only address type, enable Schnorr signatures there, attach MAST into that, and we could have one pubkey-based address type to rule everything. Or we could simply replace uint32 with uint64 for time, and no longer worry about crashing clients after 2038 (but of course, in practice maybe we will have rolling time modulo 2^32, or even modulo 2^31, because of \"bugward-compatible-code\", we will probably see those changes in 2035 or later, when someone will invent, how to deal with that).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 26, 2023, 07:12:28 AM",
+      "body": "Quote from: vjudeu on August 25, 2023, 11:05:21 PMThe easiest way to start is to clone the whole Bitcoin Core implementation, and modify only the part you want to change.This is fine as long as you work in the same language like OP but when you go to another language, extra care must be taken during the translation. The behavior could be different or misinterpreted and you end up with bugs... (speaking from experience )",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

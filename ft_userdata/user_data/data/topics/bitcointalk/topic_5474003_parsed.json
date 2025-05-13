@@ -1,0 +1,165 @@
+{
+  "id": "topic_5474003",
+  "title": "DanielHoffman",
+  "author": "DanielHoffman",
+  "created_time": "November 14, 2023, 04:25:58 AM",
+  "content": "Hi i want to check a bulk addresses balance, actually i use request.get in python way with blockstream but it's too slow (around 100 addresses in 46 seconds)Really appreciate.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5474003",
+  "comments": [
+    {
+      "author": "Yamane_Keto",
+      "created_time": "November 14, 2023, 04:50:04 AM",
+      "body": "you can try  https://blockchair.com/API for a limit of 1,000 calls per day Addresses per request (25k) Requests per minute ( 30 MIn) and If it is not enough, you can subscribe to their paid services according to the prices https://blockchair.com/api/plansif you care about Requests per minute only try blockonomics.co as you can get 100 address every 2 min.If you tell me specifically what you are looking for, I may give you better options, but https://blockchair.com provides excellent service and diverse options.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "November 14, 2023, 07:58:41 AM",
+      "body": "Using requests.get is indeed very slow.To check the balance of Bitcoin addresses in bulk, you would want an API that supports batch requests. This would speed up the whole process since you can query multiple addresses within a single API call. The Blockchain.com API supports batch requests for address balances.Code:import requestsdef fetch_balances(addresses):    address_list = '|'.join(addresses)    api_endpoint = f'https://blockchain.info/balance?active={address_list}'    response = requests.get(api_endpoint)    data = response.json()    for address, info in data.items():        balance = info['final_balance']        print(f\"Address: {address}, Balance: {balance} \")addresses = ['address1', 'address2', 'address3', ...]fetch_balances(addresses)A simple python script that would help you to fetch the balances of multiple addresses. The output would be in satoshis due to API of Blockchain.com",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 14, 2023, 01:28:30 PM",
+      "body": "Quote from: DanielHoffman on November 14, 2023, 04:25:58 AMHi i want to check a bulk addresses balance, actually i use request.get in python way with blockstream but it's too slow (around 100 addresses in 46 seconds)Why people always want to do this? It is always slow.The correct way to do this faster is download an updated list of address with balance List of all Bitcoin addresses with a balance Then load that file into a database/bloom filter or some other custom method.Check your list against that method.WIth this way you can be able to check million of address in less than a second",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "November 14, 2023, 06:06:07 PM",
+      "body": "I think the problem with those free api is that you might even get blocked doing 100 requests in less than a minute.I made this javascript tool which allows you to do search for address balances, but it can't handle 100 addresses  (I even used a try/catch method with a seocnd api when you get to api request limits)Take a lookhttps://bitcoindata.science/bitcoin-balance-checkQuote from: albert0bsd on November 14, 2023, 01:28:30 PMQuote from: DanielHoffman on November 14, 2023, 04:25:58 AMHi i want to check a bulk addresses balance, actually i use request.get in python way with blockstream but it's too slow (around 100 addresses in 46 seconds)Why people always want to do this? It is always slow.The correct way to do this faster is download an updated list of address with balance List of all Bitcoin addresses with a balance Then load that file into a database/bloom filter or some other custom method.Check your list against that method.WIth this way you can be able to check million of address in less than a secondThis is not faster than 46 seconds (as you have to download a huge file)... and the data might not be updated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 14, 2023, 06:29:01 PM",
+      "body": "Quote from: bitmover on November 14, 2023, 06:06:07 PMThis is not faster than 46 seconds (as you have to download a huge file)... and the data might not be updated.Well that is true the data may bot be updated, but it is a good point to start no? If someone do this he can keep updated their database with other sources scripts and this may avoid all  external web APIs limits.About the 46 Seconds... it is not bvious?? The time that i mention is after download and process the data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "November 14, 2023, 07:32:17 PM",
+      "body": "Quote from: albert0bsd on November 14, 2023, 06:29:01 PMQuote from: bitmover on November 14, 2023, 06:06:07 PMThis is not faster than 46 seconds (as you have to download a huge file)... and the data might not be updated.Well that is true the data may bot be updated, but it is a good point to start no? If someone do this he can keep updated their database with other sources scripts and this may avoid all  external web APIs limits.About the 46 Seconds... it is not bvious?? The time that i mention is after download and process the data.It is amazing to use this file, especially for privacy purposes. As he is looking all addresses,  nobody knows which one is his.But data probably don't get updates in every block (like a block explorer). And looks like op is looking for a performance boost",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CryptoDeivid",
+      "created_time": "November 15, 2023, 12:50:11 AM",
+      "body": "Quote from: albert0bsd on November 14, 2023, 06:29:01 PMQuote from: bitmover on November 14, 2023, 06:06:07 PMThis is not faster than 46 seconds (as you have to download a huge file)... and the data might not be updated.Well that is true the data may bot be updated, but it is a good point to start no? If someone do this he can keep updated their database with other sources scripts and this may avoid all  external web APIs limits.About the 46 Seconds... it is not bvious?? The time that i mention is after download and process the data.This time may vary depending on the specific data being used and the processing involved, I thing, but 46 seconds is a relatively short amount of time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yhiaali3",
+      "created_time": "November 15, 2023, 07:08:33 AM",
+      "body": "There are many sites that provide this service for free or paid. You can try this free site:https://cointool.app/batchCheckBalance/btcIt gives good and fast results, and the other good thing about this site is that it gives aggregate address balance results for coins other than Bitcoin on many networks such as:BTC, ETH, Arbitrum, BSC, Optimism, TRX, HECO, Solana, Polygon,.......etc",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 15, 2023, 01:53:57 PM",
+      "body": "Quote from: bitmover on November 14, 2023, 07:32:17 PMAnd looks like op is looking for a performance boostIn that case a custom host like mempool.space can be installed to handle all the block chain data already parsed and processed in this way you can change your API end point to this localhost server without any restriction..Quote from: CryptoDeivid on November 15, 2023, 12:50:11 AMThis time may vary depending on the specific data being used and the processing involved, I thing, but 46 seconds is a relatively short amount of time.Once that the data is downloaded an proccessed the waiting time will be just small.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Yamane_Keto",
+      "created_time": "November 15, 2023, 02:08:14 PM",
+      "body": "Quote from: seek3r on November 14, 2023, 07:58:41 AMCode:import requestsdef fetch_balances(addresses):    address_list = '|'.join(addresses)    api_endpoint = f'https://blockchain.info/balance?active={address_list}'A simple python script that would help you to fetch the balances of multiple addresses. The output would be in satoshis due to API of Blockchain.comThe blockchain.info API has a long history of sudden shutdowns, in which you will not receive a notification or alert, and the support team responds slowly and may continue for several days without knowing the cause of the problem.blockchair.com/API is better.Quote from: albert0bsd on November 14, 2023, 01:28:30 PMThe correct way to do this faster is download an updated list of address with balance List of all Bitcoin addresses with a balance It seems that addresses.loyce.club depends on the data that comes from blockchair_bitcoin_addresses_and_balance_DATE.tsv.gz. Therefore, even if you download this file and try to manage the database and then create the API, you are accessing the indirect blockchair/API, which I think would be slower, if If you have the resources, buy a paid service.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "November 15, 2023, 02:36:17 PM",
+      "body": "Quote from: Yamane_Keto on November 15, 2023, 02:08:14 PMA simple python script that would help you to fetch the balances of multiple addresses. The output would be in satoshis due to API of Blockchain.comThe blockchain.info API has a long history of sudden shutdowns, in which you will not receive a notification or alert, and the support team responds slowly and may continue for several days without knowing the cause of the problem.blockchair.com/API is better.But the OP asked for a solution with batch requests and afaik blockchair's API does not support this in a single API call.  Blockchairs API typically works with individual queries for each address or transaction. This means you would need to send a separate request for each address you want to check, which can be less efficient than a batch request, especially for a large number of addresses.An alternative to blockchain.com could be the Blockcypher API, but I have no experience with it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DanielHoffman",
+      "created_time": "November 15, 2023, 07:36:57 PM",
+      "body": "Quote from: seek3r on November 14, 2023, 07:58:41 AMUsing requests.get is indeed very slow.To check the balance of Bitcoin addresses in bulk, you would want an API that supports batch requests. This would speed up the whole process since you can query multiple addresses within a single API call. The Blockchain.com API supports batch requests for address balances.Code:import requestsdef fetch_balances(addresses):    address_list = '|'.join(addresses)    api_endpoint = f'https://blockchain.info/balance?active={address_list}'    response = requests.get(api_endpoint)    data = response.json()    for address, info in data.items():        balance = info['final_balance']        print(f\"Address: {address}, Balance: {balance} \")addresses = ['address1', 'address2', 'address3', ...]fetch_balances(addresses)A simple python script that would help you to fetch the balances of multiple addresses. The output would be in satoshis due to API of Blockchain.comThanks but already do check balance in same 50 seconds  , honestly i want to do this very fast but it's okay",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 15, 2023, 11:57:37 PM",
+      "body": "Quote from: DanielHoffman on November 15, 2023, 07:36:57 PMThanks but already do check balance in same 50 seconds  , honestly i want to do this very fast but it's okayYou are very lazy, you omit a lot of good answers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btc_enigma",
+      "created_time": "November 16, 2023, 06:22:18 AM",
+      "body": "Feel free to see the following github repo that uses several blockexplorer APIs to check address balanceshttps://github.com/xylevy/BTCSteroids PS: Blockonomics API actually allows to lookup multiple addresses in one call and should be quite useful for this task",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 16, 2023, 09:43:00 AMLast edit: November 16, 2023, 12:55:23 PM by apogio",
+      "body": "Another solution to the problem:Look into LoyceV's datasets: https://bitcointalk.org/index.php?topic=5254914.01. Download the daily data from there (it includes every address that has a balance).2. Import them in a DB 3. Set your code to ask the DB if it includes the address you want. This will be much faster.Optional tip: If you import batch addresses from the DB into a hashmap then you can check if it contains the address ULTRA FAST.EDIT: It has already been mentioned by Yamane_Keto & albert0bsd above.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "November 16, 2023, 12:45:27 PM",
+      "body": "Quote from: apogio on November 16, 2023, 09:43:00 AMAnother solution to the problem:...Do you read all the posts before reply?Quote from: albert0bsd on November 14, 2023, 01:28:30 PM...The correct way to do this faster is download an updated list of address with balance List of all Bitcoin addresses with a balance ...OP is a lazy newbie, he want the code already done, just to run in one-click, he is not developer, maybe he doesn't know what a hashmap or a bloom filter is... if you see he only reply to the person who actually offer some code snippet",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 16, 2023, 12:59:42 PM",
+      "body": "Quote from: albert0bsd on November 16, 2023, 12:45:27 PMDo you read all the posts before reply?I edited my post above and explained you have already mentioned it. I didn't carefully read your post, sorry.Quote from: albert0bsd on November 14, 2023, 01:28:30 PMOP is a lazy newbie, he want the code already done, just to run in one-click, he is not developer, maybe he doesn't know what a hashmap or a bloom filter is... if you see he only reply to the person who actually offer some code snippetOk, but OP can also import the file from LoyceV's website to an excel or something else and do the process manually. Excel would crash, now that I think about it.In fact, OP wants something that can't be done with just one click.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "November 16, 2023, 01:50:10 PM",
+      "body": "Quote from: albert0bsd on November 14, 2023, 01:28:30 PMThe correct way to do this faster is download an updated list of address with balance List of all Bitcoin addresses with a balance Then load that file into a database/bloom filter or some other custom method.This is what I would use to quickly check millions of addresses:Quote from: LoyceV on June 11, 2020, 03:30:34 PMHow to useThe most likely use is to check a long list of Bitcoin addresses for a remaining balance.On Linux, use this to find matching addresses (after extrating the compressed .gz file of course):Code:comm -12 Bitcoin_addresses_LATEST.txt <(cat mylist.txt | sort | uniq)Bitcoin_addresses_LATEST.txt: the extracted latest version downloaded from addresses.loyce.club.mylist.txt: your own list of addresses, one address per line.This takes only seconds to check millions of addresses.Quote from: bitmover on November 14, 2023, 06:06:07 PMThis is not faster than 46 seconds (as you have to download a huge file)... and the data might not be updated.Three things:1. The server can spit out that file within 46 seconds 2. OP mentioned \"bulk\", and I don't consider his 100 address test to be bulk.3. The data is updated daily. I assume OP is trying to brute-force Bitcoin addresses, in which case that doesn't matter.Even if it takes a few minutes to download, after that you can check billions of addresses per hour.@OP: what are you trying to accomplish?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "November 16, 2023, 01:53:01 PM",
+      "body": "Quote from: LoyceV on November 16, 2023, 01:50:10 PM3. The data is updated daily. I assume OP is trying to brute-force Bitcoin addresses, in which case that doesn't matter.Are there still people trying to brute-force keys? I am amazed...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

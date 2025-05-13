@@ -1,0 +1,61 @@
+{
+  "id": "topic_5457967",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "June 29, 2023, 05:42:03 AM",
+  "content": "In the GUI, we see that Electrum tells us all the information about the fees our transactions have paid, and the total size of the transaction, total fees, and so on. Likely because we specify the fees ourselves.But what about in the case of using the Electrum daemon/CLI to fetch any transaction? There doesn't seem to be a specific method for getting the fee info of a transaction, and gettransction just returns a raw transaction that doesn't contain transaction size (or vsize) and fee paid.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5457967",
+  "comments": [
+    {
+      "author": "Abdussamad",
+      "created_time": "June 29, 2023, 03:18:42 PM",
+      "body": "Fee paid is total inputs minus total outputs. So you can calculate the fee yourself.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MusaMohamed",
+      "created_time": "June 30, 2023, 03:00:57 AM",
+      "body": "Quote from: ThomasV on May 09, 2014, 05:46:40 PMin a terminal it is Code: > getrawtransaction txidif you use the python console, you need to comply with the python syntax:Code:getrawtransaction(\"txid\")    (with quotes)In the gui you can also use the menu: Tools -> Load Transaction -> From the blockchainIs it what you need",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 30, 2023, 04:21:02 AM",
+      "body": "Quote from: Abdussamad on June 29, 2023, 03:18:42 PMFee paid is total inputs minus total outputs. So you can calculate the fee yourself. Yes I can calculate the total fee but I would also like to calculate the fee rate in sats/vbyte, and to do this I must measure the size of the transaction in Weight Units or some other measurement, then divide the total fee by vsize.Some python function that does it without additional libraries would be useful, alternatively just point to some place in bitcoinlib or something where transactions are deserialized and I can rip that part out.Quote from: MusaMohamed on June 30, 2023, 03:00:57 AMQuote from: ThomasV on May 09, 2014, 05:46:40 PMin a terminal it is Code: > getrawtransaction txidif you use the python console, you need to comply with the python syntax:Code:getrawtransaction(\"txid\")    (with quotes)In the gui you can also use the menu: Tools -> Load Transaction -> From the blockchainIs it what you needUnfortunately, the raw transaction does not contain information about its fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 30, 2023, 08:04:52 AM",
+      "body": "Quote from: NotATether on June 29, 2023, 05:42:03 AMBut what about in the case of using the Electrum daemon/CLI to fetch any transaction? There doesn't seem to be a specific method for getting the fee info of a transaction, and gettransction just returns a raw transaction that doesn't contain transaction size (or vsize) and fee paid.Yes, I checked \"commands.py\" and nothing in it outputs the 'fee rate' or 'transaction size'.Link: https://github.com/spesmilo/electrum/blob/master/electrum/commands.pydeserialize also do not return with the transaction's fee rate, just the exact data in the raw transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "June 30, 2023, 01:48:52 PM",
+      "body": "Quote from: nc50lc on June 30, 2023, 08:04:52 AMQuote from: NotATether on June 29, 2023, 05:42:03 AMBut what about in the case of using the Electrum daemon/CLI to fetch any transaction? There doesn't seem to be a specific method for getting the fee info of a transaction, and gettransction just returns a raw transaction that doesn't contain transaction size (or vsize) and fee paid.Yes, I checked \"commands.py\" and nothing in it outputs the 'fee rate' or 'transaction size'.Link: https://github.com/spesmilo/electrum/blob/master/electrum/commands.pydeserialize also do not return with the transaction's fee rate, just the exact data in the raw transaction.I found this. Maybe it helpshttps://github.com/spesmilo/electrum/blob/master/electrum/transaction.pyCode:    def estimated_size(self):        \"\"\"Return an estimated virtual tx size in vbytes.        BIP-0141 defines 'Virtual transaction size' to be weight/4 rounded up.        This definition is only for humans, and has little meaning otherwise.        If we wanted sub-byte precision, fee calculation should use transaction        weights, but for simplicity we approximate that with (virtual_size)x4        \"\"\"        weight = self.estimated_weight()        return self.virtual_size_from_weight(weight)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 30, 2023, 02:05:18 PM",
+      "body": "Quote from: bitmover on June 30, 2023, 01:48:52 PMQuote from: nc50lc on June 30, 2023, 08:04:52 AMQuote from: NotATether on June 29, 2023, 05:42:03 AMBut what about in the case of using the Electrum daemon/CLI to fetch any transaction? There doesn't seem to be a specific method for getting the fee info of a transaction, and gettransction just returns a raw transaction that doesn't contain transaction size (or vsize) and fee paid.Yes, I checked \"commands.py\" and nothing in it outputs the 'fee rate' or 'transaction size'.Link: https://github.com/spesmilo/electrum/blob/master/electrum/commands.pydeserialize also do not return with the transaction's fee rate, just the exact data in the raw transaction.I found this. Maybe it helpshttps://github.com/spesmilo/electrum/blob/master/electrum/transaction.pyCode:    def estimated_size(self):        \"\"\"Return an estimated virtual tx size in vbytes.        BIP-0141 defines 'Virtual transaction size' to be weight/4 rounded up.        This definition is only for humans, and has little meaning otherwise.        If we wanted sub-byte precision, fee calculation should use transaction        weights, but for simplicity we approximate that with (virtual_size)x4        \"\"\"        weight = self.estimated_weight()        return self.virtual_size_from_weight(weight)Oh, OK. So is this an Electrum command exposed to the user, or just a regular function?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

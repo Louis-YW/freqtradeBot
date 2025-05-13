@@ -1,0 +1,101 @@
+{
+  "id": "topic_5399905",
+  "title": "SapphireSpire",
+  "author": "SapphireSpire",
+  "created_time": "May 23, 2022, 08:34:18 PMLast edit: January 11, 2024, 03:35:35 AM by SapphireSpire",
+  "content": "nothing to see",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5399905",
+  "comments": [
+    {
+      "author": "odolvlobo",
+      "created_time": "May 23, 2022, 09:08:31 PM",
+      "body": "The difficulty has two functions: regulating inflation and preventing a 51% attack. You might want to show how your proposal would not negatively affect those functions.Also, there is no \"the mempool\". Every mempool is different, so you would need to provide more details on how your proposal might work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "May 23, 2022, 10:38:13 PM",
+      "body": "The idea is to make shorter block intervals when the mempool is fuller?I see big problems in this idea.[1] Miners will be incentivized to just artificially fill up the mempool to create more blocks e.g. 1 per minute. Remember they can just make transactions that send to themselves over and over again at no cost. There are suspicions that Chinese miners actually did this before the ban; one explanation for the mempool getting drained after mining was banned over there.[2] If you reduce the block reward proportionally, of course there won't be financial incentive for [1], but a malicious party could still do this to push down difficulty and attack the network.[3] '6 confirmations' won't be an accurate measure of security anymore; 6 blocks with half difficulty will have half as much energy backing them than 6 blocks with normal difficulty target.[4] Agreeing on how full the mempool actually is right now will be a huge can of worms in and of itself; a miner may claim they just received millions of transactions and have to push down difficulty fast to create 10 consecutive blocks within a minute, while nobody else saw those transactions. Agreeing on this is the exact same problem as agreeing on the state of the ledger, which we currently solve with mining. So you would need to mine, to agree on a definite set of unconfirmed transactions, to then mine? I think you see how this starts to create.. a circle.. a loop. [5] I'm sure there are more. These just come from the top of my head.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "May 23, 2022, 10:42:18 PM",
+      "body": "Quote from: SapphireSpire on May 23, 2022, 09:28:50 PMTo maintain the projected inflation curve, reduce the block reward by the same proportion as the difficulty.By \"the mempool\", I'm referring to the miner's mempool.  It may not be perfectly synced with every other node, but it should be within a small margin of error.  And by \"margin of error\", I'm not implying that the difference is an error.51% attacks only work in democracies.  Bitcoin is not a democracy.If every miner's mempool is different, then how does every miner agree on the new difficulty?The purpose of PoW, which depends on the difficulty, is to prevent a 51% attack.I'm not trying to shoot down your proposal. I'm just pointing out that it is more complicated than you make it seem, and if you want people to accept it, you might want to go into more detail.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 24, 2022, 03:04:08 AM",
+      "body": "You need reproducibility when it comes to difficulty target and it can not be achieved using something that is not stored (mempool that only resides in memory). For example when a new node comes online, or an SPV client starts syncing they need to be able to validate the historical blocks or the headers and one of the steps is to verify the target which they won't be able to do.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 24, 2022, 04:54:21 AM",
+      "body": "QuoteTransaction fees already discourage spam.Transactions are \"free\" for miners. They only pay in \"available space\", so they can include their own transaction, and not include someone else's transaction. But they can pretend they received a lot of transactions, it will be \"free\", because each miner can finally take all transaction fees in its own block.QuoteReducing the difficulty increases the block rate by the same proportion, so the blockchain will have the same amount of work divided among more blocks over the same period of time. It doesn't weaken the blockchain.It weakens the blockchain a lot. The same problem is present in decentralized mining: if you have a single block header, then things are nice. But if you want to decentralize mining, then the question is: how many block headers are acceptable? We had a problem with including a lot of block headers on-chain, and your proposal is about including a lot of blocks on-chain. That will be too heavy. You need some limits, because if there are none, then what about 1 GB mempool? Or 1 TB mempool? Or 1 PB mempool? Or even more? You see the problem? Some CPU miner could artificially flood the network with a lot of transactions, and bring down the difficulty to one. That means going from ~2^80 to ~2^32 hashes per block.QuoteThe point of waiting for 6 confirmations is to give soft forks time to be worked out. It has nothing to do with security.It is crucial for security. You can reduce the block time from 10 minutes to 30 seconds, as P2Pool did. And guess what: then you need 120 confirmations to get the same security. Any proposal that will decrease the block time, will also increase the number of needed confirmations. So, if the difficulty will be equal to one, then how many blocks you would need to replace \"6 confirmations\"? I guess 6*(2^80/2^32)=6*2^48. That means a lot of blocks. And then, block time will be 600/2^48 seconds. Quite short, I think there will be a lot of reorgs.QuoteYou just include in each block a list of hashes for the transactions in the miner's mempool that are not confirmed in the block, and include a Merkle root for that list in the block header. Nodes can then validate the list as they get the transaction data and confirm the miner's mempool size and difficulty reduction.It works fine only for identical transactions. But each miner can include a different set of transactions, then everything is going to explode. And we had the same problem with decentralized mining: it can be simplified into block headers and transaction list, but only for repeated transactions, everything else has to be broadcasted, and there is no way to compress it nicely, because a lot of data can be random, like addresses and signatures.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "May 24, 2022, 05:37:55 AM",
+      "body": "QuoteYou can reduce the block time from 10 minutes to 30 seconds, as P2Pool did.Exactly, this proposal can be implemented in a no-fork way, just take P2Pool's source code and adjust it to the current network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "May 24, 2022, 05:57:03 AM",
+      "body": "Quote from: SapphireSpire on May 24, 2022, 03:39:16 AMQuote from: n0nce on May 23, 2022, 10:38:13 PM[4] Agreeing on how full the mempool actually is right now will be a huge can of worms in and of itself; a miner may claim they just received millions of transactions and have to push down difficulty fast to create 10 consecutive blocks within a minute, while nobody else saw those transactions.You just include in each block a list of hashes for the transactions in the miner's mempool that are not confirmed in the block, and include a Merkle root for that list in the block header.  Nodes can then validate the list as they get the transaction data and confirm the miner's mempool size and difficulty reduction.I think you missed the point. Is there a way to stop a miner from claiming that they have a billion transactions in their mempool? A node cannot validate a list because there is never an expectation that it will have the same transactions in its mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "May 24, 2022, 11:58:08 AM",
+      "body": "Quote from: pooya87 on May 24, 2022, 03:04:08 AMYou need reproducibility when it comes to difficulty target and it can not be achieved using something that is not stored (mempool that only resides in memory). For example when a new node comes online, or an SPV client starts syncing they need to be able to validate the historical blocks or the headers and one of the steps is to verify the target which they won't be able to do.That's a very good point. There will be no way to validate blocks after the fact, if there's no record of the mempool at all times; without this information you cannot reconstruct if difficulty targets were manipulated and you're getting fed a malicious version of the blockchain. Our current implementation bases the difficulty readjustments purely on blockchain data, therefore it's verifiable after the fact.Quote from: garlonicon on May 24, 2022, 04:54:21 AMQuoteTransaction fees already discourage spam.Transactions are \"free\" for miners. They only pay in \"available space\", so they can include their own transaction, and not include someone else's transaction. But they can pretend they received a lot of transactions, it will be \"free\", because each miner can finally take all transaction fees in its own block.Exactly, that's what I was trying to say, I thought it was obvious why they're free for miners. They don't pay anything if fees go to themselves.Quote from: odolvlobo on May 24, 2022, 05:57:03 AMQuote from: SapphireSpire on May 24, 2022, 03:39:16 AMQuote from: n0nce on May 23, 2022, 10:38:13 PM[4] Agreeing on how full the mempool actually is right now will be a huge can of worms in and of itself; a miner may claim they just received millions of transactions and have to push down difficulty fast to create 10 consecutive blocks within a minute, while nobody else saw those transactions.You just include in each block a list of hashes for the transactions in the miner's mempool that are not confirmed in the block, and include a Merkle root for that list in the block header.  Nodes can then validate the list as they get the transaction data and confirm the miner's mempool size and difficulty reduction.I think you missed the point. Is there a way to stop a miner from claiming that they have a billion transactions in their mempool? A node cannot validate a list because there is never an expectation that it will have the same transactions in its mempool.Correct: there is no consensus over the mempool. What is the only solution for decentralized consensus? Right: PoW / mining. Just putting a merkle root hash of the mempool doesn't solve the issue at all. So there would need to be mining to reach consensus about the unconfirmed transaction pool first, to then mine blocks. It makes no sense.Quote from: ETFbitcoin on May 24, 2022, 11:42:11 AMQuote from: SapphireSpire on May 24, 2022, 03:39:16 AMThe point of waiting for 6 confirmations is to give soft forks time to be worked out. It has nothing to do with security.Did you forget about possibility of double spend by forcing re-org? 6 confirmation makes it very difficult to perform such attack when the attacker have less than 51% hashrate.Except if I can just claim I have 1 trillion transactions in my petabyte-sized mempool, so I have to create 10-second blocks with a 2010 difficulty target and the network has to just 'trust me, bro' and accept them. It may re-org a few blocks, but since it's now the longest chain, they have to accept it. Right?In such a scenario, '6 confirmations' has no meaning at all anymore. And then there's this guy:Quote from: SapphireSpire on May 24, 2022, 03:39:16 AMIt doesn't weaken the blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 24, 2022, 01:09:05 PMLast edit: May 25, 2022, 09:55:48 AM by BlackHatCoiner",
+      "body": "Quote from: SapphireSpire on May 23, 2022, 09:28:50 PM51% attacks only work in democracies.So what about Ethereum Classic, Bitcoin SV, Bitcoin Gold, Verge and an endless list of other shitcoins that got attacked alike? Were these \"democracies\"? Not with the accepted sense of the term.As for your proposal, it can't work and - fortunately - there's no point to implement it, because transactions can be faked (all from the same miner), mempool isn't the same to everyone (neither there is a way to), it reduces security, etc. Besides, isn't difficulty currently the parameter the timestamp server relies on?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 24, 2022, 03:18:00 PM",
+      "body": "(No offence, but when I first saw the title of this thread, I thought \"what the heck is a DAA?\" and thought it would be packed up to the altcoins board. Are these terms even used in the source code?)There is one fundamental problem with changing from a block-based interval to a time-based one - you can never establish a correspondence between the current epoch and the expected number of blocks that will be mined in one, because the mined blocks metric is now flexible.It means that a variable number of blocks on each epoch will be the influence on difficulty, possibly deviating from the 2016 average by many standard deviations.What happens if *no* blocks are mined during the time interval? That would wreck the difficulty.OK, so maybe you'll add a condition for 0 blocks mined, but what if there's only 1 or 2 blocks mined then? According to this new algorithm, the difficulty will sink.And you can't place an exception in the code for that, otherwise the algo will be full of exceptions.Quote from: BlackHatCoiner on May 24, 2022, 01:09:05 PMBesides, isn't difficulty currently the parameter the timestamp server relies on?What do you mean? You mean the atomic clock of Bitcoin Core keeps track of the timestamp using block difficulty?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 24, 2022, 03:43:09 PM",
+      "body": "Quote from: NotATether on May 24, 2022, 03:18:00 PMWhat do you mean? You mean the atomic clock of Bitcoin Core keeps track of the timestamp using block difficulty?No, I mean that blocks define time. This is why blockchain and timechain are synonyms. And this strict correlation comes with benefits, such as fee estimation, confirmation time, scheduled inflation and even security; a large amount of computational power is wasted in this TBI due to more stale blocks.Quote from: SapphireSpire on May 23, 2022, 08:34:18 PM[edit 2] To maintain the projected inflation curve, reduce the block reward by the same proportion as the difficulty.But, you don't maintain constant inflation that way. You make it variable.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

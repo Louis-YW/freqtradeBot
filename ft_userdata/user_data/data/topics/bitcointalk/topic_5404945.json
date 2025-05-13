@@ -1,0 +1,53 @@
+{
+  "id": "topic_5404945",
+  "title": "crashedanon",
+  "author": "crashedanon",
+  "created_time": "July 02, 2022, 04:54:06 PM",
+  "content": "Suppose I want my tenant to pay monthly rent using bitcoin and I want the whole process[contract between myself and tenant] to be executed solely on the Bitcoin network. Is there a way to write this smart contract? If yes then how and where?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5404945",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "July 02, 2022, 05:36:27 PM",
+      "body": "Smart contract is quite an abstract name imo.In countries where it's legal for both to sign a deposit/bond without an intermediary than a 2 of 2 multisig could be produced for this.If you mean to take funds from their wallet and give it to yours, this isn't possible or enforceable but it wouldn't be on any chain without them having to lock up the funds.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 03, 2022, 03:38:32 AM",
+      "body": "Bitcoin scripts are not Turing complete which means not every use case is possible to code with it. Definitely, it cannot take any real-world or HTTP data as parameters, and its data is limited to numbers on a stack.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 03, 2022, 05:11:41 AM",
+      "body": "Forgetting bitcoin for a moment here, I don't think paying things such as rent automatically is a good idea to begin with. We normally pay the rent manually from our bank account to theirs.Back to bitcoin again, this could be achieved using locktimes. You basically want a mechanism where the tenant locks some coins up in a smart contract that can only be \"unlocked\" by the landlord after a certain time. You may also add an extra option for the tenant to be able to spend those coins themselves if they wanted to without the time restriction. So the smart contract could look something like this:Code:OP_IF  <time> OP_CheckLocktimeVerify OP_DROP <landlord_pubkey> OP_CheckSigOP_ELSE  <tenant_pubkey> OP_CheckSigOP_ENDIFFor example the tenant funds this address on 29th but the landlord can only spend it on 1st of next month. If the landlord loses their key the tenant can still spend these coins (it doesn't have the limitations of 2 of 2 multisig).The limitations of this is that for each month a new address has to be created by only changing the locktime (which changes the hash hence the different address).You also can't set how much the landlord can withdraw since bitcoin scripts can not fetch the amount field of the outputs in the transaction so the tenant has to fund this address with the exact rent value so that the landlord can withdraw all of it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "crashedanon",
+      "created_time": "July 03, 2022, 06:06:22 AM",
+      "body": "Quote from: pooya87 on July 03, 2022, 05:11:41 AMForgetting bitcoin for a moment here, I don't think paying things such as rent automatically is a good idea to begin with. We normally pay the rent manually from our bank account to theirs.Back to bitcoin again, this could be achieved using locktimes. You basically want a mechanism where the tenant locks some coins up in a smart contract that can only be \"unlocked\" by the landlord after a certain time. You may also add an extra option for the tenant to be able to spend those coins themselves if they wanted to without the time restriction. So the smart contract could look something like this:Code:OP_IF  <time> OP_CheckLocktimeVerify OP_DROP <landlord_pubkey> OP_CheckSigOP_ELSE  <tenant_pubkey> OP_CheckSigOP_ENDIFFor example the tenant funds this address on 29th but the landlord can only spend it on 1st of next month. If the landlord loses their key the tenant can still spend these coins (it doesn't have the limitations of 2 of 2 multisig).The limitations of this is that for each month a new address has to be created by only changing the locktime (which changes the hash hence the different address).You also can't set how much the landlord can withdraw since bitcoin scripts can not fetch the amount field of the outputs in the transaction so the tenant has to fund this address with the exact rent value so that the landlord can withdraw all of it.Hey this is exactly what I was looking for, adding more ideas to it, Yet where can I get started? and where should this smart contract be deployed, taking in account that I have some basic knowledge on creating a SC on ethereum and deploying it on the EVM.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 03, 2022, 06:47:44 AM",
+      "body": "Quote from: crashedanon on July 03, 2022, 06:06:22 AMHey this is exactly what I was looking for, adding more ideas to it, Yet where can I get started? and where should this smart contract be deployed, taking in account that I have some basic knowledge on creating a SC on ethereum and deploying it on the EVM.I don't know any tool that I can introduce but it is pretty easy to write it yourself if you are familiar with the protocol and since bitcoin scripts are pretty straight forward.All you have to do is to \"translate\" the code snippet above to a stream of bytes like this (used 2 random keys):Code:OP_IF=0x63OP_PushData=0x04+0x0023e362 (time=2022-07-29)OP_CheckLocktimeVerify=0xb1OP_DROP=0x75OP_PushData=0x21+0x022f982b2b933fdce5298439dc4e9823a78e081449e60dceb3361db3750f270b19 (pubkey)....result=63040023e362b17521022f982b2b933fdce5298439dc4e9823a78e081449e60dceb3361db3750f270b19ac672102f9168afc6b84e04cf487ef3b66462a1bcdd8908e1c690b8f41cfdbdbceb7f967ac68Then use that as your redeem script which could be used to produce either a P2SH or a P2WSH address like this:Code:HASH160(redeem)=3AXfCos6dg3NwphudW4iJVewuLBvScrb8tSHA256(redeem)= bc1qcnzcd9q5myq6wzphx0f99lms8sg3ts0peczxn3zw54z2r7xwa8qswuh48lThe rest is just a matter of funding these addresses and later spending from them.P.S. You may want to test all of this on testnet first.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

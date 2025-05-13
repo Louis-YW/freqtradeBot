@@ -1,0 +1,101 @@
+{
+  "id": "topic_5465876",
+  "title": "almqq",
+  "author": "almqq",
+  "created_time": "September 06, 2023, 03:44:54 PM",
+  "content": "Hi, I am trying to increase the fee of a transaction I created (also at the command line)I tried this:$ electrum bumpfee 39e05fa9a63d650c5476e02d79acd3ede9e4813cdb381b2c9087fff25c226728 18but got this error message:attempt to read past end of bufferHow can I progress?Thanks",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5465876",
+  "comments": [
+    {
+      "author": "Findingnemo",
+      "created_time": "September 06, 2023, 03:51:44 PM",
+      "body": "The error you mentioned actually fixed in version 3.2.0, which was years back.Check your Electrum version, if it's not ver 4.4.6 then update it to the latest version from their official site: https://electrum.org/#downloadThe updated version most likely will resolve this error.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "almqq",
+      "created_time": "September 06, 2023, 06:31:59 PM",
+      "body": "HiI am using version 4.4.6, installed about a couple of weeks ago(on an linux machine, Ubuntu 22.04.3 LTS)Everything else (all other command line options) seem to work fineAny other ideas?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "September 06, 2023, 06:46:39 PM",
+      "body": "Quote from: Findingnemo on September 06, 2023, 03:51:44 PMThe error you mentioned actually fixed in version 3.2.0, which was years back.According to this bug reports it also comes up on newer version no report yet on the most recent version but other version like 4.1.5 also have this bug.- https://github.com/spesmilo/electrum/issues/6436@OPDid you get the error message after you enter the command line? Or does it also show up on the Electrum GUI?If the error came from the most recent version I suggest report this to the Electrum issue page and then let the developer release a fixed version.If you have a backup seed I suggest try to downgrade Electrum to 4.4.5 or lower and update here if it fixes your issue.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "almqq",
+      "created_time": "September 07, 2023, 07:03:06 AM",
+      "body": "Yes, happens at the command line, I'm not using the GUI so I don't know if it happens there as wellI have left a bug report at https://github.com/spesmilo/electrum/issues/8603I'll try a 4.4.5 instance and report back",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 07, 2023, 07:26:55 AMLast edit: September 07, 2023, 08:03:47 AM by nc50lc",
+      "body": "Quote from: almqq on September 06, 2023, 06:31:59 PMAny other ideas?I tried it with the current master build from GitHub (source) and it also result with the same error, seems like a bug.Here's the log:Code:Traceback (most recent call last):-snip-    return lambda *args, **kwargs: f(method,Python310\\electrum-4.4.4\\electrum\\commands.py\", line 192, in _run    result = fut.result()Python310\\lib\\concurrent\\futures\\_base.py\", line 446, in result    return self.__get_result()Python310\\lib\\concurrent\\futures\\_base.py\", line 391, in __get_result    raise self._exceptionPython310\\electrum-4.4.4\\electrum\\commands.py\", line 155, in func_wrapper    return await func(*args, **kwargs)Python310\\electrum-4.4.4\\electrum\\commands.py\", line 787, in bumpfee    tx.add_info_from_wallet(wallet)Python310\\electrum-4.4.4\\electrum\\transaction.py\", line 989, in add_info_from_wallet    for txin in self.inputs():Python310\\electrum-4.4.4\\electrum\\transaction.py\", line 781, in inputs    self.deserialize()Python310\\electrum-4.4.4\\electrum\\transaction.py\", line 808, in deserialize    txins = [parse_input(vds) for i in range(n_vin)]Python310\\electrum-4.4.4\\electrum\\transaction.py\", line 808, in <listcomp>    txins = [parse_input(vds) for i in range(n_vin)]Python310\\electrum-4.4.4\\electrum\\transaction.py\", line 692, in parse_input    prevout_hash = vds.read_bytes(32)[::-1]Python310\\electrum-4.4.4\\electrum\\transaction.py\", line 454, in read_bytes    raise SerializationError('attempt to read past end of buffer')electrum.transaction.SerializationError: attempt to read past end of bufferI saw that you just made a new issue in GitHub (seconds ago) regarding this issue: link",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "almqq",
+      "created_time": "September 07, 2023, 07:37:48 AM",
+      "body": "HiI see it failed for you on version 4.4.4Which is the last version it is know to work?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 07, 2023, 07:55:48 AM",
+      "body": "Quote from: almqq on September 07, 2023, 07:37:48 AMHiI see it failed for you on version 4.4.4Which is the last version it is know to work?I'm about to edit it since I've provided logs from my previous test session.But given this reply, I think editing it isn't necessary anymore.Both v4.4.4, v4.4.6 and master branch results are the same so it's not yet fixed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "almqq",
+      "created_time": "September 07, 2023, 08:03:59 AM",
+      "body": "At the moment my immediate concern is to get the \"bumpfee\" to work, somehowI can download and install any previous version of electrum (on another machine), which one do you think will be able do the bumpfee?Any other ideas?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Findingnemo",
+      "created_time": "September 07, 2023, 10:27:05 AM",
+      "body": "Quote from: almqq on September 07, 2023, 08:03:59 AMAt the moment my immediate concern is to get the \"bumpfee\" to work, somehowI can download and install any previous version of electrum (on another machine), which one do you think will be able do the bumpfee?Any other ideas?If I am not wrong I used the bump fee on my Android 4.4.5 with no issues, so if you can import the wallet or that address to an Android Electrum and click the transaction there you can see the bump fee at the bottom.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "almqq",
+      "created_time": "September 07, 2023, 10:48:06 AM",
+      "body": "This worked! thanks!I will keep an eye on any progress with my bug reporthttps://github.com/spesmilo/electrum/issues/8603Thank you all for all your help",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ThomasV",
+      "created_time": "September 11, 2023, 10:26:05 AM",
+      "body": "Quote from: almqq on September 06, 2023, 03:44:54 PMHi, I am trying to increase the fee of a transaction I created (also at the command line)I tried this:$ electrum bumpfee 39e05fa9a63d650c5476e02d79acd3ede9e4813cdb381b2c9087fff25c226728 18but got this error message:attempt to read past end of bufferHow can I progress?ThanksTry to combine commands: $ electrum gettransaction 39e05fa9a63d650c5476e02d79acd3ede9e4813cdb381b2c9087fff25c226728 | electrum bumpfee - 18",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

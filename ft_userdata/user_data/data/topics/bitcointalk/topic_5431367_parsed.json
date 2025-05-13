@@ -1,0 +1,109 @@
+{
+  "id": "topic_5431367",
+  "title": "BoyFromDubai",
+  "author": "BoyFromDubai",
+  "created_time": "December 25, 2022, 11:25:13 AM",
+  "content": "According to BIP-30 it's said, that new transaction with the same txid of unspent one won't replace that one, that's still unspent. But what is happening to this new tx that must be inculded to the chain? Miners are holding this new one in the mempool and this tx is waiting for the moment when the existing one with the same txid will be removed from LevelDB that is in chainstate folder? (I'm talking not of doublespending of the same transaction but when it's two different transactions and they have the same txid)",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5431367",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "December 25, 2022, 03:30:41 PM",
+      "body": "Considering that a transaction with a txid that exists in the UTXO database is an invalid transaction, full nodes should not even enter this transaction in their mempool. In other words such transaction should be rejected right away otherwise the block that contains it would be rejected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khaled0111",
+      "created_time": "December 25, 2022, 06:27:40 PM",
+      "body": "It's not miners which are holding the tx in their mempool, it's any node connected to the network.If the first transaction (txid) has been confirmed then any transaction trying to spend any of its inputs will be an invalid transaction and no node will accept it.If the first transaction is still unconfirmed, there are two scenarios: the transaction is flagged as rbf. In this case if the second transaction is paying higher fee rate then it will replace the first one.If the first transaction is flagged as final (non-rbf), how it will be processed will depend on the node itself. If the node has the first transaction on its mempool then it will reject the second one for being invalid. If it didn't know about the first transaction existance (which is unlikely) then it will accept it and try to broadcast it to other nodes/miners. The chances of the second transaction being confirmed before the first one are slim.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 25, 2022, 06:45:51 PM",
+      "body": "The new transaction will have to change, because as said, it will be rejected. You can slightly change the locktime value to one lower, and it will produce an entirely different hash. If you don't want that, you can pay 0 coins to OP_RETURN; that will also work, but it'll cost more.Quote from: khaled0111 on December 25, 2022, 06:27:40 PM[...]This is not OP's concern. His concern is: what happens if you have two transactions which have absolutely no connection but produce the same TXID? And the answer is that the second will be rejected, because of the BIP 30 soft fork.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoyFromDubai",
+      "created_time": "December 25, 2022, 07:33:57 PM",
+      "body": "Quote from: khaled0111 on December 25, 2022, 06:27:40 PMIt's not miners which are holding the tx in their mempool, it's any node connected to the network.Why did you say that not miners hold these transactions? Anyone in the network, who have to mine, have to hold it, if I'm not mistaken. Cause a miner just takes some transactions from a file and puts it in a new block. Nodes can be far away from each other and it can take some time to get new transactions from another node. (Longer, than just to read them from a file)And in here https://www.politico.com/newsletters/digital-future-daily/2022/06/21/inside-the-mempool-where-crypto-risks-hide-00041132 it's said: \"“Mem” is short for memory, and the mempool is where each network node keeps a list of spending crypto transactions.\"If I'm mistaken, correct me please",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 25, 2022, 09:11:14 PM",
+      "body": "Quote from: BlackHatCoiner on December 25, 2022, 06:45:51 PMThe new transaction will have to change, because as said, it will be rejected. You can slightly change the locktime value to one lower, and it will produce an entirely different hash. If you don't want that, you can pay 0 coins to OP_RETURN; that will also work, but it'll cost more.Or if you are using software which doesn't allow you to do either of these things, then the simplest thing to do is simply change your fee by 1 satoshi.Quote from: BoyFromDubai on December 25, 2022, 07:33:57 PMWhy did you say that not miners hold these transactions? Anyone in the network, who have to mine, have to hold it, if I'm not mistaken.Yes, miners need to know about unconfirmed transactions, but they do so via nodes. Usually what happens is that mining pools run several nodes, and then create candidate blocks which are sent to individual miners. The individual miners themselves don't need to keep their own mempool or run their own node, because the mining pool gathers the necessary data for them via its nodes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "December 25, 2022, 10:28:55 PM",
+      "body": "Quote from: BlackHatCoiner on December 25, 2022, 06:45:51 PMHis concern is: what happens if you have two transactions which have absolutely no connection but produce the same TXID? And the answer is that the second will be rejected, because of the BIP 30 soft fork. To be more accurate:The second transaction will be rejected if the first one hasn't been fully spent. If the first transaction has been fully-spent, we can have a block including a transaction with the same ID as that fully-spent transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "December 26, 2022, 03:30:18 AM",
+      "body": "BTW, these kinds of transactions will never hit the mempool, as they can only be generated when a miner creates a coinbase transaction (Since they don't have any inputs, a miner only has to ensure that the reward and destination address is the same, and that there are no segwit transactions in the block - which can all be accomplished by mining an empty block)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 26, 2022, 03:54:33 AM",
+      "body": "Quote from: ymgve2 on December 26, 2022, 03:30:18 AMBTW, these kinds of transactions will never hit the mempool, as they can only be generated when a miner creates a coinbase transaction (Since they don't have any inputs, a miner only has to ensure that the reward and destination address is the same, and that there are no segwit transactions in the block - which can all be accomplished by mining an empty block)You forgot that coinbase transactions have to also include the block height in their signature script, that makes the final hash different even if everything else in that transaction was the same. As the result of this the chance of a duplicate coinbase transaction is just as low as any other duplicate transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "December 26, 2022, 05:37:49 AM",
+      "body": "Quote from: pooya87 on December 26, 2022, 03:54:33 AMQuote from: ymgve2 on December 26, 2022, 03:30:18 AMBTW, these kinds of transactions will never hit the mempool, as they can only be generated when a miner creates a coinbase transaction (Since they don't have any inputs, a miner only has to ensure that the reward and destination address is the same, and that there are no segwit transactions in the block - which can all be accomplished by mining an empty block)You forgot that coinbase transactions have to also include the block height in their signature script, that makes the final hash different even if everything else in that transaction was the same. As the result of this the chance of a duplicate coinbase transaction is just as low as any other duplicate transaction.Ah, I didn't realize BIP34 mandated the block height in the coinbase now. But before it was implemented it was possible, and happened twice: https://bitcointalk.org/index.php?topic=216938",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 26, 2022, 09:43:00 AM",
+      "body": "Quote from: ymgve2 on December 26, 2022, 03:30:18 AMBTW, these kinds of transactions will never hit the mempool, as they can only be generated when a miner creates a coinbase transactionThat's not accurate. Two entirely different non-coinbase transaction can theoretically have the same TXID. It's just that it would be incredibly unlikely - the same as the chance of finding a SHA256 collision.Quote from: ymgve2 on December 26, 2022, 05:37:49 AMAh, I didn't realize BIP34 mandated the block height in the coinbase now.Correct. As per BIP34, the first entry in the coinbase's scriptsig must be the block height. At present, it is the first four bytes. The first byte is 0x03 to signal three more bytes, and then the next three bytes are the block height in little endian. So if we take the scriptsig from the coinbase transaction of the most recent block (768977), we see the following:Code:03d1bb0b1b4d696e656420627920416e74506f6f6c3837342c0015005fd53c19fabe6d6db46edfa877fb61b2a3194255237dde004f732847308b864def23429d0708c9b20200000000000000a1500000fd18000000000000The block height is encoded by the following:Code:03d1bb0b0x03 tells use to look at the next three bytes. The next three bytes are d1bb0b. Convert to big endian (0bbbd1) and then to decimal, and we get 768977.Quote from: ymgve2 on December 26, 2022, 05:37:49 AMBut before it was implemented it was possible, and happened twice: https://bitcointalk.org/index.php?topic=216938That's correct. These two historic collisions are still viewable in the Bitcoin Core code here: https://github.com/bitcoin/bitcoin/blob/e9262ea32a6e1d364fb7974844fadc36f931f8c6/src/validation.cpp#L5311-L5321",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BoyFromDubai",
+      "created_time": "December 26, 2022, 08:33:00 PM",
+      "body": "Quote from: o_e_l_e_o on December 25, 2022, 09:11:14 PMYes, miners need to know about unconfirmed transactions, but they do so via nodes. Usually what happens is that mining pools run several nodes, and then create candidate blocks which are sent to individual miners. The individual miners themselves don't need to keep their own mempool or run their own node, because the mining pool gathers the necessary data for them via its nodes.In here you’re taking about miners which are a part of a mining pool?Cause if so, then okey, I didn’t actually look through technical part of these mining pools. But what about a node who launched his own Bitcoin Core client? Does he have a mempool? Cause as far as I know — yes, he does. But maybe I’m mistaken",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 27, 2022, 01:00:21 PM",
+      "body": "Quote from: BoyFromDubai on December 26, 2022, 08:33:00 PMIn here you’re taking about miners which are a part of a mining pool?If you are running your mining equipment as part of a pool, then generally speaking the pool will run multiple nodes each with their own mempool, use that information to build candidate blocks, and then send those candidate blocks to the miners to be worked on. Each individual miner doesn't need to run their own node, although many will. If you are mining solo, then you must run a node in order to receive broadcasted transactions to your node's mempool and then attempt to include them in a block you are attempting to mine.Mining hardware does not have a mempool. It is nodes which have a mempool, and then use that information to create blocks for the mining equipment to work on.Quote from: BoyFromDubai on December 26, 2022, 08:33:00 PMBut what about a node who launched his own Bitcoin Core client? Does he have a mempool? Cause as far as I know — yes, he does.Yes. Bitcoin Core is a full node, and as with any full node, will have a mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "topic_5408416",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "August 02, 2022, 04:57:38 AM",
+  "content": "I recently added some basic SegWit stuff to my personal project and noticed something in the example checksum code in BIP173.Code:def bech32_polymod(values):  GEN = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]  chk = 1  for v in values:    b = (chk >> 25)    chk = (chk & 0x1ffffff) << 5 ^ v    for i in range(5):      chk ^= GEN[i] if ((b >> i) & 1) else 0  return chkShouldn't the '^' (bitwise xor) on line 6 be a '|' (bitwise or) instead?The left shift makes enough room for 'v' (which is always >= 0 and <= 31) so xoring into zeros seems a little odd to me.Anyway, just thought I'd point that out.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408416",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "August 02, 2022, 05:35:35 AM",
+      "body": "Most probably XOR was used because of consistency since it is used everywhere else. Each round you XOR it with the generator and finally the result is XORed into the constant. Considering that 0 XOR (0 or 1) is the same as 0 OR (0 or 1) it makes no difference either.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 02, 2022, 10:54:48 AM",
+      "body": "Also depending on the language and compiler, XOR might be marginally faster than OR, when executed hundreds of times as demonstrated here with Golang, but it shouldn't have much of a difference here as this part of the checksum generation is executed only a few times.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 03, 2022, 03:01:51 AM",
+      "body": "Quote from: NotATether on August 02, 2022, 10:54:48 AMAlso depending on the language and compiler, XOR might be marginally faster than OR, when executed hundreds of times as demonstrated here with Golang, but it shouldn't have much of a difference here as this part of the checksum generation is executed only a few times.Writing a correct benchmark is harder than writing a correct code. This is a very good example since it is not benchmarking OR, XOR speeds. The loop itself and the difference between how the compiler deals with  \"increment |= 1;\" and \"increment ^= 1;\" is causing the time difference otherwise both OR and XOR take the same amount of time to run.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "August 03, 2022, 08:11:10 AM",
+      "body": "Quote from: pooya87 on August 02, 2022, 05:35:35 AMMost probably XOR was used because of consistency since it is used everywhere else.I would be surprised if this was intentional. Especially for reference code, I'm not convinced that \"consistency\" is a good reason to use a misleading operator.It's not a big deal and I'm aware it's a matter of style (i.e. no functional change), but in this case, using a 'xor' where an 'or' would suffice makes the algorithm harder to \"see\", I think.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 03, 2022, 08:48:10 AM",
+      "body": "Quote from: PowerGlove on August 03, 2022, 08:11:10 AMIt's not a big deal and I'm aware it's a matter of style (i.e. no functional change), but in this case, using a 'xor' where an 'or' would suffice makes the algorithm harder to \"see\", I think.Another way of looking at it is that XOR makes more sense than OR considering the fact that the idea of Bech32 encoding and its error correction checksum has been adapted from CRC and the algorithm used for CRC32 for example looks like this (it uses XOR):Code:for each byte in data do   nLookupIndex ← (crc32 xor byte) and 0xFF   crc32 ← (crc32 shr 8) xor CRCTable[nLookupIndex]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 04, 2022, 09:26:56 PM",
+      "body": "Quote from: PowerGlove on August 02, 2022, 04:57:38 AMShouldn't the '^' (bitwise xor) on line 6 be a '|' (bitwise or) instead?The left shift makes enough room for 'v' (which is always >= 0 and <= 31) so xoring into zeros seems a little odd to me.In GF(2^n) the '^' operation is addition.The algorithm is effectively reading base-32 digits into a big number mod some polynomial, so at each step you add the current digit. (The gen[] part below handles the carry/modular reduction).It does so happen that either would work for that operation, but I would say that ^ is operation that is more consistent with a formal description of the algorithm. Down below where the modular reduction is handled at line 8 the same addition (^) is used, and '|' wouldn't work there.Of course, since it works correctly for all values, if someone had a reason to use | instead in the place it works I don't see any reason why they shouldn't.  As a reviewer I'd be briefly confused as to what '|' was doing, while (when looking at code working in GF(2))  '^' is obviously addition.  Though I doubt I'd raise any issue with either construction.One could also argue that it would be algorithmically more clear to write the *shift* as a multiplication, but the multiplication operation needed in GF(2^n) is a carryless multiplication. Languages don't provide clmul as a native operation and it would be silly to write one out because the only multiplication we need is the special case of a multiplication by a hamming-weight 1 number whos base-2 log we know-- for that special case multiplication both in GF(2^n) and the integers can be accomplished by a shift.  Plus if compiled as written the shift will be actually faster than a GF2 or integer multiplication on devices that people actually use (vs | vs ^ which broadly have identical or close to identical performance). Plus every programmer should be familiar with using shifts to multiply by powers of two.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "August 05, 2022, 02:46:40 AM",
+      "body": "Quote from: gmaxwell on August 04, 2022, 09:26:56 PM{...}Thanks for the detailed response, I appreciate it. I think I can see your point about '|' being non-canonical in GF(2^n). I haven't spent enough time programming finite field stuff to \"agree\" with that, but I'm more than happy [1] to take your word for it.I still feel that idempotent operations are easier to reason about, and I know that when I implemented the algorithm (working from this reference) things became more transparent once I realized that the '^' on line 6 was too strong for its purpose (non-idempotent without needing to be).Quote from: gmaxwell on August 04, 2022, 09:26:56 PM{...} The gen[] part below handles the carry/modular reduction {...}Quote from: gmaxwell on August 04, 2022, 09:26:56 PM{...} Down below where the modular reduction is handled at line 8 {...}That's confusing to me (which probably just means I've got something new to learn ).I can see how carry bits from line 5 are being used on line 8, but isn't the modular reduction actually happening on line 6?Line 6 can be rearranged (perhaps unnecessarily, but it fits my brain better) into \"chk = (chk << 5 | v) % 1073741824\". Isn't that the only place where any modular reduction is happening?[1] https://www.youtube.com/watch?v=PNhj51VvbW8",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 05, 2022, 07:34:21 AM",
+      "body": "Line 6 is computing  chk*32 + v,  the top is taken first to carry, it's done first so that the range never exceeds 32 bits.  In python you could implement it otherwise though it may push it into poor performance.I generally would describe % in most code as a bad practice, particularly since if the divisor isn't constant (or the compiler doesn't do strength reduction) it's a hundred times slower than a multiply. But in python everything is already equally a thousand times slow-- but the implementations for the bip were also intended to be transliterateable to other languages and get a reasonable result.Quote from: PowerGlove on August 05, 2022, 02:46:40 AMQuote from: gmaxwell on August 04, 2022, 09:26:56 PM{...} Down below where the modular reduction is handled at line 8 {...}That's confusing to me (which probably just means I've got something new to learn ).What the checksum is logically computing is taking the entire data being checksumed as the coefficients of a big polynomial (with degree one higher than the number of input digits) mod G, where G is another polynomial specifically selected for its error detection properties.  Because the mods commute it's possible to perform the mod G for each digit as it comes in rather than accumulating up the big product and computing it at once.  That little table used at line 8 is a precomputation of the effect of reducing mod G for a given set of bits that are carried off the top of the 32-bit accumulator.The implementation of bech32 in bitcoin has a detailed mathematical description woven into the comments,  you might want to check that out: https://github.com/bitcoin/bitcoin/blob/master/src/bech32.cpp",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "August 05, 2022, 10:06:01 AM",
+      "body": "Quote from: gmaxwell on August 05, 2022, 07:34:21 AM{...} I generally would describe % in most code as a bad practice {...}Yup, I agree. The checksum code I shared with NotATether here replaces the '% 1073741824' with '& 0x3fffffff'. I just wrote it with a prominent modulo operation to emphasize that the only place I could see modular reduction happening was on that line.Quote from: gmaxwell on August 05, 2022, 07:34:21 AM{...} That little table used at line 8 is a precomputation of the effect of reducing mod G for a given set of bits that are carried off the top of the 32-bit accumulator {...}It feels like I'm close to understanding this, but I'm struggling to see how that sequence of conditional xors corresponds to modular reduction. I suspect that I need to do some more learning around finite fields and (polynomial) modular reduction.Quote from: gmaxwell on August 05, 2022, 07:34:21 AM{...} The implementation of bech32 in bitcoin has a detailed mathematical description woven into the comments {...}Thanks, I'll check that out and thanks once again for the detailed replies, I learned something interesting from both of them, much appreciated!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 05, 2022, 06:57:27 PM",
+      "body": "Quote from: PowerGlove on August 05, 2022, 10:06:01 AMIt feels like I'm close to understanding this, but I'm struggling to see how that sequence of conditional xors corresponds to modular reduction. I suspect that I need to do some more learning around finite fields and (polynomial) modular reduction.Conditional *subtractions* with constants. As xor is both addition and subtraction in GF(2^n). Say you have a 10 bit integer you want to reduce mod 384.  One way you can do it without an expensive division is with conditional subtractions: In [1]: all([(x%384)==(x-(x>=384)*384-(x>=2*384)*384) for x in range(1024)])Out[1]: TrueIn GF(2^n) it's even simpler (because addition/subtraction doesn't carry) and a bigger win (because we don't have fast hardware to do the multiplication/division operations).You can see the wikipedia article on barrett reduction for more in this class of techniques.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "August 06, 2022, 12:13:24 AM",
+      "body": "Quote from: gmaxwell on August 05, 2022, 06:57:27 PMConditional *subtractions* with constants. As xor is both addition and subtraction in GF(2^n). Reading that line made me smile from ear to ear.Oh, man. That is exactly the piece of information I was missing! Now I get it!Thank you so much, I only have 6 sMerit left, but it's yours",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

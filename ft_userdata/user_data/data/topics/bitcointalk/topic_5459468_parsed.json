@@ -1,0 +1,109 @@
+{
+  "id": "topic_5459468",
+  "title": "garlonicon",
+  "author": "garlonicon",
+  "created_time": "July 11, 2023, 09:16:41 PM",
+  "content": "Are there any such points? For some elliptic curves with less bits they can be found. I wonder if there are any such points for secp256k1, and if so, how to calculate those public keys? Even without private keys (that could be hard to find in such huge space), calculating those public keys alone could be interesting.For example, if we use \"p=14071, n=13933, base=(1,3660)\", then we can find those values:Code:n= 5744, x= 2318, y= 2318, y^2=12073n= 8470, x=11203, y=11203, y^2= 7960n=13652, x=  551, y=  551, y^2= 8110As far as I understand, if we have y^2=x^3+7, then in this case we would have x=y, so x^2=x^3+7. That means, if we look at complex numbers, then we would have three solutions for such equation. Of course, not every real point can be always represented, so when we have (1,sqrt(8)) as a solution, where x=1, and y=sqrt(8), then it is on some elliptic curve only if \"sqrt(8)\" can be represented modulo \"p\" (so if there is any value between 1 and p-1, that would give us 8, when it is multiplied by itself).",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459468",
+  "comments": [
+    {
+      "author": "digaran",
+      "created_time": "July 11, 2023, 09:41:32 PM",
+      "body": "Quoteso x^2=x^3+7How exactly x^2 is = x^3+7? Is that a typo? Also have you ever seen x=y in secp256k1?A few months ago as I was playing around with xs and ys, I remember to see something like x=y, but since I had no  clue what that could really mean, I just ignored it.Main question, what would be the result of finding such points on secp256k1?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "July 11, 2023, 11:18:00 PM",
+      "body": "Quote from: garlonicon on July 11, 2023, 09:16:41 PMAre there any such points?For starters, the real solution to y2 = x3+7 when x = y is -1.63109... I know that doesn't help, but I had fun looking it up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaCryptoRaccoon",
+      "created_time": "July 12, 2023, 02:20:12 PM",
+      "body": "I see what you're getting at! In the equationCode:y^2 = x^3 + 7, If we assume that x and y are equal, we can substitute that into the equation to simplify it to.Code: x^2 = x^3 + 7.  This simplification gives us a cubic equation, which could potentially have three solutions.When we're working with elliptic curve cryptography it's important to understand that we're dealing with points on the curve that satisfy both the x and y coordinates.Not every combination of x and y will be a valid point on the curve.  For the secp256k1 curve which is the one used in Bitcoin.Code: y^2 = x^3 + 7 defines the curve itself. But not all x and y values will give us valid points on the curve. This is because the curve is defined over a finite field, and the coordinates (x, y) must satisfy the equation modulo a large prime number.So, while it's true that there may exist y-values corresponding to certain x-values that satisfy the equation, we need to check if both x and y fall within the valid range of values for the finite field defined by the curve's prime modulus.In your example of :Code:(1, sqrt(8)), which satisfies Quotey^2 = x^3 + 7, It is important to note that it may not correspond to a valid point on the secp256k1 curve. To determine if a point (x, y) is on the curve, we must ensure that both x and y are valid values within the finite field defined by the curve's prime modulus.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CrunchyF",
+      "created_time": "July 28, 2023, 06:54:38 PM",
+      "body": "No there is no point in secp256k1 where x==ybut there is one where x==y+1x=103219894018170979103981239500535823206309202530631329673674059809050911020508y=103219894018170979103981239500535823206309202530631329673674059809050911020507 (x**3+7)%P==(y**2)%P => True",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CrunchyF",
+      "created_time": "July 28, 2023, 07:43:41 PM",
+      "body": "Quote from: interiawp on July 28, 2023, 07:21:58 PMThis is wrong. You think x==y as pointy on curve.Theo real value is y == modinv(x.n) or x == modinv(y,n)I have found only 5 points with this. One is satoshi pubkeySorry i don't understand your post...and why I'm wrongI speak about coordinate in affine plan as Q->(x,y)Q : (103219894018170979103981239500535823206309202530631329673674059809050911020508,103219894018170979103981239500535823206309202530631329673674059809050911020507) or 04e43463c1a7b06b6e49f555d75238bd140690ee0f689fda75d87623e10acf95dce43463c1a7b06 b6e49f555d75238bd140690ee0f689fda75d87623e10acf95db (uncompresed pubkey) or 03e43463c1a7b06b6e49f555d75238bd140690ee0f689fda75d87623e10acf95dcis a perfect valid bitcoin pubkey",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 29, 2023, 04:29:33 AM",
+      "body": "QuoteNo there is no point in secp256k1 where x==yHow do you know that? Is there any simple way to check, if for a given p-value, there is such point or not?Quotebut there is one where x==y+1Nice result! But how it was calculated?QuoteThis is wrong. You think x==y as pointy on curve.Because it should be a point on curve, exactly as specified in the first post:Code:n= 5744, x= 2318, y= 2318, y^2=12073n= 8470, x=11203, y=11203, y^2= 7960n=13652, x=  551, y=  551, y^2= 8110Now I only wonder, what algorithm is needed to get there?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ripemdhash",
+      "created_time": "July 29, 2023, 09:03:14 AM",
+      "body": "Quote from: CrunchyF on July 28, 2023, 06:54:38 PMNo there is no point in secp256k1 where x==ybut there is one where x==y+1x=103219894018170979103981239500535823206309202530631329673674059809050911020508y=103219894018170979103981239500535823206309202530631329673674059809050911020507 (x**3+7)%P==(y**2)%P => TrueSo. if we are talking abouy the curve and we have Fp and N :field Fp is defined by : Fp = FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE FFFFFC2Forder:Fn = FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE BAAEDCE6 AF48A03B BFD25E8C D0364141your point x,y where x==103219894018170979103981239500535823206309202530631329673674059809050911020508y==103219894018170979103981239500535823206309202530631329673674059809050911020507it is real point as half_mod Fp/Fn , I got problem to explain my english is not so good to technical explain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CrunchyF",
+      "created_time": "July 29, 2023, 12:25:14 PM",
+      "body": "Quote from: garlonicon on July 29, 2023, 04:29:33 AMHow do you know that? Is there any simple way to check, if for a given p-value, there is such point or not?the equation of the secp256k1 curve is x³+7=y² mod(P)orx³+7-y²=0 mod(P) if x=ythen x³-x²+7=0this equation is a polynomial of degree 3 in Finite Field and have no roots (solutions)Quotebut there is one where x==y+1Nice result! But how it was calculated?instead of looking for x=y we can find if roots exists replacing x=y+c  in the polynomial equation where c in a constant varying between the range [-10;10] e.gThis is my Sage script:Code:P=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fC = EllipticCurve([F(0), F(7)]) F=GF(P)R.<x>=F[]for c in range(-10,10,1):    f=((x)**3+7)-(x+c)**2    rts=f.roots()    for r in rts:        try:            G=C.lift_x(r[0])            print(c,G,-G)        except:            passWe test G and -G to see if one corresponding to x==y+cQuoteNow I only wonder, what algorithm is needed to get there?see above...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CrunchyF",
+      "created_time": "July 29, 2023, 12:30:35 PM",
+      "body": "Quote from: digaran on July 11, 2023, 09:41:32 PMMain question, what would be the result of finding such points on secp256k1?Absolutely nothing because one Generator in not different from another in term of security",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "OneGoLuck",
+      "created_time": "August 04, 2023, 12:51:39 PM",
+      "body": "Quote from: CrunchyF on July 29, 2023, 12:30:35 PMQuote from: digaran on July 11, 2023, 09:41:32 PMMain question, what would be the result of finding such points on secp256k1?Absolutely nothing because one Generator in not different from another in term of securityIf you could find one \"weak\" generator, the security of the whole bitcoin would be brokenThat is why it's assumed there are no weak generators, as none has been found. And to be honest, I cant imagine why one would be weaker than all the others",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "August 04, 2023, 06:07:21 PMLast edit: August 04, 2023, 09:38:32 PM by digaran",
+      "body": "Can anyone explain the following?Code:Lambda : 5363ad4cc05c30e0a5261c028812645a122e22ea20816678df02967c1b23bd72 Beta : 7ae96a2b657c07106e64479eac3434e99cf0497512f58995c1396c28719501ee a1 = 3086d221a7d46bcde86c90e49284eb15 b1 = e4437ed6010e88286f547fa90abfe4c3 a2 = 114ca50f7a8e2f3f657c1108d9d44cfd8What is the use of the keys above?Edit, so far I figured if we multiply a point by lambda, it will add our key to it and there won't be any multiplication and it also steals our y coordinate. So what is the use of that? About beta, I can't find anything meaningful in my results, is there any?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 05, 2023, 09:20:54 AM",
+      "body": "Quote from: digaran on August 04, 2023, 06:07:21 PMCan anyone explain the following?These are the values for endomorphism on secp256k1. You can read the original post from Hal Finney deriving these values here: https://bitcointalk.org/index.php?topic=3238.msg45565#msg45565Lambda is such that Lambda^3 (mod N) = 1.Beta is such that Beta^3 (mod P) = 1.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

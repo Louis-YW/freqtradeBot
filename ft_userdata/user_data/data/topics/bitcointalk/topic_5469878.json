@@ -1,0 +1,109 @@
+{
+  "id": "topic_5469878",
+  "title": "btcpond",
+  "author": "btcpond",
+  "created_time": "October 10, 2023, 12:51:47 PM",
+  "content": "sent btc to wallet in offline mode didn't see the funds in wallet tried to restart armory but now it won't open logfile: https://pastebin.com/qhU12HSX",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5469878",
+  "comments": [
+    {
+      "author": "goatpig",
+      "created_time": "October 10, 2023, 01:25:43 PM",
+      "body": "There isn't much to go on in the logs. It seems to be having trouble starting bitcoind.Start bitcoin-qt manually, let it progress, also check your free disk space. If it all looks good, start ArmoryDB manually, then start ArmoryQt. You are using default paths so that should work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "October 10, 2023, 05:34:24 PM",
+      "body": "The first logs seems it was from drive C: now it has changed to drive E:.Did you recently change something on armoryqt.conf file about the data folder?I suggest pointing them properly to the right folder if your Armory data and Bitcoin core data are in drive E: you can follow the guide below- https://btcarmory.com/docs/pathing#config-files",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btcpond",
+      "created_time": "October 10, 2023, 07:16:33 PMLast edit: October 10, 2023, 08:00:51 PM by btcpond",
+      "body": "i changed bitcoin or armory or both to send btc  i was connected purple but not green i need help with btc with some bitcoin commands start bitcoin start armory generate wallet generate  address view wallets send btc and close",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "October 11, 2023, 07:21:50 AM",
+      "body": "Quote from: BitMaxz on October 10, 2023, 05:34:24 PMThe first logs seems it was from drive C: now it has changed to drive E:.Did you recently change something on armoryqt.conf file about the data folder?I suggest pointing them properly to the right folder if your Armory data and Bitcoin core data are in drive E: you can follow the guide below- https://btcarmory.com/docs/pathing#config-filesWhere do you see that he changed his paths? I dont.Quote from: btcpond on October 10, 2023, 12:51:47 PMsent btc to wallet in offline mode didn't see the funds in wallet tried to restart armory but now it won't open logfile: https://pastebin.com/qhU12HSXPlease, follow my instructions here and report back.Quote from: goatpig on October 10, 2023, 01:25:43 PMStart bitcoin-qt manually, let it progress, also check your free disk space. If it all looks good, start ArmoryDB manually, then start ArmoryQt. You are using default paths so that should work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "October 11, 2023, 09:32:40 AM",
+      "body": "Quote from: goatpig on October 11, 2023, 07:21:50 AMWhere do you see that he changed his paths? I dont.I mean these logs belowCode:Log file opened at 1554331969: C:\\Users\\Cole Camwren\\AppData\\Roaming\\Armory\\armorycpplog.txt-ERROR - 1554331989: (..\\SocketObject.cpp:440) POLLERR error in readAndWrite  Log file opened at 1554334529: C:\\Users\\Cole Camwren\\AppData\\Roaming\\Armory\\armorycpplog.txt-ERROR - 1554334579: (..\\SocketObject.cpp:440) POLLERR error in readAndWrite  Log file opened at 1554343739: C:\\Users\\Cole Camwren\\AppData\\Roaming\\Armory\\armorycpplog.txt-ERROR - 1554343747: (..\\SocketObject.cpp:440) POLLERR error in readAndWrite  Log file opened at 1554343819: C:\\Users\\Cole Camwren\\AppData\\Roaming\\Armory\\armorycpplog.txt-ERROR - 1554343826: (..\\SocketObject.cpp:440) POLLERR error in readAndWrite  Log file opened at 1554344080: C:\\Users\\Cole Camwren\\AppData\\Roaming\\Armory\\armorycpplog.txt-ERROR - 1554344087: (..\\SocketObject.cpp:440) POLLERR error in readAndWrite  Log file opened at 1554344535: C:\\Users\\Cole Camwren\\AppData\\Roaming\\Armory\\armorycpplog.txt  Log file opened at 21:23:16.000: C:\\Users\\Cole Camwren\\AppData\\Roaming\\Armory\\armorycpplog.txt-ERROR - 21:23:25.016: (e:\\users\\goat\\code\\armory3\\cppforswig\\socketobject.cpp:447) POLLERR error in readAndWrite-ERROR - 21:23:25.016: (e:\\users\\goat\\code\\armory3\\cppforswig\\stringsockets.cpp:359) POLLERR error in readAndWrite Some errors according to this logs shown in C: drive and some of them are in drive e: that makes me think that he might alter the path folder of armory data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "October 12, 2023, 04:39:11 PM",
+      "body": "Quotee:\\users\\goat\\code\\armory3\\cppforswig\\That's an artifact of Windows compilation. What you are seeing is the path where the source resided on my computer at the time of building the Windows binary. This is the underlying code here:https://github.com/goatpig/BitcoinArmory/blob/master/cppForSwig/log.h#L70For some reason on Windows it resolves __FILE__ to the full path instead of relative path. Go figure. I haven't gotten around to that, and I will probably replace the current log code with spdlog anyways.There is compounding confusion in this log system, because the first half of the log is generated by the Python code and the dynamically loaded C++ code from SWIG library. That stuff runs on relative paths, for whatever reason. The second half is the concatenation of ArmoryDB's log, which has the full path resolution. Chaos ensues. You'll also notice the logs summoned from the Python side renders time as timestamps, where as the C++ logs renders them as datetime. Gotta clean up that mess at some point.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btcpond",
+      "created_time": "October 17, 2023, 05:45:58 PMLast edit: October 17, 2023, 09:15:28 PM by btcpond",
+      "body": "Error when starting ArmoryDB manually(e:\\users\\goat\\code\\armory3\\cppforswig\\sockobject.cpp:290) Poller error readinfromsocketthread(e:\\users\\goat\\code\\armory3\\cppforswig\\bitcoinp2p.cpp:1027)caught socketerror exception in process datastackthread:poller error in readfromsocket threadhttps://ibb.co/b2j4rmS",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "October 18, 2023, 07:40:11 AM",
+      "body": "It can't connect to bitcoind/qt. Did you start your bitcoin core client?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btcpond",
+      "created_time": "October 18, 2023, 02:44:21 PMLast edit: October 18, 2023, 04:31:15 PM by btcpond",
+      "body": "i did manually like you said im looking at it rn",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "October 18, 2023, 05:31:17 PM",
+      "body": "Quote from: btcpond on October 18, 2023, 02:44:21 PMi did manually like you said im looking at it rnArmory is trying to connect to your node over port 8333. Is this port used by another process? Or maybe you have an antivirus blocking it? Look for the bitcoin core logs and post that here. You should find it in ~\\AppData\\Roaming\\Bitcoin\\debug.log",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btcpond",
+      "created_time": "October 19, 2023, 05:29:46 PM",
+      "body": "https://file.io/iAhETocOnPieidk another way i can share the file idk if you are scared of downloading files on internet but i posted it here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "October 20, 2023, 09:11:12 AM",
+      "body": "Quote from: btcpond on October 19, 2023, 05:29:46 PMhttps://file.io/iAhETocOnPieidk another way i can share the file idk if you are scared of downloading files on internet but i posted it hereSays the file is cancelled. Try copying the last few thousand lines in pastebin and post the link here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

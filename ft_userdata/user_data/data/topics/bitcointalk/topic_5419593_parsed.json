@@ -1,0 +1,21 @@
+{
+  "id": "topic_5419593",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "November 06, 2022, 09:57:03 AMLast edit: November 06, 2022, 11:32:41 AM by citb0in",
+  "content": "Hi all,I am using cgminer 4.12.0 and mining against bitcoind @localhost. The hardware used is an ASIC miner GekkoScience Compac F USB miner at an average hash rate of 387 GH/s. In cgminers' source code I have testwise increased the default timeout of 5sec in the watchpool_thread function and raised it to a value higher than 5 minutes. By this it allows the threads to iterate and cycle through many nonce2 values. I was interested to see how fast cgminer cycles through the nonce2 range which is from 0-18446744073709551615QuoteStarted with nonce2=0[2022-11-06 10:31:03.924] Work nonce2 0 ntime 63677a79Ended with nonce2=15478[2022-11-06 10:36:03.922] Work nonce2 15478 ntime 63677a79The result was: it cycled through 15478 values within 5 minutes. The rate therefore was 3095.6 values/min. I consider this horribly slow.Summary:This USBminer is able to cycle through the nonce range (2^32-1) from 0-4294967295 90 (!) times per second, that is the expected hashrate of 387 GH/s which the miner is capable of.But it can only cycle through 15,479 values for the nonce2 field which is a hashrate of 3,1 KH/sI understand that when going through the nonce2 range, the Merkle root has to be regenerated each time, but the scale can't be that huge. So what explains this extremely large difference in processing rate ?I look forward to helpful answers and thank you all in advanceEDIT:One additional question. How can I display the nonce's that were used and tested so far in cgminers output/log when in debug mode? I tried this:Code:[...]//applog(LOG_DEBUG, \"Work nonce2 %\"PRIu64\" ntime %s\", work->nonce2, work->ntime);                applog(LOG_DEBUG, \"Work nonce=%\"PRIu32\" nonce2=%\"PRIu64\" ntime=%s\", work->nonce, work->nonce2, work->ntime);[...]but I got always displayed nonce=0 in the output",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5419593",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "November 07, 2022, 12:54:02 AM",
+      "body": "First of all, this is wrong:Quote from: citb0in on November 06, 2022, 09:57:03 AMthe nonce2 range which is from 0-18446744073709551615And this is right:Quote from: citb0in on November 06, 2022, 09:57:03 AMthe nonce range (2^32-1) from 0-4294967295From your other topic, it appears to me that you just removed the timer (or set it to a very long number) that resets the nonce to 0 and creates a new block template with a new timestamp. Is that what you're doing?Quote from: citb0in on November 06, 2022, 09:57:03 AMQuoteStarted with nonce2=0[2022-11-06 10:31:03.924] Work nonce2 0 ntime 63677a79Ended with nonce2=15478[2022-11-06 10:36:03.922] Work nonce2 15478 ntime 63677a79Did you consider that nonce2 may just have wrapped around a whole bunch of times? If you're already fiddling with the code, maybe just add a clause that stops increasing nonce2 once it wraps around for the first time, and redo this test.I would be very surprised if it doesn't reach 232-1 within 5 minutes. Then, if you fancy it, reduce your measurement time to 1 minute or so until it doesn't hit it.Or add a counter which keeps track of how many times nonce2 wrapped around. I'm very interested in seeing your results.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

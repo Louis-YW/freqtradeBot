@@ -1,0 +1,133 @@
+{
+  "id": "topic_5477251",
+  "title": "tarotfied",
+  "author": "tarotfied",
+  "created_time": "December 10, 2023, 03:41:19 AM",
+  "content": "Just waited for a rescan to complete, shut down Sparrow, then restarted it. This immediately shows up in the node logs:2023-12-10T03:26:31Z [cormorant] RescanFromTime: Rescanning last 9066 blocks2023-12-10T03:26:31Z [cormorant] Rescan started from block 0000000000000000000235fa86c66bf0ba443c3c648248580b48b1473a21af67... (slow variant inspecting all blocks)What is triggering these rescans? It takes at least an hour to rescan on my node which uses an HDD. It doesn't happen every time I start Sparrow.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5477251",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 10, 2023, 09:23:42 AM",
+      "body": "Did the previous rescan definitely fully complete? It showed up all your coins and transactions? If you shut down before it was fully finished then I assume it will start again from the wallet birthday whenever you next launch Sparrow.Other things to consider - did you close Sparrow normally and did you close Core normally? Neither of them crashed? Did you change your wallet's birthday, create a new wallet, or import any new addresses? All of these things will trigger a rescan. And you haven't moved/edited/deleted any of the Sparrow wallet files?Have you checked the Sparrow logs to see if they show anything useful?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "December 10, 2023, 09:30:44 AMLast edit: December 10, 2023, 09:42:43 AM by apogio",
+      "body": "And another possibility:Did you change anything in the bitcoin.conf file? (Some directives may cause this issue)All of the suggestions by o_e_l_e_o above are good suspects. Unfortunately not having a Electrum Server and connecting straight to Core can cause these issues",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tarotfied",
+      "created_time": "December 10, 2023, 10:35:40 AM",
+      "body": "Quote from: o_e_l_e_o on December 10, 2023, 09:23:42 AMDid the previous rescan definitely fully complete? It showed up all your coins and transactions? If you shut down before it was fully finished then I assume it will start again from the wallet birthday whenever you next launch Sparrow.Other things to consider - did you close Sparrow normally and did you close Core normally? Neither of them crashed? Did you change your wallet's birthday, create a new wallet, or import any new addresses? All of these things will trigger a rescan. And you haven't moved/edited/deleted any of the Sparrow wallet files?Have you checked the Sparrow logs to see if they show anything useful?None of that seems to apply in my case.OK, here's a clue possibly? I've got whirlpool running, and it started another rescan immediately after I received a new UTXO in Postmix. Come to think of it, I never had this Sparrow problem until I started using whirlpool. Would a rescan be expected behaviour?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 10, 2023, 10:57:14 AM",
+      "body": "Quote from: tarotfied on December 10, 2023, 10:35:40 AMWould a rescan be expected behaviour?No, it isn't, unless it was adding new addresses to your post-mix wallet. If you go to the \"Addresses\" tab on your post-mix wallet, you should have a huge list of dozens of unused addresses which have already been scanned and are known to be empty.Try going to your post-mix account, go to the \"Settings\" tab, and the click \"Advanced\" down the bottom. Is your wallet birthday set in the past and do you have a reasonable gap limit set? For other wallets the gap limit will be 20; for post-mix it should be several hundred at least, if not more.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tarotfied",
+      "created_time": "December 10, 2023, 11:04:47 AM",
+      "body": "Quote from: o_e_l_e_o on December 10, 2023, 10:57:14 AMTry going to your post-mix account, go to the \"Settings\" tab, and the click \"Advanced\" down the bottom. Is your wallet birthday set in the past and do you have a reasonable gap limit set? For other wallets the gap limit will be 20; for post-mix it should be several hundred at least, if not more.Alright, I'll try upping the gap limit. Can you explain why that might help?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tarotfied",
+      "created_time": "December 10, 2023, 11:11:18 AM",
+      "body": "Quote from: apogio on December 10, 2023, 09:30:44 AMUnfortunately not having a Electrum Server and connecting straight to Core can cause these issuesGoing to give Electrum a shot as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "December 10, 2023, 11:15:30 AM",
+      "body": "Quote from: tarotfied on December 10, 2023, 11:11:18 AMQuote from: apogio on December 10, 2023, 09:30:44 AMUnfortunately not having a Electrum Server and connecting straight to Core can cause these issuesGoing to give Electrum a shot as well.No I meant electrum server. It is essentially a server that allows you to interact with the Blockchain. It sits on top of Bitcoin Core. Electrum is a wallet, like sparrow and they can both be connected to an electrum server. Sparrow can also connect directly to core. Not using an Electrum Server in between.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 10, 2023, 11:18:39 AM",
+      "body": "Quote from: tarotfied on December 10, 2023, 11:04:47 AMAlright, I'll try upping the gap limit. Can you explain why that might help?I'm not 100% sure it will help, but it's worth a shot.The gap limit specifies how many unused addresses your wallet should generate and scan. For a post-mix wallet, since you are constantly using new addresses, this number should be very high to give the wallet plenty of unused addresses it can send your free remixes to. If the gap limit was low, then your wallet might need to be frequently add new addresses, which might explain frequent rescans.It seems the default post-mix gap limit on the most recent versions of Sparrow is now 4,000:https://github.com/sparrowwallet/sparrow/blob/4feb4a3a79a3bbe69178fbefa38cd530fe963240/src/main/java/com/sparrowwallet/sparrow/net/cormorant/bitcoind/BitcoindClient.java#L47C12-L47C12Code:private static final int POSTMIX_GAP_LIMIT = 4000;",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tarotfied",
+      "created_time": "December 10, 2023, 11:26:44 AM",
+      "body": "Quote from: apogio on December 10, 2023, 11:15:30 AMQuote from: tarotfied on December 10, 2023, 11:11:18 AMQuote from: apogio on December 10, 2023, 09:30:44 AMUnfortunately not having a Electrum Server and connecting straight to Core can cause these issuesGoing to give Electrum a shot as well.No I meant electrum server.So did I...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "December 10, 2023, 11:30:03 AM",
+      "body": "Quote from: tarotfied on December 10, 2023, 11:26:44 AMSo did I...Oh ok, my bad. This will be much better in terms of performance. Are you running a custom node? Or a solution like Umbrel, Start9 etc?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tarotfied",
+      "created_time": "December 10, 2023, 11:53:55 AM",
+      "body": "Quote from: apogio on December 10, 2023, 11:30:03 AMOh ok, my bad. This will be much better in terms of performance. Are you running a custom node? Or a solution like Umbrel, Start9 etc?Trying to get electrs going on Ubuntu.  Think I got it:  2023-12-10T11:52:28.645Z INFO  electrs::index] indexing 2000 blocks: [1..2000]Going to let it rip for a while. Thanks for your comments.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tarotfied",
+      "created_time": "December 10, 2023, 12:05:02 PM",
+      "body": "Quote from: o_e_l_e_o on December 10, 2023, 11:18:39 AMThe gap limit specifies how many unused addresses your wallet should generate and scan.Thanks for the explanation. I increased the limit, but to be honest, given the number of mixes I've seen since entering the pool (<20) I'm not sure this will help. I think there's something else up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "December 11, 2023, 04:21:07 PM",
+      "body": "Have you checked the Sparrow logs to see if they say what is triggering the rescan?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tarotfied",
+      "created_time": "December 12, 2023, 06:24:21 AM",
+      "body": "Quote from: o_e_l_e_o on December 11, 2023, 04:21:07 PMHave you checked the Sparrow logs to see if they say what is triggering the rescan?Nah, I set up Electrum Server and since then everything has been solid.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "December 12, 2023, 07:16:47 AM",
+      "body": "Quote from: tarotfied on December 12, 2023, 06:24:21 AMNah, I set up Electrum Server and since then everything has been solid.Yeah as we said above everything is easier with Electrum Server. Congrats man. So case solved ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "topic_5425956",
+  "title": "ParticlAccelerator",
+  "author": "ParticlAccelerator",
+  "created_time": "December 06, 2022, 10:08:25 AM",
+  "content": "Has anyone seen this, it does atomic swaps and supports Dash, Monero, BTC and LTC amongst others.basicswapdex.comNo wrapped tokens or any of that crap, it swaps directly between native wallets with no fees.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5425956",
+  "comments": [
+    {
+      "author": "Potato Chips",
+      "created_time": "December 06, 2022, 10:28:39 AM",
+      "body": "If you wanna play it safe, I advise to go with those that already have a good standing in the community. This exchange is pretty new with barely any user reviews so you will be playing the risky game.Quote from: https://www.whois.com/whois/basicswapdex.comRegistered On: 2022-07-22",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ParticlAccelerator",
+      "created_time": "December 06, 2022, 04:23:36 PM",
+      "body": "So trust is one thing, but I've been reading up more and this DEX is trustless, either the coins get traded between the two users or the users get a refund, there are no other states. Its based on some of the work by Joël Gugger. You can find the imimplimentation walk through here:https://github.com/h4sh3d/xmr-btc-atomic-swap/blob/master/whitepaper/xmr-btc.pdf",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ParticlAccelerator",
+      "created_time": "December 06, 2022, 04:30:34 PM",
+      "body": "The atomic swap mechanism supports Monero, Bitcoin,  Litecoin, Particl, PIVX, Frio and Dash for the first release. Any coins can be added in theory; an exchange can only take place if one of the chains provides time_lock.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Husires",
+      "created_time": "December 08, 2022, 04:28:52 PMLast edit: December 08, 2022, 04:46:18 PM by Husires",
+      "body": "I see that the code is open source, which gives a good first impression, but let's dig into the details:Do I need to synchronize all blockchains for all cryptocurrencies? Or just for Monero? Bitcoin or what? If it is for all blockchains, then the scalability is bad.Where is the liquidity provided? How is the price of trading pairs determined?Can you talk in more detail about how to do cross-blockchain trading without wrapped tokens?Since there are no additional fees, how was the project financed?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ParticlAccelerator",
+      "created_time": "December 09, 2022, 03:49:53 PM",
+      "body": "Quote from: Husires on December 08, 2022, 04:28:52 PMI see that the code is open source, which gives a good first impression, but let's dig into the details:Do I need to synchronize all blockchains for all cryptocurrencies? Or just for Monero? Bitcoin or what? If it is for all blockchains, then the scalability is bad.For the first beta which started yesterday, you need to have copies of the block chains stored locally, however this is implemented with pruned block chains so it is a lot lighter than running a full node. You can also point the DEX client at an existing block chain if you are already running a local client for the coin in question. You also only need to download the block chain for the coins you are interested in.In later releases you will be able to specify a trusted server so you don’t need to hold the data locally and can keep things much lighter.Looking at this running on my local drive, the sizes of each blockchains are:    - 7.3GB BTC    - 6.5GB Dash    - 4.8GB Frio    - 5.8GB LTC    - 52GB Monero    - 1.8GB Particl    - 19GB PIVXI think Pivx and Monero are lot bigger because pruning is different because they are using obfuscation protocols such as cryptonote, so it seems about 1/3 of each TX has to be kept.Quote from: Husires on December 08, 2022, 04:28:52 PMWhere is the liquidity provided? How is the price of trading pairs determined?Liquidity is simply provided by any user placing an offer on the DEX order book using Particl’s encrypted messaging system called SMSG. Any cryptocurrency that supports time_lock can be used to place an initial offer; a buyer can then bid to match that offer. Any crypto pair can be traded as long as one of them supports lock_time in its UTXO script. This is how Monero can be supported; anyone can make an initial offer to swap Monero for another coin, but no offers can be made listing Monero as the initial currency because it does not support lock_time. I hope that makes sense. There are no market makers or anything formal like that operating on the exchange at the moment, so all the trading is purely the community at this stage.Quote from: Husires on December 08, 2022, 04:28:52 PMCan you talk in more detail about how to do cross-blockchain trading without wrapped tokens?The cross blockchain trading in an implementation of this atomic swap protocol, which I believe has been about for years, but was is formalised in this white paper:https://github.com/h4sh3d/xmr-btc-atomic-swap/blob/master/whitepaper/xmr-btc.pdfAccording to the source code notes, the steps of an atomic swap are as follows:    1. Seller posts offer.        o smsg from seller to network coin-from coin-to amount-from rate min-amount time-valid    2. Buyer posts bid:        o smsg from buyer to seller offerid amount proof-of-funds address_to_buyer time-valid    3. Seller accepts bid:        o verifies proof-of-funds        o generates secret        o submits initiate tx to coin-from network        o smsg from seller to buyer txid initiatescript (includes pkhash_to_seller as the pkhash_refund)    4. Buyer participates:        o inspects initiate tx in coin-from network        o submits participate tx in coin-to network    5. Seller redeems:        o constructs participate script        o inspects participate tx in coin-to network        o redeems from participate tx revealing secret    6. Buyer redeems:        o scans coin-to network for seller-redeem tx        o redeems from initiate tx with revealed secretQuote from: Husires on December 08, 2022, 04:28:52 PMSince there are no additional fees, how was the project financed?So I guess the answer to this kind of has two threads. Firstly the Particl project was founded and funded by the community back in about 2014, so the development has been funded from there. The DEX runs of the Particl blockcahin and its encrypted SMSG protocol based on BitMessage. It’s been built as an example dApp to show off what a blockcahin and encrypted messaging protocol can achieve in combination. The message the SMSG network needs to support are very light so basically their cost on the network is almost negligible. So second the DEX is arguably a loss leader to try and bring users to Particl. For example if users swap their crypto for Particl coins they can then buy things like cash and gold bullion in the trustless marketplace which is a bit like eBay on a blockcahin and be accessed via the wallet or web portal.The marketplace was the first dApp built on Particl’s decentralised messaging system about four years ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ParticlAccelerator",
+      "created_time": "December 10, 2022, 08:11:40 PM",
+      "body": "On the thrustless decentralised market place attached to the DEX, I'm giving away the following physical cryptocurrency coins in a competition:    - 1 x Silver Casascius 2012 1oz round, 1BTC (redeemed)    - 1 x Lealana Series 1, funded with 1 LTC    - 1 x Lealana Series 2, funded with 1 LTC, (can’t remember if it is buyer funded or not)    - 1 x Casascius 5 BTC series 1 sticker (redeemed)    - 1 x Casascius 5 BTC series 1 sticker (redeemed)    - 1 x Casascius 1 BTC 2012 with Series 2 back (redeemed)    - 3 x Casascius 1 BTC 2013 with Series 2 back (redeemed)    - 1 x Casascius 0.5 BTC with Series 2 Back (redeemed)    - 10 x Nastyfans 1g silver round, Nasty Fans (no funds present)    - 10 x Nastyfans 1g silver round, Nasty Pool (no funds present)It's listed here on Bitcoin talk.If you want to enter you can use the DEX to swap some of your existing cryptos to Particl and make a bid to enter.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "The Cryptovator",
+      "created_time": "December 11, 2022, 07:42:04 PM",
+      "body": "It appears to be a one-time transaction. So, are you promoting it or sharing your experience? What is the fundamental reason to use this swap? In any case, the section isn't appropriate for promoting it. It's fine to share your experience. But I'm not going to use that swap because it's relatively new here. There are numerous established swaps that we can use. We can use dex better because there is less risk involved.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ParticlAccelerator",
+      "created_time": "December 11, 2022, 08:04:05 PM",
+      "body": "So the most fundamental point about this DEX, beyond being extensible, free and atomic, is that unlike all the other DEXs it is trustless and decentralised. All the other DEXs out there rely on some kind of centralisation for the order making and taking, this requires trust and makes the order books on these older designs a vector for attack. Basic swap doesn't have this problem because the decentralised messaging system it uses is tied to each client and the particl block chain.Spoofing message is possible on basic swap, but because the messages require work to generate, but are insignificant to verify (yes the messaging system is a proof of work implementation) its basically impossible to attack the network in any way. Also each message has to be spoofed per participant, so in terms of big O notation, the denial of service becomes On, not O^n, so trivial to mitigate.Basic swap is free to use and you don't need to own any particl coins to use the exchange, so the team is promoting it to alternate cryptos as a while label plugin for their wallets, as users of these other wallets can now swap crypto for free via this platform.I can also attest that having used it for a few days now, it feels just like a normal exchange, its really smooth and easy to use, despite relying on block chain block times.The particl team were interviewed on Friday's Monero Talk about the DEX, if you want to find out more its worth listening to, the audio starts at 1:15:https://twitter.com/monerotalk?lang=en",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joniboini",
+      "created_time": "December 12, 2022, 02:49:10 AM",
+      "body": "Quote from: The Cryptovator on December 11, 2022, 07:42:04 PMIt appears to be a one-time transaction. So, are you promoting it or sharing your experience? It looks like this DEX is part of Particl (https://twitter.com/particlproject), and seeing OP's username, he's either a believer of the project or someone who does marketing for them. Nothing is wrong with that, but I personally find that announcing/making an ANN thread about the service would be more appropriate. Maybe service discussion or service announcements should be the place to post it. Even if it's not an official thread from them, OP can still promote them as usual.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ParticlAccelerator",
+      "created_time": "December 13, 2022, 09:21:52 PM",
+      "body": "A nice interview with some members of the BasicSwap DEX team:https://odysee.com/@MoneroTalk:8/basicswapdex-%E2%80%94-trade-monero-safely-and:6They have partnered with Monero, Dash and Frio, and it looks like this DEX will be offered white label in their wallets soon, so there could be tens of thousands of users on this exchange all using it from different wallets.Good by to CEXs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ParticlAccelerator",
+      "created_time": "December 14, 2022, 10:07:55 PM",
+      "body": "Quote from: MoparMiningLLC on December 14, 2022, 07:26:44 AMas these items cannot be bought with BTC and require instead an alt coin - you should move this listing to the Altcoin marketplace - my opinion at least.There is in fact a feature planned for next year where you can pay directly in the marketplace interface in pretty much any currency including BTC, and it will do a trade in the background using Particl's DEX to trade that currency to PART which is native to the market. Right now you can do this manually via Particl's DEX.They had this working a year back with a CEX plugin, but the CEX changed its API so support that was dropped, but it was a good proof of principle before migrating to the more reliable Particl DEX.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

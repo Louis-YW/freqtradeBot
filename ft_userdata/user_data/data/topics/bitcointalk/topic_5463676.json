@@ -1,0 +1,61 @@
+{
+  "id": "topic_5463676",
+  "title": "arulbero",
+  "author": "arulbero",
+  "created_time": "August 18, 2023, 09:13:45 AM",
+  "content": "Are wallets created with Armory after 2016 actually affected by libbitcoin vulnerability ?Quote from: Carlton Banks on August 13, 2023, 04:16:09 PMsounds like I ought to check if Armory's use of libbitcoin could be affected. I didn't create any new Armory wallets since the date (late 2016) of the libbitcoin-system pull request, but possibly others did. Armory previously used Crypto++, which I guess was subject to a little more scrutiny (guessing isn't good enough however, I feel compelled now to check)",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5463676",
+  "comments": [
+    {
+      "author": "goatpig",
+      "created_time": "August 18, 2023, 10:15:45 AMLast edit: August 18, 2023, 11:01:39 AM by goatpig",
+      "body": "Interesting question, I'll break this down into multiple posts for ease of read (I'll be linking to code in github):Armory 0.96.5 (latest stable release) (TLDR; not affected)This is still using CryptoPP for RNG, no libbtc involvement.1) Wallets are created here: https://github.com/goatpig/BitcoinArmory/blob/master/ui/Wizards.py#L1732) This goes to the PyBtcWallet: https://github.com/goatpig/BitcoinArmory/blob/master/armoryengine/PyBtcWallet.py#L8403) `plainRootKey` is not set, so it defers to SecureBinaryData().generateRandom(32): https://github.com/goatpig/BitcoinArmory/blob/master/armoryengine/PyBtcWallet.py#L9044) This is the generateRandom call: https://github.com/goatpig/BitcoinArmory/blob/master/cppForSwig/EncryptionUtils.cpp#L75It uses 'BTC_PRNG prng;'5) BTC_PRNG is define here: https://github.com/goatpig/BitcoinArmory/blob/master/cppForSwig/EncryptionUtils.h#L118'#define BTC_PRNG      CryptoPP::AutoSeededX917RNG<CryptoPP::AES>'",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "August 18, 2023, 10:38:45 AMLast edit: August 18, 2023, 11:01:47 AM by goatpig",
+      "body": "Armory 0.97 (WIP, dev branch) (TLDR; not affected)This uses libbtc, not libbitcoin per se, though I plan to move to libbitcoin cause libbtc is rough around the edges and libbitcoin is getting all the attention these days (+ it's a C++ implementation, not plain C).Wallet creation can happen in many places in the new code, kinda pointless to try and pin it down (all depends on whether it has a seed or not). It's simpler to look at the RNG class where all entropy comes from.1) The main RNG class: https://github.com/goatpig/BitcoinArmory/blob/dev/cppForSwig/EncryptionUtils.h#L107This is the one that pulls entropy from the system directly, the other RNG class is seeded from this.2) This calls libbtc routines 'btc_random_init()' and 'btc_random_bytes()': https://github.com/goatpig/BitcoinArmory/blob/dev/cppForSwig/EncryptionUtils.cpp#L333) btc_random_bytes() default to btc_random_bytes_internal: https://github.com/libbtc/libbtc/blob/master/src/random.c#L464) btc_random_bytes_internal has OS dependant implementations:4.a) on Windows, it uses the MS closed source CryptGenRandom (everybody has to do this on Windows): https://github.com/libbtc/libbtc/blob/master/src/random.c#L924.b) on Linux, it reads n bytes from /dev/urandom: https://github.com/libbtc/libbtc/blob/master/src/random.c#L103",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "August 18, 2023, 10:56:21 AM",
+      "body": "Entropy buffer sizeOn both versions, entropy buffer size is set to 32, but is it effective? The issue with \"bx\" (hadn't heard of this before now) is that no matter how much entropy it fetched to seed a wallet, it would be clamped down the 4 bytes. 4 bytes of entropy is way too low, attackers would create wallets for the entire space and look at all BIP44/49/84 roots, and sweep the coins.1) In Armory, the buffer init code has not changed. Both 0.96.5 and the new code create a SecureBinaryData object, of numBytes.dev: https://github.com/goatpig/BitcoinArmory/blob/dev/cppForSwig/EncryptionUtils.cpp#L31master (0.96.5): https://github.com/goatpig/BitcoinArmory/blob/master/cppForSwig/EncryptionUtils.cpp#L862) SecureBinaryData is a child class of BinaryData, the size_t ctor defers to BinaryData(size_t).dev: https://github.com/goatpig/BitcoinArmory/blob/dev/cppForSwig/SecureBinaryData.h#L55master: https://github.com/goatpig/BitcoinArmory/blob/master/cppForSwig/EncryptionUtils.h#L1423) The BinaryData(size_t) is the same in both instances:dev: https://github.com/goatpig/BitcoinArmory/blob/dev/cppForSwig/BinaryData.h#L110master: https://github.com/goatpig/BitcoinArmory/blob/master/cppForSwig/BinaryData.h#L1114) It uses BinaryData::alloc, which calls std::vector::resize:dev: https://github.com/goatpig/BitcoinArmory/blob/dev/cppForSwig/BinaryData.h#L569master: https://github.com/goatpig/BitcoinArmory/blob/master/cppForSwig/BinaryData.h#L5995) The underlying vector is of uint8_t, i.e. bytes. Therefor the ctor allocates numBytes before filling it with random bytes. NumBytes is set to 32 in 0.96.5, in dev it can vary, as it allows for 16 bytes of entropy for 12 word BIP39 backups.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "August 18, 2023, 11:01:23 AM",
+      "body": "Some final notes:I haven't looked at the libbitcoin RNG code, but it seems the issue isnt with libbitcoin per se but with libbitcoin explorer (aka \"bx\") handling of PRNG outputs for the purpose of wallet seeds. At any rate, Armory doesn't use that code, so it's not affected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 18, 2023, 01:41:45 PM",
+      "body": "FWIW I intend to look at this again over the weekend, and simply haven't had time up to now. goatpig's review will inevitably be far higher quality than anything I do, what I end up saying won't amount to much more than a simple \"thumbs up\" (and that's despite goatpig being the author of at least some of the relevant code)also, I feel must take some responsibility for this thread appearing. it seems I misremembered whether Armory uses libbitcoin or not, and so should have not said anything at all without properly checking. it seems that in production Armory (0.96.5) all RNG seeding is not libbitcoin code, and in fact libbitcoin code isn't used at all in 0.96.5 (or 0.96.x inclusive)so I hope nobody was in any way alarmed by what I said in the Dev&Tech thread linked in the OP",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goatpig",
+      "created_time": "August 18, 2023, 01:57:44 PM",
+      "body": "Quote from: Carlton Banks on August 18, 2023, 01:41:45 PMalso, I feel must take some responsibility for this thread appearing. it seems I misremembered whether Armory uses libbitcoin or not, and so should have not said anything at all without properly checking. it seems that in production Armory (0.96.5) all RNG seeding is not libbitcoin code, and in fact libbitcoin code isn't used at all in 0.96.5 (or 0.96.x inclusive)so I hope nobody was in any way alarmed by what I said in the Dev&Tech thread linked in the OPNo harm done, better safe than sorry.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

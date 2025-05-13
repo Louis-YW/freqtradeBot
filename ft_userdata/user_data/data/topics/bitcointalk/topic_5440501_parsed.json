@@ -1,0 +1,165 @@
+{
+  "id": "topic_5440501",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "February 20, 2023, 03:30:21 AM",
+  "content": "A non-breaking space is a way to prevent a piece of text from \"breaking\" into multiple parts when there's not enough room for it to fit comfortably. This can be useful when formatting tables (I first proposed it here: Re: Gangs of BitcoinTalk). It can also be useful for signatures, too (e.g. @Royse777 could have used it recently when improving the ChipMixer signatures, [nbsp] would have worked better than [color=transparent].[/color] and could have allowed the design to remain the same; it wouldn't have been necessary to change the \"{\" into a \"#\").Although using the Unicode character (U+00A0) directly is possible, it's much handier (and more \"semantic\") to make it available as a BBCode tag.Here's a small patch for @theymos to add [nbsp] to this version of SMF:Code:--- /var/www/baseline/Sources/Subs.php 2011-09-17 21:59:55.000000000 +0000+++ /var/www/modified/Sources/Subs.php 2023-02-20 02:20:01.000000000 +0000@@ -1389,40 +1389,45 @@     'after' => '</div>',     'block_level' => true,    ),    array(     'tag' => 'me',     'type' => 'unparsed_equals',     'before' => '<div class=\"meaction\">* $1 ',     'after' => '</div>',     'quoted' => 'optional',     'block_level' => true,     'disabled_before' => '/me ',     'disabled_after' => '<br />',    ),    array(     'tag' => 'move',     'before' => '<marquee>',     'after' => '</marquee>',     'block_level' => true,    ),+   array(+    'tag' => 'nbsp',+    'type' => 'closed',+    'content' => '&nbsp;',+   ),    array(     'tag' => 'nobbc',     'type' => 'unparsed_content',     'content' => '$1',    ),    array(     'tag' => 'pre',     'before' => '<pre>',     'after' => '</pre>',    ),    array(     'tag' => 'php',     'type' => 'unparsed_content',     'content' => '<div class=\"phpcode\">$1</div>',     'validate' => isset($disabled['php']) ? null : create_function('&$tag, &$data, $disabled', '      if (!isset($disabled[\\'php\\']))      {       $add_begin = substr(trim($data), 0, 5) != \\'&lt;?\\';       $data = highlight_php_code($add_begin ? \\'&lt;?php \\' . $data . \\'?&gt;\\' : $data);       if ($add_begin)        $data = preg_replace(array(\\'~^(.+?)&lt;\\?.{0,40}?php(&nbsp;|\\s)~\\', \\'~\\?&gt;((?:</(font|span)>)*)$~\\'), \\'$1\\', $data, 2);",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440501",
+  "comments": [
+    {
+      "author": "PowerGlove",
+      "created_time": "March 17, 2023, 08:31:35 PM",
+      "body": "Bumping this because I feel it deserves a little more attention. It's obviously not the most exciting patch, but it adds something useful to BBCode and it does so in an unobtrusive way; I've never seen theymos' modifications but I'm guessing that when he added the [btc] tag to the forum, he probably went about it in a similar way (minus the custom font). As a small aside, the BBCode parser is a goddamned mess and I'm not sure what the SMF peeps were smoking when they designed it, but it must have been some seriously next-level stuff.A [nbsp] tag is a genuinely useful thing to have, and I'm surprised that it wasn't defined for BBCode from the start. The only sensible counterargument I can think of is: \"Why not just copy/paste U+00A0, when you need a non-breaking space?\". Well, beyond the obvious usability improvements ([nbsp] is much easier to see, share and talk about than:  <-- there's a non-breaking space there, in case you missed it), a more subtle reason is that a naked non-breaking space won't survive a post being edited. For example, here's a table that uses non-breaking spaces in a few key spots to keep things tidy:Strain nameTHC content (average)CBD content (average)Strain typeSmoke when?More infoAfghan Kush~21%~4%~90% IndicaEveninghttps://www.wikileaf.com/strain/afghan-kush/Godfather OG~27%~0%~60% IndicaEveninghttps://www.wikileaf.com/strain/godfather-og/Bruce Banner~25%~0%~60% SativaAfternoonhttps://www.wikileaf.com/strain/bruce-banner/Ghost Train Haze~22%~0%~75% SativaAfternoonhttps://www.wikileaf.com/strain/ghost-train-haze/Chemdawg~19%~0%~55% HybridAfternoonhttps://www.wikileaf.com/strain/chemdawg/White Widow~16%~0%~60% SativaMorninghttps://www.wikileaf.com/strain/white-widow/Devil Fruit~26%~18%~70% IndicaEveninghttps://www.wikileaf.com/strain/devil-fruit/Strawberry Banana~26%~0%~70% IndicaEveninghttps://www.wikileaf.com/strain/strawberry-banana/Sour Diesel~22%~2%~90% SativaMorninghttps://www.wikileaf.com/strain/sour-diesel/Gorilla Glue #4~26%~0%~65% SativaEveninghttps://www.wikileaf.com/strain/gorilla-glue-4/Girl Scout Cookies~27%~1%~60% IndicaEveninghttps://www.wikileaf.com/strain/girl-scout-cookies/SMF house blendUnknownUnknownUnknownNeverhttps://www.simplemachines.org/about/contact.phpI know from experience that if I edit this post then my formatting won't survive; naked non-breaking spaces will \"disappear\", and the resulting table won't render as neatly as it once did.So, in summary: I can't think of a good reason not to merge this patch, it seems like a strict improvement to me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "March 18, 2023, 06:22:51 PM",
+      "body": "Quote from: PowerGlove on March 17, 2023, 08:31:35 PMSo, in summary: I can't think of a good reason not to merge this patch, it seems like a strict improvement to me.I would agree with you and my suggestion is to try contacting theymos with personal messages and ask his opinion about this patch.He probably doesn't follow non-stop everything that is happening and maybe he missed this one.I think I remember you had other patch proposals, so better to send one message for all of them, maybe he picks one that he likes most",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Rizzrack",
+      "created_time": "March 19, 2023, 02:42:00 PM",
+      "body": "Quote from: PowerGlove on March 17, 2023, 08:31:35 PMAs a small aside, the BBCode parser is a goddamned mess and I'm not sure what the SMF peeps were smoking when they designed it, but it must have been some seriously next-level stuff.While looking through the SMF source code a while back remember seeing some comments like \"not sure why the below code is working\" or smth like that. It was related either to BBCode parser or search function. To be fair in an older version though, close to the one the forum is using.But I guess most software have some parts made by a guy that went AWOL at some point and nobody knew exactly how that code worked so just ran with it as much as they could  (Windows is no exception)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "March 24, 2023, 06:50:28 AM",
+      "body": "Quote from: Rizzrack on March 19, 2023, 02:42:00 PMWhile looking through the SMF source code a while back remember seeing some comments like \"not sure why the below code is working\" or smth like that. It was related either to BBCode parser or search function. To be fair in an older version though, close to the one the forum is using.Yup, the SMF codebase has a lot of fun/earnest comments. It makes going through the code a lot less of a slog. Here are a few from the BBCode parser:// Never show smileys for wireless clients.  More bytes, can't see it anyway :P.// !!! Maybe this can be simplified?// Shhhh!// Can't have a one letter smiley, URL, or email! (sorry.)// !!! Don't think is the real solution....// This is SADLY and INCREDIBLY browser dependent.// Are we there yet?  Are we there yet?// Did we just eat through everything and not find it?// No tag?  Keep looking, then.  Silly people using brackets without actual tags.Quote from: Rizzrack on March 19, 2023, 02:42:00 PMBut I guess most software have some parts made by a guy that went AWOL at some point and nobody knew exactly how that code worked so just ran with it as much as they could  (Windows is no exception) Yeah, that's true. Especially for Windows. Microsoft used to have some seriously talented programmers, and I'm pretty sure that most of their more recent engineering hires are left scratching their heads at some of the code that's still around from the old days.I'm just poking fun at the SMF team, I kind of get how they arrived at their design for the BBCode parser. It's not what I would have done, and it's very fragile and difficult to change without introducing new problems, but it does work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "theymos",
+      "created_time": "April 18, 2023, 09:15:55 PM",
+      "body": "Added, thanks!Quote from: PowerGlove on March 17, 2023, 08:31:35 PMThe only sensible counterargument I can think of is: \"Why not just copy/paste U+00A0, when you need a non-breaking space?\".That was my thinking originally. But because SMF automatically translates multiple spaces (like    this) into an alternating sequence of regular spaces and non-breaking spaces in the preparsing step, any intentional usage of non-breaking space characters tends to get messed up, as you mentioned. So when SMF's automatic preparsing-level usage of non-breaking spaces doesn't do what you want, this new tag will be useful.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "April 19, 2023, 09:02:43 AM",
+      "body": "How did I not notice this suggestion before!?It was really an excellent suggestion, and it will be useful for some jobs I'm planning.Quote from: theymos on April 18, 2023, 09:15:55 PMAdded, thanks!Thanks @theymos for adding this tag.Now testing if it works.Code:Now[nbsp]testing[nbsp]if[nbsp]it[nbsp]works.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "April 25, 2023, 10:34:51 PM",
+      "body": "Quote from: theymos on April 18, 2023, 09:15:55 PMAdded, thanks!Hehe, I was starting to worry that I might never get another patch accepted. Thanks for accepting this one and for letting me contribute to the forum in my own small way, theymos; it means a lot to me!I would merit your post, but I've hit the 30-day limit with you after the FlappyCAPTCHA™ thing, so I'll circle back to it later. Thanks again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "April 27, 2023, 04:05:10 PMLast edit: April 27, 2023, 04:32:03 PM by LoyceV",
+      "body": "Quote from: joker_josue on April 19, 2023, 09:02:43 AMHow did I not notice this suggestion before!?It was really an excellent suggestion, and it will be useful for some jobs I'm planning.I see only one problem: who's going to know about this? There are more hidden BBCodes, and even though I've read the post before, I forgot about the time-tag and possibility to use other BBCode in quote-titles. And I only remember 1 of the 5 additional smileys The nbsp will come in handy some day, especially when dealing with tables.Quote from: PowerGlove on April 25, 2023, 10:34:51 PMI would merit your post, but I've hit the 30-day limit with you after the FlappyCAPTCHA™ thing, so I'll circle back to it later.Theymos could only send you 1 Merit, also because of the Flappy thing  What do you know, rules apply to Admin!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "joker_josue",
+      "created_time": "April 27, 2023, 04:29:08 PM",
+      "body": "Quote from: LoyceV on April 27, 2023, 04:05:10 PMI see only one problem: who's going to know about this? There are more hidden BBCodes, and even though I've read the post before, I forgot about the time-tag and possibility to use other BBCode in quote-titles. And I only remember 1 of the 5 additional smileys The nbsp will come in handy some day, especially when dealing with tables.Thank you for drawing attention to this post. Another very useful information for some projects.So, you make me have to send one more merit...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "April 30, 2023, 02:19:42 AM",
+      "body": "Quote from: LoyceV on April 27, 2023, 04:05:10 PMThere are more hidden BBCodes, and even though I've read the post before, I forgot about the time-tag and possibility to use other BBCode in quote-titles.I went spelunking in the SMF source code a while back and found a pretty neat one that I've been using more than I thought I would: [nobbc].It's useful when you want to write about a tag without actually applying it. For example: [b]bold[/b] -> bold.Code:[nobbc][b]bold[/b][/nobbc] -> [b]bold[/b]Quote from: LoyceV on April 27, 2023, 04:05:10 PMThe nbsp will come in handy some day, especially when dealing with tables.Yup, it's definitely handy for neatening up tables, but after chatting with jayce about it, I think [nbsp] is likely to start showing up in signatures, too.A lot of signatures break apart in an uncoordinated way when they don't have enough horizontal space, like this:This problem shows up when reading posts with a browser window that's too small, and also when viewing profiles:One remedy is to \"glue\" the various pieces together so that they can't break apart. This can be accomplished with a workaround ([color=transparent].[/color]), but [nbsp] is both much shorter (which may allow for a more elaborate design to fit within the signature size limit) and more reliable (some characters cause trouble for the workaround, but not for [nbsp]).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "April 30, 2023, 07:00:05 AM",
+      "body": "Quote from: PowerGlove on April 30, 2023, 02:19:42 AMI went spelunking in the SMF source code a while back and found a pretty neat one that I've been using more than I thought I would: [nobbc].I don't think I've ever used it, but this could come in handy:Quote from: Saint-loup on December 11, 2021, 11:39:09 AMCode:[nobbc]8)[/nobbc] doesn't work, you will still get the (not) Cool smiley in your message.👉 But if you add one space after the closing parenthesis (not before the 8) it will be ok : Code:[nobbc]8) [/nobbc]👉 8)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jayce",
+      "created_time": "April 30, 2023, 09:52:37 AM",
+      "body": "This tag is very useful especially for signature design, which it maintains the design's look on various browsers and devices. This tag also is simpler and shorter comparing to using transparent dot ([color=transparent].[/color]) as a conventional way to replace space. I have applied it in signature design for Coinslotty Contest which the tag really works on both of desktop and mobile screens, but unfortunately I didn't win. Now I'm trying to apply it in my current and next works, but the main challenge is [nbsp] takes more characters than normal space, which the room for styling would be decreased if there are plenty spaces to be filled with the tag. However it's a helpful and the most efficient tag if you prefer mobile-friendly signature design.PS. PowerGlove also introduced me the [nobbc] tag for the first time. He is a BBCode Master! Since we have icopress as a Table Master already, then there are two masters in this forum!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "May 01, 2023, 03:55:20 AM",
+      "body": "Quote from: jayce on April 30, 2023, 09:52:37 AM[...] challenge is [nbsp] takes more characters than normal space, which the room for styling would be decreased if there are plenty spaces to be filled with the tag. [...]Hey, jayce! Nice to see you here. The snip above has crossed my mind too, and one solution I came up with was to add a new [r] tag that \"repeats\" things. So, if you wanted (let's say) 5 non-breaking spaces, then instead of writing [nbsp][nbsp][nbsp][nbsp][nbsp] you would just write [r=5][nbsp][/r].I can imagine a tag like that also being useful for other things that come up in signature design (like long sequences of the same character).What do you think? Would a tag like that be useful to you?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "May 01, 2023, 06:31:00 AM",
+      "body": "Quote from: PowerGlove on May 01, 2023, 03:55:20 AMyou would just write [r=5][nbsp][/r].I can imagine a tag like that also being useful for other things that come up in signature design (like long sequences of the same character).I don't think this will ever be implemented: the 4000-character limit in signatures is meant to limit the page size. If theymos wanted to increase that, increasing the limit would be much easier.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "May 01, 2023, 01:02:33 PM",
+      "body": "Quote from: LoyceV on May 01, 2023, 06:31:00 AMQuote from: PowerGlove on May 01, 2023, 03:55:20 AMyou would just write [r=5][nbsp][/r].I can imagine a tag like that also being useful for other things that come up in signature design (like long sequences of the same character).I don't think this will ever be implemented: the 4000-character limit in signatures is meant to limit the page size. If theymos wanted to increase that, increasing the limit would be much easier.Yup, I guess. The [r] tag might find uses beyond signature design, though.I've got the tag working on my branch, and while it did take quite a lot of experimenting to find a way to shoehorn it into the existing parser design, the resulting patch is small and tidy.There's a conservative size limit on the output it produces, so I don't think it'll cause new problems.If there's interest, I'll bug theymos with it, otherwise, I'll file it under \"Meh.\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jayce",
+      "created_time": "May 01, 2023, 03:28:38 PM",
+      "body": "Quote from: PowerGlove on May 01, 2023, 03:55:20 AMQuote from: jayce on April 30, 2023, 09:52:37 AM[...] challenge is [nbsp] takes more characters than normal space, which the room for styling would be decreased if there are plenty spaces to be filled with the tag. [...]Hey, jayce! Nice to see you here. The snip above has crossed my mind too, and one solution I came up with was to add a new [r] tag that \"repeats\" things. So, if you wanted (let's say) 5 non-breaking spaces, then instead of writing [nbsp][nbsp][nbsp][nbsp][nbsp] you would just write [r=5][nbsp][/r].I can imagine a tag like that also being useful for other things that come up in signature design (like long sequences of the same character).What do you think? Would a tag like that be useful to you?Heyo PowerGlove!That's actually perfectly well! Does that work for characters in ascii art too? Like if we want to create long bar in red color, let's say from 20 blocks, instead of [color=red]████████████████████[/color], it means we can just write [r=20][color=red]█[/color][/r]? If so, that's cool! It will save plenty spaces and could solve some major issues especially in signature design.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "aylabadia05",
+      "created_time": "May 02, 2023, 05:00:13 PM",
+      "body": "It's not wrong if jayce calls you a BBCode master and an icopress table master.It sounds like I am praising you too much but in fact it is true.Never mind BBCode's ability, even when I make tables, I still often make mistakes that require corrections so that every explanation written in table format can be seen clearly.What I convey is just what I experienced on a topic that I made.Sorry for having the courage to join in on this great discussion.I am proud of all of your abilities.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "May 04, 2023, 01:11:32 AM",
+      "body": "Quote from: jayce on May 01, 2023, 03:28:38 PMDoes that work for characters in ascii art too? Like if we want to create long bar in red color, let's say from 20 blocks, instead of [color=red]████████████████████[/color], it means we can just write [r=20][color=red]█[/color][/r]?Yep, that's exactly right. Quote from: jayce on May 01, 2023, 03:28:38 PMIf so, that's cool! It will save plenty spaces and could solve some major issues especially in signature design.I'm glad you like it! I only really had you (and other signature designers) in mind when I thought up the [r] tag, so there's not much point in waiting for more feedback; I'll put the tag through one last round of testing and then make a proper patch and post about it soon. (Obviously, there's no telling if theymos will like/merge it, but fingers crossed, yeah?) P.S. I'm sure I'm not telling you anything that you wouldn't have figured out on your own, but in terms of output size, it'll be more efficient to write your example as: [color=red][r=20]█[/r][/color] (i.e. move the [color] tag outside of the [r] tag).Quote from: aylabadia05 on May 02, 2023, 05:00:13 PM[...]Hehe, thanks for the kind words. (And thanks for voting for me in the 2022 BCA.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jayce",
+      "created_time": "May 04, 2023, 09:20:47 AM",
+      "body": "Quote from: PowerGlove on May 04, 2023, 01:11:32 AMI'm glad you like it! I only really had you (and other signature designers) in mind when I thought up the [r] tag, so there's not much point in waiting for more feedback; I'll put the tag through one last round of testing and then make a proper patch and post about it soon. (Obviously, there's no telling if theymos will like/merge it, but fingers crossed, yeah?) It's really getting my attention because for me personally, that tag would be very useful for signature design, more than any other bbcode-things. It's been years for us signature designers, to find the most effective ways to create an attractive signature design in limited space. I think these tags would be the best tools we have and thanks to you, for bringing them! And yeah, fingers crossed Quote from: PowerGlove on May 04, 2023, 01:11:32 AMP.S. I'm sure I'm not telling you anything that you wouldn't have figured out on your own, but in terms of output size, it'll be more efficient to write your example as: [color=red][r=20]█[/r][/color] (i.e. move the [color] tag outside of the [r] tag).Thank you for the suggestion PowerGlove! Honestly I didn't think about that before, but you are right man. That way is just more efficient and makes the code easier to read if you want to edit a whole signature design. It's important to manage the code properly so you can keep the characters amount as minimum as possible and make it readable which you wouldn't waste much time to just find the error codes.Quote from: aylabadia05 on May 02, 2023, 05:00:13 PMIt's not wrong if jayce calls you a BBCode master and an icopress table master.It sounds like I am praising you too much but in fact it is true.Never mind BBCode's ability, even when I make tables, I still often make mistakes that require corrections so that every explanation written in table format can be seen clearly.What I convey is just what I experienced on a topic that I made.Sorry for having the courage to join in on this great discussion.I am proud of all of your abilities.No need to sorry man, every opinion matters here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

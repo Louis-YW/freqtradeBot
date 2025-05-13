@@ -1,0 +1,45 @@
+{
+  "id": "topic_5418674",
+  "title": "d5000",
+  "author": "d5000",
+  "created_time": "October 28, 2022, 08:14:28 PM",
+  "content": "I wonder which is the way to store a Bitcoin address which occupies the least possible amount of bytes (it's for usage with OP_RETURN on the blockchain, so every byte counts).What I want do do is basically this:Retrieve an address from a transaction JSON - encode it in some efficient way and store it in OP_RETURN - restore the address from storage.I know Base58check is used for \"classic\" addresses. This means that the last part of the hash which generates the address is a checksum. Can this checksum be omitted in some way to save space? For example, after decoding the address with base58, can the last bytes be omitted?How does this apply to bech32 addresses? I read they also include a checksum, so a similar method should also exist.I would prefer being able to start the process knowing only the address string, not the public key (or the public key hash from a ScriptPubKey).",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5418674",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "October 29, 2022, 06:19:37 AM",
+      "body": "Quote from: d5000 on October 28, 2022, 08:14:28 PMCan this checksum be omitted in some way to save space? For example, after decoding the address with base58, can the last bytes be omitted?-snip-I would prefer being able to start the process knowing only the address string, not the public key (or the public key hash from a ScriptPubKey).Since you prefer the address, omitting the checksum will cost you to re-compute it to rebuild the address.That includes computing the checksum which needs SHA256D and base58 encode.That's basically same as having only the HASH160 of the public key (plus the network bytes \"00\").In that case, you can just save the HASH160 (20Bytes) of the public key instead to save more space.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 29, 2022, 07:33:02 AM",
+      "body": "You don't store strings in an OP_RETURN output, you store bytes so forget about base58 or any other string encoding that reduces the size but adds extra overhead (version byte, checksum, etc.).You store raw bytes in an OP_RETURN. If you want to do something not standardized then you should defined your own standard meaning you should do something like this:- Define a standard where the bytes inside the OP_RETURN include a version + data-- The version tells the address/output-script-type-- The data is the hash/pubkey used in the address that can have arbitrary length.- You can skip the push size byte.For example (version):0 -> P2PKH1 -> P2SH3 -> P2WPKH4 -> P2WSH5 -> P2TRSo your OP_RETURN output script for a P2WSH would look like this:Code:6a045bf5847136b36d23da9a706a5ad4d8eaa20a265a6b11db87d251d7c1779386fcWhen decoding this you see the 0x04 and realize the address type should be P2WSH so you need 32 bytes (no need for an extra push byte 0x20) so you read the next 32 bytes (0x5bf5847136b36d23da9a706a5ad4d8eaa20a265a6b11db87d251d7c1779386fc) and use that to encode a P2WSH bech32 address by appending the version byte (0) and adding the computed checksum.To encode, you just take these steps in reverse. You have the address and decide the version based on that (eg. 0 for P2PKH) then decode the address using the respective encoder (eg. base58) and extract the data part (eg. 20 byte hash) and put it in your custom OP_RETURN output.This method is obviously scalable since you can always add more versions like version 6 being the next SegWit version that may come after Taproot some day.This method is also as compressed as it gets. For example a normal P2PKH output takes up 25 bytes while this would take 22 bytes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 29, 2022, 09:59:25 AM",
+      "body": "Quote from: d5000 on October 28, 2022, 08:14:28 PMWhat I want do do is basically this:Retrieve an address from a transaction JSON - encode it in some efficient way and store it in OP_RETURN - restore the address from storage.I have feeling it's XY problem since it's rather costly and there are other distributed approach such as IPFS and BitTorrent protocol.Quote from: d5000 on October 28, 2022, 08:14:28 PMHow does this apply to bech32 addresses? I read they also include a checksum, so a similar method should also exist.You could use Base32-encoded of public key which contain witness version and already pass through SHA-256 and RIPEMD-160, then convert it to raw bytes. With Coding Enthusiast's guide[1], you should take result from step 5 and convert it to raw bytes.[1] https://bitcointalk.org/index.php?topic=4992632.0",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "d5000",
+      "created_time": "October 29, 2022, 10:17:28 PM",
+      "body": "Thank you! I think I will go for @pooya87's method with version numbers, it seems to me the most flexible one when regarding future updates.Quote from: ETFbitcoin on October 29, 2022, 09:59:25 AMI have feeling it's XY problem since it's rather costly and there are other distributed approach such as IPFS and BitTorrent protocol.It's for a very simple experimental DEX script with coloured coins, and I need it in a way the address becomes provably stored, so an on-chain transaction is the only possible way. I've considered the alternative to simply create a \"normal\" transaction which sends a minimal amount to the address I want to store and use OP_RETURN for other metadata, but this seems to me to be more costly regarding the required number of bytes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

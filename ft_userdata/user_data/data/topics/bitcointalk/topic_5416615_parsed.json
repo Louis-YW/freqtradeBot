@@ -1,0 +1,77 @@
+{
+  "id": "topic_5416615",
+  "title": "HoBzY",
+  "author": "HoBzY",
+  "created_time": "October 10, 2022, 03:35:40 PMLast edit: December 06, 2022, 05:04:41 PM by HoBzY",
+  "content": "None",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5416615",
+  "comments": [
+    {
+      "author": "shinohai",
+      "created_time": "October 10, 2022, 03:49:18 PM",
+      "body": "Quote from: HoBzY on October 10, 2022, 03:35:40 PMWhy is it empty when sending rpc via curl?Code:curl --user x:x --data-binary '{\"jsonrpc\":\"1.0\",\"id\":\"curltest\",\"method\":\"getrpcinfo\",\"params\":[]}' -H 'content-type:text/plain;' http://95.216.35.227:8332/Either 1) The listed IP does not have the RPC port exposed, or 2) You are trying to do this to your own node from within NAT.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "serhack",
+      "created_time": "October 10, 2022, 03:50:17 PM",
+      "body": "Quote from: HoBzY on October 10, 2022, 03:35:40 PMWhy is it empty when sending rpc via curl?Code:curl --user x:x --data-binary '{\"jsonrpc\":\"1.0\",\"id\":\"curltest\",\"method\":\"getrpcinfo\",\"params\":[]}' -H 'content-type:text/plain;' http://95.216.35.227:8332/Add flag --verbose to see the actual response from the server. You're sending a wrong username or password.Code:*   Trying 95.216.35.227...* TCP_NODELAY set* Connected to 95.216.35.227 (95.216.35.227) port 8332 (#0)> POST / HTTP/1.1> Host: 95.216.35.227:8332> User-Agent: curl/7.52.1> Accept: */*> content-type:text/plain;> Content-Length: 67> * upload completely sent off: 67 out of 67 bytes< HTTP/1.1 401 Unauthorized< WWW-Authenticate: Basic realm=\"jsonrpc\"< Date: Mon, 10 Oct 2022 15:49:26 GMT< Content-Length: 0< Content-Type: text/html; charset=ISO-8859-1< * Curl_http_done: called premature == 0* Connection #0 to host 95.216.35.227 left intact",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "serhack",
+      "created_time": "October 10, 2022, 03:59:42 PM",
+      "body": "Quote from: HoBzY on October 10, 2022, 03:51:48 PMhttps://pastenow.ru/1c82e9f8c232c55ba2f7e0e8a3acbae1Exactly, look at HTTP status code. 401 means Unauthorized, you need to supply valid username and password to be able to use RPC interface for that node.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "serhack",
+      "created_time": "October 10, 2022, 04:14:01 PM",
+      "body": "Quote from: HoBzY on October 10, 2022, 04:00:57 PMQuote from: serhack on October 10, 2022, 03:59:42 PMQuote from: HoBzY on October 10, 2022, 03:51:48 PMhttps://pastenow.ru/1c82e9f8c232c55ba2f7e0e8a3acbae1Exactly, look at HTTP status code. 401 means Unauthorized, you need to supply valid username and password to be able to use RPC interface for that node.The funny thing is that I don't know where to get them from.(IP I took from the seedsIn curl, I specify any login and password, but I don’t know where to get which one is needed (Why should you have the username/password if the node is not yours? Anyone can start a node, and can restrict the json API interface.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 10, 2022, 05:05:53 PM",
+      "body": "You should only talk to your own nodes through RPC. In the conf file you need to specify a user and password and IP range for RPC to talk to.If you need to pull other information there are various services that allow for API calls, but since access to RPC more or less means you have access to the wallet that is there you are probably not going to be able to find anyplace that allows remote calls. It's just basic bitcoin security and security in general.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 10, 2022, 07:07:29 PM",
+      "body": "Quote from: HoBzY on October 10, 2022, 04:36:57 PMThen how to be? Out of 100 ip 6-8 ips give out 401 and the rest are not working at allWait, why are you trying to connect to 100 IP addresses? Did you get IP addresses of random Bitcoin nodes and try to query them? That doesn't work. Especially since they most likely do not expose their RPC interface to the internet. That would be highly insecure.Do you even have your own Bitcoin node?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 10, 2022, 08:01:15 PM",
+      "body": "Quote from: HoBzY on October 10, 2022, 05:10:17 PMQuote from: DaveF on October 10, 2022, 05:05:53 PMYou should only talk to your own nodes through RPC. In the conf file you need to specify a user and password and IP range for RPC to talk to.If you need to pull other information there are various services that allow for API calls, but since access to RPC more or less means you have access to the wallet that is there you are probably not going to be able to find anyplace that allows remote calls. It's just basic bitcoin security and security in general.-DaveCan you link to documentation and examples?Take a look at: https://riptutorial.com/bitcoin/example/26000/node-configuration that more or less gives all the options that are available in the conf file.You also have this file generator: https://jlopp.github.io/bitcoin-core-config-generator/ I have not used it so I can't comment on how accurate it is, but I know people who have used it that say it does generate valid files.Keep in mind when running this against your own node that it does have to be fully synced for some things. I know some (most?) commands will not work until your node has finished the IBD and if you re-start it until it finishes whatever housekeeping it has to do at startup.What are you trying to do anyway?-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 11, 2022, 05:47:40 AM",
+      "body": "Note that you can also rent your own Bitcoin node with JSON-RPC access from GetBlock. Never used them myself, but they seem pretty good.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

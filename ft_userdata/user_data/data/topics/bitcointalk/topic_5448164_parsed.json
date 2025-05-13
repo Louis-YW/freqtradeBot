@@ -1,0 +1,29 @@
+{
+  "id": "topic_5448164",
+  "title": "simpleSliv3r",
+  "author": "simpleSliv3r",
+  "created_time": "April 09, 2023, 04:45:16 PM",
+  "content": "Hi all,I'm trying to get the funding transaction id from a lightning network channel using a C-Lightning Node.While in LND it's easy to do it as \"listchannels\" command returns you all the information needed, I cannot see any way to do it in a C-Lighting Node.LND:Code:lnd@alice:/$ lncli listchannels{    \"channels\": [        {            \"active\": true,            \"remote_pubkey\": \"022a2dba6a75a2b79ac5af55781d3e90709b3369da652a35c527ac32b16f424422\",            \"channel_point\": \"d4792176757a8cba7b403584e8b247c076318a6543a725c4faa63dcdb75fe998:0\",            \"chan_id\": \"118747255865344\",            \"capacity\": \"250000\",            \"local_balance\": \"0\",            \"remote_balance\": \"249817\",     .......C-Lighting:Code:clightning@bob:/$ lightning-cli listchannels{   \"channels\": [      {         \"source\": \"022a2dba6a75a2b79ac5af55781d3e90709b3369da652a35c527ac32b16f424422\",         \"destination\": \"0369e70480f6437cb2d36fadd0acabad272d161fd38b20e5663a54efdb4fe164d4\",         \"short_channel_id\": \"108x1x0\",         \"public\": true,         \"satoshis\": 250000,         \"amount_msat\": \"250000000msat\",         \"message_flags\": 1,         \"channel_flags\": 0,         \"active\": true,         \"last_update\": 1681057970,         \"base_fee_millisatoshi\": 1,         \"fee_per_millionth\": 10,         \"delay\": 6,         \"htlc_minimum_msat\": \"1msat\",         \"htlc_maximum_msat\": \"247500000msat\",         \"features\": \"\"      },      {         \"source\": \"0369e70480f6437cb2d36fadd0acabad272d161fd38b20e5663a54efdb4fe164d4\",         \"destination\": \"022a2dba6a75a2b79ac5af55781d3e90709b3369da652a35c527ac32b16f424422\",         \"short_channel_id\": \"108x1x0\",         \"public\": true,         \"satoshis\": 250000,         \"amount_msat\": \"250000000msat\",         \"message_flags\": 1,         \"channel_flags\": 1,         \"active\": true,         \"last_update\": 1681057974,         \"base_fee_millisatoshi\": 1000,         \"fee_per_millionth\": 1,         \"delay\": 40,         \"htlc_minimum_msat\": \"1000msat\",         \"htlc_maximum_msat\": \"250000000msat\",         \"features\": \"\"      }   ]}In summary I'm looking how to get the \"channel_point\" value from the LND output but from C-Lightning Node.Thanks all in advance!Best Regards,SS",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5448164",
+  "comments": [
+    {
+      "author": "HeRetiK",
+      "created_time": "April 10, 2023, 08:39:29 AM",
+      "body": "I think you might be looking for listtransactions:https://lightning.readthedocs.io/lightning-listtransactions.7.htmlWhile this will list all on-chain transactions, this will also return the associated channel ids, where applicable (in the case of funding transactions, as part of the outputs). It looks like you'll have to enable experimental features first though:https://lightning.readthedocs.io/lightningd-config.5.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "April 10, 2023, 11:05:09 AM",
+      "body": "Quote from: HeRetiK on April 10, 2023, 08:39:29 AMI think you might be looking for listtransactions:https://lightning.readthedocs.io/lightning-listtransactions.7.htmlWhile this will list all on-chain transactions, this will also return the associated channel ids, where applicable (in the case of funding transactions, as part of the outputs). It looks like you'll have to enable experimental features first though:https://lightning.readthedocs.io/lightningd-config.5.htmlHi HeRetik,Thanks for your answer, I think that would work.Anyway, I found another option; \"listpeers\" returns a json with all peers information including the channels with each peer and the funding transaction id.https://lightning.readthedocs.io/lightning-listpeers.7.html#lightning-listpeers-command-returning-data-on-connected-lightning-nodes",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

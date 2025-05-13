@@ -1,0 +1,77 @@
+{
+  "id": "topic_5402488",
+  "title": "Cricktor",
+  "author": "Cricktor",
+  "created_time": "June 13, 2022, 08:55:13 PM",
+  "content": "Why does the command/rpc importdescriptors of Bitcoin Core have no option to turn of a rescan of the blockchain while e.g. importmulti has this option?(Yes you can cancel the rescan operation manually but why not have an option?)Currently I'm messing around with a descriptor wallet that will contain a lot of descriptors (~22k descriptors). A script generates the descriptors in batches and adds them to the wallet. With the current behavior of importdescriptors it is kind of a pita. It would be much easier if I could avoid a start of a rescan after each import of every batch of descriptors and do a full rescan after all descriptor batches have been imported.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5402488",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "June 13, 2022, 11:27:03 PM",
+      "body": "The rationale was that having both timestamp and rescan was kind of redundant. Having a timestamp other than \"now\" implies that there are funds that exist prior to \"now\" that you want to be aware of, and so a rescan is required in order to know about those. But by disabling rescans and still having the timestamp means that after the import, the descriptor will claim to be a certain age, yet still be missing transactions that it should supposedly know.Setting a timestamp of \"now\" effectively disables rescanning. When you do the rescan, it will still pick up transactions before \"now\" as the timestamp is not actually used to inform when to start rescanning.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 13, 2022, 11:42:14 PMLast edit: June 14, 2022, 04:49:04 PM by Cricktor",
+      "body": "As I'm playing around with some data from the beginning of the blockchain, I thought I'd simply set timestamp to 0 (was a bit lazy to actually get the proper block times). Setting timestamps basically to epoch (of blockchain) did hurt more than expected.With correct timestamp a partial rescan is now \"faster\" and at least coinbase transactions of the descriptors appear pretty fast. I still plan a full rescan when all imports are done.P.S. (added later after some more fiddling)Using ...\"timestamp\":\"now\"... in the request for importdescriptors is helpful for me and won't waste time for rescanning. A later full or partial rescan is necessary to have an accurate coin balance in the wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 16, 2022, 01:21:44 PM",
+      "body": "Quote from: Cricktor on June 13, 2022, 11:42:14 PMUsing ...\"timestamp\":\"now\"... in the request for importdescriptors is helpful for me and won't waste time for rescanning. A later full or partial rescan is necessary to have an accurate coin balance in the wallet.Did you write a script to automate resetting the timestamps, or are you manually setting them for each descriptor by hand (a pain, since you have thousands of them)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 16, 2022, 05:35:34 PM",
+      "body": "TL;DR: no manual setting of stuff for each descriptor.Here's what I'm playing around with:I want to create \"properly\" a watch-only wallet of Satoshi/Patoshi blocks (see http://satoshiblocks.info) including genesis block. I made one with Electrum but it's not \"satisfying\" as a SPV wallet doesn't see the P2PK coinbase outputs (or any P2PK outputs, I guess). So, Electrum or similar wallets aren't suitable for this.Rescue comes in the form of \"combo(PK)#checksum\" descriptors, available in Bitcoin Core which \"see\" any standard output script for Public Key PK. Thus filling an empty descriptor wallet with appropriate combo(PK) descriptors would give me what I'm looking for. Together with the genesis block that's 21954 unique descriptors. bitcoin-cli doesn't like e.g. if I try to add 1000 descriptors at once with command importdescriptors. 500 seems to work but gets slower and slower. Not quite sure what the bottleneck is (Bitcoin Core chewing on some database or my HDD storage of wallet and blockchain or both).I wrote a script that iterates over the block heights of those 21954 blocks which constructs multiple \"requests\" of 500 combo()-descriptors. The request string is fed into bitcoin-cli importdescriptors \"request\". A single descriptor request entry consists of \"desc\", \"timestamp\" and \"label\". [For labels I use zero padded block heights of length 5 except for \"Genesis\" for block #0 and \"Satoshi\" for block #9]In my first try (with buggy script, lol, but the bug(s) didn't yet show up as I didn't get to the final blocks, I'm no professional programmer or scripter...) I didn't care about \"timestamp\" and set it simply to zero. But that had the side effect that I needed to cancel every blockchain rescan which got fired up by importdescriptors. A spare computer with a HDD as storage device for the blockchain isn't the fastest choice here. Well, that was a pita as every import of a descriptors batch took a lot of minutes before even the rescan started and cancelling the rescan took sometimes even longer before importdescriptors \"finished\". The manual intervention needed (I had bitcoin-core.QT open on my Linux desktop) wasn't quite what I was looking for.That's when the hint with \"timestamp\":\"now\" came from @achow101.I created a new empty descriptor wallet and tried again with \"timestamp\":\"now\" and rescans finished at the beginning quite fast, but then again some \"internal delays\" of importdescriptors emerged and made the (revised and debugged) script not a fire and forget (until finished) thing. Not sure what went wrong, likely my mistake when I had to interrupt the script when some error showed up as bitcoind didn't respond at some point, but I got through with all descriptors. Unfortunately the wallet showed some rather strange and unexpected transactions. Something must have gone wrong as somehow a wrong block and descriptor slipped in.Because of that I've thrown the wallet of the second experiment away and am up on a rewrite of my script to separate data fetching and import of descriptors. I don't recall that you can remove imported descriptors from a wallet, maybe I've overseen this if some command exists for removal.My next goal is to fetch all blockchain data via bitcoin-cli (before I \"abused\" an API call to my Bitcoin Explorer on my RPi Umbrel box that I run to play a little with Umbrel; Umbrel isn't my main node box (RaspiBlitz instead)) and try again with \"timestamp\":\"now\" for every descriptor while compiling the data with more care or avoiding hickups that might screw up the import for whatever reason.I hope a final full blockchain rescan will then bring up all transactions of all descriptors. If this works out: good. If not, well, well, ...Last resort would be to fetch the block time from the blockchain for every coinbase transaction descriptor and go on with that. Not really sure if and what difference this would make, though. But I'm not going to do this on a HDD as storage device. This screams for a SSD which has much faster seek and transfer time. I don't like to torture my poor small HDD with such experiments. A HDD as main storage device already feels like pain and suffering when you're used to SSDs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 19, 2022, 04:45:12 AM",
+      "body": "Quote from: Cricktor on June 16, 2022, 05:35:34 PMbitcoin-cli doesn't like e.g. if I try to add 1000 descriptors at once with command importdescriptors. 500 seems to work but gets slower and slower. Not quite sure what the bottleneck is (Bitcoin Core chewing on some database or my HDD storage of wallet and blockchain or both).It's the former. Everytime you call importdescriptors for a descriptor, it seems to check whether there is a block that has a newer timestamp than the descriptor, hence the \"timestamp\": \"now\" advice from achow101. So it is effectively hitting the block database files for each importdescriptors call.Note that timestamp: now does not prevent bitcoin core from looking up blocks in a DB, it only prevents the rescan from happening.The relevant line of code is in src/wallet/rpcdump.cpp, somewhere in lines 1645-1655:Code:CHECK_NONFATAL(pwallet->chain().findBlock(pwallet->GetLastBlockHash(), FoundBlock().time(lowest_timestamp).mtpTime(now)));",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 19, 2022, 08:24:51 AM",
+      "body": "I had mercy with my poor 2.5\" HDD and replaced it with a SSD, system feels nicely snappier.I decided to run importdescriptors with a batchsize of 50 combo()-descriptors except for the last one and timestamp \"now\". Every importdescriptors call starts a short rescan of ~23-25 blocks in the beginning which finishes pretty quickly but gets longer and longer later on.For around the first ~10k of descriptors I didn't intervene because the rescans usually finished within only very few minutes. But it gets worse with every import and projected ETA didn't look good to me. Another thing surprised me as Bitcoin Core dropped mostly syncing to the blockchain tip during the ongoing imports. Not sure if connected peers dropped my node's connections because it likely got unresponsive due the ongoing imports.The \"short\" rescans after each import got smaller, 15-19 blocks on average, but still each took too many minutes to finish, turned double digit, no way. So I decided for a shortcut: fired up a new terminal with a loop every minute to call abortrescan. This brought every import down to 1-2 minutes to finish. Why didn't I think of this earlier? Anyway, yay, progress with the imports!Now a full rescan is in progress, might take ages for the 21954 descriptors in the wallet... I'd better not look at the progress indicator for scanning that getwalletinfo reveals, lol.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 20, 2022, 09:11:16 AM",
+      "body": "Quote from: Cricktor on June 19, 2022, 08:24:51 AMThe \"short\" rescans after each import got smaller, 15-19 blocks on average, but still each took too many minutes to finish, turned double digit, no way. So I decided for a shortcut: fired up a new terminal with a loop every minute to call abortrescan. This brought every import down to 1-2 minutes to finish. Why didn't I think of this earlier? Anyway, yay, progress with the imports!Since most of the importdescriptors runtime will be spent rescanning anyway, you might as well lower the loop time for your abortrescan script to 30 seconds to halve the importing time.But I wouldn't set it any lower than that to avoid clogging the RPC handling code with calls.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 20, 2022, 12:41:17 PM",
+      "body": "OK, I was thinking about a loop interval of 15s for abortrescan, but 30s should be fine, too.Full rescan is badly slow, after almost a day (83611s into rescan) the progress indicator just got to ~0.0051.    Ouch, that's not quite my patience level. I aborted rescan for some reevaluation at block height 183388 for now. It seems the progress indicator is not based on block height here but on something else (total transaction count?).I am a bit surprised of some Bitcoin transfers that so far showed up in this wallet, despite the well known transactions of Satoshi Nakamoto to Hal Finney. (I'm aware that the Patoshi blocks are kind of attributed by some technical evidence to likely have been mined by Satoshi himself, for details see http://satoshiblocks.info/.)These are the exported transfers from the coinbase UTXOs that I see so far (sorry, slightly offtopic with respect to the importdescriptors issue):Code:\"Confirmed\",\"Date\",\"Type\",\"Label\",\"Address\",\"Amount (BTC)\",\"ID\"\"true\",\"2010-07-23T05:17:33.000\",\"Sent to\",\"\",\"1LzLve1uY7hmq71AimBEeRuHf7qEtnP4Xr\",\"-50.00000000\",\"d3b94dcede3cbb08c7c0fdd1889478baa5a0b482cd917f276fa07be702326385\"\"true\",\"2010-05-18T01:07:58.000\",\"Sent to\",\"\",\"1H5wBiJGX43FLHWz4nzAhLfyENNmYj8uA1\",\"-100.00000000\",\"028ad2c836163295e4723a49dd418ee8fb55a14613b1186675f01124b60fb763\"\"true\",\"2009-04-18T17:55:19.000\",\"Sent to\",\"\",\"1JuEjh9znXwqsy5RrnKqgzqY4Ldg7rnj5n\",\"-50.00000000\",\"ea84d39ef6f7b3b23fbf899e11a9bb18478a19413579a69f3005359da7a62c49\"\"true\",\"2009-02-02T19:21:36.000\",\"Sent to\",\"\",\"18jANvQ6AuVGJnea4EhmXiAf6bHR5qKjPB\",\"-50.00000000\",\"4b96658d39f7fd4241442e6dc9877c8ee0fe0d82477e6014e1681d1efe052c8d\"\"true\",\"2009-02-01T17:25:12.000\",\"Sent to\",\"\",\"1CHE5JRfc5mr8ZtVUP7nnsS5HC4bWcXoc6\",\"-100.00000000\",\"7d73200eac9b66ea105fe63378c69f5d68663f925297117ed178deaddb6fc3d5\"\"true\",\"2009-01-15T02:46:26.000\",\"Sent to\",\"\",\"1DCbY2GYVaAMCBpuBNN5GVg3a47pNK1wdi\",\"-25.00000000\",\"d71fd2f64c0b34465b7518d240c00e83f6a5b10138a7079d1252858fe7e6b577\"\"true\",\"2009-01-12T21:04:20.000\",\"Sent to\",\"\",\"1ByLSV2gLRcuqUmfdYcpPQH8Npm8cccsFg\",\"-10.00000000\",\"828ef3b079f9c23829c56fe86e85b4a69d9e06e5b54ea597eef5fb3ffef509fe\"\"true\",\"2009-01-12T07:34:22.000\",\"Sent to\",\"\",\"13HtsYzne8xVPdGDnmJX8gHgBZerAfJGEf\",\"-1.00000000\",\"12b5633bad1f9c167d523ad1aa1947b2732a865bf5414eab2f9e5ae5d5c191ba\"\"true\",\"2009-01-12T07:12:16.000\",\"Sent to\",\"\",\"1LzBzVqEeuQyjD2mRWHes3dgWrT9titxvq\",\"-1.00000000\",\"591e91f809d716912ca1d4a9295e70c3e78bab077683f79350f101da64588073\"\"true\",\"2009-01-12T07:02:13.000\",\"Sent to\",\"\",\"1DUDsfc23Dv9sPMEk5RsrtfzCw5ofi5sVW\",\"-10.00000000\",\"a16f3ce4dd5deb92d98ef5cf8afeaf0775ebca408f708b2146c4fb42b41e14be\"\"true\",\"2009-01-12T04:30:25.000\",\"Sent to\",\"\",\"1Q2TWHE3GMdB6BZKafqwxXtWAWgFt5Jvm3\",\"-10.00000000\",\"f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16\"Actually, any comments on those transactions are welcome. I'll try to dig up some details on them if I find something. I mention these details for clarification before I fire up a tedious and lengthy final rescan of the wallet.I will make a new wallet with every descriptor imported with a timestamp of the block time as recorded in the blockchain for the respective coinbase transaction. I'm curious if that makes any difference for the full rescan after the import. If it turns out to be equally slow, I will throw that rescan task to a spare Raspi node.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

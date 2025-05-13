@@ -1,0 +1,61 @@
+{
+  "id": "topic_5410766",
+  "title": "Boisnou",
+  "author": "Boisnou",
+  "created_time": "August 22, 2022, 08:58:06 AM",
+  "content": "Hello tout le monde, Voilà je vous partage mes interrogations sur la durée de synchronisation de mon noeud Bitcoin. Cela fait maintenant 10 jours que mon noeud se synchronise et est actuellement vers le 88%. https://i.imgur.com/y26kp05.jpgLes spec du host d'hébergement: - Raspberry PI 4 - 4Gb RAM- 1 To SSD Samsung T7- RJ45 1Gb/s- Bbox avec abonnement fibre 400/200 ( Test avec nperf valide bien avec résultat à 385/200)Je pense que niveau spec matériel c'est suffisant, pourtant quand je regarde les graph d'utilisation de la BP sur le portail d'admin de la BBox je vois une moyenne d'utilisation à 12Mb/s seulement. https://i.imgur.com/IKs9cLz.jpgPour vous est ce que Bouygues peut mettre du shaping ( limitation de débit ) ou alors les graph ne sont pas du tout parlant ? Je m'attendais à une synchro plus rapide avec mes specs. Merci !",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5410766",
+  "comments": [
+    {
+      "author": "yogg",
+      "created_time": "August 22, 2022, 11:29:24 AMLast edit: August 22, 2022, 12:09:16 PM by yogg",
+      "body": "Hello !Yes, tes specs sont suffisantes pour faire tourner un noeud Bitcoin synchronisé sans souci Cependant lors de la synchro initiale, Bitcoin valide chaque transaction dans chaque block avant de le considérer comme \"fiable\".A mon avis ton souci ne vient pas de ta BP ni du SSD, mais plutôt du processeur de ton raspberry 4.(Broadcom BCM2711 (4C Cortex-A72 ARM v8, 1.5 GHz, 64-bit SoC))Du coup au début de la synchro, les blocks étaient loin d'être pleins donc ça allait vite.Depuis 2015 les blocks sont quasiment tous remplis, donc ça met + de temps à en valider un.Dis toi que ton RPi4 doit effectuer des calculs cryptographiques sur un ensemble de données de 400+ Go.Cette étape est plutôt gourmande en ressource processeur.Une infra dans son ensemble est juste aussi efficace que son élément le plus faiblard. D'ailleurs l'interface de ton Umbrel doit ramer un peu, non ? Si c'est le cas, cela me conforte dans le fait que ton souci soit la ressource processeur.T'en est à 86%, c'est bientôt la fin !  D'ici quelques jours ça devrait être fini.Je met environ 3 jours à sync un Bitcoin wallet avec Umbrel mais sur un PC fixe qui me sert de serveur.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Boisnou",
+      "created_time": "August 22, 2022, 12:18:25 PM",
+      "body": "En effet je n'avais pas du tout orienté la cause sur le CPU ^^ ! Je te confirme que l'interface Umbrel n'est pas tout à fait fluide ahah. On est à 89%, on tient le bon bout !!!Donc en gros quand la synchro sera terminée le CPU devrait pouvoir respirer un peu pour valider un block toutes les 10 minutes seulement . Etape suivante lancer mon noeud Lightening et établir quelques canaux ! Merci !!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yogg",
+      "created_time": "August 22, 2022, 12:31:03 PM",
+      "body": "Quote from: Boisnou on August 22, 2022, 12:18:25 PMDonc en gros quand la synchro sera terminée le CPU devrait pouvoir respirer un peu pour valider un block toutes les 10 minutes seulement . Exact Enjoy ta découverte de crytoland",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LeGaulois",
+      "created_time": "August 22, 2022, 01:31:48 PMLast edit: August 22, 2022, 02:00:53 PM by LeGaulois",
+      "body": "Avec un raspberry pi le mieux c'est de pré-synchroniser la blockchain sur un ordinateur et de copier le répertoire de donnée sur le stockage Raspberry Pi. Mais bon, vu l'avancement c'est trop tard.Concernant le shaping, bouygues ou autres, ils le font tous. En fait, c'est du \"load balancing\" et c'est un peu logique d'en faire.Les 400 mb/s, ca fait du 50 Mo. Pas très important, mais j'ai toujours trouvé ca un peut bizarre de parler en mb/s au lieu de Mo.Je trouve que les FAIs utilisent ca plus pour du marketing",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "elma",
+      "created_time": "August 22, 2022, 03:53:35 PM",
+      "body": "On peut pas télécharger la blockchain sans refaire tous les validations anciennes ?Il me semble que je faisais ça avant. Non ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yogg",
+      "created_time": "August 22, 2022, 07:37:49 PM",
+      "body": "Quote from: elma on August 22, 2022, 03:53:35 PMOn peut pas télécharger la blockchain sans refaire tous les validations anciennes ?Il me semble que je faisais ça avant. Non ?Tu peux la télécharger en dehors de Bitcoin Core et démarrer Bitcoin sur ce répertoire là.Par contre ton wallet va faire en tout premier un \"rescan\". (et ça peut prendre du temps :p)Le truc c'est que pour un block soit considéré comme \"valide\", il faut qu'il référence le block d'avant, qui référence le précédent ... etc ... jusqu'au block #2 qui lui, référence le genesis block. Bitcoin refait ces calculs.(Bon, il note que tout jusqu'au block #n était bon, du coup il vérifie que les nouvelles données, ça refait pas \"tout\" mais ça en fait une bonne grosse partie à la synchro initiale)Le rescan se fait pas à chaque fois, seulement quand certains fichiers du repertoire Bitcoin ont été touchés.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

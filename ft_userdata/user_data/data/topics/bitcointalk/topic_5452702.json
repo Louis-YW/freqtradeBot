@@ -1,0 +1,61 @@
+{
+  "id": "topic_5452702",
+  "title": "Kryptowerk",
+  "author": "Kryptowerk",
+  "created_time": "May 14, 2023, 03:38:45 PM",
+  "content": "Not sure where to post this, but general discussion seems too unspecific.I remember a few years ago (probably 4+ already) I read about a bug in Bitcoin Core that, if exploited, would have allowed for the creation of unlimited coins. It was reported and fixed before any malicious abuse could take place.I found this article: https://news.bitcoin.com/bitcoin-history-part-10-the-184-billion-btc-bug/But I thought it was something that happend much more recently (like I said, maybe 4 or 5, 6 years ago).Back then I was suprised I didn't read more news about it. Now I am starting to wonder if I imagined things and tried a quick search because I would love to know some technical facts about what actually happened. Hard to find so far...",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5452702",
+  "comments": [
+    {
+      "author": "zezaiement",
+      "created_time": "May 14, 2023, 04:23:55 PM",
+      "body": "The bug occurred in the code responsible for verifying transaction outputs (specifically, the CheckTransaction function) in the Bitcoin Core software.The bug was caused by an integer overflow error. When calculating the total value of transaction outputs, the software used a 32-bit integer variable that exceeded its maximum value due to a large output value.As a result of the overflow, the software incorrectly treated the transaction as valid, allowing for the creation of an excessive number of bitcoins.The bug was fixed in Bitcoin Core version 0.3.10. The fix involved modifying the code to use a larger data type (64-bit integer) for handling transaction values, preventing similar overflow issues in the future.The incident did not lead to the creation of any extra bitcoins. The excessive amount that could have been generated was merely a theoretical possibility resulting from the bug.It's important to note that this incident highlights the robustness and decentralized nature of the Bitcoin network. If you're interested in more technical information about the bug and how it was resolved, you may want to refer to the Bitcoin Core software repository.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "May 14, 2023, 04:53:09 PM",
+      "body": "You are looking for Value overflow incident. I don't know what else of the technical facts you would love to know since the article explains it nicely and refer to the bug discussion thread.Quote from: zezaiement on May 14, 2023, 04:23:55 PMWhen calculating the total value of transaction outputs, the software used a 32-bit integer variable that exceeded its maximum value due to a large output value.Bitcoin did not use 32-bit integer values but rather 64-bit integer values all along.Quote from: zezaiement on May 14, 2023, 04:23:55 PMThe bug was fixed in Bitcoin Core version 0.3.10. The fix involved modifying the code to use a larger data type (64-bit integer) for handling transaction values, preventing similar overflow issues in the future.The update did not change any data type, instead, it just added up some sanity checks [1].[1] https://github.com/bitcoin/bitcoin/commit/d4c6b90ca3f9b47adb1b2724a0c3514f80635c84#diff-118fcbaaba162ba17933c7893247df3aR1013",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kryptowerk",
+      "created_time": "May 15, 2023, 02:27:05 AM",
+      "body": "Thanks for the info and provided links. Suprised to see it was indeed back in 2010. Did anything similar occure many years later by chance? \"While the transaction does not exist anymore, the 0.5 BTC that was consumed by it does. It appears to have come from a faucet and has not been used since.\" (from https://en.bitcoin.it/wiki/Value_overflow_incident)Not sure if I am getting this corretly - did indeed some BTC (0.5) of this malicious block end up on the current blockchain? How is that possible if the original mined transaction was made void during a fork?Quote from: zezaiement on May 14, 2023, 04:23:55 PM[...]The bug was fixed in Bitcoin Core version 0.3.10. The fix involved modifying the code to use a larger data type (64-bit integer) for handling transaction values, preventing similar overflow issues in the future.[...]The oldest Bitcoin core version on Github is 0.10.0 - where did you get your info from?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zezaiement",
+      "created_time": "May 15, 2023, 07:50:15 AM",
+      "body": "Quote from: Kryptowerk on May 15, 2023, 02:27:05 AMThanks for the info and provided links. Suprised to see it was indeed back in 2010. Did anything similar occure many years later by chance? \"While the transaction does not exist anymore, the 0.5 BTC that was consumed by it does. It appears to have come from a faucet and has not been used since.\" (from https://en.bitcoin.it/wiki/Value_overflow_incident)Not sure if I am getting this corretly - did indeed some BTC (0.5) of this malicious block end up on the current blockchain? How is that possible if the original mined transaction was made void during a fork?The statement from the Bitcoin Wiki is referring to the fact that the 0.5 BTC input used in the malicious transaction was originally obtained from a faucet (a service that distributes small amounts of cryptocurrency for free). After the value overflow incident was discovered, a fix was implemented which invalidated  the malicious transaction and any subsequent blocks built on top of it. The 0.5 BTC from the malicious transaction never became a permanent part of the blockchain and did not affect the current state of the Bitcoin network.Quote from: zezaiement on May 14, 2023, 04:23:55 PM[...]The bug was fixed in Bitcoin Core version 0.3.10. The fix involved modifying the code to use a larger data type (64-bit integer) for handling transaction values, preventing similar overflow issues in the future.[...]The oldest Bitcoin core version on Github is 0.10.0 - where did you get your info from?https://satoshi.nakamotoinstitute.org/posts/bitcointalk/376/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "May 15, 2023, 09:18:25 AM",
+      "body": "Quote from: zezaiement on May 14, 2023, 04:23:55 PMThe bug was caused by an integer overflow error. When calculating the total value of transaction outputs, the software used a 32-bit integer variable that exceeded its maximum value due to a large output value.That's incorrect - it was always 64 bit. In fact, the two outputs which this transaction created were very close to INT64_MAX, which is 0x7fffffffffffffff, or 9223372036854775807. The two outputs were 92,233,720,368.54277039 each.Quote from: zezaiement on May 14, 2023, 04:23:55 PMThe bug was fixed in Bitcoin Core version 0.3.10.The bug was actually fixed in a standalone patch Satoshi released within a few hours. Version 0.3.10 was the first full version to include this patch.Quote from: zezaiement on May 14, 2023, 04:23:55 PMThe fix involved modifying the code to use a larger data type (64-bit integer) for handling transaction values, preventing similar overflow issues in the future.No, it didn't. As vv181 has pointed out, it just implemented sanity checks.Quote from: zezaiement on May 14, 2023, 04:23:55 PMThe incident did not lead to the creation of any extra bitcoins.This is also wrong. The incident absolutely led to the creation of 184 billion bitcoin. These bitcoin no longer exist because the chain was re-orged to remove them, but they were still created in the first place.Quote from: zezaiement on May 15, 2023, 07:50:15 AMThe 0.5 BTC from the malicious transaction never became a permanent part of the blockchain and did not affect the current state of the Bitcoin network.Sorry, but this is wrong yet again. That 0.5 BTC absolutely still exists. It is the 0.5 BTC on this address - https://mempool.space/address/17TASsYPbdLrJo3UDxFfCMu5GXmxFwVZSW. This is the input which was used in the value overflow incident, which now still exists as an unspent UTXO since the value overflow transaction was re-orged out. It has not moved since, but it is still there and still completely valid to be spent in the future.Quote from: Kryptowerk on May 14, 2023, 03:38:45 PMbecause I would love to know some technical facts about what actually happened.What happened is someone created a transaction which spent the 0.5 BTC I linked to above. They created two outputs in this transaction, both for 92,233,720,368.54277039 BTC. At the time, part of the way the software checked if the transaction was valid was to ensure the fee (i.e. the sum of the inputs minus the sum of the outputs) was equal or greater than zero. If you had higher outputs than inputs, then when you subtracted them your fee would be negative, and so the transaction would be rejected.However, when the software added the value of the two outputs together, they overflowed and became negative. So then when the software subtracted this negative number from the 0.5 BTC, it ended up with a positive number, which passed the check for the fee to be positive. And so the transaction was allowed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "May 19, 2023, 02:23:18 AM",
+      "body": "Quote from: Kryptowerk on May 15, 2023, 02:27:05 AMThanks for the info and provided links. Suprised to see it was indeed back in 2010. Did anything similar occure many years later by chance? It's quite possible that you first heard about it a few years ago. Perhaps you were reading a recent article or blog post that was talking about the 2010 event and you misunderstood to think that it has just happened, or perhaps you encountered a forum post or other discussion where someone was falsely claiming that it had recently happened (either because they misunderstood or because they were intentionally spreading FUD).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

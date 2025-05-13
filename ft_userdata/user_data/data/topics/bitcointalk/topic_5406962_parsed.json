@@ -1,0 +1,117 @@
+{
+  "id": "topic_5406962",
+  "title": "RemiusRock",
+  "author": "RemiusRock",
+  "created_time": "July 20, 2022, 09:27:05 AM",
+  "content": "Hey guys, It took me a long time but I've finally manage to download all the Bitcoin Data (446 GB).Now when I try to start Armory the command window that appears with it crashes after \"... parsed block file 47*\" something. Any advices?I've recovered an old wallet of mine, wanted to see if there are any transactions pending to it.https://prnt.sc/_IhCmhK17v5R",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5406962",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "July 20, 2022, 09:50:43 AM",
+      "body": "You're using the outdated version 0.96.Download the latest version (0.96.5) from the updated site or from Armory's repository, then rebuild the database.Links in the pinned topics at the top of this board: Armory 0.96.5For the database, it's simpler to just delete the \"databases\" folder inside Armory's datadir.Or it can be flagged in \"Help->Rebuild and Rescan Databses\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RemiusRock",
+      "created_time": "July 20, 2022, 04:53:28 PM",
+      "body": "Alas still stuck, after the update https://prnt.sc/RZ4GPNk7-64I",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "July 20, 2022, 05:22:05 PMLast edit: July 20, 2022, 05:58:38 PM by hosseinimr93",
+      "body": "Quote from: RemiusRock on July 20, 2022, 04:53:28 PMAlas still stuck, after the updateDid you delete the \"databases\" folder or you just updated Armory and didn't delete that folder? As mentioned by nc50lc above, you can also rebuild and rescan databases.If you did so but it didn't work, post the logs, so we can know what's causing the problem. You can find the logs in \"armorylog\" text file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RemiusRock",
+      "created_time": "July 20, 2022, 07:31:38 PM",
+      "body": "deleted and rescanned and rebuild several timeslast lines of the logs:-INFO  - 22:22:31.469: (e:\\users\\goat\\code\\armory3\\cppforswig\\databasebuilder.cpp:281) parsed block file #455-INFO  - 22:22:32.047: (e:\\users\\goat\\code\\armory3\\cppforswig\\databasebuilder.cpp:493) Found next block after skipping 571124bytes-INFO  - 22:22:34.360: (e:\\users\\goat\\code\\armory3\\cppforswig\\databasebuilder.cpp:281) parsed block file #460-INFO  - 22:22:34.360: (e:\\users\\goat\\code\\armory3\\cppforswig\\databasebuilder.cpp:281) parsed block file #467the whole log: here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 21, 2022, 07:21:27 AM",
+      "body": "Quote from: RemiusRock on July 20, 2022, 07:31:38 PMlast lines of the logs:-INFO  - 22:22:31.469: (e:\\users\\goat\\code\\armory3\\cppforswig\\databasebuilder.cpp:281) parsed block file #455-INFO  - 22:22:32.047: (e:\\users\\goat\\code\\armory3\\cppforswig\\databasebuilder.cpp:493) Found next block after skipping 571124bytes-INFO  - 22:22:34.360: (e:\\users\\goat\\code\\armory3\\cppforswig\\databasebuilder.cpp:281) parsed block file #460-INFO  - 22:22:34.360: (e:\\users\\goat\\code\\armory3\\cppforswig\\databasebuilder.cpp:281) parsed block file #467The blk.dat files can contain other data aside from blocks like orphan/stale blocks so this may not be the issue.But if you want to check if it is Bitcoin's blockchain at fault, you can try to run Bitcoin Core with -reindex to see if there's some corruption in your blockchain.It will take a while to finish but it will not re-download the blockhain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 21, 2022, 11:59:52 PM",
+      "body": "Have you tried to check if the Armory wallet is actually pointing to the right path for your Bitcoin core and blocks?If not then try my suggestion below just leave the database blank but don't forget to manually put the path for your Bitcoin core/bitcoindQuote from: BitMaxz on September 02, 2020, 10:31:37 PMIf you already have Bitcoin core and it's fully synced but in different folder locations you can edit the armory settings.This is what it looks like Edit them to the right directory path and it should be fixed your issue.Or you can manually set it under properties and add this line at the endTargetCode:--datadir=<path to datadir>ShortcutCode:--satoshi-datadir=<path to datadir>Source: https://bitcointalk.org/index.php?topic=1432704.msg14490815#msg14490815",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 22, 2022, 04:18:38 AM",
+      "body": "Quote from: BitMaxz on July 21, 2022, 11:59:52 PMHave you tried to check if the Armory wallet is actually pointing to the right path for your Bitcoin core and blocks?-snip-His logs indicate that it's pointing to a custom --datadir and --satoshi-datadir.It's indicated that Armory can find bitcoind as well.Armorylog.txtQuoteSDM.pyc:171 - Found bitcoind in the following places:SDM.pyc:173 -    D:\\Programs\\Bitcoin\\daemon\\bitcoind.exe-snip-SDM.pyc:445 Spawning DB with command: D:\\Programs\\Armory\\ArmoryDB.exe --db-type=\"DB_FULL\" --cookie--satoshi-datadir=\"E:\\BitcoinData\\blocks\" --satoshi-port=8333 --datadir=\"D:\\User\\AppData\\Roaming\\Armory\\\" --dbdir=\"D:\\User\\AppData\\Roaming\\Armory\\databases\"dblog.txtQuote(e:\\users\\goat\\code\\armory3\\cppforswig\\blockutils.cpp:915) blkfile dir: E:\\BitcoinData\\blocks(e:\\users\\goat\\code\\armory3\\cppforswig\\blockutils.cpp:916) lmdb dir: D:\\User\\AppData\\Roaming\\Armory\\databasesWhat's weird is those folders seem structured to look like the user's %appdata% directory in the C drive, but it's not an issue if \"D:/\" drive exists.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "RemiusRock",
+      "created_time": "July 22, 2022, 08:28:39 AM",
+      "body": "Well, nothing is working, I guess I will give up. Is there a way to check my wallet balance somewhere else?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "July 22, 2022, 08:36:22 AM",
+      "body": "Quote from: RemiusRock on July 22, 2022, 08:28:39 AMIs there a way to check my wallet balance somewhere else?You can enter your address(es) in a block explorer like blockchair and check your balance. For spending your bitcoin, you can export your private key(s) and import them into a SPV wallet like electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 22, 2022, 10:00:36 PM",
+      "body": "Quote from: RemiusRock on July 22, 2022, 08:28:39 AMWell, nothing is working, I guess I will give up. Is there a way to check my wallet balance somewhere else?If you already have the BTC address from your wallet then you can check the balance to any block explorer like blockchair.com but if not yet there is another option opening armory without syncing the database which is the offline version. Check below as a referenceClick the offline one and then open your wallet and look for your addresses. Check them one by one in Blockchair.com to check the balances.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 23, 2022, 04:13:31 AM",
+      "body": "Quote from: RemiusRock on July 22, 2022, 08:28:39 AMWell, nothing is working, I guess I will give up. Is there a way to check my wallet balance somewhere else?It is possible that Armorydb wasn't updated properly due to a \"zombie process\" running in the background.Armory sometimes leave armorydb.exe running after closing the GUI, you can check your task manager.Try to reinstall 0.96.5 but make sure every armory processes are stopped before updating it to v0.96.5, restarting the PC before upgrade works as well.Does \"E:\\BitcoinData\\blocks\" actually has 446GB+ worth of data?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JRob",
+      "created_time": "February 22, 2023, 07:15:45 PM",
+      "body": "The zombie process is probably what caused his problem.  I came across this post while trying to change the --satoshi-datadir=<path to datadir> after the Armory GUI was already opened.  I created armoryqt.conf file referenced here https://btcarmory.com/docs/pathing, but when I saved the file, closed the Armory GUI, and re-opened it, Armory was still not able to find the satoshi-datadir and was referencing the following error code:BDM.pyc:197 - DB error: C:\\Users\\user\\AppData\\Roaming/Bitcoin/blocks is not a valid path.  The armorydb.exe was, in fact, a zombie process preventing a new instance of armorydb.exe from opening with the correct changes.  Simply terminate this process in your Task Manager and then re-open Armory.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HCP",
+      "created_time": "February 22, 2023, 11:26:10 PM",
+      "body": "Indeed... Armory unfortunately has a bad habit of not exiting cleanly and leaving zombie processes running in the background. Especially if a user is running into issues during the sync/database building process and tries to exit and restart Armory.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

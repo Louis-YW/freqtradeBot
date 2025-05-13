@@ -1,0 +1,101 @@
+{
+  "id": "topic_5412734",
+  "title": "nliveanalytics",
+  "author": "nliveanalytics",
+  "created_time": "September 07, 2022, 12:41:54 PM",
+  "content": "Hi!I am using my own bitcoin node server. I get the following error while making load wallet with RPC. Request body:{\"jsonrpc\": \"1.0\", \"id\": \"curltest\", \"method\": \"loadwallet\", \"params\": [\"/home/bitcoin/.bitcoin/<mywalletname>/backup.dat\"]}Response body:{    \"result\": null,    \"error\": {        \"code\": -4,        \"message\": \"Wallet file verification failed. Invalid -wallet path '/home/bitcoin/.bitcoin/<mywalletname>/backup.dat'. -wallet path should point to a directory where wallet.dat and database/log.? files can be stored, a location where such a directory could be created, or (for backwards compatibility) the name of an existing data file in -walletdir (\\\"/home/bitcoin/.bitcoin\\\")\"    },    \"id\": \"curltest\"}how can i bypass this error",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412734",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "September 07, 2022, 01:18:27 PM",
+      "body": "Quote from: nliveanalytics on September 07, 2022, 12:41:54 PMhow can i bypass this errorI didn't use this, but according to the error message you may have to have eitherCode:{\"jsonrpc\": \"1.0\", \"id\": \"curltest\", \"method\": \"loadwallet\", \"params\": [\"/home/bitcoin/.bitcoin/<mywalletname>\"]}or Code:{\"jsonrpc\": \"1.0\", \"id\": \"curltest\", \"method\": \"loadwallet\", \"params\": [\"backup.dat\"]}but certainly not the full path.Of course, this may mean some adaptations in filenames or paths.All the examples on the net seem to be loading wallet.dat without a path. Is it a problem for you to put into the datadir the wallet(s) you're planning to load?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 07, 2022, 01:22:37 PM",
+      "body": "Quote from: nliveanalytics on September 07, 2022, 12:41:54 PMhow can i bypass this errorEither put 'backup.dat' inside .bitcoin/wallets dir orCreate a 'backup' folder inside .bitcoin/wallets dir, paste your 'backup.dat' file there and rename it into 'wallet.dat'.Then load it using loadwallet backup.dat for the former or loadwallet backup for the latter.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nliveanalytics",
+      "created_time": "September 07, 2022, 01:53:25 PM",
+      "body": "Quote from: NeuroticFish on September 07, 2022, 01:18:27 PMQuote from: nliveanalytics on September 07, 2022, 12:41:54 PMhow can i bypass this errorbut certainly not the full path.Of course, this may mean some adaptations in filenames or paths.All the examples on the net seem to be loading wallet.dat without a path. Is it a problem for you to put into the datadir the wallet(s) you're planning to load?I get file validation error when directory name and folder path are correctIf I mistype the directory name I get another error because, Wallet file verification failed.Response body: Wallet file verification failed. Failed to load database path '/lastwallet/hey.dat'. Path does not exist.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "September 07, 2022, 02:00:59 PM",
+      "body": "Quote from: nliveanalytics on September 07, 2022, 01:53:25 PMResponse body: Wallet file verification failed. Failed to load database path '/lastwallet/hey.dat'. Path does not exist.The parameter has to be either a folder, either a filename (not a file path!). You've still put a path there, of course it's not working.Maybe nc50lc's answer makes it clearer?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nliveanalytics",
+      "created_time": "September 07, 2022, 02:46:03 PM",
+      "body": "Quote from: NeuroticFish on September 07, 2022, 02:00:59 PMQuote from: nliveanalytics on September 07, 2022, 01:53:25 PMResponse body: Wallet file verification failed. Failed to load database path '/lastwallet/hey.dat'. Path does not exist.The parameter has to be either a folder, either a filename (not a file path!). You've still put a path there, of course it's not working.Maybe nc50lc's answer makes it clearer?Sorry, same error.I try with all kinds of link structures / I get an error whether I put it or not. I tried all link structures.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "September 07, 2022, 03:04:10 PM",
+      "body": "Can you check the permissions on the wallet file and post the here (ls -l in the parent directory where the wallet file is and then show us the first 10 characters that should look something like -rwxrw----) just in case it's that, you could also try doing that with the parent folder if you made it yourself to check bitcoin core has the rights to see files inside the folder.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nliveanalytics",
+      "created_time": "September 07, 2022, 04:00:36 PM",
+      "body": "Quote from: jackg on September 07, 2022, 03:04:10 PMCan you check the permissions on the wallet file and post the here (ls -l in the parent directory where the wallet file is and then show us the first 10 characters that should look something like -rwxrw----) just in case it's that, you could also try doing that with the parent folder if you made it yourself to check bitcoin core has the rights to see files inside the folder. Of course I'm sending right awayWallet file ls -l:total 1876drwx------ 2 systemd-coredump systemd-coredump   4096 Sep  7 16:23 database-rw------- 1 systemd-coredump systemd-coredump      0 Sep  7 14:55 db.log-rw------- 1 systemd-coredump systemd-coredump 958464 Sep  7 15:50 hey.dat-rw------- 1 systemd-coredump systemd-coredump 958464 Sep  7 17:56 wallet.datParent bitcoin file ls -l:drwx------ 2 systemd-coredump systemd-coredump     4096 Sep  7 14:07 ariswallet-rw------- 1 systemd-coredump systemd-coredump       31 Sep  7 10:54 banlist.json-rw------- 1 systemd-coredump systemd-coredump        2 Sep  7 13:33 bitcoind.piddrwx------ 3 systemd-coredump systemd-coredump   184320 Sep  7 17:58 blocksdrwx------ 2 systemd-coredump systemd-coredump    90112 Sep  7 17:57 chainstate-rw------- 1 systemd-coredump systemd-coredump 62182892 Sep  7 17:58 debug.log-rw------- 1 systemd-coredump systemd-coredump   247985 Sep  7 13:32 fee_estimates.datdrwx------ 3 systemd-coredump systemd-coredump     4096 Sep  7 15:50 lastwallet-rw------- 1 systemd-coredump systemd-coredump       18 Sep  7 13:32 mempool.datdrwx--x--x 2 systemd-coredump systemd-coredump     4096 Sep  7 13:33 nudewallet-rw------- 1 systemd-coredump systemd-coredump   821890 Sep  7 17:48 peers.dat-rw------- 1 systemd-coredump systemd-coredump       47 Sep  7 14:55 settings.jsondrwx--x--x 2 systemd-coredump systemd-coredump     4096 Sep  7 13:33 testwallet",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "September 07, 2022, 08:36:18 PM",
+      "body": "(I'm assuming testwallet is the first wallet you used and one that works with the rpc command, is it or does that still not work)? Quote from: nliveanalytics on September 07, 2022, 04:00:36 PMdrwx------ ariswalletdrwx------ lastwalletdrwx--x--x nudewalletdrwx--x--x testwalletWhy are these different, is there a reason for that?Can you sudo chmod 711 them (according to a search engine that should be RWX--X--X you might want to confirm before doing it?See if there's a difference between the subfiles of both of those directories too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "September 08, 2022, 01:08:38 AM",
+      "body": "loadwallet takes the name of a wallet, which is the name of the directory within the wallets/ directory that contains the wallet.dat file.You can use the restorewallet RPC to restore a wallet from a backup. This takes the name to give the restored wallet, and the path to the backup of a wallet.dat file. It will create the necessary directory structure, copy the backup to the correct location, and name everything correctly. The restored wallet will already be loaded, and can be loaded or unloaded in the future using the name that you gave it when doing the restore.Note that this RPC is currently only available in version 23.0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 08, 2022, 07:14:28 AM",
+      "body": "Quote from: nliveanalytics on September 07, 2022, 02:46:03 PMQuote from: NeuroticFish on September 07, 2022, 02:00:59 PMMaybe nc50lc's answer makes it clearer?Sorry, same error.I try with all kinds of link structures / I get an error whether I put it or not. I tried all link structures.Have you copied it to the correct directory that I've pointed-out in my reply?Namely: .bitcoin/wallets ; either paste 'backup.dat' inside or create a 'backup' folder there, paste 'backup.dat' file inside it and rename it into 'wallet.dat'.Because if you did, there shouldn't be any error when you used the said commands.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 08, 2022, 10:27:24 PM",
+      "body": "Quote from: nliveanalytics on September 07, 2022, 01:53:25 PMI get file validation error when directory name and folder path are correctIf I mistype the directory name I get another error because, Wallet file verification failed.Response body: Wallet file verification failed. Failed to load database path '/lastwallet/hey.dat'. Path does not exist.Last time I checked, the wallet file needs to have a very specific name (wallet.dat), it's the folder name that indicates the name of your wallet, and as such, only the folder name should be included in a loadwallet call, without any path.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "id": "topic_5453860",
+  "title": "Jet Cash",
+  "author": "Jet Cash",
+  "created_time": "May 24, 2023, 10:44:49 AM",
+  "content": "Should people who effectively clog the blockchain pay a financial penalty. If smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, then there would be a disincentive to submit so much rubbish on the blockchain. How could this be implemented? Would it require two mempools, or just approval by the miners?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5453860",
+  "comments": [
+    {
+      "author": "zanezane",
+      "created_time": "May 24, 2023, 11:35:52 AM",
+      "body": "Quote from: Jet Cash on May 24, 2023, 10:44:49 AMShould people who effectively clog the blockchain pay a financial penalty. If smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, then there would be a disincentive to submit so much rubbish on the blockchain. How could this be implemented? Would it require two mempools, or just approval by the miners?I think, to discourage clogging the blockchain, you could implement a fee structure that charges lower fees for smaller transactions and higher fees for larger transactions. The fee validation process would involve classifying transactions based on size or complexity, and validators or miners would verify the provided fee. Insufficient fees may result in rejection or lower priority for inclusion in the blockchain",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mocacinno",
+      "created_time": "May 24, 2023, 11:41:28 AM",
+      "body": "As it stands right now, a miner could already chose to not put those spam transactions into the blocks they are trying to solve.  It would be trivial for any miner to edit the algorithm that's selecting the optimal transaction combination from the mempool in order to fill the block they're trying to solve so that those spam transactions are no longer selected (or only selected if they pay an insane fee).They chose not to do this, because they're trying to optimize their income.In order to force the miners into rejecting spam transactions, i'm pretty sure we would require a fork (a fork that would have to be accepted by the majority of the network)... Eventough, as it stands right now, it might be possible they (the miners) are sacrificing short term profit for long term loss since this situation might in the end hinder bitcoin adoption, bitcoin price increase, and eventually their income aswell...It might be a good first step if somebody wrote a patch for the default node implementation so the pool owners that still run the default client at least have the option of rejecting or at least discouraging those spam transactions??? I don't believe many node operators would chose to run a patched node tough.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 24, 2023, 11:46:31 AM",
+      "body": "No, the fee structure is fine as it is. The only thing changing it will do is add complexity and cause more issues.Even now people are severely underpaying or overpaying what is needed causing confusion.Add more tiers and you are going to wind up with about a billion questions of 'why is this a tier 2 it should be a tier 1' and so on.Take a look at block 791175 someone paid 1023 sat/vB when just about 50 sat/vB would have made it into the block.Can you picture adding tiers to that?-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "un_rank",
+      "created_time": "May 24, 2023, 11:59:43 AM",
+      "body": "Quote from: zanezane on May 24, 2023, 11:35:52 AMI think, to discourage clogging the blockchain, you could implement a fee structure that charges lower fees for smaller transactions and higher fees for larger transactions. The fee validation process would involve classifying transactions based on size or complexity, and validators or miners would verify the provided fee. Insufficient fees may result in rejection or lower priority for inclusion in the blockchainThis is precisely how the bitcoin fee structure works already. Fees are calculated in sat/vbytes, that is you pay based on the size of your transaction, one with a weight of 1000 vbytes would pay more than one with a size of 100 vbytes.Size is the important factor in fee estimation.Nodes can also adjust their mempools to reject incoming transactions which submit a low feerate relative to the network congestion at the time.- Jay -",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "May 24, 2023, 01:01:45 PM",
+      "body": "QuoteShould we have a two, or even three, tier fee structure?No. You can even find Satoshi's response for that in some old topic:Quote from: satoshi on August 05, 2010, 04:39:58 PMQuote from: bytemaster on August 05, 2010, 03:39:19 PMThe only solution to this problem is to make broadcasting of a transaction \"non free\".  Namely, if you want me to include it you have to pay me.  The net (no pun intended) result is that each client would need to pay other clients to whom they even send their transaction, not just the individual who gets it in a block.   In this way the laws of economics take over and no one gets a free ride on the transaction broadcast system.  I don't know a way to implement that.  The transaction fee to the block creator uses a special trick to include the transaction fee without any additional size.  If there was a transaction for each transaction fee, then what about the transactions fees for the transaction fee's transaction?QuoteShould people who effectively clog the blockchain pay a financial penalty.Maybe they should, but it needs a lot of brainstorming to implement that correctly. I can imagine many things that could go wrong. Currently, we have satoshis per virtual kilobyte system, and everyone can see how it works. Before, there was a coinage-based system: the older your coins were, the higher priority your transaction had. Also I saw some people mentioning UTXO-based fees: the more UTXO you create, the higher your fees are. And if you consume many UTXOs, you make it easier for pruned nodes, so maybe that should be even rewarded with some discount (or some buffer for free transactions to do that kind of UTXO cleanup, but of course it should be designed carefully to avoid misuse).That way or another, it is possible to change that without any fork. The hardest thing is presenting a better system, and convincing mining pool operators, that your way of handling it is better than the status quo. And of course, you can start with your own full node, then you will see if your local mempool is really handled better, because the first step is to check your system in practice.QuoteIf smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, then there would be a disincentive to submit so much rubbish on the blockchain.No matter what model you will take, it is hard to design a system, where you won't punish transaction batching (and UTXO-based fee model mentioned above also has the same problem). Because if you have a transaction that has one input, and creates hundreds of outputs, it does not mean it is automatically bad. It could be some batched withdrawal from some exchange, and if they for example collect all withdrawals, and produce one transaction per 24 hours, then you don't want to punish them (because replacing all of that with hundreds of small transactions would be worse).QuoteHow could this be implemented? Would it require two mempools, or just approval by the miners?One mempool is all you need. After all, finally you have a single block, and all transactions are placed in a given order. Either you include or exclude something, it is that simple. Of course you can locally make it more complicated, and have 20 layers to filter things, but finally, it will be a single binary decision: you include or exclude some transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Onyeeze",
+      "created_time": "May 24, 2023, 02:40:51 PM",
+      "body": "Quote from: zanezane on May 24, 2023, 11:35:52 AMQuote from: Jet Cash on May 24, 2023, 10:44:49 AMShould people who effectively clog the blockchain pay a financial penalty. If smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, then there would be a disincentive to submit so much rubbish on the blockchain. How could this be implemented? Would it require two mempools, or just approval by the miners?I think, to discourage clogging the blockchain, you could implement a fee structure that charges lower fees for smaller transactions and higher fees for larger transactions. The fee validation process would involve classifying transactions based on size or complexity, and validators or miners would verify the provided fee. Insufficient fees may result in rejection or lower priority for inclusion in the blockchainWhat causes rejections of transactions is when the fee is low and can't carry the confirmation process and most sometimes some of the exchanges needed high fee to process faster,using insufficient before fee is like turning everything upside and it's contradictory to understand.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "goldkingcoiner",
+      "created_time": "May 24, 2023, 03:02:09 PM",
+      "body": "Quote from: Jet Cash on May 24, 2023, 10:44:49 AMShould people who effectively clog the blockchain pay a financial penalty. If smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, then there would be a disincentive to submit so much rubbish on the blockchain. How could this be implemented? Would it require two mempools, or just approval by the miners?Sounds a bit unnecessary. Just cut out the middleman and block off the spam transactions in the first place. Problem solved. I think otherwise it would just make people weigh their return profit over their transaction cost loss and spam the blockchain anyway. NFTers are going to scam people for thousands if not hundreds of thousands per NFT. Would a higher transaction fee make them think twice? I don't think it would. Worst case scenario it would only give miners the impression that spam transactions are more rewarding than regular ones. Then those spam transactions turn into priority transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mixoftix",
+      "created_time": "May 24, 2023, 03:55:26 PM",
+      "body": "once before just suggested here there would be an \"oxidation fee\" on coins which remain untouched for many years. so the whole consensus / security providers of Bitcoin blockchain (miners) that keep safe these coins for an account could get paid by the account owner..this was just an example for the importance of having more tiers of fee structure - big like!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 25, 2023, 04:23:38 AM",
+      "body": "Quote from: Jet Cash on May 24, 2023, 10:44:49 AMIf smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, It depends on what you mean by \"smaller and larger\". * If it is purely based on size of a transaction then it must not be implemented at all because a transaction with for example 20 inputs is considered a \"large\" transaction, but actually this type of transaction should be encouraged not discouraged because it is consolidating outputs which actually helps improve scaling of bitcoin by optimizing the usage of the limited block space. That is a single tx with 20 inputs is smaller than 20 tx with 1 input each.That means if the fee of such transaction is to be higher according to your question, they would be forced to create multiple transactions with smaller number of inputs to pay a lower total fee which would increase the total size they waste.* If it is based on the \"garbage\" data they insert into the transaction using exploits in the protocol like what the Ordinals Attack is doing these days, then this method is not useful because we are talking about a vulnerability in the protocol that is being exploited, doing anything other than fixing the exploit itself is just wrong!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Ucy",
+      "created_time": "May 25, 2023, 10:02:30 AM",
+      "body": "Quote from: goldkingcoiner on May 24, 2023, 03:02:09 PMQuote from: Jet Cash on May 24, 2023, 10:44:49 AMShould people who effectively clog the blockchain pay a financial penalty. If smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, then there would be a disincentive to submit so much rubbish on the blockchain. How could this be implemented? Would it require two mempools, or just approval by the miners?Sounds a bit unnecessary. Just cut out the middleman and block off the spam transactions in the first place. Problem solved. I think otherwise it would just make people weigh their return profit over their transaction cost loss and spam the blockchain anyway. NFTers are going to scam people for thousands if not hundreds of thousands per NFT. Would a higher transaction fee make them think twice? I don't think it would. Worst case scenario it would only give miners the impression that spam transactions are more rewarding than regular ones. Then those spam transactions turn into priority transactions.I think they should be able to properly define what spam is in order to identify and reject them. Spam in Bitcoin context is simply Irrelevant & unwanted transactions that come in quick succession or in multiple amount in a given time. A transaction has to be relevant to the purpose of the Blockchain to be accepted otherwise it may be rejected alone or must be rejected if found to be spam. Blockchain is purposefully designed for financial transactions or light data. Heavy NFT or other heavy stuff could be allowed once in a while on a Blockchain but rejected when they became common/frequent.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jet Cash",
+      "created_time": "May 25, 2023, 01:16:00 PM",
+      "body": "That's like saying girls should ionly become a little bit pregnant.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "May 26, 2023, 02:14:37 PM",
+      "body": "Quote from: pooya87 on May 25, 2023, 04:23:38 AMQuote from: Jet Cash on May 24, 2023, 10:44:49 AMIf smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, It depends on what you mean by \"smaller and larger\". It sounds like looking for a central decision.Today fee could be used as a 'priority' marker, if all the fees would be fixed, how would you estimate when transaction is going to be processed?Talking about ordinals - yes, we may say that after years of improvements how to make transactions smaller finally someone proposed something opposite  but at the end it is a feature and possibility, so why not to use it? If we focus on efficiency we would have to say that for example we should stop processing outputs from uncompressed addresses as there was enough time to switch to something more efficient.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "May 27, 2023, 11:29:35 AM",
+      "body": "I'm with what @pooya87 said: fix the loopholes in Taproot which make Ordinals and BRC-20 crap possible. We would still have the OP_RETURN data storage ability but that's not as convenient as the current loopholes.For the miners there's no real benefit to stop or control the mempool clogging. They benefit from clogged mempools as timely important transactions have to pay the premium fee to top existing waiting transactions. And people have to learn to observe the mempool state and choose reasonably suitable fees, unless you don't have to care about overpaid transaction fees for whatever reason (but that's kind of throwing coins out of the window into miner's pockets).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cryptomultiplier",
+      "created_time": "May 27, 2023, 04:34:44 PM",
+      "body": "I would like to be referential in relating my reply to this post with a comparison to how most centralized financial banking platforms use this different tier fee structure to accommodate the users transaction fees based on the volume per ratio amount to be transacted or that is usually transacted.The idea on a decentralized system might be better too, as it will free up congestion on the network thus speeding up transactions. I would rather it isn't left to the miners, unless having two mempools is too much work for you.  It might get confusing at first to new users and some old users who has grown accustomed to the former, but once an update in software app automatically directs an account to the best suited fee charge per the volume to be transacted via the network tier fee structure, one would enjoy the ease per transaction speed and efficiency, I can assure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 27, 2023, 05:47:23 PM",
+      "body": "Quote from: Jet Cash on May 24, 2023, 10:44:49 AMShould people who effectively clog the blockchain pay a financial penalty.The problem with this is that, first of all you have to define what's \"clog\", secondly, you have to enforce that definition to a decentralized network, and thirdly, you have to figure out what the penalty will be (and I'm pretty sure any such penalty will be chosen arbitrarily). Quote from: Jet Cash on May 24, 2023, 10:44:49 AMIf smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, then there would be a disincentive to submit so much rubbish on the blockchain.Sounds a terrible idea. To begin with, that disincentivizes doing coinjoin, because it is purposefully large in size. But besides that: you can penalize someone from broadcasting a large transaction, but you can't penalize them for dividing it in separate small transactions, because there's pseudonymity. So, the result will be much more smaller transactions, with minimum-to-zero \"clogging\" prevented.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "May 27, 2023, 06:51:39 PM",
+      "body": "I think that adding any fee structure to the protocol is a bad idea.One problem is that it could backfire. For example, your fee structure would encourage splitting up one large transaction into several smaller transactions that would take up more space overall.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Synchronice",
+      "created_time": "May 28, 2023, 07:57:19 PM",
+      "body": "Quote from: Jet Cash on May 24, 2023, 10:44:49 AMShould people who effectively clog the blockchain pay a financial penalty. If smaller transactions ( smaller in size, and not in value), were charged a low efficiency fee, and larger ones had to pay quadruple ( say ) fees, then there would be a disincentive to submit so much rubbish on the blockchain. How could this be implemented? Would it require two mempools, or just approval by the miners?I don't understand how one can determine whether person is clogging mempool or not and how will they have to pay financial penalty.In any way, if someone wants to abuse fees, they'll succeed. You can't set fixed transaction fees because price is very volatile, will be unfair and will do nothing good. Even if you set tier fee structure, how is that gonna help you? I'll make dozens of small transaction fees and will enormously increase transaction fees for low tier transactions that will push high tier fees to rise.Btw everyone here is against the increase of block size but I don't know how do they imagine bitcoin that has two times, four times and even more number of transactions daily. But to my mind, lighting network looks very cool and promising.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "May 29, 2023, 04:56:57 AM",
+      "body": "Quote from: PawGo on May 26, 2023, 02:14:37 PMTalking about ordinals - yes, we may say that after years of improvements how to make transactions smaller finally someone proposed something opposite  but at the end it is a feature and possibilityExcept that it is not a feature, it is an oversight. A mistake that the developers who introduced the new Witness Version 1 protocol (commonly known as Taproot) made when defining the consensus and standard rules that restricted this type of attack. A mistake they did NOT make when introducing Witness Version 0 protocol and placed appropriate restrictions that prevented this type of attack.Quote from: PawGo on May 26, 2023, 02:14:37 PMIf we focus on efficiency we would have to say that for example we should stop processing outputs from uncompressed addresses as there was enough time to switch to something more efficient.We did do that! After Witness Version 0 (commonly known as SegWit) soft fork using uncompressed public keys became non-standard and you won't be able to get such transactions propagated through the network.Quote from: Synchronice on May 28, 2023, 07:57:19 PMBtw everyone here is against the increase of block size but I don't know how do they imagine bitcoin that has two times, four times and even more number of transactions daily. Not everyone We also did increase the block size since block size hasn't been 1 MB ever since 2017.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "May 29, 2023, 09:30:51 AM",
+      "body": "Quote from: pooya87 on May 25, 2023, 04:23:38 AMI think maybe, Jet Cash got the proposal backward.Either way, I don't think it is possible to implement what the OP is proposing.It is important to remember that the \"mempool\" is just a localized set of valid transactions that are not yet confirmed, according to a node's current understanding of the blockchain. There is no historical mempool, although there are some projects that store some historical information about the status of their nodes' mempools. If the maximum block size is nkb and there are nkp worth of valid transactions in a pool's mempool, it is reasonable to expect the pool to confirm all transactions in the mempool, even if there is a wide variety of transaction fee rates among transactions. So if there was a requirement for pools to include certain valid transactions prior to accepting other valid transactions, it would not be possible to validate if a particular block is valid after the fact.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

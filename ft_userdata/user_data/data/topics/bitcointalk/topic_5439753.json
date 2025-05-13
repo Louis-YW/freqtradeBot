@@ -1,0 +1,45 @@
+{
+  "id": "topic_5439753",
+  "title": "JRamos",
+  "author": "JRamos",
+  "created_time": "February 13, 2023, 06:46:50 PM",
+  "content": "I've coded mempoolcp https://github.com/dev7ba/mempoolcpWhat is mempoolcp?Mempoolpc is a command-line program to copy the mempool from one bitcoin node to another.How does it works?Through bitcoin nodes rpc interface, this program uses getrawmempool(verbose), getmempoolentry, getrawtransaction and sendrawtransaction rpc calls to copy the mempool between nodes.Mempoolpc takes into account the dependencies between transactions and the fact that you can't send a child tx before a parent tx, or a parent tx before a grandparent tx... because otherwise, the sent transactions could be denied by the receiving node.Mempoolcp is fast, as fast as rust serde is. Also, mempoolcp use multithreading when possible.It has two modes of operation: a faster one using more memory and a normal one using less. The faster uses getrawmempool_verbose (a heavy call that uses a lot of memory if there are many txs). and then getrawtransaction + sendrawTransaction for each transaction. The normal mode uses getrawmempool (without verbose), then getmempoolentry + getrawtransaction + sendrawTransaction for each transaction.Configuration is done via the command line or via mempoolcp.conf in a file (to avoid using passwords in the shell). It can actively ask for the user and password if needed.It has an option to choose network (ports): mainnet, testnet, regtest...It is compatible with any limitancestorcount value in bitcoin.confCurrently only support user/password authorization.Which problems solves?At least 3 questions in bitcoin stack exchange:https://bitcoin.stackexchange.com/questions/63675/synchronize-mempool-between-3-nodeshttps://bitcoin.stackexchange.com/questions/53638/are-there-any-ways-to-sync-mempool-from-another-nodes-fasterhttps://bitcoin.stackexchange.com/questions/93231/how-to-achieve-fast-mempool-synchronization-at-startup",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5439753",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "February 13, 2023, 07:08:12 PMLast edit: February 13, 2023, 07:21:56 PM by DaveF",
+      "body": "A few questions from a tl;dr because I am working on a tablet at the moment.How does it handle transactions coming in while it's running?AndHow does it handle a block being found while it's running?AndAny logic to check if to see if one node has more transactions then the other?I have 4 nodes running on RPi and they are all dealing with the current bloated pool just fine with the stock setting but was thinking of increasing it to some stupid large size wonder if this would help by just bloating one and copying it to the others or will it not really matter.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JRamos",
+      "created_time": "February 14, 2023, 07:50:05 AM",
+      "body": "QuoteHow does it handle transactions coming in while it's running? It's doesn't transfer them, but if both nodes are already connected to the bitcoin network, both will receive the new transactions. This program is intended to get old transactions to a node from another since they are not retransmitted normally by the bitcoin network. Anyway in a future, a ZMQ channel can be added to transfer them also. But be aware that it's difficult to get both mempools to be the same if there are conflicting txs with children. etc... among them (which is the normal thing by the way)QuoteHow does it handle a block being found while it's running? The program retransmit a snapshot of a mempool. If a block arrives while running, the evicted txs wont be retransmitted or accepted by the nodes.QuoteAny logic to check if to see if one node has more transactions then the other? Yes, there is a summary at the beginning and at the end of the execution. But again, be aware it's almost impossible to get both mempools the same.QuoteI have 4 nodes running on RPi and they are all dealing with the current bloated pool just fine with the stock setting but was thinking of increasing it to some stupid large size wonder if this would help by just bloating one and copying it to the others or will it not really matter. It helps in the sense that you can shutdown one node, increase it's limits, reboot it again, and make a transfer of txs from another node to the rebooted one. The majority of the txs will be reloaded through mempool.dat file, but the program can transfer the txs that were lost while configuring the node. If any of those tx conflicts with mempool they will be rejected by the node.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "February 14, 2023, 12:29:09 PM",
+      "body": "This is cool tool, even though i don't really need it. Does your tool consider or check custom configuration of specific node (e.g. lower minrelayfee value or higher mempool memory size)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JRamos",
+      "created_time": "February 14, 2023, 03:14:44 PM",
+      "body": "QuoteThis is cool tool, even though i don't really need it. Does your tool consider or check custom configuration of specific node (e.g. lower minrelayfee value or higher mempool memory size)?No, it only copies what it's inside a mempool into the other.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

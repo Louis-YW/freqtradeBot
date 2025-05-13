@@ -1,0 +1,61 @@
+{
+  "id": "topic_5410851",
+  "title": "seoincorporation",
+  "author": "seoincorporation",
+  "created_time": "August 22, 2022, 08:13:39 PMLast edit: August 23, 2022, 04:44:46 PM by seoincorporation",
+  "content": "Hello guys. I have been reading and learning a lot about Bitcoin address, but i get stuck when i try to create a Bech32 address from the Public Key Hash (Hash 160) of my Base58 address.Technical Discussion:Getting the public hash from my Base58 address:Code:>>> import binascii, hashlib, base58>>> hash160 = binascii.hexlify(base58.b58decode_check(b'1BtcBoSSnqe8mFJCUEyCNmo3EcF8Yzhpnc')).decode()[2:]>>> hash160'7773d807892cb200e6a4785428294452c9e3b4b9'Now, getting my public hash from my Bech32 address:Code:>>> import bech32>>> hash1 = bech32.decode(\"bc\", \"bc1qwaeaspuf9jeqpe4y0p2zs22y2ty78d9e6nvjgf\")>>> hash1(0, [119, 115, 216, 7, 137, 44, 178, 0, 230, 164, 120, 84, 40, 41, 68, 82, 201, 227, 180, 185])>>> hash2 = bytes(hash1[1])>>> hash2b'ws\\xd8\\x07\\x89,\\xb2\\x00\\xe6\\xa4xT()DR\\xc9\\xe3\\xb4\\xb9'>>> hash2.hex()'7773d807892cb200e6a4785428294452c9e3b4b9'Now, the problem is that i can't find the way to generate the address starting from the Script Hash for Bech32 address. I know there is a bech32.encode command, but i wasn't able to make it work and there is not much information about it. This process is simple for Base58:Code:>>> base58.b58encode_check(binascii.unhexlify('00'+\"7773d807892cb200e6a4785428294452c9e3b4b9\")).decode()'1BtcBoSSnqe8mFJCUEyCNmo3EcF8Yzhpnc'But how can i do that for Bench32?----------------UPDATE----------------I found the way, thanks for the support guys.Code:>>> import bech32>>> witprog = bytes.fromhex('7773d807892cb200e6a4785428294452c9e3b4b9')>>> witver = 0x00>>> hrp = 'bc'>>> address = bech32.encode(hrp, witver, witprog)>>> print(address)bc1qwaeaspuf9jeqpe4y0p2zs22y2ty78d9e6nvjgf",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5410851",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "August 22, 2022, 11:59:06 PM",
+      "body": "It is not possible to go from script hash to witness public key has (wpkh). Scripts and pubkeys are different things.However I don't think that's what you are trying to do. What do you mean by \"script hash\" in this case?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "August 23, 2022, 01:08:35 AM",
+      "body": "Quote from: achow101 on August 22, 2022, 11:59:06 PMIt is not possible to go from script hash to witness public key has (wpkh). Scripts and pubkeys are different things.However I don't think that's what you are trying to do. What do you mean by \"script hash\" in this case?I just edit the tittle achow101, you was right \"script hash\" wasn't clear, the right term is Public Key Hash (Hash 160).What i mean, if we go to this site, we can see the publick key hash of any address:https://privatekeys.pw/address/bitcoin/1BtcBoSSnqe8mFJCUEyCNmo3EcF8YzhpncAnd we can use python to get that publick key hash and i explain in the first post.The way to get the Base58 (P2PKH) from the Public Key Hash (Hash 160) simple, for example:Code:>>>base58.b58encode_check(binascii.unhexlify('00'+\"7773d807892cb200e6a4785428294452c9e3b4b9\")).decode()'1BtcBoSSnqe8mFJCUEyCNmo3EcF8Yzhpnc'I'm looking for a python way to get the  P2WPKH(Bech32) address from the Public Key Hash (Hash 160).I know with that same Public Key Hash (Hash 160): 7773d807892cb200e6a4785428294452c9e3b4b9 we have this P2WPKH address:bc1qwaeaspuf9jeqpe4y0p2zs22y2ty78d9e6nvjgf... And that's what i want to get with python.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 23, 2022, 03:56:24 AM",
+      "body": "It's pretty much the same, you have to find a python bech32 library and then call its bech32_encode method instead of the b58encode_check method and pass 3 things to that method: hrp (=bc for mainnet), witness version (=0 for P2WPKH) and the 160 bit hash (no prepended 0x00 though).This is how Electrum does it and you can use this code since it is tested and safe: https://github.com/spesmilo/electrum/blob/6650e6bbae12a79e12667857ee039f1b1f30c7e3/electrum/segwit_addr.py#L82",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 23, 2022, 11:33:00 AM",
+      "body": "So, we have this Public Key Hash:Code:7773D807892CB200E6A4785428294452C9E3B4B9And we want to make it a Witness Public Key Hash. Bech32 encoding converts this to a 5-bit unsigned int array:Code:0E1D191D10011C0905121900011915040F010A02100A0A040A0B041E070D0519To do this, I wrote some code, just for exercise. It's in C#:Code:public string squashBits(string scriptHash) {  string bits = hex2binary(scriptHash);  int n = 5;  string splitString = string.Join(string.Empty, bits.Select((x, i) => i > 0 && i % n == 0 ? string.Format(\" {0}\", x) : x.ToString()));  string[] arr = splitString.Split(' ');  string squashed = \"\";  for (int i = 0; i < arr.Length; i++) {    if (HexConverted(arr[i]).Length == 1) {      squashed += \"0\" + HexConverted(arr[i]);    } else {      squashed += HexConverted(arr[i]);    }  }  return squashed;}// copied from stackoverflow:public static string hex2binary(string hexvalue) {  return String.Join(String.Empty, hexvalue.Select(c => Convert.ToString(Convert.ToUInt32(c.ToString(), 16), 2).PadLeft(4, '0')));}string HexConverted(string strBinary) {  string strHex = Convert.ToInt32(strBinary, 2).ToString(\"X\");  return strHex;}To explain the above, your 160 bits script hash is an 4-bit array of unsigned integers. Code:0111 0111 0111 0011 1101 1000 0000 0111 1000 1001 0010 1100 1011 0010 0000 0000 1110 0110 1010 0100 0111 1000 0101 0100 0010 1000 0010 1001 0100 0100 0101 0010 1100 1001 1110 0011 1011 0100 1011 10017    7    7    3    D    8    0    7    8    9    2    C    B    2    0    0    E    6    A    4    7    8    5    4    2    8    2    9    4    4    5    2    C    9    E    3    B    4    B    9To convert it to an array of 5-bit integers, you need to \"squash\" the bits, like that:Code:01110 11101 11001 11101 10000 00001 11100 01001 00101 10010 11001 00000 00001 11001 10101 00100 01111 00001 01010 00010 10000 01010 01010 00100 01010 01011 00100 11110 00111 01101 00101 110010E    1D    19    1D    10    01    1C    09    05    12    19    00    01    19    15    04    0F    01    0A    02    10    0A    0A    04    0A    0B    04    1E    07    0D    05    19Resulting in \"0E1D191D10011C0905121900011915040F010A02100A0A040A0B041E070D0519\". To continue further, you need to add the witness byte in front (0x00):Code:000E1D191D10011C0905121900011915040F010A02100A0A040A0B041E070D0519And compute the checksum of the above, which is specified here: https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki. Besides Electrum, it's also written in Python by Pieter Wuille: https://github.com/sipa/bech32/blob/master/ref/python/segwit_addr.py. Later, it's a matter of bech32 encoding.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "August 23, 2022, 01:26:13 PM",
+      "body": "Quote from: seoincorporation on August 22, 2022, 08:13:39 PMHello guys. I have beer reading and learning a lot about Bitcoin addressDo not drink when you code  But I understand you were looking for Ballmer peak: https://xkcd.com/323/Quote from: seoincorporation on August 22, 2022, 08:13:39 PMNow, the problem is that i can't find the way to generate the address starting from the Script Hash for Bech32 address. I know there is a bech32.encode command, but i wasn't able to make it work and there is not much information about it. Which library do you use? Have you seen that example? https://github.com/bitcoinjs/bech32You may test encoding/decoding live here: https://slowli.github.io/bech32-buffer/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "August 23, 2022, 02:49:27 PM",
+      "body": "Thanks for your replies guys and sorry for that beer typo  Yesterday i find this example of encode:https://bitcoin.stackexchange.com/questions/91748/how-to-use-python-reference-for-encoding-a-bech32-addressCode:import bech32import binasciispk = binascii.unhexlify('0014751e76e8199196d454941c45d1b3a323f1433bd6')version = spk[0] - 0x50 if spk[0] else 0program = spk[2:]print(bech32.encode('bc', version, program))But sadly it prints and error if i try with my Hash160... And is fun to see how there is only one example of that encode command. And after following the white rabbit i found this book:https://books.google.com.mx/books?id=_H52EAAAQBAJ&pg=PT403#v=onepage&q&f=falseAnd when it try with the book example, it worked fine.. here is the code:Code:>>> import bech32>>> witprog = bytes.fromhex('7773d807892cb200e6a4785428294452c9e3b4b9')>>> witver = 0x00>>> hrp = 'bc'>>> address = bech32.encode(hrp, witver, witprog)>>> print(address)bc1qwaeaspuf9jeqpe4y0p2zs22y2ty78d9e6nvjgf",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

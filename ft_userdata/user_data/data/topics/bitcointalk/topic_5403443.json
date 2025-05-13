@@ -1,0 +1,93 @@
+{
+  "id": "topic_5403443",
+  "title": "PawGo",
+  "author": "PawGo",
+  "created_time": "June 21, 2022, 07:39:43 AM",
+  "content": "Hello,My question is maybe similar to that topic [https://bitcointalk.org/index.php?topic=5403115.0], but I prefer to ask separately.We know that typical legacy address is made from pubkey -> sha256 -> ripemd160. On the other hand, ETH address is made from pubkey -> keccak -> \"ending\".Now, if someone created a bitcoin address based on keccak, is it possible to spend from that address?We have private key, we have pub key, we know how address was generated based on that data - but I assume there is no way to create a transaction if it was not a op_hash160, right?Pubkey:Code:7742f3eaa9307dfee8e8014dd6dc31c39c9dc9a779a611cbd0d3aa04fa0ddc0f607a1cd271d23b310f307862a78810e4c1639914522a987b878f2f88dfd073f7keccak256 (pubkey)Code:1afd36967111a4912770ff7600c40fe2095423509b9fd9b754323158af2310f3let's take \"00c40fe2095423509b9fd9b754323158af2310f3\" as a pubkey hash (like it would be hash160), it gives us address [1153sdWpXn3yaFHnQKJYwdRiwhFwVcisAg].Coincidence? Someone's mistake? Just a test?It would be interesting to know if we may create addresses using \"custom\" hash methods.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403443",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "June 21, 2022, 07:48:22 AM",
+      "body": "Quote from: PawGo on June 21, 2022, 07:39:43 AMNow, if someone created a bitcoin address based on keccak, is it possible to spend from that address?It's impossible, because you'd need to sign from a completely bitcoin private key correspoinding to an address which happens to be the keccak hash + ending of the address you're spending from. It is highly unlikely that such an address even exists, let alone can be found.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "June 21, 2022, 08:15:11 AM",
+      "body": "Quote from: NotATether on June 21, 2022, 07:48:22 AMQuote from: PawGo on June 21, 2022, 07:39:43 AMNow, if someone created a bitcoin address based on keccak, is it possible to spend from that address?It's impossible, because you'd need to sign from a completely bitcoin private key correspoinding to an address which happens to be the keccak hash + ending of the address you're spending from. It is highly unlikely that such an address even exists, let alone can be found.It means it turns to be \"burn address\". As I understand, correct me if I am wrong, the only correct \"transformations\" are: OP_RIPEMD160 OP_SHA1 OP_SHA256   OP_HASH160 OP_HASH256",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 21, 2022, 09:17:20 AM",
+      "body": "Quote from: NotATether on June 21, 2022, 07:48:22 AMIt's impossible, because you'd need to sign from a completely bitcoin private key correspoinding to an address which happens to be the keccak hash + ending of the address you're spending from. It is highly unlikely that such an address even exists, let alone can be found.Unlikely yes, but not impossible.Although the address was obviously generated in a non-standard way, it is locked with the following script:Code:OP_DUP OP_HASH160 00c40fe2095423509b9fd9b754323158af2310f3 OP_EQUALVERIFY OP_CHECKSIGIf you can find a private key which outputs 00c40fe2095423509b9fd9b754323158af2310f3 from the function RIPEMD160(SHA256(pubkey)), then you will be able to unlock that script and spend those coins. It is incredibly unlikely anyone knows or will ever know such an address, but it is not impossible nor provably unspendable.Worth noting that the private key which generated the address in this instance is useless to us. You would essentially just need to brute force a collision.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 21, 2022, 10:52:01 AM",
+      "body": "Quote from: PawGo on June 21, 2022, 07:39:43 AMbut I assume there is no way to create a transaction if it was not a op_hash160, right?It doesn't have to be OP_HASH160 but it has to be an existing OP like OP_HASH256. Since we don't have OP_KECCAK then it is not possible to spend the output that uses a keccak hash of the public key under normal circumstances (ie. no collision!).QuoteCoincidence? Someone's mistake? Just a test?It would be interesting to know if we may create addresses using \"custom\" hash methods.Possibly a test using the same hash without having the corresponding pubkey.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cookdata",
+      "created_time": "June 21, 2022, 12:07:35 PM",
+      "body": "Quote from: pooya87 on June 21, 2022, 10:52:01 AMQuote from: PawGo on June 21, 2022, 07:39:43 AMbut I assume there is no way to create a transaction if it was not a op_hash160, right?It doesn't have to be OP_HASH160 but it has to be an existing OP like OP_HASH256. Since we don't have OP_KECCAK then it is not possible to spend the output that uses a keccak hash of the public key under normal circumstances (ie. no collision!).I agree with this and I think no nodes will validate such a transaction nor relay it to any other nodes.Op_hash160 is 20 bytes while keccak256 is having an output of 256 bits or 32 bytes hexadecimal, so wouldn't that make a difference of 10 bytes, if otherwise do correct me.It wouldn't be possible with that kind of assumption and to use it on scriptpubkey, definitely nodes will reject such kind of transactions since they do not align on bitcoin protocol level.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 21, 2022, 12:15:06 PM",
+      "body": "Quote from: Cookdata on June 21, 2022, 12:07:35 PMkeccak256 is having an output of 256 bits or 32 bytes hexadecimal, so wouldn't that make a difference of 10 bytes, if otherwise do correct me.Keccak256 digest is 256 bit but the ethereum addresses are truncating it to get a smaller 20-byte hash discarding the remaining 12 bytes.Quote from: Cookdata on June 21, 2022, 12:07:35 PMIt wouldn't be possible with that kind of assumption and to use it on scriptpubkey, definitely nodes will reject such kind of transactions since they do not align on bitcoin protocol level.If by \"protocol\" you mean the consensus rules, it does not even look at your outputs, they can contain arbitrary script that is not even valid. But if by protocol you mean the standard rule, it is rejected since we don't have the OP not because of the size since we have similar outputs that contain 256-bit data like P2WSH.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 21, 2022, 12:45:30 PM",
+      "body": "Quote from: PawGo on June 21, 2022, 07:39:43 AMlet's take \"00c40fe2095423509b9fd9b754323158af2310f3\" as a pubkey hash (like it would be hash160), it gives us address [1153sdWpXn3yaFHnQKJYwdRiwhFwVcisAg].Coincidence? Someone's mistake? Just a test?Interestingly, someone created Bitcoin addresses from Ethereum's genesis block's addresses (used as the HASH160) and sent bitcoins to them.Your example: 0x00c40fe2095423509b9fd9b754323158af2310f3 is among that list: [1] https://etherscan.io/txs?block=0&ps=100&p=1[2] https://etherscan.io/txs?a=0x00c40fe2095423509b9fd9b754323158af2310f3&f=3The first and second address from [1] have bitcoins as well:756f45e3fa69347a9a973a725e3c98bc4db0b5a0 = 1BhwMq3qNfEg519C67snYZEaUWzsR9yir8f42f905231c770f0a406f2b768877fb49eee0f21 = 1PG8rbTtauZGWzUU68hEvLYs2gPJ9QivCLI haven't tested the third and the rest.Definitely not a coincidence.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "June 21, 2022, 12:50:02 PM",
+      "body": "Quote from: nc50lc on June 21, 2022, 12:45:30 PMI haven't tested the third and the rest.Definitely not a coincidence.There are also (all are keccak brainwallets):252487948306535425542fcfe52008d32d1fd9fb = 14PPmDjSzSH7icYR9huTHagPZKqZpXYq858be04dc936399922efb111d6059383b31e09d43b = 1Dkbda1xw9Ww2FgQPsugzwKHahkfBDw1ARcd2a3d9f938e13cd947ec05abc7fe734df8dd826 = 1Khp8GBC3oPYxqBCmCzrQ3sdf9Gs5XRkZtf46b6b9c7cb552829c1d3dfd8ffb11aabae782f6 = 1PHNZWDvrPM2cpQphkSmVeTh74P9v6tJRK",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cookdata",
+      "created_time": "June 21, 2022, 12:58:02 PMLast edit: June 21, 2022, 09:01:44 PM by Cookdata",
+      "body": "Quote from: pooya87 on June 21, 2022, 12:15:06 PMQuote from: Cookdata on June 21, 2022, 12:07:35 PMkeccak256 is having an output of 256 bits or 32 bytes hexadecimal, so wouldn't that make a difference of 10 bytes, if otherwise do correct me.Keccak256 digest is 256 bit but the ethereum addresses are truncating it to get a smaller 20-byte hash discarding the remaining 12 bytes.Quote from: Cookdata on June 21, 2022, 12:07:35 PMIt wouldn't be possible with that kind of assumption and to use it on scriptpubkey, definitely nodes will reject such kind of transactions since they do not align on bitcoin protocol level.If by \"protocol\" you mean the consensus rules, it does not even look at your outputs, they can contain arbitrary script that is not even valid. But if by protocol you mean the standard rule, it is rejected since we don't have the OP not because of the size since we have similar outputs that contain 256-bit data like P2WSH.Oops, sorry for the simple math up there, it's 12 bytes actually but glad you cleared it up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "June 25, 2022, 09:53:48 PM",
+      "body": "Quote from: PawGo on June 21, 2022, 07:39:43 AMWe know that typical legacy address is made from pubkey -> sha256 -> ripemd160. On the other hand, ETH address is made from pubkey -> keccak -> \"ending\".Now, if someone created a bitcoin address based on keccak, is it possible to spend from that address?I'm going to say NO, but for a different reason than everyone else.A legacy pubKeyHash is derived from \"pubkey -> sha256 -> ripemd160\" and the locking script is OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG. OP_HASH160 does the \"pubkey -> sha256 -> ripemd160\".Now, if you want to use a bitcoin address based on keccak, you would use a locking script that looks something like this: OP_DUP <keccak hash script> <pubKeyKeccakHash> OP_EQUALVERIFY OP_CHECKSIG, where <keccak hash script> implements the Keccak hash algorithm.Unfortunately, the Keccak hash algorithm probably cannot be implemented in Bitcoin's scripting language, I believe, simply due to a lack of the necessary of operators.Somebody correct me if I am wrong.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

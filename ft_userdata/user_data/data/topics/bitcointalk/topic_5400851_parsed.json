@@ -1,0 +1,165 @@
+{
+  "id": "topic_5400851",
+  "title": "nullama",
+  "author": "nullama",
+  "created_time": "May 31, 2022, 10:35:36 AM",
+  "content": "I found an interesting project about creating your own ASIC using two BM1387 chips. The cool thing about it is that it's all open source: KiCad design files, BoM, software, etc. Basically an Open Hardware project.Github with sources here: https://github.com/skot/bitaxeHere's a reddit discussion about it: https://www.reddit.com/r/BitcoinMining/comments/uymwj3/experimental_bm1387_bitcoin_mining_machineIt's not finished yet, but it's something interesting to have a look if you're planning to make your own ASIC miner, or you want to help create an Open Source one.Also, the person who created this is now looking to make it work with cgminer:Quote from: https://www.reddit.com/r/BitcoinMining/comments/uymwj3/experimental_bm1387_bitcoin_mining_machine/iabkvg2/I’ll see if I can get the cgminer modified for the newpac to talk to the bitaxeThis would be great to tinker with, specially with cgminer.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5400851",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "May 31, 2022, 11:04:34 AM",
+      "body": "It's DIY so I'm not expecting it to be particularly fast, but do you have any hashrate figures on these self-built stuff?I'd be content if it can pump a few hundred GHash/s. It's ASIC tech after all, even USB miners with small chips can output such speeds.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "May 31, 2022, 12:09:02 PM",
+      "body": "Quote from: NotATether on May 31, 2022, 11:04:34 AMIt's DIY so I'm not expecting it to be particularly fast, but do you have any hashrate figures on these self-built stuff?I'd be content if it can pump a few hundred GHash/s. It's ASIC tech after all, even USB miners with small chips can output such speeds.Note that it's still not working properly, but based on the design, it should be able to hash around 130GH/s, which would make it similar to the NewPac USB miners, which also used a dual BM1387 setup for the hashing chips.I wonder if it's rather simple to update this design to use newer ASICs like the BM1397 like the ones used in the Compac F, or if that would require a completely new design of the board.Also the new ASICs from Intel should arrive later this year, that could potentially be a winner for DIY ASICs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "June 11, 2022, 06:29:11 AM",
+      "body": "hi nullama!I saw your reply over on reddit. I'm not sure why r/BitcoinMining is deleting legit posts -- that's pretty annoying.I was banging my head the last few days as to why the bitaxe was only working erratically. I finally got it under the microscope and discovered that the pin pitch on the PCB footprint I had made was 0.03mm off from the actual chip. Doesn't sound like much, but it really looks like a few of the BM1387 pins were not making contact. I have fixed this, updated the GitHub repo and ordered some new PCBs to give it a try. I think it would be amazing to make this work with the BM1397! It looks like the BM1387 and the BM1397 have the same chip package size and pin configuration. Does anyone know if the BM1387 and the BM1397 pinout is the same?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sidehack",
+      "created_time": "June 11, 2022, 03:05:58 PM",
+      "body": "Yeah that ~0.475mm pin pitch instead of the 0.5mm is a bit of a killer. Also no, while the footprint between BM1387 and BM1397 are the same, the pinouts are drastically different. BM1391 (S15), 1396 (*17e series) and 1397 (*17 proper) are pretty similar, and then changes were made again for 1398 (S19) to reflect a change in internal architecture but keeping most of the handy features.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "June 11, 2022, 10:24:21 PM",
+      "body": "Quote from: sidehack on June 11, 2022, 03:05:58 PMYeah that ~0.475mm pin pitch instead of the 0.5mm is a bit of a killer. Also no, while the footprint between BM1387 and BM1397 are the same, the pinouts are drastically different. BM1391 (S15), 1396 (*17e series) and 1397 (*17 proper) are pretty similar, and then changes were made again for 1398 (S19) to reflect a change in internal architecture but keeping most of the handy features.That's so crazy. I carefully measured it, and then just assumed I was off and it was really 0.45mm. oops! I've ordered a v2 PCB with the footprint changed to 0.48mm -- hopefully that works. It's also a tricky DFN package because the pins don't extend all the way to the side, so you can't see if it's soldered correctly.I don't suppose you have a pinout for the BM1397? Has anyone made one of those poorly translated \"repair guides\" for the S17?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sidehack",
+      "created_time": "June 11, 2022, 11:10:28 PM",
+      "body": "Yeah that slight pitch difference messed up early testing before we rolled out the NewPac too. Everything about that footprint makes soldering difficult. Went through three stencil aperture variants before we landed on something that would reliably deposit enough solder on the ridiculously tiny pads without putting so much on the belly pads that it would lift slightly and cause disconnects.I do have quite a bit of data on the BM1397, and you're gonna hate me for this but I'm not gonna post it, seeing as several people are currently relying on GekkoScience miner sales for income and that's the chip we're working with right now. An S17 repair guide is a good place to start though.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "June 12, 2022, 04:28:46 AM",
+      "body": "Quote from: sidehack on June 11, 2022, 11:10:28 PMI do have quite a bit of data on the BM1397, and you're gonna hate me for this but I'm not gonna post it, seeing as several people are currently relying on GekkoScience miner sales for income and that's the chip we're working with right now. An S17 repair guide is a good place to start though.No worries! Thanks for your help so far. The Compac F looks really sweet, BTW. I can't help but notice there are a lot of them for sale on eBay for $300+ in essentially unopened packaging... That's the same price a 13.5TH Antminer S9 goes for. People are craving this home bitcoin mining experience.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "norfolkenchants",
+      "created_time": "June 15, 2022, 01:51:40 PM",
+      "body": "There are some bargains on ebay! Somebody just got 2 x R606 pods, 13 x Newpacs 3 x GS Hubs 3 x PI4 a server PSU and a shed load of quality cooling for under £1000",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "June 16, 2022, 05:03:26 PM",
+      "body": "Quote from: norfolkenchants on June 15, 2022, 01:51:40 PMThere are some bargains on ebay! Somebody just got 2 x R606 pods, 13 x Newpacs 3 x GS Hubs 3 x PI4 a server PSU and a shed load of quality cooling for under £1000I’m glad to see the miner pricing falling a bit! Hopefully that will get this scalping that has been happening under control..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "June 16, 2022, 08:11:40 PM",
+      "body": "The bitaxe v2 PCBs with the (hopefully) correct footprint for the BM1387 are supposed to arrive next week. I'm really excited to try this!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "June 27, 2022, 11:31:00 PM",
+      "body": "I found the S17 repair guide that sidehack mentioned. I've put together a BM1397 version of the bitaxe -- the bitaxeMAX?? naming things is hard. Check it out and let me know what you think; https://github.com/skot/bitaxe/tree/proI haven't gotten PCBs back to test yet, so be careful!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "June 28, 2022, 01:21:50 AM",
+      "body": "Quote from: Skot on June 27, 2022, 11:31:00 PMI found the S17 repair guide that sidehack mentioned. I've put together a BM1397 version of the bitaxe -- the bitaxeMAX?? naming things is hard. Check it out and let me know what you think; https://github.com/skot/bitaxe/tree/proI haven't gotten PCBs back to test yet, so be careful!That looks very interesting, thanks for updating!Why are you using a single BM1397 instead of two like the previous BM1387?It would be great to have a dual BM1397 miner.Did you manage to make it work?Quote from: https://github.com/skot/bitaxe/tree/proI added a NCT218 so that the BM1397 core temperature can be read out over I2CHaving temperature readings is a game changer with these little miners. Great job!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "June 28, 2022, 04:28:28 AM",
+      "body": "I think a double, or even a triple BM1397 miner would be sweet! I’ll give it a try once I verify that the single works.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "June 28, 2022, 02:40:48 PM",
+      "body": "Quote from: Skot on June 28, 2022, 04:28:28 AMI think a double, or even a triple BM1397 miner would be sweet! I’ll give it a try once I verify that the single works.If you still are only using the USB connection for supplying power yer gonna have problems as the connectors simply cannot handle enough current to power the chips. The absolute max current rating for USB-A connectors is 3.1A and even that is intended to only be for a short time - not 24x7.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "June 28, 2022, 05:07:35 PM",
+      "body": "Quote from: NotFuzzyWarm on June 28, 2022, 02:40:48 PMQuote from: Skot on June 28, 2022, 04:28:28 AMI think a double, or even a triple BM1397 miner would be sweet! I’ll give it a try once I verify that the single works.If you still are only using the USB connection for supplying power yer gonna have problems as the connectors simply cannot handle enough current to power the chips. The absolute max current rating for USB-A connectors is 3.1A and even that is intended to only be for a short time - not 24x7.I've mentioned this in another thread here some time ago, but given this is a new hardware project from scratch it might be worthwhile repeating it here.It would be interesting to use a USB-C connector for the miner. This would allow a lot more power to be delivered, using the standards, and not relying on non-standard power delivery like the current generation of USB miners.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sidehack",
+      "created_time": "June 28, 2022, 07:10:48 PM",
+      "body": "And I'll follow up with that just using a USB-C connector won't do anything without USB-PD logic and additional DC-DC hardware; \"using the standards\" is much easier said than done.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "June 29, 2022, 01:20:19 AM",
+      "body": "Quote from: sidehack on June 28, 2022, 07:10:48 PMAnd I'll follow up with that just using a USB-C connector won't do anything without USB-PD logic and additional DC-DC hardware; \"using the standards\" is much easier said than done.There are some chipsets that might make this a bit easier.For example from Texas Instrument: https://www.ti.com/interface/usb/type-c-and-power-delivery/overview.htmlYou could get 3A@5V (15W) without dealing with power delivery.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sidehack",
+      "created_time": "June 29, 2022, 02:32:15 PM",
+      "body": "Might look into that. But 3A@5V isn't enough to make more than one BM1397 worth it. Those chips will absolutely eat power.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Skot",
+      "created_time": "June 29, 2022, 07:43:18 PM",
+      "body": "Quote from: Skot on June 16, 2022, 08:11:40 PMThe bitaxe v2 PCBs with the (hopefully) correct footprint for the BM1387 are supposed to arrive next week. I'm really excited to try this!I finally got the PCBs back from the fab and got a chance to build them up yesterday. It looks like the new footprint is good! The BM1387's are mining nicely..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

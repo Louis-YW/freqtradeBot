@@ -1,0 +1,165 @@
+{
+  "id": "topic_5414874",
+  "title": "BitcoinCanSaveUsAll",
+  "author": "BitcoinCanSaveUsAll",
+  "created_time": "September 25, 2022, 08:55:24 PM",
+  "content": "Hello all, I was hoping someone can help me identify the best way for identifying what the correct checksum would be in a bip 39 seed list when I've generated 11/12 words. Thanks in advance for your support!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5414874",
+  "comments": [
+    {
+      "author": "hosemary",
+      "created_time": "September 25, 2022, 09:09:20 PMLast edit: September 26, 2022, 11:22:30 AM by hosseinimr93",
+      "body": "You have 11 words and you want to select the 12th word, so the BIP39 seed phrase passes the checksum. Am I right?If I have understood you correctly, first of all note that that's not how a BIP39 seed phrase is generated. It's not that 11 words are generated and then the 12th word is selected. Instead you generate a random number and your seed phrase represents that number. Your seed phrase provides 128 bits of entropy and 4 bits are added as the checksum. Anyway, if you have the first 11 words and you want to have valid BIP39 seed phrase, there are 8 words that can be used as the 12th word. To find that word, you should use brute-force method. This means that you should test all the 2048 words one by one. The post has been edited. Thanks  o_e_l_e_o for the correction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "September 25, 2022, 09:14:45 PM",
+      "body": "Thank you for the reply. Just to clarify what I'm attempting to do is trying to generate my own offline bip39 seeds. Specifically I'm interested in generating a 12 word seed but my understanding is that the 12 word would be a checksum and therefore I would need to to be able to figure out a way to easily identify the viable checksum options which is what I'm attempting to do here. Thank you very much for your assistance",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 25, 2022, 09:21:34 PMLast edit: September 26, 2022, 11:22:47 AM by hosseinimr93",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 25, 2022, 09:14:45 PMSpecifically I'm interested in generating a 12 word seed but my understanding is that the 12 word would be a checksum.........This is not true.The checksum isn't the last word. The checksum is the last 4 bits. Each of words include 11 bits. The first 7 bits of the last word have been generated randomly and its last 4 bits are the checksum.So, if you have 11 word, for selecting the 12th word, you have to test different words until you find a valid word. As I already said in my previous post, 128 out of the 2048 words will lead to valid BIP39 seed phrase.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "September 25, 2022, 09:28:52 PM",
+      "body": "Maybe if I try to clarify a little bit further as far as to what I'm trying to do exactly it might be able to give us a better picture of whether it's feasible or not. Specifically what I'm trying to do is print out a list of the 2048 bip39 words and randomly select 12 to create my own offline generated seed. Can this be feasibly done? I'm trying to ensure true ravdsomness in seed creation and this seems to be the only way I can come up with outside of being able to independently verify the code from wallet manufacturers etc. Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 25, 2022, 09:41:12 PM",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 25, 2022, 09:28:52 PMMaybe if I try to clarify a little bit further as far as to what I'm trying to do exactly it might be able to give us a better picture of whether it's feasible or not. I fully understand what you are trying to achieve. Quote from: BitcoinCanSaveUsAll on September 25, 2022, 09:28:52 PMSpecifically what I'm trying to do is print out a list of the 2048 bip39 words and randomly select 12 to create my own offline generated seed. Can this be feasibly done? If you select 12 words, there's a big probability that your seed phrase doesn't pass the checksum.Instead, you can select 11 words and then try to find a word which lead to a valid BIP39 seed phrase. By valid, I mean it passes the checksumThis is completely feasible, but it's not a common method for generating a seed phrase. If you insist on generating your seed phrase in this way, you should make sure that the words are picked 100% random.For generating a BIP39 seed phrase, I would start with a random 128 bit entropy instead of directly going to the word list.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "September 25, 2022, 09:55:58 PMLast edit: September 25, 2022, 10:13:00 PM by odolvlobo",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 25, 2022, 09:28:52 PMSpecifically what I'm trying to do is print out a list of the 2048 bip39 words and randomly select 12 to create my own offline generated seed.The right way to do it is to follow BIP-39:1. Generate 128 random bits.2. Compute the SHA-256 hash of the 128 bits.3. Append the first 4 bits of the hash to the 128 bits, giving you 132 bits.4. Split the 132 bits into 12 11-bit values.5. Generate the phrase by using the 11-bit values as indexes into the list of 2048 words.However, there is another way similar to what you want to do, but the result may be less secure depending on how random your input is:1. Select 11 words from the word list. Duplicates are acceptable.2. Concatenate the indexes into a 121 bit string.3. Add another 7 bits, random, 0, or whatever.4. Compute the SHA-256 hash of the 128 bits.5. Append the first 4 bits of the hash to the 7 bits, giving you the index of the 12th word.Finally, here is minor variation of the previous method. Again, the security depends on how the words are chosen:1. Select 11 words from the word list. Duplicates are acceptable.2. Determine the 128 words that would be valid as the 12th word.3. Choose one.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "September 25, 2022, 10:19:24 PM",
+      "body": "Excellent reply!  I do have a few questions for you though:1) How does one identify the corresponding bit pattern from the BIP 39 word list?  Is it as simple as finding out full BIP 39 word list and then the patterns are in alphabetical order? For example would I be correct to assume that the first word alphabetically on the BIP 39 list is abandon and so the 11 bit pattern would be 00000000001 whereas the second word alphabetically is ability which should correlate to 00000000010 ?).  2) Do you know an easy way to identify the SHA 256 hash of a 128 bit stream offline in a widows PC or an android device?Thanks you very much for the excellent reply!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 25, 2022, 10:42:08 PM",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 25, 2022, 10:19:24 PM1) How does one identify the corresponding bit pattern from the BIP 39 word list?  Is it as simple as finding out full BIP 39 word list and then the patterns are in alphabetical order? For example would I be correct to assume that the first word alphabetically on the BIP 39 list is abandon and so the 11 bit pattern would be 00000000001 whereas the second word alphabetically is ability which should correlate to 00000000010 ?).  Yes. Just take note that the first word (abandon) represents 00000000000 and the second word (ability) represents 00000000001.Quote from: BitcoinCanSaveUsAll on September 25, 2022, 10:19:24 PM2) Do you know an easy way to identify the SHA 256 hash of a 128 bit stream offline in a widows PC or an android device?If you are familiar with python programming, you can use hashlib library.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "September 26, 2022, 10:13:14 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 25, 2022, 10:19:24 PM1) How does one identify the corresponding bit pattern from the BIP 39 word list?  Is it as simple as finding out full BIP 39 word list and then the patterns are in alphabetical order? For example would I be correct to assume that the first word alphabetically on the BIP 39 list is abandon and so the 11 bit pattern would be 00000000001 whereas the second word alphabetically is ability which should correlate to 00000000010 ?).  The words in the BIP-39 word lists are in a specific order, but I wouldn't depend on them being in alphabetical order. And, as hosseinimr93 pointed out, the first word is 0. Here are the \"official\" lists: BIP 39 Word ListsQuote from: BitcoinCanSaveUsAll on September 25, 2022, 10:19:24 PM2) Do you know an easy way to identify the SHA 256 hash of a 128 bit stream offline in a widows PC or an android device?Most languages have cryptography libraries on Windows and Android that include a variety of hash calculations. Windows has the CertUtil command, if that is what you are looking for.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 26, 2022, 11:10:36 AM",
+      "body": "Quote from: hosseinimr93 on September 25, 2022, 09:09:20 PMAnyway, if you have the first 11 words and you want to have valid BIP39 seed phrase, there are 8 words that can be used as the 12th word.There are (on average) 128 words which will be a valid checksum for a 12 word seed phrase. It is 8 words (on average) for 24 word seed phrases.Quote from: BitcoinCanSaveUsAll on September 25, 2022, 09:28:52 PMSpecifically what I'm trying to do is print out a list of the 2048 bip39 words and randomly select 12 to create my own offline generated seed.Don't do this! It is an incredibly insecure method of generating a seed phrase. You will not and can not choose words randomly, despite your best efforts. Humans are not random. Whatever seed phrase you end up with at the end of this process will not represent 128 bits of entropy.Quote from: BitcoinCanSaveUsAll on September 25, 2022, 09:28:52 PMI'm trying to ensure true ravdsomness in seed creation and this seems to be the only way I can come up with outside of being able to independently verify the code from wallet manufacturers etc.Do not select words. Instead, flip a fair coin 128 times to create your entropy, calculate and append the 4 bit checksum, and then encode that 132 bit number in to the corresponding words. For each 11 bit section you will need to convert to decimal and then add 1 before looking up the word on the BIP39 word list.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 26, 2022, 12:08:03 PMLast edit: September 26, 2022, 12:32:48 PM by hosseinimr93",
+      "body": "Quote from: o_e_l_e_o on September 26, 2022, 11:10:36 AMThere are (on average) 128 words which will be a valid checksum for a 12 word seed phrase. It is 8 words (on average) for 24 word seed phrases.Thanks for the correction. I edited that post. But isn't that exactly 128 words for the 12 word seed phrase and exactly 8 words for the 24 word seed phrase?Let's say I have the first 11 words of a 12 word seed phrase and the last word is unknown.There are 256  128 possibilities for the first 8 7 bits of the last word and 16 possibilities for its last 4 bits.There's 1/256 1/128 chance that the first 8 bits 7 bits of the word I choose are 0000000.There's 1/256 1/128 chance that the first 8 bits 7 bits of the word I choose are 0000001.There's 1/256 1/128 chance that the first 8 bits 7 bits of the word I choose are 0000010......................If the first 7 bits are 0000000, there's 1 possibility for the last 4 bits that make the seed phrase valid. The chance is 1/16.If the first 7 bits are 0000001, there's 1 possibility for the last 4 bits that make the seed phrase valid. The chance is 1/16.If the first 7 bits are 0000010, there's 1 possibility for the last 4 bits that make the seed phrase valid. The chance is 1/16...................Therefore the chance of having a valid BIP39 seed phrase is always 1/16 (128 out of 2048 words)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 26, 2022, 12:25:15 PMLast edit: September 26, 2022, 12:44:46 PM by o_e_l_e_o",
+      "body": "When you consider 11 fixed words and randomly selecting the 12th word, then yes, the numbers become exact rather than averages, as for any given first 7 bits (not 8 as you have used) of the last word then there is exactly 1 combination of the last 4 bits which is valid.When approaching the problem from OP's point of view of randomly selecting words and hoping for a valid seed phrase then it becomes an average as if you were to take a 12 word seed phrase and cycle through all possibilities for the first word (for example) there is no guarantee that you would end up with 128 valid seed phrases, due to the unpredictable nature of the checksum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "September 26, 2022, 10:36:31 PM",
+      "body": "Hi everyone and thank you for the excellent feedback.  Just to be sure I understand things properly, I’ve gone ahead and outlined my understanding in a step by step write up for an example of how I believe that one could calculate their 12 word BIP 39 seed.  Please let me know if I got this correct.A few key points I took away from you all are:* You need 128 bits of entropy for BIP39 for a 12 word seed phrase*Each BIP 39 word has an 11 bit code (earth = # 555 or 1000101011 in binary) that I believe is located here: https://github.com/hatgit/BIP39-wordlist-printable-en The 128 bits of entropy for BIP39 also requires and additional 4 bits for a checksum in the 12th word.  This checksum is placed in the last 4 bits of the 11 bit word.  *To obtain the additional 4 bits for the checksum you need to perform a SHA256 hash on the 128 bits of entropy and then take the first 4 bits of this hash and append it to the 128 bits which gives you a total of 132 bits.  *Once this 132 bits has been created, you then deconstruct them into 12, 11 bit groupings and then identify the valid BIP 39 words that correlate to their bit patterns.*The 12th word can have several different possible words as all that needs to be present in the last word is the four bits of the 11 bit pattern for the 12th word.With all that said, here is what I did to confirm my understanding of the above.  Please let me know if there are any obvious errors. Note that this is just an example entropy and nothing I will ever use to generate my own seed.  Thank you all for your help!1)   I first generated a random 128 bit entropy as such:1111001010110001011100111100010111010101101010101111111111101011101110000000010 00010010111111111010111111110001000000101011111002)   I next performed a hash of the entropy by saving it in a notepad.txt file then performing the following command:  certutil -hashfile test.txt SHA2563)   The resulting hash is: bc4f595b36de2533832a47bf66535612688d81594449693bed9414180ab7cad44)   The first 4 bits of the hash would be 1011.  This is my understanding as I believe that when converting from hexadecimal to binary you must always represent each binary value with four bits.  In this example, b is converted to binary as 1011.  5)   Next I appended the 4 bites derived from the first placeholder of the hexadecimal hash value converted  as follows ENT+CS = 1111001010110001011100111100010111010101101010101111111111101011101110000000010 000100101111111110101111111100010000001010111110010116)   Divide the resulting 132 bits into the following lists:111100101011000101110011110001011101010110101010111111111110101110111000000001000010010111111111010111111110001000000101011111001011 (BIP 39 word \"west\")So if I understand it right then, the only requirement for a valid 12th word for this 12 word BIP 39 phrase would have to contain 1011 at the end of their bit pattern.  That would mean that in addition to the BIP 39 word \"west\" that I chose two other options could have been either  “earth” number 555 decimal / 1000101011 binary and also the word “maximum” number 1099 / binary 10001001011  Is this correct? Also with respect to the way I computed the the hash of the 128 bits, I did the following:  I entered in all the 1s and 0s into a notepad file and saved in a .txt extension.  I then performed the CertUtil on said file that provided me the above digest in SHA256. Does this produce the correct hash file of the binary stream?  I’m not sure if I did this correctly. Thank you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 27, 2022, 04:21:05 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 26, 2022, 10:36:31 PMthat I believe is located here: https://github.com/hatgit/BIP39-wordlist-printable-en The original word-list(s) are found here:https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.mdQuote*The 12th word can have several different possible words as all that needs to be present in the last word is the four bits of the 11 bit pattern for the 12th word.~So if I understand it right then, the only requirement for a valid 12th word for this 12 word BIP 39 phrase would have to contain 1011 at the end of their bit pattern.  That would mean that in addition to the BIP 39 word \"west\" that I chose two other options could have been either  “earth” number 555 decimal / 1000101011 binary and also the word “maximum” number 1099 / binary 10001001011  Is this correct? That's not how it works.The last 4 bits are the checksum of the 128-bit entropy not arbitrary bits. This means if you change even a single bit inside the 128-bit entropy the 4-bit checksum also changes.I think you misunderstood the previous comments. They are talking about collision. If choosing \"maximum\" instead of \"west\" gives you a correct mnemonic, you are manually brute forcing the words to find a collision. In which case it is not just about the last word, you can change any other bit inside the 128-bit entropy. For example you could change the 5th word and still have the same last word (and same other 10 words).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "September 27, 2022, 05:02:09 AM",
+      "body": "Thank you for the reply. I guess I must have misunderstood some of the previous replies. Would you be able to give me an idea how I could perform the checksum on a windows box for my entropy example? My (apparently mis) understanding from the previous replies was that you take the SHA 256 digest of the 128 bit entropy then use the first 4 bits of that as the checksum occupying the last four bits of the 12th word. In this case the first hexadecimal value from said SHA 256 digest was b and when converting b hex into binary it's 1011 which I appended to the end of the original 128 bit entropy. Perhaps I'm not calculating the checksum correctly? Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 27, 2022, 05:30:32 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 27, 2022, 05:02:09 AMWould you be able to give me an idea how I could perform the checksum on a windows box for my entropy example?Sorry, I have no idea.QuoteMy (apparently mis) understanding from the previous replies was that you take the SHA 256 digest of the 128 bit entropy then use the first 4 bits of that as the checksum occupying the last four bits of the 12th word. That part is correct. The misunderstanding is after you computed and appended the checksum to the end and when you start changing your entropy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 27, 2022, 07:18:35 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 26, 2022, 10:36:31 PM3)   The resulting hash is: bc4f595b36de2533832a47bf66535612688d81594449693bed9414180ab7cad4Your calculation is wrong. You need to hash your entropy through SHA256 function as a hex input, not as a text.First, you need to convert your entropy to a hexadecimal number. The result is F2B173C5D5AAFFEBB80425FF5FE2057C.The hex number need to be hashed through SHA256 function.The result is 931258d717865a310cfc24a9161b21f4c0d02e0bb4cf12894516170a10e72339If you convert the result to a binary number, the first 4 bits would be 1001",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 27, 2022, 07:37:58 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 26, 2022, 10:36:31 PM(BIP 39 word \"west\")As hosseinimr93 has pointed out, your checksum is incorrect. The correct final word should be \"weird\", not \"west\".Quote from: BitcoinCanSaveUsAll on September 26, 2022, 10:36:31 PMSo if I understand it right then, the only requirement for a valid 12th word for this 12 word BIP 39 phrase would have to contain 1011 at the end of their bit pattern.  That would mean that in addition to the BIP 39 word \"west\" that I chose two other options could have been either  “earth” number 555 decimal / 1000101011 binary and also the word “maximum” number 1099 / binary 10001001011  Is this correct?Ignoring the fact you calculated the checksum incorrectly, your understanding here is wrong. There is exactly one word (\"weird\") which will be a valid final word for the 128 bits of entropy you have selected. There will be other words you could replace \"weird\" with and still have a valid 12 word seed phrase, but given that the last word contains 7 bits of entropy as well as 4 bits of checksum, then if you choose one of these other words then you will have a different 128 bits of entropy. Further, if you choose one of these other valid words, there is no guarantee that the 4 digit checksum would be the same given you are changing the entropy.For example, the entropy you have given above encodes this seed phrase:Code:verify merit vapor prize quiz volume theme lucky young yellow life weirdThis is also a valid seed phrase:Code:verify merit vapor prize quiz volume theme lucky young yellow life debrisWeird encodes the following:  11111001001Debris encodes the following: 00111000011Checksums are in bold.Two different valid words, but with different entropy and different checksums.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "September 27, 2022, 07:45:31 AMLast edit: September 27, 2022, 07:55:44 AM by odolvlobo",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 26, 2022, 10:36:31 PM1)   I first generated a random 128 bit entropy as such:1111001010110001011100111100010111010101101010101111111111101011101110000000010 00010010111111111010111111110001000000101011111002)   I next performed a hash of the entropy by saving it in a notepad.txt file then performing the following command:  certutil -hashfile test.txt SHA2563)   The resulting hash is: bc4f595b36de2533832a47bf66535612688d81594449693bed9414180ab7cad44)   The first 4 bits of the hash would be 1011.  This is my understanding as I believe that when converting from hexadecimal to binary you must always represent each binary value with four bits.  In this example, b is converted to binary as 1011.  The correct checksum is 0001, so the last word is 11111000001. The phrase is verify merit vapor prize quiz volume theme lucky young yellow life weirdEverything you did looks, ok except that you cannot use notepad to create the file being hashed because it stores a text version and not the binary itself. If you save a hex value instead of binary with notepad, you may be able to use \"CertUtil -decodehex ...\" to convert to binary for the sha256 calculation.You can use this site to check your results: https://iancoleman.io/bip39/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

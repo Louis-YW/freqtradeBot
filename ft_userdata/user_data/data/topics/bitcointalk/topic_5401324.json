@@ -1,0 +1,165 @@
+{
+  "id": "topic_5401324",
+  "title": "doggoboi",
+  "author": "doggoboi",
+  "created_time": "June 04, 2022, 09:09:55 AM",
+  "content": "Hi all, go easy on me total newb when it comes to config files and command line options.  Just got my Cold Card in, generated a test wallet and have a .json file on a MicroSD and trying to use it air gapped.I'm stuck on configuring all the software on my Windows 10 desktop and it's driving me nuts.Trying to use Bitcoin Core as a full node, with Electrum and Electrum Personal Server so I don't need to connect to random servers.I followed these guides https://github.com/chris-belcher/electrum-personal-serverhttps://driftwoodpalace.github.io/Hodl-Guide/hodl-guide_63_eps-win.htmlBut some stuff is not exactly 1:1 and I had to improvise on things I did not understand and the result is that I can't get everything running.I think I have Bitcoin Core running properly as it's connected through Tor and displaying peers as .onion addresses.I break down when it comes to Electrum and Electrum Personal ServerI don't understand how to get EPS to look at Electrum for the .json wallet.  And I can't get Electrum to connect to the personal server.I put xpub from the .json file into Electrum as a watch only wallet and also put it in the EPS config file.  I configured everything to localhost:50002 as per the guidesWhen I drag the config.ini to the .exe of EPS the command line window opens up but nothing happens.  Just says Press any key to continue.PLEASE HELP! (I've seen the advice to get Umbrel, etc - I just want to get this running before I spend more money on tech I don't understand.)",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5401324",
+  "comments": [
+    {
+      "author": "Abdussamad",
+      "created_time": "June 04, 2022, 10:52:32 AM",
+      "body": "umbrel is free software.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 04, 2022, 11:54:19 AM",
+      "body": "Quote from: Abdussamad on June 04, 2022, 10:52:32 AMumbrel is free software. Does it run on Windows?  Don't you have to buy extra hardware for that",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "June 04, 2022, 12:04:45 PM",
+      "body": "Actually, the Cold card is totally Airgapped you don't need to have a full node all transactions are airgapped but if this is for increasing privacy then you can set up a personal Electrum server.There is a full guide here on how to set up a personal Electrum server with Windows read this \"Bitcoin + Electrum server + Block explorer under Windows (with WSL and Debian)\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 04, 2022, 01:14:14 PM",
+      "body": "Quote from: ETFbitcoin on June 04, 2022, 12:19:18 PMQuote from: doggoboi on June 04, 2022, 09:09:55 AMPLEASE HELP! (I've seen the advice to get Umbrel, etc - I just want to get this running before I spend more money on tech I don't understand.)First of all, what is your goal? Only using ColdCard through Electrum? Bitcoin Core, EPS, Tor usually used when you have privacy concern and have decent resource.Yes my goal is to be as private as possible and not depend on public Electrum serversQuote from: BitMaxz on June 04, 2022, 12:04:45 PMActually, the Cold card is totally Airgapped you don't need to have a full node all transactions are airgapped but if this is for increasing privacy then you can set up a personal Electrum server.There is a full guide here on how to set up a personal Electrum server with Windows read this \"Bitcoin + Electrum server + Block explorer under Windows (with WSL and Debian)\"I will check out this guide tomorrow, been at this for about 7 hours and need a refresher.  I got up to this point: https://imgur.com/a/iIyrIi4The next point in the guide says it's supposed to say \"Listening for Electrum Wallet ...\" https://driftwoodpalace.github.io/Hodl-Guide/hodl-guide_63_eps-win.htmlMy command line doesn't do that it just says \"Press any key to continue\" and nothing happens",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 04, 2022, 02:03:31 PM",
+      "body": "I would forget about the Coldcard for now and try to get your EPS up and running first. I'm not familiar with setting this up on Windows, but it sounds like your EPS isn't connecting to Bitcoin Core, so this is the first issue to solve as anything to do with Electrum or your Coldcard won't work without a working EPS first.Have you worked through the config.ini file for the EPS and configured the bits that need configured? You need to import your master public key or individual addresses from your Electrum wallet in to the relevant sections, and you need to make sure the you enter the location of your Bitcoin Core datadir in the relevant field.Has EPS successfully managed to import the master private key in to Bitcoin Core (if you open the necessary wallet in Bitcoin Core, can you see the addresses from your Electrum/Coldcard wallet?)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "June 04, 2022, 02:39:15 PMLast edit: June 04, 2022, 02:54:51 PM by DireWolfM14",
+      "body": "Like o_e_l_e_o said, you're only complicating things for yourself trying to get so many things to work at the same time.  Lets take it one step at a time.Please keep in mind, my only experience with an Electrum server is running ElectrumX on an ubuntu server.  My main computer is a Windows PC, but I find it easier to have bitcoin core and Electrumx running on a remote (in the closet under my stair well) machine.  EPS may be slightly different, but the basics should be the same.Bitcoin Core configuration;Your bitcoind.conf file can be found here: C:\\Users\\<your-user-name>\\AppData\\Roaming\\Bitcoin\\.  Or, open Bitcoin Core QT (the gui,) click on Settings, then on \"Main\" tab, click on \"Open Configuration File.\"Make sure bitcoin core is listening for incoming connections, and configured for Electrum's requirements by adding these lines:Code:listen=1txindex=1dbcache=2048prune=0You may also need to enable RPC server, which by default will allow RPC commands from the localhost:Code:server=1Try those settings in your bitcoin.conf file and see if that helps.  Also keep in mind that it may take EPS some time to synchronize with bitcoin core.  The last time I installed ElectrumX without a backup it needed 36 hours to synch.   ETA:I just found this on the EPS instructions page for Windows:Quote from: https://driftwoodpalace.github.io/Hodl-Guide/hodl-guide_63_eps-win.html#settings-in-bitcoin-coreserver = 1rpcallowip=<IP of PC with Electrum Personal Server>rpcbind=<IP of Bitcoin Core node>rpcauth = <user>:some-hash-stringSet both rpcallowip and rpcbind to localhost or 127.0.0.1.For the rpcauth hash you'll need to run the rpcauth.py with your preferred username.  You'll need Python3 installed on your windows machine, and you can run it from Powershell.  It can be found in the bitcoin master, here: https://github.com/bitcoin/bitcoin/tree/master/share/rpcauthQuoteusage: rpcauth.py [-h] username [password]Create login credentials for a JSON-RPC userpositional arguments:  username    the username for authentication  password    leave empty to generate a random password or specify \"-\" to              prompt for passwordoptional arguments:  -h, --help  show this help message and exit",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 05, 2022, 07:39:31 AM",
+      "body": "Quote from: BitMaxz on June 04, 2022, 12:04:45 PMActually, the Cold card is totally Airgapped you don't need to have a full node all transactions are airgapped but if this is for increasing privacy then you can set up a personal Electrum server.There is a full guide here on how to set up a personal Electrum server with Windows read this \"Bitcoin + Electrum server + Block explorer under Windows (with WSL and Debian)\"Sorry but I'm not sure this guide pertains to me as I'm trying to set up Electrum Personal Server and I think I understand they are two different things?Quote from: o_e_l_e_o on June 04, 2022, 02:03:31 PMI would forget about the Coldcard for now and try to get your EPS up and running first. I'm not familiar with setting this up on Windows, but it sounds like your EPS isn't connecting to Bitcoin Core, so this is the first issue to solve as anything to do with Electrum or your Coldcard won't work without a working EPS first.Have you worked through the config.ini file for the EPS and configured the bits that need configured? You need to import your master public key or individual addresses from your Electrum wallet in to the relevant sections, and you need to make sure the you enter the location of your Bitcoin Core datadir in the relevant field.Has EPS successfully managed to import the master private key in to Bitcoin Core (if you open the necessary wallet in Bitcoin Core, can you see the addresses from your Electrum/Coldcard wallet?)Yes I configured the config.ini according to several different guides.  Grabbed the Mater public key from Cold Card into Electrum.  My Bitcoin Core datadir I'm assuming is the one around 433GB C:\\Users\\xxx\\AppData\\Roaming\\Bitcoin or C:\\Users\\xxx\\AppData\\Roaming\\Bitcoin\\blocks I tried both and neither worked in getting EPS online.As for your last question I'm not sure how to check for addresses but I do have a wallet that I created on Bitcoin Core as test1 open.  I also added the code \"test1 = xpubxxx\" and \"wallet_filename = test1\" in the EPS config but I'm not sure they are linking up.  The wallet is open but I don't see any of the receiving addresses mentioned in the command line here: https://i.imgur.com/Dr1w9aZ.jpgQuote from: DireWolfM14 on June 04, 2022, 02:39:15 PMBitcoin Core configuration;Your bitcoind.conf file can be found here: C:\\Users\\<your-user-name>\\AppData\\Roaming\\Bitcoin\\.  Or, open Bitcoin Core QT (the gui,) click on Settings, then on \"Main\" tab, click on \"Open Configuration File.\"Make sure bitcoin core is listening for incoming connections, and configured for Electrum's requirements by adding these lines:Code:listen=1txindex=1dbcache=2048prune=0You may also need to enable RPC server, which by default will allow RPC commands from the localhost:Code:server=1I had most of these settings except txindex,dbcache,prune.  One guide did say to have listen set to 0 so I just changed it to 1.  Nothing happened differently AFAIK.QuoteTry those settings in your bitcoin.conf file and see if that helps.  Also keep in mind that it may take EPS some time to synchronize with bitcoin core.  The last time I installed ElectrumX without a backup it needed 36 hours to synch.Are you saying I need to leave the command line window open for a day or more even though it says to Press any key to continue?  Is the program still initializing and I'm abrubtly quitting it every time I close it?This is where I'm at right now.  According to the guides it should say \"listening for Electrum Wallet\" at this point https://i.imgur.com/Dr1w9aZ.jpg   ETA:I just found this on the EPS instructions page for Windows:Quote from: https://driftwoodpalace.github.io/Hodl-Guide/hodl-guide_63_eps-win.html#settings-in-bitcoin-coreserver = 1rpcallowip=<IP of PC with Electrum Personal Server>rpcbind=<IP of Bitcoin Core node>rpcauth = <user>:some-hash-stringCode:rpcport=8332rpcallowip=127.0.0.1rpcbind=127.0.0.1And I have the rpcauth set up from way back when I set up bitcoin core on the first day - though I don't know how to test if it is working properly.  I also added the same rpcauth string to the EPS config.ini file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 05, 2022, 08:03:13 AM",
+      "body": "Quote from: doggoboi on June 05, 2022, 07:39:31 AMC:\\Users\\xxx\\AppData\\Roaming\\BitcoinThis is the correct path for Windows.Quote from: doggoboi on June 05, 2022, 07:39:31 AMI also added the code \"test1 = xpubxxx\" and \"wallet_filename = test1\" in the EPS config but I'm not sure they are linking upMight be a silly question, but did you uncomment both these lines (delete the # symbol at the start)? Your screenshot says that it is importing in to \"electrum-watchonly-addresses\", but you say you called your wallet \"test1\", which is why I'm asking if you have maybe forgotten to uncomment a line. And are you sure Core has the correct wallet open?Quote from: doggoboi on June 05, 2022, 07:39:31 AMAre you saying I need to leave the command line window open for a day or more even though it says to Press any key to continue?  Is the program still initializing and I'm abrubtly quitting it every time I close it?I don't think so. EPS only scans the addresses in your wallet, as opposed to ElectrumX which scans every address, so it should rescan in a matter of minutes. EPS (on Linux, at least) also tells you when it is rescanning and gives you a progress bar.Really not sure why this isn't linking up, but as I say, I'm not very familiar with Windows. Are you using Tor maybe?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 05, 2022, 08:05:03 AM",
+      "body": "I've watched this https://youtu.be/1JMP4NZCC5gbut the commands are so confusing for me being on a different OS I don't know how to translate 100%https://youtu.be/4H8gCFrjTYsAt 8:17 he does something with Python that I didn't try until now but I don't think that did anything.  (Is this part outdated)  As the current release on github did not include the setup.py I downloaded that separately today to try and install it the way he did in the video.  It got installed in C:\\Users\\xxx\\AppData\\Roaming\\Python\\Python310\\Scripts  This .exe in there does not do ANYTHING, it just flashes the command line for a second and it disappears automatically.The only thing I can think of is that I'm looking at too many different guides and I got my ports and IPs mixed up.  Is localhost and 127.0.0.1 interchangable?  I've been putting 127.0.0.1 anywhere it says to put localhost.bitcoin.conf hasCode:server=1listen=1txindex=1dbcache=2048prune=0onion=127.0.0.1:9050listenonion=0onlynet=onionproxy=127.0.0.1:9050proxyrandomize=1rpcport=8332rpcallowip=127.0.0.1rpcbind=127.0.0.1rpcauth=xxx:xxxEPS config hasCode:test1 = xpubxxx[bitcoin-rpc]host = 127.0.0.1port = 8332datadir = C:\\Users\\xxx\\AppData\\Roaming\\Bitcoinrpcauth = xxx:xxxwallet_filename = test1poll_interval_listening = 30poll_interval_connected = 1initial_import_count = 1000gap_limit = 25[electrum-server]host = 127.0.0.1port = 50002certfile = certs/cert.crtkeyfile = certs/cert.keydisable_mempool_fee_histogram = falsemempool_update_interval = 60broadcast_method = tor-or-own-nodetor_host = localhosttor_port = 9050Some thoughts and questions I got just by typing that out.  Why so many different host and ports?  Is the config confusing itself?  There are headers I'm assuming the program can read [bitcoin-rpc] and [electrum-server] having different host and ports.  Even tor has it's own port number.  Is that all up to par?Lastly for this post I found a config file for Electrum here C:\\Users\\xxx\\AppData\\Roaming\\ElectrumCode:{    \"auto_connect\": false,    \"block_explorer\": \"mempool.space\",    \"blockchain_preferred_block\": {        \"hash\": \"000000000019d6689c085ae16afasdfafasdaffa2asdfaasdfadfa8ce26f\",        \"height\": 0    },    \"check_updates\": true,    \"config_version\": 3,    \"confirmed_only\": true,    \"gui_last_wallet\": \"c:\\\\users\\\\xxx\\\\appdata\\\\roaming\\\\electrum\\\\wallets\\\\test1\",    \"io_dir\": \"D:/\",    \"is_maximized\": false,    \"oneserver\": true,    \"receive_tabs_index\": 0,    \"recently_open\": [        \"c:\\\\users\\\\xxx\\\\appdata\\\\roaming\\\\electrum\\\\wallets\\\\test1\"    ],    \"rpcpassword\": \"6DS0xxxxxxxxxxxzA==\",    \"rpcuser\": \"user\",    \"server\": \"127.0.0.1:50002:s\",    \"show_addresses_tab\": false,    \"show_console_tab\": true}Some thoughts and questions I've tried manually setting the rpcpassword and rpcuser to the same as the rpcauth information in the other two config file and it will just revert to this default upon reopening the config file.What is the \":s\" part in the \"server\": \"127.0.0.1:50002:s\".  Several different guides I have seen :s and also a :t, etc.  Currently in my network window of Electrum it shows \"localhost:1\"  Instead of any of the ports mentioned previously.  Is this just mean the same as localhost?In the proxy tab of network settings both \"Use Tor proxy at port 9050\" and \"Use proxy\" is both unchecked.  They were previously checked but it does not seem to make any difference in getting everything running currently.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 05, 2022, 08:21:53 AM",
+      "body": "Quote from: o_e_l_e_o on June 05, 2022, 08:03:13 AMMight be a silly question, but did you uncomment both these lines (delete the # symbol at the start)? Your screenshot says that it is importing in to \"electrum-watchonly-addresses\", but you say you called your wallet \"test1\", which is why I'm asking if you have maybe forgotten to uncomment a line. And are you sure Core has the correct wallet open?Yes I found that part funny too.  the [electrum-watchonly-addresses] is wayyyyy down in the config but I have nothing listed there just the comments made from the default sample config.  Should I add the # to omit that header too?  The correct header [master-public-keys] has no # symbol in front of the test1 line.I don't know how to check if Core has the correct wallet open.  Somewhere along the line one of the guides said to \"Create a new wallet\" manually IN bitcoin core.  I named it the same test1 as the same name label I gave to my xpub in Electrum.  Are they supposed to be different names?  I think I messed up there if they are.  And I don't know how to delete a wallet in Bitcoin Core, I only see the option to close walletQuote from: o_e_l_e_oReally not sure why this isn't linking up, but as I say, I'm not very familiar with Windows. Are you using Tor maybe?I am using Tor for Bitcoin Core and it seems to be running fine - I'm currently connected to 10 onion addresses.  Beyond that Not sure if there are settings I'm missing in the EPS/Electrum config files that I need",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 05, 2022, 08:38:42 AM",
+      "body": "Quote from: o_e_l_e_o on June 05, 2022, 08:03:13 AMMight be a silly question, but did you uncomment both these lines (delete the # symbol at the start)? Your screenshot says that it is importing in to \"electrum-watchonly-addresses\", but you say you called your wallet \"test1\", which is why I'm asking if you have maybe forgotten to uncomment a line. And are you sure Core has the correct wallet open?Thinking about it, does it matter if the wallet is a watch only wallet or a regular standard wallet?  When I tried setting up the wallet in Electrum it was asking for the wallet seed or a master key.  I thought the whole purpose of the hardware wallet is not to type out a seed ever on the desktop so I put the xpub in where it asks for the master key.  Am I supposed to have put the seeds in at this point?https://i.imgur.com/sPkXM5t.png",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 05, 2022, 08:45:02 AM",
+      "body": "Quote from: doggoboi on June 05, 2022, 08:05:03 AMLastly for this post I found a config file for Electrum here C:\\Users\\xxx\\AppData\\Roaming\\ElectrumAgain, I wouldn't even be opening Electrum right now. It will never connect until your EPS is working properly, and by messing around with Electrum config files you are likely to just cause yourself more issues in the future when we get to that part.Quote from: doggoboi on June 05, 2022, 08:21:53 AMYes I found that part funny too.  the [electrum-watchonly-addresses] is wayyyyy down in the config but I have nothing listed there just the comments made from the default sample config.  Should I add the # to omit that header too?  The correct header [master-public-keys] has no # symbol in front of the test1 line.The default config file doesn't have a header named [electrum-watchonly-addresses] - https://github.com/chris-belcher/electrum-personal-server/blob/master/config.ini_sampleIt does have [watch-only-addresses], which I assume is what you mean. Whether or not the header is commented shouldn't make a difference.Quote from: doggoboi on June 05, 2022, 08:21:53 AMI don't know how to check if Core has the correct wallet open.If you are using the GUI, then there is a drop down menu at the top right of the main window.After you press any key, does this window (https://i.imgur.com/Dr1w9aZ.jpg) close? What happens if you then start the server back up again?It seems that EPS is indeed linking with Bitcoin Core, but for some reason isn't importing the addresses in to the Bitcoin Core wallet properly. I'd maybe redownload the config file from above to have a clean slate and start the whole process again with a newly named wallet.Quote from: doggoboi on June 05, 2022, 08:38:42 AMThinking about it, does it matter if the wallet is a watch only wallet or a regular standard wallet?  When I tried setting up the wallet in Electrum it was asking for the wallet seed or a master key.Whatever you do in Electrum right now is irrelevant to getting EPS set up and running. You could be using a dummy xpub pulled from iancoleman.io to try to get the server running. But no, you should never type your hardware wallet seed phrase in to Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 05, 2022, 09:17:18 AM",
+      "body": "Quote from: o_e_l_e_o on June 05, 2022, 08:45:02 AMAgain, I wouldn't even be opening Electrum right now. It will never connect until your EPS is working properly, and by messing around with Electrum config files you are likely to just cause yourself more issues in the future when we get to that part.The default config file doesn't have a header named [electrum-watchonly-addresses] - https://github.com/chris-belcher/electrum-personal-server/blob/master/config.ini_sampleIt does have [watch-only-addresses], which I assume is what you mean. Whether or not the header is commented shouldn't make a difference.Sorry yes, I got the headers wrong.Ok, I won't even be looking at Electrum for now - I didn't know the xpub in EPS config could be a dummy one I thought it all had to sync up between EPS/Electrum/Bitcoin CoreQuoteIf you are using the GUI, then there is a drop down menu at the top right of the main window.After you press any key, does this window (https://i.imgur.com/Dr1w9aZ.jpg) close? What happens if you then start the server back up again?It seems that EPS is indeed linking with Bitcoin Core, but for some reason isn't importing the addresses in to the Bitcoin Core wallet properly. I'd maybe redownload the config file from above to have a clean slate and start the whole process again with a newly named wallet.After I press the key the window does close, and if I drag the config over the exe again it happens again exactly the same.Unfortunately I don't see the addresses anywhere in Bitcoin core  https://i.imgur.com/9pQANCa.pngI am wondering why one of the guides said to even create a wallet in Bitcoin core - can I delete the Bitcoin core wallet somehow?  Since EPS is supposed to give the wallet data TO bitcoin core how come I need to start a separate wallet in Bitcoin Core?Could you take a look at my previous post where I put the config file settings and see if all the ports match up properly?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 05, 2022, 11:33:06 AM",
+      "body": "Quote from: doggoboi on June 05, 2022, 09:17:18 AMOk, I won't even be looking at Electrum for now - I didn't know the xpub in EPS config could be a dummy one I thought it all had to sync up between EPS/Electrum/Bitcoin CoreEventually yes, but for the time being we need to get EPS and Core to sync up first. Then we can worry about Electrum. EPS runs just fine without Electrum being open, and just sits at the \"Listening for Electrum Wallet\" screen until you open Electrum. That's the point we need to get to first.Quote from: doggoboi on June 05, 2022, 09:17:18 AMUnfortunately I don't see the addresses anywhere in Bitcoin core  https://i.imgur.com/9pQANCa.pngClick on Window -> Console, and then in console enter the command listaddressgroupings. Does it show up the addresses from your xpub?Quote from: doggoboi on June 05, 2022, 09:17:18 AMI am wondering why one of the guides said to even create a wallet in Bitcoin core - can I delete the Bitcoin core wallet somehow?Go in to your bitcoin directory, open the wallets folder, and delete any wallets you don't need. Be careful doing this if you have ever used any of those wallets though! Don't want to accidentally delete access to some coins. (If you have ever used any of these wallets, better to just move them out to a different directory rather than delete them, just in case.)Quote from: doggoboi on June 05, 2022, 09:17:18 AMSince EPS is supposed to give the wallet data TO bitcoin core how come I need to start a separate wallet in Bitcoin Core?You need to create an empty Bitcoin Core wallet first for EPS to import the addresses in to. If you point EPS at a wallet which doesn't exist (or no wallet at all), it will return an error.Quote from: doggoboi on June 05, 2022, 09:17:18 AMCould you take a look at my previous post where I put the config file settings and see if all the ports match up properly?I can't see anything obvious that would be causing issues here. It looks like EPS successfully finds your Bitcoin Core client, so the ports, etc. must all be working, but then cannot actually import the addresses in to the wallet file.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 06, 2022, 04:04:58 AM",
+      "body": "QuoteClick on Window -> Console, and then in console enter the command listaddressgroupings. Does it show up the addresses from your xpub?Unfortunately it is blank even after running a fresh download of EPS.https://i.imgur.com/WwTkrl4.pngI deleted all the EPS files and downloaded a new fresh .zip of the latest EPS and still the exact same thing.  I'm putting the xpub where it asks for the [master-public-keys]  but should I be putting it elsewhere?I even tried deleting the # in front of the example given in the sample config and that produced the same result.Also another thought how you called me out on naming \"electrum-watchonly-addresses\"  This is something only seen in the command line window it's no where to be found in the config.iniQuoteGo in to your bitcoin directory, open the wallets folder, and delete any wallets you don't need. Be careful doing this if you have ever used any of those wallets though! Don't want to accidentally delete access to some coins. (If you have ever used any of these wallets, better to just move them out to a different directory rather than delete them, just in case.)Thanks for the warning - I didn't have any wallets and any wallet made was just to get this set up and were blank.QuoteYou need to create an empty Bitcoin Core wallet first for EPS to import the addresses in to. If you point EPS at a wallet which doesn't exist (or no wallet at all), it will return an error.So do the names of the wallet in Bitcoin Core and the \"any_name_works = \" + \"wallet_filename = \" in the config.ini supposed to match up?QuoteI can't see anything obvious that would be causing issues here. It looks like EPS successfully finds your Bitcoin Core client, so the ports, etc. must all be working, but then cannot actually import the addresses in to the wallet file.I'm stumped - beginning to lose hope",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 06, 2022, 04:11:22 AM",
+      "body": "I mentioned this on my previous post but one big thing that is confusing me is Quotehttps://youtu.be/4H8gCFrjTYsAt 8:17 he does something with Python that I didn't try until now but I don't think that did anything.  (Is this part outdated)  As the current release on github did not include the setup.py I downloaded that separately today to try and install it the way he did in the video. It got installed in C:\\Users\\xxx\\AppData\\Roaming\\Python\\Python310\\Scripts  This .exe in there does not do ANYTHING, it just flashes the command line for a second and it disappears automatically.That Python command from setup.py sets up a whole new EPS.exe that can be found in the file path mentioned but am I supposed to be doing this step  in this new version of EPS?  Seems like I'm supposed to skip this step in the video.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 06, 2022, 04:23:41 AM",
+      "body": "I saw someone else with a similar if not the same issue as me and they opened it up on githubhttps://github.com/chris-belcher/electrum-personal-server/issues/268Glad to see I might not be the only one having trouble to get this to work",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 06, 2022, 07:50:53 AM",
+      "body": "Quote from: doggoboi on June 06, 2022, 04:04:58 AMUnfortunately it is blank even after running a fresh download of EPS.https://i.imgur.com/WwTkrl4.pngSo your wallet in Bitcoin Core is called \"electrumpersonalserver\", but your EPS config.ini file that you quoted above has \"wallet_file = test1\". I would create a new wallet in Bitcoin Core called something new, and then put this new wallet name in to your EPS config file and try again.Quote from: doggoboi on June 06, 2022, 04:04:58 AMSo do the names of the wallet in Bitcoin Core and the \"any_name_works = \" + \"wallet_filename = \" in the config.ini supposed to match up?Yes.Quote from: doggoboi on June 06, 2022, 04:11:22 AMThat Python command from setup.py sets up a whole new EPS.exe that can be found in the file path mentioned but am I supposed to be doing this step  in this new version of EPS?  Seems like I'm supposed to skip this step in the video.If you've download and ran the Windows release (which is running, just not syncing with Core), then you shouldn't also need to install a version using Python.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "doggoboi",
+      "created_time": "June 06, 2022, 12:09:12 PM",
+      "body": "Quote from: o_e_l_e_o on June 06, 2022, 07:50:53 AMSo your wallet in Bitcoin Core is called \"electrumpersonalserver\", but your EPS config.ini file that you quoted above has \"wallet_file = test1\". I would create a new wallet in Bitcoin Core called something new, and then put this new wallet name in to your EPS config file and try again.No I think you might be looking at the old config, the past few days I did have both named as test1 on Bitcoin Core and the EPS config.ini.  Today when I deleted all files and re-downloaded EPS I use electrumpersonalserver for both sides.  Still the same result.Unless there is a very specific order of operations to naming and creating the wallet and modifying the settings...I've hit a dead end and am out of ideas",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

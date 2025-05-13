@@ -1,0 +1,165 @@
+{
+  "id": "topic_5432897",
+  "title": "Vampobit",
+  "author": "Vampobit",
+  "created_time": "January 03, 2023, 07:57:45 PMLast edit: January 10, 2023, 08:04:42 PM by Vampobit",
+  "content": "This is a Work In Progress and I made it just for fun and because I wanted to educate myself in Bitcoin Wallets! Every key or address in this thread must be ignored! I just provide them to showcase how the program works! DON'T USE ANY OF THEM! UPDATE: 2023, Jan 10thHello friends! So I have developed a non-deterministic wallet in JAVA, using as less external libraries as possible (obviously I used some code from other libraries).So here is the repo link: https://bitbucket.org/vampobit/safet/src/main/The program creates a non-deterministic wallet generating entropy * using:Java's SecureRandom = 208 User's input = 48 bits of entropya runtime example is:Code:-------------------------| Generating Entropy |-------------------------Please enter a random sequence of characters from the keyboard: let's see how this goes... vampobitUsing user input to generate 48 bits of entropy.Using SecureRandom to generate 204 bits of entropy.---------------------| Generated Keys |---------------------Private Key: b49bd68e4f1bd220e90871031860009b0b44654268cb1e4dcdca93743fc7961ePrivate Key (WIF): L3Gnp62mS3PsmtQ3AEZveuYWywkucv787krXEXj9xDcuJAQjC4pCPublic Key: 02a16995de6cd203c0459a841752fad6941a65ca43a0cbf629f3413d64db7fb24cLegacy Address: 15zHNp2irZGBpd4NzJ8JypsahRDyjpoa52My latest additions have been:generating QR Codes for private key and for legacy addressremoving the initial entropy I used to get using time thanks to ETFbitcoin's indication I have tested everything both on Test Net and the Main Net and it works pretty good (the QR codes too).Please let me know what you think!!!!Hello everyone! First of all, I may make mistakes in the following post, so forgive my possible ignorance. I need your help.I want to learn theoretically how a wallet works. What algorithms are used etc. It is a little opaque to me.develop a simple wallet generator in JAVA So far, I think the process is that the seed phrase is hashed (I don't know what function is used) and it produces a private key which is attached to the public key based on ECDSA. Is that correct?I want to write the code from scratch, probably in java. Do you have any good tutorials or libraries I could use? Maybe bitcoinj?Sorry if I am asking quite a lot here, but googling these questions didn't actually help. I thought this place is the best for development questions.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432897",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "January 03, 2023, 09:48:15 PM",
+      "body": "Quote from: Vampobit on January 03, 2023, 07:57:45 PMSo far, I think the process is that the seed phrase is hashed (I don't know what function is used) and it produces a private key which is attached to the public key based on ECDSA. Is that correct?Very roughly, yes. However, the seed phrase is just a mnemonic representation of the 64-byte binary seed. Private keys are generated from that seed and not from the seed phrase.The HMAC of the seed gives you a master private key from which you generate child private keys through hashing it with a counter.Generating addresses from private keys is another step that is a bit more complicated than your description. You can't 'attach' keys to each other; just generate one from another based on a fixed set of rules (since those are deterministic, it basically makes the keys inherently 'attached').It's all explained very well on learnmeabitcoin.Quote from: Vampobit on January 03, 2023, 07:57:45 PMI want to write the code from scratch, probably in java. Do you have any good tutorials or libraries I could use? Maybe bitcoinj?Either you use a library, or you write it yourself. If you don't care about learning how it works, you can just use bitcoinj. You may be able to learn something by reading their code and reimplementing it yourself, but a good theoretical foundation is good to have.Quote from: Vampobit on January 03, 2023, 07:57:45 PMSorry if I am asking quite a lot here, but googling these questions didn't actually help. I thought this place is the best for development questions.My advice is browsing these pages:https://learnmeabitcoin.com/https://en.bitcoin.it/wiki/Main_PageAs well as searching Bitcointalk using ninjastic.space with appropriate filters and search terms.https://ninjastic.space/searchIf you haven't read the https://bitcoinbook.info/ yet, you can read the relevant chapters online:Chapter 4 (Keys, Addresses): https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch04.asciidocChapter 5 (Wallets): https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch05.asciidoc",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Vampobit",
+      "created_time": "January 03, 2023, 10:08:47 PM",
+      "body": "Thank you very much! I am trying to develop it using bitcoinj now. I will test it using Electrum once I have implemented it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "January 04, 2023, 09:33:09 AM",
+      "body": "bitcoinj is all you need.If you want to see how to generate addresses from a given private key or from seed, take a look at some of my projects:https://github.com/PawelGorny/WifSolverhttps://github.com/PawelGorny/lostwordYou will find there code for different address types.And here https://github.com/PawelGorny/NodeWatcher you will find a very simple example of creating and broadcasting transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Vampobit",
+      "created_time": "January 05, 2023, 09:56:05 PM",
+      "body": "Hello people! I have developed a very simple JAVA application that:1. generates entropy 2. creates a private key and produces its WIF representation3. produces a public key4. produces an addressI sent some sats from my mobile's BlueWallet, straight into the address.Then I loaded up the WIF private key in Electrum and I saw the incoming transaction.Finally, I sent the sats back.Everything I have developed is totally custom and I didn't use many external libraries.Next steps: Create a HD wallet using a seed phrase. I will create a seed using the entropy and a checksum. Then I will translate the binary seed into a seed phrase etc etc.Thank you all for the assistance!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 06, 2023, 01:36:58 AM",
+      "body": "Would you like to open-source the tool in case someone else finds it useful?The less people reinventing the wheel, especially in cryptography applications, the better - less bugs and vulnerabilities.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "January 06, 2023, 01:41:16 AM",
+      "body": "Quote from: Vampobit on January 05, 2023, 09:56:05 PMHello people! I have developed a very simple JAVA application that:1. generates entropy 2. creates a private key and produces its WIF representation3. produces a public key4. produces an addressI sent some sats from my mobile's BlueWallet, straight into the address.Then I loaded up the WIF private key in Electrum and I saw the incoming transaction.Finally, I sent the sats back.Everything I have developed is totally custom and I didn't use many external libraries.Next steps: Create a HD wallet using a seed phrase. I will create a seed using the entropy and a checksum. Then I will translate the binary seed into a seed phrase etc etc.Thank you all for the assistance!I will suggest that you take a look at this website, which has a nice Javascript implementation:https://iancoleman.io/bip39/https://github.com/iancoleman/bip39",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 06, 2023, 01:49:37 AM",
+      "body": "Quote from: bitmover on January 06, 2023, 01:41:16 AMI will suggest that you take a look at this website, which has a nice Javascript implementation:https://iancoleman.io/bip39/https://github.com/iancoleman/bip39Iancoleman's tool is fine but I would argue that any crypto tool written in Java is decisively better than its JS equivalent because Java can already run everywhere, and it doesn't need s browser which is a (admittedly only slightly) larger attack surface than the Java runtime itself.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "January 06, 2023, 04:00:08 AM",
+      "body": "Quote from: Vampobit on January 05, 2023, 09:56:05 PMI sent some sats from my mobile's BlueWallet, straight into the address.You should look into bitcoin's testnet for things like this, so that you can use coins that have no value and can be acquired freely (eg. from a faucet) so losing them (in case of a bug) is not going to cost you anything. You'd also move your test transaction to testnet instead of mainnet (ie. less spam).https://en.bitcoin.it/wiki/Testnet",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Vampobit",
+      "created_time": "January 06, 2023, 09:04:47 AM",
+      "body": "Quote from: pooya87 on January 06, 2023, 04:00:08 AMQuote from: Vampobit on January 05, 2023, 09:56:05 PMI sent some sats from my mobile's BlueWallet, straight into the address.You should look into bitcoin's testnet for things like this, so that you can use coins that have no value and can be acquired freely (eg. from a faucet) so losing them (in case of a bug) is not going to cost you anything. You'd also move your test transaction to testnet instead of mainnet (ie. less spam).https://en.bitcoin.it/wiki/TestnetThanks! I did to be honest, but I also tested it on the main net once I was certain my code was functioning correctly.Quote from: NotATether on January 06, 2023, 01:36:58 AMWould you like to open-source the tool in case someone else finds it useful?The less people reinventing the wheel, especially in cryptography applications, the better - less bugs and vulnerabilities.Absolutely! However I am going to mention that it is a WIP so people know that they should try it with caution.Quote from: NotATether on January 06, 2023, 01:49:37 AMQuote from: bitmover on January 06, 2023, 01:41:16 AMI will suggest that you take a look at this website, which has a nice Javascript implementation:https://iancoleman.io/bip39/https://github.com/iancoleman/bip39Iancoleman's tool is fine but I would argue that any crypto tool written in Java is decisively better than its JS equivalent because Java can already run everywhere, and it doesn't need s browser which is a (admittedly only slightly) larger attack surface than the Java runtime itself.Well yes I prefer Java for this exact reason. Besides, I am using Java for the past 5 years at work, so it came in more handy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "January 06, 2023, 09:38:14 AM",
+      "body": "How do you generate entropy? How many sources do you use, or what is the main source?I would love to see the source code, could be very interesting.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Vampobit",
+      "created_time": "January 09, 2023, 07:06:18 PM",
+      "body": "Quote from: PawGo on January 06, 2023, 09:38:14 AMHow do you generate entropy? How many sources do you use, or what is the main source?I would love to see the source code, could be very interesting.Hello! sorry for being late but I have been busy.So here is the repo link: https://bitbucket.org/vampobit/safet/src/main/I use a user input from the keyboard to generate 48 bits of entropy.I use java's SecureRandom class to generate 204 bits of entropy.I use current time to generate 4 bits of entropy.A runtime example of the execution is as follows:Code:----------------------| Generating Entropy |----------------------Please enter a random sequence of characters from the keyboard: let's see how this goes... vampobitUsing user input to generate 48 bits of entropy.Using SecureRandom to generate 204 bits of entropy.Using Timestamp to generate 4 bits of entropy.------------------| Generated Keys |------------------Private Key: 170d99345e5f5fd4bf46a580c1a600c71c4a4ed70f8b0c87a0f490b94de918bbPrivate Key (WIF): KwzXJ51JTBEj5kp7ZW5YuDL4TZzXTupbsF9mMRJo6K7ahbfeiKf6Public Key: 02e68a4a2bdac08e797d92ae5364979268dd671dc7f2aa684b5975d16dcca690e5Legacy Address: 1K8Fs8qCeoRiWbCBeKVGF53WJcMmaRaHqLPlease review it and let me know what you think. PS1: Actually I believe it's the simplest code I could had written but it really helped me understand the theory behind wallets.PS2: I know that it generates a non-deterministic wallet!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Vampobit",
+      "created_time": "January 10, 2023, 12:10:22 PM",
+      "body": "Quote from: ETFbitcoin on January 10, 2023, 11:45:57 AMQuote from: Vampobit on January 09, 2023, 07:06:18 PMI use a user input from the keyboard to generate 48 bits of entropy.I use java's SecureRandom class to generate 204 bits of entropy.I use current time to generate 4 bits of entropy.Do you mind explain technical reasoning behind this decision? I have no intention offend you, it's just that i find it's unusual since many wallet would just use single secure source (such as os.urandom on Python).No offense taken of course! I am Glad you ask because discussions like this can only make things better.So I thought it would be better not to rely on one source. Considering that I haven't written SecureRandom library myself and that I am unable to find details on how it works and how it generates entropy, I decided to add two more entropy sources. One that is \"decided\" by the user and one that is \"decided\" by time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "January 10, 2023, 12:27:28 PMLast edit: January 10, 2023, 01:31:09 PM by ETFbitcoin",
+      "body": "Quote from: Vampobit on January 10, 2023, 12:10:22 PMSo I thought it would be better not to rely on one source. Considering that I haven't written SecureRandom library myself and that I am unable to find details on how it works and how it generates entropy, I decided to add two more entropy sources. One that is \"decided\" by the user and one that is \"decided\" by time. Thanks for the explanation. While i understand rationale behind the decision, there are few things i'd like to comment.1. I have doubt using time improve the security since the attacker (assuming they know how the private key is generated) could reduce search space between time you create this library and first time the address receive Bitcoin.2. I'm not sure how useful is 52-bit entropy from 2 different source when anything less than 112-bit no longer recommended these days.3. Some details of Java's SecureRandom can be seen at https://docs.oracle.com/javase/8/docs/technotes/guides/security/SunProviders.html#SecureRandomImp.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Vampobit",
+      "created_time": "January 10, 2023, 07:32:38 PMLast edit: January 10, 2023, 08:12:47 PM by Vampobit",
+      "body": "Quote from: ETFbitcoin on January 10, 2023, 12:27:28 PMQuote from: Vampobit on January 10, 2023, 12:10:22 PMSo I thought it would be better not to rely on one source. Considering that I haven't written SecureRandom library myself and that I am unable to find details on how it works and how it generates entropy, I decided to add two more entropy sources. One that is \"decided\" by the user and one that is \"decided\" by time. Thanks for the explanation. While i understand rationale behind the decision, there are few things i'd like to comment.1. I have doubt using time improve the security since the attacker (assuming they know how the private key is generated) could reduce search space between time you create this library and first time the address receive Bitcoin.2. I'm not sure how useful is 52-bit entropy from 2 different source when anything less than 112-bit no longer recommended these days.3. Some details of Java's SecureRandom can be seen at https://docs.oracle.com/javase/8/docs/technotes/guides/security/SunProviders.html#SecureRandomImp.Are you sure about the second comment though?btw: I am adding a QR generator for the keys. Please see my original post at the top of the thread, I have updated it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "January 11, 2023, 07:39:26 AM",
+      "body": "Interesting, I appreciate you work, regardless of its actual usefulness.Do you use QR code displayed in the console or saved to file?I think with a very little effort you may add generation of other types of addresses, even legacy uncompressed one, if the purpose is to learn/understand how things work.And of course restore address with a given WIF, but I guess I am not the one to create TODO list, you know what to do",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Vampobit",
+      "created_time": "January 11, 2023, 07:53:01 AM",
+      "body": "Quote from: PawGo on January 11, 2023, 07:39:26 AMInteresting, I appreciate you work, regardless of its actual usefulness.Hello. My purpose is to educate myself only. I want to learn... that's all!Quote from: PawGo on January 11, 2023, 07:39:26 AMDo you use QR code displayed in the console or saved to file?QR codes are saved as .png files inside the project's classpath.Quote from: PawGo on January 11, 2023, 07:39:26 AMI think with a very little effort you may add generation of other types of addresses, even legacy uncompressed one, if the purpose is to learn/understand how things work.Yes! actually to create an uncompressed legacy address, I only have to call one method, like key.decompress() and for the bech32, I already have it ready in my next commit!!So, can you tell me the difference between an uncompressed and a compressed address ? I don't even know if I am asking the question properly",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "January 11, 2023, 08:02:16 AM",
+      "body": "Quote from: Vampobit on January 11, 2023, 07:53:01 AMSo, can you tell me the difference between an uncompressed and a compressed address ? I don't even know if I am asking the question properlyWe say compressed/uncompressed address to say if address was generated from compressed or uncompressed form of public key.The address is generated exactly the same way - some input is hashed sha256, encoded with base58 etc.The difference is what the input is. Public key is in fact a point in 2 dimensions, so you may think it is like (x, y). But, all the points are on the given curve, which is symmetrical, we may say if we have point (x, +y), we may also have point (x, -y) [they are not exactly +-,  as symmetry is not on '0 level', but you feel the difference I hope].So, in the far far past, what was used was point uncompressed, where you hashed XY, and there was prefix 0x04, so content for hash was 04XY. Then, for simplicity, compressed addresses became more popular and now they are almost mandatory (you cannot generate (native)Segwit address from uncompressed public key).Compressed public key looks like 02X or 03X, where 02 and 03 are 'markers' if you have public key which could be 'extended' to (X, +Y) or (X, -Y).As for given X it is obvious what Y is, the only question is if it is + or -.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Vampobit",
+      "created_time": "January 11, 2023, 08:09:08 AM",
+      "body": "Quote from: PawGo on January 11, 2023, 08:02:16 AMQuote from: Vampobit on January 11, 2023, 07:53:01 AMSo, can you tell me the difference between an uncompressed and a compressed address ? I don't even know if I am asking the question properlyWe say compressed/uncompressed address to say if address was generated from compressed or uncompressed form of public key.The address is generated exactly the same way - some input is hashed sha256, encoded with base58 etc.The difference is what the input is. Public key is in fact a point in 2 dimensions, so you may think it is like (x, y). But, all the points are on the given curve, which is symmetrical, we may say if we have point (x, +y), we may also have point (x, -y) [they are not exactly +-,  as symmetry is not on '0 level', but you feel the difference I hope].So, in the far far past, what was used was point uncompressed, where you hashed XY, and there was prefix 0x04, so content for hash was 04XY. Then, for simplicity, compressed addresses became more popular and now they are almost mandatory (you cannot generate (native)Segwit address from uncompressed public key).Compressed public key looks like 02X or 03X, where 02 and 03 are 'markers' if you have public key which could be 'extended' to (X, +Y) or (X, -Y).As for given X it is obvious what Y is, the only question is if it is + or -.Perfect explanation, thanks.Alright, so if you go to my OP where I have a printed execution example, I could say that my public key starts with 02 and therefore it is compressed, correct ? it must be so, because I used the default method (from bitcoinj) uses a compressed key!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "January 11, 2023, 08:16:04 AM",
+      "body": "Quote from: Vampobit on January 11, 2023, 08:09:08 AMAlright, so if you go to my OP where I have a printed execution example, I could say that my public key starts with 02 and therefore it is compressed, correct ? it must be so, because I used the default method (from bitcoinj) uses a compressed key!Yes. If you generate many keys, sometimes you will see 02, sometimes 03.There is great page https://learnmeabitcoin.com/technical/ which could be very helpful for you. All the algorithms are explained there and you may test calculations/examples yourself.That page is about 2 kinds of public key: https://learnmeabitcoin.com/technical/public-keyUncompressed public key from your OP would be:Code:Private Key: b49bd68e4f1bd220e90871031860009b0b44654268cb1e4dcdca93743fc7961e04a16995de6cd203c0459a841752fad6941a65ca43a0cbf629f3413d64db7fb24cdcf2530931fba3705b3054de3e16cfacbdfabd32caa9bd2bff42e66e3a45d6ac",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

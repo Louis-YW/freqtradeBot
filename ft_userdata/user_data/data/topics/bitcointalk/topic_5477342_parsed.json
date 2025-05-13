@@ -1,0 +1,157 @@
+{
+  "id": "topic_5477342",
+  "title": "mcdouglasx",
+  "author": "mcdouglasx",
+  "created_time": "December 10, 2023, 06:39:15 PMLast edit: August 03, 2024, 02:10:38 PM by mcdouglasx",
+  "content": "updated 08/03/2024.The Baby Step Giant Step (BSGS) algorithm is used to solve the discrete logarithm problem efficiently in a cyclic group. The algorithm works by breaking down the problem into two steps:Baby Steps In this step, we calculate a list of baby steps by iteratively raising the generator g to different powers. We start with j = 0 and calculate g^j for values of j from 0 up to m-1 , where m is typically chosen as the square root of the group order n . We store each calculation in 1 bit per key, this is the highlight because it considerably minimizes the size of our database.binary baby step200000 KeysCode:#by mcdouglasximport secp256k1 as icefrom bitstring import BitArrayprint(\"creating Baby Step\")#create baby stepnum = 200000 # Keys number in Binary Babystep. same m in search scriptLow_m= 20lm= num // Low_mAdd = 1Add_pub= ice.scalar_multiplication(Add)res= ice.point_sequential_increment(lm, Add_pub)binary = ''for t in range (lm):    h= (res[t*65:t*65+65]).hex()    hc= int(h[2:], 16)                    if hc % 2 == 0:        A=\"0\"        binary+= ''.join(str(A))                else:        A=\"1\"        binary+= ''.join(str(A))        my_str = (BitArray(bin=binary))#bin=binarybinary_file = open('baby_steps__binary.bin', 'ab')my_str.tofile(binary_file)binary_file.close()for i in range (1,Low_m):    print(\"stage: \"+ str(i+1)+\"/\"+str(20))        lm_upub= ice.scalar_multiplication((lm*i))    res= ice.point_sequential_increment(lm, lm_upub)    binary = ''    for t in range (lm):        h= (res[t*65:t*65+65]).hex()        hc= int(h[2:], 16)                                if hc % 2 == 0:            A=\"0\"            binary+= ''.join(str(A))                        else:            A=\"1\"            binary+= ''.join(str(A))                my_str = (BitArray(bin=binary))#bin=binary    binary_file = open('baby_steps__binary.bin', 'ab')    my_str.tofile(binary_file)    binary_file.close()Giant Steps In this step, we perform giant steps by multiplying, this approach is efficient because it reduces the search space for the discrete logarithm from O(n) to O(sqrt(n)) , significantly speeding up the computation for large cyclic groups.search scriptCode:#@author: iceland, modified by @mcdouglasximport secp256k1 as iceimport timeimport randomimport osfrom bitstring import BitArrayimport numpy as np#Pk: 1033162084 puzzle #30Target = '030d282cf2ff536d2c42f105d0b8588821a915dc3f9a05bd98bb23af67a2e92a5b'start= 536870911                                                                                                                                                                                                                                           end=   1073741823                                                                                                                                                                                                                                                                                                                                                                                                                                                             m = 200000  # Keys number in Binary BabystepAdd = 1Add_pub = ice.scalar_multiplication(Add)Cm = 64public_key = ice.pub2upub(Target)bs_file = 'baby_steps__binary.bin'Q = public_keyPi = ice.pub2upub(\"020000000000000000000000000000000000000000000000000000000000000000\")# Find baby step filevalid = os.path.isfile(bs_file)if valid:    print(f'Found the Baby Steps Table file: {bs_file}. Will be used directly')    file = bytes(np.fromfile(bs_file))    baby_steps = BitArray(file)else:    print(f'Not Found {bs_file}. You must create this file now.')k1 = random.randint(start, end)k2 = k1 + m * mprint(f'Checking {m * m} keys from {(k1)}')# Start timest = time.time()k1G = ice.scalar_multiplication(k1)mG = ice.scalar_multiplication(m)# Find keydef findkey(onePoint):    S = ice.point_subtraction(onePoint, k1G)    if S == Pi:        return k1  # Point at Infinity    found = False    step = 0    while not found and step < (1 + k2 - k1):        Sx_1 = ice.point_sequential_increment(Cm, S)        binary = ''        for t in range(Cm):            h = (Sx_1[t * 65:t * 65 + 65]).hex()            hc = int(h[2:], 16)            A = \"0\" if hc % 2 == 0 else \"1\"            binary += A        b = BitArray(bin=binary)        c = bytes(b)        Sw = c        if b in baby_steps:            s = c            f = BitArray(baby_steps)            inx = f.find(s)            inx_1 = str(inx).replace(\",\", \"\").replace(\"(\", \"\").replace(\")\", \"\")            b = int(inx_1)            found = True            break        else:            # Giant step            S = ice.point_subtraction(S, mG)            step += m    if found:        final_key = (k1 + step + b + 1) - 1    else:        final_key = -1    return final_keyfinal_key = findkey(Q)if final_key > 0:    print(f'BSGS FOUND PrivateKey: {final_key}')    with open(\"win.txt\", \"a\") as data:        A0 = ice.scalar_multiplication(final_key)        A1 = ice.pubkey_to_address(0,1, A0)        data.write(f\"private key = {final_key}\\n\")        data.write(f\"address = {A1}\\n\")        data.write(f\"Time Spent: {time.time() - st:.2f} seconds\\n\")else:    print('PrivateKey Not Found')print(f\"Time Spent: {time.time() - st:.2f} seconds\")This script is just an idea, it is not intended to be fast.Make your own version in C.This is a modification of Iceland's work.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5477342",
+  "comments": [
+    {
+      "author": "digaran",
+      "created_time": "December 10, 2023, 06:45:20 PM",
+      "body": "You should add a description as to what baby step is and how it actually works, explain the logic so even a newbie can understand. Looking forward to see more improvements and more tools.👏💯",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "December 10, 2023, 08:40:18 PM",
+      "body": "Quote from: digaran on December 10, 2023, 06:45:20 PMYou should add a description as to what baby step is and how it actually works, explain the logic so even a newbie can understand. Looking forward to see more improvements and more tools.👏💯You're right, I published it quickly, when I have enough time I will do it, but for example baby step is a simple progressive database, equivalent to 2 million keys (it can be any size you want).The advantage of using bits is that it is easier to manage light databases, its original version stores 400 million keys in 2GB, with bits only a few MB are needed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "December 10, 2023, 11:47:43 PM",
+      "body": "Quote from: mcdouglasx on December 10, 2023, 08:40:18 PMQuote from: digaran on December 10, 2023, 06:45:20 PMYou should add a description as to what baby step is and how it actually works, explain the logic so even a newbie can understand. Looking forward to see more improvements and more tools.👏💯You're right, I published it quickly, when I have enough time I will do it, but for example baby step is a simple progressive database, equivalent to 2 million keys (it can be any size you want).The advantage of using bits is that it is easier to manage light databases, its original version stores 400 million keys in 2GB, with bits only a few MB are needed.Great. Thank you very much",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sssergy2705",
+      "created_time": "December 12, 2023, 05:15:30 AM",
+      "body": "Quote from: mcdouglasx on December 10, 2023, 06:39:15 PMupdated 12/11/2023.Code:#by mcdouglasximport secp256k1 as icefrom bitstring import BitArrayprint(\"creating Baby Step\")#create baby stepnum = 2000000 # Keys number in Binary Babystep. same m in search scriptLow_m= 20lm= num // Low_mAdd = 1Add_pub= ice.scalar_multiplication(Add)res= ice.point_sequential_increment(lm, Add_pub)binary = ''for t in range (lm):    h= (res[t*65:t*65+65]).hex()    hc= int(h[2:], 16)                    if str(hc).endswith(('0','2','4','6','8')):        A=\"0\"        binary+= ''.join(str(A))                if str(hc).endswith(('1','3','5','7','9')):        A=\"1\"        binary+= ''.join(str(A))        my_str = (BitArray(bin=binary))#bin=binarybinary_file = open('baby_steps__binary.bin', 'ab')my_str.tofile(binary_file)binary_file.close()for i in range (1,Low_m):    print(\"stage: \"+ str(i+1)+\"/\"+str(20))        lm_upub= ice.scalar_multiplication((lm*i))    res= ice.point_sequential_increment(lm, lm_upub)    binary = ''    for t in range (lm):        h= (res[t*65:t*65+65]).hex()        hc= int(h[2:], 16)                                if str(hc).endswith(('0','2','4','6','8')):            A=\"0\"            binary+= ''.join(str(A))                        if str(hc).endswith(('1','3','5','7','9')):            A=\"1\"            binary+= ''.join(str(A))                my_str = (BitArray(bin=binary))#bin=binary    binary_file = open('baby_steps__binary.bin', 'ab')    my_str.tofile(binary_file)    binary_file.close()Add = 1Could this variable have a different meaning?Or is there an analogue in the second script?The fact is that when changing the value in this variable, the search script does not find matches.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "December 12, 2023, 05:34:20 AM",
+      "body": "Quote from: sssergy2705 on December 12, 2023, 05:15:30 AMQuote from: mcdouglasx on December 10, 2023, 06:39:15 PMupdated 12/11/2023.Code:#by mcdouglasximport secp256k1 as icefrom bitstring import BitArrayprint(\"creating Baby Step\")#create baby stepnum = 2000000 # Keys number in Binary Babystep. same m in search scriptLow_m= 20lm= num // Low_mAdd = 1Add_pub= ice.scalar_multiplication(Add)res= ice.point_sequential_increment(lm, Add_pub)binary = ''for t in range (lm):    h= (res[t*65:t*65+65]).hex()    hc= int(h[2:], 16)                    if str(hc).endswith(('0','2','4','6','8')):        A=\"0\"        binary+= ''.join(str(A))                if str(hc).endswith(('1','3','5','7','9')):        A=\"1\"        binary+= ''.join(str(A))        my_str = (BitArray(bin=binary))#bin=binarybinary_file = open('baby_steps__binary.bin', 'ab')my_str.tofile(binary_file)binary_file.close()for i in range (1,Low_m):    print(\"stage: \"+ str(i+1)+\"/\"+str(20))        lm_upub= ice.scalar_multiplication((lm*i))    res= ice.point_sequential_increment(lm, lm_upub)    binary = ''    for t in range (lm):        h= (res[t*65:t*65+65]).hex()        hc= int(h[2:], 16)                                if str(hc).endswith(('0','2','4','6','8')):            A=\"0\"            binary+= ''.join(str(A))                        if str(hc).endswith(('1','3','5','7','9')):            A=\"1\"            binary+= ''.join(str(A))                my_str = (BitArray(bin=binary))#bin=binary    binary_file = open('baby_steps__binary.bin', 'ab')    my_str.tofile(binary_file)    binary_file.close()Add = 1Could this variable have a different meaning?Or is there an analogue in the second script?The fact is that when changing the value in this variable, the search script does not find matches.It is the beginning of the database. starting from pk 1.If you want to start from another point you must use this linelm_upub= ice.scalar_multiplication(Add+(lm*i))",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dextronomous",
+      "created_time": "December 12, 2023, 01:18:17 PM",
+      "body": "sorry for jumping in and having to ask what i have to changebinary_bsgs_v1.py using this one starting at another point instead of 1 using this\"lm_upub= ice.scalar_multiplication(Add+(lm*i))\"will go for 120 bit db how to setup after 125 any help on this , mean where are you're specific scripts,you all have your own scripts share it is care for it..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Drawesome",
+      "created_time": "December 14, 2023, 12:04:47 AM",
+      "body": "I found your work very interesting and have spent a couple of hours trying to understand it. These things really motivate me to keep learning. However, my biggest doubt is: In what natural context would a sequence of public keys with some pattern appear? I can't think of any, except for testing the security of the Secp256k1 scheme itself",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nomachine",
+      "created_time": "January 06, 2024, 11:19:52 AMLast edit: January 06, 2024, 01:32:47 PM by nomachine",
+      "body": "How to make lightweight database for Public Key Hashes (Hash 160) ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nomachine",
+      "created_time": "January 06, 2024, 03:57:20 PMLast edit: January 06, 2024, 04:15:48 PM by nomachine",
+      "body": "Quote from: dextronomous on December 12, 2023, 01:18:17 PMsorry for jumping in and having to ask what i have to changebinary_bsgs_v1.py using this one starting at another point instead of 1 using this\"lm_upub= ice.scalar_multiplication(Add+(lm*i))\"will go for 120 bit db how to setup after 125 any help on this , mean where are you're specific scripts,you all have your own scripts share it is care for it.. Example for 65bitIt won't work if there are no chunks. It will throw out that you don't have enough memory even if you have 128GB of RAM.So this is will create baby_steps_binary.bin from 46117 stages....Size of file over 5GB ....So calculate size for 130 bit.  Code:import secp256k1 as icefrom bitstring import BitArrayprint(\"creating Baby Step\")# create baby stepnum = 92233720368  # Keys number in Binary Babystep. same m in the search scriptLow_m = 20lm = num // Low_mAdd = 18446744073709551615Add_pub = ice.scalar_multiplication(Add)# Function to process a chunk and write to binary filedef process_and_write_chunk(start, end):    res = ice.point_sequential_increment(end - start, Add_pub)    # Ensure the length of res is a multiple of 65    res_length = len(res)    if res_length % 65 != 0:        res = res[:-(res_length % 65)]    binary = ''    for t in range(start, end):        h = res[t * 65 : (t + 1) * 65].hex()        hc = int(h[2:], 16) if h else 0  # Handle the case when h is an empty string        if str(hc).endswith(('0', '2', '4', '6', '8')):            A = \"0\"            binary += ''.join(str(A))        if str(hc).endswith(('1', '3', '5', '7', '9')):            A = \"1\"            binary += ''.join(str(A))    my_str = BitArray(bin=binary)    binary_file = open('baby_steps_binary.bin', 'ab')    my_str.tofile(binary_file)    binary_file.close()# Process the remaining chunks with a smaller chunk sizechunk_size = 100000for i in range(0, lm, chunk_size):    print(\"stage: \" + str(i // chunk_size + 1) + \"/\" + str((lm + chunk_size - 1) // chunk_size))    end = min(i + chunk_size, lm)    process_and_write_chunk(i, end)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mabdlmonem",
+      "created_time": "January 06, 2024, 07:11:14 PM",
+      "body": "Quote from: nomachine on January 06, 2024, 03:57:20 PMQuote from: dextronomous on December 12, 2023, 01:18:17 PMsorry for jumping in and having to ask what i have to changebinary_bsgs_v1.py using this one starting at another point instead of 1 using this\"lm_upub= ice.scalar_multiplication(Add+(lm*i))\"will go for 120 bit db how to setup after 125 any help on this , mean where are you're specific scripts,you all have your own scripts share it is care for it.. Example for 65bitIt won't work if there are no chunks. It will throw out that you don't have enough memory even if you have 128GB of RAM.So this is will create baby_steps_binary.bin from 46117 stages....Size of file over 5GB ....So calculate size for 130 bit.  Code:import secp256k1 as icefrom bitstring import BitArrayprint(\"creating Baby Step\")# create baby stepnum = 92233720368  # Keys number in Binary Babystep. same m in the search scriptLow_m = 20lm = num // Low_mAdd = 18446744073709551615Add_pub = ice.scalar_multiplication(Add)# Function to process a chunk and write to binary filedef process_and_write_chunk(start, end):    res = ice.point_sequential_increment(end - start, Add_pub)    # Ensure the length of res is a multiple of 65    res_length = len(res)    if res_length % 65 != 0:        res = res[:-(res_length % 65)]    binary = ''    for t in range(start, end):        h = res[t * 65 : (t + 1) * 65].hex()        hc = int(h[2:], 16) if h else 0  # Handle the case when h is an empty string        if str(hc).endswith(('0', '2', '4', '6', '8')):            A = \"0\"            binary += ''.join(str(A))        if str(hc).endswith(('1', '3', '5', '7', '9')):            A = \"1\"            binary += ''.join(str(A))    my_str = BitArray(bin=binary)    binary_file = open('baby_steps_binary.bin', 'ab')    my_str.tofile(binary_file)    binary_file.close()# Process the remaining chunks with a smaller chunk sizechunk_size = 100000for i in range(0, lm, chunk_size):    print(\"stage: \" + str(i // chunk_size + 1) + \"/\" + str((lm + chunk_size - 1) // chunk_size))    end = min(i + chunk_size, lm)    process_and_write_chunk(i, end) what about add step size , I think it will more better",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "January 06, 2024, 07:21:21 PM",
+      "body": "Quote from: nomachine on January 06, 2024, 03:57:20 PMQuote from: dextronomous on December 12, 2023, 01:18:17 PMsorry for jumping in and having to ask what i have to changebinary_bsgs_v1.py using this one starting at another point instead of 1 using this\"lm_upub= ice.scalar_multiplication(Add+(lm*i))\"will go for 120 bit db how to setup after 125 any help on this , mean where are you're specific scripts,you all have your own scripts share it is care for it.. Example for 65bitIt won't work if there are no chunks. It will throw out that you don't have enough memory even if you have 128GB of RAM.So this is will create baby_steps_binary.bin from 46117 stages....Size of file over 5GB ....So calculate size for 130 bit.  Code:import secp256k1 as icefrom bitstring import BitArrayprint(\"creating Baby Step\")# create baby stepnum = 92233720368  # Keys number in Binary Babystep. same m in the search scriptLow_m = 20lm = num // Low_mAdd = 18446744073709551615Add_pub = ice.scalar_multiplication(Add)# Function to process a chunk and write to binary filedef process_and_write_chunk(start, end):    res = ice.point_sequential_increment(end - start, Add_pub)    # Ensure the length of res is a multiple of 65    res_length = len(res)    if res_length % 65 != 0:        res = res[:-(res_length % 65)]    binary = ''    for t in range(start, end):        h = res[t * 65 : (t + 1) * 65].hex()        hc = int(h[2:], 16) if h else 0  # Handle the case when h is an empty string        if str(hc).endswith(('0', '2', '4', '6', '8')):            A = \"0\"            binary += ''.join(str(A))        if str(hc).endswith(('1', '3', '5', '7', '9')):            A = \"1\"            binary += ''.join(str(A))    my_str = BitArray(bin=binary)    binary_file = open('baby_steps_binary.bin', 'ab')    my_str.tofile(binary_file)    binary_file.close()# Process the remaining chunks with a smaller chunk sizechunk_size = 100000for i in range(0, lm, chunk_size):    print(\"stage: \" + str(i // chunk_size + 1) + \"/\" + str((lm + chunk_size - 1) // chunk_size))    end = min(i + chunk_size, lm)    process_and_write_chunk(i, end)Your topics is most interested in 2020-2024  on bittalc.orgNo other so knowlage able, like you in brute btc )))",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nomachine",
+      "created_time": "January 07, 2024, 07:00:14 AM",
+      "body": "Quote from: mabdlmonem on January 06, 2024, 07:11:14 PMwhat about add step size , I think it will more better there is already a ready-made script that does this perfectly:https://github.com/iceland2k14/bsgs/tree/main/v6_dll_bsgsbut keyhunt is still better...so, nothing new to invent here.only the way the bin file is packed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "January 07, 2024, 02:48:11 PM",
+      "body": "Quote from: nomachine on January 07, 2024, 07:00:14 AMQuote from: mabdlmonem on January 06, 2024, 07:11:14 PMwhat about add step size , I think it will more better there is already a ready-made script that does this perfectly:https://github.com/iceland2k14/bsgs/tree/main/v6_dll_bsgsbut keyhunt is still better...so, nothing new to invent here.only the way the bin file is packed. You hit the nail on the head, maybe replacing bp files with binary db in keyhunt would be a plus.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "January 07, 2024, 05:49:27 PM",
+      "body": "Yo mc, sup! 😂 Can you please explain what CM is and how should we treat it? I mean I have used 32 low m, 128M keys as num and 256 to sub each time, now I have 128M in baby step, 256 Add, 32 low m, with 128M on giant step and CM as 32.The thing is, it's finding false positives left and right. 😂",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mcdouglasx",
+      "created_time": "January 07, 2024, 07:27:18 PM",
+      "body": "Quote from: digaran on January 07, 2024, 05:49:27 PMYo mc, sup! 😂 Can you please explain what CM is and how should we treat it? I mean I have used 32 low m, 128M keys as num and 256 to sub each time, now I have 128M in baby step, 256 Add, 32 low m, with 128M on giant step and CM as 32.The thing is, it's finding false positives left and right. 😂CM is the sequence of 1 and 0 to check in the database, if you choose a CM less than 64, you will have a high probability of obtaining false positives. that's why I choose 64 bits.In your case 2^32 is your probability of false positives.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WanderingPhilospher",
+      "created_time": "January 07, 2024, 08:46:19 PM",
+      "body": "Quote from: mcdouglasx on January 07, 2024, 07:27:18 PMQuote from: digaran on January 07, 2024, 05:49:27 PMYo mc, sup! 😂 Can you please explain what CM is and how should we treat it? I mean I have used 32 low m, 128M keys as num and 256 to sub each time, now I have 128M in baby step, 256 Add, 32 low m, with 128M on giant step and CM as 32.The thing is, it's finding false positives left and right. 😂CM is the sequence of 1 and 0 to check in the database, if you choose a CM less than 64, you will have a high probability of obtaining false positives. that's why I choose 64 bits.In your case 2^32 is your probability of false positives.Just add a false positive check where it skips false positives and keeps on checking for the actual result.That way, you can speed up the search (less CM).This is a classical, less DB size, but you give up search speed.I've managed to work out another angle with BSGS, using less DB space, transferring to a bloom filter, while maintaining original speed and using way less RAM during the search. This is with an ICE version. It's still not as fast as other BSGS but I'm still tinkering. But none are as fast as a GPU BSGS. Then it comes down to price comparison; can you buy 100s of GB of RAM sticks or a new mid-level GPU for less? That's really the rub here. With a single 4090, one can achieve over 100 Exakey/s.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "_Counselor",
+      "created_time": "January 08, 2024, 06:49:34 PM",
+      "body": "I don't see any benefits of this. If you have N baby steps with 1 bit of each, then roughly N/2 steps will collide with each giant step. This mean you will need to perform at least N/2 additional operations on each giant step to check false positives. This leads to the fact that the ability to store n-times more baby steps leads to an n-times increase in the size of the giant step, but at the same time increases the number of operations required to check the collision by the same number.Simply put, this ultimately will not give any increase in speed compared to maintaining the full baby step value.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WanderingPhilospher",
+      "created_time": "January 08, 2024, 07:46:31 PM",
+      "body": "Quote from: _Counselor on January 08, 2024, 06:49:34 PMI don't see any benefits of this. If you have N baby steps with 1 bit of each, then roughly N/2 steps will collide with each giant step. This mean you will need to perform at least N/2 additional operations on each giant step to check false positives. This leads to the fact that the ability to store n-times more baby steps leads to an n-times increase in the size of the giant step, but at the same time increases the number of operations required to check the collision by the same number.Simply put, this ultimately will not give any increase in speed compared to maintaining the full baby step value.Each key is represented by 1 bit; but 64 keys are calculated and hashed to binary, so basically 64, zeros and ones, represent 64 keys. False collision 1 out of every 2^64? So DB is smaller but search is slower. DB is much smaller.I managed to represent each key with 8 bits and add false collision check. Larger DB size than the OPs original, but search Key/s is faster.Working on another angle now. It works with normal search but I have not tried to implement into BSGS as OP did.Also, Counselor, check your discord.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

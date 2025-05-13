@@ -1,0 +1,61 @@
+{
+  "id": "topic_5453143",
+  "title": "notocactus",
+  "author": "notocactus",
+  "created_time": "May 18, 2023, 03:49:41 AM",
+  "content": "It is not my new idea. I raised it years ago but none of admin or tech savvy in community make it. Lately we have PowerGlove who wrote some SMF patches for forum.This idea comes to my brain again today.  Forum has a hidden page for each user, if you want to get your topic list (with topic link too).Code:https://bitcointalk.org/gettopics.php?user=3486361It will list all topics you have ever created.If you want to narrow the list down to a specific board, use this formatCode:https://bitcointalk.org/gettopics.php?user=3486361;board=24Examples for PowerGlovehttps://bitcointalk.org/gettopics.php?user=3486361https://bitcointalk.org/gettopics.php?user=3486361;board=24Could we have a SMF patch for it at bottom of each user profile page?Current informationQuoteAdditional Information:Send this member a personal message.Show the last posts of this person.Show the last topics started by this person.Show general statistics for this member.I'd like to haveQuoteAdditional Information:Send this member a personal message.Show the last posts of this person.Show the topic list of this person.Show the last topics started by this person.Show general statistics for this member.May you help us with it @PowerGlove?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5453143",
+  "comments": [
+    {
+      "author": "PowerGlove",
+      "created_time": "May 18, 2023, 05:21:58 AM",
+      "body": "Quote from: tranthidung on May 18, 2023, 03:49:41 AM(...) May you help us with it @PowerGlove?  Hehe, yeah, I can do that. Here's the patch:Code:--- /var/www/baseline/Themes/default/Profile.template.php 2007-02-03 15:55:14.000000000 +0000+++ /var/www/modified/Themes/default/Profile.template.php 2023-05-18 04:51:40.000000000 +0000@@ -69,25 +69,25 @@ {  global $context, $settings, $options;   echo '     </td>    </tr>   </table>'; }  // This template displays users details without any option to edit them. function template_summary() {- global $context, $settings, $options, $scripturl, $modSettings, $txt;+ global $context, $settings, $options, $boardurl, $scripturl, $modSettings, $txt;   // First do the containing table and table header.  echo ' <table border=\"0\" cellpadding=\"4\" cellspacing=\"1\" align=\"center\" class=\"bordercolor\">  <tr class=\"titlebg\">   <td width=\"420\" height=\"26\">    <img src=\"', $settings['images_url'], '/icons/profile_sm.gif\" alt=\"\" align=\"top\" />&nbsp;    ', $txt['summary'], ' - ', $context['member']['name'], '   </td>   <td align=\"center\" width=\"150\">', $txt[232], '</td>  </tr>'; @@ -308,24 +308,25 @@  echo '  <tr class=\"titlebg\">   <td colspan=\"2\">', $txt[597], ':</td>  </tr>  <tr>   <td class=\"windowbg2\" colspan=\"2\">';  if (!$context['user']['is_owner'] && $context['can_send_pm'])   echo '    <a href=\"', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '\">', $txt[688], '.</a><br />    <br />';  echo '    <a href=\"', $scripturl, '?action=profile;u=', $context['member']['id'], ';sa=showPosts\">', $txt[460], ' ', $txt[461], '.</a><br />+   <a href=\"', $boardurl, '/gettopics.php?user=', $context['member']['id'], '\">', 'Show the topic list of this person.</a><br />    <a href=\"', $scripturl, '?action=profile;u=', $context['member']['id'], ';sa=statPanel\">', $txt['statPanel_show'], '.</a><br />    <br />   </td>  </tr> </table>'; }  // Template for showing all the posts of the user, in chronological order. function template_showPosts() {  global $context, $settings, $options, $scripturl, $modSettings, $txt;Now it's your job to bug theymos, and see if you can get him to merge it.  (I'm not saying that this idea couldn't use some refinement, but it's a straightforward patch, so I figured I would just do what OP asked, and not overthink things.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "June 04, 2023, 04:03:11 AM",
+      "body": "I've had some time to think about this one, and I'd be surprised if theymos accepts the above patch; there are already four links in that area, and adding a fifth one for something that's not really necessary is a pretty tough sell.I think a smarter way to do this would be to remove the link for per-user statistics (they've been disabled anyway), add the link for the topic list (which is what OP is asking for), remove the redundant line break that currently leaves a gap at the bottom of that area (might as well clean things up, while I'm here), and then rearrange things so that the last three links are all on one line.That way, instead of that area looking like this:It would look like this:For my money, that's a strict improvement (i.e. it's tidier, it takes up less vertical space, and it replaces an effectively dead link with a useful one).Here's the updated patch:Code:--- /var/www/baseline/Themes/default/Profile.template.php 2007-02-03 15:55:14.000000000 +0000+++ /var/www/modified/Themes/default/Profile.template.php 2023-06-04 02:48:35.000000000 +0000@@ -69,25 +69,25 @@ {  global $context, $settings, $options;   echo '     </td>    </tr>   </table>'; }  // This template displays users details without any option to edit them. function template_summary() {- global $context, $settings, $options, $scripturl, $modSettings, $txt;+ global $context, $settings, $options, $boardurl, $scripturl, $modSettings, $txt;   // First do the containing table and table header.  echo ' <table border=\"0\" cellpadding=\"4\" cellspacing=\"1\" align=\"center\" class=\"bordercolor\">  <tr class=\"titlebg\">   <td width=\"420\" height=\"26\">    <img src=\"', $settings['images_url'], '/icons/profile_sm.gif\" alt=\"\" align=\"top\" />&nbsp;    ', $txt['summary'], ' - ', $context['member']['name'], '   </td>   <td align=\"center\" width=\"150\">', $txt[232], '</td>  </tr>'; @@ -307,26 +307,25 @@  // Finally, if applicable, span the bottom of the table with links to other useful member functions.  echo '  <tr class=\"titlebg\">   <td colspan=\"2\">', $txt[597], ':</td>  </tr>  <tr>   <td class=\"windowbg2\" colspan=\"2\">';  if (!$context['user']['is_owner'] && $context['can_send_pm'])   echo '    <a href=\"', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '\">', $txt[688], '.</a><br />    <br />';  echo '-   <a href=\"', $scripturl, '?action=profile;u=', $context['member']['id'], ';sa=showPosts\">', $txt[460], ' ', $txt[461], '.</a><br />-   <a href=\"', $scripturl, '?action=profile;u=', $context['member']['id'], ';sa=statPanel\">', $txt['statPanel_show'], '.</a><br />+   <span>Show the <a href=\"', $scripturl, '?action=profile;u=', $context['member']['id'], ';sa=showPosts\">posts</a>, <a href=\"', $scripturl, '?action=profile;threads;u=', $context['member']['id'], ';sa=showPosts\">topics</a> or <a href=\"', $boardurl, '/gettopics.php?user=', $context['member']['id'], '\">topic list</a> of this person.</span>    <br />   </td>  </tr> </table>'; }  // Template for showing all the posts of the user, in chronological order. function template_showPosts() {  global $context, $settings, $options, $scripturl, $modSettings, $txt;",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 04, 2023, 05:27:06 AM",
+      "body": "Quote from: PowerGlove on June 04, 2023, 04:03:11 AMremove the redundant line break that currently leaves a gap at the bottom of that areaThat line break is needed for other things:I guess Mods may have more features down there. Of course, the real fix would be adding the line break only when needed, but you'll need to be able to see them to patch it.Quote from: tranthidung on May 18, 2023, 03:49:41 AMForum has a hidden page for each user, if you want to get your topic list (with topic link too).Code:https://bitcointalk.org/gettopics.php?user=3486361It will list all topics you have ever created.I'd like to see this patch, now I use my bookmarks to find the link (and edit it).While we're on the subject of improvements: I often miss a link from the Trust summary back to the the profile. This happens when I type a username in my browser, and it brings me to wrong page. And, surprisingly, this happens quite a lot.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "June 04, 2023, 11:29:20 AM",
+      "body": "Quote from: LoyceV on June 04, 2023, 05:27:06 AMThat line break is needed for other things: (...)Yup, theymos will have to tweak the patch as it is (to fit in with his other changes), so the trailing line break issue is up to him to resolve (I think prefix-style line breaks might make more sense than postfix ones do).Quote from: LoyceV on June 04, 2023, 05:27:06 AMWhile we're on the subject of improvements: I often miss a link from the Trust summary back to the the profile.That's a good suggestion (and a simple thing to fix).I don't have access to theymos' code (trust system, merit system, etc.) and I can't patch things that I can't see (at least, not in any sensible kind of way). I think a logical place for it to go would be here:(Sorry I can't be more help than that, maybe if you send theymos a PM he'll do it for you.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "notocactus",
+      "created_time": "June 04, 2023, 12:31:51 PM",
+      "body": "Quote from: PowerGlove on June 04, 2023, 04:03:11 AMIt would look like this:For my money, that's a strict improvement (i.e. it's tidier, it takes up less vertical space, and it replaces an effectively dead link with a useful one).I really like the patch and its visualization which is neat, very neat.I asked myself long time ago that why forum disabled user stats page but did not remove that line \"Show general statistics for this member.\" Thinking about it repeatedly I come to my answer that maybe the admin did not exclude to re-enable it in future so he just left it there like that. It would be more time consuming to disable, re-enable minor things.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 05, 2023, 09:54:34 AM",
+      "body": "Quote from: PowerGlove on June 04, 2023, 11:29:20 AMI think a logical place for it to go would be here:(Sorry I can't be more help than that, maybe if you send theymos a PM he'll do it for you.)That looks good, but I won't bug theymos for this. Let's assume Admin reads Meta topics",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

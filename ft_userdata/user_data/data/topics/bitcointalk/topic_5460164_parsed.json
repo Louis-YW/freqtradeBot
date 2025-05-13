@@ -1,0 +1,165 @@
+{
+  "id": "topic_5460164",
+  "title": "COBRAS",
+  "author": "COBRAS",
+  "created_time": "July 18, 2023, 03:42:14 AM",
+  "content": "How many subsets what have exactly 35 numbers I can generate from set {1,2,…,525} ? Thx",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5460164",
+  "comments": [
+    {
+      "author": "vjudeu",
+      "created_time": "July 18, 2023, 04:25:54 AM",
+      "body": "You can pick the first number in 525 ways. The second number in 524 ways. And so on. Getting this part is simple:(525-0)*(525-1)*(525-2)*...*(525-34)Also, it doesn't matter if you picked number \"a\" first, and then number \"b\", or maybe number \"b\" first, and then \"a\". So, you divide it by the number of combinations for picking 35 numbers:1*2*3*...*35If you divide the first line by the second one, you will get binomial coefficients.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 18, 2023, 04:27:51 AM",
+      "body": "Your question sounds like a math problem, more specifically Combination. You want to select k items from a set containing n items which is denoted as Ckn and is calculated by computing factorials: n!/(k!(n-k)!)Your k is 35 and your n is 525.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "July 18, 2023, 04:30:11 AM",
+      "body": "Quote from: pooya87 on July 18, 2023, 04:27:51 AMYour question sounds like a math problem, more specifically Combination. You want to select k items from a set containing n items which is denoted as Ckn and is calculated by computing factorials: n!/(k!(n-k)!)Your k is 35 and your n is 525.(((( Bad news. Bat Bitcoin security is children games if look at combinations.....",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "July 18, 2023, 04:30:36 AM",
+      "body": "Thank you All !!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 18, 2023, 04:31:00 AM",
+      "body": "Quote from: COBRAS on July 18, 2023, 03:42:14 AMHow many subsets what have exactly 35 numbers I can generate from set {1,2,…,525} ? ThxCode:Python 3.11.3 (main, Apr  7 2023, 00:39:07) [Clang 14.0.7 (https://android.googlesource.com/toolchain/llvm-project 4c603efb0 on linuxType \"help\", \"copyright\", \"credits\" or \"license\" for more information.>>> import itertools>>> a = set(range(1, 526))>>> len(list(itertools.combinations(a, 35)))Please note that running this script may slow down or even damage your device since the amount of time and space to calculate this are enormous.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 18, 2023, 10:30:00 AM",
+      "body": "Quote from: witcher_sense on July 18, 2023, 04:31:00 AMCode:Python 3.11.3 (main, Apr  7 2023, 00:39:07) [Clang 14.0.7 (https://android.googlesource.com/toolchain/llvm-project 4c603efb0 on linuxType \"help\", \"copyright\", \"credits\" or \"license\" for more information.>>> import itertools>>> a = set(range(1, 526))>>> len(list(itertools.combinations(a, 35)))Please note that running this script may slow down or even damage your device since the amount of time and space to calculate this are enormous.I think that warning is overblown. If all you want is to process the combinations one at a time and optionally get their length, you could do something like this:Code:import itertoolsa = set(range(1, 526))n = itertools.combinations(a, 35) # returns a generator, not a listcount = 0try:    while True:        element = next(n)        count += 1        # Process the elementexcept StopIteration:    passprint(count)With your code, it's not going to damage your device - the worst that can happen is that you run out of memory and are forced to do a hard reboot. Though if you are doing this on a server, then yeah. That's not fun. I've been in that situation more than once",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 18, 2023, 10:39:38 AM",
+      "body": "Quote from: witcher_sense on July 18, 2023, 04:31:00 AMPlease note that running this script may slow down or even damage your device since the amount of time and space to calculate this are enormous.It is very computationally expensive; can't run it on my device, it kills it. The operation you want to calculate is:Code:n! / (k! * (n-k)!) => 525! / (35! * (525-35)!) => 525! / (35! * 490!)I wrote this:Code:def factorial_loop(n):    factorial = 1    for i in range(1, n + 1):        factorial *= i    return factorialfrom decimal import Decimal, getcontextgetcontext().prec = 500n = int(input(\"Enter a number n: \"))k = int(input(\"Enter a number k: \"))numerator = Decimal(factorial_loop(n))denominator = Decimal(factorial_loop(k) * factorial_loop(n-k))result = numerator / denominatorprint(\"numerator: \", numerator)print(\"denominator: \", denominator)print(\"result: \", result)The result is:Code:4875197867478707228958513876216391120239539892113911200First time writing python guys, and I now quite recognize why it's so popular.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 18, 2023, 01:17:54 PM",
+      "body": "Quote from: BlackHatCoiner on July 18, 2023, 10:39:38 AMIt is very computationally expensive; can't run it on my device, it kills it. The operation you want to calculate is:Code:n! / (k! * (n-k)!) => 525! / (35! * (525-35)!) => 525! / (35! * 490!)Here is a math trick:n! = n* (n-1)! = n*(n-1)* (n-2)! = n*(n-1)*(n-2)* (n-3)!525! = 525*524*...*492*491 * 490!Now the equation is simplified like this:525*524*...*492*491 * 490! / 35! * 490!So we actually need to only compute 525*524*...*492*491 (roughly 35 multiplication) and 35! (roughly another 35 multiplication) then do a division.Code:BigInteger dividend = 1;for (int i = 491; i <= 525; i++){    dividend *= i;}BigInteger divisor = 1;for (int i = 2; i <= 35; i++){    divisor *= i;}BigInteger result = dividend / divisor;This code takes less than a second to run, it also doesn't consume memory.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 18, 2023, 02:41:09 PM",
+      "body": "QuoteSo we actually need to only compute 525*524*...*492*491 (roughly 35 multiplication) and 35! (roughly another 35 multiplication) then do a division.Even better: we need to only compute 35 integers, that we prepare for final multiplication.Because we have 35 concurrent numbers, it is guaranteed that one of them is divisible by 35, so we can reduce that before multiplying anything. And so on for 34. And then for 33. We can start reduction from prime numbers (or even express each number as a product of some prime numbers with their powers, and then reduce it).Finally, we can reach a list of 35 numbers, that we can multiply in the end. That also means, we can safely use for example uint32 to store and prepare those 35 numbers, before using any BigInteger type.Also, for bigger numbers, it is probably useful to see them in some simplified form. Depending on what is needed, it may be sufficient to just know that the answer is less than 10^N or 2^N, instead of knowing every single digit of that result.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 18, 2023, 04:06:30 PM",
+      "body": "Quote from: BlackHatCoiner on July 18, 2023, 10:39:38 AMFirst time writing python guys, and I now quite recognize why it's so popular.  With Python, you rarely need to reinvent the wheel because it already has a rich library of highly-optimized functions, including those specifically designed for the calculation of factorials of large numbers. Instead of writing inefficient for loops for repetitive multiplications, you just import math module and receive the same result in a matter of milliseconds. Look at the following console session:Code:Python 3.11.3 (main, Apr  7 2023, 00:39:07) [Clang 14.0.7 (https://android.googlesource.com/toolchain/llvm-project 4c603efb0 on linuxType \"help\", \"copyright\", \"credits\" or \"license\" for more information.>>> import math>>> f, n, k = math.factorial, 525, 35>>> f(n) // (f(k) * f(n-k))4875197867478707228958513876216391120239539892113911200>>>",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "July 19, 2023, 01:03:47 AMLast edit: July 19, 2023, 01:40:51 AM by COBRAS",
+      "body": "525 , 35  needs for crack 256 bit priv. so 4875197867478707228958513876216391120239539892113911200 =  2^182 is security of 2**256screen link https://ibb.co/4ZM3LJh on screen, result = 0 is mean what priv is find. pp mean number of combinationsand algo not required bsgs, base points , start and ranges or cangaroo...big thank you for yours scypts !can someone provide FAST  scrypt for generate all posible combinations of 525 , with length 450 ?p.s. then length is bigger, result less dramatic.big thank you",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "July 19, 2023, 04:50:09 AM",
+      "body": "Quote from: COBRAS on July 19, 2023, 01:03:47 AMcan someone provide FAST  scrypt for generate all posible combinations of 525 , with length 450 ?The python script that I provided earlier calculates combinations pretty fast since all underlying functions written in C language. It takes around 0.5 milliseconds on my Android to receive the number of combinations, even less on PC and without execution time measurement.Code:>>> import math; from time import perf_counter as pk; start,f,n,k = pk(), math.factorial,525,450; f(n) // (f(k) * f(n-k)); perf_counter() - start1602385948602564327564263244742305824701465983791687129625009605670572958180919196398308400800.0005006769933970645",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 19, 2023, 04:55:47 AM",
+      "body": "Quote from: garlonicon on July 18, 2023, 02:41:09 PMQuoteSo we actually need to only compute 525*524*...*492*491 (roughly 35 multiplication) and 35! (roughly another 35 multiplication) then do a division.Even better: we need to only compute 35 integers, that we prepare for final multiplication.Because we have 35 concurrent numbers, it is guaranteed that one of them is divisible by 35, so we can reduce that before multiplying anything. And so on for 34. And then for 33. We can start reduction from prime numbers (or even express each number as a product of some prime numbers with their powers, and then reduce it).Finally, we can reach a list of 35 numbers, that we can multiply in the end. That also means, we can safely use for example uint32 to store and prepare those 35 numbers, before using any BigInteger type.Also, for bigger numbers, it is probably useful to see them in some simplified form. Depending on what is needed, it may be sufficient to just know that the answer is less than 10^N or 2^N, instead of knowing every single digit of that result.There is always room for more improvement but the real question is how much time you want to dedicate to solving a problem and how much you want to improve. If we go from for example 10 minutes and 1 GB memory usage to 1 second and 1 kb memory, that is an improvement but if we go from 1 second to 0.9 second and 1 kb to 0.5 kb, that is not much of an improvement.Take the code I posted above, the usage of C# BigInteger in a loop will create a lot of garbage for the garbage collector to collect (due to the underlying array allocated on the heap) hence it not only wastes memory but also slows down the code. But it is a short loop with low number of iterations and the whole thing takes less than a second so spending time trying to fix that is a waste of time.Now about your suggestion, it has to be tested and benchmarked but the problem I see is that when you say a number has to be divisible by X, that is not something we just know but something we have to calculate that means extra steps or in other words possibility of adding additional bottlenecks instead of optimizing the existing code. Not to mention that division itself is generally a slow process.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GR Sasa",
+      "created_time": "July 19, 2023, 07:47:12 AM",
+      "body": "Hi there guys,What is the topic about? What combinations are those?Is it for cracking 256 bits? Someone please explain",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Flexystar",
+      "created_time": "July 20, 2023, 03:13:14 PM",
+      "body": "Quote from: GR Sasa on July 19, 2023, 07:47:12 AMHi there guys,What is the topic about? What combinations are those?Is it for cracking 256 bits? Someone please explain  I hardly think that it has got anything to do with the cracking of combinations of 256 hash. It has got nothing to do with any sort of cracking. I believe OP just needed a solution to mathematical problem of subset segregation. I am so surprised to see so many solutions for a single problem. The math subject really seems fun on this thread and I would be very honest with you guys, even my math teacher was not this good to teach us the basic math. Mind is blown right now seeing that you guys went even further and wrote a script for the same. Lolz. No wonder, maths is fun but I skipped it. Eh.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "July 20, 2023, 07:30:21 PM",
+      "body": "Quote from: Flexystar on July 20, 2023, 03:13:14 PMQuote from: GR Sasa on July 19, 2023, 07:47:12 AMHi there guys,What is the topic about? What combinations are those?Is it for cracking 256 bits? Someone please explain  I hardly think that it has got anything to do with the cracking of combinations of 256 hash. It has got nothing to do with any sort of cracking. I believe OP just needed a solution to mathematical problem of subset segregation. I am so surprised to see so many solutions for a single problem. The math subject really seems fun on this thread and I would be very honest with you guys, even my math teacher was not this good to teach us the basic math. Mind is blown right now seeing that you guys went even further and wrote a script for the same. Lolz. No wonder, maths is fun but I skipped it. Eh.  2**77 subsets for crack 130 bit puzzle",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "July 23, 2023, 05:13:26 AM",
+      "body": "Quote from: pooya87 on July 18, 2023, 01:17:54 PMYou seem to love helping out stranger looters and while you are at it, they will use whatever you or others provide to empty people's addresses \"if they get the chance\"!To all other code/ECC experts, why on earth would any of you openly and publicly help to break ECC? In case you haven't noticed, some of you are one of a kind regarding the knowledge about ECC, so don't sell yourselves short.It is good to teach others things they don't know, but teaching has limits, I'm not talking about this topic, I just used it as an excuse to post this.Know the limits and consider the consequences.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 23, 2023, 05:46:22 AM",
+      "body": "Quote from: digaran on July 23, 2023, 05:13:26 AMQuote from: pooya87 on July 18, 2023, 01:17:54 PMYou seem to love helping out stranger looters and while you are at it, they will use whatever you or others provide to empty people's addresses \"if they get the chance\"!Basic mathematics including combination which we learned in high school is not going to help you break ECC or solve ECDLP. Not to mention that one could find this information with a quick search in Google since as I said this is basic math.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 23, 2023, 08:50:03 AM",
+      "body": "QuoteTo all other code/ECC expertsI am not an ECC expert. Some people think I am, but this is not the case. Also, when it comes to writing code, I saw many better programmers. There are people who can generate any 256-bit curve just like that, while I am still struggling with 32-bit ones. That means, I am just a beginner, compared to them.Quotewhy on earth would any of you openly and publicly help to break ECC?My goal is not to break things, but to learn from scratch, how they were created. It is entirely different thing. Knowing that the pair (p=67,n=79) and (p=79,n=67) is the only single-byte pair that meets secp256k1 conditions (and uses a=0,b=7) is not going to help you with breaking anything. It can only help you understand, how those curves are constructed.The main reason is the curiosity: were you never curious, how n-value was calculated for secp256k1, why \"p\" and \"n\" are different, how it was checked that those huge numbers are primes, and so on?QuoteIn case you haven't noticed, some of you are one of a kind regarding the knowledge about ECC, so don't sell yourselves short.Do you seriously think that all of those things are hidden from the public, and some people here are revealing some secret magic, that was never known? This is clearly not the case, you have the whole pages, where you can find integer sequences. You have even similar pages, dedicated specifically for elliptic curves. Even more: you have tools for generating curves on GitHub. And after seeing all of that, do you really think some random people on bitcointalk have some secret knowledge, that cannot be reached on any of those linked pages?QuoteIt is good to teach others things they don't know, but teaching has limitsQuoteBasic mathematics including combination which we learned in high school is not going to help you break ECC or solve ECDLP.QuoteI'm not talking about this topic, I just used it as an excuse to post this.Are you talking about this topic? https://bitcointalk.org/index.php?topic=5459153.0QuoteKnow the limits and consider the consequences.I know the limits. And the only consequences so far, was OP trying to use brute-force to handle all of those combinations, instead of using even basic optimizations mentioned in this topic. So, calm down, we are safe.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

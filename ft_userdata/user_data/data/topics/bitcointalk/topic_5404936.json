@@ -1,0 +1,165 @@
+{
+  "id": "topic_5404936",
+  "title": "Pmalek",
+  "author": "Pmalek",
+  "created_time": "July 02, 2022, 04:02:14 PM",
+  "content": "After the Trezor One video, the hardware hacker Joe Grand posted a 2nd hacking video. This time he was working on a Samsung Galaxy S3 Android phone whose owner had forgotten the swipe pattern to unlock it. He thought he bought the coins in 2013, sent them to a wallet on his phone, and forgot about them for 7 years. The phone was configured to delete all data after 10 unsuccessful swipes. So once he finally gained access to it, the owner eventually gave up so as not to erase his data and wallet.    Joe aimed to disassemble the phone and copy the whole personal storage from the chip to his laptop. From there, he wanted to figure out where the swipe pattern file was located. Joe plugged his cable into a connector and connected it to a debugging piece of hardware. But he couldn't establish a connection due to problems with the cable. Since that didn’t work, Joe had to take the more difficult route, use a hardwired connection, and solder his own wires to the board. A total of 9 different connections were required. After some difficulties, it eventually worked, and Joe started copying the data from the phone.   After the data was copied to the laptop, Joe started looking for the user partition for the personal data. He was interested in a system file called gesture.key. This file contains the cryptographic hash of the swap platform used on the phone. The hash can’t be converted back, but Joe had a list of all possible gesture combinations. He can run through these combinations to find the correct hash. He found the SHA-1 hash of the swap platform used on the phone.Joe searched for the correct bites on his list and found only one match corresponding to the 2589 swipe pattern. So he reassembled the phone, powered it on, and the owner tried to unlock it with the 2589 swipe combination. It worked. They then opened the mycelium wallet on the phone and found only 0.003 BTC. A bit later, Joe was able to trace what happened to the owner’s coins. He purchased $400 worth of BTC in 2016, but a big part of it was sent to Bit Blender, which shut down in 2019. All in all, Joe recovered only about $2.000 worth of BTC.Never forget to make multiple physical backups of your recovery phrases so you can gain access to your crypto whenever you need to.Don’t be reckless with your coins, no matter how small the amount is. One day it can amount to something big.Don’t forget passwords, PINS, swipe patterns, and other important details that could cause a loss of money. Source: https://www.youtube.com/watch?v=icBD5PiyoyI",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5404936",
+  "comments": [
+    {
+      "author": "mk4",
+      "created_time": "July 02, 2022, 04:14:38 PM",
+      "body": "I assume this was only possible (the digging of the gesture keys) because of the Galaxy S3 being old and outdated security-wise, right? It's a 10 year old phone model. I assume modern smartphones are going to be a lot harder to break into.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "July 02, 2022, 04:27:10 PM",
+      "body": "Quote from: mk4 on July 02, 2022, 04:14:38 PMI assume this was only possible (the digging of the gesture keys) because of the Galaxy S3 being old and outdated security-wise, right? It's a 10 year old phone model. I assume modern smartphones are going to be a lot harder to break into. I have no idea really. But Joe likes to say that everything can be hacked if you give it enough time and resources. The data must be stored somewhere on the chip and is encoded in one way or the other. Either way it can be found. A friend of a friend is an IT specialist and works for a governmental protection agency. I am not going to say which agency or which country. Anyways, his job is to retrieve data from phones, laptops, and computers from criminals who get their stuff confiscated from the police. One of the nifty gadgets he uses allows you to connect any modern phone and it's capable of retrieving all its data including SMS messages, apps, phone calls, deleted and non-deleted stuff, etc.. Don't ask me how or what, but the things are out there. It's just not available to regular folks or sold in stores. Professional encryption software would surely be a problem depending on what it is, but not that many people use that, especially on mobile phones.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 02, 2022, 05:00:11 PMLast edit: July 04, 2022, 09:00:36 AM by NotATether",
+      "body": "Quote from: Pmalek on July 02, 2022, 04:02:14 PMAfter the data was copied to the laptop, Joe started looking for the user partition for the personal data. He was interested in a system file called gesture.key. This file contains the cryptographic hash of the swap platform used on the phone. The hash cant be converted back, but Joe had a list of all possible gesture combinations. He can run through these combinations to find the correct hash. He found the SHA-1 hash of the swap platform used on the phone....Never forget to make multiple physical backups of your recovery phrases so you can gain access to your crypto whenever you need to.Dont be reckless with your coins, no matter how small the amount is. One day it can amount to something big.Dont forget passwords, PINS, swipe patterns, and other important details that could cause a loss of money. How about Don't use gestures as lock codes in the first place?I'm not kidding. Gestures are extremely insecure, not only from a user perspective where another bystander could look over your shoulder and remember the patten, but also from a cryptographic point of view.This is how the hash of the gesture is made:Code:-------------| 1 | 2 | 3 |-------------| 4 | 5 | 6 |-------------| 7 | 8 | 9 |-------------These numbers correspond to the dots on the pattern screen. Each number is converted to the byte representation from \\x01 to \\x09, concatenated together (this is what makes the algorithm vulnerable) then SHA1 hashed.So when you move your hands down the first column, it combines 1 -> 4 -> 7 and hashes \\x01\\x04\\x07.It is extremely insecure because short and medium patterns can be brute-forced instantly, and long ones without too much of a hassle.A 7 line pattern (say the greek letter Sigma, from 3 -> 2 -> 1 -> 5 -> 7 -> 8 -> 9 ->) has theoretically 9^7 combinations, but the actual number of combinations is much less because numbers can only connected to adjacent ones.This means you'd get at best 9*5*3*5*3*5*3 combos (replace any of the 5's or 3's with 7 if use the center dot, the 5 and 3s can also be reversed, and if you only swipe diagonally along the edges you can replace the 3's with 5's) which amounts to no more than 9^2*5^2*3 (243*25, I'll let you do the math yourself but it is much less than 9^7. It means you can even brute force gestures on a CPU.It is worth noting that 7-line gestures are less secure than 5-digit PINs, and even less secure than 6-digit PINs.Do yourselves a favour and use passwords or if you must, PINs instead of gestures.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "July 02, 2022, 06:03:57 PM",
+      "body": "Although impressive as @mk4 said it's an outdated OS on outdated hardware.@NotATether is correct in that gestures as lock codes are insecure, but on more modern hardware and OS some things are not possible to be obtained as easily. Sometimes it's just better programming. As in the hash is generated based on a time when the phone is powered on for the 1st time. NOT on a predefined piece of information.Think about it this way. In the old days you had a fairly easy to pick lock on your car and hoped that the annoying sound of your car alarm would stop someone from stealing your car. Then we got security keys, which helped somewhat but after a while they were defeated too. Now we have a RFID tag in the key and a separate transmitter and receiver in the key that has 2 way communication with the security module in the car. So the BCM (body control module) talks to one thing and the security module talks to another. Stops the more casual thefts but not the pros.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Agbe",
+      "created_time": "July 02, 2022, 08:34:30 PM",
+      "body": "This is a very interesting story of Joe. Joe really tried for the owner of the coins. Joe is a very good and expertise engineer (repairer) if not all the data of Samsung Galaxy S3 would have been gone forever. That is I advise people to store their seed phrase in hardware like washer or Coinplate or any other place which the keys can be stored. Keeping keys in a phone without backup is very dangerous. Because human being is not a computer that has already been programmed to always carry out a specific task without making a mistake. Human make mistake and forget How it started and where it ended. Just like the owner forgot how the swipe started and where it ended. I thank the engineer for recovering the money for the owner. Making multiple backup of the keys is also good but that is also dangerous as well because you might keep a seed copy at a particular place and forgot to remove it from there and someone sees it and take. The person will use it to transfer all your coins.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "July 03, 2022, 06:51:46 AM",
+      "body": "Quote from: NotATether on July 02, 2022, 05:00:11 PMHow about Don't use gestures as lock codes in the first place? Luckily, that lack of security can be exploited for good as we can see from this particular example. If the swipe pattern security was impossible to break, the recovery would have never worked. Too bad that the final sum was such an insignificant one though. What I find unbelievable is the fact that the owner totally forgot that he sent his coins to BitBlender. And why did he need to do that in the first place? He obviously knew nothing about Bitcoin even when he purchased it. Too bad.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lucius",
+      "created_time": "July 03, 2022, 10:53:25 AM",
+      "body": "Quote from: Pmalek on July 03, 2022, 06:51:46 AMWhat I find unbelievable is the fact that the owner totally forgot that he sent his coins to BitBlender. And why did he need to do that in the first place? He obviously knew nothing about Bitcoin even when he purchased it. Too bad. At some moments it seemed to me that the owner was not actually the owner of that phone - because the swipe pattern was very obvious and simple and actually consisted of the initial letter of the owner's name (L) - and it is even more strange that the man does not remember anything at all, so the story about a possible $6 million turned into nothing more than the discovery of some dust.As for hacking, I can agree that with enough time, knowledge and the right equipment it is possible to do almost anything - especially at the level that exists when it comes to state agencies that deal with it. One of the famous politicians/criminals from my country threw his smartphone into a fairly large river in an attempt to destroy evidence, but the phone was found and all data was saved - it seems he had a waterproof device",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "July 03, 2022, 12:34:53 PM",
+      "body": "Quote from: mk4 on July 02, 2022, 04:14:38 PMI assume this was only possible (the digging of the gesture keys) because of the Galaxy S3 being old and outdated security-wise, right? It's a 10 year old phone model. I assume modern smartphones are going to be a lot harder to break into.You're correct, today Android[1] and iOS[2] use encryption by default. With this method, he also need to figure how to decrypt the file or disk (depending on encryption method).[1] https://source.android.com/security/encryption/[2] https://support.apple.com/guide/security/encryption-and-data-protection-overview-sece3bee0835/web",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 03, 2022, 11:53:07 PM",
+      "body": "Quote from: Pmalek on July 02, 2022, 04:02:14 PM[...]Never forget to make multiple physical backups of your recovery phrases so you can gain access to your crypto whenever you need to.Don’t be reckless with your coins, no matter how small the amount is. One day it can amount to something big.Don’t forget passwords, PINS, swipe patterns, and other important details that could cause a loss of money. [...]Interesting! Since some people asked: this only works if the flash storage chip is not encrypted. Modern mobile operating systems encrypt the flash storage using various types of full-disk encryption, similar to DM-Crypt on Linux.That's part of the reason why cold boot attacks are nowadays interesting, because they allow to read from RAM (where you can find unencrypted data and keys) instead of flash storage (which only contains encrypted data).I'd add to the list: create backups of your mobile device. This may or may not help if the device PIN is lost, but it will help in case of device loss or destruction.The great thing about mobile wallets and phone backups is that as long as you made a single backup after having created the wallet, you will be able to restore those funds.Even though restoring a very old backup is often seen as useless due to losing all the recent data, if you can restore the wallet, it will obviously contain all of the coins; even ones received long after the backup creation.I know; nothing groundbreaking, but a little interesting thought I came up with a while ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "July 04, 2022, 08:45:01 AM",
+      "body": "Quote from: n0nce on July 03, 2022, 11:53:07 PM<Snip> I am not sure how accurate this information is, but judging by the source, Samsung S3s aren't using data encryption by default. But they do have encryption software built in that allows users to encrypt user data and the content on SD cards. The owner of the S3 in the video surely didn't use these security features, which allowed Joe to copy all the data in unencrypted form.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "July 04, 2022, 01:44:05 PM",
+      "body": "This was interesting video to watch but spoiler alert, ending was very disappointing and title was again just a clickbait commercial self-advertisement campaign from Kingpin.I guess he earns a living like this so I can understand him, but why saying fake $6 million number in the title  Quote from: NotATether on July 02, 2022, 05:00:11 PMHow about Don't use gestures as lock codes in the first place?I honestly didn't know how insecure gestures are, but I generally don't trust modern smartphones at all.People think that newer smartphones are safer, but I think that opposite is probably closer to truth.Using strong password for phones is not a great idea, unless you want to type it every time device gets locked, and that is time consuming and boring.I don't think that PINs are much stronger than gestures, and I am sure most smartphones have similar hidden backdoors giving them easy access if you know what you are doing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "July 04, 2022, 04:59:16 PM",
+      "body": "Quote from: dkbit98 on July 04, 2022, 01:44:05 PMThis was interesting video to watch but spoiler alert, ending was very disappointing and title was again just a clickbait commercial self-advertisement campaign from Kingpin.I guess he earns a living like this so I can understand him, but why saying fake $6 million number in the title   The ending was disappointing because of the recovered amount, but the steps that led to the coin recovery would be the same no matter the balance of the wallet. The $6 million number is partially a clickbait since he wants people to watch the video. No one would watch a hacking video titled how I hacked a Samsung phone and recovered $80 in Bitcoin. But the other reason for the title might have to do with the information he was given by the owner who believed that he had enough coins to be considered a millionaire. We saw how that worked out.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 05, 2022, 12:47:15 AM",
+      "body": "Quote from: dkbit98 on July 04, 2022, 01:44:05 PMI honestly didn't know how insecure gestures are, but I generally don't trust modern smartphones at all.People think that newer smartphones are safer, but I think that opposite is probably closer to truth.It's important to discern between 'trust' as in 'trust that there are no backdoors and other shady stuff going on' and 'trust that the actual security is getting better'.As for the former, I can't tell you any more than anyone else here. Regarding the latter, there is plenty of open, public evidence that newer smartphones are absolutely safer than older models. An example is the standard full-disk encryption that was added after the S3 era, which is an exceptional improvement and would have made Joe's attack impossible without a lot of extra steps.Other aspects such as ASLR were also added to the majority of computers and phones in the last decade, which had a substantial impact on the level of difficulty required to perform various types of attacks.Quote from: https://en.wikipedia.org/wiki/Address_space_layout_randomization#AndroidAndroid 4.0 Ice Cream Sandwich provides address space layout randomization (ASLR) to help protect system and third-party applications from exploits due to memory-management issues. Position-independent executable support was added in Android 4.1. Android 5.0 dropped non-PIE support and requires all dynamically linked binaries to be position independent. Library load ordering randomization was accepted into the Android open-source project on 26 October 2015, and was included in the Android 7.0 release.Quote from: https://en.wikipedia.org/wiki/Address_space_layout_randomization#iOS_(iPhone,_iPod_touch,_iPad)Apple introduced ASLR in iOS 4.3 (released March 2011).KASLR was introduced in iOS 6. The randomized kernel base is 0x01000000 + ((1+0xRR) * 0x00200000), where 0xRR is a random byte from SHA1 (random data) generated by iBoot (the 2nd-stage iOS Boot Loader).Quote from: dkbit98 on July 04, 2022, 01:44:05 PMUsing strong password for phones is not a great idea, unless you want to type it every time device gets locked, and that is time consuming and boring.Actually, if you 'trust' (refer to the first topic I touched upon) the biometric sensors on your device not to leak the data off the device, it's a good idea to use a strong alphanumeric passphrase and unlock the device with biometrics 99.9% of the time. In case you need it, you can use the passphrase similar to a seed phrase backup that is well protected somewhere. Quote from: dkbit98 on July 04, 2022, 01:44:05 PMI don't think that PINs are much stronger than gestures, and I am sure most smartphones have similar hidden backdoors giving them easy access if you know what you are doing.There is actual research that proves gestures to be weaker than PIN codes. It sounds silly, but e.g. increasing the default length from 4 to 6 on iOS also made it substantially harder to brute-force PINs.Quote from: https://threatpost.com/android-lockscreen-patterns-less-secure-than-pins/128123/“Analyzing the results, we found that in all settings, Android’s graphical pattern unlock is the most vulnerable, especially when feedback lines are visible,” authors of the report wrote. Newer smaller-screened iPhones that require a 6-digit passcode, are more secure, researchers said.[...]“These results support what we as a community have believed to be true anecdotally, and further demonstrates that current authentication methods provide stronger security against shoulder surfing than one might expect,” researchers said.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "July 05, 2022, 11:16:12 AM",
+      "body": "Quote from: n0nce on July 05, 2022, 12:47:15 AMRegarding the latter, there is plenty of open, public evidence that newer smartphones are absolutely safer than older models. An example is the standard full-disk encryption that was added after the S3 era, which is an exceptional improvement and would have made Joe's attack impossible without a lot of extra steps.They are possibly safer and they fixed some bug and flaws that was found in older devices, but in the same time they are opening bigger windows for exploits, because they are adding more stuff in new devices.For example, old phones had simple function to call, receive calls and send/receive sms, modern smartphones have all kind of stuff inside.Until I see actual everyday working smartphone with Linux OS, I will have my suspicions about them.Custom ROMs are ok, but not there yet.Quote from: n0nce on July 05, 2022, 12:47:15 AMThere is actual research that proves gestures to be weaker than PIN codes. It sounds silly, but e.g. increasing the default length from 4 to 6 on iOS also made it substantially harder to brute-force PINs.I didn't research this topic deeper so it's possible, but brute forcing PIN is not as hard as you may think, that is if you have correct tools and knowledge.I just heard that Chinese government was hacked and millions of people information got leaked and it's selling on darknet forums.If hackers can hack this, why would I think it's so hard to hack simple PIN code",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stanner.austin",
+      "created_time": "July 05, 2022, 01:16:08 PM",
+      "body": "I have spend 15 years in GSM reverse engineering and still continue.S3 I9300 Exynos chipset base very first phone which that time was hot. data was not encrypted until android 4.1 released that's also optional.Currently all latest android smartphones use FDE(Full disc encryption) so data is by default encrypted.Apple devices X and older are considered unsafe & unsecure due to bootrom exploit.(data is encrypted but bruteforce possible for simple phone lock codes.)Mediatek cpu base all phones are considered unsafe & unsecure due to boot rom exploit. (FDE can be dumped rpmb key can be dumped)spreadtrum cpu also most used this days can be dumped if correct FDLs are available.Some android vendor even use hidden signed message to unlock your phone via OTA . (everyone know this for FBI & NSA.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 06, 2022, 12:34:39 AM",
+      "body": "Quote from: dkbit98 on July 05, 2022, 11:16:12 AMQuote from: n0nce on July 05, 2022, 12:47:15 AMRegarding the latter, there is plenty of open, public evidence that newer smartphones are absolutely safer than older models. An example is the standard full-disk encryption that was added after the S3 era, which is an exceptional improvement and would have made Joe's attack impossible without a lot of extra steps.They are possibly safer and they fixed some bug and flaws that was found in older devices, but in the same time they are opening bigger windows for exploits, because they are adding more stuff in new devices.For example, old phones had simple function to call, receive calls and send/receive sms, modern smartphones have all kind of stuff inside.Until I see actual everyday working smartphone with Linux OS, I will have my suspicions about them.Custom ROMs are ok, but not there yet.It's not just about fixing bugs; these are actual completely new security mechanisms that can kill whole 'families' of attacks and make certain things completely impossible.Do keep in mind I wasn't comparing smartphones (basically small computers) to 'dumb phones'; obviously, if your phone doesn't even have an internet connection, and no way for users to download and / or install things, it massively reduces the attack surface and also the attractiveness for an attacker. I think that's pretty obvious.But it's just a fact that a modern (2022) smartphone will be more secure than a 2012 smartphone.Regarding Linux on mobile: do keep in mind that 'open source' doesn't equal 'secure'. It's a fallacy I come across often in 'Linux circles'. There are papers and studies about this, that have shown how a mobile OS built from the ground up with sandboxing, secure boot with hardware root of trust and no built-in way for escalating privileges, running on an SoC is much harder to attack than a box-standard Linux install on a general-purpose laptop. So there is a tradeoff between privacy and security; privacy and auditability of the code doesn't equal security.It's highly probable that Linux phones of today are less secure than iOS and Android devices.Quote from: dkbit98 on July 05, 2022, 11:16:12 AMQuote from: n0nce on July 05, 2022, 12:47:15 AMThere is actual research that proves gestures to be weaker than PIN codes. It sounds silly, but e.g. increasing the default length from 4 to 6 on iOS also made it substantially harder to brute-force PINs.I didn't research this topic deeper so it's possible, but brute forcing PIN is not as hard as you may think, that is if you have correct tools and knowledge.I just heard that Chinese government was hacked and millions of people information got leaked and it's selling on darknet forums.If hackers can hack this, why would I think it's so hard to hack simple PIN code Sure; PINs aren't that secure either, I'm just saying they are more secure than patterns in the real world, e.g. due to low-tech 'shoulder surfing' attacks being much easier.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrivacyG",
+      "created_time": "July 06, 2022, 10:13:42 AM",
+      "body": "Would in this case not be a lot safer if Joe had his Mycelium wallet locked by a very strong password?  I personally have my phone locked with a pretty easy password for quick access, but all my Cryptocurrency apps are secured with very strong passwords so in case my phone is ever stolen, they can get some data off it but not my wallets.Also.  We have to take something into account.  What is today safe may not be safe tomorrow.  We have way too many examples of things that used to be considered safe but later on were found to have crucial security flaws.-Regards,PrivacyG",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "July 06, 2022, 12:49:57 PM",
+      "body": "Quote from: stanner.austin on July 05, 2022, 01:16:08 PMSome android vendor even use hidden signed message to unlock your phone via OTA . (everyone know this for FBI & NSA.)Ok, so we know what is not safe to use, but what exactly smartphone models would you suggest to average Joe who cares about privacy?Maybe there are some extra steps anyone can do to improve security, maybe using Google Pixel or some other smartphone with custom ROM or what?Quote from: n0nce on July 06, 2022, 12:34:39 AMIt's not just about fixing bugs; these are actual completely new security mechanisms that can kill whole 'families' of attacks and make certain things completely impossible.Ok, let me give you few examples that are not directly connected with smartphones but can be applied for them as well, do you think that Windows 11 is more secure than Windows 10 or Windows 8 OS?- I think that each new windows os is worse and it provides less privacy than previous versions.Second example, do you think that modern laptops are better and more secure than proven older modular laptops?- New laptops are mostly not modular, you can't replace or fix anything yourself, and they are made from cheaper materials.New stuff is not always better, and it often times just opens a big new can of worms after each new releases.Yes I know Linux OS doesn't mean something is safe, but I just want clean open source stuff without extra crap on top.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "July 06, 2022, 01:01:05 PM",
+      "body": "Quote from: PrivacyG on July 06, 2022, 10:13:42 AMWould in this case not be a lot safer if Joe had his Mycelium wallet locked by a very strong password? Joe is the hacker. The client who forgot his swipe patterns is Lamal or something like that. But anyways, yes it would be safer. Besides breaking the gestures pattern, Joe would have to find a way to bruteforce the wallet password and I doubt he would succeed with that unless Jamal used something like 1234. Quote from: dkbit98 on July 06, 2022, 12:49:57 PMOk, let me give you few examples that are not directly connected with smartphones but can be applied for them as well, do you think that Windows 11 is more secure than Windows 10 or Windows 8 OS?- I think that each new windows os is worse and it provides less privacy than previous versions. As you said yourself, those are privacy concerns, not security concerns. A security concern would be someone finding a vulnerability in the OS to break into your PC, online accounts, or anything else on your computer due to vulnerabilities in your Windows installation. Microsoft and other third parties spying on you is bad for privacy, but it doesn't necessarily make your security worse. If Windows 11 is also worse in terms of security than Windows 10, that's a different topic.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

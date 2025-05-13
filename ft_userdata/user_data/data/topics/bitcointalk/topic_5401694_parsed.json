@@ -1,0 +1,165 @@
+{
+  "id": "topic_5401694",
+  "title": "pbies",
+  "author": "pbies",
+  "created_time": "June 07, 2022, 02:40:20 PM",
+  "content": "I've conducted an experiment:1. make a list of 21203 brainwallet phrases2. convert this list to WIF by two ways: SHA256 hash once & twice3. import \"once\" to Bitcoin Core4. import \"twice\" to Bitcoin Core\"Once\" appeared in 367490 transactions,\"twice\" appeared in ... 0 transactions!Seems like the way the WIF was encoded for most private keys is SHA256 used once which is different from what tells the documentation of WIF.Docs say that SHA256 should be done twice (second time on result of first). Strange.I can share the Python script which creates WIF output files from given input set if anyone wants to.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5401694",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "June 07, 2022, 02:51:03 PM",
+      "body": "How are you generating the WIF? Are you using the SHA256(Phrase) and SHA256(SHA256(Phrase)) to generate the ECDSA private key and then converting it to WIF?If so, then it would make perfect sense because if they're using brainwallet, then they would use the default implementation which is a single SHA256 and if they use a double SHA256 then they would be knowledgeable enough to know that it isn't secure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "June 07, 2022, 04:12:17 PM",
+      "body": "WIF generation:1. get text as bytes2. get bytes of sha256 of bytes from 13. convert to readable hex4. add 80 in front5. convert to bytes6. base58encode_check7. print to WIF fileThis is with SHA256 once.Twice is SHA256(SHA256-bytes(phrase as bytes)).What ECDSA are you talking about here? This is Bitcoin...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 07, 2022, 04:52:29 PM",
+      "body": "Quote from: pbies on June 07, 2022, 02:40:20 PMSeems like the way the WIF was encoded for most private keys is SHA256 used once which is different from what tells the documentation of WIF.WIF is an encoded format; it doesn't tell you the functions that were called before that. Just like in base64, base58 etc., you just represent the same binary data in another way. A decoded WIF gives you: prefix + private_key + is_compressed + checksum. Quote from: pbies on June 07, 2022, 04:12:17 PMWhat ECDSA are you talking about here? This is Bitcoin...The SHA256(phrase's bytes) gives you the ECDSA private key. Why do you search for double hashes? Brainwalletx uses single hash. It's justified that you found no transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "June 07, 2022, 05:11:53 PM",
+      "body": "Quote from: BlackHatCoiner on June 07, 2022, 04:52:29 PMWIF is an encoded format; it doesn't tell you the functions that were called before that. Just like in base64, base58 etc., you just represent the same binary data in another way. A decoded WIF gives you: prefix + private_key + is_compressed + checksum. Why do you search for double hashes? Brainwalletx uses single hash. It's justified that you found no transactions. Does not tell but I want to do as the docs (WIF Wiki). Normally there should be sha256 used twice.I am surprised that it is used only once.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pikanakapika",
+      "created_time": "June 07, 2022, 10:14:49 PM",
+      "body": "There is no official/documented way to create brainwallets (words to privatekey). You are talking about \"privatekey to WIF\" which is something different.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 08, 2022, 02:58:52 AM",
+      "body": "Quote from: pbies on June 07, 2022, 05:11:53 PMDoes not tell but I want to do as the docs (WIF Wiki). Normally there should be sha256 used twice.I am surprised that it is used only once.There is nothing normal about using brainwallets and you shouldn't be surprised to see a single SHA256 being used since brainwallets are inherently weak and those who create tools for this purpose are obviously using the easiest way to produce a 256-bit key from an arbitrary length input.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "June 08, 2022, 07:13:04 AM",
+      "body": "Quote from: pbies on June 07, 2022, 02:40:20 PMI've conducted an experiment:1. make a list of 21203 brainwallet phrases2. convert this list to WIF by two ways: SHA256 hash once & twice3. import \"once\" to Bitcoin Core4. import \"twice\" to Bitcoin Core\"Once\" appeared in 367490 transactions,\"twice\" appeared in ... 0 transactions!Seems like the way the WIF was encoded for most private keys is SHA256 used once which is different from what tells the documentation of WIF.Docs say that SHA256 should be done twice (second time on result of first). Strange.I think you are mixing 2 things (or I do not understand something).Usually, to create brainwallet you use single sha on the phrase. It gives you private key.And now, what you want to do with that private key is something different. You may of course convert to WIF, why not. To calculcate checksum, you use double sha on \"extended\"  private key (+\"80\" etc etc.).But I do not understand your confusion. Did you expect another method of creating private keys?We use sha256 for phrase -> private keys for bitcoin. For Ethereum, they use keccak (sha3). And in the past they used 1 round of keccak, then they changed to 2031 rounds!If you use software X, they may use \"phrase+salt\" or whatever. There is no clear documentation (clear standard) for brainwallets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "June 08, 2022, 09:00:39 AM",
+      "body": "Quote from: pbies on June 07, 2022, 02:40:20 PMSeems like the way the WIF was encoded for most private keys is SHA256 used once which is different from what tells the documentation of WIF.Docs say that SHA256 should be done twice (second time on result of first). Strange.First of all, WIF documentation tells us to generate a private key and convert it to hex before doing any encoding. Only when you already have successfully generated your random number can you start hashing it \"once\" and \"twice.\" With brainwallets, you generate your private key by hashing any arbitrary data, which results in standard  SHA256 output of fixed size. This part has nothing to do with WIF. But this SHA256 output we calculated previously can be used as input in the \"WIF function,\" where it further hashes once and twice.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 08, 2022, 09:25:36 AM",
+      "body": "Quote from: pbies on June 07, 2022, 02:40:20 PMSeems like the way the WIF was encoded for most private keys is SHA256 used once which is different from what tells the documentation of WIF.Docs say that SHA256 should be done twice (second time on result of first). Strange.Quote from: pbies on June 07, 2022, 05:11:53 PM-snip-Does not tell but I want to do as the docs (WIF Wiki). Normally there should be sha256 used twice.You mean this wiki: en.bitcoin.it/wiki/Wallet_import_format?The only step where it mentioned to use SHA256 twice is for computation of the checksum which is already the \"_check\" in your \"6. base58encode_check\" step.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "June 08, 2022, 09:58:18 AM",
+      "body": "Quote from: nc50lc on June 08, 2022, 09:25:36 AMQuote from: pbies on June 07, 2022, 02:40:20 PMSeems like the way the WIF was encoded for most private keys is SHA256 used once which is different from what tells the documentation of WIF.Docs say that SHA256 should be done twice (second time on result of first). Strange.Quote from: pbies on June 07, 2022, 05:11:53 PM-snip-Does not tell but I want to do as the docs (WIF Wiki). Normally there should be sha256 used twice.You mean this wiki: en.bitcoin.it/wiki/Wallet_import_format?The only step where it mentioned to use SHA256 twice is for computation of the checksum which is already the \"_check\" in your \"6. base58encode_check\" step.Yes, this is page which I am talking about.Does \"_check\" first go with sha256 on the data?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 08, 2022, 11:36:56 AM",
+      "body": "Quote from: pbies on June 08, 2022, 09:58:18 AMYes, this is page which I am talking about.Hmm, if so, it has nothing to do with brainwallets.It's about encoding the ECDSA Private key into Wallet Import Format, it's all about private keys.Those two \"SHA256 hash\" steps aren't about hashing a passphrase, I believe it's clearly written there.These are the only steps in your reply that's covered by the WIF documentation:Quote from: pbies on June 07, 2022, 04:12:17 PMWIF generation:-snip--snip--snip-4. add 80 in front-snip-6. base58encode_check7. print to WIF fileIts equivalent steps of the instruction in the Wiki \"Private key to WIF\" are:4       =   26 & 7   =   3, 4, 5, 6, 7Quote from: pbies on June 08, 2022, 09:58:18 AMDoes \"_check\" first go with sha256 on the data?\"Base58\" just encodes the data into Base58\"Base58Check\" encodes it with a checksum where those two SHA256 is used.Brainwallet isn't actually part of Bitcoin, it's just a simple \"hack\" to make ECDSA private key.Since SHA256's result is 256-bit and ECDSA private key is also 256-bit, the makers of Brainwallet have thought of using that hashing algorithm to make ECDSA private keys from phrases.Only steps 1 and 2 in your reply above are related to Brainwallet, the rest of the steps are just to convert the 256-bit result into WIF.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pbies",
+      "created_time": "June 08, 2022, 01:12:59 PMLast edit: June 08, 2022, 02:35:49 PM by pbies",
+      "body": "Quote from: nc50lc on June 08, 2022, 11:36:56 AM...So it is clear, that sha256 takes place two times - once in visible sha256 call and second in base58_check.Then doing visible sha256 twice makes it at the end three times because of base58_check which does the third time of sha256.Thanks for clarifying that to me.Now I need to rescan all wallets which were made out of phrases:1. take phrase2. add 0x80 at the beginning3. base58_check it (no need for sha256 before that)4. print each WIF to file5. rescan all WIFs in Bitcoin CoreEDIT: but it seems not the proper way without visible sha256, because WIFs look totally different. I should use at least one sha256.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zilon",
+      "created_time": "June 08, 2022, 08:09:29 PM",
+      "body": "Quote from: pbies on June 08, 2022, 01:12:59 PM3. base58_check it (no need for sha256 before that)4. print each WIF to file5. rescan all WIFs in Bitcoin CoreEDIT: but it seems not the proper way without visible sha256, because WIFs look totally different. I should use at least one sha256.If there is no need for SHA256 hashing then how will the extended key be hashed and the checksum gotten also what will the base58_check be converting from a byte string to base58 string. The two SHA256 is needed first for  Performing a  SHA-256 hash on the extended key and second to do a  SHA-256 hash on the outcome of SHA-256 hash. before getting the checksum which will later be added to the extended key which was first hashed using SHA256",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "June 08, 2022, 09:59:15 PM",
+      "body": "Quote from: pbies on June 07, 2022, 04:12:17 PMWIF generation:1. get text as bytes2. get bytes of sha256 of bytes from 13. convert to readable hex4. add 80 in front5. convert to bytes6. base58encode_check7. print to WIF fileThis is with SHA256 once.Twice is SHA256(SHA256-bytes(phrase as bytes)).What ECDSA are you talking about here? This is Bitcoin...Precisely. Bitcoin addresses are a representation of an ECDSA public key and there is a corresponding ECDSA private key. The method that you're doing (SHA256 hashing) converts the seed phrase into an ECDSA private key. You might want to read up more on how Bitcoin addresses and transactions work.Quote from: pbies on June 08, 2022, 01:12:59 PMNow I need to rescan all wallets which were made out of phrases:1. take phrase2. add 0x80 at the beginning3. base58_check it (no need for sha256 before that)4. print each WIF to file5. rescan all WIFs in Bitcoin CoreEDIT: but it seems not the proper way without visible sha256, because WIFs look totally different. I should use at least one sha256.SHA256 is only used as a checksum in WIF. While you can still generate a WIF without the checksum, you cannot import it in any wallets because they do a check of the checksum and it would otherwise be invalid.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 09, 2022, 02:47:31 AM",
+      "body": "Quote from: pbies on June 08, 2022, 01:12:59 PM-snip-EDIT: but it seems not the proper way without visible sha256, because WIFs look totally different. I should use at least one sha256.I'm not suggesting to edit your WIF generation method so do not change it since it's the proper way to generate a Brainwallet (uncompressed)which is basically:  \"get a phrase->hash it once->prepend 0x80->Base58Check\" <-- the 'SHA256 twice' is used in that last stepWhile the WIF wiki only contains:   \"private key->prepend 0x80->Base58Check\" <-- the 'SHA256 twice' is used in that last stepbecause it's a documentation for encoding private key into WIF, not brainwallet.I'm just correcting this part:Quote from: pbies on June 07, 2022, 02:40:20 PMSeems like the way the WIF was encoded for most private keys is SHA256 used once which is different from what tells the documentation of WIF.Docs say that SHA256 should be done twice (second time on result of first). Strange.There shouldn't be any misleading info in that Bitcoin Wiki page.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 09, 2022, 04:16:46 AM",
+      "body": "Quote from: pbies on June 08, 2022, 09:58:18 AMYes, this is page which I am talking about.Does \"_check\" first go with sha256 on the data?In case you are referring to brainwallets, there is no checksum, magic bytes, or any prefix or suffix text added to your text. It's just hashed by itself, and is very different from WIF in this regard (again, this is because of a lack of documentation on Bitcoin Wiki and other places such as Bitcoin SE that caused people to process it however they like).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "June 13, 2022, 08:13:22 AM",
+      "body": "Quote from: pooya87 on June 08, 2022, 02:58:52 AMThere is nothing normal about using brainwallets and you shouldn't be surprised to see a single SHA256 being used since brainwallets are inherently weak and those who create tools for this purpose are obviously using the easiest way to produce a 256-bit key from an arbitrary length input.Not all brainwallets use the \"easiest way\". Some of them really do alot more than just a simple SHA256. And I would say they are pretty secure as far as no one being able to crack them. Brute force just wouldn't work because it takes a long time to compute them (and because they use a salt) . Unlike a simple Sha256. Being cpu and memory intensive will discourage most any attacker.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "June 13, 2022, 08:21:51 AM",
+      "body": "Quote from: larry_vw_1955 on June 13, 2022, 08:13:22 AMQuote from: pooya87 on June 08, 2022, 02:58:52 AMThere is nothing normal about using brainwallets and you shouldn't be surprised to see a single SHA256 being used since brainwallets are inherently weak and those who create tools for this purpose are obviously using the easiest way to produce a 256-bit key from an arbitrary length input.Not all brainwallets use the \"easiest way\". Some of them really do alot more than just a simple SHA256. And I would say they are pretty secure as far as no one being able to crack them. Brute force just wouldn't work because it takes a long time to compute them (and because they use a salt) . Unlike a simple Sha256. Being cpu and memory intensive will discourage most any attacker.Could you give any example of \"other kind\" of brain wallet?For sure single sha256 (bitaddress etc.) is the most popular. Until recently I was not aware of ETH brainwallets (single keccak256 or 2031*keccak256 from ethercamp). Was there something like that for BTC? And how about restoring that kind of wallet, because I guess even if there was other number of loops or salt used, it had to be public for restoring using 3rd party tools.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "June 13, 2022, 08:32:24 AM",
+      "body": "Quote from: PawGo on June 13, 2022, 08:21:51 AMCould you give any example of \"other kind\" of brain wallet?For sure single sha256 (bitaddress etc.) is the most popular. Until recently I was not aware of ETH brainwallets (single keccak256 or 2031*keccak256 from ethercamp). Was there something like that for BTC? And how about restoring that kind of wallet, because I guess even if there was other number of loops or salt used, it had to be public for restoring using 3rd party tools.After the initial brainflayer fiasco, the original brainwallet was shut down. There were variations of it such as brainwallet.io and warpwallet which both uses Scrypt and salt to enhance the security. It wouldn't go as far as to say that they are uncrackable; given sufficient resources and common enough phrases and passphrase it can be crackable. The most infallible method is really to just use BIP39 or similar mnemonic systems.There are ways to crack them and tools to do so. Just that they are significantly slower (and more expensive) than single round SHA256.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

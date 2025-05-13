@@ -1,0 +1,77 @@
+{
+  "id": "topic_5424148",
+  "title": "simpic",
+  "author": "simpic",
+  "created_time": "November 29, 2022, 05:05:03 PMLast edit: November 29, 2022, 06:33:06 PM by simpic",
+  "content": "Hello, I have installed Bitcoin Core on Ubuntu 20 and I changed the path of \".bitcoin\" folder. When I run \"bitcoind\" file it does not create \"bitcoind.pid\" file, as instead it does on another computer.Since the current instance file is not created the client crashes:Quote2022-11-29T16:56:38Z Bitcoin Core version v23.0.0 (release build)2022-11-29T16:56:38Z Assuming ancestors of block 000000000000000000052d314a259755ca65944e68df6b12a067ea8f1f5a7091 have valid signatures.2022-11-29T16:56:38Z Setting nMinimumChainWork=00000000000000000000000000000000000000002927cdceccbd5209e81e80db2022-11-29T16:56:38Z Using the 'arm_shani(1way,2way)' SHA256 implementation2022-11-29T16:56:38Z Default data directory /root/.bitcoin2022-11-29T16:56:38Z Using data directory /mnt/media/<UUID>/.bitcoin2022-11-29T16:56:38Z Config file: /mnt/media/<UUID>/.bitcoin/bitcoin.conf2022-11-29T16:56:38Z Config file arg: bind=\"0.0.0.0\"2022-11-29T16:56:38Z Config file arg: checkblocks=\"24\"2022-11-29T16:56:38Z Config file arg: checklevel=\"0\"2022-11-29T16:56:38Z Config file arg: dbcache=\"64\"2022-11-29T16:56:38Z Config file arg: disablewallet=\"1\"2022-11-29T16:56:38Z Config file arg: listen=\"1\"2022-11-29T16:56:38Z Config file arg: maxconnections=\"64\"2022-11-29T16:56:38Z Config file arg: par=\"2\"2022-11-29T16:56:38Z Config file arg: port=\"8333\"2022-11-29T16:56:38Z Config file arg: rpcallowip=\"127.0.0.1\"2022-11-29T16:56:38Z Config file arg: rpcbind=****2022-11-29T16:56:38Z Config file arg: rpccookiefile=\"/root/bitcoin-core/.bitcoin/.cookie\"2022-11-29T16:56:38Z Config file arg: rpcport=\"8332\"2022-11-29T16:56:38Z Config file arg: upnp=\"1\"2022-11-29T16:56:38Z Command-line arg: conf=\"/mnt/media/<UUID>/.bitcoin/bitcoin.conf\"2022-11-29T16:56:38Z Command-line arg: daemon=\"\"2022-11-29T16:56:38Z Command-line arg: datadir=\"/mnt/media/<UUID>/.bitcoin\"2022-11-29T16:56:38Z Using at most 64 automatic connections (32768 file descriptors available)2022-11-29T16:56:38Z Using 16 MiB out of 32/2 requested for signature cache, able to store 524288 elements2022-11-29T16:56:38Z Using 16 MiB out of 32/2 requested for script execution cache, able to store 524288 elements2022-11-29T16:56:38Z Script verification uses 1 additional threads2022-11-29T16:56:38Z Wallet disabled!2022-11-29T16:56:38Z scheduler thread start2022-11-29T16:56:38Z HTTP: creating work queue of depth 162022-11-29T16:56:38Z Using random cookie authentication.2022-11-29T16:56:38Z Unable to open cookie authentication file /root/bitcoin-core/.bitcoin/.cookie.tmp for writing2022-11-29T16:56:38Z Error: Unable to start HTTP server. See debug log for details.2022-11-29T16:56:38Z Shutdown: In progress...2022-11-29T16:56:38Z scheduler thread exit2022-11-29T16:56:38Z Shutdown: doneDo you see any useful hint in this log file? Why the client still use default data directory for some paths?What could be the problem?I have also tried versione 24.0, but nothing changed.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5424148",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 29, 2022, 05:25:44 PM",
+      "body": "As far as I can see, you do have set the proper datadir and conf parameters (pointing to your external drive). The problem seems to be your cookie file. It tries to read the .cookie.tmp from the default root directory, and not from your pointed external datadir. It's unable to open it and so it shuts down. Do you include the cookie location somewhere in the configuration file? Try backing that cookie file up, and delete it. Restart Core afterwards.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 29, 2022, 05:45:51 PM",
+      "body": "As what user are you running bitcoind?Your log file hints at running it as root, which I'd highly discourage to do in the first place.Then, as BlackHatCoiner said, it tries to use / write the cookie to /root/bitcoin-core/.bitcoin/.cookie, as you passed that command-line parameter. Why are you doing that? It's possible that the process just can't write there or the directory /root/bitcoin-core/.bitcoin doesn't exist.Quoterpccookiefile=\"/root/bitcoin-core/.bitcoin/.cookie\"I'd remove this altogether. Bitcoin Core will save the cookie in the data directory, which for all intents and purposes is where it should live.Also do consider sharing the command-line and / or service file that you use to run Bitcoin Core.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "November 29, 2022, 06:31:37 PM",
+      "body": "It was hardcoded in \"bitcoin.conf\" file, I just removed it and now it works.As said by n0nce, Bitcoin Core saves the cookie in the data directory... that I passed as parameter to \"bitcoind\" command.Thank you for your replies.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "November 29, 2022, 07:07:25 PM",
+      "body": "Now I have tried to launch \"bitcoin-cli getblockchaininfo\" but it is still looking for default data dir:Quotecannot create directories: File exists [/root/.bitcoin/wallets] bitcoin in AppInitRPC()How to change this behaviour?Here is the content of my \"bitcoin.conf\" file:Quote### IPv4/IPv6 mode #### This mode requires uPnP feature on your router to allow Bitcoin Core to accept incoming connections.bind=0.0.0.0upnp=1### Tor mode #### This mode requires tor (https://www.torproject.org/download/) to be running at the proxy address below.# No configuration is needed on your router to allow Bitcoin Core to accept incoming connections.#proxy=127.0.0.1:9050#bind=127.0.0.1#onlynet=onionlisten=1port=8333maxconnections=64dbcache=64par=2checkblocks=24checklevel=0disablewallet=1#rpccookiefile=/root/bitcoin-core/.bitcoin/.cookierpcbind=127.0.0.1rpcport=8332rpcallowip=127.0.0.1And this is the command I run:Quote/root/bitcoin-core/bin/bitcoind -conf=/mnt/media/<UUID>/.bitcoin/bitcoin.conf -datadir=/mnt/media/<UUID>/.bitcoin -daemon",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 29, 2022, 09:51:59 PMLast edit: November 29, 2022, 10:04:17 PM by n0nce",
+      "body": "Quote from: simpic on November 29, 2022, 07:07:25 PMQuote/root/bitcoin-core/bin/bitcoind -conf=/mnt/media/<UUID>/.bitcoin/bitcoin.conf -datadir=/mnt/media/<UUID>/.bitcoin -daemonYou may want to add these lines to your bitcoin.conf file; then you don't have to specify it on the command line.Code:datadir=/mnt/media/<UUID>/.bitcoindaemon=1Remove the local .bitcoin folder (rm -rf /root/.bitcoin).You may need to add:Code:server=1And tell bitcoin-cli where to find the conf (and thus all the data):Code:bitcoin-cli -conf=/mnt/media/<UUID>/.bitcoin/bitcoin.conf getblockchaininfo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "November 30, 2022, 11:09:01 AM",
+      "body": "Quote from: n0nce on November 29, 2022, 09:51:59 PMRemove the local .bitcoin folder (rm -rf /root/.bitcoin).You may need to add:Code:server=1Why this?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 30, 2022, 12:07:16 PM",
+      "body": "Quote from: simpic on November 30, 2022, 11:09:01 AMQuote from: n0nce on November 29, 2022, 09:51:59 PMRemove the local .bitcoin folder (rm -rf /root/.bitcoin).You may need to add:Code:server=1Why this?Without it, there is no RPC interface, which is what bitcoin-cli attaches to (or tries to do) to interact with Core.Code:bitcoin@localhost:~> bitcoind --helpBitcoin Core version v22.0Copyright (C) 2009-2021 The Bitcoin Core developersPlease contribute if you find Bitcoin Core useful. Visit<https://bitcoincore.org/> for further information about the software.The source code is available from <https://github.com/bitcoin/bitcoin>.This is experimental software.Distributed under the MIT software license, see the accompanying file COPYINGor <https://opensource.org/licenses/MIT>Usage:  bitcoind [options]                     Start Bitcoin CoreOptions:  -?       Print this help message and exit[...]RPC server options:[...]  -server       Accept command line and JSON-RPC commands",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpic",
+      "created_time": "November 30, 2022, 04:21:30 PM",
+      "body": "Ok, I solved, thank you so much.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

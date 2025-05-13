@@ -1,0 +1,21 @@
+{
+  "id": "topic_5457753",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "June 27, 2023, 11:11:59 AM",
+  "content": "I've just did a crawl through Blockchair's data dump repository at, https://gz.blockchair.com, the total size of all the data on the site, including blocks, txs, outputs, inputs, etc. from all the chains is (as of today) about 2.7 terabytes. Here is the command I used to measure it in bytes: wget --mirror --no-host-directories -e robots=off --reject html  -l 0 --spider https://gz.blockchair.com 2>&1 | grep -E -o 'Length: [0-9]+' | awk '{sum += $2} END {print sum}' it only takes a few hours to run.It seems to be a better alternative to using the Blockchair API proper, which seems to just randomly ban IP addresses without a paid API key.Now since the data files are all in CSV format, just with tabs separated by spaces, I was wondering what is the best way to compress all this data, per chain at least? I know that CSV is a very inefficient representation as there's already megabytes of TAB characters, and there's no reason to store those either, so it's not like just compressing this with XZ or LZMA is the best solution.Nevertheless it looks like all this stuff can be distributed at a reasonable size via Bittorrent - and even can be used to accelerate crypto applications so that they just need to fetch today's data online - if the dumps are compressed enough (per chain - don't want to mix up chain stuff). I would've liked to try it myself, but unfortunately this project needs 2x the disk space I have available right now.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5457753",
+  "comments": [
+    {
+      "author": "witcher_sense",
+      "created_time": "June 28, 2023, 10:07:59 AM",
+      "body": "Use Apache Parquet instead of .csv or .tsv files: https://www.databricks.com/glossary/what-is-parquetQuoteCharacteristics of ParquetFree and open source file format.Language agnostic.Column-based format - files are organized by column, rather than by row, which saves storage space and speeds up analytics queries.Used for analytics (OLAP) use cases, typically in conjunction with traditional OLTP databases.Highly efficient data compression and decompression.Supports complex data types and advanced nested data structures.Here is a python script to convert tsv to parquet with pandas: https://stackoverflow.com/questions/26124417/how-to-convert-a-csv-file-to-parquet",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

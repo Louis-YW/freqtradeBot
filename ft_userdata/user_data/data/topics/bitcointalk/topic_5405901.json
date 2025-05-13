@@ -1,0 +1,61 @@
+{
+  "id": "topic_5405901",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "July 11, 2022, 03:39:41 PM",
+  "content": "I learned something pretty cool a while back that I thought I'd share here because it's applicable to cryptography and can be used during \"offline\" generation of bitcoin addresses.It's called \"randomness extraction\" and it allows for high-quality randomness to be produced from an imperfect or weak entropy source.The specific extractor that I want to outline below is due to John von Neumann and is known as the \"Von Neumann extractor\".Although there are now more modern approaches to solving this problem, I think it's worth understanding this particular extractor both because of its elegance/cleverness and because it's easy to remember and possible to \"execute\" by hand (without a computer).Okay, so imagine you have a coin that is \"biased\" (e.g. it produces heads more often than tails). To make the example more compelling, let's imagine that this coin is so badly biased that (on average) only one in every ten flips is heads and the rest are tails.A coin that produces heads only 10% of the time seems pretty useless for generating a secure private key.If you take heads to be 1 and tails to be 0, then here is a private key (in binary) that such a coin might produce:0100000100001000000000010001000000010100000011010100001000000001000000110001001 0000000000000000001000001000001000000000000000000000000010010000100000000001100 0000101000000000000010101000000000000000000010000000010000000000000000000000000 0000000000000010000Now, obviously, that is not a very secure private key. I don't want to derail with an aside defining \"entropy\" but, suffice it to say that this key doesn't have enough of it!In physics, radioactive decay can produce sequences like the above where long stretches of inactivity (represented by 0's) are interrupted by infrequent \"clicks\" (represented by 1's). John von Neumann was studying sequences like these when he discovered a way to \"unbias\" them by considering the outcomes pair-wise instead of individually.Going back to our coin, these are the statistics for individual outcomes:------------------------| T | 90% chance | 0.9 |------------------------| H | 10% chance | 0.1 |------------------------And these are the statistics for pairs of consecutive outcomes:-------------------------------| TT | 81% chance | 0.9 * 0.9 |-------------------------------| TH | 9% chance  | 0.9 * 0.1 |-------------------------------| HT | 9% chance  | 0.1 * 0.9 |-------------------------------| HH | 1% chance  | 0.1 * 0.1 |-------------------------------The trick is to realize that the outcomes TH and HT always have equal probabilities of occurring (regardless of how biased the coin might be). That means that if you ignore the other two outcomes (TT and HH) you can treat TH and HT as each having a 50% chance of occurring, just like a fair coin!So, if you have a (possibly biased) coin and a piece of paper you can produce an \"unbiased\" sequence of 1's and 0's by doing the following:  1. Flip the coin twice and mentally record the outcome  2. If you got TT, don't write anything and goto 1  3. If you got TH, write down \"0\" and goto 1  4. If you got HT, write down \"1\" and goto 1  5. If you got HH, don't write anything and goto 1Pretty neat, huh? I really like simple techniques like this. I hope some of you found this interesting",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5405901",
+  "comments": [
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 11, 2022, 08:06:45 PM",
+      "body": "It's an interesting technique for sure. Its main draw back is that the more biased your coin, the higher your rejection rate, meaning you have to make more and more flips to achieve the desired amount of entropy.If we say your probability of flipping heads is p, then the chance of flipping HH is p2, and your chance of flipping TT is (1-p)2, so your chance of flipping either HH or TT and having to discard your result is p2 + (1-p)2.With a perfectly balanced coin, your chance of flipping heads is 0.5. So:0.52 + (1-0.5)2 = 0.5This means that with a perfectly balanced coin you would expect to flip either HH or TT 50% of the time, meaning you are discarding 50% of your pairs. To generate 256 bits of entropy, you would need to flip your coin 1,024 times on average (2 flips per bit, with 50% of your pairs being discarded).In your example of a coin which gives a 10% chance of heads, then:0.12 + (1-0.1)2 = 0.82This means that you would have to discard 82% of your pairs. In this scenario, to generate 256 bits of entropy, you would have to flip your coin 2,845 times on average.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "July 11, 2022, 09:15:04 PM",
+      "body": "Quote from: o_e_l_e_o on July 11, 2022, 08:06:45 PMIts main draw back is that the more biased your coin, the higher your rejection rate, meaning you have to make more and more flips to achieve the desired amount of entropy.Yup, that's exactly right. Like I alluded to in the post, there are more modern techniques available to us now. One of the benefits of modern extractors is that they are less wasteful.I really like this extractor because it's simple to understand and \"executable\" by hand. It's not very ergonomic though, I agree.Quote from: o_e_l_e_o on July 11, 2022, 08:06:45 PMThis means that you would have to discard 82% of your pairs. In this scenario, to generate 256 bits of entropy, you would have to flip your coin 2,845 times on average.Yup, that's right too. Making the bias so extreme was just for exposition. Realistically, any bias you encounter (either due to the coin or your flipping technique) will be much smaller than that.As you said, even with a perfectly fair coin, you will still have to flip it 8 times per 2 bits, so 4 times more than normal. I'm sure very few people are patient enough to ever actually carry out this procedure, but I still think it's well worth understanding.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Chlotide",
+      "created_time": "July 11, 2022, 10:57:04 PMLast edit: July 12, 2022, 01:02:30 AM by Chlotide",
+      "body": "The closest one can get to randomness are these TRNG (True Random Number Generators) based on real physical events. Like the one described here, the lava lamp wall from \"the one who's name we shall not mention\" (Cloudflare) etcSo even if you have to toss that biased coin 2,845 times, you might as well go ahead if your really strive randomness or as close as possible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "July 12, 2022, 02:10:30 AMLast edit: July 12, 2022, 02:34:00 AM by COBRAS",
+      "body": "but there will be no bias in one direction or another. although there is no doubt there are numbers from the range from 1 to 2^256 that will look like they have a bias.. and again, there will be no other private keys with the same bias.one of most secured privkeys is privkeys what hards to divide...for ex  hi qality but too short privkey 1011011111110111000001110000111111 looks like not goid entropylook at this privkey, can you copy randomness of this privkey    https://privatekeys.pw/key/fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140?Br",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 12, 2022, 04:10:51 AM",
+      "body": "Quote from: o_e_l_e_o on July 11, 2022, 08:06:45 PMIt's an interesting technique for sure. Its main draw back is that the more biased your coin, the higher your rejection rate, meaning you have to make more and more flips to achieve the desired amount of entropy.Practically speaking, if a randomness source is found to be that biased is should not be used at all, and replaced by a more random source.But this has a practical application in extracting purely random numbers from hardware RNGs, which may or may not be compromised for the NSA (I think the Linux kernel RNG uses something similar for its randomness sources).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 12, 2022, 08:10:45 AM",
+      "body": "Quote from: NotATether on July 12, 2022, 04:10:51 AMPractically speaking, if a randomness source is found to be that biased is should not be used at all, and replaced by a more random source.This is true, but how many people actually test a coin for randomness? How many people would even know how to do such a thing? It's a lot more complicated than flipping it 100 times and seeing if you get ~50 heads and ~50 tails.If you ended up with 90 heads and 10 tails, then sure, that coin is incredibly unlikely to be fair and should be discarded. If you end up with 52 heads and 48 tails, though. What then? The smaller the bias on your coin, the larger the number of flips you need to detect that bias. And it also depends on how sure you want to be that you've detected that bias. For example, if your coin had a 52/48 bias, then to be 99.9% sure you have detected that bias, you would need to flip the coin over 2000 times. At this point, it becomes more economical to just use the coin with von Neumann's debiasing algorithm.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "topic_5407563",
+  "title": "Cookdata",
+  "author": "Cookdata",
+  "created_time": "July 25, 2022, 10:43:13 AM",
+  "content": "Yesterday, I bump into Chipmixer service thread when OP sent out weekly payment to their signature participants and when I opened the transaction hash= 714701687f40263d6ff40139568e5162f38fd3eb04efb2b44954e36279d2712f, it was yet to be confirmed with 1 sat/vb and as that time the least unconfirmed median fee was 8 sats/vbyte and then right below one of the receiving wallet address, I saw one wallet did spent the output but was also unconfirmed at time. I was skeptical that the only way for the owner to spend his UTXO is to do a Child pay for parents or when the the parent transaction fee is bump.When I checked the wallet address transaction, it was flagged by the explorer as CPFP with a fee of 1.01 sat/vb but the fee was not too different from the parent transaction (1sat/vb). I wait to see what will happen when the mempool becomes less congested to see which one will first get confirm because that fee aren't too different. I just checked now, they both have been confirmed in the same block at the same time but it seems the parent was confirmed and the CPFP was confirmed as normal transaction.Parent transaction = https://mempool.space/tx/714701687f40263d6ff40139568e5162f38fd3eb04efb2b44954e36279d2712fAttempted CPFP= https://mempool.space/tx/c6a2070c5370533fd73b2f07b0800f16c61e820781fa0fa0f24c8a865a412d1fIt is obvious the two transactions are independent of each other as the first transaction input was 1609 sat as fee and the second with 111 sat.From the screenshots, you can see they were both confirm in the same block and the same minutes but my question is was 0.01 sat/vbyte not significant to trigger the parent transaction as CPFP?Second question, if they were both confirm at the same time in the same block, where did the second transaction have his transaction reference from? For it to confirm, it need the previous(reference) transaction hash but seeing they both confirm at the same time is unclear to me.I was expecting the second transaction to be sitting in the orphan transaction pool since the parent need to be confirmed to have the previous hash to be able to to confirm the second transaction.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5407563",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "July 25, 2022, 11:22:12 AM",
+      "body": "First, this has nothing to do with ChipMixer. Second: I made that transaction It has nothing to do with CPFP, it's just a regular \"spend unconfirmed input\" (which can go much deeper than just one unconfirmed parent).Quote from: Cookdata on July 25, 2022, 10:43:13 AMSecond question, if they were both confirm at the same time in the same block, where did the second transaction have his transaction reference from? For it to confirm, it need the previous(reference) transaction hash but seeing they both confirm at the same time is unclear to me.The txid is already known when broadcasting the transaction, that's why you can spend unconfirmed inputs. The risk is double spending the original transaction, in which case the second transaction would no longer exist. But that's not a risk I worry about in this case.I don't know where you got the median fee of 8 sats/vbyte, but at the time I made the transaction, the minimum fee was enough for a fast confirmation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cookdata",
+      "created_time": "July 25, 2022, 11:50:26 AM",
+      "body": "Quote from: LoyceV on July 25, 2022, 11:22:12 AMFirst, this has nothing to do with ChipMixer. Second: I made that transaction It has nothing to do with CPFP, it's just a regular \"spend unconfirmed input\" (which can go much deeper than just one unconfirmed parent).I was very sure what I saw, the mempool flagged it as a CPFP. I wished I have taken the screenshot before the transaction were confirmed to back it up but my curiosity wasn't there yet until I reopened the tab I left on my PC. Now, I can't prove anything   QuoteThe txid is already known when broadcasting the transaction, that's why you can spend unconfirmed inputs. The risk is double spending the original transaction, in which case the second transaction would no longer exist. But that's not a risk I worry about in this case.I can't say anything further about this since you said it was a normal transaction.QuoteI don't know where you got the median fee of 8 sats/vbyte, but at the time I made the transaction, the minimum fee was enough for a fast confirmation.May be mempool was doing his thing, it was at that range when I opened the transactions.Assuming that the second transaction was child pays for parent, is 0.01sat difference enough to override the parent transaction if the fee should go lower ? I have not seen median fee as 1.5, 1.7, 3.5sat before.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 25, 2022, 12:01:39 PM",
+      "body": "Quote from: Cookdata on July 25, 2022, 11:50:26 AMI was very sure what I saw, the mempool flagged it as a CPFP.I used the minimum fee: 111 sat for 111 bytes. According to your link, it turned into 110.25 vbyte, which makes it 1.0068 sat/vbyte. I guess you can call it CPFP, but the 0.75 sat \"extra\" isn't going to make much of a difference. My point was that it's not intended to be CPFP for all practical purposes.QuoteAssuming that the second transaction was child pays for parent, is 0.01sat difference enough to override the parent transaction if the fee should go lower ? I have not seen median fee as 1.5, 1.7, 3.5sat before.There is no \"overriding\": miners do simple math: they calculate the average fee for \"combined\" transactions, and pick the most profitable ones from there. With such a small difference, I expect it to confirm together with other 1 sat/vbyte transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 25, 2022, 02:05:24 PM",
+      "body": "Quote from: Cookdata on July 25, 2022, 10:43:13 AMSecond question, if they were both confirm at the same time in the same block, where did the second transaction have his transaction reference from? For it to confirm, it need the previous(reference) transaction hash but seeing they both confirm at the same time is unclear to me.Yes, when you create a bitcoin transaction the inputs to the transaction are referenced based on the parent transaction's hash. Usually the parent comes from an earlier block, but it can also come from the same block, provided that the parent transaction appears before the child transaction in the transaction list in that block. When other nodes verify that block, they will verify the parent transaction first, and so have the relevant transaction ID to reference when they come to validating the child transaction.If the transactions were included in the block in reverse, then the block would be rejected as invalid.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 25, 2022, 02:18:08 PM",
+      "body": "Quote from: Cookdata on July 25, 2022, 10:43:13 AMI was skeptical that the only way for the owner to spend his UTXO is to do a Child pay for parents or when the the parent transaction fee is bump.Quote from: Cookdata on July 25, 2022, 11:50:26 AMI was very sure what I saw, the mempool flagged it as a CPFP. I wished I have taken the screenshot before the transaction were confirmed to back it up but my curiosity wasn't there yet until I reopened the tab I left on my PC.That's because Child-Pays-For-Parent transaction is actually just a regular transaction that spent an output from its parent unconfirmed transaction.There's nothing special about it, it's just a regular transaction that spent an unconfirmed UTXO.So, if users were to spend their received unconfirmed bitcoins \"normally\", it will be considered CPFP as long as the fee rate is higher than the parent.mempool.space (a blockexplorer, not \"the mempool\") is just flagging similar transactions as CPFP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

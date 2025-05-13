@@ -1,0 +1,77 @@
+{
+  "id": "topic_5404790",
+  "title": "Springfieldmen",
+  "author": "Springfieldmen",
+  "created_time": "July 01, 2022, 02:42:16 PM",
+  "content": "Trying to send transaction using python lib https://github.com/petertodd/python-bitcoinlibWe debugged rest API which broadcasts to service chain.so and it was successful:https://chain.so/tx/BTCTEST/98d9f2bc3f65b0ca81f775f43c2f48b6ffe29fcfa06779c7ab299709ea7fc639DST address is our BitPay testnet wallet,SRC addresses come generated from python-bitcoinlib using wallet.get_key()Also we even can't find it on other services.Also we tried same to to post transaction to bitaps.com and we can't see it there too.Probably someone can give a clue where to look, what can be wrong and why Confidence on chain.so is 0%. Probably you can recommend other service?Code is very straightforward:Code:wallet = wallet_create_or_open(name='MainWallet', network='testnet', witness_type='segwit')transaction = wallet.send_to(  to_address=body.address,  amount=decimal_to_satoshi(body.amount),  fee='low', offline=True,)transaction.send(offline=False)",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5404790",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "July 01, 2022, 03:59:52 PM",
+      "body": "When I check the transaction from chain.so it wasn't yet confirmed I tried to copy the raw hex and try to broadcast it to blockcypher testnet it broadcasted but it still stuck. I check the raw hex into https://tbtc.bitaps.com/broadcast but there is an error it shows \"Broadcast transaction failed: min relay fee not met, 111 < 141 (code 66)\"Based on the error it seems that you are sending tBTC with a below minimum fee. Would you mind trying to bump or increase the fee and broadcast it to blockcypher testnet.Check the source code of the Bitcoinlib you might be able to change the minimum fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Coding Enthusiast",
+      "created_time": "July 02, 2022, 07:41:58 AM",
+      "body": "I had some free time so I mined your transaction on TestNet. Enjoy!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 03, 2022, 04:36:48 AM",
+      "body": "Quote from: Springfieldmen on July 01, 2022, 02:42:16 PM98d9f2bc3f65b0ca81f775f43c2f48b6ffe29fcfa06779c7ab299709ea7fc639You transaction was mined by Coding Enthusiast but take note that under normal circumstances,it wont easily propagate to the network since most of the nodes wont relay it and miners will likely reject a similar transaction in mainnet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hZti",
+      "created_time": "July 06, 2022, 04:59:22 PM",
+      "body": "The fee of the transaction was simply to low for it to get accepted. If Im not wrong it was even below 1 sat/vbyte wich is to less to be accepted at all. It should have been refunded to you after some days but it was luckily manually included in a block. In the real bitcoin network it would only have been done if you pay a mining pool a fee which would be quite high.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hZti",
+      "created_time": "July 09, 2022, 02:03:06 PM",
+      "body": "Quote from: ETFbitcoin on July 07, 2022, 11:14:59 AMQuote from: hZti on July 06, 2022, 04:59:22 PMIt should have been refunded to you after some days but it was luckily manually included in a block.To be precise, it's not refunded but the unconfirmed transaction is dropped/removed from mempool by node after some time (usually 2 weeks) or when the mempool is full which causes transaction with low fee rate removed first.Technically this is true but for most users it is only important if their transaction is now stuck forever or if at one point they will get the coins back in their wallet so they can resend them. What I was wondering after reading that 0 sats/vByte transactions can at least make it to the mempool, if you could simply send an infinite amount of transactions to clog up up the mempool? This transactions will never spam the blockchain, but wouldn't clogging up the mempool be enough to mess with the network. Imagine somebody does millions of transactions per day and will not stop because for him it is essentially free.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 10, 2022, 03:39:30 AM",
+      "body": "Quote from: hZti on July 09, 2022, 02:03:06 PMWhat I was wondering after reading that 0 sats/vByte transactions can at least make it to the mempool, if you could simply send an infinite amount of transactions to clog up up the mempool? This transactions will never spam the blockchain, but wouldn't clogging up the mempool be enough to mess with the network. Imagine somebody does millions of transactions per day and will not stop because for him it is essentially free.Each node has its own mempool and its own rules for transactions that they accept in it. Majority of nodes use the default settings that rejects 0 fee transactions and non-standard transactions meaning such txs with 0 fee would never be propagated throughout the network just like how OP's transaction never reached 99% of the network and was only found on one explorer with loose rules.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 10, 2022, 07:58:54 AM",
+      "body": "Quote from: hZti on July 09, 2022, 02:03:06 PMWhat I was wondering after reading that 0 sats/vByte transactions can at least make it to the mempool, if you could simply send an infinite amount of transactions to clog up up the mempool? This transactions will never spam the blockchain, but wouldn't clogging up the mempool be enough to mess with the network. Imagine somebody does millions of transactions per day and will not stop because for him it is essentially free.By adjusting your node's configuration, yes, you can accept 0-fee transactions to your own mempool.However, when relaying that transaction to your peers, you'll see that almost all of them wont accept it.In that scenario, only those nodes that accept 0-fee transactions will be affected by the spammer.IMO, the damage isn't even serious because a node's mempool has a default size limit so, it won't accept any more 0-fee transactions if the limit has passed and will drop a number for any 1+ sat/vB transaction received.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Springfieldmen",
+      "created_time": "July 12, 2022, 07:55:04 PM",
+      "body": "Oh, thanks a lot!!! You helped me a lot, but had a daughter born and was not able to respond! You rock bitcointalk members",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

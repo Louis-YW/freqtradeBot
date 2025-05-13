@@ -1,0 +1,85 @@
+{
+  "id": "topic_5434734",
+  "title": "CryptoWomb@at",
+  "author": "CryptoWomb@at",
+  "created_time": "January 14, 2023, 06:18:25 PM",
+  "content": "Hello,I posted this in Coldcard reddit but didn't really get a proper explanation so I hope someone can explain what is really the issue.As per the Coldcard guide, you would need to export .json file and open it with Electrum where you would see all your addresses but you need Coldcard to sign a transaction to send coins (either via cable or PTSB signed file). This works with no issues.However, when I extract zpub master public key and add it to watch only wallet in Electrum, I get exactly the same addresses and balances as with .json file. But when I try to sign a transaction by extracting PTSB file, it doesn't work, Coldcard gives error message that wallet signatures don't match.Can someone explain the difference between .json file and zpub master key. Do they contain exactly the same data in different format or there is a real difference. Also, is there an increased risk by exposing .json file to the public/hackers vs xpub/zpub?Someone from Coinkite suggested that the issue is probably different paths, but if the paths are different, wouldn't you get different addresses? In my case, I get 2 identical Electrum wallets with exactly same addresses (native segwit). Except when using zpub in Electrum, I can't sign a transaction (different master key fingerprint).Thanks in advance.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5434734",
+  "comments": [
+    {
+      "author": "Sarah Azhari",
+      "created_time": "January 15, 2023, 02:49:00 AM",
+      "body": "Quote from: CryptoWomb@at on January 14, 2023, 06:18:25 PMHowever, when I extract zpub master public key and add it to watch only wallet in Electrum, I get exactly the same addresses and balances as with .json file. But when I try to sign a transaction by extracting PTSB file, it doesn't work, Coldcard gives error message that wallet signatures don't match.as you mentioned as watch only wallet that is impossible to sign a transaction because there isn't key to open it. so that possible PTSB is also doesn't have key to sign. So, what is PTSB?, I just heard today from you.Quote from: CryptoWomb@at on January 14, 2023, 06:18:25 PMCan someone explain the difference between .json file and zpub master key. Do they contain exactly the same data in different format or there is a real difference. Also, is there an increased risk by exposing .json file to the public/hackers vs xpub/zpub?Yes, they do NOT Exactly the same data .json file you can not use for wallet where aren't support it, while zpub master key you can extract it first from a tool that you can get the key to importing to another wallet.Quote from: CryptoWomb@at on January 14, 2023, 06:18:25 PMSomeone from Coinkite suggested that the issue is probably different paths, but if the paths are different, wouldn't you get different addresses? In my case, I get 2 identical Electrum wallets with exactly same addresses (native segwit). Except when using zpub in Electrum, I can't sign a transaction (different master key fingerprint).Maybe Coinkite support means not as derivation path, but a other path like .json file. or code. Like electrum, we can't import private key without code front [p2pkh:, p2wpkh-p2sh:, p2wpkh]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Edwardard",
+      "created_time": "January 15, 2023, 03:08:03 AM",
+      "body": "Quote from: Sarah Azhari on January 15, 2023, 02:49:00 AMSo, what is PTSB?, I just heard today from you.It should be PSBT (not PTSB), should've been a typo error made by OP. Btw, PSBT means Partially Signed Bitcoin TransactionUsing PSBTs, a transaction can be crafted with a watch-only wallet, which does not have access to the private keys needed to sign the transaction. The watch-only wallet can then export a PSBT file, which can be imported to a wallet which does contain the required private keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "January 15, 2023, 04:38:18 AM",
+      "body": "It is not possible to find the problem without seeing the PSBT contents but usually problems like this are caused by the wallet creating the wrong \"fingerprint\" for the transaction the wallet sends to the other device/tool to sign. This is why your Electrum wallet created using the master public key is showing correct derivation path and correct addresses but the PSBT is rejected.Conversely when you export the JSON file from ColdCard, it already contains the correct fingerprint so the PSBT created that way is not rejected.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 17, 2023, 12:56:37 PM",
+      "body": "I'm an Electrum user, and AFAIK, there is no option to import JSON into Electrum. So do you have any idea what kind of data is inside the .json file you are trying to import?You can import x/y/zpubs, addresses, privkeys, BIP39/Electrum seedphrases, and the corresponding formats for multisig. And of course there is the integration with hardware wallets that might let you put in additional data.Quote from: pooya87 on January 15, 2023, 04:38:18 AMConversely when you export the JSON file from ColdCard, it already contains the correct fingerprint so the PSBT created that way is not rejected.You mean the output descriptor?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "January 18, 2023, 05:40:17 AM",
+      "body": "Quote from: NotATether on January 17, 2023, 12:56:37 PMI'm an Electrum user, and AFAIK, there is no option to import JSON into Electrum. So do you have any idea what kind of data is inside the .json file you are trying to import?Since he's talking about Coldcard, it's the exported .json file with simple data like keystore, script type, path, etc. which can be loaded in Electrum as a new wallet.Using \"File->Open\" will import it and Electrum will then format it into a proper Electrum wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "January 18, 2023, 05:45:58 AM",
+      "body": "Quote from: nc50lc on January 18, 2023, 05:40:17 AMQuote from: NotATether on January 17, 2023, 12:56:37 PMI'm an Electrum user, and AFAIK, there is no option to import JSON into Electrum. So do you have any idea what kind of data is inside the .json file you are trying to import?Since he's talking about Coldcard, it's the exported .json file with simple data like keystore, script type, path, etc. which can be loaded in Electrum as a new wallet.Using \"File->Open\" will import it and Electrum will then format it into a proper Electrum wallet.Oh cool. Is there any specification for this particular wallet format? There could also be some description in the Electrum source code for it, right? But I would assume that ColdCard has some page about it, no?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "January 18, 2023, 05:57:12 AM",
+      "body": "Quote from: NotATether on January 18, 2023, 05:45:58 AM-snip-I haven't searched but try these links.Electrum ColdCard Plugin: https://github.com/spesmilo/electrum/blob/master/electrum/plugins/coldcard/coldcard.py#L246ColdCard Sample Electrum Wallets (unimported): github.com/Coldcard/firmware/tree/master/docs/sample-electrum-wallets",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Edwardard",
+      "created_time": "January 18, 2023, 06:12:26 AM",
+      "body": "Quote from: NotATether on January 18, 2023, 05:45:58 AMOh cool. Is there any specification for this particular wallet format?I have not tried it personally but in this video[1] they have successfully shown how to import a .json file into electrum. Its pretty old one but maybe still valid with the current (newer) versions?! [1] How to setup COLDCARD with electrum: https://youtu.be/u5jRJ8L1Vwo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 18, 2023, 08:37:41 AM",
+      "body": "In case you missed it, here is an official guide on how to make air-gapped transactions with Coldcard and Electrum: https://www.youtube.com/watch?v=fNZgVHq0FGMThe process doesn't seem too complicated:1) you open your Electrum wallet and construct transaction as if it is \"normal\" transaction2) then click \"Finalize\"3) click \"Export\" -> \"For hardware device; include xpubs\" -> \"Export to file\"4) select a name for your new file: \"file.psbt\" for example and put it on MicroSD card.5) import to your Coldcard and select \"Ready to sign\" from the options6) confirm all details and transfer signed transaction back to Electrum7) select \"Tools\" -> \"Load transaction\" -> \"From file\" and select the file you transfered click \"Broadcast\"Hope this information will help you to recover funds.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

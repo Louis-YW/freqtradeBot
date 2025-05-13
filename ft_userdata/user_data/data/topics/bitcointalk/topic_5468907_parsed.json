@@ -1,0 +1,85 @@
+{
+  "id": "topic_5468907",
+  "title": "PowerGlove",
+  "author": "PowerGlove",
+  "created_time": "October 02, 2023, 03:10:32 PMLast edit: October 06, 2023, 05:59:33 AM by PowerGlove",
+  "content": "This is a fix for an old issue that Foxpup diagnosed:Quote from: Foxpup on March 05, 2017, 02:56:48 AMThe cause is that Arabic text automatically switches the text direction to right-to-left, and since the immediately following text is just numbers and punctuation marks, which can written in either direction, there's nothing to change it back.Mods can fix it in this instance by adding a left-to-right mark (U+200E, &#8206;) to the end of the thread title, though that doesn't address the underlying bug.Basically, topic titles ending with certain characters will cause the page numbers to mis-render, like this:It's easy to find many examples of this on the Arabic and Hebrew local boards, like the following:With this patch, the two previous examples would render like so:Here's the diff for @theymos:Code:--- baseline/Sources/MessageIndex.php 2011-12-22 22:56:39.000000000 +0000+++ modified/Sources/MessageIndex.php 2023-10-02 14:44:40.000000000 +0000@@ -495,32 +495,32 @@     // Decide how many pages the topic should have.    $topic_length = $row['numReplies'] + 1;    if ($topic_length > $modSettings['defaultMaxMessages'])    {     $tmppages = array();     $tmpa = 1;     for ($tmpb = 0; $tmpb < $topic_length; $tmpb += $modSettings['defaultMaxMessages'])     {      $tmppages[] = '<a href=\"' . $scripturl . '?topic=' . $row['ID_TOPIC'] . '.' . $tmpb . '\">' . $tmpa . '</a>';      $tmpa++;     }     // Show links to all the pages?     if (count($tmppages) <= 5)-     $pages = '&#171; ' . implode(' ', $tmppages);+     $pages = '&lrm;&#171; ' . implode(' ', $tmppages);     // Or skip a few?     else-     $pages = '&#171; ' . $tmppages[0] . ' ' . $tmppages[1] . ' ... ' . $tmppages[count($tmppages) - 2] . ' ' . $tmppages[count($tmppages) - 1];+     $pages = '&lrm;&#171; ' . $tmppages[0] . ' ' . $tmppages[1] . ' ... ' . $tmppages[count($tmppages) - 2] . ' ' . $tmppages[count($tmppages) - 1];      if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])      $pages .= ' &nbsp;<a href=\"' . $scripturl . '?topic=' . $row['ID_TOPIC'] . '.0;all\">' . $txt[190] . '</a>';     $pages .= ' &#187;';    }    else     $pages = '';     // We need to check the topic icons exist...    if (empty($modSettings['messageIconChecks_disable']))    {     if (!isset($context['icon_sources'][$row['firstIcon']]))      $context['icon_sources'][$row['firstIcon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['firstIcon'] . '.gif') ? 'images_url' : 'default_images_url';     if (!isset($context['icon_sources'][$row['lastIcon']]))Edit: Adding a second diff because I noticed that this issue also shows up on ?action=unread, ?action=unreadreplies and ?action=watchlist.Code:--- baseline/Sources/Recent.php 2011-02-07 16:45:09.000000000 +0000+++ modified/Sources/Recent.php 2023-10-06 04:52:26.000000000 +0000@@ -981,32 +981,32 @@    // Decide how many pages the topic should have.   $topic_length = $row['numReplies'] + 1;   if ($topic_length > $modSettings['defaultMaxMessages'])   {    $tmppages = array();    $tmpa = 1;    for ($tmpb = 0; $tmpb < $topic_length; $tmpb += $modSettings['defaultMaxMessages'])    {     $tmppages[] = '<a href=\"' . $scripturl . '?topic=' . $row['ID_TOPIC'] . '.' . $tmpb . ';topicseen\">' . $tmpa . '</a>';     $tmpa++;    }    // Show links to all the pages?    if (count($tmppages) <= 5)-    $pages = '&#171; ' . implode(' ', $tmppages);+    $pages = '&lrm;&#171; ' . implode(' ', $tmppages);    // Or skip a few?    else-    $pages = '&#171; ' . $tmppages[0] . ' ' . $tmppages[1] . ' ... ' . $tmppages[count($tmppages) - 2] . ' ' . $tmppages[count($tmppages) - 1];+    $pages = '&lrm;&#171; ' . $tmppages[0] . ' ' . $tmppages[1] . ' ... ' . $tmppages[count($tmppages) - 2] . ' ' . $tmppages[count($tmppages) - 1];     if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])     $pages .= ' &nbsp;<a href=\"' . $scripturl . '?topic=' . $row['ID_TOPIC'] . '.0;all\">' . $txt[190] . '</a>';    $pages .= ' &#187;';   }   else    $pages = '';    // We need to check the topic icons exist... you can never be too sure!   if (empty($modSettings['messageIconChecks_disable']))   {    // First icon first... as you'd expect.    if (!isset($context['icon_sources'][$row['firstIcon']]))     $context['icon_sources'][$row['firstIcon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['firstIcon'] . '.gif') ? 'images_url' : 'default_images_url';",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468907",
+  "comments": [
+    {
+      "author": "digaran",
+      "created_time": "October 02, 2023, 05:39:09 PM",
+      "body": "This seems to be the case on local boards and not other languages board, why do you think that is?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hg_away",
+      "created_time": "October 02, 2023, 06:39:27 PM",
+      "body": "Quote from: digaran on October 02, 2023, 05:39:09 PMThis seems to be the case on local boards and not other languages board, why do you think that is?It almost applies to languages that are written from right to left, such as Arabic and Hebrew. It is an update that has been awaited for almost several years, so I hope that the patch will be implemented.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 02, 2023, 08:48:44 PM",
+      "body": "Quote from: hg_away on October 02, 2023, 06:39:27 PMQuote from: digaran on October 02, 2023, 05:39:09 PMThis seems to be the case on local boards and not other languages board, why do you think that is?It almost applies to languages that are written from right to left, such as Arabic and Hebrew. It is an update that has been awaited for almost several years, so I hope that the patch will be implemented.I just checked and it seems to show like that for some cases, example is  persian thread in other languages which is Ok, and when you read the last post on other topics,  this bug shows when there are no new posts, [new] seems to fix the bug temporarily.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 03, 2023, 06:30:07 PM",
+      "body": "Quote from: digaran on October 02, 2023, 05:39:09 PMThis seems to be the case on local boards and not other languages board, why do you think that is?This is an issue on that board, too. Here's an (Urdu, I think) example:If you read the OP carefully (particularly Foxpup's quote) then you'll understand this issue better. Some Unicode characters are meant to be laid out right-to-left instead of left-to-right, and sometimes topic titles end with character sequences that leave the text direction flipped, which then messes up the way the page links are rendered. What this patch does is make sure that the text direction is always set to left-to-right before the page links get emitted.Quote from: digaran on October 02, 2023, 08:48:44 PM(...) this bug shows when there are no new posts, [new] seems to fix the bug temporarily.Hmm, I don't think that's the case (though, maybe I misunderstand you). Here's the previous example with the \"new\" button in effect, and the bug presents the same way:",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 03, 2023, 08:23:56 PM",
+      "body": "Your screenshots differ from mine, look :",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 03, 2023, 11:38:19 PM",
+      "body": "Quote from: digaran on October 03, 2023, 08:23:56 PMYour screenshots differ from mine (...)I see. I'm not sure why your button is textual and mine is graphical (maybe it's a mobile vs. desktop thing, or a BPIP vs. vanilla thing), but if you understood my previous response (and carefully read Foxpup's quote in the OP), then I'm sure you can appreciate why putting the text \"[new]\" between the topic title and the page links will flip the text direction back to left-to-right. It's kind of interesting, but doesn't really have any bearing on this patch, so I don't think it's a tangent that justifies further discussion.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "yhiaali3",
+      "created_time": "October 04, 2023, 04:45:28 AM",
+      "body": "Good news for the Arabic section and sections that write from right to left, this is a really annoying old problem.I do not know if this update will solve the other problem, which is the inability of the title to read the entire Arabic text if the number of characters is greater than a certain number. This can be seen in this example:This is a screenshot of the notification email with a new topic title as it appears fully in the message:                                    While the title does not appear in full on the main Arabic section page:                                    Can this problem be solved with this update?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 04, 2023, 08:34:58 AM",
+      "body": "Quote from: yhiaali3 on October 04, 2023, 04:45:28 AMCan this problem be solved with this update?Unfortunately, this patch won't fix the issue you're talking about. Thanks for bringing it to my attention, though! (I appreciate learning about forum problems that I'm unlikely to bump into on my own.)I'll add it to my backlog and see what I can do about it in the future.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "October 16, 2024, 07:19:25 AM",
+      "body": "FEI: I re-did this patch in a slightly better way and have sent the new fix to theymos. (I mean, a lot of people probably won't care about this one, because it's an issue that rarely shows up on the global boards, but, it's an easy thing to improve, and I have to imagine that the people using the Arabic local board, the Hebrew local board, and maybe future RTL-script local boards, like an Urdu or Persian one, will appreciate their board views looking a bit less borked, especially because this issue causes the graphical \"new\" button to only stay on the right-hand-side of a topic's title up until that topic reaches a certain number of replies, at which point the button suddenly switches to being on the opposite side of the title, or sometimes even buried within the title itself.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

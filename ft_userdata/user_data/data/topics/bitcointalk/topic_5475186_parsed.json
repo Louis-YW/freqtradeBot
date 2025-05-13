@@ -1,0 +1,133 @@
+{
+  "id": "topic_5475186",
+  "title": "digital_mine",
+  "author": "digital_mine",
+  "created_time": "November 23, 2023, 11:37:14 AM",
+  "content": "Hello everyone, I finally decided to use again the beloved bitcoin core wallet after several years.These last events regarding CEX, regulations and ETF approvals, let me think that is not safe anymore, if ever, to keep my bitcoin on Binance.I downloaded the last bitcoin core version, synced with the blockchain, and I wanted to import some wallet addresses I used back in the day and, I wanted to get the private keys of some new addresses just created, but in both cases I got this error: \"Only legacy wallets are supported by this command (code -4)\".I don't get how to use private keys with this bitcoin core version, in my opinion being able to fully control private keys is the most important part of safety using bitcoin, so I'm uncomfortable to withdraw my funds without being sure of being in total control of my private keys.These are the command I'm using on the wallet console:Code:importprivkey \"MY KEY\"Code:dumpprivkey \"ADDRESS\"This is the error:Code:Only legacy wallets are supported by this command (code -4)Thanks in advance!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5475186",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "November 23, 2023, 11:53:38 AM",
+      "body": "The newer versions of core create descriptor  / HD walletsQuote from: NotATether on April 18, 2023, 07:22:08 AMSee https://github.com/bitcoin/bitcoin/issues/26239Bitcoin Core is now creating descriptor wallets by default since version 24.0. These have an HD key by default, so Core is blocking you from exporting the private keys made by it.Docs say you should use backupwallet with the -rpcwallet command-line switch (to select the wallet) to make a backup copy of the wallet in a location you choose, which from my point of view is ridiculous since you could just make a copy of the wallet manually.It is always possible to open up the database wallet file and perform surgery on it to get its encrypted private keys though.Sadly, it does not allow you to (easily) get the individual private keys Eliminating all other points of this discussion for the moment. If you are going to keep your coins yourself, which is a very good thing since not your keys, not your coins. Don't use just core or any other wallet, get a hardware wallet for additional security.The funds you save will be your own....-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digital_mine",
+      "created_time": "November 23, 2023, 12:08:25 PM",
+      "body": "Quote from: DaveF on November 23, 2023, 11:53:38 AMThe newer versions of core create descriptor  / HD walletsQuote from: NotATether on April 18, 2023, 07:22:08 AMSee https://github.com/bitcoin/bitcoin/issues/26239Bitcoin Core is now creating descriptor wallets by default since version 24.0. These have an HD key by default, so Core is blocking you from exporting the private keys made by it.Docs say you should use backupwallet with the -rpcwallet command-line switch (to select the wallet) to make a backup copy of the wallet in a location you choose, which from my point of view is ridiculous since you could just make a copy of the wallet manually.It is always possible to open up the database wallet file and perform surgery on it to get its encrypted private keys though.Sadly, it does not allow you to (easily) get the individual private keys Eliminating all other points of this discussion for the moment. If you are going to keep your coins yourself, which is a very good thing since not your keys, not your coins. Don't use just core or any other wallet, get a hardware wallet for additional security.The funds you save will be your own....-DaveThanks Dave,If I can't get my keys, the point is the same: NOT MY KEYS NOT MY COINS.So at this point what, if you know, is the last bitcoin core version that allow to EASILY, get your keys like back in the days.Thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 23, 2023, 01:01:07 PM",
+      "body": "Quote from: digital_mine on November 23, 2023, 11:37:14 AMThese are the command I'm using on the wallet console:Code:importprivkey \"MY KEY\"Code:dumpprivkey \"ADDRESS\"You still can import but with a different command: use importdescriptors instead.For a single WIF private key of a Native SegWit address, the command should look like this:Code:importdescriptors \"[{\\\"desc\\\": \\\"wpkh(WIF_PRIV_KEY)#z0cazjry\\\", \\\"timestamp\\\": 0}]\"Use: help importdescriptors to know how to use the command.Here's how to construct descriptors: https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.mdAnd to get the checksum (#z0cazjry in the example), use: getdescriptorinfo \"descriptor\"For dumpprivkey, I believe that it's intentionally removed because of the design of BIP44, BIP49, BIP84 and BIP86 standards which now use non-hardened addresses.Previously, there's no serious issue with exporting a single private key from a legacy HD wallet with hardened addresses since there's no way to compute the parent extended private key from its pair extended public key and a child (exported) private key.Now, since the 'address_index' as well as the 'chain_index' (change) paths aren't hardened, that issue is now possible if an attacker gets his hand on the data mentioned above.There's a workaround to export your privKey but be warned of the issue above:  https://bitcointalk.org/index.php?topic=5449245.msg62109703#msg62109703Quote from: digital_mine on November 23, 2023, 12:08:25 PMIf I can't get my keys, the point is the same: NOT MY KEYS NOT MY COINS.You're still in control your keys in your wallet which is stored in your device.There's no second/third-party custodian that hodls it for you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "whanau",
+      "created_time": "November 23, 2023, 07:43:26 PM",
+      "body": "Quote from: digital_mine on November 23, 2023, 12:08:25 PMSo at this point what, if you know, is the last bitcoin core version that allow to EASILY, get your keys like back in the days.ThanksNot  sure what version you need but there is an old one here https://bitcoincore.org/en/releases/0.11.2/Make sure you verify it is genuine!You may be able to edit the URL to get other early versions too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digital_mine",
+      "created_time": "November 23, 2023, 11:22:05 PM",
+      "body": "Quote from: nc50lc on November 23, 2023, 01:01:07 PMQuote from: digital_mine on November 23, 2023, 11:37:14 AMThese are the command I'm using on the wallet console:Code:importprivkey \"MY KEY\"Code:dumpprivkey \"ADDRESS\"You still can import but with a different command: use importdescriptors instead.For a single WIF private key of a Native SegWit address, the command should look like this:Code:importdescriptors \"[{\\\"desc\\\": \\\"wpkh(WIF_PRIV_KEY)#z0cazjry\\\", \\\"timestamp\\\": 0}]\"Use: help importdescriptors to know how to use the command.Here's how to construct descriptors: https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.mdAnd to get the checksum (#z0cazjry in the example), use: getdescriptorinfo \"descriptor\"For dumpprivkey, I believe that it's intentionally removed because of the design of BIP44, BIP49, BIP84 and BIP86 standards which now use non-hardened addresses.Previously, there's no serious issue with exporting a single private key from a legacy HD wallet with hardened addresses since there's no way to compute the parent extended private key from its pair extended public key and a child (exported) private key.Now, since the 'address_index' as well as the 'chain_index' (change) paths aren't hardened, that issue is now possible if an attacker gets his hand on the data mentioned above.There's a workaround to export your privKey but be warned of the issue above:  https://bitcointalk.org/index.php?topic=5449245.msg62109703#msg62109703Quote from: digital_mine on November 23, 2023, 12:08:25 PMIf I can't get my keys, the point is the same: NOT MY KEYS NOT MY COINS.You're still in control your keys in your wallet which is stored in your device.There's no second/third-party custodian that hodls it for you.Thanks, it looks like it works.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "November 23, 2023, 11:35:15 PM",
+      "body": "And you can also create a non descriptor wallet.When you create a new wallet just uncheck the option for descriptor walletThis option will eventually no longer be supported but you will always have some way to handle a private key.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digital_mine",
+      "created_time": "November 24, 2023, 11:43:14 AM",
+      "body": "Quote from: DaveF on November 23, 2023, 11:35:15 PMAnd you can also create a non descriptor wallet.When you create a new wallet just uncheck the option for descriptor walletThis option will eventually no longer be supported but you will always have some way to handle a private key.-DaveThis actually helps a lot thanks!!I don't understand why we are going on the direction of removing the possibility to fully get access to the private keys?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 24, 2023, 01:03:12 PM",
+      "body": "Quote from: digital_mine on November 24, 2023, 11:43:14 AMI don't understand why we are going on the direction of removing the possibility to fully get access to the private keys?Having no access to export individual private keys isn't depriving users access to their private keys.The command listdescriptors true is always available to export the wallet's master private key anyways.Refer to my post above regarding the reason for removal of dumpprivkey command in descriptor wallets.For the depreciation of legacy wallets, read this article written by achow101: achow101.com/2020/10/0.21-wallets",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digital_mine",
+      "created_time": "November 24, 2023, 09:04:43 PM",
+      "body": "Quote from: nc50lc on November 24, 2023, 01:03:12 PMQuote from: digital_mine on November 24, 2023, 11:43:14 AMI don't understand why we are going on the direction of removing the possibility to fully get access to the private keys?Having no access to export individual private keys isn't depriving users access to their private keys.The command listdescriptors true is always available to export the wallet's master private key anyways.Refer to my post above regarding the reason for removal of dumpprivkey command in descriptor wallets.For the depreciation of legacy wallets, read this article written by achow101: achow101.com/2020/10/0.21-walletsThanks a lot, I need to study a bit this new functionality",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "December 10, 2023, 04:21:23 PM",
+      "body": "Just as an update 26.0 came out the other day: https://bitcointalk.org/index.php?topic=5476782.0So the day slowly coming when non descriptor wallets are going to go away.Should probably keep posting / commenting in threads where people are asking about them just so people know what's coming.Not really a big deal since you can for now get old builds.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "FredCailloux",
+      "created_time": "March 06, 2024, 03:52:17 PMLast edit: March 06, 2024, 05:54:51 PM by FredCailloux",
+      "body": "Back in January 2023 I created a Private/Public keys paper wallet with an Wallet Generator website that has been copied to a local folder on an offline laptop (security oblige). Lately (Jan 2024) I used this Paper Wallet to purchase a little bit of Bitcoin from a vendor machine. I was eager to import the private key into an updated Bitcoin Core V25, as I’ve done this many times in the past for others, and myself. The import procedure went smoothly.Code:Importprivkey “My1KeyWithLots494Of Upper5CaseAndNumbersAndLowerCase” “” falseLater, I encountered some issues with my Linux PC HDD and decided to scrap the whole installation and re-installed Bitcoin Core (this time Version 26) with a freshly downloaded complete blockchain .I was surprised to find out that I could no longer import my private key, as I was getting the exact same error as digital_mine, OP.Suffice to say, after reading this whole subject, I was quite surprised because just about 1 month ago, I was successfully importing my private key without any issues, with Version 25.After encountering this problem and read this whole post, I figured, “let just install a previous version of Bitcoin Core, say V23” just to load my private key, as I just did a month ago with V25. Nope! Didn’t work! Same error message.The Questions: Why did it work fine, last month ?What was done such that I was able to load my private key ?Is it possible that the original version of Bitcoin Core was V22 (being prior to V23) and compatible with importing private key, is the cause of the possible import?  I mean, the import in January 2024 was done with an upgraded version 25 from V22. V22 perhaps left some indications toward compatibility with the importprivkey and upgrading it to V25 didn't implement the restriction?  Following a complete HDD rebuild with a brand new V26 installation, got rit of the V22 possible import ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "March 07, 2024, 05:47:04 AM",
+      "body": "Quote from: FredCailloux on March 06, 2024, 03:52:17 PM-snip-It's your wallet.dat.You can't use importprivkey on a descriptor wallet which is the default wallet type in v26.0.After creating a new wallet in v26.0, even after you downgraded to an older version (that still supports descriptors), that wallet isn't replaced by a legacy wallet.dat automatically.You can either use the importdescriptors command that I've mentioned which is recommended to use future Bitcoin Core versions.Or create a new wallet that isn't descriptor (untick the option/set a false flag) in the older Bitcoin Core version to create a legacy wallet where importprivkey command still works.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "FredCailloux",
+      "created_time": "March 07, 2024, 05:03:45 PM",
+      "body": "Quote from: nc50lc on March 07, 2024, 05:47:04 AMIt's your wallet.dat. You can't use importprivkey on a descriptor wallet which is the default wallet type in v26.0.OK. I need to clearly understand this.Yesterday I did an experiment. I installed Bitcoin Core V22 fully synced. I was able to importprivkey and succesfully run rescanblockchain.I could see my Sats. Then I updated to V26, just by updating the bin folder. I relaunched Bitcoin Core. The wallet oppened and the amount of Sats were OK.So, here is my comprehension, pls correct me if needed:* Starting at V23, creating a wallet would not allow the importprivkey command.* If a blank wallet is created with V22 and importprivkey, this wallet can, subsequently be opened with V23 and up.* It is not the Bitcoin Core version that prevent importprivkey, but the type of wallet created from the appropriate version.So then, if \"it's in the wallet\" Does that mean that if a wallet is importprivkey compatible, then a user could importprivkey in V26. In other words: Is importprivkey functionality stricktly dependent on the kind of wallet and not the Bicoin Core version ?Thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Forsyth Jones",
+      "created_time": "March 08, 2024, 01:13:11 AM",
+      "body": "Quote* If a blank wallet is created with V22 and importprivkey, this wallet can, subsequently be opened with V23 and up.Yes, if you've created a legacy wallet, this wallet can be opened even with the latest version at the moment of bitcoin core: v26, however, I cannot guarantee whether the developers will support legacy wallets in future versions, but if not, don't worry, you'll only be asked to migrate the legacy wallet to one with a descriptor (all your old keys will be combined with the new ones in the same bag, so a new backup must be made).Quote* It is not the Bitcoin Core version that prevent importprivkey, but the type of wallet created from the appropriate version.Yes, understand: legacy wallets support: importprivkey, dumpprivkey, dumpwallet, importwallet, etc.Descriptor wallets do not support the commands mentioned above, that is the difference!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "March 08, 2024, 07:11:02 AM",
+      "body": "Quote from: FredCailloux on March 07, 2024, 05:03:45 PMSo, here is my comprehension, pls correct me if needed:* Starting at V23, creating a wallet would not allow the importprivkey command.* If a blank wallet is created with V22 and importprivkey, this wallet can, subsequently be opened with V23 and up.* It is not the Bitcoin Core version that prevent importprivkey, but the type of wallet created from the appropriate version.You got it all correct.Additionally, in v23.0, you can still create a legacy wallet by selecting the right options or disabling descriptor flag.It's in v26.0 that the option is totally removed and the only way to create a legacy wallet is by using deprecatedrpc=create_bdb config/arg.But you must read the warning in v26.0 when loading a legacy wallet file.Support for legacy wallet is scheduled to be dropped in v29.0: https://github.com/bitcoin/bitcoin/issues/20160#issue-722711719Quote from: FredCaillouxSo then, if \"it's in the wallet\" Does that mean that if a wallet is importprivkey compatible, then a user could importprivkey in V26. In other words: Is importprivkey functionality stricktly dependent on the kind of wallet and not the Bicoin Core version ?Yes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

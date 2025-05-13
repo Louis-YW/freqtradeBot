@@ -1,0 +1,101 @@
+{
+  "id": "topic_5434513",
+  "title": "bomberb17",
+  "author": "bomberb17",
+  "created_time": "January 12, 2023, 08:59:07 PM",
+  "content": "I am doing some research on what is the potential impact of shorter public keys, hashes or signatures in Bitcoin transactions (leaving the security implications aside). So I basically want to see how a Bitcoin transaction exactly looks like in terms of bytes, basically a figure similar to the figures of IP packets which show that the first 4 bytes indicate the version, etc, then the source IP is 32 bytes as payload etc.So far all I have found is this website for a bitcoin transaction calculatorhttps://bitcoinops.org/en/tools/calc-size/However it just computes the final size and does not show clearly which part takes how much space.Is there any better website/image that shows the elements of a bitcoin transaction in a byte level?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5434513",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "January 12, 2023, 09:04:26 PM",
+      "body": "Quote from: bomberb17 on January 12, 2023, 08:59:07 PMIs there any better website/image that shows the elements of a bitcoin transaction in a byte level? Maybe this is what you're looking for? https://learnmeabitcoin.com/technical/transaction-dataThat website is afaik one of the best sources for learning.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_solo_miner",
+      "created_time": "January 12, 2023, 10:03:37 PM",
+      "body": "Quote from: NeuroticFish on January 12, 2023, 09:04:26 PMQuote from: bomberb17 on January 12, 2023, 08:59:07 PMIs there any better website/image that shows the elements of a bitcoin transaction in a byte level? Maybe this is what you're looking for? https://learnmeabitcoin.com/technical/transaction-dataThat website is afaik one of the best sources for learning.Thank you for sharing that website, wish I had thoose when I was starting with bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitDane",
+      "created_time": "January 13, 2023, 03:19:30 AM",
+      "body": "You can also check to this site for possible additional information : https://developer.bitcoin.org/reference/transactions.html#:~:text=Bitcoin%20transactions%20are%20broadcast%20between,part%20of%20the%20consensus%20rules.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bomberb17",
+      "created_time": "January 16, 2023, 04:02:44 AM",
+      "body": "Thanks all.So to understand better:1. In tx inputs, the size is dominated by scriptsig. I googled a bit and found this guide https://hackernoon.com/scriptsig-a-bitcoin-architecture-deep-dive-fs1i3zvy which has an example of a scriptsig for one input, and says that it has 140 hex chars (=70 bytes) for the digital signature and 130 hex chars (=65 bytes) for the hashed public key. My question is a) why 70 bytes for an ECDSA signature? b) why 65 bytes for a RIPEMD160 hash? (unless this example is incorrect and I am missing something).2. In tx outputs, the size is dominated by scriptpubkey. For 2 outputs, you need to have 2 Pay To Pubkey Hash correct? In this example https://learnmeabitcoin.com/technical/scriptPubKey I see Pay to Pubkey hash takes 40 hex each = 20 bytes?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "January 16, 2023, 04:36:27 AM",
+      "body": "Quote from: bomberb17 on January 16, 2023, 04:02:44 AM1. In tx inputs, the size is dominated by scriptsig.Each input has parts with fixed size and parts with variable size, the signature script and the witness (that could also be counted as part of input) have variable size depending on what type of output-script is being spent and are generally bigger than other parts.Quotewhich has an example of a scriptsig for one input, and says that it has 140 hex chars (=70 bytes) for the digital signature and 130 hex chars (=65 bytes) for the hashed public key. My question is a) why 70 bytes for an ECDSA signature? b) why 65 bytes for a RIPEMD160 hash? (unless this example is incorrect and I am missing something).65 bytes is the uncompressed public key (which is uncommon by the way) not the hash of it. Normally the compressed public key is used which is 33 bytes.Note that such scripts are for spending one of the oldest and simplest output-scripts called P2PKH.Quote2. In tx outputs, the size is dominated by scriptpubkey. For 2 outputs, you need to have 2 Pay To Pubkey Hash correct? Correct, assuming you want to pay to P2PKH addresses, there are a bunch of other types with slightly different sizes.QuoteIn this example https://learnmeabitcoin.com/technical/scriptPubKey I see Pay to Pubkey hash takes 40 hex each = 20 bytes?The hash alone is 20 bytes, there are other stuff in the script itself to create the locking script:Code:OP_DUP (1 byte)OP_HASH160 (1 byte)OP_PUSH (1 byte)<hash> (20 bytes)OP_EQUALVERIFY (1 byte)OP_CHECKSIG (1 byte)The \"OP_\" codes are like commands telling the script interpreter (smart contract machine) what to do. For example OP_DUP tells it to duplicate the item it finds on top of the stack.Note that \"OP_PUSH\" isn't exactly a named OP code, it is basically a byte telling the interpreter the size of the data it should read ahead and push to the stack (0x14 --> read and push 20 bytes).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bomberb17",
+      "created_time": "January 16, 2023, 04:46:23 AM",
+      "body": "And about the signature in the input, why does it take 70 bytes? Isn't it normally 64 bytes?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "January 16, 2023, 06:30:34 AM",
+      "body": "It should be, and in Taproot it really is. But in old versions, it is encoded in DER, so we have additional bytes repeated over and over again:Code:30 //sequence, always 0x3044 //size of sequence02 //integer, always 0x0220 //size of integer4e45e169 32b8af51 4961a1d3 a1a25fdf3f4f7732 e9d624c6 c61548ab 5fb8cd4102 //integer, always 0x0220 //size of integer181522ec 8eca07de 4860a4ac dd12909d831cc56c bbac4622 082221a8 768d1d0901 //sighashes, attached to (r,s) pairSo, we have to put \"30440220<r>0220<s>\" that could take 72 bytes (when size of integer is 0x21), instead of simply \"<r><s>\" taking 64 bytes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "January 16, 2023, 11:02:47 AM",
+      "body": "You should keep in mind that in DER encoding the integers have arbitrary sizes and can have a sign so in order to indicate r and s integers are positive the most significant bit is used, if it is set the number is negative otherwise it is positive. This means in ECDSA signatures that both integers are positive if the most significant bit is set we have to add a 0x00 at the beginning so the whole structure posted above changes.0x44 and both 0x20 indicate the size of the sequence and integer respectively, if the 0x00 is added it has to be reflected correctly (0x20 -> 0x21).This is why you will sometimes see signatures (specially in transactions from early years) that have signatures bigger than 72 bytes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 16, 2023, 12:31:57 PM",
+      "body": "Quote from: bomberb17 on January 12, 2023, 08:59:07 PMIs there any better website/image that shows the elements of a bitcoin transaction in a byte level?Here is a site which you will find useful:https://nioctib.tech/Take the TXID of any transaction you are interested in, paste it in to the top and click \"Search\", and then click on the symbol of the piece of paper which says \"Raw\". It will give you a color coded breakdown of all the parts of the transaction data. Hover your mouse over each part to see what it is.If you are not sure about how to understand the locking scripts, then look the same transaction up at https://mempool.space/ and click the \"Details\" button to see the locking scripts decoded with relevant bytes replaced with OP codes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bomberb17",
+      "created_time": "January 17, 2023, 03:08:46 AM",
+      "body": "Thanks for all those info, really useful.So to sum up, a common P2PKH transaction with 1 input and 2 outputs w.r.t the hashes and signature needs the following:Input ECDSA signature:  ~70 bytes (64 in taproot)Input ECDSA public key: 33 bytesFor each output hash: 20 bytes",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "January 17, 2023, 09:36:51 AM",
+      "body": "Quote from: bomberb17 on January 17, 2023, 03:08:46 AMThanks for all those info, really useful.So to sum up, a common P2PKH transaction with 1 input and 2 outputs w.r.t the hashes and signature needs the following:Input ECDSA signature:  ~70 bytes (64 in taproot)Input ECDSA public key: 33 bytesFor each output hash: 20 bytesNot quite. As explained above, you can't just insert the public key or the output locking script on their own. You need to include additional OP codes which tell the software what to do with the data.For including the public key in the signature, you need to include a byte saying how long that public key is. For a 33 byte compressed public key, you would prefix it with 0x21 (with 21 being the hex representation of 33). So that becomes 34 bytes in total.For the output locking script, you need to prefix with a byte saying how long the script is, followed by OP_DUP, OP_HASH160, OP_PUSH (20 bytes), then the 20 byte pubkey hash, then OP_EQUALVERIFY and OP_CHECKSIG. This would look like this:Code:0x1976a914-PUBKEYHASH-88acSo instead of just 20 bytes, the whole thing becomes 26 bytes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

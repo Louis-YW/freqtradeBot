@@ -1,0 +1,165 @@
+{
+  "id": "topic_5444779",
+  "title": "Lepi",
+  "author": "Lepi",
+  "created_time": "March 13, 2023, 09:44:28 PMLast edit: March 13, 2023, 10:23:58 PM by Lepi",
+  "content": "After Coinbase multisig vault was discontinued in 2018, a third-party multisig-tool was introduced on Github.But that one stopped working as well.According to this thread: https://bitcointalk.org/index.php?topic=5436171.msg61722006#msg61722006 the forked version (https://github.com/dlajarretie/multisig-tool) still works correctly but needs to be run locally.I am stuck halfway in the instructions provided on Github and would appreciate if someone could guide me through the rest.My progress so far:-I installed Linux Ubuntu on a spare computer-I installed npm and browserify-I cloned the repository from: https://github.com/dlajarretie/multisig-toolI entered the following commands in the multisig-tool repository in the terminal:-npm install bitcoinjs-lib-npm install --save bip38-npm install bip38 crypto-browserify --save-browserify -r bip38 -s Bip38 > lib/multisig/bip38.jsThe latter command didn't show anything in the terminal, but I do see the \"bip38.js\"  file in the lib/multisig folder so  it could've been successful.Are there any other steps I've to perform before going further?When I enter \"make run\", I get the following error:cd lib/multisig && \\../../node_modules/.bin/browserify -r ./vault -r ./views/addresses_view > ../../multisig.jspython -m SimpleHTTPServermake: python: No such file or directorymake: *** [Makefile:2: run] Error 127I look forward to hearing from the community and very much appreciate the help.Also shoutout to o_e_l_e_o for being extremely helpful in the DM's.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5444779",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "March 14, 2023, 12:36:14 AM",
+      "body": "Never use this Coinbase vault recovery before but based on what I understand from the guide on Github under the \"make run\" it looks like a permission issue.Code:Running locallyIf you wish to run the tool locally, you need to do it through a local web server. The easiest way to do that is by running:make runThis is because we use Web Workers for decrypting your BIP38 encrypted shared key seed, and Web Workers are not permitted to run through the file:/// protocol.Another alternative is to run Chrome with the --allow-access-from-files parameter.That is I think it suggests running Chrome with this parameter \"--allow-access-from-files\"Why don't you just use the hosted one since it's ready to use?They do only need the online on the first step when pasting public keys after they found balances you can now turn internet off and start the recovery process.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "March 14, 2023, 07:47:31 AM",
+      "body": "The error is trying to tell you that you need to install Python (2, not 3). SimpleHTTPServer is a Python 2 class and it has been deleted in Python 3.And Ubuntu makes it particularly hard to install Python 2 in recent versions of the distro, so you should start with an older Ubuntu version such as Trusty (14.04) or Precise (12.04) that have Python 2.7 bundled.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "March 14, 2023, 12:27:56 PM",
+      "body": "Quote from: NotATether on March 14, 2023, 07:47:31 AMAnd Ubuntu makes it particularly hard to install Python 2 in recent versions of the distro, so you should start with an older Ubuntu version such as Trusty (14.04) or Precise (12.04) that have Python 2.7 bundled.Not only Ubuntu, but most newer version of linux distro. And i'd recommend to use Debian 11 since it's newest version of Debian and still ship Python 2.7[1] rather than using EOL version of Ubuntu.[1] https://packages.debian.org/bullseye/python2.7",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lepi",
+      "created_time": "March 15, 2023, 08:07:48 AM",
+      "body": "All your replies are much appreciated.I will try to install either Debian 11 or one of the older Ubuntu versions.Quote from: BitMaxzWhy don't you just use the hosted one since it's ready to use?The hosted version is not working correctly anymore (since years). According to other threads it's due to an SSL handshake error with an api at bipay.com. After inserting the 3 xpub keys in step 1, it generates a list of empty addresses followed by the \"failure\" message next to each address.Quote from: BitMaxzThat is I think it suggests running Chrome with this parameter \"--allow-access-from-files\"Could you please tell me how I can set this up in Linux? Would I still need to perform the other steps?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lepi",
+      "created_time": "March 16, 2023, 08:59:17 PM",
+      "body": "Quote from: ETFbitcoin on March 15, 2023, 12:03:38 PMQuote from: Lepi on March 15, 2023, 08:07:48 AMQuote from: BitMaxzThat is I think it suggests running Chrome with this parameter \"--allow-access-from-files\"Could you please tell me how I can set this up in Linux? Would I still need to perform the other steps?For now, adding parameter --allow-access-from-files when you launch Chrome or chromium-based browser is needed since the current problem is when you execute make run, not silent error when you use the tool on the browser.I launched Chrome with the \"-allow-file-access-from-files\"  parameter by typing the following command: \"./chrome --allow-file-access-from-files\"What is the next step? Am I supposed to open the index.html file? Because using Chrome to simply use the web version is not an option as the API is broken (I tried it again, which resulted into \"Failed!\" addresses.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 16, 2023, 09:18:45 PM",
+      "body": "Quote from: Lepi on March 16, 2023, 08:59:17 PMWhat is the next step? Am I supposed to open the index.html file? Because using Chrome to simply use the web version is not an option as the API is broken (I tried it again, which resulted into \"Failed!\" addresses.)Yes, open your local copy of index.html.Once you open it, hit F12 on your keyboard and click on the Console tab. Does it show you any errors?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lepi",
+      "created_time": "March 16, 2023, 09:26:30 PM",
+      "body": "Quote from: o_e_l_e_o on March 16, 2023, 09:18:45 PMQuote from: Lepi on March 16, 2023, 08:59:17 PMWhat is the next step? Am I supposed to open the index.html file? Because using Chrome to simply use the web version is not an option as the API is broken (I tried it again, which resulted into \"Failed!\" addresses.)Yes, open your local copy of index.html.Once you open it, hit F12 on your keyboard and click on the Console tab. Does it show you any errors?Ah good to see your reply Leo!It only says the following:Quoteindex.html:1 Access to fetch at 'file:///home/revived/multisig-tool/lib/multisig/bip38.js' from origin 'null' has been blocked by CORS policy: Cross origin requests are only supported for protocol schemes: http, data, isolated-app, chrome-extension, chrome, https, chrome-untrusted.lib/multisig/bip38.js:1          Failed to load resource: net::ERR_FAILEDmultisig.js:136                  Uncaught (in promise) TypeError: Failed to fetch    at require.2 (multisig.js:136:1)    at o (multisig.js:1:273)    at multisig.js:1:324    at require./vault../address (multisig.js:15193:19)    at o (multisig.js:1:273)    at HTMLDocument.<anonymous> (tool.js:14:15)    at j (jquery-2.1.3.min.js:2:26911)    at Object.fireWith [as resolveWith] (jquery-2.1.3.min.js:2:27724)    at Function.ready (jquery-2.1.3.min.js:2:29518)    at HTMLDocument.I (jquery-2.1.3.min.js:2:29709)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 16, 2023, 09:29:40 PM",
+      "body": "Quote from: Lepi on March 16, 2023, 09:26:30 PMindex.html:1 Access to fetch at 'file:///home/revived/multisig-tool/lib/multisig/bip38.js' from origin 'null' has been blocked by CORS policy: Cross origin requests are only supported for protocol schemesThis means your --allow-file-access-from-files isn't working as intended. I've never used Chrome so can't advise otherwise here. I use the alternative HTTP Server method instead, which works just fine. Did you make any headway on that?The command given above is for Python 2:Code:python -m SimpleHTTPServerIf you are using Python 3, try the following command:Code:python3 -m http.server",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lepi",
+      "created_time": "March 16, 2023, 09:46:09 PM",
+      "body": "Quote from: o_e_l_e_o on March 16, 2023, 09:29:40 PMQuote from: Lepi on March 16, 2023, 09:26:30 PMindex.html:1 Access to fetch at 'file:///home/revived/multisig-tool/lib/multisig/bip38.js' from origin 'null' has been blocked by CORS policy: Cross origin requests are only supported for protocol schemesThis means your --allow-file-access-from-files isn't working as intended. I've never used Chrome so can't advise otherwise here. I use the alternative HTTP Server method instead, which works just fine. Did you make any headway on that?The command given above is for Python 2:Code:python -m SimpleHTTPServerIf you are using Python 3, try the following command:Code:python3 -m http.serverIs the alternative \"HTTP Server method\" the \"Running Locally\" / make run method?I installed the BitcoinJS library. And if I'm not mistaken, I performed BIP38's step 1 & 2 correctly:QuoteWe use the BIP38 library to decrypt the encrypted shared key seeds.To build the multisig/bip38.js we used:    1. Install packages with npm: \"npm install bip38 crypto-browserify --save\"    2. Use browserify to resolve dependencies: \"browserify -r bip38 -s Bip38 > lib/multisig/bip38.js\"However, I haven't been able to figure out what I've to do in this following step:QuoteThen we amend the \"lib/multisig/bip38.js\" to support progress callbacks and Web Worker messages handling.We need this as a separate file, because we're using it with web workers.I also can't make out what you mean by the \"python3 -m http.server\" command, I have Python 3.10.6 but what do I have to do after I enter that command (and should it be in the multisig-tool respository? I'm sorry, I'm a complete beginner and don't know what I'm doing so I need to know every step no matter how basic it is.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WillyAp",
+      "created_time": "March 16, 2023, 10:14:34 PM",
+      "body": "Quote from: Lepi on March 16, 2023, 09:46:09 PMI also can't make out what you mean by the \"python3 -m http.server\" command, I have Python 3.10.6 but what do I have to do after I enter that command (and should it be in the multisig-tool respository? I'm sorry, I'm a complete beginner and don't know what I'm doing so I need to know every step no matter how basic it is. Could well be a permission issue, Linux requieres several permission levels. Have you tried running it as sudo (root)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "March 16, 2023, 11:32:05 PM",
+      "body": "I think you did it wrong that is why you get this error.Would you mind to try to put the flag on the launcher properties dialog? Look for the chrome launcher open the properties dialog and you should see something like this belowCode:/usr/bin/google-chrome %UAnd replace it with thisCode:/usr/bin/google-chrome --allow-access-from-filesThis will make  --allow-access-from-files permanent but you can change it later if you didn't need it anymore. And don't forget to re-pin the launcher after modifying it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 17, 2023, 08:36:49 AM",
+      "body": "Quote from: Lepi on March 16, 2023, 09:46:09 PMIs the alternative \"HTTP Server method\" the \"Running Locally\" / make run method?The make run command simply compiles the multisig.js file (which seems to be working fine for you - you can tell for sure by the presence of a file called multisig.js in your multisig-tool folder), and then attempts to launch an HTTP server. Running an HTTP server is the alternative to trying to launch chrome with --allow-file-access-from-files.Since the make run command is trying to launch an HTTP server using a Python 2 command, and you have Python 3 installed, then instead of using make run you can just launch the HTTP server directly using the command I gave above:Code:python3 -m http.serverYou should run it from your multisig-tool folder, the one with \"index.html\" in it. Open a terminal here and enter the command. If it has worked, it should say something like:Code:Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/)Then you just open any web browser, and navigate to that address - http://0.0.0.0:8000. The tool will load and hopefully(!) be fully functional.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lepi",
+      "created_time": "March 17, 2023, 09:37:02 AM",
+      "body": "Quote from: o_e_l_e_o on March 17, 2023, 08:36:49 AMQuote from: Lepi on March 16, 2023, 09:46:09 PMIs the alternative \"HTTP Server method\" the \"Running Locally\" / make run method?The make run command simply compiles the multisig.js file (which seems to be working fine for you - you can tell for sure by the presence of a file called multisig.js in your multisig-tool folder), and then attempts to launch an HTTP server. Running an HTTP server is the alternative to trying to launch chrome with --allow-file-access-from-files.Since the make run command is trying to launch an HTTP server using a Python 2 command, and you have Python 3 installed, then instead of using make run you can just launch the HTTP server directly using the command I gave above:Code:python3 -m http.serverYou should run it from your multisig-tool folder, the one with \"index.html\" in it. Open a terminal here and enter the command. If it has worked, it should say something like:Code:Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/)Then you just open any web browser, and navigate to that address - http://0.0.0.0:8000. The tool will load and hopefully(!) be fully functional.Indeed, the multisig.js file is in the multisig-tool folder. However if I'm not mistaken it was already there (the icon however is changed from a notepad thingy to \"JS\" in big yellow letters). Also entering \"python3 -m http.server\" in the same repository terminal did indeed show \"Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/)\".And typing \"http://0.0.0.0:8000\" in the browser did automatically show the Coinbase Multisig Vault recovery tool similar to the web version. However, after entering the 3 xpub keys, I still got the exact same list of addresses, followed by a \"Failed!\" message and each address turning red, as I did before (using the web version)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 17, 2023, 09:53:20 AM",
+      "body": "What error do you see in the console (F12) now?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lepi",
+      "created_time": "March 17, 2023, 01:06:41 PM",
+      "body": "Quote from: o_e_l_e_o on March 17, 2023, 09:53:20 AMWhat error do you see in the console (F12) now?:8000/favicon.ico:1          Failed to load resource: the server responded with a status of 404 (File not found)Also as soon as I go on \"http://0.0.0.0:8000/\", then the terminal shows these 2 messages:-code 404, message File not found-\"GET /favicon.ico HTTP/1.1\" 404 -",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 17, 2023, 02:02:36 PM",
+      "body": "Being unable to find a favicon file is irrelevant. This is simply the little logo icon that different websites use.In the absence of any other errors, something is stopping your browser from correctly fetching the balances. Your browser can visit other websites normally? You don't have any firewall or similar running?The first thing I would try would be to open a terminal in the usual multisig tool directory, and then run the following two commands:Code:make cleanmake compileThe first will delete the multisig.js file (which is responsible for this look up); the second will recompile it from scratch. This is to rule out any error in the file.If that doesn't work then I'm afraid I'm running out of ideas...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "WillyAp",
+      "created_time": "March 17, 2023, 04:05:14 PM",
+      "body": "Quote from: o_e_l_e_o on March 17, 2023, 02:02:36 PMIf that doesn't work then I'm afraid I'm running out of ideas... If that doesn work post your permission sets of the folders/files which cause issues.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Lepi",
+      "created_time": "March 17, 2023, 10:24:45 PM",
+      "body": "Quote from: o_e_l_e_o on March 17, 2023, 02:02:36 PMBeing unable to find a favicon file is irrelevant. This is simply the little logo icon that different websites use.In the absence of any other errors, something is stopping your browser from correctly fetching the balances. Your browser can visit other websites normally? You don't have any firewall or similar running?The first thing I would try would be to open a terminal in the usual multisig tool directory, and then run the following two commands:Code:make cleanmake compileThe first will delete the multisig.js file (which is responsible for this look up); the second will recompile it from scratch. This is to rule out any error in the file.If that doesn't work then I'm afraid I'm running out of ideas... -Firewall is inactive.-I am connected to a VPN however.-Tried both Firefox and Chrome. After the make clean & make compile command, I did the \"python3 -m http.server\" again but this time got this error: BrokenPipeError: [Errno 32] Broken pipeAlso Chrome's F12 now shows 165 issues:-QuoteAccess to XMLHttpRequest at 'https://insight.bitpay.com/api/addr/3CSa...zYGno8MTeLYGM/utxo' from origin 'http://0.0.0.0:8000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.-QuoteFailed to load resource: net::ERR_FAILED insight.bitpay.com/a…YGno8MTeLYGM/utxo:1 (Changed the address in the error code just in case it's not safe to share publicly).The other issues are basically a repeat of the above but with all the other addresses in the list. Btw, user \"HCP\" also mentioned something about the \"Insight API\" missing in this thread: https://bitcointalk.org/index.php?topic=5316286.0Quote from: WillyAPIf that doesn work post your permission sets of the folders/files which cause issues. Not sure if ChatGPT explained correctly on how to do this but I typed \"ls -l\" in the multisig-tool directory and got the following:Quotetotal 572-rw-rw-r--   1 revived revived   2265 mrt 12 18:12 CONTRIBUTING.mddrwxrwxr-x   2 revived revived   4096 mrt 12 18:12 cssdrwxrwxr-x   4 revived revived   4096 mrt 12 19:01 env-rw-rw-r--   1 revived revived   4610 mrt 12 18:12 index.htmldrwxrwxr-x   3 revived revived   4096 mrt 12 18:12 lib-rw-rw-r--   1 revived revived  11344 mrt 12 18:12 LICENSE-rw-rw-r--   1 revived revived    428 mrt 12 18:12 Makefile-rw-rw-r--   1 revived revived 421914 mrt 17 23:00 multisig.js-rw-rw-r--   1 revived revived    181 mrt 12 18:12 multisig-tool.sublime-projectdrwxrwxr-x 142 revived revived   4096 mrt 13 21:17 node_modules-rw-rw-r--   1 revived revived    704 mrt 12 18:52 package.json-rw-rw-r--   1 revived revived 100713 mrt 13 21:20 package-lock.json-rw-rw-r--   1 revived revived   3734 mrt 12 18:12 README.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "March 18, 2023, 10:54:13 AM",
+      "body": "I did quick testing on Debian 11 and it seems to works. But i can't verify whether it works on next step since i only have 3 xpub generated from https://coinb.in/#newHDaddress. Here are the steps,1. Check my environment.Code:$ node --versionv12.22.12$ npm --version7.5.2$ python3 --versionPython 3.9.2$ python2 --versionPython 2.7.182. Setup and run multisig-tool.Code:$ git clone --depth 1 https://github.com/dlajarretie/multisig-toolCloning into 'multisig-tool'...remote: Enumerating objects: 29, done.remote: Counting objects: 100% (29/29), done.remote: Compressing objects: 100% (28/28), done.remote: Total 29 (delta 0), reused 12 (delta 0), pack-reused 0Receiving objects: 100% (29/29), 109.27 KiB | 34.00 KiB/s, done.$ cd multisig-tool/$ npm installadded 149 packages, and audited 150 packages in 1m9 vulnerabilities (1 moderate, 4 high, 4 critical)To address all issues, run:  npm audit fixRun `npm audit` for details.$ npm install bip38 crypto-browserify --saveadded 3 packages, and audited 153 packages in 19s9 vulnerabilities (1 moderate, 4 high, 4 critical)To address all issues, run:  npm audit fixRun `npm audit` for details.$ ./node_modules/.bin/browserify -r bip38 -s Bip38 > lib/multisig/bip38.js$ make compilecd lib/multisig && \\../../node_modules/.bin/browserify -r ./vault -r ./views/addresses_view > ../../multisig.js$ make runcd lib/multisig && \\../../node_modules/.bin/browserify -r ./vault -r ./views/addresses_view > ../../multisig.jspython -m SimpleHTTPServerServing HTTP on 0.0.0.0 port 8000 ......3. Open on Firefox by typing localhost:8000, enter 3 xpub and click continue. Here's the screenshot some time after i click continue. Take note i assume it works since,1. Firefox only show error message about favicon on it's console (F12).2. I do not see \"Failed!\" message or each address turning red.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

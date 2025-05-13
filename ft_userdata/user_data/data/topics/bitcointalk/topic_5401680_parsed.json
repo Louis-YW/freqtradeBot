@@ -1,0 +1,165 @@
+{
+  "id": "topic_5401680",
+  "title": "ccamrobertson",
+  "author": "ccamrobertson",
+  "created_time": "June 07, 2022, 01:18:02 PM",
+  "content": "Hello --Excited to show off something that we've been working on: the Bitcoin Note. The Bitcoin Note is a cash instrument that is backed by Bitcoin via multisig. Each note is printed with beautiful, currency-grade elements that use secure printing techniques typically reserved for government documents like microtext, raised print and foil. More importantly, each note includes a secure NFC chip which is where a multisig lives that allows you to claim the Bitcoin at any time.We were heavily inspired by OG Bitcoin physical money like Casascius coins, however, we wanted to created a design whereby (1) anyone can spend, gift and share the Bitcoin for years to come without having to worry a sophisticated attacker who extracts a private key from under a label or scratch off and (2) trust was minimized on that part of the printer (us). This lead us to the design we landed on for the Bitcoin Note --An NFC chip readable by nearly all modern smartphonesA two part multisig where (1) we write an encrypted private key to the note (and don't keep a copy and (2) you write a user key to the note in plaintext and then load the noteWe only release the decryption key when someone cuts the note and reports this via an authenticated and encrypted way to our serverThe multisig reverts to only your key after a printed expiration date on the noteYou can re-key the user key on the note you receive if you want to hold it for a long timeThe result is you do not need to trust us as the creators of the note. While, as I noted, we do not keep a copy of the encrypted private key this doesn't really matter: by the construction of the multisig, this key can never access the funds alone. Likewise, the expiration date means that even if we aren't around or refuse to allow for the claiming of a note by cutting it, the holder can wait and then use the user private key to claim.We believe that the result of this design achieves the goal of Bitcoin that's incredibly easy to use -- like cash -- but still preserves the important quality of self-custody. Take a look at http://bitcoinnote.com/ to learn more and reserve a spot in line for our release later this summer. Any and all feedback is appreciated and I would be happy to answer any questions.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5401680",
+  "comments": [
+    {
+      "author": "dkbit98",
+      "created_time": "June 07, 2022, 01:49:39 PM",
+      "body": "Quote from: ccamrobertson on June 07, 2022, 01:18:02 PMThe Bitcoin Note is a cash instrument that is backed by Bitcoin via multisig. Each note is printed with beautiful, currency-grade elements that use secure printing techniques typically reserved for government documents like microtext, raised print and foil. More importantly, each note includes a secure NFC chip which is where a multisig lives that allows you to claim the Bitcoin at any time.This bitcoin note looks great and I think it has potential to be very valuable collectibles item if there is limited number of first edition paper notes.I have seen similar products before but I think this is the first product  that is offering multisig solution with locally encrypted key.What I don't understand is that each note has an expiration date, so does this mean that bitcoin can't be used or what?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ccamrobertson",
+      "created_time": "June 07, 2022, 01:54:26 PM",
+      "body": "> What I don't understand is that each note has an expiration date, so does this mean that bitcoin can't be used or what?Yeah, this is a great question. We needed to have a condition where the multisig reverts from 2-of-2 (the user key on the note and the encrypted key on the note) to 1-of-2 in the case where we go out of business or simply refuse to release the encryption key. This happens after the expiration date. It's a bit of weird concept, but we always want to make sure you retain ultimate control over the Bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 07, 2022, 02:04:13 PM",
+      "body": "Quote from: ccamrobertson on June 07, 2022, 01:54:26 PM> What I don't understand is that each note has an expiration date, so does this mean that bitcoin can't be used or what?Yeah, this is a great question. We needed to have a condition where the multisig reverts from 2-of-2 (the user key on the note and the encrypted key on the note) to 1-of-2 in the case where we go out of business or simply refuse to release the encryption key. This happens after the expiration date. It's a bit of weird concept, but we always want to make sure you retain ultimate control over the Bitcoin.How exactly does your chip change the multisig configuration when the expiration date is reached?I'm assuming that the unlocking script is already etched inside the NFC as 2-of-2 multisig (user-key and your own key).This raises two situations where the unlocking script would have to be updated:- You want to change your own plaintext PK- (as I mentioned) the expiration date renders your key unnecessary.From my understanding, you can't simply create a new unlocking script for the bitcoin without knowledge of the private key. You would need to have the expiration date check coded inside the unlocking script (I'm not sure if this is even possible), but it doesn't explain the other scenario, how can you change the user key and modify the multisig unlocking script to use the new key?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "June 07, 2022, 02:15:16 PM",
+      "body": "Quote from: ccamrobertson on June 07, 2022, 01:18:02 PMWe only release the decryption key when someone cuts the note and reports this via an authenticated and encrypted way to our serverI see this as yet another nice collectible, especially by changing the PK it should be safer than the established collectible items.My questions are:* Will you open source / peer review your technology? I mean that nothing stops you have something else than you claim (i.e. you can keep private keys, maybe make it 2-of-3 with 2 keys in your hands, and redeem yourself the funds after a couple of years).* Will these items get redeemed only after expiration or by destroying them? I mean that usually collectibles do have a value even if they are redeemed (if they are not destroyed).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ccamrobertson",
+      "created_time": "June 07, 2022, 02:32:37 PM",
+      "body": "> How exactly does your chip change the multisig configuration when the expiration date is reached?The script is created from a template when the first user loads the note; we are using OP_CHECKLOCKTIMEVERIFY to modify the conditions of the multisig from 2-of-2 to 1-of-2 in 2029. When you re-key the user key you are really sending from the first multisig to a new one. We're going to release the script for review prior to note shipment as well as have a more detailed article on security.> Will you open source / peer review your technology?The script and mobile app will both be fully open sourced for review.> Will these items get redeemed only after expiration or by destroying them?Exactly; those are the only two conditions where you can redeem. \"Cutting\" doesn't require slicing the whole note in half, only a portion of it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "June 07, 2022, 02:41:44 PM",
+      "body": "Is this going to work with lightning? The Bold Card for example uses NFC and allows lightning transaction by just tapping it.Also, is there any open source app, library, or standard that can be used to confirm that the bill actually holds the funds it says it has? Of course it can have a public address, but that doesn't mean it has control over it. Not sure if it's possible to prove this. I guess something like this is critical for mass usage of this type of thing.And finally, why are you guys patenting this?, it feels very far from the original idea of Bitcoin and the open source philosophy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ccamrobertson",
+      "created_time": "June 07, 2022, 03:00:26 PM",
+      "body": "> Is this going to work with lightning? The Bold Card for example uses NFC and allows lightning transaction by just tapping it.We designed these to be long-lived with few transactions throughout their life. We thought about Lightning but decided to start first with vanilla Bitcoin. As a payment instrument that you pass from person to person, on-chain transactions should be fairly minimal (unless you want to re-key the note). The Bold Card makes way more sense for frequent on-chain transactions, e.g. like a debit or credit card.> Also, is there any open source app, library, or standard that can be used to confirm that the bill actually holds the funds it says it has? Of course it can have a public address, but that doesn't mean it has control over it. Not sure if it's possible to prove this. I guess something like this is critical for mass usage of this type of thing.Given knowledge of the redeem script and the public keys which are plaintext on the note you should be able verify the address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "June 07, 2022, 04:20:39 PM",
+      "body": "Quote from: ccamrobertson on June 07, 2022, 01:54:26 PMYeah, this is a great question. We needed to have a condition where the multisig reverts from 2-of-2 (the user key on the note and the encrypted key on the note) to 1-of-2 in the case where we go out of business or simply refuse to release the encryption key. This happens after the expiration date. It's a bit of weird concept, but we always want to make sure you retain ultimate control over the Bitcoin.OK, that means that I could still spend Bitcoin from my Bitcoin Note even after it is ''expired''.Maybe you should rephrase that and add explanation it is only related with multisig, because it reminded me on CBDC that central banks are creating with expiration period, after that digital currency becomes unusable and goes back to zero.I would also like to see more information how multisig works, but it's nice to see you are going to release code as open source.I am going to reserve my spot, and decide later about purchase depending on price.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ccamrobertson",
+      "created_time": "June 07, 2022, 05:06:42 PM",
+      "body": "Thanks for the feedback. Expiration is indeed a weird concept here -- maybe there is a better word. On the notes it states \"Claim Before Jan 3 2029\" as a warning, with the goal of indicating to a holder that *something* should be done before that date if they haven't re-keyed the note.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MoparMiningLLC",
+      "created_time": "June 07, 2022, 05:29:52 PM",
+      "body": "Quote from: ccamrobertson on June 07, 2022, 05:06:42 PMThanks for the feedback. Expiration is indeed a weird concept here -- maybe there is a better word. On the notes it states \"Claim Before Jan 3 2029\" as a warning, with the goal of indicating to a holder that *something* should be done before that date if they haven't re-keyed the note.maybe I dont understand the answers above - but what happens on Jan 4 2029 to any of the notes should they still be loaded?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ccamrobertson",
+      "created_time": "June 07, 2022, 05:58:48 PM",
+      "body": "> maybe I dont understand the answers above - but what happens on Jan 4 2029 to any of the notes should they still be loaded?On January 3 2029 the multisig downgrades from 2-of-2 to 1-of-2 where the only key that can spend the funds is the user key on the note. If you're the last holder and you didn't re-key the note, it's probable that someone else also has a copy of the key (hence why we recommend re-keying when you receive a note).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MoparMiningLLC",
+      "created_time": "June 07, 2022, 06:24:22 PM",
+      "body": "Quote from: ccamrobertson on June 07, 2022, 05:58:48 PM> maybe I dont understand the answers above - but what happens on Jan 4 2029 to any of the notes should they still be loaded?On January 3 2029 the multisig downgrades from 2-of-2 to 1-of-2 where the only key that can spend the funds is the user key on the note. If you're the last holder and you didn't re-key the note, it's probable that someone else also has a copy of the key (hence why we recommend re-keying when you receive a note).ahh ok gotcha. is there an estimated price for the set of 4 notes? and how many sets will each reservation be able to purchase?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ccamrobertson",
+      "created_time": "June 07, 2022, 08:03:23 PM",
+      "body": "We don't have pricing ready just yet, but think somewhere around a set of Opendimes. Limited production runs right now mean we don't get great volume discounts, but these notes will be low serial number (if that matters).We probably will let folks order more than one set, but can't confirm that just yet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tadamichi",
+      "created_time": "June 07, 2022, 08:07:37 PM",
+      "body": "1. Love the design, i think they can make for great collectibles and you could release different versions later down the road.2. Amazing concept, i think this makes for great UX. Will definitely use this to spice gifts up. Is there an easy way for non key holders to verify what’s on the bill and that it’s genuine?3. I would add some place in the app that will explain the expiration date, just in case there’s misconceptions and people think their Bitcoin will expire.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ccamrobertson",
+      "created_time": "June 07, 2022, 08:40:19 PM",
+      "body": "Quote1. Love the design, i think they can make for great collectibles and you could release different versions later down the road.2. Amazing concept, i think this makes for great UX. Will definitely use this to spice gifts up. Is there an easy way for non key holders to verify what’s on the bill and that it’s genuine?3. I would add some place in the app that will explain the expiration date, just in case there’s misconceptions and people think their Bitcoin will expire.Thanks! The apps will implicitly authenticate the notes with us (although, of course, that's trusting us) and we're investigating making them capable of auditing the multisig independently from us. In either case we hope that open sourcing the apps means that folks have an alternative means of verifying the multisig and how the apps function if so desired.Yes, definitely -- the UX of the app is really important in helping less technical users understand the notes and their limitations.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MoparMiningLLC",
+      "created_time": "June 07, 2022, 09:12:15 PM",
+      "body": "the reason I ask is there are a few of us on the forums that arrange and process group buys where many members here may partake and then have all the ordered items shipped to one location where the members then also have their various orders consolidated to reduce shipping costs.If it was possible to know a limit on quantity and/or price, it might be possible to arrange a group buy here where it is possible that 50 or more sets could easily be ordered as one order.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ccamrobertson",
+      "created_time": "June 07, 2022, 09:57:25 PM",
+      "body": "That's really good to know, makes complete sense. We can probably coordinate something behind the scenes if multiple folks are in line.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nullama",
+      "created_time": "June 08, 2022, 01:05:23 AM",
+      "body": "I really like this project, thanks for making it.There's a weird feeling with this one though, on one hand it looks like a great item for a collection, being a limited edition. But on the other hand, the whole purpose of it is to become more mainstream and very common, so that a lot of people are trading it back and forth, which would lower the collector's value.I guess the first edition might keep the value as a collector's item and next batches would be not limited...Any plans decided now about the future of production of these bills?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MoparMiningLLC",
+      "created_time": "June 08, 2022, 01:57:00 AM",
+      "body": "Quote from: ccamrobertson on June 07, 2022, 09:57:25 PMThat's really good to know, makes complete sense. We can probably coordinate something behind the scenes if multiple folks are in line.awesome - I would love to set up a group buy!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "id": "topic_5440623",
+  "title": "Macadonian",
+  "author": "Macadonian",
+  "created_time": "February 20, 2023, 10:52:27 PM",
+  "content": "I am having a difficult time understanding transaction malleability. I have https://en.bitcoin.it/wiki/Transaction_Malleability. Let me see if I have understood the main parts.I think I understand that transaction malleability is when a attacker modifies the unique identifier the transaction ID of a Bitcoin transaction but the transaction still goes to the same address it was originally sent too. If Bob sends to Alice and an attack interrupts this transaction and changes the ID they can do what exactly? They cannot change the destination so what can they do?I understand that by modifying the transaction ID it becomes more difficult for people who use transaction ids to trace their money because they can be modified but how are they modified and would this cause corruption of the Blockchain? because you have some nodes with the correct transaction ID but during transit they have been modified to a different one and therefore the confirmed transaction will show a different transaction ID how does that work? I have read that BIP 0062 was made to stop transaction malleability attacks from happening https://en.bitcoin.it/wiki/BIP_0062 but it was removed? Does that mean Transaction Malleability is still a danger to transaction ID? Or does SegWit fix this? I have read https://en.bitcoin.it/wiki/Segregated_Witness which says it adds protection from transaction malleability attacks but how does it do it different to BIP 0062 and what is the significance of it? I thought segwit was for reducing fees but learned that it was created to stop transaction malleability attacks. To summarize my questions 1. Is a transaction malleability attack still a concern with segwit? 2. What does segwit do different to BIP 0062 3. Why was BIP 0062 revoked? 4. When can this type of attack happen? Before it is confirmed? 5. Could transaction malleability be used against old transactions to stop quantum computers attacking address which has exposed their public key?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5440623",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "February 21, 2023, 01:40:41 AM",
+      "body": "Transaction malleability can affect two major things: wallet software, and contracting protocols.There are two kinds of transaction malleation: 3rd party malleation, and 1st party malleation. In 3rd party malleation, anyone can change a transaction's id by modifying parts of it that are not covered by a signature. This includes the signature itself. In 1st party malleation, the transaction ID is modified by the sender(s). This is trivially done by re-signing the transaction but using a different nonce in the signature.While malleation is modifying a transaction so its txid changes, a different way to view it is a transaction that double spends the original but happens to send the Bitcoin to the same outputs. This is how nodes and wallets view the transaction, there is nothing special to mark transactions as being malleated nor does there need to be, they just look like and should be treated as double spends. Additionally, malleation is only an issue for unconfirmed transactions. Once a transaction confirms, the block commits to the transaction ids of all of the transactions in the block so there is no \"show a different transaction ID\". Again, these must be considered as double spends because that's what they are. There's really no \"original transaction\" or \"modified transaction\", they're two distinct transactions that conflict with each other (spend the same inputs), that just so happen to have the same outputs.Malleability first became a noticeable issue when wallet software would have issues because of malleated transactions. Back then, wallet software in general was not very good at handling double spends. This would result in issues such as wallets thinking they had access to more coins than they actually did, wallets continuously displaying and trying to rebroadcast conflicts that are no longer valid, and wallets trying to spend coins that no longer exist. These are all generally annoyances but shouldn't be the cause of significant concern, and they aren't unique to malleated transactions, any double spending could result in these issues. But since anyone could malleate a transaction, these annoyances could be done on a large scale by a single person. This is generally no longer an issue as wallet developers are aware of transaction conflicts and have made changes to their wallets to deal with them more gracefully.Transaction malleation was also noticed to be a major hindrance in contracting protocols such as Lightning. These protocols rely on the transaction ID not changing as they are pre-signing transactions that refer to a transaction that has not been broadcast yet. If the first transaction is malleated, and the counterparty is not cooperating (perhaps they malleated the first), then funds could be lost. Resolving these issues so that such protocols can work would require a solution that removes both 3rd and 1st party malleation.There were a couple of attempts to remove malleation. BIP 62 was one of them. It tried to enumerate many different malleation techniques and essentially outlaw them. However this is not necessarily a good solution since it still allows malleation in ways that may not have been thought of. So it was withdrawn.Segwit is different from BIP 62 in that it resolves the vast majority of malleation issues by removing most things that could cause malleation from the txid calculation itself. Segwit made it so that signatures, scripts, and stack items are all stored in a separate part of the transaction which everyone would ignore for the purposes of transaction id calculation. It further does this only for a subset of scripts so that it can remain backwards compatible. In this way, instead of figuring out what could be malleable and explicitly enumerating them, it just takes everything that could be malleable and puts it somewhere else. However Segwit is not a perfect solution, things that were malleable previously still are malleable, you have to opt-in to using Segwit and non-malleability. Furthermore, there are still ways to make segwit things malleable, but they basically require trying to make things that are malleable rather than malleability being the default as with non-segwit.Quote from: Macadonian on February 20, 2023, 10:52:27 PM5. Could transaction malleability be used against old transactions to stop quantum computers attacking address which has exposed their public key?  No. Malleability does not apply to anything that's confirmed and it does not actually hide anything.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Macadonian",
+      "created_time": "February 21, 2023, 03:14:58 PM",
+      "body": "Are there any known transaction malleations that are in the Blockchain?Quote from: achow101 on February 21, 2023, 01:40:41 AMTransaction malleation was also noticed to be a major hindrance in contracting protocols such as Lightning. These protocols rely on the transaction ID not changing as they are pre-signing transactions that refer to a transaction that has not been broadcast yet. If the first transaction is malleated, and the counterparty is not cooperating (perhaps they malleated the first), then funds could be lost. Resolving these issues so that such protocols can work would require a solution that removes both 3rd and 1st party malleation. Quote from: achow101 on February 21, 2023, 01:40:41 AMSegwit is different from BIP 62 in that it resolves the vast majority of malleation issues by removing most things that could cause malleation from the txid calculation itself. Segwit made it so that signatures, scripts, and stack items are all stored in a separate part of the transaction which everyone would ignore for the purposes of transaction id calculation. It further does this only for a subset of scripts so that it can remain backwards compatible. In this way, instead of figuring out what could be malleable and explicitly enumerating them, it just takes everything that could be malleable and puts it somewhere else. However Segwit is not a perfect solution, things that were malleable previously still are malleable, you have to opt-in to using Segwit and non-malleability. Furthermore, there are still ways to make segwit things malleable, but they basically require trying to make things that are malleable rather than malleability being the default as with non-segwit.  If segwit improves on malleability why is it the default option? My knowledge is if the transactions have been altered various nodes will have different copies of the blockchain or does a transaction that has been altered change to the original information once it has been confirmed. Can a transaction that has been altered be confirmed or would it return a error?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "February 21, 2023, 05:21:16 PM",
+      "body": "Quote from: Macadonian on February 21, 2023, 03:14:58 PMAre there any known transaction malleations that are in the Blockchain?There are transactions which were malleated that are in the blockchain. But that doesn't mean there are two versions of one transaction - there's only one \"version\" of the transaction in the blockchain, and it just happens to be one that was not the original broadcast by the original creator.Quote from: Macadonian on February 21, 2023, 03:14:58 PMIf segwit improves on malleability why is it the default option?Malleability is the \"default\" because changing that would be a hard fork. Non-segwit transactions are malleable by default, there is no way to fix this in a way similar to what segwit does without making a backwards incompatible change.Quote from: Macadonian on February 21, 2023, 03:14:58 PMMy knowledge is if the transactions have been altered various nodes will have different copies of the blockchainNo. As I said in my previous post, a malleated transaction is just a transaction that has a conflict. When there are transaction conflicts, only one of the conflicting transactions can be confirmed and added to the blockchain. There will not be different copies of the same transaction in the blockchain.Quote from: Macadonian on February 21, 2023, 03:14:58 PM or does a transaction that has been altered change to the original information once it has been confirmed. Can a transaction that has been altered be confirmed or would it return a error? Malleation can only occur on unconfirmed transaction. When an unconfirmed transaction is malleated, the malleated one could also confirm, which would invalidate the original. Likewise, the original could confirm and therefore invalidate the malleated one. Both cannot be confirmed as that would mean the same coins have been spent twice.It seems like you are thinking of malleation as \"transaction X but slightly altered\". However that's not a good way to look at it if you want to understand how malleated transactions are treated. You need to think of malleated transactions as double spends. They are simply transactions that spend the same inputs as another transaction. It just so happens to be that someone other than the original creator can produce these kinds of double spends. Since malleated transactions are just double spends, all of the same rules regarding double spends apply - only one of the transactions can be confirmed, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "March 06, 2023, 05:48:43 AM",
+      "body": "Right so one of the excuses for segwit was to stop malleation by removing changeable witness data from the hash,and also included a completely uinrelated to segwit change, that was supposed to solve it without segwit,but malleation is effectively the same as a double spend, except the fee, amount and target are  exactly the same.but now core is going to make double spending standard ...Heh - backflip much ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Macadonian",
+      "created_time": "March 06, 2023, 11:35:02 AM",
+      "body": "Quote from: kano on March 06, 2023, 05:48:43 AMbut now core is going to make double spending standard ...Can you link me to this please? I have not heard that double spending will be standard and I cannot believe that it will because it is a key part of Bitcoin. Confirmations used to stop double spending.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "March 06, 2023, 06:42:58 PM",
+      "body": "Quote from: kano on March 06, 2023, 05:48:43 AMbut now core is going to make double spending standard ...Ugh. I'm starting to feel that the critics of the RBF-by-default haven't looked at 0-conf with caution. 0-conf stands for Zero Confirmations-- that means no confirmations. Believing that Core is now arguing for \"double-spending standard\" is no different than arguing for a network that uses nodes' honesty to avoid double-spending. Lol.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "March 06, 2023, 10:02:45 PM",
+      "body": "Quote from: kano on March 06, 2023, 05:48:43 AMbut malleation is effectively the same as a double spend, except the fee, amount and target are  exactly the same.The important difference is that previously anybody could create a new version of any transaction and that caused severe usability issues. Preventing transaction malleability is a major improvement.On the other hand, double-spends are not an issue and never have been an issue. The problems of double-spends are solved by PoW.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HmmMAA",
+      "created_time": "March 07, 2023, 09:02:40 AM",
+      "body": "Quote from: achow101 on February 21, 2023, 01:40:41 AMBack then, wallet software in general was not very good at handling double spends. This would result in issues such as wallets thinking they had access to more coins than they actually did, wallets continuously displaying and trying to rebroadcast conflicts that are no longer valid, and wallets trying to spend coins that no longer exist. Where can i find info about this ? From a google search i didn't find anything . Could anyone provide me any links to dig further ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "March 07, 2023, 01:08:12 PM",
+      "body": "Quote from: HmmMAA on March 07, 2023, 09:02:40 AMQuote from: achow101 on February 21, 2023, 01:40:41 AMBack then, wallet software in general was not very good at handling double spends. This would result in issues such as wallets thinking they had access to more coins than they actually did, wallets continuously displaying and trying to rebroadcast conflicts that are no longer valid, and wallets trying to spend coins that no longer exist. Where can i find info about this ? From a google search i didn't find anything . Could anyone provide me any links to dig further ?Some info/discussion can be found on GitHub page of each wallet. Few example,https://github.com/bitcoin/bitcoin/issues/1898https://github.com/bitcoin/bitcoin/issues/3816https://github.com/spesmilo/electrum/issues/1543I also expect you can find few discussion about it on this forum using search tool such as https://ninjastic.space/search.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

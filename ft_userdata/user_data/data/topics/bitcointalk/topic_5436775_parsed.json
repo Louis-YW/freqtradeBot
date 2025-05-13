@@ -1,0 +1,21 @@
+{
+  "id": "topic_5436775",
+  "title": "dwarf_racoon",
+  "author": "dwarf_racoon",
+  "created_time": "January 25, 2023, 07:24:02 PMLast edit: January 25, 2023, 08:37:28 PM by dwarf_racoon",
+  "content": "Hey heyI'm writing a python script to take stratum tcp messages recorded through a mining proxy to reconstruct blockheaders and verify the miners' work. Documentation seems fairly sparse and at times conflicting. From an initial 'mining.subscribe' response, we can gather the ExtraNonce1 (or from a later 'mining.set_extranonce')From a 'mining.notify' job specification, we can gather the version, previous hash, time, and nBits towards the blockheader, additionally we can gather both the coinbase bits and the merkle branches.From a 'mining.submission', we can gather the extraNonce2 and the nonce.We can build the merkle root applying the following by first constructing the coinbase_hash:Code:coinbase=trans1+extraNonce1+extraNonce2+trans2coinbase_hash_bin = hashlib.sha256(hashlib.sha256(binascii.unhexlify(coinbase)).digest()).digest()and then the following: Code:def build_merkle_root(merkle_branch, coinbase_hash_bin):        merkle_root = coinbase_hash_bin        for h in merkle_branch:                #merkle_root = doublesha(merkle_root + binascii.unhexlify(h))                merkle_root = hashlib.sha256(hashlib.sha256(merkle_root + binascii.unhexlify(h)).digest()).digest()        return binascii.hexlify(merkle_root)From here is where things seem to get fuzzy, as https://github.com/ricmoo/nightminer/ gives a different order for the blockheader than say https://braiins.com/stratum-v1/docs where ricmoo has the nbits before the ntime, whilst the latter (and most other documentation) has nbits after ntime.I can build a simple byte reversal and swap for the merkel_root via:Code:def swap_order(s):    a=list(s[::-1])    a2=list(s[::-1])    for i in range(0,len(s),2):        a[i]=a2[i+1]        a[i+1]=a2[i]    return ''.join(a)and get towards the following:Code:padding='000000800000000000000000000000000000000000000000000000000000000000000000000000000000000080020000'blockHeader=btcVersion+prevHash+swap_order(str(mk_root,'utf-8'))+nTime+nBits+nOnce+paddinghexlify(hashlib.sha256(hashlib.sha256(binascii.unhexlify(blockHeader)).digest()).digest())but this does not seem to result in hashes that are below the target difficulty.I've struggled to find a straightforward version of this kind of a script and would appreciate any tips, insights, or links to related projects",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5436775",
+  "comments": [
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "January 25, 2023, 08:33:11 PM",
+      "body": "A better place to ask this in in the Bitcoin Technical Support area of the Forum. This area is mainly for hardware support, not coding.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

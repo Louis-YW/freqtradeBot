@@ -1,0 +1,69 @@
+{
+  "id": "topic_5424858",
+  "title": "btctaipei",
+  "author": "btctaipei",
+  "created_time": "November 30, 2022, 08:18:52 PM",
+  "content": "Hi Guys, sometime meals/lodging were being paid but by default Bech32 (Segwit) were auto selected on the dropdown box of BCore 23.this is creating a bit of confusion for our cashiers - had remember to either uncheck create bech32 address to change dropdown to select Base58 so it creates a bit of confusion.This had to do with wallet implementations I think - because not all can process upper case bech32 addresses. some of them won't even allow prefix / substring that starts with bitcoin:BC1Q*******. (it is a bit irony that bitcoin: part is lower case, whilst address isn't)did look for command line arguments on wallet options but to no avail (so can be specified when starting Bitcoin core).  Any tips on an work-around are appreciated!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5424858",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "November 30, 2022, 09:11:38 PM",
+      "body": "All Bech32 addresses created by my Bitcoin Core installation are lower case. I can't tell why yours are not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "November 30, 2022, 09:15:56 PM",
+      "body": "Quote from: LoyceV on November 30, 2022, 09:11:38 PMAll Bech32 addresses created by my Bitcoin Core installation are lower case.I think OP is referring to the QR code displayed when clicking on \"Create new receiving address\" in the GUI. If you scan the QR code, you will get an address with uppercase letters and \"bitcoin:\" prefix.bitcoin:BC1Q..........",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 30, 2022, 11:15:04 PM",
+      "body": "Quote from: hosseinimr93 on November 30, 2022, 09:15:56 PMQuote from: LoyceV on November 30, 2022, 09:11:38 PMAll Bech32 addresses created by my Bitcoin Core installation are lower case.I think OP is referring to the QR code displayed when clicking on \"Create new receiving address\" in the GUI. If you scan the QR code, you will get an address with uppercase letters and \"bitcoin:\" prefix.bitcoin:BC1Q..........Doesn't make much sense to keep the address in uppercase as Bech32 and Base58 are designed to prevent human error in the first place. Maybe I will open a pull request for this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "December 01, 2022, 02:40:29 AM",
+      "body": "Quote from: NotATether on November 30, 2022, 11:15:04 PMDoesn't make much sense to keep the address in uppercase as Bech32 and Base58 are designed to prevent human error in the first place. Maybe I will open a pull request for this.I think it's because it's stated in the proposal.BIP-0173 strongly suggests to encode Bech32 address as uppercase in QR Codes: github.com/bitcoin/bips/blob/master/bip-0173.mediawiki#bech32A command line option to generate lowercase would be great.Quote from: btctaipei on November 30, 2022, 08:18:52 PM(it is a bit irony that bitcoin: part is lower case, whilst address isn't)Setting it to uppercase will further increase the incompatibility of the QR Code.There's a discussion about that in Bitcoin Core's GUI repo GitHub: https://github.com/bitcoin-core/gui/issues/145",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "December 01, 2022, 04:25:25 AM",
+      "body": "Quote from: btctaipei on November 30, 2022, 08:18:52 PMThis had to do with wallet implementations I think - because not all can process upper case bech32 addresses.You should avoid using such tools that can not process upper case bech32 addresses because that is a bug in their implementation as the said encoding is not case sensitive and should only reject mixed case strings.Quotesome of them won't even allow prefix / substring that starts with bitcoin:BC1Q*******. (it is a bit irony that bitcoin: part is lower case, whilst address isn't)The \"bitcoin:\" part is a URI scheme (BIP-21) that not all wallets support. These are supposed to be a clickable link and after clicking them the information will be sent to your wallet which would fill the \"payto\" textboxes for you automatically. However, this may be obvious but it should not be entered manually in the address field since that would be rejected.The reason why it is lower case is because it is not encoded as part of the address nor in the QR code. It is just part of the URI scheme.QuoteAny tips on an work-around are appreciated!There should not be any workarounds available since the whole point of designing bech32 encoding like this was to allow QR codes to be created using upper case letters as @nc50lc pointed out.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "December 01, 2022, 11:21:11 AM",
+      "body": "Quote from: pooya87 on December 01, 2022, 04:25:25 AMQuote from: btctaipei on November 30, 2022, 08:18:52 PMThis had to do with wallet implementations I think - because not all can process upper case bech32 addresses.You should avoid using such tools that can not process upper case bech32 addresses because that is a bug in their implementation as the said encoding is not case sensitive and should only reject mixed case strings.I agree, although it looks OP's customer is the one who use buggy wallet. So asking the cashier to make suggestion about proper wallet to customer seems to be tricky.Quote from: btctaipei on November 30, 2022, 08:18:52 PMdid look for command line arguments on wallet options but to no avail (so can be specified when starting Bitcoin core).  Any tips on an work-around are appreciated!One possible workaround is by changing default type of generated address by adding this line on bitcoin.conf file. Take note p2sh-segwit refer to address with prefix 3.... Other possible option are legacy and bech32.Code:addresstype=p2sh-segwitP.S. Tested with Bitcoin Core 23.0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "btctaipei",
+      "created_time": "December 01, 2022, 07:23:51 PM",
+      "body": "Hi and thanks generous comment from everyone~I found the temporary work around and it works great since last night: generate 40 native bech32 addresses and save it as .png., replace bitcoin:BC1q*** QR photo with what each .png file actually says bc1q**** with .png / .jpg generated from another QR code generator.  merge 4 of those unique bech32 request payment QRs and Print them out + cut it up nightly to have 40 unique wallet address for the next morning.  took me bet. 10-15 minutes for all this.Then on 10xA4 sized paper @ with 4 native bech32 addresses with modified QR image with correct lower case bc1q*** encoding.Quote from: pooya87 on December 01, 2022, 04:25:25 AMYou should avoid using such tools that can not process upper case bech32 addresses because that is a bug in their implementation as the said encoding is not case sensitive and should only reject mixed case strings.^We have no control: Neither our establishment nor street food vendors renting space at lobby / courtesy areas selling rice balls (飯糰), fish balls, or soy milk had much say on which wallet tourist / bitcoin user should use.  Maybe across the straight in mainland China is better@mandate things - for example: either use compliant wallet like Muun to receive BTC or be outright banned.The \"tool\" we use is bCore 23. What is odd about it is when operator press \"Create new receiving address\" what the QR shown on screen along with code (lower case) don't match what QR really is.  Since no one wants to wait for confirmation with lowest fees when merchant received some payment unconfirmed on modified QR image wallet we have script that analyzes it to make sure transactions are ledgit.  If not screening Bcore node LINE vendor directly with txt description of potential issues so they can bring it up with bitcoin sender in seconds.can't seems to get BCore 23 to put out images that matches what encode on the QR. The QR really says bitcoin:BC1q****<SNIP>. we have to instead find another in-house quick-fix ASP.NET app to re-encodes saved .png it into bc1q****<SNIP> and all problem went away.Quote from: pooya87 on December 01, 2022, 04:25:25 AMThere should not be any workarounds available since the whole point of designing bech32 encoding like this was to allow QR codes to be created using upper case letters as @nc50lc pointed out.^ our 40 bech32 address work around QR image on paper @day seems rather equitable for now, until a more permanent solution similar to cypherpunkpay.org (not perfect) that works behind RFC1918 closed network being fully implemented.  I guess we'll just have to take those 25, 30, 45NTD payments more than once from different non-compliant wallet users on the same lower case bc1q paper wallet when we ran out (you know, some bitcoin-er travels in group. we have no control of that either)To put in perspective mining fees for each incoming is approx 45NTD (approx $1.45) for non-native segwit alternative.  For room reservation/checkouts that is fine, but for those vending joints in the lobby native segwit becomes significant: breakfast costs 85-120NTD on average, but those problematic native segwit users pays 5-10NTD(~$0.25) minimal fees.  Maybe I'll exploit better alternative with bc1p addresses to make direct bitcoin payment effective.  There are alternatives, of course (LINE Pay, 旺 PAY, or YoYoPay 悠遊付 merchant integration).  Then there are incoming LN payments as well but settle fund out of it daily for accounting seems rather expensive.  Freedom isn't cheap - even A4 paper prices are out of control.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "id": "topic_5422138",
+  "title": "krashfire",
+  "author": "krashfire",
+  "created_time": "November 18, 2022, 05:55:13 PMLast edit: November 21, 2022, 11:43:38 PM by krashfire",
+  "content": "I am trying to create 100 RSZ with K nonce using my own signatures and public key.This  code below gives random range from the ecdsa library.How can I modify this so I can recreate a 100 signatures with the same public key with k nonce known.Quote def generates_signatures(number_sigs, message, kbits, data_type, curve):      print(\"Preparing Data\")      d_key = random.randrange(ecdsa_lib.curve_n(curve))      print(\"Private key to be found (as demo) :\")      print(hex(d_key))",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5422138",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "November 18, 2022, 06:17:56 PM",
+      "body": "1) What's \"KP nonce\". Did you mean \"K nonce\"?2) What are you trying to accomplish?Quote from: krashfire on November 18, 2022, 05:55:13 PMHow can I modify this so I can recreate a 100 signatures with the same public key with k nonce known.Correct me if I'm wrong: Given d the private key, and k the random number that is used, you want to create signatures with different s values. As far as I can see from the code, there's only a variable d, so it's impossible (by altering only that part of the code).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "November 19, 2022, 02:48:44 AM",
+      "body": "Quote from: BlackHatCoiner on November 18, 2022, 06:17:56 PM1) What's \"KP nonce\". Did you mean \"K nonce\"?2) What are you trying to accomplish?Quote from: krashfire on November 18, 2022, 05:55:13 PMHow can I modify this so I can recreate a 100 signatures with the same public key with k nonce known.Correct me if I'm wrong: Given d the private key, and k the random number that is used, you want to create signatures with different s values. As far as I can see from the code, there's only a variable d, so it's impossible (by altering only that part of the code).  Hi... This is the full codeQuoteimport argparse  import random  import json    import ecdsa_lib      def generates_signatures(number_sigs, message, kbits, data_type, curve):      print(\"Preparing Data\")      d_key = random.randrange(ecdsa_lib.curve_n(curve))      print(\"Private key to be found (as demo) :\")      print(hex(d_key))      sigs = []      sz_curve = ecdsa_lib.curve_size(curve)      kbi = int(2 ** kbits)      print(f\"Generating {number_sigs} signatures with curve {curve.upper()}\")      print(f\" leaking {kbits} bits for k ({data_type})  ...\")      if message is not None:          msg = message.encode(\"utf8\")          # Always hash message provided with SHA2-256, whatever          hash_int = ecdsa_lib.sha2_int(msg)      for _ in range(number_sigs):          if message is None:              # Use a random different message for each signature              # Note : there is no associated message from the hash              #  Do not ever that in practice, this is insecure, only here for demo              hash_int = random.randrange(ecdsa_lib.curve_n(curve))          # Compute signatures with k (nonce), r, s          sig_info = ecdsa_lib.ecdsa_sign_kout(hash_int, d_key, curve)          # pack and save data as : r, s, k%(2^bits) (partial k : \"kp\")          sigs.append(              {                  \"r\": sig_info[0],                  \"s\": sig_info[1],                  \"kp\": sig_info[2] % kbi                  if data_type == \"LSB\"                  else sig_info[2] >> (sz_curve - kbits),              }          )          if message is None:              sigs[-1][\"hash\"] = hash_int      ret = {          \"curve\": curve.upper(),          \"public_key\": ecdsa_lib.privkey_to_pubkey(d_key, curve),          \"known_type\": data_type,          \"known_bits\": kbits,          \"signatures\": sigs,      }      if message is not None:          ret[\"message\"] = list(msg)      return ret      if __name__ == \"__main__\":      parser = argparse.ArgumentParser(          description=\"Generate random demo data for ECDSA attack.\"      )      parser.add_argument(          \"-f\",          default=\"data.json\",          help=\"File name output\",          metavar=\"fileout\",      )      parser.add_argument(          \"-m\",          help=\"Message string\",          metavar=\"msg\",      )      parser.add_argument(          \"-c\", default=\"secp256k1\", help=\"Elliptic curve name\", metavar=\"curve\"      )      parser.add_argument(          \"-b\",          default=6,          type=int,          help=\"Number of known bits (at least 4)\",          metavar=\"nbits\",      )      parser.add_argument(          \"-t\", default=\"LSB\", help=\"bits type : MSB or LSB\", metavar=\"type\"      )      parser.add_argument(          \"-n\",          default=1000,          type=int,          help=\"Number of signatures to generate\",          metavar=\"num\",      )      arg = parser.parse_args()      sigs_data = generates_signatures(arg.n, arg.m, arg.b, arg.t, arg.c)      with open(arg.f, \"w\") as fout:          json.dump(sigs_data, fout)      print(f\"File {arg.f} written with all data.\")      ]I need to recreate a lattice attack scenario against my own wallet. Hence I need to create at least 100 signatures for the attack.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 19, 2022, 08:53:37 AM",
+      "body": "Quote from: BlackHatCoiner on November 18, 2022, 06:17:56 PM1) What's \"KP nonce\". Did you mean \"K nonce\"?From looking at his supplies code, he collects a list of nonces \"K\", module some bit size, I.e. the nonces are truncated by some amount of bits - which is variable and can be adjusted using the \"kbits\" parameter.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "November 20, 2022, 12:39:46 AM",
+      "body": "Quote from: NotATether on November 19, 2022, 08:53:37 AMQuote from: BlackHatCoiner on November 18, 2022, 06:17:56 PM1) What's \"KP nonce\". Did you mean \"K nonce\"?From looking at his supplies code, he collects a list of nonces \"K\", module some bit size, I.e. the nonces are truncated by some amount of bits - which is variable and can be adjusted using the \"kbits\" parameter.Yes that's true.What my problem is. They are being generated randomly. I need it to be able to accept a sample RSZ and public key and it can generate another 100 signatures which output the same public key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 21, 2022, 05:51:40 AM",
+      "body": "Quote from: krashfire on November 20, 2022, 12:39:46 AMQuote from: NotATether on November 19, 2022, 08:53:37 AMQuote from: BlackHatCoiner on November 18, 2022, 06:17:56 PM1) What's \"KP nonce\". Did you mean \"K nonce\"?From looking at his supplies code, he collects a list of nonces \"K\", module some bit size, I.e. the nonces are truncated by some amount of bits - which is variable and can be adjusted using the \"kbits\" parameter.Yes that's true.What my problem is. They are being generated randomly. I need it to be able to accept a sample RSZ and public key and it can generate another 100 signatures which output the same public key. Why don't you simply make 100 raw transactions with the same input containing the pubkey, but with different amounts? You should certainly get 100 different RSZ tuples that way. You don't need to use a sample RSZ for this, you just need an input that is associated with the public key you type.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "November 21, 2022, 09:14:21 AM",
+      "body": "Quote from: NotATether on November 21, 2022, 05:51:40 AMQuote from: krashfire on November 20, 2022, 12:39:46 AMQuote from: NotATether on November 19, 2022, 08:53:37 AMQuote from: BlackHatCoiner on November 18, 2022, 06:17:56 PM1) What's \"KP nonce\". Did you mean \"K nonce\"?From looking at his supplies code, he collects a list of nonces \"K\", module some bit size, I.e. the nonces are truncated by some amount of bits - which is variable and can be adjusted using the \"kbits\" parameter.Yes that's true.What my problem is. They are being generated randomly. I need it to be able to accept a sample RSZ and public key and it can generate another 100 signatures which output the same public key. Why don't you simply make 100 raw transactions with the same input containing the pubkey, but with different amounts? You should certainly get 100 different RSZ tuples that way. You don't need to use a sample RSZ for this, you just need an input that is associated with the public key you type. I don't have that much bitcoins to spend.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "November 21, 2022, 11:47:35 AM",
+      "body": "Quote from: krashfire on November 21, 2022, 09:14:21 AMQuote from: NotATether on November 21, 2022, 05:51:40 AMWhy don't you simply make 100 raw transactions with the same input containing the pubkey, but with different amounts? You should certainly get 100 different RSZ tuples that way. You don't need to use a sample RSZ for this, you just need an input that is associated with the public key you type.I don't have that much bitcoins to spend. 1. You can create signed raw transaction without broadcasting it, which means you never spend your Bitcoin.2. You could use Testnet or Regtest network. Although you might need to obtain some coin from faucet (for testnet), perform initial node setup (for regtest) or make small change on your script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "November 21, 2022, 11:42:47 PM",
+      "body": "Quote from: ETFbitcoin on November 21, 2022, 11:47:35 AMQuote from: krashfire on November 21, 2022, 09:14:21 AMQuote from: NotATether on November 21, 2022, 05:51:40 AMWhy don't you simply make 100 raw transactions with the same input containing the pubkey, but with different amounts? You should certainly get 100 different RSZ tuples that way. You don't need to use a sample RSZ for this, you just need an input that is associated with the public key you type.I don't have that much bitcoins to spend. 1. You can create signed raw transaction without broadcasting it, which means you never spend your Bitcoin.2. You could use Testnet or Regtest network. Although you might need to obtain some coin from faucet (for testnet), perform initial node setup (for regtest) or make small change on your script. oh i did not know that. ok will do. thank you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "stanner.austin",
+      "created_time": "November 22, 2022, 08:29:21 AM",
+      "body": "Quote from: krashfire on November 19, 2022, 02:48:44 AMQuote from: BlackHatCoiner on November 18, 2022, 06:17:56 PM1) What's \"KP nonce\". Did you mean \"K nonce\"?2) What are you trying to accomplish?Quote from: krashfire on November 18, 2022, 05:55:13 PMHow can I modify this so I can recreate a 100 signatures with the same public key with k nonce known.Correct me if I'm wrong: Given d the private key, and k the random number that is used, you want to create signatures with different s values. As far as I can see from the code, there's only a variable d, so it's impossible (by altering only that part of the code).  Hi... This is the full codeQuoteimport argparse  import random  import json    import ecdsa_lib      def generates_signatures(number_sigs, message, kbits, data_type, curve):      print(\"Preparing Data\")      d_key = random.randrange(ecdsa_lib.curve_n(curve))      print(\"Private key to be found (as demo) :\")      print(hex(d_key))      sigs = []      sz_curve = ecdsa_lib.curve_size(curve)      kbi = int(2 ** kbits)      print(f\"Generating {number_sigs} signatures with curve {curve.upper()}\")      print(f\" leaking {kbits} bits for k ({data_type})  ...\")      if message is not None:          msg = message.encode(\"utf8\")          # Always hash message provided with SHA2-256, whatever          hash_int = ecdsa_lib.sha2_int(msg)      for _ in range(number_sigs):          if message is None:              # Use a random different message for each signature              # Note : there is no associated message from the hash              #  Do not ever that in practice, this is insecure, only here for demo              hash_int = random.randrange(ecdsa_lib.curve_n(curve))          # Compute signatures with k (nonce), r, s          sig_info = ecdsa_lib.ecdsa_sign_kout(hash_int, d_key, curve)          # pack and save data as : r, s, k%(2^bits) (partial k : \"kp\")          sigs.append(              {                  \"r\": sig_info[0],                  \"s\": sig_info[1],                  \"kp\": sig_info[2] % kbi                  if data_type == \"LSB\"                  else sig_info[2] >> (sz_curve - kbits),              }          )          if message is None:              sigs[-1][\"hash\"] = hash_int      ret = {          \"curve\": curve.upper(),          \"public_key\": ecdsa_lib.privkey_to_pubkey(d_key, curve),          \"known_type\": data_type,          \"known_bits\": kbits,          \"signatures\": sigs,      }      if message is not None:          ret[\"message\"] = list(msg)      return ret      if __name__ == \"__main__\":      parser = argparse.ArgumentParser(          description=\"Generate random demo data for ECDSA attack.\"      )      parser.add_argument(          \"-f\",          default=\"data.json\",          help=\"File name output\",          metavar=\"fileout\",      )      parser.add_argument(          \"-m\",          help=\"Message string\",          metavar=\"msg\",      )      parser.add_argument(          \"-c\", default=\"secp256k1\", help=\"Elliptic curve name\", metavar=\"curve\"      )      parser.add_argument(          \"-b\",          default=6,          type=int,          help=\"Number of known bits (at least 4)\",          metavar=\"nbits\",      )      parser.add_argument(          \"-t\", default=\"LSB\", help=\"bits type : MSB or LSB\", metavar=\"type\"      )      parser.add_argument(          \"-n\",          default=1000,          type=int,          help=\"Number of signatures to generate\",          metavar=\"num\",      )      arg = parser.parse_args()      sigs_data = generates_signatures(arg.n, arg.m, arg.b, arg.t, arg.c)      with open(arg.f, \"w\") as fout:          json.dump(sigs_data, fout)      print(f\"File {arg.f} written with all data.\")      ]I need to recreate a lattice attack scenario against my own wallet. Hence I need to create at least 100 signatures for the attack. HelloI don't know what so hard on this.You just need to replace this lined_key = random.randrange(ecdsa_lib.curve_n(curve))with your own keyfor example d_key = 0x1000 this will generate your private key if its(0x1000 in hex) 1000 sign because default generation.In case you want to customize K_nonce not private key it self(D_key) you have to specify it while using  at this linesig_info = ecdsa_lib.ecdsa_sign_kout(hash_int, d_key, curve)change to sig_info = ecdsa_lib.ecdsa_sign_kout(hash_int, d_key, curve,0x2222222222)0x2222222222 is K_nonce this is just example.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 22, 2022, 04:31:33 PM",
+      "body": "Quote from: krashfire on November 21, 2022, 11:42:47 PMQuote from: ETFbitcoin on November 21, 2022, 11:47:35 AMQuote from: krashfire on November 21, 2022, 09:14:21 AMQuote from: NotATether on November 21, 2022, 05:51:40 AMWhy don't you simply make 100 raw transactions with the same input containing the pubkey, but with different amounts? You should certainly get 100 different RSZ tuples that way. You don't need to use a sample RSZ for this, you just need an input that is associated with the public key you type.I don't have that much bitcoins to spend. 1. You can create signed raw transaction without broadcasting it, which means you never spend your Bitcoin.2. You could use Testnet or Regtest network. Although you might need to obtain some coin from faucet (for testnet), perform initial node setup (for regtest) or make small change on your script. oh i did not know that. ok will do. thank you.Yes, if you get some testnet bitcoins from a faucet (you'd need a Bitcoin Core or other full node to use regtest because it makes a brand-new blockchain on your node, But most wallets support testnet node) and make transaction spends with dust amounts like 1000 sats, you should be able to generate 100 RSZs for about 0.001 testnet BTC.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

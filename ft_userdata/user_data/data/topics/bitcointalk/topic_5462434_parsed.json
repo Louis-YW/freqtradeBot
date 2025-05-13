@@ -1,0 +1,165 @@
+{
+  "id": "topic_5462434",
+  "title": "doyouthinkitisOK",
+  "author": "doyouthinkitisOK",
+  "created_time": "August 08, 2023, 01:26:21 AM",
+  "content": "Do you think it's safe to use a  private key hash from 12-characterslike  pes53hL6Neh0Sf44ejbLAtvy88BB3XSDMJvsuB3xWQGniabeXtugqR6OKOe2",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5462434",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "August 08, 2023, 01:34:20 AM",
+      "body": "Depends, how big is your key space and how are you generating it? If it is generated in a manner that is completely random and you're including all of the alphabets (both capitalized and non-capitalized) with all of the numbers, then you might possibly be safe. Given the correct criteria, I would think that so long as a good key stretching function (think Scrypt, and salted) that is sufficiently strong and slow is used, it should be safe.However, note that this isn't exactly recommended because there are still various points of failure involved. You are better off using one of the wallets to generate a seed instead.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 08, 2023, 12:49:50 PM",
+      "body": "You have to figure out what the size of your \"entropy\" is. If it is at least 128 bits, then it is secure regardless of the hash algorithm you use (a simple SHA256 would suffice). Otherwise if it is lower, your security is going down too.So how many bits does each of your characters represent?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "August 08, 2023, 09:45:29 PM",
+      "body": "Quote from: doyouthinkitisOK on August 08, 2023, 01:26:21 AMDo you think it's safe to use a  private key hash from 12-charactersAssuming that the 12-character string is generated randomly and the range for each character is [0-9][a-z][A-Z], Then, the number of possible keys is 6212, or approximately 271.5, so you have only 71.5 bits of entropy.In my non-expert opinion, it is not safe for a private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Findingnemo",
+      "created_time": "August 10, 2023, 02:59:28 PM",
+      "body": "Quote from: doyouthinkitisOK on August 08, 2023, 01:26:21 AMDo you think it's safe to use a  private key hash from 12-charactersNo, it is not, and if I am not wrong it can be cracked in a few minutes.If 12 characters in the key, the total number of combinations is 16^12.16^12 = 18,446,744,073,709,551,616Comparing it with 256 bits entropy or 64 hexadecimal characters then the total number of combinations is 16^64.16^64 = 115,792,089,237,316,195,423,570,985,008,687,907,853,269,984,665,640,564,039,457,584,007,913,129,639,936And it will take at least a century to brute force this possibility even with powerful computation power.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 10, 2023, 04:02:54 PM",
+      "body": "Quote from: Findingnemo on August 10, 2023, 02:59:28 PMNo, it is not, and if I am not wrong it can be cracked in a few minutes.If 12 characters in the key, the total number of combinations is 16^12.Judging by the examples that OP gave, then it should be 62^12 instead. Note that it isn't as secure, but you can still have some sort of dependency on the hashing function used.Keybase Warp uses Scrypt and their 8 letter challenge for 10BTC was never solved until expiry (https://keybase.io/warp/) and I have some confidence that it could be secure, if we assume that the hashing function doesn't experience a huge speedup or any weakening in the near future. Again, this is very much dependent on your chances and if you're generating a wallet from random letters, then using an established HD wallet is far better.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 11, 2023, 04:41:06 AM",
+      "body": "^^ Even though the numbers using 6212 is correct but you guys are missing the fact that the entropy size depends on the size of the character list as I said above. The total of 62 characters (lower/upper a to z and numbers) is the simplest list of characters that doesn't even include regular symbols (*.,/\\'\":; and so on). Not to mention that technically speaking UTF8 encoding which is common for character representation can encode more than a million characters (not just the 62) ergo depending on the list you used, each of your characters can indeed represent a lot more than just 72-ish bits.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "August 13, 2023, 05:05:40 PM",
+      "body": "OP hasn't specified unambigously the character or rather symbol set he has in mind. So, based on his examples we have to assume [A-Z][a-z][0-9] and not necessarily UTF8 which gives a way larger character set.It's questions like OP stated that lack some details for good reasoning. Why use a limit of 12 symbols which are hashed to a private key (i.e. a sort of brain wallet, if SHA256 is used to hash the string of symbols)? His examples appear as a random sequence of symbols. A little more context would be nice.Anyway, I wouldn't want to use this little entropy like a search space of \"only\" 6212 aka 72-ish bits.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "August 13, 2023, 07:16:49 PM",
+      "body": "Quote from: Cricktor on August 13, 2023, 05:05:40 PMAnyway, I wouldn't want to use this little entropy like a search space of \"only\" 6212 aka 72-ish bits. 72 bits is clearly insufficient when subjected to a simple key derivation function like SHA256.The lack of entropy must be compensated by a corresponding increase in key derivation function complexity.Suppose we consider 112 bits to be bare minimum entropy for SHA256 key derivation.Then 72 bits of entropy requires key derivation to have complexity at least 2^{112-72} = 2^40 ~ 10^12.That could be a thousand billion iterations of SHA256.Or, better yet, a thousand billion iterations of a memory hard function using several GB of memory.It might take several hours, days, or even weeks of computation, but that's what lets you get awaywith significantly less entropy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "August 22, 2023, 08:05:19 PM",
+      "body": "Quote from: ranochigo on August 10, 2023, 04:02:54 PMQuote from: Findingnemo on August 10, 2023, 02:59:28 PMIf 12 characters in the key, the total number of combinations is 16^12.Judging by the examples that OP gave, then it should be 62^12 instead. Note that it isn't as secure, but you can still have some sort of dependency on the hashing function used.12 Chars passwords are hard to crack, some people would say they aren't secure enough, I was looking to some sites to verify how long it would take to crack it.Trying with: XtugqR6OKOe2 (12 chars, upper and low, and numbers)For Password Brute Force Calculator: https://www.proxynova.com/tools/brute-force-calculator/Time: 2 years, 11 monthsFor Brute Force Calculator: https://www.lostmypass.com/tools/bruteforce-calculator/Time: 1624 yearsHashrate: 63 GH/sMaybe now is secure to do it, but I don't think is a good practice. Maybe if you play more with the encryption, something like sha256(12Chars)=R1; sha256(R1+12Chars). And this way you can get the second sha by only knowing the 12 chars password.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "August 22, 2023, 08:55:44 PM",
+      "body": "Personally, if I were going to store a value that I would hash to generate a private key, assuming that my character set is 94 characters:a - z (26 characters)A - Z (26 characters)0 - 9 (10 characters)the 32 punctuation/special characters I can see on the keyboard in front of me right nowI'd want my generated seed to be AT LEAST 20 characters. If I've done the math correctly, that should give me a key that is at least 128 bits long.However:I don't see any good reason to do this.If I did it anyhow, I'd want to be VERY CAREFUL about the method I used to generate the seed. Any lack of randomness in the process, resulting in any bias in the results could lead to unexpected weakness in the security of the Bitcoins.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 23, 2023, 02:42:28 AM",
+      "body": "Quote from: seoincorporation on August 22, 2023, 08:05:19 PM12 Chars passwords are hard to crack, some people would say they aren't secure enough, I was looking to some sites to verify how long it would take to crack it.Trying with: XtugqR6OKOe2 (12 chars, upper and low, and numbers)For Password Brute Force Calculator: https://www.proxynova.com/tools/brute-force-calculator/Time: 2 years, 11 monthsFor Brute Force Calculator: https://www.lostmypass.com/tools/bruteforce-calculator/Time: 1624 yearsHashrate: 63 GH/sMaybe now is secure to do it, but I don't think is a good practice. Maybe if you play more with the encryption, something like sha256(12Chars)=R1; sha256(R1+12Chars). And this way you can get the second sha by only knowing the 12 chars password.Not really. SHA256, even double SHA256 and salted might not be good enough. SHA256 is naturally a pretty low resource hashing function to bruteforce as compared to other commonly used hash functions, Scrypt for example which is memory hard and expensive. I would recommend using a hash function with a better parameter, if you absolutely have to do it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 23, 2023, 04:32:18 AM",
+      "body": "Quote from: seoincorporation on August 22, 2023, 08:05:19 PMsomething like sha256(12Chars)=R1; sha256(R1+12Chars). That's not changing enough though. This is pretty much the same as double SHA256 hash we use in mining bitcoin. With the size being fixed and we knowing most of the initial blocks for each iteration, some of the computation can even be skipped during the internal block compression in each round of SHA256 and in the second SHA256 which would optimize the code significantly.The reason why KDFs are created and used for storing passwords is partly this. You can't just skip computation like in a simple subsequent SHA256 computation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 23, 2023, 08:02:40 AMLast edit: August 24, 2023, 12:03:45 PM by o_e_l_e_o",
+      "body": "Quote from: doyouthinkitisOK on August 08, 2023, 01:26:21 AMDo you think it's safe to use a  private key hash from 12-charactersI think the real question which no one has asked is: Why?I think this every time we see some new method for generating a seed phrase or backing them up. From combining email addresses, passwords and nonces to generate your entropy, to backing up your seed phrase as colors or even emojis. Why?None of these harebrained schemes that people come up with will be better than the standardized processes we already have in place. You'll either be decreasing your security and making your coins easier to hack, or you'll be increasing the difficulty of recovering from your back up and put yourself at risk of locking yourself out of your wallet.If you want to do this because you don't trust dev/urandom, then you should use a physical process such as unbiased coin flips to generate your entropy (and also get a new OS). If you want to do this because you are going to save your 12 characters in a password manager or try to remember them, then you vastly increase the risk of theft or loss compared to writing down a seed phrase. I can't think of any other reason you would want to do this.Quote from: DannyHamilton on August 22, 2023, 08:55:44 PMI'd want my generated seed to be AT LEAST 20 characters. If I've done the math correctly, that should give me a key that is at least 128 bits long.That's correct, although the set of basic printable ASCII characters is 95, rather than 94. You've probably missed out \"space\". Although you could obviously massively increase you character set by using UTF-8 or similar.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Knight Hider",
+      "created_time": "August 23, 2023, 02:57:59 PM",
+      "body": "Quote from: o_e_l_e_o on August 23, 2023, 08:02:40 AMQuote from: doyouthinkitisOK on August 08, 2023, 01:26:21 AMDo you think it's safe to use a  private key hash from 12-charactersI think the real question which no one has asked is: Why?I see the appeal of storing money in your brain. I have some, it's been there for years. Without checking, I'm certain it's still there. But the key is much more complicated than 12 characters.--Knight Hider",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "un_rank",
+      "created_time": "August 23, 2023, 07:45:33 PM",
+      "body": "Quote from: Knight Hider on August 23, 2023, 02:57:59 PMI see the appeal of storing money in your brain. I have some, it's been there for years. Without checking, I'm certain it's still there. But the key is much more complicated than 12 characters.It does not seem like that was the reason for the question the OP asked, and there should be no appeal to store sensitive information in your brain considering how fragile it is even if it is just 12 characters or even less.We sometimes forget basic things like passwords or even patterns used to protect our phones during memory down-times. If it is not written down in multiple locations it is not secure.- Jay -",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 23, 2023, 09:20:53 PM",
+      "body": "Quote from: Knight Hider on August 23, 2023, 02:57:59 PMI see the appeal of storing money in your brain.I don't. It'd make me extremely anxious. Whether it's 20 ASCII characters, or 12 words, or a bunch of Chinese characters with emojis and symbols included. It'd simply scare the shit out of me the thought that if my memory somehow cease to work properly, my money would be gone. And if you're curious how will that happen, here's a well-documented response: https://chat.openai.com/share/a186be91-93cf-4547-a95f-5d9cad337080Simple question: why not, while attempting to memorize that, also have a backup just to sleep easy?Quote from: o_e_l_e_o on August 23, 2023, 08:02:40 AMI think the real question which no one has asked is: Why?It's just impressive what people come up with, believing it's superior to what actual technicians with expertise in Bitcoin suggest.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "August 24, 2023, 06:43:30 PM",
+      "body": "I know from personal experience that I can't and don't dare to rely on my brain's memory only for difficult secrets, unless I repeat consistently and regularly what I have memorized. Why the hassle? Because to train and check on a regular schedule if my memory still serves what it should, I'd need a reliable reference backup (written on paper or stamped into metall, whatever avoids destruction by elements and digital theft). This physical reference backup negates the necessity to memorize it in my head. It doesn't make much sense for me therefore to try to go the risky route to cram difficult secrets into my head. In my opinion it's a recipe for future desaster.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Knight Hider",
+      "created_time": "August 24, 2023, 08:09:45 PM",
+      "body": "Quote from: BlackHatCoiner on August 23, 2023, 09:20:53 PMSimple question: why not, while attempting to memorize that, also have a backup just to sleep easy?A backup can be found by someone, my brain is all mine.I sleep fine, thanks.--Knight Hider",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 25, 2023, 04:57:11 AM",
+      "body": "Quote from: Knight Hider on August 24, 2023, 08:09:45 PMQuote from: BlackHatCoiner on August 23, 2023, 09:20:53 PMSimple question: why not, while attempting to memorize that, also have a backup just to sleep easy?A backup can be found by someone, my brain is all mine.I sleep fine, thanks.--Knight HiderI dunno, I've seen stories here about people forgetting their seed phrase or password because they only memorized it in their head...Unless you share your house with someone, writing a note and putting it in a personal area is pretty safe and foolproof.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

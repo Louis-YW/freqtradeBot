@@ -1,0 +1,117 @@
+{
+  "id": "topic_5412013",
+  "title": "fboi1",
+  "author": "fboi1",
+  "created_time": "September 01, 2022, 01:20:38 PM",
+  "content": "Hi, i'm new to the rpc interface but i'm trying to get details on all of the latest unconfirmed transactions in real time. I'm using bitcoin core and i'd like to get the latest unconfirmed transactions on the whole network with their value, fee and timestamps.I've tried to query Code:getrawmempool verbose=true and it gives the timestamp and fees for each of the transactions along with other data however it doesn't give the value of the transactions.I thought I could do Code:getrawmempool verbose=true and query each transaction id with Code:getrawtransaction \"mytxid\" true to get the value of the transactions however it seems like a long process to loop through each txid in the mempool in real time.Does anyone know a good solution?Thanksp.s with getrawmempool verbose=true it also shows the size of the transaction but i don't know how/if it can be interprated as the value. Thanks!!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5412013",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 01, 2022, 01:48:32 PM",
+      "body": "Quote from: fboi1 on September 01, 2022, 01:20:38 PMhowever it seems like a long process to loop through each txid in the mempool in real timeDo you mean computationally expensive? I don't think it takes so much time to run getrawmempool, take the entire thing, run a for loop function which contains getrawtransaction and (optionally) decoderawtransaction, and finally match each txid with its value.Quote from: fboi1 on September 01, 2022, 01:20:38 PMp.s with getrawmempool verbose=true it also shows the size of the transaction but i don't know how/if it can be interprated as the value. Thanks!!No. Virtual size (vsize) isn't value. Do you want to tell us what you're trying to accomplish?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fboi1",
+      "created_time": "September 01, 2022, 02:01:19 PM",
+      "body": "My concern was that perhaps by the time i complete a for loop on lets say 30 of the transactions in the mempool and get each corresponding values, i may have missed new entries in the mempool which would also have to be looped through... Honestly it's a valid option but i was just wondering if there would be a better solution. Perhaps a single rpc call that returns all the data regarding the transactions?Sorry, the goal is to generate a database filled with unconfirmed transactions. Each entry would have the txid, time of the tx, value of the tx and the fee. It's sort of a datascience projectThanks again!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 01, 2022, 02:05:21 PM",
+      "body": "Quote from: fboi1 on September 01, 2022, 02:01:19 PMMy concern was that perhaps by the time i complete a for loop on lets say 30 of the transactions in the mempool and get each corresponding values, i may have missed new entries in the mempool which would also have to be looped through...So, once that process is over, redo it and skip the already added transactions. Even if such RPC call existed (which I don't cross my fingers there isn't) you'd need to call it frequently; in fact every second, because there are sometimes dozens of transactions been broadcasted in one second. You don't need any other RPC call; use getrawmempool in combination with getrawtransaction and a for loop.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fboi1",
+      "created_time": "September 01, 2022, 02:13:06 PM",
+      "body": "Cheers pal, i'll get to it then  btw just out of curiosity would you know how services like blochain.info do it?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 01, 2022, 04:05:05 PM",
+      "body": "Quote from: fboi1 on September 01, 2022, 02:13:06 PMbtw just out of curiosity would you know how services like blochain.info do it?Have a look at mempool.space: it's open source and the source is on Github.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "September 01, 2022, 06:48:23 PM",
+      "body": "Quote from: fboi1 on September 01, 2022, 01:20:38 PMHi, i'm new to the rpc interface but i'm trying to get details on all of the latest unconfirmed transactions in real time. I thought I could do Code:getrawmempool verbose=true and query each transaction id with Code:getrawtransaction \"mytxid\" true to get the value of the transactions however it seems like a long process to loop through each txid in the mempool in real time.You are right, it could be time consuming. What I do, is to remember which transactions I have already processed and then for each transaction in mempool I see if it was checked or not. On the other hand, I clean cache from transactions which are not in mempool anymore.But I confirm, it is not the perfect solution. Of course you may improve it by using several threads (divide-and-conquer approach), but still you must check each transaction separately.You may take a look how I do it:https://github.com/PawelGorny/NodeWatcher/blob/main/src/main/java/net/com/pawelgorny/nodewatcher/Main.java",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fboi1",
+      "created_time": "September 02, 2022, 04:30:37 PM",
+      "body": "Thanks for the advice!for this project i'm using python as i have no clue how to use other languages. threads approach sounds very interesting! how do you clear the cache from transactions not in the mempool. is this also an rpc call?Thanks again!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "September 02, 2022, 04:44:30 PM",
+      "body": "Quote from: fboi1 on September 02, 2022, 04:30:37 PMhow do you clear the cache from transactions not in the mempool. is this also an rpc call?No, I was talking about my cache, to \"remember\" which transactions were already processed. To clear cache - just remove transactions which are in cache but not it the recent list of mempool transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fboi1",
+      "created_time": "September 02, 2022, 08:12:34 PM",
+      "body": "got it, this is a great solution. Cheers!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "fboi1",
+      "created_time": "September 02, 2022, 10:26:45 PM",
+      "body": "also, on a related note, is it possible for my node to miss any unconfirmed bitcoin transactions if, for some reason, they don't ever show up in my mempool. Or is there a low chance of this happening? thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 02, 2022, 10:36:44 PM",
+      "body": "Quote from: fboi1 on September 02, 2022, 10:26:45 PMalso, on a related note, is it possible for my node to miss any unconfirmed bitcoin transactions if, for some reason, they don't ever show up in my mempool. Or is there a low chance of this happening? thanksAbsolutely. The system works asynchronously, some nodes receive some transactions in a different time span in contrast with others. They'll eventually all share about the same transactions, but not exactly the same. For example, some nodes allow transactions that don't pay a fee to enter their mempool, while some others not. Also, some nodes might consider something as non-standard, while some others not (such as a transaction that creates an output of 1 satoshi). Generally, there are different mempools, because nodes across the network don't have the same local configuration with each other.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PawGo",
+      "created_time": "September 03, 2022, 09:05:56 AM",
+      "body": "Quote from: fboi1 on September 02, 2022, 10:26:45 PMalso, on a related note, is it possible for my node to miss any unconfirmed bitcoin transactions if, for some reason, they don't ever show up in my mempool. Or is there a low chance of this happening? thanksIt is also possible that when you retrieve list of transactions and start to process them one by one, asking each time for details, the transaction will already \"disappear\", because new block could be mined in the meantime.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "September 07, 2022, 05:24:42 PM",
+      "body": "Quote from: fboi1 on September 01, 2022, 02:01:19 PMMy concern was that perhaps by the time i complete a for loop on lets say 30 of the transactions in the mempool and get each corresponding values, i may have missed new entries in the mempool which would also have to be looped through...Absolutely. You can only capture a moment-in-time view of your mempool.  Then at another time you can capture another moment-in-time view. This would be true even if the getrawmempool command included values.  You'd still only be able to capture the values of the transactions that happened to be in your mempool at the exact moment that you ran the command.Quote from: fboi1 on September 01, 2022, 02:13:06 PMbtw just out of curiosity would you know how services like blochain.info do it?I'm not sure that they've ever publicly shared their internal processes.  If it were me, I might just pull down the source for Bitcoin Core and then modify it to connect directly to my database and store all the information that I wanted to capture as it received transactions and blocks from peers. For the purposes of scalability I might actually have it write that information to some sort of in-memory queue. That way I could have multiple custom nodes all writing to the queue simultaneously and then have a de-duplication process that pulls from the queue and updates the database.  This would protect me from some of the performance issues that might arise from establishing DB connections and write-locks.Quote from: fboi1 on September 02, 2022, 10:26:45 PMalso, on a related note, is it possible for my node to miss any unconfirmed bitcoin transactions if, for some reason, they don't ever show up in my mempool. Or is there a low chance of this happening? thanksIt's possible that your node receives transactions in a different order with different timestamps than other nodes.It's possible that your node receives transactions that some other nodes ONLY receive in a block (never entering their mempool).It's possible that other nodes receive transactions that your node ONLY receives in a block (never entering your mempool).It's possible that your node will receive transactions that some other nodes never receive AT ALL.It's possible that other nodes receive transactions that your node never receives AT ALL.It is possible that your node:Receives some transactions into your mempoolReceives a block (Block_A1) containing those transactions and therefore removes them from your mempoolReceives a replacement block (Block_A2) that doesn't include those transactionsReceives a third block (Block_B2) that builds on top of Block_A2 (forcing a re-org for you)Moves some of the transactions from Block_A1 back into the mempoolReceives another block (Block_C2) that invalidates some of those transactions that moved back to your mempool, causing them to be abandoned, permanently. (note that this process could technically repeat multiple times for the same transaction moving from mempool to a block, back to mempool due to a re-org, back to a block, back to mempool due to another re-org, back to a block, and so on until eventually either there is no re-org and remains in a block or it is permanently abandoned.)It is also possible that your node receives a transaction, it remains in the mempool for many days, it is eventually purged from the mempool without being confirmed in order to make room for more transactions, and then it is received again (a second time, or third, or fourth, etc).It is also possible that your node receives a transaction, it eventually expires out of your mempool unconfirmed, and a replacement transaction is received that spends ALL of the exact same inputs and sends value to all the exact same Txout-scripts/scriptPubKeys, BUT is a completely different transaction ID (due perhaps to slightly different values assigned to those outputs?)It is also possible that the arrival time of a transaction in your mempool (timestamp) could be LATER than the timestamp of the block that it eventually is included in.These are the scenarios that come immediately to mind. I suspect there are others that I could come up with if I thought about it a bit longer.Such is the nature of a decentralized system. You can't count on the fact that you'll receive EVERYTHING that every other node receives, or that any of them will receive EVERYTHING that you receive, or that those things which you and some other node do both receive will arrive in the same order for both of you.Some things to ask yourself about your code:If a transaction that I never saw in my mempool shows up in a block, do I want to add it to the list of unconfirmed transactions that I had generated prior to the arrival of the block?If a confirmed transaction once again becomes unconfirmed (due to a re-org), do I want to keep track of that fact?If an unconfirmed transaction in my mempool becomes invalidated by some other transaction that arrives in a block, do I still include the (now invalidated) transaction in my list of unconfirmed transactions?If the timestamp of when I receive a transaction is LATER than the timestamp of the block that it is eventually included in, do I want to modify the timestamp of the transaction to be equal to the block timestamp?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

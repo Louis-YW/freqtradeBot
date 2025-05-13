@@ -1,0 +1,141 @@
+{
+  "id": "topic_5408051",
+  "title": "Samehvan",
+  "author": "Samehvan",
+  "created_time": "July 29, 2022, 01:10:33 PMLast edit: July 29, 2022, 07:34:16 PM by Samehvan",
+  "content": "i need a Sha256 kernel file ,i am using Cloo as my opencl library ,thanks in advance[Edit]now i got it to work but just for string (abc and abcdef)when i tried double hash it gave me a very different hash than expectedfor strings i used Code:Encoding.ASCII.GetBytes(\"abcdef\")and for block header i used hexstringTobyteArray function",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5408051",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "July 29, 2022, 03:46:56 PM",
+      "body": "What actually trying to achieve?It seems that you are planning to mine using GPU?Take note that GPU is no longer support mining BTC.Check this link- https://searchcode.com/file/45893396/src/opencl/sha256_kernel.cl/I got the source from this",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Samehvan",
+      "created_time": "July 29, 2022, 04:01:36 PMLast edit: July 29, 2022, 05:03:36 PM by Samehvan",
+      "body": "thanks for your replyi am actually trying opencl CPU versioni did checked this one but i don't seem to run it properly specially as i do not know the arguments it requiredex. dataInfo arg should contain a numKey byte is that the number of charcters the keys have or what ?keys ! are they as byte array or characters arrayi have passed the hash and result buffers to it along with zero keys buffer but the result was not correctso i am searching for one that just pass the string or byte array to it and receive the hash valuesorry if am too newbie for you but i am trying my best  .here is my code for it after removing the keys args from the kernel             Code:            var headerByte = Encoding.ASCII.GetBytes(\"abcdef\");// Utilities.getTestHeader();            var dataInfo = new byte[2];            dataInfo[0] = (byte)headerByte.Length;            dataInfo[1] = dataInfo[0];            var hashRest = new byte[32];            // buffers to store kernel output            var clBuffer0 = new ComputeBuffer<byte>(context, ComputeMemoryFlags.ReadWrite, dataInfo.Length);            var clBuffer1 = new ComputeBuffer<byte>(context, ComputeMemoryFlags.ReadWrite, headerByte.Length);            var clBuffer2 = new ComputeBuffer<byte>(context, ComputeMemoryFlags.ReadOnly, hashRest.Length);            queue.WriteToBuffer(dataInfo, clBuffer0, true, null);            queue.WriteToBuffer(headerByte, clBuffer1, true, null);            queue.WriteToBuffer(hashRest, clBuffer2, true, null);            var prog = new ComputeProgram(context, kernelcode);            try            {                prog.Build(new[] { device }, \" -D WORKSIZE=1\", null, userDataPtr);            }            catch (ComputeException)            {                AddLog(prog.GetBuildLog(device));                return;            }            var kernel = prog.CreateKernel(\"sha256\");            kernel.SetMemoryArgument(0, clBuffer0);            kernel.SetMemoryArgument(1, clBuffer1);            kernel.SetMemoryArgument(2, clBuffer2);            queue.Finish();            queue.Execute(kernel, null, new long[] { 1 }, new long[] { 1 }, null);            var outp = new byte[hashRest.Length];            queue.ReadFromBuffer(clBuffer2, ref outp, true, null);",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "July 29, 2022, 05:11:58 PM",
+      "body": "Um, as BitMaxz already said - it is beyond useless to use a CPU or GPU to process Bitcoin hashes. Given the current difficulty and even going back to around late 2013t the time taken to process even a single hash cycle is many magnitudes too long.Now sha256 altcoins - that is a different matter as there are several that have a low enough difficulty that they can still be mined with CPU/GPU's. If you intend pursuing this please move the discussion to the altcoin areas as it has nothing to do with Bitcoin...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Samehvan",
+      "created_time": "July 29, 2022, 05:49:55 PM",
+      "body": "Quote from: NotFuzzyWarm on July 29, 2022, 05:11:58 PMUm, as BitMaxz already said - it is beyond useless to use a CPU or GPU to process Bitcoin hashes. Given the current difficulty and even going back to around late 2013t the time taken to process even a single hash cycle is many magnitudes too long.Now sha256 altcoins - that is a different matter as there are several that have a low enough difficulty that they can still be mined with CPU/GPU's. If you intend pursuing this please move the discussion to the altcoin areas as it has nothing to do with Bitcoin...Thanks for your replyi know it's ultimately no chance here , but consider me as a student or even a dreamer the point is i would like to try , so i am trying",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 29, 2022, 10:05:52 PM",
+      "body": "Quote from: Samehvan on July 29, 2022, 05:49:55 PMThanks for your replyi know it's ultimately no chance here , but consider me as a student or even a dreamer the point is i would like to try , so i am trying Actually, if you want to mine Bitcoin you don't need to study them and install any sha256 files because all ASIC machines right now are plug and play you just need to set up your miner's pool and it is ready to mine. Better start reading this First time/Small miner reference for getting started.Or if this is all about study purposes then I think USB miner Newpac or Compac F is your best option which is way cheaper than buying an Antminer s9 and above units.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Samehvan",
+      "created_time": "July 29, 2022, 10:54:46 PM",
+      "body": "Quote from: BitMaxz on July 29, 2022, 10:05:52 PMQuote from: Samehvan on July 29, 2022, 05:49:55 PMThanks for your replyi know it's ultimately no chance here , but consider me as a student or even a dreamer the point is i would like to try , so i am trying Actually, if you want to mine Bitcoin you don't need to study them and install any sha256 files because all ASIC machines right now are plug and play you just need to set up your miner's pool and it is ready to mine. Better start reading this First time/Small miner reference for getting started.Or if this is all about study purposes then I think USB miner Newpac or Compac F is your best option which is way cheaper than buying an Antminer s9 and above units.thanks again for your response and sorry if i am consistent on something that seems stupid or worthlessi took another look at the link you gave and managed to get it to work with simble strings now the problem is it can't give the correct hash when passing the headerCode:            AddLog(getHash(Encoding.ASCII.GetBytes(\"abcdef\"))); // this works fine            var head = Utilities.getTestHeader(); // returning header as byte array with 80 bytes length             string res = getHash(head); // this gives a wrong hash[Edit]now it seems it can't handle long arrays i tried 80 length string and returned a wrong hash , dont know what is wrong in the code , i will try to study it again",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "July 30, 2022, 01:04:29 AMLast edit: July 30, 2022, 01:58:49 AM by NotFuzzyWarm",
+      "body": "What folks here are trying to get across is that other than as a purely academic exercise, hashing sha256 just using CPU(s) has no possible use. Even the most primitive ASIC sha256 chips from say late 2013 delivered speeds in excess of 1GHs when pushed hard and over 500MHs when throttled back. Even a very high-end PC with 24 or more cores cannot match those early generation mining chips. What you are looking to do is like learning assembler (lowest level CPU microcode) vs learning a interpreted programming language. Ja, it is always nice to know it or at least have a decent understanding of it but overall aside from some very specialized purposes not helpful to know.Point is that any real world application of sha256 blockchain technology is going to use ASIC's - not any mid to high level interpreted CPU code like C, .NET, Py, etc running on CPU's. Even the most modest applications would at least use FPGA's or even GPU's vs CPU's. The fact that Intel jumped into the fray with their open-to-all-comers mining ASIC proves that.Now, if you want to explore how to talk to an ASIC mining chip might I suggest you checkout Kano's cgminer git and pickup a low cost USB stick like any of Sidehack's to run the software on? Compiling instructions are here.Being fully open source you can not only see and tinker with how the software that interfaces between the BTC network and a miner operates but also investigate the code used as drivers that interface between software and the actual ASIC chips. The driver library also includes one for FPGA's as well as a variety of ASIC's.  That is the side of your learning that has useful career possibilities.Edited for typo's",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Samehvan",
+      "created_time": "July 30, 2022, 01:31:27 AMLast edit: July 30, 2022, 12:50:29 PM by Samehvan",
+      "body": "Quote from: NotFuzzyWarm on July 30, 2022, 01:04:29 AMWhat folks here are trying to get across is that other than as a purely academic exercise, hashing sha256 just using CPU(s) has no possible use. Even the most primitive ASIC sha256 chips from say late 2013 delivered speeds in excess of 1GHs when pushed hard and over 500MHs when throttled back. Even a very high-end PC with 24 or more cores cannot match those early generation mining chips. What you are looking to do is like learning assembler (lowest level CPU microcode) vs learning a interpreted programming language. Ja, it is always nice to know it or at least have a decent understanding of it but overall aside from some very specialized purposes not helpful to know.Point is that any real world application of sha256 blockchain technology is going to use ASIC's - not any mid to high level interpreted CPU code like C, .NET, Py, etc. Even the most modest applications would at least use FPGA'sor even GPU's vs CPU's. The fact that Intel jumped into the fray with their open-to-all-comers mining ASIC proves that.Now, if you want to explore how to talk to an ASIC mining chip might I suggest you checkout Kano's cgminer git and pickup a low cost USB stick like any of Sidehack's to run the software on? Compiling instructions are here.Being fully open source you can not only see and tinker with how the software that interfaces between the BTC network and a miner operates but also investigate the code used as drivers that interface between software and the actual ASIC chips. The driver also includes one for FPGA's as well as a variety of ASIC's.  That is the side of your learning that has possible career possibilities.WAW , that was great post, thanks a lot .yet as this is a totally new area for me i was trying to move forward from things i am familiar with to the next unknown cryptographic is one of the things i ddnt work on be4 so i was trying to take a little deep  dive using the languages i am used to and when i got an acceptable picture of what is going on there i move on and take another step.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "JimyRG",
+      "created_time": "August 08, 2022, 06:29:28 PM",
+      "body": "Quote from: BitMaxz on July 29, 2022, 10:05:52 PMQuote from: Samehvan on July 29, 2022, 05:49:55 PMThanks for your replyi know it's ultimately no chance here , but consider me as a student or even a dreamer the point is i would like to try , so i am trying Actually, if you want to mine Bitcoin you don't need to study them and install any sha256 files because all ASIC machines right now are plug and play you just need to set up your miner's pool and it is ready to mine. Better start reading this First time/Small miner reference for getting started.Or if this is all about study purposes then I think USB miner Newpac or Compac F is your best option which is way cheaper than buying an Antminer s9 and above units.Thank you for the instructions; actually, I had the same thought as you, that I needed some knowledge to install the sha256 files, and I was worried about my lack of knowledge. However, your post gave me confidence, and now I'm hoping to purchase ASIC machines soon, set up my miner's pool, and begin mining.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "August 09, 2022, 01:41:47 AM",
+      "body": "I think what is relevant in all this is that no mining is done with CPU/GPU any more for a very good reason.So you wont learn something you can use.The public code, e.g. that I updated for the CompacF, is what's relevant.Talking to an asic chip, passing it work, getting back results.(see my sig for cgminer)The insides of that asic chip are basically just the SHA256 hash which, for interest sake, you can find documented easily.One issue with people going on about 'academic' CPU/GPU mining is that it is usually about stealing CPU/GPU cycles from a lot of other computers.But it's still pointless even if you have a lot of other computers.So some basic numbers:CPU about 30 MH/s per coreFast GPU uses about 300W and does about 600 MH/sCompacF uses about 12W to do about 325000 MH/sA 90TH/s miner uses about 3500W to do about 90000000 MH/sSo to match a tiny 12W CompacF doing 325000 MH/s you'd need 541 GPUs using 162000W (yes 162kW)So this firstly shows how ridiculous it is to even consider doing it.For CPU mining you'd need about 20 times as many CPU cores to match the tiny 12W CompacF, or about 10820 CPU coresBut as soon as you consider a current 90TH/s miner, these number become very large.GPUs - 150000 of them (45MW) - or CPU core count 3000000 (yes 3 million of them)It is literally way worse than saying you want to learn about being a home removalist by carrying everything in a house, 1000km on your back.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Samehvan",
+      "created_time": "August 10, 2022, 07:12:53 AMLast edit: August 10, 2022, 07:27:52 AM by Samehvan",
+      "body": "Quote from: kano on August 09, 2022, 01:41:47 AMI think what is relevant in all this is that no mining is done with CPU/GPU any more for a very good reason.So you wont learn something you can use..........It is literally way worse than saying you want to learn about being a home removalist by carrying everything in a house, 1000km on your back.Thank you for your post appreciate it.now just to make things very clear for me, lets show my thoughts and please correct me wherever you find a wrong one.so as i know any small change in the header will coz the full hash result to change that means if i found a way to change anything in the header (keeping it a right one),that means i am now competing against my own luck because then it will be a unique header only for me and no other miners will have the same header to hash.now if i could get my cpu or gpu to calculate the 4.29 billion nonces in under a minute  i will have a pretty good window to try my luck as in average it took about 10 minutes to solve a blockso in my thoughts as fast as i can try the maximum nonce tries i will change the header again and have another round is that correct or i am missing things?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "August 10, 2022, 07:59:02 AM",
+      "body": "A 90TH/s miner tries 90,000,000,000,000 nonces a secondA 90TH/s miner currently has a 1 in 15562 chance of finding a block in a full day of mining.A block currently expects 121,009,279,702,779,954,200,576 nonces per block.You are wasting your time and the time of people reading this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jack1cryptotalk007",
+      "created_time": "August 25, 2022, 12:38:12 PM",
+      "body": "Quote from: Samehvan on August 10, 2022, 07:12:53 AMQuote from: kano on August 09, 2022, 01:41:47 AMI think what is relevant in all this is that no mining is done with CPU/GPU any more for a very good reason.So you wont learn something you can use..........It is literally way worse than saying you want to learn about being a home removalist by carrying everything in a house, 1000km on your back.Thank you for your post appreciate it.now just to make things very clear for me, lets show my thoughts and please correct me wherever you find a wrong one.so as i know any small change in the header will coz the full hash result to change that means if i found a way to change anything in the header (keeping it a right one),that means i am now competing against my own luck because then it will be a unique header only for me and no other miners will have the same header to hash.now if i could get my cpu or gpu to calculate the 4.29 billion nonces in under a minute  i will have a pretty good window to try my luck as in average it took about 10 minutes to solve a blockso in my thoughts as fast as i can try the maximum nonce tries i will change the header again and have another round is that correct or i am missing things? I understood your idea. You want change original block header a little bit and make it possibly be a best block header in order to hash this header data to contain a nonce to resolve a block. 1. But, the problem is there is no criteira (or no better way) to select a best block header data from the original block header. At the moment, in the state of art, an original block header has created bllions of local header data to be used, then, asic miners do hashing on billions of these local block header data. Now, bitcoin network has 200+ EH/s, which means 200 plus E block header data are hashed in per seconds. So, a PC can't fight with these ASIC machines. A very fast PC only can hash a header data in 10 minutes and find 0, 1 to 3 nonces as I experienced.2. But, you can use your small ASIC machine and try your optimalized block header data to do hashing in a cost saving way against those big miners. The key issues  are:(1). to find a  or few common or univerrse nonces, which is a broken hole in sha256 algorithm, or hashing collision aspect. (2). to find a way to reduce search space (sha256 hash function has a huge space) or focus on a sub space for your search the nonce from few of header data, which is common optimalization method (task) in computing optimaliztion algorithms.(3). in computer science, there are a lot of optimalization algorithms. 3. You can google \"cpuminer\" to find old cpuminer software in github. eg. cpuminer pooler. too many there. Then, do your development of them. Good luck.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "unicornmangle",
+      "created_time": "October 21, 2022, 04:24:58 AM",
+      "body": "Quote from: jack1cryptotalk007 on August 25, 2022, 12:38:12 PMso in my thoughts as fast as i can try the maximum nonce tries i will change the header again and have another round is that correct or i am missing things? So in finding the nonce using the bitcoin ledger for prior successful block finds as a reference of what to avoid or optimized as the possibility of collisions are so rare? Would this be the hole you speak of?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "October 21, 2022, 12:31:55 PMLast edit: October 22, 2022, 12:59:19 AM by NotFuzzyWarm",
+      "body": "How about sprinkling a bit'o Fairy Dust on the PC to improve Luck? It would do just as much good Looking at previous results to try and find patterns is pointless because the process is totally random. What has occurred in the past has zero relation to what will happen in the future.Folks have been trying to find flaws/cheats or other shortcuts in the BTC mining algo since 2009. Guess what - there aren't any...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinSoloMiner",
+      "created_time": "December 23, 2022, 12:38:43 AM",
+      "body": "OP, did you have any luck finding an up to date opencl kernel? How did your progression go? what miner are you using?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

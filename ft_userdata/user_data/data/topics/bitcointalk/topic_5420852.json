@@ -1,0 +1,101 @@
+{
+  "id": "topic_5420852",
+  "title": "HPt",
+  "author": "HPt",
+  "created_time": "November 13, 2022, 02:56:54 PM",
+  "content": "I use Electrum 4.3.2 in Windows 10 and imported the address bc1q4c8n5t00jmj8temxdgcc3t32nkg2wjwz24lywvElectrum shows me 0 transactions and 0 balance for this address, while https://www.blockchain.com/btc/address/bc1q4c8n5t00jmj8temxdgcc3t32nkg2wjwz24lywv shows 31,047 transactions and a final balance of 8556.92711380.Why does Electrum have problems with this address?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5420852",
+  "comments": [
+    {
+      "author": "OmegaStarScream",
+      "created_time": "November 13, 2022, 02:59:41 PM",
+      "body": "Are you connected to the serve (see the bottom rightt of the wallet)? I would guess it's due to the high amount of transactions the address has.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Abdussamad",
+      "created_time": "November 13, 2022, 03:16:44 PM",
+      "body": "Yeah that address has too many transactions. i created a watch only wallet with that address and electrum is struggling to synchronize with a server. you will need to use bitcoin core to watch this address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HPt",
+      "created_time": "November 13, 2022, 04:14:34 PM",
+      "body": "Yes, it takes pretty long to synchronize. But it finally finishes synchronizing. And then it shows wrong values and no warning whatsoever that the shown values might be wrong.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 14, 2022, 06:22:19 AM",
+      "body": "Quote from: HPt on November 13, 2022, 04:14:34 PMYes, it takes pretty long to synchronize. But it finally finishes synchronizing. And then it shows wrong values and no warning whatsoever that the shown values might be wrong.It didn't synchronize; more likely, it decided not to synchronize and just found a server that is can still connect to.Here, I reproduced it to see the logs after it's done with the endless sync attempt.First, I got bunch of these errors in a loop (or variation of such), one server after another:ERROR | interface.[random_server:port] | disconnecting due to GracefulDisconnect(RPCError(1, 'history too large'))After a long while, it looped through all of the available servers but wont initialize synchronization, just to find a server that still lets the connection through:DEBUG | util.profiler | HistoryModel.refresh 0.0000 secINFO | interface.[random_server:port] | skipping header 763103INFO | interface.[random_server:port] | skipping header 763103INFO | interface.[random_server:port] | could connect 763103INFO | interface.[random_server:port] | skipping header 763103...The \"could connect\" shows-up as the connected server in the client (so it's \"green\") but the history will still be empty since it didn't sync.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HPt",
+      "created_time": "November 14, 2022, 10:27:27 AM",
+      "body": "Hi nc50lc, thanks for the clarification.So, it's not Electrum which can't handle the many transactions, but it's the servers which aren't willing to provide a history that long, correct?But still, I would have expected that Electrum let's the user know that there is a problem and, therefore, the shown values can't be trusted. Instead, as shown in the screenshot of my last post, everything seems to be fine from the GUI user's perspective (green ball in the lower right corner and no error message).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Abdussamad",
+      "created_time": "November 14, 2022, 02:08:37 PM",
+      "body": "you could file a bug report on github issues. they will likely ask for the debug log.https://github.com/spesmilo/electrum/issues",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "November 14, 2022, 09:37:21 PM",
+      "body": "Quote from: HPt on November 14, 2022, 10:27:27 AMHi nc50lc, thanks for the clarification.So, it's not Electrum which can't handle the many transactions, but it's the servers which aren't willing to provide a history that long, correct?But still, I would have expected that Electrum let's the user know that there is a problem and, therefore, the shown values can't be trusted. Instead, as shown in the screenshot of my last post, everything seems to be fine from the GUI user's perspective (green ball in the lower right corner and no error message).How about the transaction history tab do you see any transaction there?If no then there maybe something that electrum is blocked syncing to any server. I suggest try to switch to other server by clicking the green circle or change your device DNS to Google/Cloudflare DNS.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khaled0111",
+      "created_time": "November 14, 2022, 10:54:54 PM",
+      "body": "Quote from: HPt on November 14, 2022, 10:27:27 AMBut still, I would have expected that Electrum let's the user know that there is a problem and, therefore, the shown values can't be trusted. Instead, as shown in the screenshot of my last post, everything seems to be fine from the GUI user's perspective (green ball in the lower right corner and no error message).I agree with you on this. Electrum messages usually don't let you know what's going wrong. Electrum usually produce a generic message when something is not right and you have to figure out what is the cause of the problem.But in this particular case, it's obvious that Electrum didn't finish syncing or something went wrong. On the to bar menu it's showing: \"imported, nur lesen \" and when translated it means \"imported, no read\". So it's obvious there is something wrong. And it didn't show any wrong values, it didn't show any values at all!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 15, 2022, 04:10:01 AM",
+      "body": "Quote from: HPt on November 14, 2022, 10:27:27 AMHi nc50lc, thanks for the clarification.So, it's not Electrum which can't handle the many transactions, but it's the servers which aren't willing to provide a history that long, correct?Yes, it's set by default to almost all Electrum server programs available to prevent DDOS/request spam.(the workaround is to setup your own server and disable that limit)But there's some extreme cases that Electrum itself can't handle the number of transactions/addresses.Quote from: HPtBut still, I would have expected that Electrum let's the user know that there is a problem and, therefore, the shown values can't be trusted. Instead, as shown in the screenshot of my last post, everything seems to be fine from the GUI user's perspective (green ball in the lower right corner and no error message).Agree, an error would be nice instead of forcing a connection while not being able to syncronize.You can follow Abdussamad's suggestion and add a \"Feature Request\" to add an error message when your wallet failed to fetch transaction history.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "November 15, 2022, 09:49:19 AM",
+      "body": "Quote from: khaled0111 on November 14, 2022, 10:54:54 PMOn the to bar menu it's showing: \"imported, nur lesen \" and when translated it means \"imported, no read\". So it's obvious there is something wrong. HPt imported a bitcoin address, effectively creating a watch-only wallet. His Electrum client was installed in German. The \"imported, nur lesen\" part just tells us that it's a watch-only wallet in German.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HPt",
+      "created_time": "November 15, 2022, 10:24:53 AM",
+      "body": "Thanks for all your answers. @khaled0111: Yes, Pmalek is correct. The reason for the German \"[imported, nur lesen]\" in the screenshot is that it's a watch-only wallet, that is, I imported the address without providing the corresponding private key. @Abdussamad, @nc50lc: I just created a Github issue. See here: https://github.com/spesmilo/electrum/issues/8067",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

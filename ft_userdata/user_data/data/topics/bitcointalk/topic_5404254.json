@@ -1,0 +1,37 @@
+{
+  "id": "topic_5404254",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "June 27, 2022, 04:05:28 PM",
+  "content": "I created a channel worth of 0.02 tBTC to test some things with routing in Electrum, and it appears to not work as expected. I've made two transactions, sending 100 sats and 10,001 sats respectively from my Electrum Lightning node to my Core Lightning node. Shouldn't the receiving capacity increase by 10,101 sats? Also, shouldn't sending capacity be greater? More like 0.01989563 tBTC?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5404254",
+  "comments": [
+    {
+      "author": "Rath_",
+      "created_time": "June 27, 2022, 04:19:42 PM",
+      "body": "Quote from: BlackHatCoiner on June 27, 2022, 04:05:28 PMShouldn't the receiving capacity increase by 10,101 sats? Also, shouldn't sending capacity be greater? More like 0.01989563 tBTC?Both parties are required to keep a small unspendable reserve.Quote from: https://github.com/lightning/bolts/blob/master/02-peer-protocol.mdEach side of a channel maintains this reserve so it always has something to lose if it were to try to broadcast an old, revoked commitment transaction. Initially, this reserve may not be met, as only one side has funds; but the protocol ensures that there is always progress toward meeting this reserve, and once met, it is maintained.Try spending more coins. Once you spend enough to meet your reserve, any extra coins sent should be added to your \"Can receive\" counter. The reserve is usually 1% so you should see the difference once you spend over 20k satoshi.Type in lightning-cli listpeers on your other node, find that channel and compare \"our_channel_reserve_satoshis\" and \"their_channel_reserve_satoshis\" values.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 27, 2022, 06:29:08 PM",
+      "body": "Quote from: Rath_ on June 27, 2022, 04:19:42 PMTry spending more coins.That was the problem. Thanks again!Quote from: Rath_ on June 27, 2022, 04:19:42 PMType in lightning-cli listpeers on your other node, find that channel and compare \"our_channel_reserve_satoshis\" and \"their_channel_reserve_satoshis\" values. I've opened a channel from both Electrum's node and Core's node to 1ml dot com's node, because apparently I can't make those two connect together, so 1ml routes my transactions. With a listpeers from Core Lightning I see:Code:\"their_channel_reserve_satoshis\": 15000\"our_channel_reserve_satoshis\": 15000I sent another 20,000 sats, which means I've sent 30,101 over all, plus a few in fees. Now my receiving capacity is 10,110 sats. What's the explanation behind that? The number would make sense if the reserve was 20,000 sats. (I haven't checked the reserve from Electrum's console as I don't know how to do it atm, but it shouldn't be different; it's the same Lightning node)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Rath_",
+      "created_time": "June 27, 2022, 11:33:59 PM",
+      "body": "Quote from: BlackHatCoiner on June 27, 2022, 06:29:08 PMI sent another 20,000 sats, which means I've sent 30,101 over all, plus a few in fees. Now my receiving capacity is 10,110 sats. What's the explanation behind that? The number would make sense if the reserve was 20,000 sats. (I haven't checked the reserve from Electrum's console as I don't know how to do it atm, but it shouldn't be different; it's the same Lightning node)It could be different; Electrum might be the one enforcing a higher reserve. Try running \"list_channels()\" in the console and check both \"local_reserve\" and \"remote_reserve\" values.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

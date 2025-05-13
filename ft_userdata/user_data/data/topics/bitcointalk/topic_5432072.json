@@ -1,0 +1,117 @@
+{
+  "id": "topic_5432072",
+  "title": "zander1983",
+  "author": "zander1983",
+  "created_time": "December 27, 2022, 08:42:00 PM",
+  "content": "This may be a naive question but here goes.Im building a way for users to use fiat to buy Bitcoin - but not sell it (they can at a later stage withdraw it). Basically like a direct debit savings account.Users create an account, go through KYC, and add funds via a debit card. When a user creates an account they provide a seed phrase, and this can be used to generate a hierarchical deterministic (HD) wallet.I then will acquire Bitcoin for the user (not sure how this part will be done yet), generate a public key from the HD wallet, and send the Bitcoin to this. I wont save the private key or the seed phrase since I can later, if they would like to withdraw, generate the private keys for the users wallet from the seed phrase they provide (as far as I understand). Is this plan feasible and is it secure? To me, it looks secure since Im not storing private keys.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432072",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "December 27, 2022, 09:12:49 PM",
+      "body": "Quote from: zander1983 on December 27, 2022, 08:42:00 PMIs this plan feasible and is it secure? To me, it looks secure since Im not storing private keys.I will ignore the fact that most users are simply incapable to safely generate themselves a HD seed phrase, I will jump directly to two possible problems:1. Working with a seed phrase online, what could go wrong? (/s)* local malware can detect and steal that* phishing sites looking similar to yours could steal the seed phrase* unsafely generated seed could get in others' hands* users who don't know what they do will store their HD seed unsafely and lose it or others get hands on it==> all these users will most probably blame you if their coins get stolen2. The users have the HD seed. They buy bitcoins with stolen cards. As soon as the bitcoins arrive to their wallet they send those coins further away to be sure (even if you'd store a copy of the seed those coins would go somewhere you cannot touch). Then the rightful owner try to chargeback.==> if you're not careful enough, with this system you can easily end up giving bitcoins for free to some scammers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "December 27, 2022, 09:32:56 PM",
+      "body": "Just about any payment method other then handing cash to someone has a reversal risk.So, even if they fund with a debit card 6 weeks later the funds can be pulled back. So, now you have to acquire the BTC and sit on it until you are sure the funds clear. How are you going to handle the KYC? There are a ton of places that will do it for you for a fee. But now they have access to your site / API calls so you are at risk that way.And so on.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "December 27, 2022, 09:58:28 PM",
+      "body": "Quote from: NeuroticFish on December 27, 2022, 09:12:49 PMQuote from: zander1983 on December 27, 2022, 08:42:00 PMIs this plan feasible and is it secure? To me, it looks secure since Im not storing private keys.I will ignore the fact that most users are simply incapable to safely generate themselves a HD seed phrase, I will jump directly to two possible problems:1. Working with a seed phrase online, what could go wrong? (/s)* local malware can detect and steal that* phishing sites looking similar to yours could steal the seed phrase* unsafely generated seed could get in others' hands* users who don't know what they do will store their HD seed unsafely and lose it or others get hands on it==> all these users will most probably blame you if their coins get stolen2. The users have the HD seed. They buy bitcoins with stolen cards. As soon as the bitcoins arrive to their wallet they send those coins further away to be sure (even if you'd store a copy of the seed those coins would go somewhere you cannot touch). Then the rightful owner try to chargeback.==> if you're not careful enough, with this system you can easily end up giving bitcoins for free to some scammers.With number 1, I think of my online banking - I need to have my phone, user id and password to get in. If you think of user id + password as the same as a seed phrase, cant something similar be used here (eg 3d secure by sending an OTP  to the user's phone)?With 2, this isnt really a problem unique to a Bitcoin exchange though - people try this all the time purchasing stuff with stolen cards. Most acquirers have really good fraud detection. Or am I not considering something here?Your point about users losing their seed phrase and blaming me is legit though. I guess THIS is the main reason so many get hacked - they have to keep a copy of the seed phrase or private keys to cover this scenario...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "December 27, 2022, 10:08:21 PM",
+      "body": "Quote from: DaveF on December 27, 2022, 09:32:56 PMJust about any payment method other then handing cash to someone has a reversal risk.So, even if they fund with a debit card 6 weeks later the funds can be pulled back. So, now you have to acquire the BTC and sit on it until you are sure the funds clear. How are you going to handle the KYC? There are a ton of places that will do it for you for a fee. But now they have access to your site / API calls so you are at risk that way.And so on.-DaveThere are KYC services that do not make external calls. For example, they provide you with an SDK that you bundle with your iOS/Android app. This parses documents, does liveness check etc. You then save these docs and results on your server. Regarding the reversal risk, I work in online payments and, for the most part, we avoid reversals by forcing all paying with a debit/credit card through 3d secure. This shifts liability to the card holder. Actually what I want to do is a bit different - its pay by bank account. Its becoming more common now here in Europe due to increase in open banking.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DannyHamilton",
+      "created_time": "December 27, 2022, 10:24:47 PM",
+      "body": "Quote from: zander1983 on December 27, 2022, 09:58:28 PMIf you think of user id + password as the same as a seed phrase, cant something similar be used here (eg 3d secure by sending an OTP  to the user's phone)?You can't change the seed phrase for a HD wallet. That's not how cryptocurrency (or at least Bitcoin) works.  If you change the seed phrase, you get a completely different wallet with completely different addresses. That will not give you access to the funds that are still stuck at the addresses from the old seed phrase.A userID and password is something that gives access to a website.  If you operate the website, you can generate a one-time password (I assume that's what you mean when you say OTP?) and send it to a user, then when they connect to your website, you can force them to create a new password. You can do this because you control the website, and you get to choose who gets to access the website and who doesn't. You get to choose the methods that are used to access that website.There is no \"Bitcoin Company\" that has control of access to the Bitcoins.  Therefore, there is nobody available to issue a OTP that will allow the user access to their Bitcoins.  If the user has permanently lost their seed phrase (or any of the associated private keys), and there is nobody else storing any of that for them then those Bitcoins are locked into those addresses forever.So, I suppose you could store a copy of the user's seed phrase for them. Then if they forget their seed phrase, you could give it back to them, but then you are taking on the risk of storing that phrase.  If you are hacked, and the hacker gets the seed phrase, then they have access to ALL of the private keys and therefore all of the addresses associated with that HD wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "December 27, 2022, 11:55:06 PM",
+      "body": "Quote from: zander1983 on December 27, 2022, 08:42:00 PMUsers create an account, go through KYC, and add funds via a debit card. When a user creates an account they provide a seed phrase, and this can be used to generate a hierarchical deterministic (HD) wallet.Why would they provide a seed phrase that's pretty risky to share a seed online or to any exchange users should only provide a public key address, not the seed phrase only the owner should know the seed phrase because if someone knows it they also have full control of their wallets. How can users trust you if you ask for a seed phrase that's too risky there is no exchange that asks for a seed phrase.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "December 28, 2022, 04:15:19 AM",
+      "body": "An exchange with your seed phrase sounds like it could be scammy a lot of attacks could take place on that as have been listed above. Remote attacks from a rogue employee on your servers could also happen.Exchanges are prone to being hacked because they're good targets. You've left out many important details in determining if your idea is secure or not: like where are the exchanges keys stored for sending funds, where are email addresses stored to prevent against phishing, where are IDs, usernames and emails stored to prevent against user doxxing, impersonation",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "December 28, 2022, 07:32:10 AMLast edit: December 28, 2022, 08:01:39 AM by zander1983",
+      "body": "Quote from: DannyHamilton on December 27, 2022, 10:24:47 PMQuote from: zander1983 on December 27, 2022, 09:58:28 PMIf you think of user id + password as the same as a seed phrase, cant something similar be used here (eg 3d secure by sending an OTP  to the user's phone)?You can't change the seed phrase for a HD wallet. That's not how cryptocurrency (or at least Bitcoin) works.  If you change the seed phrase, you get a completely different wallet with completely different addresses. That will not give you access to the funds that are still stuck at the addresses from the old seed phrase.A userID and password is something that gives access to a website.  If you operate the website, you can generate a one-time password (I assume that's what you mean when you say OTP?) and send it to a user, then when they connect to your website, you can force them to create a new password. You can do this because you control the website, and you get to choose who gets to access the website and who doesn't. You get to choose the methods that are used to access that website.There is no \"Bitcoin Company\" that has control of access to the Bitcoins.  Therefore, there is nobody available to issue a OTP that will allow the user access to their Bitcoins.  If the user has permanently lost their seed phrase (or any of the associated private keys), and there is nobody else storing any of that for them then those Bitcoins are locked into those addresses forever.So, I suppose you could store a copy of the user's seed phrase for them. Then if they forget their seed phrase, you could give it back to them, but then you are taking on the risk of storing that phrase.  If you are hacked, and the hacker gets the seed phrase, then they have access to ALL of the private keys and therefore all of the addresses associated with that HD wallet.That makes sense. So we're back to people cant be trusted to store their seed phrase - and storing them on a server is too insecure. Seems to be one of the main barriers to adoption. But if there was a service that made it clear the funds are gone if you lose your seed phrase, I think I would still use it. I want to be able to quickly buy Bitcoin every week, and not have to soend 45 mins transferring it to my Ledger.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "December 28, 2022, 07:44:13 AM",
+      "body": "Quote from: BitMaxz on December 27, 2022, 11:55:06 PMQuote from: zander1983 on December 27, 2022, 08:42:00 PMUsers create an account, go through KYC, and add funds via a debit card. When a user creates an account they provide a seed phrase, and this can be used to generate a hierarchical deterministic (HD) wallet.Why would they provide a seed phrase that's pretty risky to share a seed online or to any exchange users should only provide a public key address, not the seed phrase only the owner should know the seed phrase because if someone knows it they also have full control of their wallets. How can users trust you if you ask for a seed phrase that's too risky there is no exchange that asks for a seed phrase. Most exchanges store the seed/private key. Isn't it less risky to not do so, and only ask for it upon withdrawal, and guarantee that its not stored or logged by the server? Companies do this with /debit cards and must meet PCI standards https://www.pcisecuritystandards.org/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zander1983",
+      "created_time": "December 28, 2022, 08:05:14 AM",
+      "body": "Quote from: jackg on December 28, 2022, 04:15:19 AMAn exchange with your seed phrase sounds like it could be scammy a lot of attacks could take place on that as have been listed above. Remote attacks from a rogue employee on your servers could also happen.Exchanges are prone to being hacked because they're good targets. You've left out many important details in determining if your idea is secure or not: like where are the exchanges keys stored for sending funds, where are email addresses stored to prevent against phishing, where are IDs, usernames and emails stored to prevent against user doxxing, impersonation Im suggesting no storage of private keys. So nobody has the private key - they are regenerated from the seed phrase which the user provides when they want to withdraw. Is this a terrible idea? Regarding the other security issues, I work in online payments and most of those issues are solved by good practices, and AWS provides some good tools also.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "December 28, 2022, 10:03:32 AM",
+      "body": "Quote from: zander1983 on December 28, 2022, 08:05:14 AMIm suggesting no storage of private keys. So nobody has the private key - they are regenerated from the seed phrase which the user provides when they want to withdraw. Is this a terrible idea? If the user provides the seed phrase, then the user has is and can simply use it with another wallet. They also can get from that wallet of theirs the private keys too. So there's no \"nobody has the private key\". I think that you should get better understanding of all this before you implement anything.Quote from: zander1983 on December 27, 2022, 09:58:28 PMWith number 1, I think of my online banking - I need to have my phone, user id and password to get in. If you think of user id + password as the same as a seed phrase, cant something similar be used here (eg 3d secure by sending an OTP  to the user's phone)?Wow. No. You're wrong. The bank has the money in their custody until you go to an ATM.If the user have the seed phrase, the bitcoins are in their (self) custody. Way different.Plus, as said, if the use loses his phone number or whatever, he will get new login info from the bank; if they do the same with you, the bitcoins are lost forever. Plus the scam scenarios I already wrote.Quote from: zander1983 on December 27, 2022, 09:58:28 PMWith 2, this isnt really a problem unique to a Bitcoin exchange though - people try this all the time purchasing stuff with stolen cards. Most acquirers have really good fraud detection. Or am I not considering something here?While banks may be considering reimbursing this or that in the case of reputed stores selling physical goods, they may not be that nice with bitcoin related businesses. Just look at the history of PayPal vs Bitcoin and how many chargebacks did happen in P2P exchanging simply because bitcoin is digital and PayPal never cared to research deeper.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "December 28, 2022, 04:48:28 PM",
+      "body": "Quote from: zander1983 on December 27, 2022, 08:42:00 PMWhen a user creates an account they provide a seed phrase, and this can be used to generate a hierarchical deterministic (HD) wallet.Makes no sense; you want to build such a system based on a database. Just store the total number of owned BTC per user, or alternatively store each purchase and add them on the fly whenever they fetch their balance.Quote from: zander1983 on December 27, 2022, 08:42:00 PMI then will acquire Bitcoin for the user (not sure how this part will be done yet), generate a public key from the HD wallet, and send the Bitcoin to this. I wont save the private key [emphasis mine] or the seed phrase since I can later, if they would like to withdraw, generate the private keys for the users wallet from the seed phrase they provide (as far as I understand).This makes no sense, either. You do need to store keys on your server in one way or another; whenever a user wants to withdraw, you use those keys to create a Bitcoin transaction that spends up to the user's balance and sends it to the address they specify.A user should never be asked to send you their seed phrase, because at that point you will own all of their private keys, even though you don't need them just to send them Bitcoin. You just need a single address.Quote from: zander1983 on December 28, 2022, 08:05:14 AMIm suggesting no storage of private keys.Then do it like https://getbittr.com/. Users provide an address and whenever they send the service fiat, they immediately get the same amount in BTC sent to that Bitcoin address. Quote from: zander1983 on December 28, 2022, 08:05:14 AMSo nobody has the private key - they are regenerated from the seed phrase which the user provides when they want to withdraw. Is this a terrible idea? It is a terrible idea asking users for a seed phrase; seed phrase = private keys. You need public addresses and no private keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 28, 2022, 09:21:15 PM",
+      "body": "Exchanges are actually at an elevated risk of being hacked compared to other online services because there are a lot of crazies out there determined to get their hands on the money.This means baseline industrial security practices are not enough to ensure funds safety.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

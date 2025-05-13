@@ -1,0 +1,37 @@
+{
+  "id": "topic_5438487",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "February 07, 2023, 10:27:14 AM",
+  "content": "From another thread:Quote from: NotATether on February 07, 2023, 09:36:14 AMAnd I'm not sure if factoring will work, but just as how in regular numbers we can compute a factor tree, for numbers representing point coordinates, we can have them in terms of G, G*2, G*3, G*5 and so on. I'm not exactly sure how this would be implemented, but if computers were able to find a prime number much bigger than 2^256, then it should be reasonably possible to enumerate all of the prime numbers from 1 to 2^256 and calculate the products with G, and make some kind of factor tree out of that.The idea is you'd no longer have to do the algorithm for P, but you could do it for all of its factors instead, and multiply all of the results together at the end.I've just thought about it, and while conventional factoring using algorithms like EGCD check that the factored number eventually goes to zero after it keeps being divided, the cyclic nature of elliptic curves makes it not so clear how to check when the number can no longer be factored.Let's take an example: 15GNow we know its factors are 5G and 3G because 5G*3G = (5*3*G) = 15G. But using a factoring algorithm, this is not so clear.To divide by a number, we'd multiply by its multiplicative inverse in p. So in other words: 15/2 = 15*(1/3) = 15*(p/3) [the last one because Fermat's little theorem implies x^p = x^1 and the curve order should always be prime anyway].Then, you compare the result of 15*(p/3)G to your list of prime coordinates: G, 2G, 3G, 5G... (though it should not ever equal G unless you are multiplying by the same number).But this only works because I chose a number I knew had two factors, and divided by one of them. What if it was 15*(p/2) for example, where 2 was being tested?Maybe if there was a way to split the integer part of any public key from the G part, in other words, decomposing it. But I'm not sure if even that is possible.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5438487",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "February 07, 2023, 10:44:49 AM",
+      "body": "The idea is flawed since you can't multiply points together, only add them. The normal way to optimize private to public key calculations (as long as you don't care about timing attacks) is to use lookup tables - like you have one table with 1G, 2G, 3G, then another table with 4G, 8G, 12G, yet another with 16G, 32G, 48G and so on. Then you compute by adding up the values, like 55G = 3G + 4G + 48G.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "February 07, 2023, 10:52:33 AM",
+      "body": "Quote from: ymgve2 on February 07, 2023, 10:44:49 AMThe idea is flawed since you can't multiply points together, only add them. The normal way to optimize private to public key calculations (as long as you don't care about timing attacks) is to use lookup tables - like you have one table with 1G, 2G, 3G, then another table with 4G, 8G, 12G, yet another with 16G, 32G, 48G and so on. Then you compute by adding up the values, like 55G = 3G + 4G + 48G.But isn't the lookup table usually one with powers of two, like G, 2G, 4G, 8G 16G to conserve space though, since it accomplishes the same thing but with a few more multiplications?I don't recall seeing a lookup table with factors starting from a number other than 2.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "February 07, 2023, 10:59:28 AM",
+      "body": "Space is practically free. What's costly is processing time. Brainflayer, for example, uses a default window size of 16 bits, so it precomputes 1G to 65535G, (1*65536)G to (65535*65536)G and so on, reducing a scalar multiplication to 16 additions. It also uses Jacobian Coordinates for point representation so it can defer the multiplicative inversion until all additions are done.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

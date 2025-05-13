@@ -1,0 +1,157 @@
+{
+  "id": "topic_5471654",
+  "title": "shalldonow",
+  "author": "shalldonow",
+  "created_time": "October 25, 2023, 06:30:20 PM",
+  "content": "Is there a reliable source of information, maybe academic work or independent analysis with statistics, on the average number of sha256 hashes a consumer-grade CPU can compute?Otherwise, could somebody help me write a C code or Rust code with threads to run the computations in a multicore computer? So I can test it locally.I just would like to know a rough estimate. I'd like to know the order of magnitude, such as hundreds of thousands or maybe millions of hashes per second.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471654",
+  "comments": [
+    {
+      "author": "Gabrics",
+      "created_time": "October 25, 2023, 06:58:44 PM",
+      "body": "https://stackoverflow.com/questions/4764026/how-many-sha256-hashes-can-a-modern-computer-computeThere is a code you can run and post the results.I believe though that this is not relevant as GPUs are WAAAAY better. So pointless to run this on CPU, look for CUDA implementation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 25, 2023, 07:08:03 PMLast edit: October 25, 2023, 08:52:32 PM by digaran",
+      "body": "Maybe this topic could also help you. The link on stackoverflow site is for 2012.Edit: I remember a powerful tool capable of running different hash functions and doing benchmark. It's called hashcat, from hashcat.net😉",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "October 25, 2023, 07:20:57 PM",
+      "body": "Quote from: shalldonow on October 25, 2023, 06:30:20 PMOtherwise, could somebody help me write a C code or Rust code with threads to run the computations in a multicore computer? So I can test it locally.Might could help you with that. Can you give me infos about ur CPU that will be used for this test? Need to know so I can set the maximum of threads that will be used. Otherwise I will just set two variables so you can adjust it while testing. One for the number of used threads and one for the amount of hashes per thread. Rust is fine for you?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "October 25, 2023, 10:47:00 PM",
+      "body": "I just made a script for this, that way op can verify how fast his PC can generate sha codes.Code:time for a in $(seq 1 10); do echo \"$a\" | sha256sum; doneThe code is for linux and what it does is to generate 10 sha256 and print the time:Quotereal   0m0.019suser   0m0.015ssys   0m0.008sNow let's try with 1000 and see the time.Quotereal   0m1.501suser   0m1.413ssys   0m0.570sAnd with 10,000Quotereal   0m16.384suser   0m14.474ssys   0m5.943sAnd i get these results with this CPU, maybe other users could test and post their results with a better PC:Code:*-cpu          product: Intel(R) Core(TM) i5-6300HQ CPU @ 2.30GHz          vendor: Intel Corp.          physical id: 1          bus info: cpu@0          version: 6.94.3          size: 2660MHz          capacity: 3200MHz          width: 64 bits",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shalldonow",
+      "created_time": "October 25, 2023, 11:49:47 PM",
+      "body": "Quote from: seek3r on October 25, 2023, 07:20:57 PMQuote from: shalldonow on October 25, 2023, 06:30:20 PMOtherwise, could somebody help me write a C code or Rust code with threads to run the computations in a multicore computer? So I can test it locally.Might could help you with that. Can you give me infos about ur CPU that will be used for this test? Need to know so I can set the maximum of threads that will be used. Otherwise I will just set two variables so you can adjust it while testing. One for the number of used threads and one for the amount of hashes per thread. Rust is fine for you? I have a linux machine, x86_64 architecture, 4-core Intel. Thank you!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shalldonow",
+      "created_time": "October 26, 2023, 12:11:21 AM",
+      "body": "Quote from: seoincorporation on October 25, 2023, 10:47:00 PMI just made a script for this, that way op can verify how fast his PC can generate sha codes.Code:time for a in $(seq 1 10); do echo \"$a\" | sha256sum; doneThe code is for linux and what it does is to generate 10 sha256 and print the time:Quotereal   0m0.019suser   0m0.015ssys   0m0.008sNow let's try with 1000 and see the time.Quotereal   0m1.501suser   0m1.413ssys   0m0.570sAnd with 10,000Quotereal   0m16.384suser   0m14.474ssys   0m5.943sAnd i get these results with this CPU, maybe other users could test and post their results with a better PC:Code:*-cpu          product: Intel(R) Core(TM) i5-6300HQ CPU @ 2.30GHz          vendor: Intel Corp.          physical id: 1          bus info: cpu@0          version: 6.94.3          size: 2660MHz          capacity: 3200MHz          width: 64 bitsThanks for the code!However, it understimates the computations because it runs shell commands each time. For every hash, the operating system will load the SHA256SUM binary into memory, make the proper system calls, then execute. There is a lot of CPU cycles there which are not used for computing the hashes.I think it the proper way is to compute millions of hashes within a C or Rust program (maybe C++ too) and also measure the time within the program itself, using the languages libraries.That's because running the `time` command line ulitiy also takes into account the time to load the program into memory, setup the main function, exit the program, which is a lot of system calls and numerous CPU cycles that are not used for the computation of the hashes and they do take some miliseconds.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 26, 2023, 04:25:28 AM",
+      "body": "It depends on the message you want to compute the hash for. The smaller the size of the message the lower the number of blocks (internally used in SHA256) hence the faster it will compute. For example computing hash for 10 bytes is faster than 33 bytes and faster than 80 bytes and faster than 200 bytes. It is slower if you want to compute double SHA256 hash. In the context of bitcoin we almost always compute double SHA256. 33 bytes is size of majority of public keys that are hashed in the most common OP_HASH160 scripts. 80 byte is the header size that is hashed in mining and you can easily find stats for both CPUs and GPUs hashrates on the internet like [1].[1] https://en.bitcoin.it/wiki/Non-specialized_hardware_comparison",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "October 26, 2023, 06:10:11 AM",
+      "body": "Quote from: shalldonow on October 25, 2023, 11:49:47 PMI have a linux machine, x86_64 architecture, 4-core Intel. Thank you!Alright thanks. Tried something on Rust. You can test around with the NUM_THREADS - set it to 8 if your cpu supports hyper-threading. You can test around and increase NUM_HASHES by every round to get a more precise result. Since I used crypto and rayon crates you have to add them as dependencies on your cargo.toml with their latest versions:Code:[dependencies]crypto = \"0.2.36\"rayon = \"1.8.0\"After that, implement this code:Code:extern crate crypto;extern crate rayon;use crypto::digest::Digest;use crypto::sha2::Sha256;use rayon::prelude::*;use std::time::Instant;const NUM_HASHES: usize = 1000000;const NUM_THREADS: usize = 4;fn compute_hashes() {    let string = \"sha256_maxhash\".as_bytes();    let mut sha = Sha256::new();    for _ in 0..NUM_HASHES {        sha.input(string);        let _ = sha.result_str();        sha.reset();    }}fn main() {    rayon::ThreadPoolBuilder::new()        .num_threads(NUM_THREADS)        .build_global()        .unwrap();    let start = Instant::now();    (0..NUM_THREADS).into_par_iter().for_each(|_| compute_hashes());    let duration = start.elapsed();    let total_hashes = NUM_HASHES * NUM_THREADS;    let hashes_per_second = total_hashes as f64 / duration.as_secs_f64();    println!(\"Time taken: {:?} seconds\", duration);    println!(\"Hash rate: {:.0} hashes per second\", hashes_per_second);}Save it and you are done! To run it just execute it via cargo run --release in the same directory.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 26, 2023, 08:41:54 AM",
+      "body": "As far as SHA256 performance on CPU is concerned, there are special instructions available on most CPUs for accelerating the computation of SHA256 hashes.These are available per-thread, so the performance you get from using some generic SHA-256 function is going to be slower than a specialized function that makes use of these opcodes.Having said that, someone made a performance benchmark to check how fast calculating SHA256 your CPU is, inside the browser: https://www.measurethat.net/Benchmarks/Show/1246/0/sha256",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 26, 2023, 11:22:33 AM",
+      "body": "Quote from: NotATether on October 26, 2023, 08:41:54 AMAs far as SHA256 performance on CPU is concerned, there are special instructions available on most CPUs for accelerating the computation of SHA256 hashes.These are available per-thread, so the performance you get from using some generic SHA-256 function is going to be slower than a specialized function that makes use of these opcodes.Having said that, someone made a performance benchmark to check how fast calculating SHA256 your CPU is, inside the browser: https://www.measurethat.net/Benchmarks/Show/1246/0/sha256Not even tl;dr, just dr but isn't that going to only be able to use 1 core of a CPU? Usually most browsers will limit that.But no matter what running it in a browser although simple, will never give good results due to overhead.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 26, 2023, 11:54:18 AM",
+      "body": "While some member provide nice answer, i would just recommend OP to search for result of Hashcat benchmark result for certain device. Few example,1. Apple M1 Ultra, 1785.4MH/s. Source, https://gist.github.com/Chick3nman/ccfb883d2d267d94770869b09f5b96ed.2. 8x Nvidia GTX 1080, 23012.1 MH/s. Source, https://gist.github.com/epixoip/a83d38f412b4737e99bbef804a270c40.Quote from: NotATether on October 26, 2023, 08:41:54 AMHaving said that, someone made a performance benchmark to check how fast calculating SHA256 your CPU is, inside the browser: https://www.measurethat.net/Benchmarks/Show/1246/0/sha256Doesn't seem reliable to me since different browser and browser version could affect benchmark result.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shalldonow",
+      "created_time": "October 26, 2023, 01:46:08 PM",
+      "body": "Quote from: seek3r on October 26, 2023, 06:10:11 AMQuote from: shalldonow on October 25, 2023, 11:49:47 PMI have a linux machine, x86_64 architecture, 4-core Intel. Thank you!Alright thanks. Tried something on Rust. You can test around with the NUM_THREADS - set it to 8 if your cpu supports hyper-threading. You can test around and increase NUM_HASHES by every round to get a more precise result. Since I used crypto and rayon crates you have to add them as dependencies on your cargo.toml with their latest versions:Code:[dependencies]crypto = \"0.2.36\"rayon = \"1.8.0\"After that, implement this code:Code:extern crate crypto;extern crate rayon;use crypto::digest::Digest;use crypto::sha2::Sha256;use rayon::prelude::*;use std::time::Instant;const NUM_HASHES: usize = 1000000;const NUM_THREADS: usize = 4;fn compute_hashes() {    let string = \"sha256_maxhash\".as_bytes();    let mut sha = Sha256::new();    for _ in 0..NUM_HASHES {        sha.input(string);        let _ = sha.result_str();        sha.reset();    }}fn main() {    rayon::ThreadPoolBuilder::new()        .num_threads(NUM_THREADS)        .build_global()        .unwrap();    let start = Instant::now();    (0..NUM_THREADS).into_par_iter().for_each(|_| compute_hashes());    let duration = start.elapsed();    let total_hashes = NUM_HASHES * NUM_THREADS;    let hashes_per_second = total_hashes as f64 / duration.as_secs_f64();    println!(\"Time taken: {:?} seconds\", duration);    println!(\"Hash rate: {:.0} hashes per second\", hashes_per_second);}Save it and you are done! To run it just execute it via cargo run --release in the same directory.Thank you very much! It worked for my purposes!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "October 26, 2023, 01:49:31 PM",
+      "body": "Quote from: shalldonow on October 26, 2023, 01:46:08 PMThank you very much! It worked for my purposes!Glad to hear that!Always a pleasure, especially if it means I can improve/check my Rust skills.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shalldonow",
+      "created_time": "October 26, 2023, 01:53:22 PM",
+      "body": "Using the code provided by seek3r, with some adaptions (such as using more recent package versions for the sha2 and digests crates) I was able to obtain around over 3 million double sha256 hashes per second with 2 threads. I actually computed double sha256 hashes (the output of the first digest being the input for the second), so it would be 6 million single hashes. The tests were done in a x86_64 architecture machine, running 2 threads, and each thread ran on a Intel CPU with 2.60 GHz (upper bound 4GHz).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotFuzzyWarm",
+      "created_time": "October 28, 2023, 12:48:15 AMLast edit: October 30, 2023, 01:56:58 PM by NotFuzzyWarm",
+      "body": "Keep in mind that Intel, AMD,et al have had support for hardware sha256 functions since at least 2013 and the more recent generations of Intel & AMD cpu's now have said hardware built into the chip. Sorta like the early PC days when there were 1st math coprocessors for the 186, 286 & 386 cpu's followed by the 486 with the coprocessor in the CPU chip. Details of the Intel extensions is here.Thing is that they are for full data encryption & decryption functions both of which rely on knowing both the private and public keys for speedy processing - not mining where we only try to randomly find the right key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "October 29, 2023, 06:03:55 PM",
+      "body": "A long time ago, the Bitcoin mining hash rate on a CPU was up to 3 MH/s, and up to 1 GH/s on a GPU. They may be somewhat higher now, but still the same order of magnitude.Here is a chart: https://en.bitcoin.it/wiki/Non-specialized_hardware_comparison",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "October 30, 2023, 08:39:10 PM",
+      "body": "This seems to be an example of the XY problemhttps://en.wikipedia.org/wiki/XY_problemIt would be easier if you told us why you need the number of hashes a consumer grade CPU can do, so we can better aid with the underlying problem you've encountered.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "philipma1957",
+      "created_time": "November 07, 2023, 01:17:54 PM",
+      "body": "Quote from: odolvlobo on October 29, 2023, 06:03:55 PMA long time ago, the Bitcoin mining hash rate on a CPU was up to 3 MH/s, and up to 1 GH/s on a GPU. They may be somewhat higher now, but still the same order of magnitude.Here is a chart: https://en.bitcoin.it/wiki/Non-specialized_hardware_comparisonCore i5 2500K   4/4   20.6mh from your chart is accurate as I used to mine just a tiny bit with an i5 2500  on the pool bitminter back in 2012",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

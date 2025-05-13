@@ -1,0 +1,165 @@
+{
+  "id": "topic_5448610",
+  "title": "Finhum",
+  "author": "Finhum",
+  "created_time": "April 13, 2023, 01:50:30 AM",
+  "content": "Hi All, Bitcoin Client Software and Version Number: Bitcoin Core 24.0.1; running on Umbrel node over Tor on a Raspberry Pi 4Operating System: Windows 11 Home 64-bitSystem Hardware Specs: 11th gen Intel(R) Core(TM) i7 @ 2.80 GHz (8 CPUs), 16GB memory, 500 GB hard drive, GeForce GTX 1650 Ti Max-Q Design Graphics Card.Description of Problem:My bitcoin transaction on mainchain has been unconfirmed for over two weeks.Unfortunately, the highest miner fee that was suggested by Umbrel was 1.02 sat/vbyte (without going to advanced setting and setting it manually). This is the reason no miner is picking it up.Shortly after, the on-chain transaction volume spiked and the mining fee went all the way to 15 sats/vbyte, leaving my 1.02 sat/vbyte unconfirmed after 24 hours.The Transaction is still currently unconfirmed.This transaction is not RBF compatible.I’ve tried using CPFP to push my original transaction through using Ride the Lightning app on the Umbrel Node UI, with no success. I am not able to see an option on how to isolate the unconfirmed UTXO and send it back to myself.I do see options to \"Lease\" certain UTXO's for 10 minutes. So I tried leasing all the non-relevant UTXO's and tried sending my unconfirmed UTXO (‎0.00550372 BTC - See below) back to me with a high mining Fee (30 Sat/Vbyte) with no success. The parent transaction still stays unconfirmed, as well as my Unconfirmed UTXO that was sent back to my address.I'm reading 21 days is the magic number for broadcasting to stop and the mempool to wipe any unconfirmed transactions. Is this a solid fact? I'm approaching this date. I'm also reading if the mempool wipes unconfirmed transactions, my node can still re-broadcast it automatically and it will be stuck in limbo again - which I don't want.Any help would be greatly appreciated. All relevant info is below. Any Related Addresses: (mempool URL for my original transaction:)https://mempool.space/tx/03996da080448b10b4a69706214c19062c317e84d9337b7c7637437e883fc68fNote that 0.00550372 BTC got sent back to me - This is the unconfirmed UTXO I was trying to send back to myself in the above explanation.Any Related Transaction IDs:03996da080448b10b4a69706214c19062c317e84d9337b7c7637437e883fc68fScreenshot of the problem: See mempool URL for my transactionLog Files from the Bitcoin Client: Can provide upon specific requestWould greatly appreciate any support from the bitcoin community - Although I've learned a lot of technical aspects of bitcoin on this journey, it has been stressful.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5448610",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "April 13, 2023, 04:30:28 AM",
+      "body": "The transaction (which you means as child transaction) with 30 sat/vbyte would have been confirmed early. Even if it has a parent transaction with a fee of 1 sat/vbyte, both transaction would have been confirmed. There is something you did not just do rightly.I have just used an explorer to check txid that you included in n above post. I used three blockchain explorers and no transaction found.https://blockstream.info/search?q=03996da080448b10b4a69706214c19062c317e84d9337b7c7637437e883fc68fhttps://blockchair.com/search?q=03996da080448b10b4a69706214c19062c317e84d9337b7c7637437e883fc68fhttps://www.blockchain.com/explorer/search?search=03996da080448b10b4a69706214c19062c317e84d9337b7c7637437e883fc68fLikely the transaction has been dropped out of mempool and you should be able to spend the coins again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Finhum",
+      "created_time": "April 13, 2023, 04:37:06 AM",
+      "body": "Thanks for the reply !Is there something I have to additionally do at my end to spend the coins again?If you use mempool.space explorer it will show as unconfirmed.I see an unconfirmed UTXO still.Just to confirm - I have to send the exact UTXO that was sent back to me from the original parent transaction, correct?This is the UTXO (that's unconfirmed) that I have to again send back to myself to push the original parent transaction through?Is this correct? If so, I have done this. Thanks for your help.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "April 13, 2023, 04:55:14 AM",
+      "body": "Some node runners do not leave the nodes to drop unconfirmed transactions after 14 days, they increase the days, while not all full nodes are Bitcoin Core full client, the 14 days may not be the default on all nodes. Some nodes still have the transaction and keep rebroadcasting it I think.I check the transaction on http://mempool.space and I can see it too: https://mempool.space/tx/03996da080448b10b4a69706214c19062c317e84d9337b7c7637437e883fc68fI have been frustrated like this before like 2 years ago when my transaction did not get confirmed for 2 months.Did you send the transaction to just one address, while the other is a change address? I believe Bitcoin Core have coin control which you can use to spend certain input, spend the change address UTXO as an input and include a fee that is enough to confirm two transactions. I am not a Bitcoin Core user, I would have explained better.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 13, 2023, 06:09:19 AM",
+      "body": "Quote from: Finhum on April 13, 2023, 01:50:30 AMI'm reading 21 days is the magic number for broadcasting to stop and the mempool to wipe any unconfirmed transactions. Is this a solid fact? I'm approaching this date. I'm also reading if the mempool wipes unconfirmed transactions, my node can still re-broadcast it automatically and it will be stuck in limbo again - which I don't want.Any help would be greatly appreciated.Bitcoin Core's default is 14days. I don't know if Umbrel changed that default.The transaction has been dropped from most nodes that's why it can't be searched from most blockexplorers.Since it's been two weeks+, there's a chance that it's already dropped your own mempool as well since 1sat/vB shouldn't dropped with today's average mempool.If I understood you correctly, the transaction is sent by you, correct?If so, open Bitcoin Core and check the transaction, right-click on it and see if \"Abandon Transaction\" is available.That option is only available if the txn isn't in your mempool and selecting it will basically remove the transaction from your wallet.That will enable you to spend the UTXOs used by the abandoned transaction, then send a replacement using those inputs again.Since you're on Umbrel, navigating through the options may be different but the name should be the same or similar.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Finhum",
+      "created_time": "April 13, 2023, 04:44:52 PM",
+      "body": "Quote from: Charles-Tim on April 13, 2023, 04:55:14 AMDid you send the transaction to just one address, while the other is a change address? I believe Bitcoin Core have coin control which you can use to spend certain input, spend the change address UTXO as an input and include a fee that is enough to confirm two transactions. I am not a Bitcoin Core user, I would have explained better.Yes, The Total Transaction was sent to 1 address. Since the way UTXO's work, i've gotten the diference (total bitcoin on wallet - what i'm sending) sent back to me as a change transaction - This is the 550,372 sats that were sent back to me.I don't use bitcoin core. I'm using umbrel and have a self hosted node. However, The concept of coin control should be analogous, so i'm looking for a way to do it within my UI - https://ibb.co/hKc0YLDI'm only seeing \"view info\", \"label\" and \"lease\" as my options for each UTXO. And the one you see that's not confirmed for 550,372 sats is my change that came back to me. I don't know how to specifically spend this one. This is where i'm stuck I think.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Finhum",
+      "created_time": "April 13, 2023, 05:12:21 PMLast edit: April 13, 2023, 06:07:18 PM by Finhum",
+      "body": "Quote from: nc50lc on April 13, 2023, 06:09:19 AMSince it's been two weeks+, there's a chance that it's already dropped your own mempool as well since 1sat/vB shouldn't dropped with today's average mempool.Did you mean they SHOULD be dropped or Shouldn't? I'm assuming a 1.02 sat/vbyte SHOULD be dropped as no miner would want to add that to the block as there's no incentive to do so. General Question: What's the workflow here? Let's say there's 'n' nodes on the network.My node broadcasts a 1 sat/vbyte transaction to the entire network.Assuming this single tranaction doesn't get into the block < 24 hrs, it gets labeled as unconfimed. But it's still in the mempool - My personal mempool that's working off my personal node. A collection of these mempools makes a pool of global mempools. Is this accurate so far?So, what happens if all other mempools running on all other 'n-1' nodes stop broadcasting my transaction, but my specifc node keeps re-broadcasting/relaying it to all othe nodes? My node just wants to keep pushing it through at a low fee with no success.Will this unconfirmed trasaction just stay unconfirmed indefinitly until I tell my node to stop broadcasting it?If that's the case, how do I tell my node to do so? I'm using Umbrel - I don't see any options to stop broadcasting transactions. Yes, this transactin is mine. I've attached in my previous post what I see in my Umbrel UI.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "April 13, 2023, 05:41:57 PM",
+      "body": "Quote from: Finhum on April 13, 2023, 05:12:21 PMA collection of these mempools makes a pool of global mempools. Each node has its own mempool. It's possible that a node has your transaction in its mempool while another mempool doesn't have it. Quote from: Finhum on April 13, 2023, 05:12:21 PMSo, what happens if all other mempools running on all other 'n-1' nodes stop broadcasting my transaction, but my specifc node keeps re-broadcasting/relaying it to all othe nodes? My node just wants to keep pushing it through at a low fee with no success.If your node rebroadcast your transaction, the nodes that receive the transaction will ignore it if they already have it in their mempool. In the case they don't have it, they put it in their mempool and relay it to other nodes. Note that if the size of mempool of a node has reached its limit and the fee rate of your transaction is lower than all the transactions in the mempool, there wouldn't be any room for your transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Finhum",
+      "created_time": "April 13, 2023, 06:09:55 PM",
+      "body": "Quote from: hosseinimr93 on April 13, 2023, 05:41:57 PMQuote from: Finhum on April 13, 2023, 05:12:21 PMA collection of these mempools makes a pool of global mempools. Each node has its own mempool. It's possible that a node has your transaction in its mempool while another mempool doesn't have it. Quote from: Finhum on April 13, 2023, 05:12:21 PMSo, what happens if all other mempools running on all other 'n-1' nodes stop broadcasting my transaction, but my specifc node keeps re-broadcasting/relaying it to all othe nodes? My node just wants to keep pushing it through at a low fee with no success.If your node rebroadcast your transaction, the nodes that receive the transaction will ignore it if they already have it in their mempool. In the case they don't have it, they put it in their mempool and relay it to other nodes. Note that if the size of mempool of a node has reached its limit and the fee rate of your transaction is lower than all the transactions in the mempool, there wouldn't be any room for your transaction. Ok, Got it. Thanks. So in my situation - what's the best move I should do?I'm not sure what to do anymore but wait.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 13, 2023, 07:35:45 PM",
+      "body": "Quote from: Finhum on April 13, 2023, 06:09:55 PMSo in my situation - what's the best move I should do?I'm not sure what to do anymore but wait.Waiting any longer will not achieve anything (unless you wait for the mempool to completely empty, but that could take months). Most nodes have dropped your transaction already, and even if you try to rebroadcast it most nodes won't pick it up since their mempools have already hit the memory limit.You need to make a new transaction. Your options to do this are either to find a way to delete the transaction from your software so you can spend the coins again, or if you can't do that, export the necessary private keys of the UTXOs you are trying to spend and import them elsewhere. The first option will be much easier. You say you are not running Core - what software are you running?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khaled0111",
+      "created_time": "April 13, 2023, 11:37:23 PM",
+      "body": "I took a look at your address's transaction history and it seems you tried made a CPFP transaction on the 4-10 to accelerate the stuck transaction. If I'm getting this right then the issue here is that you spent the wrong UTXO. The confusion probably came from the fact that the address in question received the same amount on multiple instances. To accelerate the stuck transaction, you need to spend the unconfirmed output not the confirmed one. Not sure if this is still possible since the original transaction has been dropped from many mempools.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Finhum",
+      "created_time": "April 14, 2023, 12:23:56 AM",
+      "body": "Quote from: o_e_l_e_o on April 13, 2023, 07:35:45 PMQuote from: Finhum on April 13, 2023, 06:09:55 PMYou say you are not running Core - what software are you running?Sorry, I indeed am running bitcoin core through Umbrel. Umbrel functions on bitcoin core from what I'm reading. I have no idea how to delete the transaction with the umbrel UI. I've looked into this and there's nothing. I'm reading users recommending running “Abandon transaction” commands. But I'm not sure where to run this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Finhum",
+      "created_time": "April 14, 2023, 01:00:25 AM",
+      "body": "Quote from: khaled0111 on April 13, 2023, 11:37:23 PMTo accelerate the stuck transaction, you need to spend the unconfirmed output not the confirmed one. Not sure if this is still possible since the original transaction has been dropped from many mempools. The UI doesn't allow me to pick specific UTXO's - this is the problem i'm facing. I can lease UTXO's - are you familiar with this?I've posted a pic of the Umbrel UI in my post above. What happens if I send everything in my wallet? (All UTXO's?) confirmed and unconfirmed ?Basically send all my current bitcoin back to me in 1 transaction. Will this help?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 14, 2023, 04:39:27 AM",
+      "body": "Quote from: Finhum on April 13, 2023, 05:12:21 PMQuote from: nc50lc on April 13, 2023, 06:09:19 AMSince it's been two weeks+, there's a chance that it's already dropped your own mempool as well since 1sat/vB shouldn't dropped with today's average mempool.Did you mean they SHOULD be dropped or Shouldn't? I'm assuming a 1.02 sat/vbyte SHOULD be dropped as no miner would want to add that to the block as there's no incentive to do so. I mean that it must have been dropped from your node's mempool since it's already dropped from other node's mempool as well.It's more than two weeks so, it's just what you can expect from most Bitcoin nodes.Since it's dropped, you now have the chance to use abandon transaction to be able remove it from your \"wallet transaction\" history.Quote from: Finhum on April 14, 2023, 01:00:25 AMWhat happens if I send everything in my wallet? (All UTXO's?) confirmed and unconfirmed ?The dropped transaction won't be included as input, you'll only create another transaction normally.it'll stay like that and the inputs that it's trying to spend wont be selected by the coin-selection algorithm or even manual coin selection until it's abandoned.(Those are what to expect in Bitcoin Core, not if Umbrel/the user has changed the default settings)Quote from: Finhum on April 14, 2023, 01:00:25 AMThe UI doesn't allow me to pick specific UTXO's - this is the problem i'm facing. You can use bitcoin-cli to perform abandontransaction wallet command.I don't know if this FAQ is still relevant, but it shows how to use bitcoin-cli on Umbrel: https://community.getumbrel.com/t/using-bitcoin-cli-on-umbrel/504Here's the general info about the command: https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/abandontransaction/Take note that you might need to include --wallet argument if you have loaded more than one wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Finhum",
+      "created_time": "April 14, 2023, 04:44:47 AM",
+      "body": "Quote from: nc50lc on April 14, 2023, 04:39:27 AMQuote from: Finhum on April 13, 2023, 05:12:21 PMQuote from: nc50lc on April 13, 2023, 06:09:19 AMSince it's been two weeks+, there's a chance that it's already dropped your own mempool as well since 1sat/vB shouldn't dropped with today's average mempool.Did you mean they SHOULD be dropped or Shouldn't? I'm assuming a 1.02 sat/vbyte SHOULD be dropped as no miner would want to add that to the block as there's no incentive to do so. I mean that it must have been dropped from your node's mempool since it's already dropped from other node's mempool as well.It's more than two weeks so, it's just what you can expect from most Bitcoin nodes.Since it's dropped, you now have the chance to use abandon transaction to be able remove it from your \"wallet transaction\" history.Quote from: Finhum on April 14, 2023, 01:00:25 AMWhat happens if I send everything in my wallet? (All UTXO's?) confirmed and unconfirmed ?The dropped transaction won't be included as input, you'll only create another transaction normally.it'll stay like that and the inputs that it's trying to spend wont be selected by the coin-selection algorithm or even manual coin selection until it's abandoned.Quote from: Finhum on April 14, 2023, 01:00:25 AMThe UI doesn't allow me to pick specific UTXO's - this is the problem i'm facing. You can use bitcoin-cli to perform abandontransaction wallet command.I don't know if this FAQ is still relevant, but it shows how to use bitcoin-cli on Umbrel: https://community.getumbrel.com/t/using-bitcoin-cli-on-umbrel/504Here's the general info about the command: https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/abandontransaction/Take note that you might need to include --wallet argument if you have loaded more than one wallet.Thanks for the info. I'll review this and see if I can get my transaction abandoned.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 15, 2023, 09:55:29 PM",
+      "body": "As far as I know Umbrel (I have a test Umbrel node running to evaluate) the Bitcoin wallet is the Lightning node's on-chain wallet. You're not dealing with a bitcoind wallet on Umbrel, particularly not in the assumed setup that you use in your Umbrel.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Finhum",
+      "created_time": "April 15, 2023, 09:59:53 PM",
+      "body": "Quote from: Cricktor on April 15, 2023, 09:55:29 PMAs far as I know Umbrel (I have a test Umbrel node running to evaluate) the Bitcoin wallet is the Lightning node's on-chain wallet. You're not dealing with a bitcoind wallet on Umbrel, particularly not in the assumed setup that you use in your Umbrel.Yes, you're correct.You're on-chain and Lightning wallets are both in the lightning node app (which I find weird), but that's how it works. I'm sure there was some reason for doing doing so that's beyond me. There is however \"bitcoin core\" on umbrel - but you just see stats there, and there's no wallet information there. It's simply your node. I still have no idea where to run commands or abandon transactions. No one from Umbrel is even reaching back to me.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 15, 2023, 10:23:37 PM",
+      "body": "If you're running LND for Lightning on your Umbrel then you can interact with the LND wallet via lncli to my knowledge.Log-in via SSH to your Umbrel and cd into the umbrel directory, there in /home/umbrel/umbrel/bin you will find lncli, a script to interface with the lncli in the LND docker container. If you invoke /home/umbrel/umbrel/bin/lncli without any arguments, it will print kind of a command help page.The not deprecated way to invoke lncli is this:Code:/home/umbrel/umbrel/scripts/app compose lightning exec lnd lncli",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 16, 2023, 07:02:06 AM",
+      "body": "If you are using lncli, then the command abandonchannel can be used to abandon a failed channel transaction, but I have no idea if it would work with a non-channel transaction. Make sure you know what you are doing with it though, since if you abandon an open channel then you'll probably lose all the coins in that channel.The other option would be to restart lnd using the --reset-wallet-transactions command and force a rescan, as detailed here: https://github.com/lightningnetwork/lnd/blob/master/docs/recovery.md#forced-in-place-rescan. Again, if you have any open channels, make sure you have them backed up first.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 16, 2023, 07:51:05 AM",
+      "body": "At first, I don't see the need for such drastic steps that @o_e_l_e_o suggests.I would first take a look with the command lncli wallet pendingsweeps if LND's batching engine knows about the pending transaction (it should).Then read through what lncli wallet bumpfee offers as this seems to support both RBF and CPFP.Or if this is a channel closing transaction then lncli wallet bumpclosefee might be more appropriate.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

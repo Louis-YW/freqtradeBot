@@ -1,0 +1,165 @@
+{
+  "id": "topic_5419182",
+  "title": "sdp",
+  "author": "sdp",
+  "created_time": "November 02, 2022, 12:51:53 PM",
+  "content": "In my application I have this idea for a some large number of people who don't completely trust each other, endevor to buy something collectively, like a plot of land that would get subdivided into lots for themselves.  Each of the users make a payment to the society (a n of n multisignature wallet) and in the end payments are made out of it for purchase of the common property land and then implementation of services.  The most simple non-trivial case is a 2 of 2.  Let's make up two users Alice and Bob.  Can I create a payment transaction from both Alice and Bob, so that both of them pay 0.1 mBTC for the society payment but if unless both sign (pay) then neither pays into it?  Is there a wallet that does this kind of thing already?I think this could be a good way to prevent people from running away with funds.  I think the upper limit for n is 15 in Bitcoin.  I have a copy of the private keys for some test wallets.  Send me a private message if you wish to participate in trying to do this.  We should only use popular clients like Electrum, core or Armory.  I don't think I should be writing custom wallet software!Perhaps this can be done with the CSV import mechanism in Electrum.  Maybe there is something we can use from the RPC of one of these clients.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5419182",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "November 02, 2022, 01:08:47 PM",
+      "body": "Standard 2 of 2 multisig is already a thing but isn't implemented. The lightning network has a similar thing with channels whereby a multisig address is paid but that transaction isn't broadcast until a withdrawal transaction is made so both parties can get their funds back. Which are you expecting to implement (should the user have the ability to withdraw from the \"contract\"/multisig)?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 02, 2022, 03:10:07 PMLast edit: November 03, 2022, 11:56:53 AM by o_e_l_e_o",
+      "body": "I wouldn't use multi-sig for this at all. Instead I would use SIGHASH_ALL | SIGHASH_ANYONECANPAY.Essentially, Alice creates a transaction which contains her 0.1 mBTC input and a 0.2 mBTC output to the society. She signs it with SIGHASH_ALL | SIGHASH_ANYONECANPAY. This signs her input and the output (meaning they cannot be changed), but allows the addition of further inputs (but not further outputs). She then passes this transaction to Bob. Bob cannot broadcast it as it stands, because the outputs are higher than the inputs and so it is invalid. However, Bob can then add his own 0.1 mBTC input to the transaction, which would make it valid, and can then be broadcast.Alternatively, Alice could sign with SIGHASH_SINGLE | SIGHASH_ANYONECANPAY, allowing Bob to add his own input as well as additional outputs, in case he doesn't have a 0.1 mBTC ready to go and needs to add a change address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "November 03, 2022, 02:33:48 PM",
+      "body": "To sign the transaction with inputs from both users you need those users private keys working on the same Core, and i feel this can be done if the core belongs to a third party.Maybe creating a wallet service where users can make transactions together then they could be able to make this kind of 'team transactions'. But from my point of view without a third party it would be impossible.And other option is to create a platform where users can manipulate their balance but not the private key, and leave the transactions to the server side, this would work like a mixing service.This are just some ideas, i hope they helps.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 03, 2022, 03:20:29 PM",
+      "body": "Quote from: o_e_l_e_o on November 02, 2022, 03:10:07 PMI wouldn't use multi-sig for this at all. Instead I would use SIGHASH_ALL | SIGHASH_ANYONECANPAY.Essentially, Alice creates a transaction which contains her 0.1 mBTC input and a 0.2 mBTC output to the society. She signs it with SIGHASH_ALL | SIGHASH_ANYONECANPAY. This signs her input and the output (meaning they cannot be changed), but allows the addition of further inputs (but not further outputs). She then passes this transaction to Bob. Bob cannot broadcast it as it stands, because the outputs are higher than the inputs and so it is invalid. However, Bob can then add his own 0.1 mBTC input to the transaction, which would make it valid, and can then be broadcast.Brilliant idea!Imagine if instead of using MuSig to aggregate signatures (since that doesn't work in M-of-N configurations), we make a transaction with a large number of outputs, but a comparatively smaller number of inputs from people who are signing with SIGHASH_ALL | SIGHASH_ANYONECANPAY.Granted, tx size would still be a problem and this kind of signing wouldn't solve that, but imagine if there was a side network hat operated almost exactly like the Bitcoin network but it has more lax fee calculation for transactions with many outputs - so it becomes like a \"discount\".In particular, if somebody broadcasts a L1 transaction that has a timelock, that will have priority over transactions which don't have such a time lock. And longer locks would have priority over shorter ones. Whereas on the side chain these transactions would be confirmed instantly, on the mainnet they are still listed with unconfirmed status, but they will confirm eventually.Sure, that scheme would work by making an endless trail of unconfirmed transactions which are used on the side network, but the timelock prevents them from moving them back to L1 for a set period of time, so that there is always liquidity for the network to run with.Which means:A bunch of large, invalid (because outputs > inputs) transactions with SIGHASH ALL, ANYONECANPAY are broadcasted - this is an interactive process. The side network gets a list of all the outputs, and then constructs smaller raw transactions, that it requests those who are sending inputs to there right now to sign. Anyone who doesn't respond within an interval, is excluded. In this way, it guarantees that participating network users will always sign their transactions",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MarbleBoss",
+      "created_time": "November 03, 2022, 06:19:46 PM",
+      "body": "Quote from: sdp on November 02, 2022, 12:51:53 PMWe should only use popular clients like Electrum, core or Armory. Why restrict to only these? You may use https://coinb.in/#newTransaction as well, of course offline after downloading it from Github. It is light weight & open source.Quote from: o_e_l_e_o on November 02, 2022, 03:10:07 PMI wouldn't use multi-sig for this at all. Instead I would use SIGHASH_ALL | SIGHASH_ANYONECANPAY.Essentially, Alice creates a transaction which contains her 0.1 mBTC input and a 0.2 mBTC output to the society. She signs it with SIGHASH_ALL | SIGHASH_ANYONECANPAY. This signs her input and the output (meaning they cannot be changed), but allows the addition of further inputs (but not further outputs). She then passes this transaction to Bob. Bob cannot broadcast it as it stands, because the outputs are higher than the inputs and so it is invalid. However, Bob can then add his own 0.1 mBTC input to the transaction, which would make it valid, and can then be broadcast.Alternatively, Alice could sign with SIGHASH_SINGLE | SIGHASH_ANYONECANPAY, allowing Bob to add his own input as well as additional outputs, in case he doesn't have a 0.1 mBTC ready to go and needs to add a change address.Both Sig Hash Type, i.e. ALL|ANYONECANPAY & SINGLE|ANYONECANPAY are available @ https://coinb.in/#sign",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alexeyneu",
+      "created_time": "November 06, 2022, 06:16:03 PM",
+      "body": "it can't be done this way unless they're both blockchain programmers .",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "November 07, 2022, 01:08:07 AM",
+      "body": "Quote from: seoincorporation on November 03, 2022, 02:33:48 PM~Sorry, but this is all wrong. Multiple decentralized, trustless methods have been suggested before and after your reply; with Bitcoin multisig, Leo's 2 little scripts, and MuSig.I just want to clarify this for anyone reading this topic and getting confused by your reply. It's absolutely not required to put all the parties' keys into one wallet or using a centralized party.Quote from: alexeyneu on November 06, 2022, 06:16:03 PMit can't be done this way unless they're both blockchain programmers .That's also wrong; it is absolutely possible to implement one of the suggested methods in an easy-to-use, GUI-based application.What is discussed here are the technicalities under the hood, that users never see. You wouldn't believe how many complicated things happen under the hood of the browser you're using to visit this forum. By your logic, 'nobody can access the web unless they are browser developers'.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alexeyneu",
+      "created_time": "November 07, 2022, 02:16:01 AM",
+      "body": "Quote from: n0nce on November 07, 2022, 01:08:07 AMQuote from: alexeyneu on November 06, 2022, 06:16:03 PMit can't be done this way unless they're both blockchain programmers .That's also wrong; it is absolutely possible to implement one of the suggested methods in an easy-to-use, GUI-based application.What is discussed here are the technicalities under the hood, that users never see. You wouldn't believe how many complicated things happen under the hood of the browser you're using to visit this forum. By your logic, 'nobody can access the web unless they are browser developers'.if you'd seen gui for a multisig wallet (best realized in stellar lumens lobster wallet) - it's already on the edge of learning curve for someone without those skills.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 07, 2022, 04:20:58 AM",
+      "body": "Quote from: alexeyneu on November 07, 2022, 02:16:01 AMif you'd seen gui for a multisig wallet (best realized in stellar lumens lobster wallet) - it's already on the edge of learning curve for someone without those skills. There is not need to look at a terrible shitcoin wallet, we already have the bitcoin wallet called Electrum that has multisig options that are very user friendly and easy to use. There is not really a learning curve needed either. If there is any demand for what OP proposes, it is trivial to create it on top of existing wallets like Electrum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 07, 2022, 11:14:40 AM",
+      "body": "If you think the options given above are too complicated, then here is an even easier solution which only requires a very basic knowledge of Electrum.Alice and Bob both want to pay 0.1 BTC to Charlie in the same transaction, and neither Alice nor Bob want the transaction to go ahead unless both Alice and Bob commit to it.Bob lets Alice know the input he will be using to make this transaction, by sharing an address with Alice and letting her know which UTXO on that address (if more than one exists) he wishes to spend.Alice then creates a new watch only wallet in Electrum, imports the address from Bob, and imports her own address she will be using to make this transaction.She then uses this watch only wallet to create an unsigned transaction sending 0.1 BTC from her own address, 0.1 BTC from Bob's address, and any change addresses as needed and agreed upon.She then imports this unsigned transaction to her full Electrum wallet and signs her input.She passes this partially signed transaction to Bob, who also imports it and signs his input, and then broadcasts it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "November 08, 2022, 11:41:57 PM",
+      "body": "Quote from: o_e_l_e_o on November 07, 2022, 11:14:40 AMShe then imports this unsigned transaction to her full Electrum wallet and signs her input.Is Alice leaking information about her public key to Bob though by doing this? I know it may not be a huge deal but if Bob is dishonest, then maybe he has ulterior motives. QuoteShe passes this partially signed transaction to Bob, who also imports it and signs his input, and then broadcasts it.That's what she hopes Bob will do. He doesn't have to. So if he doesn't do it then she will need to probably spend one of those utxos so that Bob at a later time can't come back on her at a point when she doesn't want the transaction to happen anymore.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 09, 2022, 03:53:39 AM",
+      "body": "Quote from: larry_vw_1955 on November 08, 2022, 11:41:57 PMIs Alice leaking information about her public key to Bob though by doing this? I know it may not be a huge deal but if Bob is dishonest, then maybe he has ulterior motives. There can not be any kind of \"ulterior motive\" here simply because a public key is made to be public by design.QuoteThat's what she hopes Bob will do. He doesn't have to. So if he doesn't do it then she will need to probably spend one of those utxos so that Bob at a later time can't come back on her at a point when she doesn't want the transaction to happen anymore.That's true but Bob still has to include his own UTXO and spend bitcoin to get that transaction to go through and reach the destination which we assume Alice wants the funds to reach to.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "November 09, 2022, 05:33:15 AM",
+      "body": "Quote from: pooya87 on November 09, 2022, 03:53:39 AMThere can not be any kind of \"ulterior motive\" here simply because a public key is made to be public by design.https://en.bitcoin.it/wiki/Address_reuseWhy would someone want to re-use an address when HD Wallets exist? QuoteThat's true but Bob still has to include his own UTXO and spend bitcoin to get that transaction to go through and reach the destination which we assume Alice wants the funds to reach to.She might want them to reach there originally but circumstances could eventually change if bob waits too long - for whatever reason.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 09, 2022, 08:27:23 AM",
+      "body": "Quote from: larry_vw_1955 on November 08, 2022, 11:41:57 PMIs Alice leaking information about her public key to Bob though by doing this? I know it may not be a huge deal but if Bob is dishonest, then maybe he has ulterior motives.As soon as the transaction is broadcast, Alice's public key becomes public anyway, so there is no additional information leaked to Bob that he would not have access to anyway in the scenario OP is describing.Quote from: larry_vw_1955 on November 08, 2022, 11:41:57 PMThat's what she hopes Bob will do. He doesn't have to.Absolutely. But the provision was that both parties only spend their inputs if the other party also spends their input. If Bob refuses to broadcast the transaction, then Alice's input also remains unspent.Quote from: larry_vw_1955 on November 08, 2022, 11:41:57 PMSo if he doesn't do it then she will need to probably spend one of those utxos so that Bob at a later time can't come back on her at a point when she doesn't want the transaction to happen anymore.True enough, but as pooya87 points out, Bob can only do this if he commits his own funds to the transaction, which was the entire point of the transaction in the first place.Quote from: larry_vw_1955 on November 09, 2022, 05:33:15 AMWhy would someone want to re-use an address when HD Wallets exist?For the same reasons people use the same password for multiple accounts. Convenience, laziness, poor software which does it for them, it's what they always done and they can't be bothered to change, etc.Quote from: larry_vw_1955 on November 09, 2022, 05:33:15 AMShe might want them to reach there originally but circumstances could eventually change if bob waits too long - for whatever reason.True, and easily avoided by Alice spending the UTXO in question to another address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alexeyneu",
+      "created_time": "November 09, 2022, 02:24:44 PM",
+      "body": "Quote from: o_e_l_e_o on November 09, 2022, 08:27:23 AMQuote from: larry_vw_1955 on November 09, 2022, 05:33:15 AMShe might want them to reach there originally but circumstances could eventually change if bob waits too long - for whatever reason.True, and easily avoided by Alice spending the UTXO in question to another address.So what you offer her is to wipeout her wallet faster than bob",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "November 09, 2022, 06:42:26 PM",
+      "body": "As @o_e_l_e_o points out, there is no need for multi-sig. You just create a single transaction with N (or more) inputs, each signed by one of the N participants. BIP 174 (Partially Signed Bitcoin Transaction) is designed to handle this use case. I don't know which wallets support PSBT, but I wouldn't be surprised if there are some that do.If what you want to do is more complicated than a single transaction, then the multi-user transaction could first send the bitcoins to a multi-sig address, with some sort of governance set up to spend them from there.FYI, anonymous multi-user transactions are the basis of CoinJoin, though whether they use PSBT depends on the implementation.Quote from: alexeyneu on November 09, 2022, 02:24:44 PMQuote from: o_e_l_e_o on November 09, 2022, 08:27:23 AMQuote from: larry_vw_1955 on November 09, 2022, 05:33:15 AMShe might want them to reach there originally but circumstances could eventually change if bob waits too long - for whatever reason.True, and easily avoided by Alice spending the UTXO in question to another address.So what you offer her is to wipeout her wallet faster than bobBob can only spend Alice's bitcoins in the transaction set up by Alice and Bob. The point is that Bob cannot hold Alice's bitcoins hostage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "November 10, 2022, 04:24:21 AM",
+      "body": "Quote from: o_e_l_e_o on November 09, 2022, 08:27:23 AMAs soon as the transaction is broadcast, Alice's public key becomes public anyway, so there is no additional information leaked to Bob that he would not have access to anyway in the scenario OP is describing.Technically, if Bob doesn't fulfill his end of the deal then he got Alice's public key for free. And she never actually did a transaction using it on the blockchain. He can sit on that public key for a long long time trying to crack it and waiting for her to use that public key again sometime. Again, this is all just symantics but it is probably worth pointing out in the hope for a more fair solution to \"Alice\".QuoteAbsolutely. But the provision was that both parties only spend their inputs if the other party also spends their input. If Bob refuses to broadcast the transaction, then Alice's input also remains unspent.The main difference being that if Bob doesn't spend his input (and broadcast the transaction), it places a burden onto Alice to take an action. The situation is not symmetrical. Not a huge deal but the more ideal solution would be one in which did not impose any burden on any party if the entire transaction did not get broadcast and thus completed. Thinking of a time limit too. After which the entire thing would become invalid.Quote from: larry_vw_1955 on November 09, 2022, 05:33:15 AMWhy would someone want to re-use an address when HD Wallets exist?QuoteFor the same reasons people use the same password for multiple accounts. Convenience, laziness, poor software which does it for them, it's what they always done and they can't be bothered to change, etc.But from that wiki page I linked, it says:Address reuse refers to the use of the same address for multiple transactions. It is an unintended practice, abusing the privacy and security of the participants of the transactions as well as future holders of their value. It also only functions by accident, not by design, so cannot be depended on to work reliably.if it only function that way by accident then it shouldn't probably be a \"feature\" of bitcoin in the first place. but i guess that's getting a bit off topic.QuoteTrue, and easily avoided by Alice spending the UTXO in question to another address.which imposes on her and she has to pay a transaction fee to get out of it. not the ideal situation for her vs bob. he doesn't have to do anything.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 10, 2022, 04:33:45 AM",
+      "body": "Quote from: larry_vw_1955 on November 09, 2022, 05:33:15 AMQuote from: pooya87 on November 09, 2022, 03:53:39 AMThere can not be any kind of \"ulterior motive\" here simply because a public key is made to be public by design.https://en.bitcoin.it/wiki/Address_reuseWhy would someone want to re-use an address when HD Wallets exist?That's an entirely different question which has nothing to do with revealing public key and having that be abused by the party that you are in cooperation with for making a transaction!Quote from: larry_vw_1955 on November 10, 2022, 04:24:21 AMif it only function that way by accident then it shouldn't probably be a \"feature\" of bitcoin in the first place. but i guess that's getting a bit off topic.There are a lot of other things that are \"features\" in Bitcoin that can be worse like if you send your coins to an OP_TRUE output script (anyone can spend it)! That doesn't mean they shouldn't exist. It is up to the user to learn how to use them correctly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 10, 2022, 10:43:49 AM",
+      "body": "Quote from: larry_vw_1955 on November 10, 2022, 04:24:21 AMTechnically, if Bob doesn't fulfill his end of the deal then he got Alice's public key for free. And she never actually did a transaction using it on the blockchain. He can sit on that public key for a long long time trying to crack it and waiting for her to use that public key again sometime.A meaningless concession. There are millions of bitcoin on addresses with revealed public keys or locked by P2PK. Bob isn't going to spend decades trying to steal Alice's 0.1 BTC when if he was actually able to crack a public key he could steal millions of BTC instead.Quote from: larry_vw_1955 on November 10, 2022, 04:24:21 AMThe situation is not symmetrical. Not a huge deal but the more ideal solution would be one in which did not impose any burden on any party if the entire transaction did not get broadcast and thus completed.There are plenty of projects which already use multi-party funded transactions in a trustless manner, such as Lightning and coinjoins. My suggestion for sharing unsigned/partially signed transaction directly between users was because other users were complaining the solutions given were too complicated. If you want a super simple solution like my Electrum one, then by necessity there will be some drawbacks. If you don't want these drawbacks, then use one of the more complicated solutions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

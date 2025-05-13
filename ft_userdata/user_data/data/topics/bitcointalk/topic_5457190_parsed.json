@@ -1,0 +1,109 @@
+{
+  "id": "topic_5457190",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "June 22, 2023, 10:12:04 AMLast edit: June 22, 2023, 10:39:40 AM by NotATether",
+  "content": "Bitcoin Client Software and Version Number: Bitcoin Core 24.0.0Operating System: Linux (Ubuntu 22.04)System Hardware Specs: 8 threads, 16GB of memoryDescription of Problem:I am having a strange error when I try to load a particular watch-only wallet that contains about 4.5 thousand transactions.The debug log is not printing anything useful either, it's just showing me the wallet version. What is the daemon actually doing?bitcoin-cli loadwallet ... seems to be hanging for no explicable reason.Any Related Addresses: 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa (the sole address in a watch-only wallet)Last Log Files from the Bitcoin Client:Code:2023-06-22T10:02:03Z Using SQLite Version 3.38.52023-06-22T10:02:03Z Using wallet /home/zenulabidin/.bitcoin/wallets/api22023-06-22T10:02:09Z init message: Loading wallet…2023-06-22T10:02:09Z [api2] Wallet file version = 10500, last client version = 240000But if I understand correctly, it's supposed to be followed by something like this:Code:2023-06-22T10:13:36Z [api] Setting spkMan to active: id = 3c2cb6cdb938eac92356d10376de55b52292b0ac1e39dc85a2ba73357688db8e, type = legacy, internal = false2023-06-22T10:13:36Z [api] Setting spkMan to active: id = 2e878a2ea9ed364f0c973363e86d59e4e382c0d89b025e167b31c3bbfedbe8bb, type = p2sh-segwit, internal = false2023-06-22T10:13:36Z [api] Setting spkMan to active: id = 8ef7b08f1c5f86526a804b6df490694ba52b1494ec30363005e169405b7db99c, type = bech32, internal = false2023-06-22T10:13:36Z [api] Setting spkMan to active: id = cad55039069308e856d62db5256d18564aae476f85adf4cc493793b306af70a8, type = bech32m, internal = false2023-06-22T10:13:36Z [api] Setting spkMan to active: id = b521d155517870891a6c109616585c04328dbc1ae36152da533c97c5211c4c1a, type = legacy, internal = true2023-06-22T10:13:36Z [api] Setting spkMan to active: id = b94c9d701b6ca8b2ae87981e1cb080944fd4839ed85f4fc28701c8ca0ed21553, type = p2sh-segwit, internal = true2023-06-22T10:13:36Z [api] Setting spkMan to active: id = edb5fcc5e6f9b327aae1f1c91d3d0bb432d300dfec19f0974f32cced0fc34cdc, type = bech32, internal = true2023-06-22T10:13:36Z [api] Setting spkMan to active: id = 41cfbc5134852e4f17ea5106de5c3cbabd2a4bbdbd1e6ff0a0443ae516252898, type = bech32m, internal = true2023-06-22T10:13:36Z [api] Keys: 8 plaintext, 0 encrypted, 0 w/ metadata, 8 total. Unknown wallet records: 02023-06-22T10:13:38Z [api] Wallet completed loading in            2676ms2023-06-22T10:13:48Z New outbound peer connected: version: 70016, blocks=795417, peer=187 (outbound-full-relay)2023-06-22T10:13:48Z 218 addresses found from DNS seeds2023-06-22T10:13:48Z P2P peers available. Finished DNS seeding.2023-06-22T10:13:48Z dnsseed thread exit2023-06-22T10:13:54Z init message: Rescanning…2023-06-22T10:13:54Z [api] Rescanning last 2 blocks (from block 795415)...2023-06-22T10:13:59Z [api] Rescan started from block 000000000000000000055bac7fd78bc5b181e893e73703c2d6aa77deb0d935f0...2023-06-22T10:14:08Z Socks5() connect to t2b7l2kulkxh5lh64wzt67vo3knhjzhrcs7lqoohl2f3pgdbh6vowfid.onion:8333 failed: host unreachable2023-06-22T10:14:59Z [api] Scanning current mempool transactions.2023-06-22T10:15:03Z [api] Rescan completed in           63372ms2023-06-22T10:15:08Z [api] setKeyPool.size() = 80002023-06-22T10:15:08Z [api] mapWallet.size() = 02023-06-22T10:15:08Z [api] m_address_book.size() = 0Here is my bitcoin.conf:Code:wallet=1daemon=1peerbloomfilters=1txindex=1server=1blocknotify=bash ~/.bitcoin/blocknotify %smempoolfullrbf=1rpckeepalive=0 # This is only here because I saw this tip in a Github issue somewhere.# Try to lower excessive Bitcoin Core memory usagedbcache=64Interestingly, if I shut down the daemon, the messages appear in the log before saying \"rescan interrupted\" just before the shutdown completes.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5457190",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "June 22, 2023, 11:03:08 AM",
+      "body": "Quote from: ETFbitcoin on June 22, 2023, 10:54:37 AMI'm also not sure why it's slow, but have you tried these (common) suggestion?1. Update to Bitcoin Core 25.0.2. Increase dbcache to few thousand MB. If rescan still use UTXO, that might be the reason.In addition, did you create legacy (use Berkeley DB) or description (use SQLite) wallet?It's a descriptor wallet. By comparison, a similar descriptor wallet with only 40-something transactions loads almost instantly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 22, 2023, 11:07:36 AM",
+      "body": "Quote from: NotATether on June 22, 2023, 10:12:04 AMbitcoin-cli loadwallet ... seems to be hanging for no explicable reason.Does it consume CPU while it \"hangs\"?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 22, 2023, 11:15:11 AM",
+      "body": "Quote from: LoyceV on June 22, 2023, 11:07:36 AMQuote from: NotATether on June 22, 2023, 10:12:04 AMbitcoin-cli loadwallet ... seems to be hanging for no explicable reason.Does it consume CPU while it \"hangs\"?Yes, bitcoind is using about 2-7% CPU during the loadwallet operation (I'm assuming that the rest of the time it's doing I/O, because iotop says it's doing between 1-5MB/s of reads and writes each).Why exactly these numbers is beyond me though, as the initial block download has already finished and the offending wallet.dat itself is only 4.4MB.Meanwhile I have increased the dbcache to 1GB.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 22, 2023, 11:17:56 AM",
+      "body": "Quote from: NotATether on June 22, 2023, 11:15:11 AMYes, bitcoind is using about 2-7% CPU during the loadwallet operation (I'm assuming that the rest of the time it's doing I/O, because iotop says it's doing between 1-5MB/s of reads and writes each).Any chance the system is very low on memory?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 22, 2023, 11:19:14 AMLast edit: June 22, 2023, 12:01:17 PM by NotATether",
+      "body": "Quote from: LoyceV on June 22, 2023, 11:17:56 AMQuote from: NotATether on June 22, 2023, 11:15:11 AMYes, bitcoind is using about 2-7% CPU during the loadwallet operation (I'm assuming that the rest of the time it's doing I/O, because iotop says it's doing between 1-5MB/s of reads and writes each).Any chance the system is very low on memory?Nope, only 9.2 GB used out of 15.6 total RAM.The strange thing is, is that the wallet rescaning is kicking in right after I issue the stop command and \"torcontrol\" thread is shutdown. (Yes I am running a TOR interface to bitcoind).P.S. the dbcache doesn't seem to be making much of a difference, I can see that 800MB of the cache was allocated to \"UTXO set\", probably has nothing to do with the wallet module.Could it have something to do with https://github.com/bitcoin/bitcoin/issues/26463 ?EDIT: Finally, in 42 minutes!Code:2023-06-22T11:53:48Z [api2] Keys: 0 plaintext, 0 encrypted, 0 w/ metadata, 0 total. Unknown wallet records: 02023-06-22T11:53:48Z [api2] Wallet completed loading in         2575413ms2023-06-22T11:53:52Z init message: Rescanning…2023-06-22T11:53:52Z [api2] Rescanning last 9 blocks (from block 795415)...2023-06-22T11:53:54Z [api2] Rescan started from block 000000000000000000055bac7fd78bc5b181e893e73703c2d6aa77deb0d935f0...2023-06-22T11:54:15Z [api2] Scanning current mempool transactions.2023-06-22T11:54:15Z [api2] Rescan completed in           20838ms2023-06-22T11:54:17Z [api2] setKeyPool.size() = 02023-06-22T11:54:17Z [api2] mapWallet.size() = 45482023-06-22T11:54:17Z [api2] m_address_book.size() = 12023-06-22T11:54:17Z [api2] Submitting wtx 22396f0e982f5bb68c118c1c7053b90a1cd43ecca4c8124c06f8f66f2e31a2d7 to mempool for relay2023-06-22T11:54:18Z [api2] ResubmitWalletTransactions: resubmit 1 unconfirmed transactions2023-06-22T11:54:20Z [api2] AddToWallet 22396f0e982f5bb68c118c1c7053b90a1cd43ecca4c8124c06f8f66f2e31a2d7  2023-06-22T11:54:20Z [api2] AddToWallet 22396f0e982f5bb68c118c1c7053b90a1cd43ecca4c8124c06f8f66f2e31a2d7 But we're not done yet. Quite frankly, the lack of logging information for the status of the wallet loading is unacceptable. I at least was expecting something like the \"verifying block headers\" message which has percentages on it.I will upgrade to 25.0, but in the meantime, we need to find out where the RPC call is spending most of its time in and add some LogPrintf statements accordingly.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 22, 2023, 02:40:32 PM",
+      "body": "I believe this currently falls under the category of \"expected behavior\". It's a big wallet, that's gonna take a while to load as it has to read every record from disk in to memory. Although that does seem like a lot longer than I would expect.The logging could probably be better, although it's hard to figure out the loading percentage since neither BDB nor SQLite seem to expose ways to get the count of records that don't involve iterating the whole db.If you're able to, can you try profiling it? Some docs here: https://github.com/bitcoin/bitcoin/blob/master/doc/developer-notes.md#performance-profiling-with-perf",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 23, 2023, 05:14:41 PM",
+      "body": "Quote from: ETFbitcoin on June 23, 2023, 10:01:52 AMQuote from: achow101 on June 22, 2023, 02:40:32 PMIf you're able to, can you try profiling it? Some docs here: https://github.com/bitcoin/bitcoin/blob/master/doc/developer-notes.md#performance-profiling-with-perfBy \"you\", does that refer to @NotATether?Whoever is able to replicate this problem (so, yes, NotATether).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 24, 2023, 07:40:28 AM",
+      "body": "achow, I'll try to make a benchmark later today and upload it here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "June 24, 2023, 02:03:32 PMLast edit: June 24, 2023, 02:31:39 PM by Cricktor",
+      "body": "The following descriptor for the Genesis block transaction is more accurate:Code:\"combo(04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f)#gvgcz9wt\"It catches all address types that derive from the public key. @achow101 Does this also apply to a Taproot address?(I'm sorry, need really to read more on this Taproot stuff. So little time, so much to learn...).But your slow wallet loading is strange. I have a watch-only descriptor wallet with 21954 of such combo(PK) descriptors and it loads in seconds on a Raspi 4B with 8GB RAM. While the majority of transactions are sent to the Genesis block, there are still quite some on other blocks that are attributed to the miner \"Patoshi\". Blocks 0 and 9 clearly are Satoshi's and there's some strong evidence that Patoshi was Satoshi himself, though this might be debatable.Code:2023-06-03T12:44:05Z [watch_patoshi-time] Wallet file version = 10500, last client version = 2400012023-06-03T12:44:07Z [watch_patoshi-time] Keys: 0 plaintext, 0 encrypted, 0 w/ metadata, 0 total. Unknown wallet records: 02023-06-03T12:44:08Z [watch_patoshi-time] Wallet completed loading in            2663ms2023-06-03T12:44:08Z [watch_patoshi-time] setKeyPool.size() = 02023-06-03T12:44:08Z [watch_patoshi-time] mapWallet.size() = 271532023-06-03T12:44:08Z [watch_patoshi-time] m_address_book.size() = 21954But don't ask how long it took to rescan such a wallet over the whole blockchain. Core v25.0 really got faster with blockfilterindex=1 active, but still it'll take weeks, months.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 26, 2023, 10:51:43 AMLast edit: June 26, 2023, 03:12:55 PM by NotATether",
+      "body": "Quote from: NotATether on June 24, 2023, 07:40:28 AMachow, I'll try to make a benchmark later today and upload it here.I managed to make a performance trace but unfortunately I profiled a release build of bitcoind so most of the symbols are just question marks. I'll try again with a debug build.UPDATEHere's a proper trace: https://gofile.io/d/Ds89Ep (1.7GB)Recorded for 1 hour (3600 seconds) - the loadwallet calls are at the very beginning. Make sure to filter the output by the thread b-httpworker.0 (the RPC thread) to remove all the noise from the rest of the modules. Meanwhile, I can show you a few insights that I saw:https://i.imgur.com/BXHRzqy.pnghttps://i.imgur.com/wj3meUZ.pnghttps://i.imgur.com/UAqioxT.png",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 27, 2023, 12:17:49 AM",
+      "body": "I don't think perf includes the debug symbol info itself, so viewing the trace doesn't work on my machine as I don't have the debug symbols for your build. However the release builds made with guix do have debug symbols as separate files, although not published on the website. You can get them by doing the guix build yourself, or from my own github repo: https://github.com/achow101/bitcoin/releases (uploading the most recent releases, forgot to do those). Can you do the profiling with a release build?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 27, 2023, 06:07:55 AM",
+      "body": "Quote from: achow101 on June 27, 2023, 12:17:49 AMI don't think perf includes the debug symbol info itself, so viewing the trace doesn't work on my machine as I don't have the debug symbols for your build. However the release builds made with guix do have debug symbols as separate files, although not published on the website. You can get them by doing the guix build yourself, or from my own github repo: https://github.com/achow101/bitcoin/releases (uploading the most recent releases, forgot to do those). Can you do the profiling with a release build?I think I should upgrade to 25.0 first as that will rule out possibilities that inefficiencies such as in wallet::CWallet::AddToWalletIfInvolvingMe, CTransaction computing hashes inside node::chainImpl::findBlock and some of the other cycle consumers were fixed in the later versions (I profiled it on 24.0, and I really should upgrade my node anyway).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

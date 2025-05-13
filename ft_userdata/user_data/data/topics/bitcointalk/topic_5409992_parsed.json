@@ -1,0 +1,85 @@
+{
+  "id": "topic_5409992",
+  "title": "francescocmazza",
+  "author": "francescocmazza",
+  "created_time": "August 15, 2022, 10:39:41 PM",
+  "content": "Hello everyone,I'm tinkering around a cgminer implementation on bitmain asic mining firmwares that is driving me crazy. I have two questions. I hope some of you may help me sort out what I'm getting wrong. If i query cgminer-api pools the system counts an overall of 6 pools, but in the following details in the 'cgminer-api pools' result I see only 4 pools, not 6. 1. Are the remaining 2 hidden or it is some kind of malfunction?Also I'm going nuts trying to find the correct syntax for 'cgminer-api removepool' or 'cgminer-api disablepool'. 'cgminer-api pools' Reports pools from no. 0 to no 3. If I try 'cgminer-api disablepool 1' for example I get invalid argument error for the disablepool command. From some research it seems I should be using some pool ID in the disablepool or remove pool commands, but i cant find this pool id information anywhere.2. What am i doing wrong in using these commands? Does anyone of you guys have any suggestions? Thank you so much, its been over a week now I'm stuck at this! Francesco",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5409992",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "August 16, 2022, 11:35:15 PM",
+      "body": "Based on what I heard that cgminer api pools command it is a known issue that these commands you mention above do not work but try to read this one on how to use it- https://github.com/ckolivas/cgminer/blob/master/API-README#L50Why not try other OS like Braiins OS to try those API commands available on Braiins OS you can read this https://docs.braiins.com/os/plus-en/Development/1_api.htmlYou can also try HiveOS they do have more options on their web interface and I think you can achieve what you want to achieve in your ASIC unit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "francescocmazza",
+      "created_time": "August 17, 2022, 01:29:28 PM",
+      "body": "Thank you very much Bitmaxz for your kind reply.That line you linked on api-readme regards the API groups. In the group I'm using I'm allowed to use all pool related commands. as a matter of fact I receive invalid argument, not forbidden, as a reply.Braiinsos has a terrible mining engine running at over 10c more than cgminer at same performance levels. Also it is much less stable than cgminer. Hiveos is very poor in programming quality, i.e. it throttles fans according to pcb temps not chip temps (LOL).Any other ideas? Thanks friends",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "August 17, 2022, 09:56:38 PM",
+      "body": "What is the exact unit model of your machine?How do you send these API commands?Note that all bitmain units are API restricted or it has limited function. So if the commands that you want to make it work but do not work you can try access SSH and send that command there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "August 21, 2022, 09:01:22 AM",
+      "body": "As the API-README states, you can't change settings in the miner without privs enabled in the miner for your IP address.You may have read access due to the settings, but not 'write' access. Read the W: part.The default settings in the miner are up to whoever provided you with the firmware.P.S. linking to an old out of date git isn't the best idea See my sig. I wrote the API and the manual.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "francescocmazza",
+      "created_time": "August 22, 2022, 12:27:14 PM",
+      "body": "Thank you very much Kano and Bitmax for your kind replies. Have 2 new babies in the house and I don't have access to pc often these days. Here are my replies to each of your questions and feebacks.To Kano: I studied the api-readme, I have the commands enabled in my api group. As a matter of fact when I issue the command via SSH I do not get forbidden reply from the api, I receive the missing pool ID reply. I do not use W: group as I had some issues in understanding what IP where my commands being received from, so I changed the default api group adding the commands I needed and it seems to be working fine. I know you wrote the api and the readme, so I'm honored you are actually replying to me in person! To Bitmaxz: I am working on several machine types (bitmain Antminer L3+, t17, s17, if I can make the few changes I need I would really need also to extend the work to s19). I send the commands via ssh interface.Thank you so much for your help!Francesco",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "September 01, 2022, 08:35:03 AM",
+      "body": "As API-README says - you set different access to different IPsSSH is 127.0.0.1scam coins belong elsewhere.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "francescocmazza",
+      "created_time": "September 01, 2022, 09:55:05 AM",
+      "body": "One last quick question, can you please help me clarify this syntax  error of disablepool command?Quote from: francescocmazza on August 15, 2022, 10:39:41 PM...Also I'm going nuts trying to find the correct syntax for 'cgminer-api removepool' or 'cgminer-api disablepool'. 'cgminer-api pools' Reports pools from no. 0 to no 3. If I try 'cgminer-api disablepool 1' for example I get invalid argument error for the disablepool command. From some research it seems I should be using some pool ID in the disablepool or remove pool commands, but i cant find this pool id information anywhere.Thank you very much!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kano",
+      "created_time": "September 01, 2022, 10:41:51 AM",
+      "body": "Code:The JSON request format required is '{\"command\":\"CMD\",\"parameter\":\"PARAM\"}'(though of course parameter is not required for all requests)where \"CMD\" is from the \"Request\" column below and \"PARAM\" would be e.g.the ASC/PGA number if required.An example request in both formats to disable Hotplug:  hotplug|0  {\"command\":\"hotplug\",\"parameter\":\"0\"}The list of requests - a (*) means it requires privileged access - and replies: Request       Reply Section  Details -------       -------------  ------- disablepool|N (*)               none           There is no reply section just the STATUS section                              stating the results of disabling pool N                              The Msg includes the pool URL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "francescocmazza",
+      "created_time": "September 04, 2022, 02:51:58 PM",
+      "body": "Thank you very much Kano.I did study that part of the readme word by word but the command didn't work as written, on my end. After many hours of trials, I found out what the issue was. I'm writing it extensively so anyone that comes across my same issue may benefit. Sending the command cgminer-api disablepool|1 (as I understood from the readme) could not work because the symbol \"|\" has its own meaning in Linux and gets interpreted as such, and not as an option of cgminer-api command.The correct syntax is therefore: cgminer-api \"disablepool|1\". This way it works with most pools.In my case I can only disable some of the pools in the list, I need to study better how is that possible. My guess is that the pools i'm trying to remove are somehow hard-coded in cgminer configuration by some file where my account that has no write authority.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

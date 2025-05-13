@@ -1,0 +1,77 @@
+{
+  "id": "topic_5413641",
+  "title": "krashfire",
+  "author": "krashfire",
+  "created_time": "September 15, 2022, 08:08:31 AM",
+  "content": "Hi.. I need help.1) I have been getting this error. I downloaded it here.>>> https://github.com/bitlogik/lattice-attackhowever, i have been getting errors. i wanted to  check on weak edcsa but i couldn't get this program to run properly. even when i use the sample that comes with it and the gen_data.py ...it still dont work. is there something i need to change?python3 lattice_attack.py ----- Lattice ECDSA Attack ----- Loading data from file data.jsonRunning with 6 bits of k (LSB)Starting recovery attack (curve SECP256K1)Constructing matrixSolving matrix ...LLL reductionTraceback (most recent call last):  File \"/home/krash/lattack/lattice_attack.py\", line 259, in <module>    lattice_attack_cli(arg.f, arg.l)  File \"/home/krash/lattack/lattice_attack.py\", line 239, in lattice_attack_cli    result = recover_private_key(  File \"/home/krash/lattack/lattice_attack.py\", line 195, in recover_private_key    res = test_result(lattice, pub_key, curve)  File \"/home/krash/lattack/lattice_attack.py\", line 93, in test_result    if target_pubkey == ecdsa_lib.privkey_to_pubkey(cand1, curve):  File \"/home/krash/lattack/ecdsa_lib.py\", line 129, in privkey_to_pubkey    ec.derive_private_key(pv_key_int, ec_backend, backends.default_backend())  File \"/usr/lib/python3/dist-packages/cryptography/hazmat/primitives/asymmetric/ec.py\", line 332, in derive_private_key    raise TypeError(\"private_value must be an integer type.\")TypeError: private_value must be an integer type.What is wrong here??2)If i wanna input my own datas in (RSZ,hashes) which file should i change it at?Thank you for your advise and help in advance.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5413641",
+  "comments": [
+    {
+      "author": "stanner.austin",
+      "created_time": "September 15, 2022, 09:08:00 AM",
+      "body": "HelloIf you have sage installed this conflict with fpylll integers.Possible solution is just use int(cand1) and int(cand2)  to avoid this.For second question.public transtion R,S,Z don't have leaked nonce. bitlogik lattice attack need leaked nonce min 4 bit with 100 sign pairs.If you consider you have weak nonce pairs in your R,S,Z you can use sage method from https://github.com/daedalus/BreakingECDSAwithLLLThis one don't need leaked nonce bit but its attack on weak nonce data in R.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "September 15, 2022, 09:08:08 AM",
+      "body": "Did you install the dependencies and follow what's on the readme?It tells you how to edit the json file with your own information on what you know of your private key and coordinates of the public key, this is why I ask, maybe it's a step you've missed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "September 15, 2022, 02:44:26 PM",
+      "body": "Quote from: stanner.austin on September 15, 2022, 09:08:00 AMHelloIf you have sage installed this conflict with fpylll integers.Possible solution is just use int(cand1) and int(cand2)  to avoid this.For second question.public transtion R,S,Z don't have leaked nonce. bitlogik lattice attack need leaked nonce min 4 bit with 100 sign pairs.If you consider you have weak nonce pairs in your R,S,Z you can use sage method from https://github.com/daedalus/BreakingECDSAwithLLLThis one don't need leaked nonce bit but its attack on weak nonce data in R.Thank you so much. it works now. however, im just wondering and im doing it correctly because the generated data as shown is the same as the key found. the generated data of Priv Key is the same as Key Found? python3 gen_data.py && python3 lattice_attack.pyPreparing DataPrivate key to be found (as demo) :0x416e7cb879e0e2d89aa6ad9e3426bf386a957a1c8f94c7907b528abc8eada15bGenerating 1000 signatures with curve SECP256K1 leaking 6 bits for k (LSB)  ...File data.json written with all data. ----- Lattice ECDSA Attack ----- Loading data from file data.jsonRunning with 6 bits of k (LSB)Starting recovery attack (curve SECP256K1)Constructing matrixSolving matrix ...LLL reductionKey found \\o/0x416e7cb879e0e2d89aa6ad9e3426bf386a957a1c8f94c7907b528abc8eada15b",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "September 15, 2022, 02:51:28 PM",
+      "body": "Quote from: jackg on September 15, 2022, 09:08:08 AMDid you install the dependencies and follow what's on the readme?It tells you how to edit the json file with your own information on what you know of your private key and coordinates of the public key, this is why I ask, maybe it's a step you've missed. ah yes..i got that now. just for everyone who is reading this sake (and mine too) , is it enough to just give the public keys without giving the coordinates and the RSZ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "puzzleplayer",
+      "created_time": "September 16, 2022, 01:33:51 PM",
+      "body": "Quote from: krashfire on September 15, 2022, 08:08:31 AMTraceback (most recent call last):  File \"/home/krash/lattack/lattice_attack.py\", line 259, in <module>    lattice_attack_cli(arg.f, arg.l)  File \"/home/krash/lattack/lattice_attack.py\", line 239, in lattice_attack_cli    result = recover_private_key(  File \"/home/krash/lattack/lattice_attack.py\", line 195, in recover_private_key    res = test_result(lattice, pub_key, curve)  File \"/home/krash/lattack/lattice_attack.py\", line 93, in test_result    if target_pubkey == ecdsa_lib.privkey_to_pubkey(cand1, curve):  File \"/home/krash/lattack/ecdsa_lib.py\", line 129, in privkey_to_pubkey    ec.derive_private_key(pv_key_int, ec_backend, backends.default_backend())  File \"/usr/lib/python3/dist-packages/cryptography/hazmat/primitives/asymmetric/ec.py\", line 332, in derive_private_key    raise TypeError(\"private_value must be an integer type.\")TypeError: private_value must be an integer type.from OP maybe the problem is from the python version try to test on a different python version to solve a problemrecommend with python 3.7 try this",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "September 16, 2022, 05:04:48 PM",
+      "body": "Quote from: krashfire on September 15, 2022, 02:51:28 PMah yes..i got that now. just for everyone who is reading this sake (and mine too) , is it enough to just give the public keys without giving the coordinates and the RSZ?The public key might be the coordinates already (if it's uncompressed) if it's compressed then you should probably run it through something that can give you both coordinates just to be safe.Afaik, uncompressed public keys start with hexadecimal 04 (0x04) and compressed public keys start with hexadecimals (02 or 03) as identifiers.I think your other question about using RSZ was answered also but maybe you could confirm that once you get something going or explain what it is that you're asking.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "March 29, 2024, 05:25:21 AM",
+      "body": "Quote from: herecomesjohnny on March 23, 2024, 03:25:40 PMQuote from: krashfire on September 15, 2022, 08:08:31 AMHi.. I need help.1) I have been getting this error. I downloaded it here.>>> https://github.com/bitlogik/lattice-attackhowever, i have been getting errors. i wanted to  check on weak edcsa but i couldn't get this program to run properly. even when i use the sample that comes with it and the gen_data.py ...it still dont work. is there something i need to change?python3 lattice_attack.py ----- Lattice ECDSA Attack ----- Loading data from file data.jsonRunning with 6 bits of k (LSB)Starting recovery attack (curve SECP256K1)Constructing matrixSolving matrix ...LLL reductionTraceback (most recent call last):  File \"/home/krash/lattack/lattice_attack.py\", line 259, in <module>    lattice_attack_cli(arg.f, arg.l)  File \"/home/krash/lattack/lattice_attack.py\", line 239, in lattice_attack_cli    result = recover_private_key(  File \"/home/krash/lattack/lattice_attack.py\", line 195, in recover_private_key    res = test_result(lattice, pub_key, curve)  File \"/home/krash/lattack/lattice_attack.py\", line 93, in test_result    if target_pubkey == ecdsa_lib.privkey_to_pubkey(cand1, curve):  File \"/home/krash/lattack/ecdsa_lib.py\", line 129, in privkey_to_pubkey    ec.derive_private_key(pv_key_int, ec_backend, backends.default_backend())  File \"/usr/lib/python3/dist-packages/cryptography/hazmat/primitives/asymmetric/ec.py\", line 332, in derive_private_key    raise TypeError(\"private_value must be an integer type.\")TypeError: private_value must be an integer type.What is wrong here??2)If i wanna input my own datas in (RSZ,hashes) which file should i change it at?Thank you for your advise and help in advance. It seems like you're encountering an error related to the type of the private key value in the lattice_attack.py script. The error message \"private_value must be an integer type\" suggests that there might be an issue with the format of the private key value being used.To troubleshoot this issue, you should check the data file data.json that you're loading. Make sure that the private key values are stored as integers. If they are stored as strings or in a different format, you may need to convert them to integers before passing them to the relevant functions.Regarding your second question, if you want to input your own data for (RSZ, hashes), you'll need to modify the data.json file directly. This file likely contains a JSON object with keys corresponding to different parameters used in the attack, such as the number of bits of the secret key k, the public key pubkey, and possibly other parameters like RSZ and hashes.Simply locate the relevant keys in the JSON object and replace the existing values with your own data. Ensure that the format of your data matches what the script expects. After making the changes, save the file and rerun the script. Make sure to follow any specific instructions or conventions regarding the format of the data within the script's documentation or comments.this was posted back in september 2022. i already figure it out. it was the fpylll library. cant run with sagemath. need to uninstall the sagemath and then fpylll can be use.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Bglhn",
+      "created_time": "April 08, 2024, 09:50:54 PM",
+      "body": "Hello. How to find lsb or msb bit leak in lattice attack? Is there a method for this?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

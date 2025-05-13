@@ -1,0 +1,61 @@
+{
+  "id": "topic_5460127",
+  "title": "FullofSats",
+  "author": "FullofSats",
+  "created_time": "July 17, 2023, 06:33:53 PM",
+  "content": "As the title say.RPC returned \"Éxécution...\" and then nothing. After ten minutes I reopened the backup wallet.Wallet has no name (I put \"\" in the parameter). I gave it a name when I first used Bitcoin Core in 2016 but somehow it got lost along the way with new versions. Passphrase and interface are French.Should I wait it gets fixed or it could be done now? I want to migrate from Berkeley DB to sqlite. Not sure if it's legacy or descriptors.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5460127",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "July 18, 2023, 01:50:58 AM",
+      "body": "Is your wallet large? Does it have a lot of addresses and transactions? Have you done anything atypical with your wallet such as importing scripts and pubkeys?The migration process shouldn't take too long, although it can take some time depending on the size of your wallet since it has to rewrite everything to a new file.It's possible that there is a bug somewhere, although it may be hard to diagnose that without access to the wallet itself.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "FullofSats",
+      "created_time": "July 18, 2023, 03:25:54 PM",
+      "body": "Quote from: achow101 on July 18, 2023, 01:50:58 AMIs your wallet large? Does it have a lot of addresses and transactions? Have you done anything atypical with your wallet such as importing scripts and pubkeys?The migration process shouldn't take too long, although it can take some time depending on the size of your wallet since it has to rewrite everything to a new file.It's possible that there is a bug somewhere, although it may be hard to diagnose that without access to the wallet itself.Wallet is about 2^6 transactions and about the same number of receiving addresses. I haven't tried to import scripts or pubkeys, but in the last days I tried to install the Berkeley DB dependencies to run bitcoind from the terminal (on a Ubuntu PC). bitcoind still couldn't load my wallet. Everything worked fine with bitcoin-qt UI.NEW: I reloaded my backup wallet. I saw my transactions and balance again but I did not send nor receive. I shut down bitcoin-qt. When I started it again, it started with some bitcoin-25.99* version, and no wallet was loadable. It was only a node with peers, nothing else. I resinstalled bitcoin-25.0 and finally I could access my wallet again. I successfully made a new transaction with it. It says \"*.legacy.bak\". Migration apparently didn't work.At that point I'm just too afraid to try migratewallet again. I don't want to end up with a corrupted wallet file. I'd really want to use bitcoind though but it doesn't seem possible with a legacy wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "July 18, 2023, 06:40:33 PM",
+      "body": "Quote from: FullofSats on July 18, 2023, 03:25:54 PMI shut down bitcoin-qt. When I started it again, it started with some bitcoin-25.99* version, and no wallet was loadable. It was only a node with peers, nothing else.It sounds like you compiled it from source and did so without wallet support enabled. You probably didn't have the wallet dependencies installed in a way that the build could find them, so it didn't build the wallet component.if you want to use bitcoind, it should already come with the bitcoin-qt that you already have. They are released together. Regardless, there is no difference between the functionality of bitcoind and bitcoin-qt, except that bitcoin-qt has a GUI. The RPCs all behave the same way.What happens if you just wait longer for the migration to finish?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "FullofSats",
+      "created_time": "July 18, 2023, 07:02:40 PM",
+      "body": "Quote from: achow101 on July 18, 2023, 06:40:33 PMQuote from: FullofSats on July 18, 2023, 03:25:54 PMI shut down bitcoin-qt. When I started it again, it started with some bitcoin-25.99* version, and no wallet was loadable. It was only a node with peers, nothing else.It sounds like you compiled it from source and did so without wallet support enabled. You probably didn't have the wallet dependencies installed in a way that the build could find them, so it didn't build the wallet component.if you want to use bitcoind, it should already come with the bitcoin-qt that you already have. They are released together. Regardless, there is no difference between the functionality of bitcoind and bitcoin-qt, except that bitcoin-qt has a GUI. The RPCs all behave the same way.What happens if you just wait longer for the migration to finish?Nice. I tried bitcoind again. This time, I loaded it from the same folder as bitcoin-qt and gave it the same permission:cd '/(localpath)/bitcoin-25.0/bin'chmod +x bitcoind./bitcoindIn another terminal I tried: bitcoin-cli getbalanceIt returned a different error:error code: -19error message:Wallet file not specified (must request wallet RPC through /wallet/<filename> uri-path).Try adding \"-rpcwallet=<filename>\" option to bitcoin-cli command line.So I did as instructed: bitcoin-cli -rpcwallet=\"\" getbalanceIt worked. I will write bitcoin-cli -rpcwallet=\"\" from now on I guess.I think I'm going to wait for more bugs get fixed and a migration button to be added to the UI before I do it. Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "FullofSats",
+      "created_time": "July 18, 2023, 07:22:02 PM",
+      "body": "bitcoin-cli -rpcwallet=\"\" getwalletinfo{...  \"format\": \"sqlite\",...  \"descriptors\": true,...}Seems like it migrated, right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "July 19, 2023, 03:04:38 AM",
+      "body": "Quote from: FullofSats on July 18, 2023, 07:22:02 PMbitcoin-cli -rpcwallet=\"\" getwalletinfo{...  \"format\": \"sqlite\",...  \"descriptors\": true,...}Seems like it migrated, right?If your wallet didn't originally have a name and your balance and transactions all show up as expected, then yes, it should be successfully migrated. But you should keep the backup of the original legacy wallet just in case you later find out something went wrong.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

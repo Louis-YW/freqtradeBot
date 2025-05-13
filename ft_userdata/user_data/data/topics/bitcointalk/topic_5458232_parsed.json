@@ -1,0 +1,69 @@
+{
+  "id": "topic_5458232",
+  "title": "0xdeadpork",
+  "author": "0xdeadpork",
+  "created_time": "July 01, 2023, 01:25:46 PM",
+  "content": "Hi, lightning node operatorsI opened a channel with 10000 sats to node A.My node has run as a router node so I sent 5000 sats to node A.Therefore, the current local and remote balance is 5000 sats respectively.When the node A is offline for a few months so I want to close the channel.In fact, as I opened the channel only with my balance - 10000 sats, I want to give them all back.When I close the channel by force, will I get back the total balance?If not, do I have to communicate with the node operator and tell them to give me back the rest of sats?Thanks",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5458232",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 01, 2023, 03:26:05 PM",
+      "body": "How did you manage to open such a small channel? If I remember correctly, the default minimum value is 20,000 sats in c-lightning. I suppose the other node operator is some familiar of yours and you're doing tests?Currently, if your local balance is 5000 sats, and you want to withdraw that on-chain, you're most likely going to lose half in fees, and all that to create a near dust UTXO (~2500 sats). Note that the force-closing transaction is already signed, and the fee depends on how congested the mempool was when you did a commitment transaction last time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 01, 2023, 04:26:48 PM",
+      "body": "Quote from: 0xdeadpork on July 01, 2023, 01:25:46 PMI opened a channel with 10000 sats to node A.My node has run as a router node so I sent 5000 sats to node A.-snip-When I close the channel by force, will I get back the total balance?If not, do I have to communicate with the node operator and tell them to give me back the rest of sats?What is the name of the lightning wallet that you've used?Because based from the information provided, it looks like some feature of a custodial lightning wallet.If we're talking about the standard lightning implementation,force-closing it with 5000 sat local balance will result with 5000sat on-chain fund minus the fee, you'll loose the remote balance since it's the other party's funds.Broadcasting an old state when the local balance is 10000sat is dangerous since it could lead to a penalty of losing all of your balance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "0xdeadpork",
+      "created_time": "July 01, 2023, 05:02:10 PM",
+      "body": "Quote from: BlackHatCoiner on July 01, 2023, 03:26:05 PMHow did you manage to open such a small channel? If I remember correctly, the default minimum value is 20,000 sats in c-lightning. I suppose the other node operator is some familiar of yours and you're doing tests?Currently, if your local balance is 5000 sats, and you want to withdraw that on-chain, you're most likely going to lose half in fees, and all that to create a near dust UTXO (~2500 sats). Note that the force-closing transaction is already signed, and the fee depends on how congested the mempool was when you did a commitment transaction last time. Thanks for response   It's just a simplified example! As you said, the balance is not that small. And I ve realized that even if my balance is retrieved from my channel for a routing purpose, then I will get back the retrieved balance from another channel.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "July 01, 2023, 10:56:12 PM",
+      "body": "Quote from: 0xdeadpork on July 01, 2023, 05:02:10 PMThanks for response   It's just a simplified example! As you said, the balance is not that small. Don't you think it is better to give more reasonable values as an example instead of the 10k sats you mentioned? It can be misleading as pointed out in some of the answers. If you're making up the numbers then why not choose a value in a more useful size range than a ridiculous small 10k channel. When I read your initial post my first thought was, who opens such a small channel and why did your channel partner accepted that?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "0xdeadpork",
+      "created_time": "July 02, 2023, 02:34:26 AM",
+      "body": "Quote from: Cricktor on July 01, 2023, 10:56:12 PMQuote from: 0xdeadpork on July 01, 2023, 05:02:10 PMThanks for response   It's just a simplified example! As you said, the balance is not that small. Don't you think it is better to give more reasonable values as an example instead of the 10k sats you mentioned? It can be misleading as pointed out in some of the answers. If you're making up the numbers then why not choose a value in a more useful size range than a ridiculous small 10k channel. When I read your initial post my first thought was, who opens such a small channel and why did your channel partner accepted that?thanks for your advice !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "July 02, 2023, 10:05:36 AM",
+      "body": "I think what the OP is asking is after he sent 5k sats to the other peer and if he force-close this channel, if he will also get back the 5k sats he sent to the other peer. If this is the case, no, because you sent them to the other peer, so they are owned by the other peer. If this was just for testing purposes, the only way is to ask the other peer to send them back to you and then you can close the channel. But in that case, you wouldn't either be in a non-responsive situation with the other peer, I guess.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "July 02, 2023, 10:20:39 AM",
+      "body": "The OP stated that his LN node acted as a routing node for a transaction that apparently someone else has initiated. This can only work if the routing node has two channels at minimum, one incomming and one outgoing from perspective of routing a transaction. When 5k sats are moved through your routing node, you receive 5k plus some routing fees in one channel and you send 5k sats further to the destination node or some next routing node on the path to the destination node (incl. some additional transfer fees possibly required in case it's another routing node).Yes, if you force close that particular channel, you don't get the 5k sat that are on the remote side of the channel. But you got 5k sat (plus possibly some routing sats) on the local side of your other incomming channel.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

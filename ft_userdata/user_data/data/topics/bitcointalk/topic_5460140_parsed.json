@@ -1,0 +1,69 @@
+{
+  "id": "topic_5460140",
+  "title": "Xenophon8",
+  "author": "Xenophon8",
+  "created_time": "July 17, 2023, 08:43:24 PM",
+  "content": "Hi all, wondering if anyone knows how to get Electrum address generation & transaction signing to work with hardened addresses. I actually got it to work a few months ago, so I know it's possible. Just messing something up now. Here's the setup:BIP39 seed used with Ian Coleman's tool to generate a number of hardened child addresses (m/84'/0'/0'/0/xx').Online device (Windows, Electrum 4.4.5) with watch-only wallet generated from a hardened child receive address.Offline device (Linux, Electrum 4.0.9) with wallet generated from a corresponding hardened child private key.Transaction generated on watch-only wallet, then transferred via QR code to and from offline device for signing. I am pretty sure this method of using a wallet with single imported child addresses is what I used previously. But now it breaks down when trying to generate the public child address from the private child key on the offline device. The public address generated is completely wrong; it starts with 1 rather than bc1, so not even BIP84. So of course when I go to try to sign the imported transaction, the sign button is greyed out.It seems like Electrum auto-updated to a newer version on the Windows device since I got it working previously, but that shouldn't matter since the receive address generation on the offline device is the problem. I did try rolling back to 4.3.3 on the online device, but then the offline device generated an error when trying to import the transaction QR code.I did also try to generate the whole HD wallet from seed phrase, blowing past the BIP39 warning Electrum gives, but the resultant generated addresses are also incorrect. At least these ones I recognize - they are just the unhardened addresses associated with the seed. I messed around with the derivation pathway, such as by pasting the pathway from Ian Coleman's tool, but that just made the addresses unrecognizable. Also tried generating from account extended private key, but got the same unhardened addresses.Any ideas?? Electrum documentation doesn't mention hardened addresses at all.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5460140",
+  "comments": [
+    {
+      "author": "Abdussamad",
+      "created_time": "July 17, 2023, 10:08:03 PM",
+      "body": "Quote from: Xenophon8 on July 17, 2023, 08:43:24 PMI am pretty sure this method of using a wallet with single imported child addresses is what I used previously. But now it breaks down when trying to generate the public child address from the private child key on the offline device. The public address generated is completely wrong; it starts with 1 rather than bc1, so not even BIP84. So of course when I go to try to sign the imported transaction, the sign button is greyed out.When creating the imported private key wallet on the offline device you have to prepend p2wpkh: to the private key. This tells electrum what sort of address to generate. You can start the process again in a new wallet file by going to file > new/restore",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Xenophon8",
+      "created_time": "July 17, 2023, 10:47:48 PM",
+      "body": "Wow that was it, thank you so much. Totally forgot about that and not even sure where I read it the first time.Do you happen to have a good source to point me towards re Electrum or Bitcoin keys in general to avoid making dumb mistakes like this in the future?Thanks again",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "July 17, 2023, 11:46:00 PM",
+      "body": "Quote from: Xenophon8 on July 17, 2023, 10:47:48 PMWow that was it, thank you so much. Totally forgot about that and not even sure where I read it the first time.Do you happen to have a good source to point me towards re Electrum or Bitcoin keys in general to avoid making dumb mistakes like this in the future?Thanks againIf it's for importing private keys there is a thread here on the forum that you can bookmark check this link below you can also read this guide How to import the private key into Electrum.- https://bitcointalk.org/index.php?topic=5096376.msg51114438#msg51114438",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 18, 2023, 05:05:33 AM",
+      "body": "Quote from: Xenophon8 on July 17, 2023, 08:43:24 PM-snip-I did also try to generate the whole HD wallet from seed phrase, blowing past the BIP39 warning Electrum gives, but the resultant generated addresses are also incorrect. At least these ones I recognize - they are just the unhardened addresses associated with the seed. I messed around with the derivation pathway, such as by pasting the pathway from Ian Coleman's tool, but that just made the addresses unrecognizable.Also tried generating from account extended private key, but got the same unhardened addresses.This will never work in Electrum since the derivation path that you can edit only applies up to the BIP39's account index.Any additional derivation paths will work regardless despite being non-standard.Whatever the derivation path that you've set,Electrum will follow it up with internal/external index (for receiving and change path), then the \"address_index\";both are hardcoded to be unhardened.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 18, 2023, 12:16:48 PM",
+      "body": "If you have signed any transaction offline in Electrum then you have already accomplished this process with hardened address, because according to HCP's post from 2020, the full derivation path used by Electrum is actually m/84'/0'/0'/xxx , so BIP84 - where the xxx is 0/0 or 0/1 or anything else you'd see placed as Electrum's derivation path like this: m/0/0.Because this:QuoteBIP39 seed used with Ian Coleman's tool to generate a number of hardened child addresses (m/84'/0'/0'/0/xx').Is actually the same kind of address that Electrum creates (except with xx instead of the xx', which is unnecessary because you already have 3x hardening in the root).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Xenophon8",
+      "created_time": "July 18, 2023, 09:46:47 PM",
+      "body": "Quote from: BitMaxz on July 17, 2023, 11:46:00 PMIf it's for importing private keys there is a thread here on the forum that you can bookmark check this link below you can also read this guide How to import the private key into Electrum.- https://bitcointalk.org/index.php?topic=5096376.msg51114438#msg51114438Yes that's the kind of thing I was looking for, thank you!Quote from: nc50lc on July 18, 2023, 05:05:33 AMThis will never work in Electrum since the derivation path that you can edit only applies up to the BIP39's account index.Any additional derivation paths will work regardless despite being non-standard.Whatever the derivation path that you've set,Electrum will follow it up with internal/external index (for receiving and change path), then the \"address_index\";both are hardcoded to be unhardened.Kinda annoying, my understanding from an old paper by Vitalik is that hardened addresses are far more secure due to a trivially easy attack on the whole HD wallet if one child private key is compromised.Quote from: NotATether on July 18, 2023, 12:16:48 PMIs actually the same kind of address that Electrum creates (except with xx instead of the xx', which is unnecessary because you already have 3x hardening in the root).I originally decided to do things the hard way and generate addresses externally because I wanted a lot more control over the seed generation process than Electrum allows. Good info though, thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 19, 2023, 04:02:45 AM",
+      "body": "Quote from: Xenophon8 on July 18, 2023, 09:46:47 PMQuote from: nc50lc on July 18, 2023, 05:05:33 AM-snip-Kinda annoying, my understanding from an old paper by Vitalik is that hardened addresses are far more secure due to a trivially easy attack on the whole HD wallet if one child private key is compromised.That's true, they also need its parent extended public key to do so.But if you manage to expose one of your private key, then you should worry about other things than that.Another thing is, in case your machine is compromised, a hacker wouldn't target just one private key and the xpub to get the whole wallet, he'll just get it whole.That's unless you're exporting your private keys and saving them in unsecure locations which is a bad habit to begin with.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "topic_5399337",
+  "title": "ajaxtempest",
+  "author": "ajaxtempest",
+  "created_time": "May 19, 2022, 10:54:48 AM",
+  "content": "So i have connected electrum watch only with bwt plugin to bitcoin core. On top right of the corner i have the option to change wallets. Each wallet.dat file shows the btc amount but is there any way the bitcoin core shows gross btc of all the wallets that have been connected?I dont want to manually calculate btc per wallet.mods i dont know in which sub forum this belongs. Now i see dev and tech discussion forum.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5399337",
+  "comments": [
+    {
+      "author": "DaveF",
+      "created_time": "May 19, 2022, 11:21:38 AM",
+      "body": "On the bottom left you have move post. You can put it in  Development & Technical Discussion > Wallet software > Electrum mods don't need to.But no, there is no way to have electrum add all the totals. Evey wallet file is independent of each other. How many are there 2? 5? 10? more?You can export the private keys from all the separate wallets in one, but that takes time and leaves the potential for mistakes.And as been stated many times before, never delete wallet files even if you move everything or they are empty. You never know when you might need something from them.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 20, 2022, 05:48:42 AMLast edit: July 05, 2022, 04:25:45 AM by nc50lc",
+      "body": "Quote from: ajaxtempest on May 19, 2022, 10:54:48 AMEach wallet.dat file shows the btc amount but is there any way the bitcoin core shows gross btc of all the wallets that have been connected?Just to be clear, since you're using BWT plugin in, are the \"connected wallets\" from Electrum?If so, then it's doable using this workaround: Create a \"blank descriptor wallet\" that will hold all of the wallet's master public keys.Importing each xpub key via \"descriptor\" can be time consuming but after setting it up, that specific wallet.dat will be able see all of the imported master keys' transactions and total their balances.These are the steps:In Electrum, get the \"Master Public Key\" of the wallet that you want to import in \"Wallet->Information\".For Native SegWit and P2SH-SegWit wallets, you'll have to convert the zpub or ypub into xpub to be compatible with Bitcoin coreusing the console command (\"View->Show Console\" to enable console tab):convert_xkey(xkey=\"zpub6YBr.....XXZ3DysZgsPX\",xtype=\"standard\")With the xpub, create a parent descriptor by following this format:For P2WPKH (receiving):        \"wpkh([00000000/0]xpub....YOUR_XPUB_KEY......./0/*)\"For P2WPKH (change):           \"wpkh([00000000/0]xpub....YOUR_XPUB_KEY......./1/*)\"For P2PKH (receiving):         \"pkh([00000000/0]xpub....YOUR_XPUB_KEY......./0/*)\"For P2PKH (change):            \"pkh([00000000/0]xpub....YOUR_XPUB_KEY......./1/*)\"For P2SH-P2WPKH (receiving):   \"sh(wpkh([00000000/0]xpub....YOUR_XPUB_KEY......./0/*))\"For P2SH-P2WPKH (change):      \"sh(wpkh([00000000/0]xpub....YOUR_XPUB_KEY......./1/*))\"If your Electrum wallet is Native SegWit (P2WPKH), create P2WPKH receiving and change address descriptors.Get its checksum by using Bitcoin Core's console, use the command getdescriptorinfoFor example: getdescriptorinfo \"wpkh([00000000/0]xpub....YOUR_XPUB_KEY......./0/*)\"Take note of the \"checksum\" among the results.Now, it's ready to be imported to Bitcoin Core.Create a new blank wallet in Bitcoin Core by ticking the boxes: \"Disable Private Keys\", \"Make Blank Wallet\" and \"Descriptor Wallet\".After creating the wallet, go to Bitcoin Core's Console (Window->Console), select the newly created wallet from the drop-down menu above.Then import the descriptor by using this command:For receiving addresses:importdescriptors \"[{\\\"desc\\\": \\\"wpkh([00000000/0]xpub....YOUR_XPUB_KEY......./0/*)#2r29ev5v\\\",\\\"timestamp\\\": \\\"now\\\",\\\"watching-only\\\": true,\\\"internal\\\": false,\\\"range\\\": [0,999]}]\"For change addresses:importdescriptors \"[{\\\"desc\\\": \\\"wpkh([00000000/0]xpub....YOUR_XPUB_KEY......./1/*)#mh0yyey5\\\",\\\"timestamp\\\": \\\"now\\\",\\\"watching-only\\\": true,\\\"internal\\\": true,\\\"range\\\": [0,999]}]\"The example checksum are \"2r29ev5v\"  and \"mh0yyey5\" that are next to the descriptors; the only difference is \"internal\" flag, it's set to 'true' for change address; and lastly you might need to increase the end range depending on the wallet's usage.Just repeat the steps to each of the connected Electrum's master public key, except the \"create a new wallet\" step.Import the other descriptors to that same wallet.-edited the title for search engines-",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ajaxtempest",
+      "created_time": "May 22, 2022, 07:43:58 AM",
+      "body": "daymm thanks but it went over my head!.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 22, 2022, 08:04:24 AM",
+      "body": "Quote from: ajaxtempest on May 22, 2022, 07:43:58 AMdaymm thanks but it went over my head!.You can try to create a \"Feature Request\" issue in Bitcoin's GitHub repository, here: https://github.com/bitcoin/bitcoin/issuesIf the developers will find it useful, they may consider implementing a \"gross balance\" feature.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ajaxtempest",
+      "created_time": "May 22, 2022, 03:17:41 PM",
+      "body": "Will do but i hope bitcoin devs are watching this thread.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mertliti",
+      "created_time": "October 23, 2022, 06:40:58 PM",
+      "body": "Quote from: nc50lc on May 20, 2022, 05:48:42 AMImporting each xpub key via \"descriptor\" can be time consuming but after setting it up, that specific wallet.dat will be able see all of the imported master keys' transactions and total their balances.These are the steps:Super helpful. Thank you!To make this work for a full wallet (non watching only), I did a few modifications:Instead of \"xpub\" key, import the \"xpriv\" key gotten by using the command in Electrum's console: getmasterprivate()Add \\\"active\\\": true, to the 'receiving' and 'change' descriptors to set those as the active descriptors.Remove \\\"watching-only\\\": false, from the descriptors also.Would this work also on a non blank wallet? Or will it cause problems to have multiple active descriptors?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 24, 2022, 06:59:47 AM",
+      "body": "Quote from: mertliti on October 23, 2022, 06:40:58 PMQuote from: nc50lc on May 20, 2022, 05:48:42 AM-snip-Would this work also on a non blank wallet? Or will it cause problems to have multiple active descriptors?There'll be only one active parent descriptor per script type of receiving and change derivation paths.If you imported another with \"active: true\", the original descriptor of that script type will be deactivated.For more details, go to my reply in your other post: /index.php?topic=5409926.msg61174577#msg61174577",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

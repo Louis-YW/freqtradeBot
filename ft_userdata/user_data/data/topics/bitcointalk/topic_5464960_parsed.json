@@ -1,0 +1,45 @@
+{
+  "id": "topic_5464960",
+  "title": "alerdenisov",
+  "author": "alerdenisov",
+  "created_time": "August 29, 2023, 01:38:04 PM",
+  "content": "Hello, bitcoiners and builders.Story behind in advance: I came back from EVM to check do I have exotic/rare sats on my wallet from 2017 (still HODL with 600% profit) and found (thanks for early builders) few polindromes. But during exploration I found lack of JS lib to operate with sats (convert from one to another notation, parse from strings and etc). I decided to fill the gap with 0-dependency implementation on pure TS and publish as open-source public npm module. https://github.com/tookey-io/sats — source-codehttps://www.npmjs.com/package/@tookey-io/sats — npm libraryHere is simple example: Code:import { Sat } from \"@tookey-io/sats\";const sat = Sat.fromName(\"alerdenisov\");console.log(\"alerdenisov sat #\" + sat.n); // 1892488848343776console.log(\"alerdenisov sat mine height: \" + sat.decimal.height.n); // 717982console.log(\"alerdenisov sat mine offset: \" + sat.decimal.offset); // 98343776I would like to see your feedback and stars on github!  PS: API is simple and partially documented and very welcome to contribute typedoc if you free to PSS: Rarity and exotic checks for sats are coming with v0.1.0",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464960",
+  "comments": [
+    {
+      "author": "alerdenisov",
+      "created_time": "August 30, 2023, 02:53:07 PM",
+      "body": "Quote from: ETFbitcoin on August 30, 2023, 12:17:21 PMI did quick test with few inscription and it seems to works properly. So here are few of my thought,1. Is it right to assume your library only have function to look for sat properties of Ordinals inscription based on one of known value (e.g. decimal)?2. It annoys me fromDecimal require me to enter string rather than decimal.Code:> Sat.fromDecimal(313225.1127208201)<repl>.ts:29:17 - error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.29 Sat.fromDecimal(313225.1127208201)> Sat.fromDecimal(\"313225.1127208201\")Sat { n: 1308063627208201 }3. Function fromString with parameter sat initially confuse me. Different name such as fromSat or fromSatNumber probably would be better.Thank you for feedback. Sounds reasonable! 1. About string as type of argument – let me check max precision of JS number and max possible decimal notation. If fit, i will add additional type. 2. Function fromString allow to pass any notation. I assume to deprecate original and introduce from or even parse, what do you think? I don't want to request any external API (such as explorer or bitcoin rpc) and let to use library inside quite limited environment with V8 interp. So any operations with inscription isn't available by design. I will add rarity and exotic check function for Sat class and function to pass whole range for scan. I think that's all I can imagine without being tied to external data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 31, 2023, 07:57:49 AM",
+      "body": "Am I right in assuming the string that you are passing to fetch the rare sats information (Sat.fromName) is the wallet name? ord uses Bitcoin Core to create wallets which store said sats.Speaking of which, this library can only explore rare sats inside wallets that are on the local computer, at a specific filesystem path I guess, and no other locations, right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "alerdenisov",
+      "created_time": "August 31, 2023, 10:07:41 AM",
+      "body": "Quote from: ETFbitcoin on August 31, 2023, 09:53:49 AMQuote from: alerdenisov on August 30, 2023, 02:53:07 PM2. Function fromString allow to pass any notation.Oh, i didn't know fromString actually accept any notation.Quote from: alerdenisov on August 30, 2023, 02:53:07 PMI assume to deprecate original and introduce from or even parse, what do you think?parse seems to be good idea. But i'd suggest you get additional opinion first since i'm not expert in either ordinal and programming.Deprecation is the exact that way: it will notice developer method is going to be deleted (in the future) and lead to another. Quote from: NotATether on August 31, 2023, 07:57:49 AMAm I right in assuming the string that you are passing to fetch the rare sats information (Sat.fromName) is the wallet name? ord uses Bitcoin Core to create wallets which store said sats.Speaking of which, this library can only explore rare sats inside wallets that are on the local computer, at a specific filesystem path I guess, and no other locations, right?I see this library as a tool to convert and check rarity of sats. It isn't SDK to call API or interact with Ordinals, but I'm working on tools to interact as well (they're dependent on thridparty services and I decide to split library and sdk).Accordingly to question. Sat.fromName parses the sat name (sush as alerdenisov or satoshi) to Sat object and provides access to number, decimal and degree notations. Let me refer official handbook (https://docs.ordinals.com/overview.html) to avoid copy paste of notaion definitions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sdp",
+      "created_time": "September 16, 2023, 03:02:43 PM",
+      "body": "Quote from: ETFbitcoin on August 30, 2023, 12:17:21 PMI did quick test with few inscription and it seems to works properly. So here are few of my thought,1. Is it right to assume your library only have function to look for sat properties of Ordinals inscription based on one of known value (e.g. decimal)?2. It annoys me fromDecimal require me to enter string rather than decimal.Code:> Sat.fromDecimal(313225.1127208201)<repl>.ts:29:17 - error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.29 Sat.fromDecimal(313225.1127208201)> Sat.fromDecimal(\"313225.1127208201\")Sat { n: 1308063627208201 }3. Function fromString with parameter sat initially confuse me. Different name such as fromSat or fromSatNumber probably would be better.Numeric values with decimals are not used when there is no tolerance for error because of the standard way of storing numbers in memory result in values being encoded into a binary fashion.  That means a number is represented as a sum of fractions once or zero times from the set { 1, 1/2, 2, 1/4, 4, 1/8, 8, ... }.  Most of the time, you can not sum to a given terminating decimal with a finite number of these but you can normally get close enough.  This is fine for working with numbers for science where a small error factor is understood and accounted for.  We like to be perfectly precise which is why APIs work with sats rather than BTCs.   So if  you are working with fraction values, as a string, you wont lose information when encoding.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

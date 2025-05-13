@@ -1,0 +1,117 @@
+{
+  "id": "topic_5469504",
+  "title": "athanred",
+  "author": "athanred",
+  "created_time": "October 07, 2023, 07:03:19 AM",
+  "content": "Just an idea, but I think it is worth implementing. If you want to get a block explorer, it requires storing the whole chain. That means, you need to have all blocks, and maintain full archival node, if you want to run a block explorer. As blockchain gets bigger and bigger, people no longer can use their internal HDD or SSD, permanently attached to their machines, because many devices have 256 GB or 512 GB storage. That means, some external disks are needed, for example connected via USB.So, what is the problem with external disks? Well, they are sometimes disconnected by the OS, for example when Bitcoin Core downloads a lot of data into memory, and processes all of that, without doing any I/O for a long time. Which means, some unexpected I/O error could easily kill Bitcoin Core, and then you end up reindexing the chain (which takes a lot of time, even if you have for example the first 500 GB already downloaded, and stored on your external disk). That also means, if you cannot turn \"energy efficient mode\" off, you are forced to monitor your Bitcoin Core client, and restart it every sometimes, just to dump everything into your disk, before your OS will detach it, because of external disk inactivity for N minutes.That means, the final setup looks like that: there is a full archival node, sitting on some external disk, just to be safe, and to have the whole blockchain, just in case. But on internal disk, on which OS is running, there is some pruned node, for daily operations. Also, when it comes to nodes running 24/7, those nodes usually can be placed on some servers, but their storage is usually not so big, to allow storing the whole chain. Which means, only a local node on external disk is full archive node, all other nodes are in pruning mode.As blockchain gets bigger and bigger, we can expect there will be more and more pruned nodes. Because using external block explorers is unsafe, it is usually a good idea to have your own block explorer, and just import addresses as watch-only, if you want to explore them. However, if your node is in pruning node, then some commands does not work, for example importing addresses, because there is not enough history for a full rescan. Which means, to have a full functionality, it is still needed to attach some external disk, and ask full archival node for some proofs, to import them into pruned node.However, pruned nodes already contain a lot of useful information. For example, each pruned node can verify, if a new incoming transaction is correct or not. That means, each pruned node contains a full UTXO database. And very often, what users really care about, is not the full history, related to some address. Users often just want to observe only some unspent transaction outputs, and not dig into the whole history of past transactions, and spend transaction outputs. All of that leads us to the idea from the topic: having UTXO explorer, instead of block explorers.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5469504",
+  "comments": [
+    {
+      "author": "Bitcoin Smith",
+      "created_time": "October 07, 2023, 07:16:27 AM",
+      "body": "We can get 4 TB M.2 SSD around $200 nowadays so the cost of maintaining the full blockchain data is cheaper now compared to few years back, so I will still recommend go with the full data which will be useful in every aspect unlike pruned nodes which will specifically target the particular transaction. But having our own blockchain aka node gives us the ultimate privacy and eliminate the reliance of third party servers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "athanred",
+      "created_time": "October 07, 2023, 07:44:51 AM",
+      "body": "QuoteWe can get 4 TB M.2 SSD around $200 nowadays so the cost of maintaining the full blockchain data is cheaper now compared to few years back, so I will still recommend go with the full dataI already have one full archival node, and many pruned nodes. The cost is not the issue in case of local node, the problem is you usually don't get hardware with built-in 4 TB disk, so you need some external one. And then, OS can do some optimizations to turn it off, when it is not used, and then you need to reindex your full node, because of corrupted database, when Bitcoin Core is killed by some I/O error.Also, if you have any server, running 24/7, then it is not one-time-cost to buy some larger disk, because you pay monthly or yearly for that, so it is a cost, that will force you to pay more, for a longer time. Which means, having 4 TB of storage on your server in the cloud, will eventually be much more expensive than having 4 TB of local storage, because you are not the owner of that disk, but you pay for a service of having that storage, and then it quickly becomes more expensive than buying a disk and owning it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 07, 2023, 10:31:46 AM",
+      "body": "Actually it's interesting idea, data stored on UTXO is enough to display basic information of address. Creating additional index for fast lookup shouldn't take much storage either. For people who curious about what kind of data available on UTXO (specifically chainstate on Bitcoin Core), check https://github.com/in3rsha/bitcoin-chainstate-parser.Quote from: athanred on October 07, 2023, 07:44:51 AMQuoteWe can get 4 TB M.2 SSD around $200 nowadays so the cost of maintaining the full blockchain data is cheaper now compared to few years back, so I will still recommend go with the full dataI already have one full archival node, and many pruned nodes. The cost is not the issue in case of local node, the problem is you usually don't get hardware with built-in 4 TB disk, so you need some external one.But on other hand, most device let you replace it's internal storage. Some laptop even have multiple slots for internal storage (such as SATA + M2).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Synchronice",
+      "created_time": "October 07, 2023, 01:44:19 PM",
+      "body": "It's pretty curious that I am talking about how we need to increase bitcoin block size while others come up with a solution to decrease the amount of storage we need to occupy to support bitcoin.While it's an interesting idea, I still think that it's not a problem today to buy a storage or to buy a laptop with 1 TB HDD or SSD. Secondhand laptops are very cheap to get on eBay, especially if you see eBay auctions and find a good deal with bids. Or you can find better deals via local websites like eBay Kleinanzeigen or probably just visit some small local computer repair stores.I think we should step up, hardware aren't that expensive today as they were back ten years ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "athanred",
+      "created_time": "October 07, 2023, 02:02:04 PM",
+      "body": "QuoteIt's pretty curious that I am talking about how we need to increase bitcoin block size while others come up with a solution to decrease the amount of storage we need to occupy to support bitcoin.Do you have full archival node? Because if you do, then I wonder how many times it crashed, and you had to reindex it. Because for example copying 500 GB of data from one disk to another is not a big deal. The bigger problem is verification time, where you can spend a week on reindexing the chain, and rebuilding the database from scratch, even if all blocks are already downloaded.QuoteI think we should step up, hardware aren't that expensive today as they were back ten years ago.I also wonder, how many times you tried to verify the chain. Because CPU speed is not much better than ten years ago. When it comes to CPU speed, you can for example see, that CPU-based mining is still quite slow, which means, if you want to mine blocks on the lowest difficulty, it is not that much better, than it was ten years ago. If you look at signet, you see that the base difficulty is even lower than on mainnet!And now, I made a copy of the whole chain on my 4 TB external disk, and I spend next hours on getting it reindexed, to the point where it were before latest crash. Guess what: copying the whole chain was quite fast, but verification is still ongoing, it was started on Monday this week, and I hope it will finish before next Monday, without crashing. But I restart the client regularly, and refresh my copy, to not start reindexing from 2009 again. Guess what: reindexing is much slower than refreshing my backup.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 07, 2023, 02:33:38 PM",
+      "body": "Quote from: athanred on October 07, 2023, 02:02:04 PMQuoteIt's pretty curious that I am talking about how we need to increase bitcoin block size while others come up with a solution to decrease the amount of storage we need to occupy to support bitcoin.Do you have full archival node? Because if you do, then I wonder how many times it crashed, and you had to reindex it. Because for example copying 500 GB of data from one disk to another is not a big deal. The bigger problem is verification time, where you can spend a week on reindexing the chain, and rebuilding the database from scratch, even if all blocks are already downloaded.QuoteI think we should step up, hardware aren't that expensive today as they were back ten years ago.I also wonder, how many times you tried to verify the chain. Because CPU speed is not much better than ten years ago. When it comes to CPU speed, you can for example see, that CPU-based mining is still quite slow, which means, if you want to mine blocks on the lowest difficulty, it is not that much better, than it was ten years ago. If you look at signet, you see that the base difficulty is even lower than on mainnet!And now, I made a copy of the whole chain on my 4 TB external disk, and I spend next hours on getting it reindexed, to the point where it were before latest crash. Guess what: copying the whole chain was quite fast, but verification is still ongoing, it was started on Monday this week, and I hope it will finish before next Monday, without crashing. But I restart the client regularly, and refresh my copy, to not start reindexing from 2009 again. Guess what: reindexing is much slower than refreshing my backup.Then get better hardware.A used 6th gen i5 with 16GB of ram is under $150 a  1TB SSD to add to it is under $50.These are retail US prices. So for under $200 you can get a machine that can store / re-index / do whatever in under a couple of days.You CAN run core on less, but as you pointed out when things go wrong it takes longer to recover. You can also haul around lots of construction supplies in your compact car, but getting a pickup truck works better.The right tool for the right job.https://bitcointalk.org/index.php?topic=5399730-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "shortveggie",
+      "created_time": "October 07, 2023, 03:20:23 PM",
+      "body": "Quote from: athanred on October 07, 2023, 02:02:04 PMDo you have full archival node? Because if you do, then I wonder how many times it crashed, and you had to reindex it.if you are worried about corrupted data, you should invest into some redundancy with multiple disks. zfs has self-healing capabilities with snapshots and lvm has snapshots too. take snapshots of the bitcoin data folder at some intervals and you can return to previous state and restart bitcoin with no reindex.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 08, 2023, 05:41:14 AM",
+      "body": "Quote from: athanred on October 07, 2023, 07:03:19 AMAs blockchain gets bigger and bigger, people no longer can use their internal HDD or SSD, permanently attached to their machines, because many devices have 256 GB or 512 GB storage. That means, some external disks are needed, for example connected via USB.Quote from: athanred on October 07, 2023, 07:44:51 AMthe problem is you usually don't get hardware with built-in 4 TB disk, so you need some external one.Are you talking about laptops here? I think the main system people usually use to run full nodes is their PCs not laptops, I don't even think it is efficient to use a laptop since you can run a PC for long periods even 24/7 but not a laptop.A PC motherboard supports multiple storage disks (SSD, M.2, SATA).Quote from: athanred on October 07, 2023, 02:02:04 PMI also wonder, how many times you tried to verify the chain. Because CPU speed is not much better than ten years ago.The speed of a single core hasn't gone up for ages but we are getting CPUs with many cores that can perform computations in parallel hence significantly increasing the computation time. Full nodes like bitcoin core utilize parallelism for verification.QuoteAnd now, I made a copy of the whole chain on my 4 TB external disk, and I spend next hours on getting it reindexed, to the point where it were before latest crash. Guess what: copying the whole chain was quite fast, but verification is still ongoing, it was started on Monday this week, and I hope it will finish before next Monday, without crashing. But I restart the client regularly, and refresh my copy, to not start reindexing from 2009 again. Guess what: reindexing is much slower than refreshing my backup.If you have enough RAM and are using bitcoin core, try increasing your dbcache. It helps with the verification process speed up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 08, 2023, 12:57:13 PM",
+      "body": "Yes. It is an interesting idea, and it can help people who run full node in low-resource machines (i.e., Raspberry Pi), not necessarily if pruned. This could help any user in general who wants a comfortable way to search the balance of an address without the history of its UTXO. Basically, what you're suggesting here is to take advantage of the UTXO set every kind of full node necessarily carries, and make it accessible in a comfortable fashion, via a web page. I'm just going to say that I'm running full node on a 4GB RPi 4, and I have installed a mempool.space explorer, and it runs fine. And I do sometimes want to check information beyond the UTXO set, so I'm under the impression this won't be in great demand.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 08, 2023, 01:23:31 PM",
+      "body": "Quote from: pooya87 on October 08, 2023, 05:41:14 AMAre you talking about laptops here? I think the main system people usually use to run full nodes is their PCs not laptops, I don't even think it is efficient to use a laptop since you can run a PC for long periods even 24/7 but not a laptop.A PC motherboard supports multiple storage disks (SSD, M.2, SATA).Yes and no. A lot of people run 'headless laptops. You disconnect the display and remove the battery and just have the base of the unit plugged in.I have a few like that. Most recent laptops also have either 2 x M.2 or 1M.2 and 1 SATA The advantage is that there are a lot of laptops with broken screens out there that are just not worth repairing. Once again looking at the 6th gen era.But, for $100 + a drive they are cheap.I see them pop up on Craigslist / freecycle and such all the time. Obviously, YMMV in different parts of the world.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 10, 2023, 08:33:02 AM",
+      "body": "Quote from: athanred on October 07, 2023, 07:03:19 AMHowever, pruned nodes already contain a lot of useful information. For example, each pruned node can verify, if a new incoming transaction is correct or not. That means, each pruned node contains a full UTXO database. And very often, what users really care about, is not the full history, related to some address. Users often just want to observe only some unspent transaction outputs, and not dig into the whole history of past transactions, and spend transaction outputs. All of that leads us to the idea from the topic: having UTXO explorer, instead of block explorers.A UTXO explorer would be suitable for looking up account balances, but not transaction history.This might be fine for applications that don't require it, but let's be honest here. Nearly every major crypto program deployed to the internet has some sort of capability for checking whether a user has paid, and for that, it is required to check for a transaction containing a particular destination address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "October 10, 2023, 04:28:02 PM",
+      "body": "Quotechecking whether a user has paid, and for that, it is required to check for a transaction containing a particular destination addressWhy? If you provide any kind of service, and you require payment to address X, then:1. Even if you have pruned node, you can still have a wallet, and then those transactions will not be pruned.2. If you have pruned node with wallet disabled (as it could be the case in public UTXO explorers), then if you request payment to address X, only you can move it, so it will stay in UTXO set.3. All pruned nodes still contain last N blocks. Which means, if you want to find some recently confirmed transactions, you can decide \"store last 2016 blocks\", and then you will always see all payments confirmed in the last two weeks, even if you have pruned node. As far as I remember, network-wise, you can still check last 288 blocks in all pruned nodes, so something like that could still be available in UTXO explorers, because pruned nodes have to store them anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 11, 2023, 06:06:26 AM",
+      "body": "Quote from: vjudeu on October 10, 2023, 04:28:02 PMQuotechecking whether a user has paid, and for that, it is required to check for a transaction containing a particular destination addressWhy? If you provide any kind of service, and you require payment to address X, then:1. Even if you have pruned node, you can still have a wallet, and then those transactions will not be pruned.2. If you have pruned node with wallet disabled (as it could be the case in public UTXO explorers), then if you request payment to address X, only you can move it, so it will stay in UTXO set.3. All pruned nodes still contain last N blocks. Which means, if you want to find some recently confirmed transactions, you can decide \"store last 2016 blocks\", and then you will always see all payments confirmed in the last two weeks, even if you have pruned node. As far as I remember, network-wise, you can still check last 288 blocks in all pruned nodes, so something like that could still be available in UTXO explorers, because pruned nodes have to store them anyway.In a full UTXO based setup, there technically should no longer be a \"pruned blockchain\". Also as a service that receives payments, they usually have an automatic setup where every received coin is spent rather quickly so if after a while they wanted to check if a payment is received only from UTXOs they would not find it there because the automation has already spent it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

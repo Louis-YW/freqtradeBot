@@ -1,0 +1,29 @@
+{
+  "id": "topic_5417306",
+  "title": "ykt",
+  "author": "ykt",
+  "created_time": "October 16, 2022, 01:45:35 PM",
+  "content": "Hi,I'm trying to get all addresses and their transactions for an xpub using Blockchain.com API, and right now pretty much drown drowning under the amount of new information  So hope somebody can clarify this for me. As a first step, I'm sending a `multiaddr` request like this Code:GET https://blockchain.info/multiaddr?active=xpub...And in return, I'm getting a JSON struct with three keys - `addresses`, `wallet` and `txs`Code:{   \"addresses\":[      {         \"address\":\"<sample xpub>\",         \"change_index\":10,         \"account_index\":18,         \"final_balance\":0,         \"n_tx\":32,         \"total_received\": <obfuscated>,         \"total_sent\":<obfuscated>      }   ],   \"wallet\":{      \"final_balance\":0,      \"n_tx\":32,      \"n_tx_filtered\":32,      \"total_received\":<obfuscated>,      \"total_sent\":<obfuscated>   },   \"txs\":[...]}Every item under the `txs` list has inputs and outputs, and that's about the point where I'm stuck right now. How do I figure out whether this is a \"spend\" or \"receive\" transaction in relation to a given xpub and what is the associated address?Thank you.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417306",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "October 16, 2022, 02:01:06 PM",
+      "body": "Why didn't you give us an example of what's in the txs?When testing this with an xpub the two main things I can see that are probably useful are \"balance\" and \"result\" that come with each transaction (or seem to).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 17, 2022, 04:05:20 AM",
+      "body": "Quote from: ykt on October 16, 2022, 01:45:35 PM-snip- Every item under the `txs` list has inputs and outputs, and that's about the point where I'm stuck right now.How do I figure out whether this is a \"spend\" or \"receive\" transaction in relation to a given xpub and what is the associated address?Let's use this result as an example:Code:  \"txs\":[      {         \"hash\":\"0202b8ba785d8befdbbeca1641a981d371ddfc2f5216a2d1fd78de7e8e460478\",         \"ver\":2,         \"vin_sz\":2,         \"vout_sz\":1,         \"size\":335,         \"weight\":1340,         \"fee\":820,         \"relayed_by\":\"0.0.0.0\",         \"lock_time\":640369,         \"tx_index\":4222712286272463,         \"double_spend\":false,         \"time\":1595650444,         \"block_index\":640678,         \"block_height\":640678,         \"inputs\":[...         ],         \"out\":[...         ],         \"result\":-1820,         \"balance\":546      },Below each transaction, there should be a \"result\" and \"balance\",If the result is a negative value, that means that it's a \"spend\" transaction, \"receive\" if positive.The associated address(es) are the \"addr\" in the \"inputs\" if it's a spend txn, in the \"out\" if it's a receive txn.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

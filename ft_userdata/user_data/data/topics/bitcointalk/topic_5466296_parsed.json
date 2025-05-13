@@ -1,0 +1,165 @@
+{
+  "id": "topic_5466296",
+  "title": "satscraper",
+  "author": "satscraper",
+  "created_time": "September 10, 2023, 09:42:34 AMLast edit: September 11, 2023, 07:18:03 AM by satscraper",
+  "content": "Let's say one has multisig wallet which requires n valid signatures to sign transactions. What is the probability to loose coins the wallet holds in the case of loosing  at least one private key required for signature   when each key has its own probability  to be lost?My solution Let's Pi is the probability of loosing key with the  index of i , i= 1.....nThen the probability of not loosing it is 1-PiAllowing independent events for key loosing we get the following expression for the probability that i keys all together  will be never   lost: ∏i=1..n(1-Pi) Then target value is P= 1 - ∏i=1..n(1-Pi) where ∏ - multiplication operatorIs my calculation correct?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466296",
+  "comments": [
+    {
+      "author": "hugeblack",
+      "created_time": "September 10, 2023, 12:39:08 PM",
+      "body": "If I understand what you mean, in the multi-signature wallet we have a limited number of keys, and let us assume that it is 3 out of 8, so the calculations are as follows:The total number of N keys is 8The number required to spend F 3Losing one of the keys we haveN^ = 8-1=7F^=3-1=2Thus, the spending probability becomes p=f^/N^=2/7The probability of not being able to spend is 1-pThen you can replace N and F according to the NofM values and thus obtain a general equation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 10, 2023, 12:47:11 PM",
+      "body": "Quote from: hugeblack on September 10, 2023, 12:39:08 PMIf I understand what you mean, in the multi-signature wallet we have a limited number of keys, and let us assume that it is 3 out of 8, so the calculations are as follows:The total number of N keys is 8The number required to spend F 3Losing one of the keys we haveN^ = 8-1=7F^=3-1=2Thus, the spending probability becomes p=f^/N^=2/7The probability of not being able to spend is 1-pThen you can replace N and F according to the NofM values and thus obtain a general equation.Nope, it is not the same. Assume that F=N   and set individual probability for each key to lose.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "September 14, 2023, 11:31:41 PMLast edit: September 15, 2023, 12:52:59 AM by Saint-loup",
+      "body": "Quote from: hugeblack on September 10, 2023, 12:39:08 PMIf I understand what you mean, in the multi-signature wallet we have a limited number of keys, and let us assume that it is 3 out of 8, so the calculations are as follows:The total number of N keys is 8The number required to spend F 3Losing one of the keys we haveN^ = 8-1=7F^=3-1=2Thus, the spending probability becomes p=f^/N^=2/7The probability of not being able to spend is 1-pThen you can replace N and F according to the NofM values and thus obtain a general equation.He's not really talking about the probability of deadlocking a multisig wallet here actually, but more about the probability of losing at least one key (whatever the scheme used by the wallet). If the wallet is a N=M wallet, the wallet will be lost with only one missing key though but I think it's also important to have an idea of the probability of losing at least one key even if it doesn't lock the wallet, in order to take better decisions when we use SLIP39 for example. When we share keys in several locations, the probability of losing them is not identical in each location.@satscraper It would have been more clear with one example with real numbers but for me you're right, your formula is good.But do you know one to calculate the probability of losing at least N keys out of M ?For example if I have 3keys of a 2 of 3 wallet, what will be the probability of losing at least 2keys?PL2K = P1P2 + P2P3 + P1P3 + P1P2P3But it's not a general formula unfortunately.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 15, 2023, 06:48:16 AM",
+      "body": "Quote from: Saint-loup on September 14, 2023, 11:31:41 PM@satscraper It would have been more clear with one example with real numbers but for me you're right, your formula is good.Real numbers instance is not a problem at all.For instance if n=1  P=1 for P1=1 , while P=0  for P1=0If n=2, and say P1=0.5,  P2=0.7, then P=0.85If n=100 and say Pi =0.9 for each i index then P = 1 - 0.1100 which is very close to 1So, you can take any numbers and get the result.Quote from: Saint-loup on September 14, 2023, 11:31:41 PM@satscraper It would have been more clear with one example with real numbers but for me you're right, your formula is good.But do you know one to calculate the probability of losing at least N keys out of M ?For example if I have 3keys of a 2 of 3 wallet, what will be the probability of losing at least 2keys?PL2K = P1P2 + P2P3 + P1P3 + P1P2P3But it's not a general formula unfortunately.Unfortunately your formula is not valid even for  3keys of a 2 of 3 wallet.Take  P1 = P2 = P3 = 0.9 and you will get P>1 which is impossible.I will think about N- out -of -M -solution in general case which should include also the calculation of probability to lose the specific  set of N from all possible combinations.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 15, 2023, 09:51:58 AMLast edit: September 15, 2023, 10:32:31 AM by o_e_l_e_o",
+      "body": "Let's call your keys A, B, and C.Probability of losing A = P(A)Probability of not losing A = P(A') = 1-P(A)Probability of losing all three keys = P(A ⋂ B ⋂ C) = P(A).P(B).P(C)Probability of losing exactly one key = P(A ⋂ B' ⋂ C') + P(A' ⋂ B ⋂ C') + P(A' ⋂ B' ⋂ C) = P(A).P(B').P(C') + P(A').P(B).P(C') + P(A').P(B').P(C)Probability of losing one or more keys = P(A ⋃ B ⋃ C) = P(A) + P(B) + P(C) - P(A ⋂ B) - P(A ⋂ C) - P(B ⋂ C) + P(A ⋂ B ⋂ C)Plug in your numbers as desired. If you are looking specifically for the probability of never losing a single key, then do 1 minus the last equation above.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 15, 2023, 03:04:34 PMLast edit: September 15, 2023, 03:20:12 PM by satscraper",
+      "body": "Quote from: Saint-loup on September 14, 2023, 11:31:41 PMFor example if I have 3keys of a 2 of 3 wallet, what will be the probability of losing at least 2keys?PL2K = P1P2 + P2P3 + P1P3 + P1P2P3But it's not a general formula unfortunately. @Saint-loup, to get correct formula for PL2K  you should base calculation on the sum of probability to lose any of key pairs and probability not to lose it. That sum is  equal to 1Then, using your notations) PL2K  = 1 - (1-P1P2 ) x (1-P2P3 ) x (1-P1P3 ) If you wanna include three lost keys then PL2K  = 1 - (1-P1P2 ) x (1-P2P3 ) x (1-P1P3 ) x (1- P1P2P3)The same approach is applied to write formula for \" at least N keys out of M  keys\", but I am still looking for the best way to express in general notations the arbitrary commutation of N from M BTW, what does tt /tt code stand for? Never saw it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 15, 2023, 04:01:51 PM",
+      "body": "This is wrong.If you want to calculate the probability of losing access to a 2-of-3 multi-sig, then you need to work out the sum of the probabilities of losing any two keys and the probability of losing all three keys. The formula you are looking for is as follows:P(A).P(B).P(C') + P(A).P(B').P(C) + P(A').P(B).P(C) + P(A).P(B).P(C)This is the probability of losing A and B, plus the probability of losing A and C, plus the probability of losing B and C, plus the probability of losing all three.The other way to calculate would be to add the probability of losing exactly one key to the probability of losing no keys, and then subtract that from 1:1 - (P(A ⋂ B' ⋂ C') + P(A' ⋂ B ⋂ C') + P(A' ⋂ B' ⋂ C) + P(∅))Where P(∅) = 1 - P(A ⋃ B ⋃ C)Quote from: satscraper on September 15, 2023, 03:04:34 PMBTW, what does tt /tt code stand for? Never saw it.Teletype. It's a monospace font which is generally used when referring to small snippets of code, command line arguments, etc.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "September 15, 2023, 05:42:00 PMLast edit: September 15, 2023, 05:53:45 PM by Saint-loup",
+      "body": "Quote from: satscraper on September 15, 2023, 06:48:16 AMReal numbers instance is not a problem at all.For instance if n=1  P=1 for P1=1 , while P=0  for P1=0If n=2, and say P1=0.5,  P2=0.7, then P=0.85Not sure it's really clearer for all people lol.P= 1 - ∏i=1..2(1-Pi) = 1 - (1-P1)(1-P2) = 1 - (1-0.5)(1-0.7) = 1 - 0.15 = 0.85Quote from: satscraper on September 15, 2023, 06:48:16 AMUnfortunately your formula is not valid even for  3keys of a 2 of 3 wallet.Take  P1 = P2 = P3 = 0.9 and you will get P>1 which is impossible.I will think about N- out -of -M -solution in general case which should include also the calculation of probability to lose the specific  set of N from all possible combinations. You're right bro, actually if you draw 3 circles A, B and C intersected and you take the intersection A ⋂ B, you will also take A ⋂ B ⋂ C into it. So if you take A ⋂ B +  B ⋂ C + A ⋂ C you will count 3 times  A ⋂ B ⋂ C instead of one time.So it must bePL2K = P1P2 + P2P3 + P1P3 + P1P2P3 - 3P1P2P3 = P1P2 + P2P3 + P1P3 - 2P1P2P3",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 15, 2023, 06:37:59 PM",
+      "body": "Quote from: Saint-loup on September 15, 2023, 05:42:00 PMPL2K = P1P2 + P2P3 + P1P3 + P1P2P3 - 3P1P2P3 = P1P2 + P2P3 + P1P3 - 2P1P2P3This is correct, and is analogous to the equation I shared above:P(A).P(B).P(C') + P(A).P(B').P(C) + P(A').P(B).P(C) + P(A).P(B).P(C)Your equation works out the three intersects of A ⋂ B, A ⋂ C, and B ⋂ C, and the subtracts the middle intersect of A ⋂ B ⋂ C twice since you have included it three times.My equation works out the intersects while excluding the middle intersect each time, and then adds the middle intersect back in at the end.Either way, you will end up with the same result.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 15, 2023, 06:39:15 PM",
+      "body": "Quote from: o_e_l_e_o on September 15, 2023, 04:01:51 PMThis is wrong.Well, easier to say wrong than explain why  P(1)= 0.1   P(2) = 0.2 and P(3) = 0,3Your formula  results in 0.098, mine in 0,10646I'm not sure which of two results is correct.Please, explain why you think that my approach is wrong.  Quote from: Saint-loup on September 15, 2023, 05:42:00 PM you will count 3 times  A ⋂ B ⋂ C instead of one time.Depends on how you will intersect them.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 15, 2023, 06:55:26 PM",
+      "body": "Quote from: satscraper on September 15, 2023, 06:39:15 PMYour formula  results in 0.098, mine in 0,10646.I'm not sure which of two results is correct.0.098 or 9.8% is the correct answer. Plug those numbers in to an online probability calculator to confirm, such as this one: https://www.calctool.org/math-and-statistics/probability-three-eventsQuote from: satscraper on September 15, 2023, 06:39:15 PMPlease, explain why you think that my approach is wrong.Here is your equation:Quote from: satscraper on September 15, 2023, 03:04:34 PMPL2K  = 1 - (1-P1P2 ) x (1-P2P3 ) x (1-P1P3 )I'm afraid it simply doesn't make sense.Why are you multiplying the probabilities together? You are not looking for the probability you lose P1&P2 AND P1&P3 AND P2&P3, but rather you are looking for the probability you lose P1&P2 OR P1&P3 OR P2&P3. And as Saint-loup has pointed out, you are counting the middle intersect three times here, meaning you either have to subtract it twice at the end as they have done in their equation, or you need to modify each equation with respect to not losing the third key as I have done in mine.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 15, 2023, 07:18:10 PM",
+      "body": "Quote from: o_e_l_e_o on September 15, 2023, 06:55:26 PMQuote from: satscraper on September 15, 2023, 06:39:15 PMYour formula  results in 0.098, mine in 0,10646.I'm not sure which of two results is correct.0.098 or 9.8% is the correct answer. Plug those numbers in to an online probability calculator to confirm, such as this one: https://www.calctool.org/math-and-statistics/probability-three-eventsQuote from: satscraper on September 15, 2023, 06:39:15 PMPlease, explain why you think that my approach is wrong.Here is your equation:Quote from: satscraper on September 15, 2023, 03:04:34 PMPL2K  = 1 - (1-P1P2 ) x (1-P2P3 ) x (1-P1P3 )I'm afraid it simply doesn't make sense.Why are you multiplying the probabilities together? You are not looking for the probability you lose P1&P2 AND P1&P3 AND P2&P3, but rather you are looking for the probability you lose P1&P2 OR P1&P3 OR P2&P3. And as Saint-loup has pointed out, you are counting the middle intersect three times here, meaning you either have to subtract it twice at the end as they have done in their equation, or you need to modify each equation with respect to not losing the third key as I have done in mine.Well, I have  understood you way of thinking, but I have indeed assumed that three circles (in term of Saint-loup) do not have the common area.  Quote from: o_e_l_e_o on September 15, 2023, 06:55:26 PMWhy are you multiplying the probabilities together? Because events to lose  pairs are independent thus one needs to multiply probabilities  according to the  probability theory. We add them if they dependent , again according to to the  probability theory.Well, I think we both have   calculated different cases.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 15, 2023, 07:32:30 PM",
+      "body": "Quote from: satscraper on September 15, 2023, 07:18:10 PMBecause events to lose  pairs are independent thus one needs to multiply probabilities  according to the  probability theory. We add them if they dependent , again according to to the  probability theory.You multiply within each pair, for example P(A).P(B), as you are considering the probability of losing both Key A and also losing Key B.You do not then multiply pairs together as you have done, as that doesn't make sense. You aren't considering the possibility of losing the pair A and B, and also losing the pair A and C. How would that even work? You lose all three keys but you lose A twice? You are considering losing pair A and B OR losing A and C, so you add the probabilities of each pair together.Quote from: satscraper on September 15, 2023, 07:18:10 PMWell, I think we both have   calculated different cases.I'm afraid you haven't calculated any real world scenario. You cannot lose A&C when you've already lost A&B. A is already lost. You can't lose it twice.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 15, 2023, 07:45:03 PMLast edit: September 15, 2023, 07:57:06 PM by satscraper",
+      "body": "Quote from: o_e_l_e_o on September 15, 2023, 07:32:30 PMYou cannot lose A&C when you've already lost A&B. A is already lost. You can't lose it twice.Absolutely correct, but I have multiplied probabilities for not to lose pairs. I can not to lose A&B, A&C and B&C, each event of not loosing is independent. Another words, any of three pairs can not be lost.Thus the probability to not lose all three is (1-P(A)P(B)) (1-P(A)(C))(1-P(C)P(B))",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "September 15, 2023, 07:50:21 PM",
+      "body": "Quote from: o_e_l_e_o on September 15, 2023, 06:37:59 PMQuote from: Saint-loup on September 15, 2023, 05:42:00 PMPL2K = P1P2 + P2P3 + P1P3 + P1P2P3 - 3P1P2P3 = P1P2 + P2P3 + P1P3 - 2P1P2P3This is correct, and is analogous to the equation I shared above:P(A).P(B).P(C') + P(A).P(B').P(C) + P(A').P(B).P(C) + P(A).P(B).P(C)Your equation works out the three intersects of A ⋂ B, A ⋂ C, and B ⋂ C, and the subtracts the middle intersect of A ⋂ B ⋂ C twice since you have included it three times.My equation works out the intersects while excluding the middle intersect each time, and then adds the middle intersect back in at the end.Either way, you will end up with the same result.Yes that's what we can see if we replace P(X') by 1 - P(X) and make the calculations :P(A).P(B).P(C') + P(A).P(B').P(C) + P(A').P(B).P(C) + P(A).P(B).P(C) = P(A)P(B)(1-P(C)) + P(A)(1-P(B))P(C) + (1-P(A))P(B)P(C) + P(A)P(B)P(C)= P(A)P(B) - P(A)P(B)P(C) + P(A)P(C) - P(A)P(B)P(C) + P(B)P(C) - P(A)P(B)P(C) + P(A)P(B)P(C)= P(A)P(B) + P(A)P(C) + P(B)P(C) - 2P(A)P(B)P(C)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 15, 2023, 07:59:55 PM",
+      "body": "Quote from: satscraper on September 15, 2023, 07:45:03 PMAbsolutely correct, but I have multiplied probabilities for not to lose pairs. I can not to lose A&B, A&C and B&C, each event of not loosing is independent.It isn't, because you have included the same event multiple times. Just as you can't lose A twice, you can't \"not lose A\" twice. You either lose it or you don't.Quote from: satscraper on September 15, 2023, 07:45:03 PMThus the probability to not lose all three is (1-P(A)P(B)) (1-P(A)(C))(1-P(C)P(B))No. As I've already said above:Probability of losing all three keys = P(A ⋂ B ⋂ C) = P(A).P(B).P(C)So the probability to not lose all three keys is simply 1 - P(A).P(B).P(C)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "September 15, 2023, 08:22:33 PM",
+      "body": "Quote from: satscraper on September 15, 2023, 06:39:15 PMDepends on how you will intersect them. If the events are independent and don't exclude each other that's how their outcomes intersect. If your keys are in 3 different places, normally they can be lost all together. When you lose the key A you can also lose the key B and/or C at the same time unfortunately so it can be represented like that",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "September 15, 2023, 09:06:40 PM",
+      "body": "Quote from: Saint-loup on September 15, 2023, 08:22:33 PMQuote from: satscraper on September 15, 2023, 06:39:15 PMDepends on how you will intersect them. If the events are independent and don't exclude each other that's how their outcomes intersect. If your keys are in 3 different places, normally they can be lost all together. When you lose the key A you can also lose the key B and/or C at the same time unfortunately so it can be represented like thatNice illustration.Well, isn't it enough to lose say A&B and forget about probability to lose C as in this scenario your 2 of 3 keys multisig  wallet will stop to work for you?  I think such scenario has more  practical sense and in this case the red area  on your picture will turn into the single point of intersections  of  three circles.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "September 15, 2023, 09:41:55 PMLast edit: September 15, 2023, 09:52:50 PM by Saint-loup",
+      "body": "Quote from: satscraper on September 15, 2023, 09:06:40 PMNice illustration.Well, isn't it enough to lose say A&B and forget about probability to lose C as in this scenario your 2 of 3 keys multisig  wallet will stop to work for you?  I think such scenario has more  practical sense and in this case the red area  on your picture will turn into the single point of intersections  of  three circles.I don't think it's possible because you can also lose B along with C or A along with C and lock your wallet due to these 2 other losses, so how would you represent and count those cases? Probabilities to lose each key are not exactly the same if they are not at the same place or not stored in the same way, so I don't think trying to simplify by using probabilities of losing keys whatever they are would be the most relevant.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

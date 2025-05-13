@@ -1,0 +1,69 @@
+{
+  "id": "topic_5415778",
+  "title": "satoci",
+  "author": "satoci",
+  "created_time": "October 03, 2022, 12:37:16 PM",
+  "content": "While trying to calculate some on-chain metrics, I stumbled upon a cornerstone case that I do not know how to handle. When spending a UTXO, the change will be returned to the person who initiated the transaction, but the address is different. For instance, I have a UTXO of 15 BTC and I want to send 1 BTC to person X. There will be two transactions, one for 1 BTC to that person and the rest minus the fee back to me under a new address. Is there a way to detect 'change' transactions' and if so, how? Thanks",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415778",
+  "comments": [
+    {
+      "author": "hosemary",
+      "created_time": "October 03, 2022, 12:44:33 PMLast edit: October 03, 2022, 01:28:33 PM by hosseinimr93",
+      "body": "Quote from: satoci on October 03, 2022, 12:37:16 PMFor instance, I have a UTXO of 15 BTC and I want to send 1 BTC to person X. There will be two transactions, one for 1 BTC to that person and the rest minus the fee back to me under a new address.There won't be two transactions. There will be a single transaction with two outputs.One of the outputs will belong to the receiver and the other one will be the change.Quote from: satoci on October 03, 2022, 12:37:16 PMIs there a way to detect 'change' transactions' and if so, how? ThanksIf you send round amounts, anyone looking at your transaction will probably think that the round amount belongs to the receiver and the other output is the change.If you send exactly 1 BTC to someone and 14 BTC minus fee to your change address, it's almost obvious that each output is the change.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "October 03, 2022, 01:06:01 PM",
+      "body": "I can't remember the name of the site fully but I think it was wallet explorer that tried joining addresses together for spv clients: https://www.walletexplorer.comI think there might be ways this has been done with other places but blockchain.com removed there's because it seemed to get quite a lot of things wrong.One way of seeing if an address was change would be to analyse what the wallet has done before or to pick and output you don't think is change (such as one that's not spent instantly if the person was paying an exchange/service/payment processor).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "October 03, 2022, 01:14:02 PMLast edit: October 03, 2022, 01:29:53 PM by hosseinimr93",
+      "body": "Quote from: jackg on October 03, 2022, 01:06:01 PMI can't remember the name of the site fully but I think it was wallet explorer that tried joining addresses together for spv clients: https://www.walletexplorer.comWallet explorer put addresses in the same wallet if they are co-spent with each other.For example, if you spend from addresses A and B in a transaction and spend from addresses B and C in another transaction, they conclude that addresses A, B and C belong to the same wallet.That's all walletexplorer do.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 03, 2022, 01:37:30 PM",
+      "body": "Quote from: satoci on October 03, 2022, 12:37:16 PM-snip- Is there a way to detect 'change' transactions' and if so, how? ThanksThere's no definitive way to detect which output (not another txn) is the change.In the blockchain, the output for the change does not differ from the actual sent amount's output.There's no label, mark or data that will tell that it's the change.All you can do is to \"guess\" based from the common characteristics of a change output.Example: https://en.bitcoin.it/wiki/Privacy#Change_address_detectionTake note that most privacy-oriented bitcoin users rarely make those mistakes.Or pay for services that could do blockchain analysis reliably (but still not 100% accurate).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 03, 2022, 01:50:19 PM",
+      "body": "Quote from: satoci on October 03, 2022, 12:37:16 PMIs there a way to detect 'change' transactions' and if so, how?There are multiple ways to make an educated guess, but there are usually no ways to say definitively which output is change.The most common is by looking at the address type. Most wallets send change back to the same address type as the outputs. So if I spend from a legacy address, the change will be sent back to a legacy address. If the other output is to a segwit address, then you can make an educated guess that the legacy output is the change. The next most common technique is looking at the value, as hosseinimr93 has said above. Payment amounts are more commonly a round value, say 0.001 BTC, while change amounts are more commonly made up of whatever is left over and so are not a round value, such as 0.0012918 BTC.There are other more advanced techniques, such as looking for unnecessary inputs, looking at how the suspected change is later spent/consolidated, or looking at the some of the specifics of the transaction such as the sequence, locktime, or fee rate.However, not only can you avoid all these things if you know what you are doing, but you can actively use them to specifically make your payment look like change and your change look like a payment.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 03, 2022, 11:56:13 PM",
+      "body": "Quote from: o_e_l_e_o on October 03, 2022, 01:50:19 PMPayment amounts are more commonly a round value, say 0.001 BTC, while change amounts are more commonly made up of whatever is left over and so are not a round value, such as 0.0012918 BTC.Are they, though? Most of the time when people use Bitcoin (i.e. for buying something), the fiat amount may be round (like $100 USD), which is equivalent to a non-round BTC value.I guess you could improve 'change output detection' by checking the historical Bitcoin price at the time of the transaction and checking whether one of the 2 outputs has a round USD, EUR, CNY, ... value at that point in time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 04, 2022, 08:55:32 AM",
+      "body": "Quote from: n0nce on October 03, 2022, 11:56:13 PMAre they, though? Most of the time when people use Bitcoin (i.e. for buying something), the fiat amount may be round (like $100 USD), which is equivalent to a non-round BTC value.If you are paying in a fiat-denominated value, then chances are both your outputs will be non-round numbers. If you are paying in a bitcoin-denominated value, then chances are the payment output will be round and the change output will be non-round. I'm not saying that every payment output is a round figure, only that round figures are more likely to be payments.Quote from: n0nce on October 03, 2022, 11:56:13 PMI guess you could improve 'change output detection' by checking the historical Bitcoin price at the time of the transaction and checking whether one of the 2 outputs has a round USD, EUR, CNY, ... value at that point in time.It is very likely that blockchain analysis companies are already doing this. You can also do it yourself using blockchair, which appends the value in a fiat of your choosing at the time of the transaction to each input and output.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

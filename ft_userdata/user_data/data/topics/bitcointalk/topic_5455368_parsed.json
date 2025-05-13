@@ -1,0 +1,165 @@
+{
+  "id": "topic_5455368",
+  "title": "abadon666999",
+  "author": "abadon666999",
+  "created_time": "June 06, 2023, 02:17:29 PMLast edit: June 07, 2023, 07:28:02 AM by abadon666999",
+  "content": "thanks all...closed",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5455368",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "June 06, 2023, 03:02:45 PMLast edit: June 07, 2023, 07:14:56 AM by LoyceV",
+      "body": "Quote from: abadon666999 on June 06, 2023, 02:17:29 PMi have read that poolin pool have broadcast in the past...non standard tx with hight fees as compensationThat might have been an uncompressed Segwit input, that's different.Quoteif you try to put signed tx on the site for broadcast i have error 64 no final that error is for \"lock_time\": 7140000 ...this number is not possible change moreis there any solution?Option 1: whoever has access to 39QWbnkbcPFcrJFEB6yvVDc12eX5zqVt3y can create a new transaction.Option 2: if you own 3QNHG5gAs2pfLFQUsNnoCh8UjHoX9cZBEa, you'll have to wait about 125 years (and hope the owner of the sending address doesn't move the funds before that).Option 3: petition for Bitcoin to mine blocks faster.So, what's the story behind this transaction? Someone's pranking you?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 06, 2023, 03:45:37 PM",
+      "body": "Quote from: abadon666999 on June 06, 2023, 02:17:29 PMi have read that poolin pool have broadcast in the past...non standard tx with hight fees as compensationYours is actually standard in the current protocol but your nLocktime isn't less than the LOCKTIME_THRESHOLD which made it \"lock-by-blockheight\".So you'll have to wait for block height 7140000 or the Bitcoins locked in that script cannot be spent.It's a different scenario this time since they do not have to change anything in Bitcoin to include the \"uncompressed SegWit\" transaction in their block.All they had to do is accept that said transaction to their mempool to be included to their block.Only miners with nodes before BIP-65 implementation may consider your transaction non-standard but valid;But AFAIK (CMIIAW), the block will be rejected by new nodes.Quote from: LoyceV on June 06, 2023, 03:02:45 PMOption 1: whoever has access to 39QWbnkbcPFcrJFEB6yvVDc12eX5zqVt3y can create a new transaction.Unfortunately, the \"7140000 locktime\" isn't the transaction's locktime but the locking script's.For reference, here's the input's Redeem Script:Code:7140000 OP_CHECKLOCKTIMEVERIFY OP_DROP <PubKey> OP_CHECKSIG",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 06, 2023, 04:25:27 PM",
+      "body": "Quote from: nc50lc on June 06, 2023, 03:45:37 PMQuote from: LoyceV on June 06, 2023, 03:02:45 PMOption 1: whoever has access to 39QWbnkbcPFcrJFEB6yvVDc12eX5zqVt3y can create a new transaction.Unfortunately, the \"7140000 locktime\" isn't the transaction's locktime but the locking script's.This goes above my head... Does this mean someone created an input that's impossible to spend this century?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "June 06, 2023, 04:34:52 PM",
+      "body": "Quote from: LoyceV on June 06, 2023, 04:25:27 PMThis goes above my head... Does this mean someone created an input that's impossible to spend this century?Yes.Basically the same as: https://coinb.in/#newTimeLockedTick \"blockheight\", then set 7140000 in the blockheight box below it.As the matter of fact, it produces the same script which uses pubKey in contrary to others which uses pubKeyHash.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 06, 2023, 06:51:40 PMLast edit: June 06, 2023, 07:02:45 PM by o_e_l_e_o",
+      "body": "Quote from: LoyceV on June 06, 2023, 04:25:27 PMThis goes above my head... Does this mean someone created an input that's impossible to spend this century?Take the script OP shared above:Code:483045022100a688c15bad1efdadf609c898421cca929da4c2f27fc97fc3dce018228c81460c02203f876bb82dcdd6cdddf36f44f14df38904759ee8d163b69800fffd0665ee292e014903a0f26cb17541045332b5e3bcaeef3a062b49d5129ac21017d369e9c52c2f12c472d8d6236e2f5116b580dd1f99fd9b321d9207c9a512f301c263bd58238dbbebf469675e09a2b2acBreaking that down, we get the following:48   -   Size of script (72 bytes)30   -   Header byte indicating signature45   -   Push 69 bytes to the stack02   -   Header byte for R21   -   Length of R (33 bytes)00a6....460c   -   R02   -   Header byte for S20   -   Length of S (32 bytes)3f87....292e   -   S01   -   SIGHASH_ALL--------------------------------49   -   Size of script (73 bytes)03   -   Push 3 bytes to the stacka0f26c   -   Little endian encoding of 7,140,000b1   -   OP_CHECKLOCKTIMEVERIFY75   -   OP_DROP41   -   Push 65 bytes to the stack0453....a2b2   -   Uncompressed public keyac   -   OP_CHECKSIGLooking at the second half of this script - if we haven't hit the necessary block as specified, then OP_CHECKLOCKTIMEVERIFY will terminate the script with an error. If we have reached the necessary block, then OP_CHECKLOCKTIMEVERIFY will verify, OP_DROP will clear the stack, and then all that is left will be the pubkey and OP_CHECKSIG as it would be in a old school P2PK output.Now, if we take that part of the script:Code:03a0f26cb17541045332b5e3bcaeef3a062b49d5129ac21017d369e9c52c2f12c472d8d6236e2f5116b580dd1f99fd9b321d9207c9a512f301c263bd58238dbbebf469675e09a2b2acTake the RIPEMD160(SHA256(script)):Code:54A1DF7BE7557E2FD2F65CA45FF541EE363A0085Add the network byte 0x05, and then compute and append the checksum:Code:0554A1DF7BE7557E2FD2F65CA45FF541EE363A00858CD8A9D8And then encode in Base58:Code:39QWbnkbcPFcrJFEB6yvVDc12eX5zqVt3ySo all coins sent to the address 39QWbnkbcPFcrJFEB6yvVDc12eX5zqVt3y are locked by the above script, meaning they can only be spent when we hit block 7,140,000.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 06, 2023, 08:00:00 PM",
+      "body": "In case it isn't clear enough yet, your transaction is invalid until block 7,140,000. Did you write this yourself? I mean, individually, without using some reputable wallet software. Or did you use such, but deliberately entered 7140000 in the LockTime field? Seems to me like you wanted 714,000 and an extra zero slipped through you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 06, 2023, 08:02:53 PM",
+      "body": "If you look at the OPs posts they are all about getting coins from wallets / private keys.https://bitcointalk.org/index.php?topic=5438141https://bitcointalk.org/index.php?topic=5260282https://bitcointalk.org/index.php?topic=5414773https://bitcointalk.org/index.php?topic=5416193And so on.IIRC the original transaction was discussed back when it was created, but it could have been another one with a really long lock by a script. There are a couple of them out there.Wonder if it's a mistake or for some other reason.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "June 07, 2023, 06:43:27 AM",
+      "body": "Quote from: LoyceV on June 06, 2023, 03:02:45 PMQuote from: abadon666999 on June 06, 2023, 02:17:29 PMi have read that poolin pool have broadcast in the past...non standard tx with hight fees as compensationThat might have been an uncompressed Segwit input, that's different.Quoteif you try to put signed tx on the site for broadcast i have error 64 no final that error is for \"lock_time\": 7140000 ...this number is not possible change moreis there any solution?Option 1: whoever has access to 39QWbnkbcPFcrJFEB6yvVDc12eX5zqVt3y can create a new transaction.Option 2: if you own 3QNHG5gAs2pfLFQUsNnoCh8UjHoX9cZBEa, you'll have to wait about 125 years (and hope the owner of the sending address doesn't move the funds before that).Option 3: petition for Bitcoin to mine blocks faster.So, what's the story behind this transaction? Someone's pranking you?So, how can one avoid a situation like this where people send money to your address with a vicious timelock.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 07, 2023, 07:16:26 AM",
+      "body": "Quote from: Jason Brendon on June 07, 2023, 06:43:27 AMSo, how can one avoid a situation like this where people send money to your address with a vicious timelock.That's easy to avoid: don't create addresses with a vicious timelock",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 07, 2023, 08:05:01 AM",
+      "body": "Quote from: Jason Brendon on June 07, 2023, 06:43:27 AMSo, how can one avoid a situation like this where people send money to your address with a vicious timelock.As Loyce says, don't create the address in the first place.As I explained above, the address in question is generated from a script which contains a timelock. For you to have such an address, you would have to specifically create it. It's not the case where a regular address can be turned in to a timelocked address, nor for me to send coins to your regular address and specify how or when you are allowed to spend them in the future.This was a mistake on behalf of the person who created that address, not on behalf of the person who sent coins to that address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 07, 2023, 11:15:13 AM",
+      "body": "Quote from: LoyceV on June 07, 2023, 07:16:26 AMQuote from: Jason Brendon on June 07, 2023, 06:43:27 AMSo, how can one avoid a situation like this where people send money to your address with a vicious timelock.That's easy to avoid: don't create addresses with a vicious timelock But it is an interesting way to scam. Create said address, send funds to it, keep selling the private key.P. T. Barnum:Quote\"There's a sucker born every minute\" Think about it, how many people are greedy and just don't know that this really cannot be undone.If the person who created this and sent the funds to it sold it 100 times between $500 and $1000 they have made a lot of money.Sigh....humanity.....-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 07, 2023, 11:25:47 AMLast edit: June 07, 2023, 01:19:50 PM by LoyceV",
+      "body": "Quote from: DaveF on June 07, 2023, 11:15:13 AMBut it is an interesting way to scam. Create said address, send funds to it, keep selling the private key.One problem: the buyer can sell it too QuoteIf the person who created this and sent the funds to it sold it 100 times between $500 and $1000 they have made a lot of money.Second problem: the buyer won't understand how to use this private key, and thus can't easily verify it belongs to that address. Considering OP's history on this forum, I don't think he created this on his own. Which means that whoever created it spread it already. This address is mentioned on Reddit in a 2 years old post, but it doesn't add anything. I'm curious what's the story behind this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 07, 2023, 04:24:53 PM",
+      "body": "Quote from: LoyceV on June 07, 2023, 11:25:47 AMSecond problem: the buyer won't understand how to use this private key, and thus can't easily verify it belongs to that address. Considering OP's history on this forum, I don't think he created this on his own. Which means that whoever created it spread it already. This address is mentioned on Reddit in a 2 years old post, but it doesn't add anything. I'm curious what's the story behind this.Either a massive screwup / typo when doing something OR exactly what I said, invest BTC0.5 to get BTC2.0 as you sell it for BTC0.01 to 200 people.I'll keep saying it, never underestimate greed and stupidity. How many obvious scams do we see here day in and day out.Add to that telegram and what's app and everything else I can easily see getting a couple of hundred people to pay.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 07, 2023, 06:42:17 PM",
+      "body": "This address (39QWbnkbcPFcrJFEB6yvVDc12eX5zqVt3y) doesn't have a private key though: It has an unlocking script, the details of which I've given above. The private key needed in the script is the one belonging to the uncompressed public key in the script, which leads to the address 1PE3udPhhcSP4RAkVVuTPwQrGidVtkcaA4.If you try to sell someone that private key, they will see an empty (although previously used) address. To lead them to the given address you'd need to first teach them about scripting. And if they can understand the script well enough to generate the given address, then they'll see through the scam.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 07, 2023, 08:24:17 PM",
+      "body": "Quote from: o_e_l_e_o on June 07, 2023, 06:42:17 PMThis address (39QWbnkbcPFcrJFEB6yvVDc12eX5zqVt3y) doesn't have a private key though: It has an unlocking script, the details of which I've given above. The private key needed in the script is the one belonging to the uncompressed public key in the script, which leads to the address 1PE3udPhhcSP4RAkVVuTPwQrGidVtkcaA4.If you try to sell someone that private key, they will see an empty (although previously used) address. To lead them to the given address you'd need to first teach them about scripting. And if they can understand the script well enough to generate the given address, then they'll see through the scam.I was leaving out the step of faking a wallet with that address in it, like the 'password protected' ones, just doing it differently. Thought it was implied. It's a look I messed up and can't get to these coins since they are time-locked, here is a script here is a wallet with the address in there. (What you can't read my mind....)Anyway I think this particular scam has been outed, at least for now.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "June 08, 2023, 12:29:00 AM",
+      "body": "Quote from: LoyceV on June 07, 2023, 07:16:26 AMQuote from: Jason Brendon on June 07, 2023, 06:43:27 AMSo, how can one avoid a situation like this where people send money to your address with a vicious timelock.That's easy to avoid: don't create addresses with a vicious timelock No, people can send funds to any address with a timelock on it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 08, 2023, 08:43:15 AM",
+      "body": "Quote from: Jason Brendon on June 08, 2023, 12:29:00 AMNo, people can send funds to any address with a timelock on it.Correct, but that doesn't affect me. There's nothing stopping anyone doing all manner of stupid things with their bitcoin, like locking it behind scripts which are impossible to ever unlock, or burning it entirely. But no one can lock up bitcoin they are sending me unless I first agree to it by creating such a timelocked address in this case (or via covenants in the future, etc.)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jason Brendon",
+      "created_time": "June 08, 2023, 09:59:11 AM",
+      "body": "Quote from: o_e_l_e_o on June 08, 2023, 08:43:15 AMQuote from: Jason Brendon on June 08, 2023, 12:29:00 AMNo, people can send funds to any address with a timelock on it.Correct, but that doesn't affect me. There's nothing stopping anyone doing all manner of stupid things with their bitcoin, like locking it behind scripts which are impossible to ever unlock, or burning it entirely. But no one can lock up bitcoin they are sending me unless I first agree to it by creating such a timelocked address in this case (or via covenants in the future, etc.)How about this? You are busy with something and someone wants to buy something from you. And with very limited access to the network, you check your address to see, ok the funds arrived, then you released the goods but it's too late to find out there is actually a 100years timelock on it..This shit can happen.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 08, 2023, 10:08:59 AM",
+      "body": "Quote from: Jason Brendon on June 08, 2023, 09:59:11 AMThis shit can happen.How can this shit happen by mistake? You can't just \"find out there's a timelock\", you need to consciously specify it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

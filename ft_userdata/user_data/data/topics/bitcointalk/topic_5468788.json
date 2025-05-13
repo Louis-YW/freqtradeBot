@@ -1,0 +1,165 @@
+{
+  "id": "topic_5468788",
+  "title": "cygan",
+  "author": "cygan",
+  "created_time": "October 01, 2023, 03:18:49 PM",
+  "content": "with these 4 slides i would like to discuss with you the topic 'eclipse attack' and give you some information about it.an eclipse attack targets specific nodes on a network by surrounding them and obscuring their view of the entire network, thus isolating them. for example, if a Bitcoin node has 8 connections to other nodes and an attacker controls all 8 of those nodes, the attacker may refuse to forward any new blocks that miners produce. although the rest of the network will continue to process new blocks, the victim node will not know that blocks are coming in. to prevent or eliminate this, you can use a hard-coded list of seed nodes. if they are unreachable, the node uses dns seeds and returns a list of ip addresses of active nodes when queried.also, nodes can exchange peers by sending a 'getaddr' message and receiving addresses of the peer  https://twitter.com/BTCillustrated",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468788",
+  "comments": [
+    {
+      "author": "albert0bsd",
+      "created_time": "October 01, 2023, 03:32:32 PM",
+      "body": "QuoteBroadcast fake transactionsThis is near to impossible, maybe the attacker can broadcast transaction that are already spent in the real largest chain.But any invalid transaction is going to be dropped without problem.Or maybe I am wrong how a fake transaction is done?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 01, 2023, 03:48:39 PM",
+      "body": "Broadcast fake transaction to which node? To the isolated node or all the other nodes? Unless the isolated node is mining there is no use of doing fake tx, even if it was mining, it wouldn't accept a fake tx unless you feed it with a fake longest chain, on top of that aren't mining nodes connected to several of other trusted/ honest nodes to prevent such attacks?And in order to have unlimited time to generate blocks with double spends, wouldn't they need to eclipse 51% of nodes? And even if they do, what would they do with the majority of hash power which are comfortably mining the longest valid chain? So this is only good for a small network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cygan",
+      "created_time": "October 01, 2023, 04:16:47 PM",
+      "body": "i have found two more sources here that address this topic and also explain it well:QuoteAn eclipse attack is a relatively simple attack that a malicious actor may deploy to interfere with nodes on a network. As the name may suggest, the attack aims to obscure a participant’s view of the peer-to-peer network, in order to cause general disruption, or to prepare for more sophisticated attacks.https://medium.com/crossfi-official/eclipse-attack-in-blockchain-1531f6e9c20aQuoteEclipse attacks occur when a node is isolated from all honest peers but remains connected to at least one malicious peer.https://bitcoinops.org/en/topics/eclipse-attacks/however, even if the nodes in the table are corrupted, the currently running nodes have already found all their peers, so they cannot affect the network and in addition, there is also an option to specify the desired peer, through which you can get the addresses of other peers",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 01, 2023, 04:49:17 PM",
+      "body": "Quote from: albert0bsd on October 01, 2023, 03:32:32 PMThis is near to impossible, maybe the attacker can broadcast transaction that are already spent in the real largest chain.It is possible to broadcast any transaction. What's impossible is to \"fake\" a transaction if it isn't against the protocol rules. Double-spending a transaction doesn't count as \"faking\" if you redo the work.Quote from: digaran on October 01, 2023, 03:48:39 PMUnless the isolated node is mining there is no use of doing fake tx, even if it was mining, it wouldn't accept a fake tx unless you feed it with a fake longest chainThere is no \"fake longest chain\", no matter how much we'd want it. There is the difficultywise-longest chain, and it's always the correct chain. If another one comes up, with more work, that becomes the correct one. What is needed to be emphasized is that an eclipse attack isn't going to be effective if the attacker doesn't spend a significant amount of resources to redo the Proof-of-Work, which in that case, the network would be under threat anyway. The reason is that the attacker must maintain an entire chain themselves. If your node receives no blocks for hours, or days, you can make out you're under an eclipse attack. The attacker must solve blocks every 10 minutes to go unnoticed, which requires to redo a lot of work. They cannot re-create their own, little-worked chain, because node software comes with checkpoints.That is my understanding as to why an eclipse attack shouldn't be concerning, but please correct me if I'm wrong.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 02, 2023, 10:23:32 AM",
+      "body": "Quote from: BlackHatCoiner on October 01, 2023, 04:49:17 PMWhat is needed to be emphasized is that an eclipse attack isn't going to be effective if the attacker doesn't spend a significant amount of resources to redo the Proof-of-Work, which in that case, the network would be under threat anyway. The reason is that the attacker must maintain an entire chain themselves. If your node receives no blocks for hours, or days, you can make out you're under an eclipse attack. [emphasis mine]I wouldn't take this for granted. To the best of my knowledge, Bitcoin Core has no mechanism in place that makes it exit with an error message if something like that happens, for instance. Therefore, unless you actively monitor the logs of your node, I can definitely see how getting no blocks for a while could go unnoticed.Realistically, you would notice it when you try to send BTC and get 0 confirmations, check on block explorers and realize something's wrong with your node.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 02, 2023, 02:41:00 PM",
+      "body": "I did a little bit of a research, and eclipse attacks appear to be concerning. Paper \"Eclipse Attacks on Bitcoin’s Peer-to-Peer Network\" greatly demonstrates experiments and countermeasures of such attack. Fortunately, Bitcoin Core has implemented 6 out of the 7 countermeasures (which are described in detail above). You can check it out the pull requests in the official page of the paper's authors: http://web.archive.org/web/20220412122303/http://cs-people.bu.edu/heilman/eclipse/ (I found out the site from the v0.10.1 releasing notes, in which three of them were fixed)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HmmMAA",
+      "created_time": "October 06, 2023, 07:29:00 AM",
+      "body": "Quote from: digaran on October 01, 2023, 03:48:39 PMUnless the isolated node is mining there is no use of doing fake tx, even if it was mining, it wouldn't accept a fake tx unless you feed it with a fake longest chain, on top of that aren't mining nodes connected to several of other trusted/ honest nodes to prevent such attacks?If that node mines it has no problem as mining pools are interconnected to get the solved block and work on the next one as soon as possible . If that node belongs to an attacker which uses multiple \"sybil\" nodes it cannot attack the rest of the mining pools unless it owns the majority of them . As a pool you want to be connected with the source which is the rest of mining pools and not \"full nodes\" . The designed system is robust as mining nodes have economic incentive to receive and broadcast with high speeds . Only \"full nodes\" might face that kind of attack and it doesn't matter as they cannot change the blockchain . Bitcoin designed as a mandala network and that's why it is immune to attacks of that kind https://www.nature.com/articles/srep09082 .",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 06, 2023, 08:45:06 AM",
+      "body": "Quote from: HmmMAA on October 06, 2023, 07:29:00 AMOnly \"full nodes\" might face that kind of attack and it doesn't matter as they cannot change the blockchain .I mean, totally false. It surely matters. Full nodes verifying the integrity of the blockchain is what's Bitcoin all about. Their incapability to change the blockchain (in terms of orders of transactions, as with miners) is irrelevant. The whole point is full nodes verifying the difficultywise-longest chain produced by honest nodes, without trusting third parties. An eclipse attack is pretty much trying to forbid you from figuring out there's a more-worked chain to verify.Quote from: HmmMAA on October 06, 2023, 07:29:00 AMBitcoin designed as a mandala network and that's why it is immune to attacks of that kind https://www.nature.com/articles/srep09082 . Miners are immune to that kind. People who merely want to verify their transactions are not.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GR Sasa",
+      "created_time": "October 06, 2023, 08:53:32 AM",
+      "body": "I don't get it much, what benefits gets the attacker if he prevents nodes to broadcast blocks?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HmmMAA",
+      "created_time": "October 07, 2023, 06:21:01 PM",
+      "body": "Quote from: ETFbitcoin on October 06, 2023, 10:02:41 AMI disagree. Imagine what would happen if full nodes by for-profit service (e.g. exchange, custodial wallet) got attacked. Their customer would have bad time (e.g. feeling uneasy their deposit never shown on the service) and it could affect their business profit/reputation. Even if the full nodes owned by individual, they would waste some time checking what's wrong with their device/full node software.That's exactly the reason that for-profit nodes should be connected as close to the only source of truth which is mining nodes . Only mining nodes have the economic incentive to be honest by receiving rewards from subsidy and fees . Most people can't understand that even mining nodes aren't the same . Have a look at the pools history and you will notice that there are always 3-4 nodes that solve the majority of blocks . Take a look at the image and you will understand how bitcoin is designed .",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "digaran",
+      "created_time": "October 07, 2023, 08:00:16 PM",
+      "body": "Nice image, the figures reminds me of mysterious  crop circles found all around the globe, I wonder if these large pools/ nodes can be geo-located? If they can be located then there is a danger of physical attack on nodes( considering if they really want to disrupt the network), another thing, is there a trustworthy source to get the IPs of these networked nodes and only connect to them?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cryptosize",
+      "created_time": "October 08, 2023, 12:31:39 AM",
+      "body": "@everyoneKeep in mind HmmMAA is a CSW/BSV fanboy.That's why he spreads propaganda material straight from the BSV wiki:https://wiki.bitcoinsv.io/index.php/Mandala_NetworkEveryone knows BSV is not censorship-resistant, but he believes the (totalitarian) state should be able to confiscate coins from \"criminals\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Dump3er",
+      "created_time": "October 08, 2023, 03:25:10 AM",
+      "body": "Quote from: BlackHatCoiner on October 06, 2023, 08:45:06 AMQuote from: HmmMAA on October 06, 2023, 07:29:00 AMOnly \"full nodes\" might face that kind of attack and it doesn't matter as they cannot change the blockchain .I mean, totally false. It surely matters. Full nodes verifying the integrity of the blockchain is what's Bitcoin all about. Their incapability to change the blockchain (in terms of orders of transactions, as with miners) is irrelevant. The whole point is full nodes verifying the difficultywise-longest chain produced by honest nodes, without trusting third parties. An eclipse attack is pretty much trying to forbid you from figuring out there's a more-worked chain to verify.Quote from: HmmMAA on October 06, 2023, 07:29:00 AMBitcoin designed as a mandala network and that's why it is immune to attacks of that kind https://www.nature.com/articles/srep09082 . Miners are immune to that kind. People who merely want to verify their transactions are not. Correct and the group of people you are mentioning here are often users of light weight clients. The most fatal attack is a double-spend and that is what most people have in their heads when they hear the word \"attack\", but likewise an eclipse attack can as well be used to disrupt network communication and thereby delay or censor transactions. The issue with lightweight clients like Electrum or the Neutrino protocol or even the Lightning network is that they are dependent on communication with honest nodes. If those communication channels are cut off and infiltrated with malicious sybil attacks, there is all kinds of shenanigans an attacker could do. It's not necessarily the double-spend someone loses it all problem. But it could be the case for lightweight and second layer solutions. Communication with \"honest nodes\" is key to security of funds, aka for funds to stay with the rightful owner. Quote from: BlackHatCoiner on October 02, 2023, 02:41:00 PMI did a little bit of a research, and eclipse attacks appear to be concerning. Paper \"Eclipse Attacks on Bitcoin’s Peer-to-Peer Network\" greatly demonstrates experiments and countermeasures of such attack. Fortunately, Bitcoin Core has implemented 6 out of the 7 countermeasures (which are described in detail above). You can check it out the pull requests in the official page of the paper's authors: http://web.archive.org/web/20220412122303/http://cs-people.bu.edu/heilman/eclipse/ (I found out the site from the v0.10.1 releasing notes, in which three of them were fixed)Thanks for sharing this and this paper is also worth having a look at although a bit outdated maybe (from 2020).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 08, 2023, 08:48:24 AM",
+      "body": "Quote from: HmmMAA on October 07, 2023, 06:21:01 PMThat's exactly the reason that for-profit nodes should be connected as close to the only source of truth which is mining nodes .Mining pools can't accept the incoming connection of dozens of thousands of Bitcoin nodes, and neither should they. The network is peer-to-peer. That's why we have DNS seeds.Quote from: HmmMAA on October 07, 2023, 06:21:01 PMOnly mining nodes have the economic incentive to be honest by receiving rewards from subsidy and fees .\"Only banks have the economic incentive to be honest by receiving rewards from transaction fees\".  That model doesn't work great. It is demonstrated that the more power you give to a group of people, the more likely it is to be exploited. Mining is useful at decentralizing the issuance of money. Miners should only decide the order of the transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 08, 2023, 09:20:47 AM",
+      "body": "Quote from: HmmMAA on October 07, 2023, 06:21:01 PMQuote from: ETFbitcoin on October 06, 2023, 10:02:41 AMI disagree. Imagine what would happen if full nodes by for-profit service (e.g. exchange, custodial wallet) got attacked. Their customer would have bad time (e.g. feeling uneasy their deposit never shown on the service) and it could affect their business profit/reputation. Even if the full nodes owned by individual, they would waste some time checking what's wrong with their device/full node software.That's exactly the reason that for-profit nodes should be connected as close to the only source of truth which is mining nodes . The only source of truth? Bitcoin isn't centralized.Quote from: HmmMAA on October 07, 2023, 06:21:01 PMOnly mining nodes have the economic incentive to be honest by receiving rewards from subsidy and fees . Malicious node would be banned quickly, so anyone who want to run full nodes for non-malicious purpose (e.g. perform full verification, need whole blockchain data) also have incentive to be honest.Quote from: HmmMAA on October 07, 2023, 06:21:01 PMMost people can't understand that even mining nodes aren't the same . Have a look at the pools history and you will notice that there are always 3-4 nodes that solve the majority of blocks .I already know that. Although FWIW one mining pool may have multiple full nodes.Quote from: HmmMAA on October 07, 2023, 06:21:01 PMTake a look at the image and you will understand how bitcoin is designed . https://www.talkimg.com/images/2023/10/07/RX8LG.pngThat image doesn't represent Bitcoin or other decentralized network.Quote from: Dump3er on October 08, 2023, 03:25:10 AMThe issue with lightweight clients like Electrum or the Neutrino protocol or even the Lightning network is that they are dependent on communication with honest nodes. If those communication channels are cut off and infiltrated with malicious sybil attacks, there is all kinds of shenanigans an attacker could do. It's not necessarily the double-spend someone loses it all problem. But it could be the case for lightweight and second layer solutions. Communication with \"honest nodes\" is key to security of funds, aka for funds to stay with the rightful owner.Fortunately some light wallet (such as Electrum) connect to multiple server, node or backend which make such attack more costly and difficult.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Dump3er",
+      "created_time": "October 09, 2023, 03:12:09 AM",
+      "body": "Quote from: ETFbitcoin on October 08, 2023, 09:20:47 AM~Quote from: Dump3er on October 08, 2023, 03:25:10 AMThe issue with lightweight clients like Electrum or the Neutrino protocol or even the Lightning network is that they are dependent on communication with honest nodes. If those communication channels are cut off and infiltrated with malicious sybil attacks, there is all kinds of shenanigans an attacker could do. It's not necessarily the double-spend someone loses it all problem. But it could be the case for lightweight and second layer solutions. Communication with \"honest nodes\" is key to security of funds, aka for funds to stay with the rightful owner.Fortunately some light wallet (such as Electrum) connect to multiple server, node or backend which make such attack more costly and difficult.Yes that's right, and this is also why I linked the paper because it really explains in simple terms how these attacks work, how they are set up (calculated) and executed. They provide an example based on the Neutrino protocol. But they also provide some insightful stuff for Electrum Light clients. \"By default, Electrum tries to maintain connections to ~10 servers.\"This is not a whole lot compared to the example given for the Neutrino protocol in the paper. The required number of attacker Sybil serving nodes to achieve reasonable probability for success isn't that high. But all of this is no reason to freak out as there is a number of other factors that have to be sorted out first before an attack 1) can be executed and 2) makes any sense at all. But dealing with potential security issues is fun as I think it contributes a lot to expanding one's knowledge about the technicalities of the network. And trying to understand its vulnerabilities contributes a great deal to understanding Bitcoin's robustness. Because most of the attacks that are discussed here on the forum have never really led to publicly known large-scale damage, which means Bitcoin is really resilient because there is no lack for people trying to attack it. They do, but they can't get it done in notable ways. Yet, having some good talk about security can never hurt.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HmmMAA",
+      "created_time": "October 09, 2023, 08:35:05 AM",
+      "body": "Quote from: digaran on October 07, 2023, 08:00:16 PM I wonder if these large pools/ nodes can be geo-located? If they can be located then there is a danger of physical attack on nodes( considering if they really want to disrupt the network), another thing, is there a trustworthy source to get the IPs of these networked nodes and only connect to them? An individual might not be able to , but everything is geo-located if big countries decide it . I'm not certain if there's a list of trusted IP's , but definitely mining pools share each other their IP's , it's for their best economic interest to being interconnected .Quote from: Dump3er on October 08, 2023, 03:25:10 AMQuote from: BlackHatCoiner on October 06, 2023, 08:45:06 AMQuote from: HmmMAA on October 06, 2023, 07:29:00 AMOnly \"full nodes\" might face that kind of attack and it doesn't matter as they cannot change the blockchain .I mean, totally false. It surely matters. Full nodes verifying the integrity of the blockchain is what's Bitcoin all about. Their incapability to change the blockchain (in terms of orders of transactions, as with miners) is irrelevant. The whole point is full nodes verifying the difficultywise-longest chain produced by honest nodes, without trusting third parties. An eclipse attack is pretty much trying to forbid you from figuring out there's a more-worked chain to verify.Quote from: HmmMAA on October 06, 2023, 07:29:00 AMBitcoin designed as a mandala network and that's why it is immune to attacks of that kind https://www.nature.com/articles/srep09082 . Miners are immune to that kind. People who merely want to verify their transactions are not. Correct and the group of people you are mentioning here are often users of light weight clients. The most fatal attack is a double-spend and that is what most people have in their heads when they hear the word \"attack\", but likewise an eclipse attack can as well be used to disrupt network communication and thereby delay or censor transactions. The issue with lightweight clients like Electrum or the Neutrino protocol or even the Lightning network is that they are dependent on communication with honest nodes. If those communication channels are cut off and infiltrated with malicious sybil attacks, there is all kinds of shenanigans an attacker could do. It's not necessarily the double-spend someone loses it all problem. But it could be the case for lightweight and second layer solutions. Communication with \"honest nodes\" is key to security of funds, aka for funds to stay with the rightful owner. To BHC , thanks to Dump3er quote as you are ignored now like your \"friend\" . Let's consider an example of the attack in a massive scale . Let's say that i flood the network with a massive amount of sybil nodes ( 90% ) . In that way the probability of your \"full node\" to be connected only to malicious nodes is very high . So your \"validation\" has nothing to do with the real ledger which is produced by the mining nodes . You can understand that mining nodes are unaffected by that kind of attack as they give a shit about your node .  Bitcoin isn't a democratic network where everyone can change the consensus by running a \"full node\" . That's why it's called PoW and not PoMN( Most nodes ) . Bitcoin provided a solution to the problem of byzantine generals , not byzantine soldiers . Troops have a by far low number of generals than soldiers . Imagine a troop where every soldier would have to decide if the attack ordered should be executed . Do you think that there be a consensus ? That's what you (and most here ) don't get , that you are part of the consensus but just acknowledge it . It's like i use a bucket to take water from a river and by throwing it back i believe that i'm contributing to it's flow . But as i said to you many times , you only look bitcoin from the coding side , you can't extend your thought to the philosophical aspects behind it .  To Dump3er . The problem with current model that btc uses is that there's no economic incentive for non mining nodes to be honest . If you could use a service of a honest node that gains money by earning a small amount (less than a cent ) each time you use their explorer to see if the transaction you're interested is double spent , would you use it ? Of course , with the current fee market created by the 1 MB limit that's not possible . If you could create such a node that earns you money everyday would you be interested to give fake results for a double spend that doesn't affect you at all and you don't get any profit from it , while on the other hand you would lose the profit from the service you are providing ?   SPV's was the solution satoshi provided for massive scale . At some point we shall see if that model can work . If it works no one will want to use the current banking/credit system . Companies will earn insane amounts from fees in the long term as visa/MC has at least 1% fee + 10 cents per transaction . Quote from: ETFbitcoin on October 08, 2023, 09:20:47 AMThe only source of truth? Bitcoin isn't centralized.Define centralised and decentralised . I can provide examples of a 5 nodes network that's decentralised and a 10k nodes network that's centralised . Decantralisation comes not from the number of nodes but from the incentive nodes have to not collude .QuoteMalicious node would be banned quickly, so anyone who want to run full nodes for non-malicious purpose (e.g. perform full verification, need whole blockchain data) also have incentive to be honest.How do you know in a network flooded by malicious nodes which one is the malicious ? How do you know which one is honest ? If the truth in the network is the one provided by the malicious actor isn't the real truth false ? Who are the only CERTAIN trusted/honest nodes in the network and why? Mining nodes because no one wants to kill the golden goose just to earn a double spend . QuoteI already know that. Although FWIW one mining pool may have multiple full nodes.Not just multiple , multiple HONEST nodes that many for profit nodes can connect .",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HmmMAA",
+      "created_time": "October 09, 2023, 12:07:03 PM",
+      "body": "Quote from: ETFbitcoin on October 09, 2023, 10:35:51 AM1. I can't give exact definition of centralised and decentralised.2. Number of malicious node and whether other node collude or not mostly doesn't matter since full node supposed to verify everything.3. Even miner can perform certain attack which doesn't violate Bitcoin rule, such as selfish mining and intentionally exclude certain transaction.1. If you can't give a definition how do you know that btc isn't centralised ? This reminds me the documentary \"what is a woman\" https://twitter.com/Gidi_Traffic/status/16977476796593603222. In an environment where the majority of nodes are mallicious , -i think- you will verify a false ledger .3. If that is valid , why don't we see selfish miners and other attacks happening everyday ? No one leaves more profitability on the table , especially in that sector . Maybe there are other reasons that make pools stay honest ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "October 09, 2023, 01:39:18 PMLast edit: October 10, 2023, 11:37:30 AM by BlackHatCoiner",
+      "body": "Quote from: HmmMAA on October 09, 2023, 08:35:05 AMTo BHC , thanks to Dump3er quote as you are ignored now like your \"friend\" .You can ignore the truth all you like. I will still cover all the BSV bullshit. Quote from: HmmMAA on October 09, 2023, 08:35:05 AMThat's why it's called PoW and not PoMN( Most nodes ) .Nobody argues that the number of nodes helps in the consensus process. As I previously discussed in our local board, the choice to run a full node is largely driven by individual preferences. There isn't a strong incentive beyond concerns for security and privacy. What people argue, is that the average person should be able to run such a piece of software, a perspective differing from what you and your BSV associates propose.Quote from: HmmMAA on October 09, 2023, 12:07:03 PM2. In an environment where the majority of nodes are mallicious , -i think- you will verify a false ledger .Wanna try out spinning up fifty thousand nodes to beat the air? Go for it. We've covered in literally the previous page that a malicious node without doing Proof-of-Work, is essentially a harmless node.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

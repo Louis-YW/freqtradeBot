@@ -1,0 +1,77 @@
+{
+  "id": "topic_5432639",
+  "title": "ecdsa123",
+  "author": "ecdsa123",
+  "created_time": "January 01, 2023, 07:25:34 PMLast edit: August 31, 2024, 02:52:12 PM by ecdsa123",
+  "content": "",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432639",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "January 01, 2023, 07:38:25 PM",
+      "body": "Printing is the friend of debugging. What does it print for checksum? It should be 0x4671fc3f for compressed private key = 1. Also, what's the error it shows to you? You can't expect everyone who sees this, to run it on their local machine. Explain better. Quote from: ecdsa123 on January 01, 2023, 07:25:34 PMand I do not know where is problem. I got problem with checksumYou don't know where the problem is, but you know that it has to do with checksum? Again, what's the error?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "January 01, 2023, 08:19:02 PM",
+      "body": "https://github.com/matja/bitcoin-tooluse these tools, for all side converters",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 01, 2023, 09:09:51 PM",
+      "body": "Code:import base58from sha256 import sha256def wif_to_hex(wif: str) -> str:    uncompressed = True if wif.startswith('5') else False    private_key = base58.b58decode(wif).hex(    )[2:-8] if uncompressed else base58.b58decode(wif).hex()[2:-10]    return private_key                                                                                         def is_checksum_valid(wif: str) -> bool:    wif_bytes = base58.b58decode(wif).hex()    wif_key, checksum = wif_bytes[:-8], wif_bytes[-8:]    checksum_temp = sha256(sha256(bytes.fromhex(wif_key))).hex()[:8]    return checksum_temp == checksumprint(wif_to_hex('5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreVqkVkk8'))print(is_checksum_valid('5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreVqkVkk8'))",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "January 02, 2023, 04:08:15 AM",
+      "body": "Quote from: ecdsa123 on January 01, 2023, 07:25:34 PM    # Decode the WIF string to a bytes object        wif_bytes = wif.encode()You want to \"decode\" then you call \"encode\" method?! Doesn't that return a string instead of bytes? If so, the rest of your code is also wrong since it is not using the decoded base58 but a converted string.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "January 02, 2023, 04:36:53 AM",
+      "body": "Quote from: ecdsa123 on January 01, 2023, 07:25:34 PMCode:    # The last four bytes of the WIF string represent the checksumThe last four bytes of the decoded WIF is the checksum, and the the last four characters in the string.https://en.bitcoin.it/wiki/Wallet_import_format",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 02, 2023, 05:02:39 AM",
+      "body": "Have you consulted https://en.bitcoin.it/wiki/Wallet_import_format page before writing your code? For example (as pooya87 has already noted):Code:# Decode the WIF string to a bytes objectwif_bytes = wif.encode()Wrong. You should be using b58decode function from base58 module or something similar to convert encoded string to bytes.Therefore, the following two lines are also wrong because you are dealing with improperly decoded string.And yes, when you calculate a checksum you don't disregard a first byte (you add it instead).Code:# The last four bytes of the WIF string represent the checksumchecksum = wif_bytes[-4:]  # The private key is the bytes preceding the checksumprivate_key_bytes = wif_bytes[1:-4]    Checksum is a double hash of a byte string, so your calculated checksum is wrong by definition:Code:calculated_checksum = hashlib.sha256(private_key_bytes).digest()[:4]Lines likeCode:if wif_bytes[0] == 0x80:will never work because you didn't specify encoding (bytes[0].hex() == '80' or b.hex() == f'{0x80:x}' if you like)Code:wif_bytes[0] == 0xef:# Compressed WIFWrong, it is not compressed WIF, 0xef byte is for testnet keys. In order to determine whether a private key is compressed or uncompressed, you should be checking for 0x01 byte at the end of a private key. However, the more accurate way would be to check against length in bytes. Uncompressed private keys will be 1 byte shorter than compressed.Something like the following should work:Code:def wif_to_int_private_key(wif: str) -> int:    import base58    from sha256 import sha256    # https://en.bitcoin.it/wiki/Wallet_import_format    wif_bytes = base58.b58decode(wif)    private_key_bytes, checksum = wif_bytes[:-4], wif_bytes[-4:]    calculated_checksum = sha256(sha256(private_key_bytes))[:4]    if calculated_checksum != checksum:        raise ValueError(\"Invalid WIF checksum\")    private_key = int.from_bytes(private_key_bytes[1:-1]) if len(        private_key_bytes) == 34 else int.from_bytes(private_key_bytes[1:])    return private_key",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "mash23",
+      "created_time": "January 02, 2023, 07:14:08 AM",
+      "body": "if wif_bytes[0] == 0x80:will never work because you didn't specify encoding (bytes[0].hex() == '80' or b.hex() == f'{0x80:x}' if you like)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "January 02, 2023, 07:54:44 AM",
+      "body": "Quote from: mash23 on January 02, 2023, 07:14:08 AMif wif_bytes[0] == 0x80:will never work because you didn't specify encoding (bytes[0].hex() == '80' or b.hex() == f'{0x80:x}' if you like)You can also convert a hex representation of bytes to integer with base 16 and compare it with  a given hexadecimal value.You can't compare them directly because bytes can represent different things (not only integers).You can also use this method to compare bytes as integers:Quote from: https://stackoverflow.com/questions/24842764/comparison-of-byte-literals-in-python?rq=1If you want to interpret these sequences explicitly as integer literals, then use ast.literal_eval() to interpret decoded text values; always normalise first before comparison:Code:>>> import ast>>> ast.literal_eval(b'0b11111111'.decode('utf8'))255>>> ast.literal_eval(b'0xff'.decode('utf8'))255Here is a complete script to convert wif to an integer:Code:import base58from sha256 import sha256def wif_to_bytes(wif: str) -> tuple[bytes, ...]:    private_key = base58.b58decode(wif)    return private_key[:1], private_key[1:-4], private_key[-4:]def is_checksum_valid(version: bytes, private_key: bytes, checksum: bytes) -> bool:    return sha256(sha256(version + private_key))[:4] == checksumdef wif_to_int_private_key(wif: str) -> int:    # https://en.bitcoin.it/wiki/Wallet_import_format    version, private_key, checksum = wif_to_bytes(wif)    if not is_checksum_valid(version, private_key, checksum):        raise ValueError(\"Invalid WIF checksum\")    private_key_int = int.from_bytes(private_key[:-1], 'big') if len(        private_key) == 33 else int.from_bytes(private_key, 'big')    return private_key_int",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

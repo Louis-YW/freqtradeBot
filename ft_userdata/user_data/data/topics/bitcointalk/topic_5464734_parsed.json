@@ -1,0 +1,149 @@
+{
+  "id": "topic_5464734",
+  "title": "frogx",
+  "author": "frogx",
+  "created_time": "August 27, 2023, 01:45:01 PM",
+  "content": "Assume that all payments are RBF enabled.If address A sends address C a transaction with a low fee, B can use CPFP to receive the funds quicker.However, if address A sends address B a transaction with a low fee, and then B sends it to C, and then C uses CPFP to increase the fee, will the transaction actually confirm faster? I thought not, because the CPFP would only apply to the B to C transaction, and not touch the A to B transaction. Is this correct?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464734",
+  "comments": [
+    {
+      "author": "Bitcoin Smith",
+      "created_time": "August 27, 2023, 01:51:57 PM",
+      "body": "Assume if the wallet is Electrum you can actually use CPFP to bump the fee even if the transaction in A to B is low if you enabled  spend unconfirmed transaction in the address B at the time of broadcasting the transaction from B to C.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 27, 2023, 01:52:49 PM",
+      "body": "Quote from: frogx on August 27, 2023, 01:45:01 PMIf address A sends address C a transaction with a low fee, B can use CPFP to receive the funds quicker.I assume you mean if address A sends coins to address B, then yes, B can use CPFP.Quote from: frogx on August 27, 2023, 01:45:01 PMHowever, if address A sends address B a transaction with a low fee, and then B sends it to C, and then C uses CPFP to increase the fee, will the transaction actually confirm faster?Yes, provided C has paid a high enough fee to bump the overall fee rate for both unconfirmed parents.Quote from: frogx on August 27, 2023, 01:45:01 PMI thought not, because the CPFP would only apply to the B to C transaction, and not touch the A to B transaction. Is this correct?No, not correct.Miners will consider the transactions as a package. It doesn't matter too much if the package of transaction is a chain of two unconfirmed transactions as in your first example, or if it is a chain of three unconfirmed transactions in your second example. Miners will look at the total space taken up by all the unconfirmed transactions in the chain, the total fee paid by all the unconfirmed transactions in the chain, and then work out the effective fee rate and whether or not it is worth including the entire package of transactions.So yes, C can use CPFP, but will need to pay a fee high enough not just to bump the B to C transaction, but also to bump the A to B transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cookdata",
+      "created_time": "August 27, 2023, 01:53:46 PM",
+      "body": "Quote from: frogx on August 27, 2023, 01:45:01 PMAssume that all payments are RBF enabled.If address A sends address C a transaction with a low fee, B can use CPFP to receive the funds quicker.However, if address A sends address B a transaction with a low fee, and then B sends it to C, and then C uses CPFP to increase the fee, will the transaction actually confirm faster? I thought not, because the CPFP would only apply to the B to C transaction, and not touch the A to B transaction. Is this correct?First of all, for the transaction to confirm faster, it depends on how mempool is congested with unconfirmed transactions and how much sats you are willing to replace the fee with, if you pay a high transaction fee for Child pay for Parent(CPFP), it will confirm faster( most likely in the immediate block) but if you pay low a fee, it will stay in the mempool until a miner pick it up; If RBF is enable, you can bump the fee.In addition, the CPFP transaction is paying the transaction fees of A--->B and B--->C together, but how fast it becomes confirm depends on how you prioritised the fees.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "August 27, 2023, 01:54:01 PM",
+      "body": "This has nothing to do with RBF.You mean coin is sent from address A to B with low fee, while not yet having any confirmation, address B send the coin or part of the coin with unconfirmed transaction to address C with low fee. If address address C send to address D with the fee high enough for its transaction and to cover the two unconfirmed transactions, all the unconfirmed transactions (address A, B and C unconfirmed transactions) would be confirmed at ones as address C uses enough high fee to send to address D.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 27, 2023, 01:54:29 PM",
+      "body": "Assuming A -> B -> CIf A sends to B with a low fee and then B sends to C with a low fee then C can send the coins to D (which could be their own address) with a high enough fee that it covers the extra from A to B and B to C and it will get confirmed faster.RBFing the transaction from A to B would still leave the transaction from B to C waiting if the B to C did not use enough of a fee.edit: what everyone else above said but I can't delete from this from my phone for some reason.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "frogx",
+      "created_time": "August 27, 2023, 01:55:17 PM",
+      "body": "Quote from: o_e_l_e_o on August 27, 2023, 01:52:49 PMQuote from: frogx on August 27, 2023, 01:45:01 PMIf address A sends address C a transaction with a low fee, B can use CPFP to receive the funds quicker.I assume you mean if address A sends coins to address B, then yes, B can use CPFP.Quote from: frogx on August 27, 2023, 01:45:01 PMHowever, if address A sends address B a transaction with a low fee, and then B sends it to C, and then C uses CPFP to increase the fee, will the transaction actually confirm faster?Yes, provided C has paid a high enough fee to bump the overall fee rate for both unconfirmed parents.Quote from: frogx on August 27, 2023, 01:45:01 PMI thought not, because the CPFP would only apply to the B to C transaction, and not touch the A to B transaction. Is this correct?No, not correct.Miners will consider the transactions as a package. It doesn't matter too much if the package of transaction is a chain of two unconfirmed transactions as in your first example, or if it is a chain of three unconfirmed transactions in your second example. Miners will look at the total space taken up by all the unconfirmed transactions in the chain, the total fee paid by all the unconfirmed transactions in the chain, and then work out the effective fee rate and whether or not it is worth including the entire package of transactions.So yes, C can use CPFP, but will need to pay a fee high enough not just to bump the B to C transaction, but also to bump the A to B transaction.Thanks very much!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 27, 2023, 01:58:03 PM",
+      "body": "Quote from: DaveF on August 27, 2023, 01:54:29 PMRBFing the transaction from A to B would still leave the transaction from B to C waiting if the B to C did not use enough of a fee.RBFing from A to B would change the TXID and therefore invalidate B to C and any other unconfirmed children.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "frogx",
+      "created_time": "August 27, 2023, 02:01:45 PM",
+      "body": "Quote from: o_e_l_e_o on August 27, 2023, 01:58:03 PMQuote from: DaveF on August 27, 2023, 01:54:29 PMRBFing the transaction from A to B would still leave the transaction from B to C waiting if the B to C did not use enough of a fee.RBFing from A to B would change the TXID and therefore invalidate B to C and any other unconfirmed children.Yes, exactly. I knew this, which is why i was confused - but after reading your explanation it does make sense that C has the ability to increase the fee for both transactions without anything being invalidated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "August 27, 2023, 02:09:16 PM",
+      "body": "Quote from: frogx on August 27, 2023, 02:01:45 PMYes, exactly. I knew this, which is why i was confused - but after reading your explanation it does make sense that C has the ability to increase the fee for both transactions without anything being invalidated.But using replace-by-fee can be of low fee, instead of using child-pay-for-parent.If you are buying items on online stores, you can use child-pay-for-parent because the transaction would be replaced with new txid. But I have used RBF to increase the fee while sending to centralized exchanges and while sending to friends without any complain. If not necessary to use CPFP, it is better you use a wallet that is supporting RBF and use it instead to pump the fee for a lower transaction fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Zaguru12",
+      "created_time": "August 27, 2023, 02:27:36 PM",
+      "body": "Quote from: Charles-Tim on August 27, 2023, 02:09:16 PMBut using replace-by-fee can be of low fee, instead of using child-pay-for-parent.If you are buying items on online stores, you can use child-pay-for-parent because the transaction would be replaced with new txid. But I have used RBF to increase the fee while sending to centralized exchanges and while sending to friends without any complain. If not necessary to use CPFP, it is better you use a wallet that is supporting RBF and use it instead to pump the fee for a lower transaction fee.I think base on my understanding of the entire question it is only CPFP that would work out. The question is actually about C address bumping the transaction, C is the last Recipient address from the question and can use the CPFP method to bump the transaction from the remaining two unconfirmed transactions. The only address that can actually use RBF is address A because it remains the original sender of the coins. B to C transaction is CPFP and yet to confirm so B also cannot use RBF. So C address can not use RBF because it is the receiver address and RBF is done by the sender address which is not what OP is asking about.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "August 27, 2023, 04:07:14 PM",
+      "body": "CPFP, and to a certain extent, RBF aren't defined as per the protocol but RBF is built into the mechanism of the reference client. There is a chance that miners wouldn't consider RBF transactions (fairly rare) or not consider CPFP (which can be more common). Whilst CPFP can help to convince certain miners to include your chain of transactions into your block, RBF would be more straightforward and elegant.An issue that CPFP faces is also if the parent transaction has a poor propagation. The resultant child transaction would also have a poor propagation as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "August 27, 2023, 05:04:12 PM",
+      "body": "Quote from: Zaguru12 on August 27, 2023, 02:27:36 PMThe only address that can actually use RBF is address A because it remains the original sender of the coins. B to C transaction is CPFP and yet to confirm so B also cannot use RBF. This is wrong.Assuming there's an RBF-enabled unconfirmed transaction from address A to address B and another RBF-enabled transaction sending the fund from address B to address C, both transactions can be replaced by a new one paying higher fee using RBF method.If the transaction made from address A to address B is replaced by a new one paying higher fee, it can get confirmed faster, but the transaction from address B to C will be invalidated. If the transaction made from address B to address C is replaced by a new one paying higher fee, it can get confirmed faster and if the fee rate used for the replacing transaction is higher than the fee rate used for the transaction from address A to address B, the transaction from A to B is also accelerated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dzungmobile",
+      "created_time": "August 29, 2023, 04:42:04 AM",
+      "body": "Topics about Child Pay For ParentsHow Replace-By-Fee (RBF) an Child-Pays-For-Parent (CPFP) can speed up confirmations[TUTORIAL]getting a low-fee transaction unstuck by creating a CPFP with electrumMy transaction has been unconfirmed for a long time. What can I do? All about \"stuck\" transactions and what you can do to fix them",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "August 29, 2023, 06:21:01 AM",
+      "body": "Quote from: dzungmobile on August 29, 2023, 04:42:04 AMTopics about Child Pay For ParentsHow Replace-By-Fee (RBF) an Child-Pays-For-Parent (CPFP) can speed up confirmations[TUTORIAL]getting a low-fee transaction unstuck by creating a CPFP with electrumMy transaction has been unconfirmed for a long time. What can I do? All about \"stuck\" transactions and what you can do to fix themfrogx who is the OP of this thread is not asking about how to use child-pay-for-parent. He knows what child-pay-for-parent is and how to use it to pump transaction fee according to his question:Quote from: frogx on August 27, 2023, 01:45:01 PMHowever, if address A sends address B a transaction with a low fee, and then B sends it to C, and then C uses CPFP to increase the fee, will the transaction actually confirm faster? I thought not, because the CPFP would only apply to the B to C transaction, and not touch the A to B transaction. Is this correct?And he has already been given the information he needs:Quote from: o_e_l_e_o on August 27, 2023, 01:52:49 PMSo yes, C can use CPFP, but will need to pay a fee high enough not just to bump the B to C transaction, but also to bump the A to B transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 29, 2023, 06:24:44 AM",
+      "body": "Quote from: dzungmobile on August 29, 2023, 04:42:04 AM-snip-Just to point out that a couple of those links are very much out of date. The Electrum one for example talks about checking the \"Replaceable\" box, where as Electrum has actually removed this option altogether now on the GUI and made all transactions opted in to RBF by default for some time now. achow101's post makes a distinction between making an opt-in and a full RBF transaction which is also fairly outdated since most good wallets have supported opt-in RBF for years and full RBF is now becoming the standard.Given the number of nodes and the amount of hashrate now supporting full RBF, then you can essentially now replace any transaction whether or not it is flagged as RBF, and so stuck transactions should be a thing of the past. If your wallet software does not let you do this, then switch to a better wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "August 29, 2023, 07:03:38 AM",
+      "body": "Quote from: o_e_l_e_o on August 29, 2023, 06:24:44 AMGiven the number of nodes and the amount of hashrate now supporting full RBF, then you can essentially now replace any transaction whether or not it is flagged as RBF, and so stuck transactions should be a thing of the past. If your wallet software does not let you do this, then switch to a better wallet.o_e_l_e_o, do you know any SPV wallet that allow doing so?If I am not wrong, to replace a transaction that has not been flagged as RBF with a new one, you have to run your own node, enable full RBF, broadcast your transaction and hope that your node connects to a node that has enabled \"full RBF\". Correct me if I am wrong, please.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "August 29, 2023, 07:36:52 AM",
+      "body": "Quote from: hosseinimr93 on August 29, 2023, 07:03:38 AMo_e_l_e_o, do you know any SPV wallet that allow doing so?You can do it with Electrum. You might need to cycle through a couple of different servers until you find one which accepts full RBF replacements, but there are definitely a good number of such servers out there which you can connect to which will accept and broadcast your replacement. You'll just need to create the transaction manually since Electrum won't (yet) give you the GUI option to bump an opted out transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

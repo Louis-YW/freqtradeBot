@@ -1,0 +1,53 @@
+{
+  "id": "topic_5415347",
+  "title": "linz",
+  "author": "linz",
+  "created_time": "September 29, 2022, 12:19:54 PM",
+  "content": "hello friends,i installsudo make install in ubuntu 20 .  it show error as follow ``` make: *** [Makefile:2018: cxx_db.o] Error 1```how can i fix that",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5415347",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "September 29, 2022, 01:34:02 PM",
+      "body": "1. Please post the full error message including source code if it is given.2. Please tell us what program you are compiling (Bitcoin Core?)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "linz",
+      "created_time": "September 29, 2022, 02:18:28 PM",
+      "body": "Quote from: NotATether on September 29, 2022, 01:34:02 PM1. Please post the full error message including source code if it is given.2. Please tell us what program you are compiling (Bitcoin Core?)i solved this error by enter dbinc and atomic.h and edit atomic_compare_exchange to atomic_compare_exchange_db in atomic.h .  Now I compile bitcoin core by following commands```cd bitcoin./autogen.shsudo chmod -R 775 /root/bitcoin/./autogen.sh./configure CPPFLAGS=\"-I${BDB_PREFIX}/include/ -O2\" LDFLAGS=\"-L${BDB_PREFIX}/lib/\"make```when command make , it show error again . this is ```g++: fatal error: Killed signal terminated program cc1pluscompilation terminated.make[2]: *** [Makefile:9605: libbitcoin_node_a-init.o] Error 1make[2]: Leaving directory '/root/bitcoin/src'make[1]: *** [Makefile:18946: all-recursive] Error 1make[1]: Leaving directory '/root/bitcoin/src'make: *** [Makefile:821: all-recursive] Error 1```why this happen ?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 29, 2022, 02:33:55 PM",
+      "body": "You seem to be running out of memory during compilation. How much RAM do you have, and how are you calling make (e.g. make -j4)? A single thread requires about 2GB of memory for compiling Bitcoin Core.If you are just using make with one thread (no -j argument), you can try adding temporary swap space, but I don't recommend this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "linz",
+      "created_time": "September 29, 2022, 02:38:20 PM",
+      "body": "Quote from: NotATether on September 29, 2022, 02:33:55 PMYou seem to be running out of memory during compilation. How much RAM do you have, and how are you calling make (e.g. make -j4)? A single thread requires about 2GB of memory for compiling Bitcoin Core.If you are just using make with one thread (no -j argument), you can try adding temporary swap space, but I don't recommend this.RAM 1GB cannot handle bitcoin core. Right ? just simply call by ``` make ``` . if increase RAM GB , it will be ok . right?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "September 29, 2022, 04:34:16 PM",
+      "body": "Quote from: linz on September 29, 2022, 02:18:28 PMQuote from: NotATether on September 29, 2022, 01:34:02 PM1. Please post the full error message including source code if it is given.2. Please tell us what program you are compiling (Bitcoin Core?)i solved this error by enter dbinc and atomic.h and edit atomic_compare_exchange to atomic_compare_exchange_db in atomic.h .  Um... No. Don't modify the Bitcoin source code to fix compiling errors.. It compiles just fine providing your setup (dependencies, hardware, ...) is good. Working around such issues by modifying the source is not the way to go.Quote from: linz on September 29, 2022, 02:18:28 PMNow I compile bitcoin core by following commandsCode:cd bitcoin./autogen.shsudo chmod -R 775 /root/bitcoin/First of all, I wouldn't recommend running Bitcoin Core as root user, nor installing it as user root.Quote from: linz on September 29, 2022, 02:18:28 PMCode:./autogen.sh./configure CPPFLAGS=\"-I${BDB_PREFIX}/include/ -O2\" LDFLAGS=\"-L${BDB_PREFIX}/lib/\"makeWhy don't you use the default build commands from the documentation?https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.mdQuote from: linz on September 29, 2022, 02:18:28 PMwhen command make , it show error again . this is Code:g++: fatal error: Killed signal terminated program cc1pluscompilation terminated.make[2]: *** [Makefile:9605: libbitcoin_node_a-init.o] Error 1make[2]: Leaving directory '/root/bitcoin/src'make[1]: *** [Makefile:18946: all-recursive] Error 1make[1]: Leaving directory '/root/bitcoin/src'make: *** [Makefile:821: all-recursive] Error 1why this happen ?This is again not the complete error message, though, right.Quote from: linz on September 29, 2022, 02:38:20 PMQuote from: NotATether on September 29, 2022, 02:33:55 PMYou seem to be running out of memory during compilation. How much RAM do you have, and how are you calling make (e.g. make -j4)? A single thread requires about 2GB of memory for compiling Bitcoin Core.If you are just using make with one thread (no -j argument), you can try adding temporary swap space, but I don't recommend this.RAM 1GB cannot handle bitcoin core. Right ? just simply call by ``` make ``` . if increase RAM GB , it will be ok . right?It is recommended to have 1.5GB at the very least, but you can tune compiler flags.Quote from: https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md#memory-requirementsC++ compilers are memory-hungry. It is recommended to have at least 1.5 GB of memory available when compiling Bitcoin Core. On systems with less, gcc can be tuned to conserve memory with additional CXXFLAGS:[...]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

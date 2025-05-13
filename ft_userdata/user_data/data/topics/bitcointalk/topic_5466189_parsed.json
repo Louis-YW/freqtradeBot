@@ -1,0 +1,37 @@
+{
+  "id": "topic_5466189",
+  "title": "digaran",
+  "author": "digaran",
+  "created_time": "September 09, 2023, 08:35:06 AMLast edit: January 20, 2024, 07:30:20 AM by digaran",
+  "content": "🖤",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466189",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "September 09, 2023, 10:36:41 AM",
+      "body": "Quotebut I couldn't find any weak entry point for an attackBecause if there is any weakness, it is not there. You could start with x=1 as well, and get as strong elliptic curve, as it currently is. The only difference would be in signatures, where you could get some advantage in case of bugs like SIGHASH_SINGLE. But nothing beyond that. If one point is weak, then all of them are, that's why picking a different generator doesn't change that much.QuoteAnd using 2 as private key will result in our original secp256k1 G, using 3 as private key will result in n/2+1, so am I doing it wrong?You are doing it right. If you use \"1/2\" as your base point, then you can just halve all of your private keys, and you will reach exactly the same points. So, it doesn't really matter if you have \"3\" as your private key on your curve, or if you have \"3/2\" on the original curve. It leads you to exactly the same public key, and all ECDSA operations are exactly as strong, as they were before.QuoteIsn't this exploitable if we could find a point easily solvable by finding it's discrete log?No, because the base point is \"easily solvable\". And guess what: knowing that the private key for \"G\" is equal to \"one\" gives you nothing. Knowing one weak point does not make the whole curve weak. You would need a way to take two public keys as your input, and produce a distance between them as an output. So far, nobody can do that by using \"addition-only\", or by using \"multiplication-only\". More than that: we cannot do that even by using \"addition-and-multiplication\", because this thing is what we can call \"a signature\", and you cannot produce that kind of connection for two public keys, without knowing private key for any of them.QuoteI really don't understand why selecting  the right G is important, can someone explain please?Because if you would have some curve with a point, where x=0 is valid, then you could mess up with signatures. Similarly, for x=1, and for such small numbers, you could have some safe curve, that has vulnerable signatures. In general, if your z-value is not protected enough, and for example you directly sign data, without any hashing, then using unsafe generator could lead to some problems. Another thing is that if your generator is small, then you cannot do some things, for example you cannot create a puzzle, based on mining public keys. For that reason, if we would have some puzzle, where there would be a reward for getting leading zeroes in x-value of a public key, then we would be forced to redesign it, to find different solutions, like a binary digits of a \"pi\" constant, or something like that, because our \"1/2\" would allow getting all smaller rewards, without checking 2^90 public keys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 09, 2023, 11:20:33 AM",
+      "body": "Quote from: garlonicon on September 09, 2023, 10:36:41 AMQuoteI really don't understand why selecting  the right G is important, can someone explain please?Because if you would have some curve with a point, where x=0 is valid, then you could mess up with signatures. Similarly, for x=1, and for such small numbers, you could have some safe curve, that has vulnerable signatures. In general, if your z-value is not protected enough, and for example you directly sign data, without any hashing, then using unsafe generator could lead to some problems. Another thing is that if your generator is small, then you cannot do some things, for example you cannot create a puzzle, based on mining public keys. For that reason, if we would have some puzzle, where there would be a reward for getting leading zeroes in x-value of a public key, then we would be forced to redesign it, to find different solutions, like a binary digits of a \"pi\" constant, or something like that, because our \"1/2\" would allow getting all smaller rewards, without checking 2^90 public keys.Basically, if we can simplify y^2 = x^3 + 7 given one of the point coordinates, then we should not use such a coordinate as the base point, since then the whole sequence could be broken.Also just adding a large number of points to G and using that as new G won't suddenly make the curve more secure. Let's say we make 2^128*G and call it NewG. Since it's points and key are already known, it's no different from using G itself.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 09, 2023, 12:01:24 PM",
+      "body": "Quote from: digaran on September 09, 2023, 11:27:39 AM@NotATether, can you show example of such simplified point?Alright, here is a proof of concept:Code:from math import *# Collect points on the curvel = []for x in range(1000000):  y = sqrt(x**3 + 7)  # Make sure y is on the curve  if floor(y) == y:    l.append((x,int(y)))p = 128 # Or any other numberfor m in l:  print(m[0], m[1], m[0] % p, m[1] % pThis is a little experiment you can use to investigate what happens when you change the curve characteristic, given the first one million points on a given curve. Making the characteristic lower or less prime increases the chance that we are going to have two different sets of points (the first two coordinates printed) that are equivalent (last two coordinates printed are the same for both points).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

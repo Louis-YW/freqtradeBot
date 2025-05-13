@@ -1,0 +1,77 @@
+{
+  "id": "topic_5474089",
+  "title": "night_driver",
+  "author": "night_driver",
+  "created_time": "November 14, 2023, 09:38:00 PM",
+  "content": "Hello,I would like to understand better the restore process of a wallet on a node.To give a bit of context, i had only one wallet on a bitcoin node with multiples addresses (almost 30).I re-import this wallet from the \"importprvkey\" method and all works fine my wallet was restored.This issue is I lost all the addresses except the main address of this wallet. For example i send a transaction to one the addresses i had before the import and i cannot list the transactions for this address my node telling me that is cannot retrieve from this address.My question is : How to restore a wallet including all the addresses i had created in the past ?Thank you for help !",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5474089",
+  "comments": [
+    {
+      "author": "LucyFurr",
+      "created_time": "November 14, 2023, 09:41:29 PM",
+      "body": "If you import the private key it only retrieve the coins stored in that address so did you imported 30 privkeys?You need to use the recovery seeds/mnemonic phrase/seed phrase to import the wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "night_driver",
+      "created_time": "November 14, 2023, 09:52:42 PM",
+      "body": "Quote from: LucyFurr on November 14, 2023, 09:41:29 PMIf you import the private key it only retrieve the coins stored in that address so did you imported 30 privkeys?You need to use the recovery seeds/mnemonic phrase/seed phrase to import the wallet.Hello, Thank you for your reply !The 30 addresses were on the same wallet.Because a wallet can have one or more addresses but at the end it's the same and only one wallet file.So when i restore this wallet i except that it will re-import all the addresses also.The \"dumpprvkey\" also return only one private key even if you have 30 addresses so i cannot restore 30 wallets even if i wanted.Thank you !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LucyFurr",
+      "created_time": "November 14, 2023, 10:03:12 PM",
+      "body": "Quote from: night_driver on November 14, 2023, 09:52:42 PMThe \"dumpprvkey\" also return only one private key even if you have 30 addresses so i cannot restore 30 wallets even if i wanted.Thank you !\"dumpprvkey\" <address> will give private key of the specific address only in qt. AFAIK you can't retrieve seeds in qt wallet so either you can recover the wallet using wallet.dat file or 30 addresses with 30 private keys. Please correct me if I am wrong guys.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "night_driver",
+      "created_time": "November 14, 2023, 10:06:54 PM",
+      "body": "Quote from: LucyFurr on November 14, 2023, 10:03:12 PMQuote from: night_driver on November 14, 2023, 09:52:42 PMThe \"dumpprvkey\" also return only one private key even if you have 30 addresses so i cannot restore 30 wallets even if i wanted.Thank you !\"dumpprvkey\" <address> will give private key of the specific address only in qt. AFAIK you can't retrieve seeds in qt wallet so either you can recover the wallet using wallet.dat file or 30 addresses with 30 private keys. Please correct me if I am wrong guys.What mean's qt please ?Thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "November 14, 2023, 10:11:21 PM",
+      "body": "Quote from: night_driver on November 14, 2023, 09:38:00 PMMy question is : How to restore a wallet including all the addresses i had created in the past ?Which version of Bitcoin Core are you using? You might wanna try the prompt \"rescan\" after importing ur private key.  It tells Bitcoin Core to scan the blockchain for transactions associated with the imported private key.This process might take some time but once it is successfully completed, all addresses corresponding to the imported private key should now be part of your wallet.Another consideration would be the import of the wallet.dat because importing HD wallets via \"importprvkey\" might not restore all addresses that were associated. With the release of v0.13.0 all created wallets were HD wallets by default.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "night_driver",
+      "created_time": "November 15, 2023, 06:15:38 PM",
+      "body": "Quote from: seek3r on November 14, 2023, 10:11:21 PMQuote from: night_driver on November 14, 2023, 09:38:00 PMMy question is : How to restore a wallet including all the addresses i had created in the past ?Which version of Bitcoin Core are you using? You might wanna try the prompt \"rescan\" after importing ur private key.  It tells Bitcoin Core to scan the blockchain for transactions associated with the imported private key.This process might take some time but once it is successfully completed, all addresses corresponding to the imported private key should now be part of your wallet.Another consideration would be the import of the wallet.dat because importing HD wallets via \"importprvkey\" might not restore all addresses that were associated. With the release of v0.13.0 all created wallets were HD wallets by default. Thank you for your reply !I tried the -rescan option but it's seems it's not existing anymore since the v21 version. I also read that normally this scan should be automatic now that why they remove the flag.The problem is i still don't have all my addresses.An other solution would be to backup directly the file \"*.dat\" but that's mean each time i generate a new address  i need to backup the last version of this file right ?Or maybe someone has bettter solution ?Thanks you !",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seek3r",
+      "created_time": "November 16, 2023, 06:43:11 AM",
+      "body": "Quote from: night_driver on November 15, 2023, 06:15:38 PMI tried the -rescan option but it's seems it's not existing anymore since the v21 version. I also read that normally this scan should be automatic now that why they remove the flag.Oh yes in the latest versions of Bitcoin Core the rescanning method got automatically initiated when its neccessary. But you can still do this manually if u wish. The command for that would be rescanblockchain - you can specify start and block heights for that aswell. This would look like this \"rescanblockchain [start_block] [stop_block]\"Quote from: night_driver on November 15, 2023, 06:15:38 PMAn other solution would be to backup directly the file \"*.dat\" but that's mean each time i generate a new address  i need to backup the last version of this file right ?No its not neccessary to do that because all future addresses can be generated from the existing seed with HD wallets.But I would highly recommend to backup ur wallet.dat at regular intervals. Especially with big changes regarding balance or something similar.You can also try the command \"listreceivedbyaddress 0 true\" which lists all addresses that received atleast a single transaction including those with zero balances.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "November 26, 2023, 08:32:59 PM",
+      "body": "Quote from: night_driver on November 14, 2023, 09:38:00 PMI would like to understand better the restore process of a wallet on a node.To give a bit of context, i had only one wallet on a bitcoin node with multiples addresses (almost 30).I re-import this wallet from the \"importprvkey\" method and all works fine my wallet was restored.Do you remember with what version of Bitcoin Core you created your wallet?Was it a HD wallet?Quote from: night_driver on November 14, 2023, 09:38:00 PMThis issue is I lost all the addresses except the main address of this wallet. For example i send a transaction to one the addresses i had before the import and i cannot list the transactions for this address my node telling me that is cannot retrieve from this address.I would say there's no \"main address\" in a Bitcoin Core wallet. You have external addresses which are used when you request a receive address and there are internal addresses which are used for change coins, e.g. when you have an transaction input of 0.1BTC and you want to send Bob 0.06BTC with a transaction fee of 0.00002BTC, your wallet will create automatically a change output to return the excess of 0.03998BTC as change into an internal change address of your wallet.I hope for you that you still have the original wallet.dat file OR you have dumped all your keys with bitcoin-cli dumpwallet \"filename\". It's important to dump all keys if you have a non-HD legacy wallet and if you dare to deal with unprotected private keys (not recommended on an online device). bitcoin-cli dumpprivkey \"address\" only gives you the private key for one particular address, which is definitely not enough in your case.To restore a non-HD legacy Bitcoin Core wallet you would need all private keys and key types (external and internal) to import.A HD wallet does generate all private keys, public keys and addresses from a single HD seed key (a specially marked private key with hdseed=1 in wallet dump file). I haven't done such a restore myself yet, but if you have a dump of such a HD seed key, it should be possible to open an empty HD wallet with no keys, import that HD seed key with bitcoin-cli sethdseed \"true\" \"HD-seed-in-WIF-format\" and a subsequent bitcoin-cli keypoolrefill would generate by default 1000 receive and change addresses which should be identical to your initial wallet.A bitcoin-cli rescanblockchain should then find all UTXOs of such a restaured wallet.Bitcoin Core descriptor wallets can be restaured quite easily if you have the correct private key descriptor and derivation path. The devil lies in details but to my knowledge it's even possible to restore a BIP-39 mnemonic words wallet in Bitcoin Core (with additional tools like the Iancoleman-script (download from Github, verify authenticity, use only offline on permanently air-gapped or disposable or agnostic devices!).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

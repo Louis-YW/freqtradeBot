@@ -1,0 +1,93 @@
+{
+  "id": "topic_5448115",
+  "title": "ragnar dannesk gold",
+  "author": "ragnar dannesk gold",
+  "created_time": "April 09, 2023, 07:49:13 AM",
+  "content": "I have researched and just don't have the technical acumen to understand how to do this.Is there a simple line I can post in the GUI console to create a watch-only wallet with an Ypub?More specifically, I am trying to import a YPUB address into Core with standard derivation path (m/49'/0'/0').I have tried to figure out how to do this but find myself confused.Is this possible? Please help",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5448115",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "April 09, 2023, 07:55:39 AM",
+      "body": "Probably this guide will help you: Bitcoin core create a watch only wallet and sign transactions offline [Tutorial]You should be able to set up a watch-only if you read the guide very well and understand it. Note that watch-only wallet can not be used to spend because it contains no private key and can not generate private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ragnar dannesk gold",
+      "created_time": "April 09, 2023, 08:10:19 AM",
+      "body": "Quote from: Charles-Tim on April 09, 2023, 07:55:39 AMProbably this guide will help you: Bitcoin core create a watch only wallet and sign transactions offline [Tutorial]You should be able to set up a watch-only if you read the guide very well and understand it. Note that watch-only wallet can not be used to spend because it contains no private key and can not generate private key.Thanks for the link.importdescriptors \"[{\\\"desc\\\": \\\"wpkh([66bb13d5/84'/0'/0']xpub6CtDSW4S3XVd5uYp9CgsLTZKQcKieJSmjehcvfVJBSy1rPbkKNU3T6UmZ3mn7DoSsTsM6uH8ZKe m7LQh3PHyrBAtZopSvF2tonEE7foTWFe/0/*)#v3w0q0zv\\\", \\\"range\\\": [0, 1000], \\\"timestamp\\\": 1647182091, \\\"internal\\\": false, \\\"watchonly\\\": true, \\\"active\\\": true}]\"What do the bolded parts mean? And where would I get them from?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 09, 2023, 09:05:25 AM",
+      "body": "First of all, double check that you have a ypub and not a Ypub. The two are different things. The rest of what I say below will assume you have a ypub (which you should have if you are using a standard nested segwit path at m/49'/0'/0', as you say).First, you need to convert that ypub to an xpub. The easiest way of doing that will be to paste it in to this site: https://jlopp.github.io/xpub-converter/. Select the top option from the drop down box (xpub), and hit convert.Then, run the following command, changing the xpub for the one you have just generated from the above site:Code:getdescriptorinfo \"sh(wpkh([00000000/49'/0'/0']xpub6Cyu4zAA9sU3T46hUfmycvnRs6dmSFSkkVm9JKqbHinuKAeJbGCuL36Wyd44pV7PAL9uQz6p2CmK4yZhFcjATQECEmHfWzPYPyiUtYiZ6Yr/0/*))\"It should hopefully return the following:Code:  \"checksum\": \"k0veet2v\",  \"isrange\": true,  \"issolvable\": true,  \"hasprivatekeys\": falseNow, run the following command, again changing the xpub to your own one, and also changing the \"xxxxxxxx\" to the 8 character checksum you just produced above. (Yours will be different from my example). You can also change the timestamp to a more appropriate time - this is the Unix time from which Core will start rescanning the blockchain looking for transactions. If you know when the first transaction to this wallet is, you can change it to a little before that time. If you aren't sure, leave it at 0, but it will take a while to perform a full scan.Code:importdescriptors \"[{\\\"desc\\\": \\\"sh(wpkh([00000000/49'/0'/0']xpub6Cyu4zAA9sU3T46hUfmycvnRs6dmSFSkkVm9JKqbHinuKAeJbGCuL36Wyd44pV7PAL9uQz6p2CmK4yZhFcjATQECEmHfWzPYPyiUtYiZ6Yr/0/*))#xxxxxxxx\\\", \\\"range\\\": [0,999], \\\"timestamp\\\": 0, \\\"internal\\\": false, \\\"watchonly\\\": true, \\\"active\\\": true}]\"You'll also want to repeat the process with the following command, which will add change addresses:Code:importdescriptors \"[{\\\"desc\\\": \\\"sh(wpkh([00000000/49'/0'/0']xpub6Cyu4zAA9sU3T46hUfmycvnRs6dmSFSkkVm9JKqbHinuKAeJbGCuL36Wyd44pV7PAL9uQz6p2CmK4yZhFcjATQECEmHfWzPYPyiUtYiZ6Yr/1/*))#xxxxxxxx\\\", \\\"range\\\": [0,999], \\\"timestamp\\\": 0, \\\"internal\\\": true, \\\"watchonly\\\": true, \\\"active\\\": true}]\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 09, 2023, 09:21:30 AM",
+      "body": "AFAIR, the first bold part is the fingerprint of the extended public key, the second bold part is the descriptor checksum.The checksum of a descriptor can be obtained with the getdescriptorinfo command.You will likely need to convert your YPUB to a XPUB, see here: https://jlopp.github.io/xpub-converter/(You get the fingerprints there, too. Not sure which one to use then, though, as you get two of them.)You can't use the linked tutorial that easily because it doesn't explain how to construct the descriptor for importdescriptors in your specific use case.What kind of script type does your YPUB represent? I assume P2WPKH-P2SH which should be the normal case for a standard derivation path of m/49'/0'/0'.I haven't tried this myself yet, but I think you will need to construct your descriptor something like thissh(wpkh([parent fingerprint/49'/0'/0']converted xpub/0/*))#desc.-checksum [for receive addresses; add a descriptor sh(wpkh(.../1/*)) to cover change addresses, too]I'm just giving some hints, no full recipe, yet untested by myself. Someone with more experience with Core descriptors should definitely chime in.This documentation of Core descriptors might help a little: https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 09, 2023, 09:50:35 AMLast edit: April 09, 2023, 04:16:19 PM by o_e_l_e_o",
+      "body": "Quote from: Cricktor on April 09, 2023, 09:21:30 AMYou get the fingerprints there, too. Not sure which one to use then, though, as you get two of them.Neither of them.The fingerprints that jlopp site gives you are the fingerprint of that specific xpub and the fingerprint of its parent. So in this case you are getting the fingerprint of the key at m/49'/0'/0', and the fingerprint of its parent at m/49'/0'.In the bitcoin core descriptor, the fingerprint is that of the key at m. Since we don't know it, I simply substituted \"00000000\". This will make no difference to importing the descriptor.Quote from: Cricktor on April 09, 2023, 09:21:30 AMWhat kind of script type does your YPUB represent? I assume P2WPKH-P2SH which should be the normal case for a standard derivation path of m/49'/0'/0'.Note that there is no such thing as a YPUB. There is either a ypub, which is P2WPKH-P2SH, or there is a Ypub, which is P2WSH-P2SH.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 09, 2023, 10:47:40 AM",
+      "body": "Thx, @o_e_l_e_o for clarification!I tested the followingypub6We5GsbnuDes464y8MuWVKsjY6JwhWwxdq4ossiRLo1aJeM2F9iqKgcSDvZLC8hUoCBh2FPc7Cn RzqPWpx2WfAcc7TgisZruTYd6UwsSmws,derived from mnemonic words\"energy page dizzy open tumble play honey thought prepare embody coast tackle\"via standard BIP49 derivation from https://iancoleman.io/bip39/ and converted toxpub6BooyCvskY7PCnsrJ17tHEnEN8AVktxTiiYb6UpXxndhFYXnzVZGhcxJCibkCE3ZPZ4tGmo3eYR t7Ymx7FcVrvw1F7zJHf3RBpZT6QPUvRvwith https://jlopp.github.io/xpub-converter/Code:bitcoin-cli getdescriptorinfo \"sh(wpkh([00000000/49h/0h/0h]xpub6BooyCvskY7PCnsrJ17tHEnEN8AVktxTiiYb6UpXxndhFYXnzVZGhcxJCibkCE3ZPZ4tGmo3eYRt7Ymx7FcVrvw1F7zJHf3RBpZT6QPUvRv/0/*))\"givesCode:{  \"descriptor\": \"sh(wpkh([00000000/49'/0'/0']xpub6BooyCvskY7PCnsrJ17tHEnEN8AVktxTiiYb6UpXxndhFYXnzVZGhcxJCibkCE3ZPZ4tGmo3eYRt7Ymx7FcVrvw1F7zJHf3RBpZT6QPUvRv/0/*))#jv8x96vl\",  \"checksum\": \"ku5aja5a\",  \"isrange\": true,  \"issolvable\": true,  \"hasprivatekeys\": false}and deriving the first ten public addresses with the commandCode:bitcoin-cli deriveaddresses \"sh(wpkh([00000000/49h/0h/0h]xpub6BooyCvskY7PCnsrJ17tHEnEN8AVktxTiiYb6UpXxndhFYXnzVZGhcxJCibkCE3ZPZ4tGmo3eYRt7Ymx7FcVrvw1F7zJHf3RBpZT6QPUvRv/0/*))#ku5aja5a\" \"[0,9]\"yields addressesCode:[  \"3MoGFiRNNBvW2357PRcmCzTBmCZoAo5Uxc\",  \"3LRjXPq4pQV4yqPxGNtVsaV5QjSZZpC2rC\",  \"38ksPrx3jLDtG7UQjYULHwJvtQRzHZZLCS\",  \"3Nfpwn6uJ4jkPujifgnciXrcWzbZcWzoLN\",  \"32M5NGPogEqcaYFBpcWr7X5XgX43K9zDDA\",  \"3EigtxXTgaujT2zHFAaTVMQx6oJvMhyLV2\",  \"3P6SARfisi5EZu7WMsz5ANeM3EtDSoZPXe\",  \"3HiAwfehjjFjArjQMiVziAkhX77tACvKvG\",  \"3GtRsWBiP8YBL5wwXrTYMgndz7Dwya3CZS\",  \"3DbCfBYdVudvHxaZvxroPtimfG56XHaM2m\"]Those addresses match perfectly what the iancoleman.io script shows for a BIP49 derivation of above example mnemonic words:m/49'/0'/0'/0/0    3MoGFiRNNBvW2357PRcmCzTBmCZoAo5Uxc       m/49'/0'/0'/0/1    3LRjXPq4pQV4yqPxGNtVsaV5QjSZZpC2rC       m/49'/0'/0'/0/2    38ksPrx3jLDtG7UQjYULHwJvtQRzHZZLCS       m/49'/0'/0'/0/3    3Nfpwn6uJ4jkPujifgnciXrcWzbZcWzoLN       m/49'/0'/0'/0/4    32M5NGPogEqcaYFBpcWr7X5XgX43K9zDDA       m/49'/0'/0'/0/5    3EigtxXTgaujT2zHFAaTVMQx6oJvMhyLV2       m/49'/0'/0'/0/6    3P6SARfisi5EZu7WMsz5ANeM3EtDSoZPXe       m/49'/0'/0'/0/7    3HiAwfehjjFjArjQMiVziAkhX77tACvKvG       m/49'/0'/0'/0/8    3GtRsWBiP8YBL5wwXrTYMgndz7Dwya3CZS       m/49'/0'/0'/0/9    3DbCfBYdVudvHxaZvxroPtimfG56XHaM2m",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ragnar dannesk gold",
+      "created_time": "April 09, 2023, 12:49:52 PM",
+      "body": "Thanks a lot everyone.o_e_l_e_o, regarding the change addresses, when running the below command:Quoteimportdescriptors \"[{\\\"desc\\\": \\\"sh(wpkh([00000000/49'/0'/0']xpub6Cyu4zAA9sU3T46hUfmycvnRs6dmSFSkkVm9JKqbHinuKAeJbGCuL36Wyd44pV7PAL9uQz6p2Cm K4yZhFcjATQECEmHfWzPYPyiUtYiZ6Yr/1/*))#xxxxxxxx\\\", \\\"range\\\": [0,999], \\\"timestamp\\\": 0, \\\"internal\\\": true, \\\"watchonly\\\": true, \\\"active\\\": true}]\"(with xpub replaced and fingerprint replaced), I got the following error: Quote\"success\": false,\"error\": {\"code \": -8,\"message\": \"new range must include current range = [0,1039]\"It worked when I replaced the range with that. Is this a reference to how many addresses have already been used in the first wallet? I'm not sure why it required that range change.Further to that, I was attempting to run the command without rescan, and tried timestamp \"now\", but it gave an error:Quoteimportdescriptors \"[{\\\"desc\\\": \\\"sh(wpkh([00000000/49'/0'/0']xpub6Cyu4zAA9sU3T46hUfmycvnRs6dmSFSkkVm9JKqbHinuKAeJbGCuL36Wyd44pV7PAL9uQz6p2Cm K4yZhFcjATQECEmHfWzPYPyiUtYiZ6Yr/1/*))#xxxxxxxx\\\", \\\"range\\\": [0,999], \\\"timestamp\\\": now, \\\"internal\\\": true, \\\"watchonly\\\": true, \\\"active\\\": true}]\"The rest worked well. If wanting to add another xpub to the same wallet, to have the sum of balances displayed, I assume I just repeat the process in the same wallet with the new xpub/fingerprint? Hopefully combining multiple xpubs in one wallet for watching total balances is possible?Thanks again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ragnar dannesk gold",
+      "created_time": "April 09, 2023, 01:07:13 PM",
+      "body": "Quote from: Cricktor on April 09, 2023, 10:47:40 AMand deriving the first ten public addresses with the commandCode:bitcoin-cli deriveaddresses \"sh(wpkh([00000000/49h/0h/0h]xpub6BooyCvskY7PCnsrJ17tHEnEN8AVktxTiiYb6UpXxndhFYXnzVZGhcxJCibkCE3ZPZ4tGmo3eYRt7Ymx7FcVrvw1F7zJHf3RBpZT6QPUvRv/0/*))#ku5aja5a\" \"[0,9]\"What command would you type in to derive change addresses? (I imported the change addresses \"internal\\\": true), but wasn't sure how to display addresses to cross check. From memory, aren't change addresses just derived from a slightly different derivation path? (m / purpose' / coin_type' / account' / change / address_index) -> I attempted to change it to deriveaddresses \"sh(wpkh([00000000/49'/0'/0'/1]xpub....\" but got a checksum not matching error.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 09, 2023, 01:21:05 PM",
+      "body": "Quote from: ragnar dannesk gold on April 09, 2023, 01:07:13 PMWhat command would you type in to derive change addresses? (I imported the change addresses \"internal\\\": true), but wasn't sure how to display addresses to cross check.You need to change \"internal\" to true, and you also need to change the derivation path after the xpub from /0/* to /1/*I have given you the commands to import in my post above. Just copy them and follow my instructions.Quote from: ragnar dannesk gold on April 09, 2023, 01:07:13 PMI attempted to change it to deriveaddresses \"sh(wpkh([00000000/49'/0'/0'/1]xpub....\" but got a checksum not matching error.This is not the way to do it. You should import \"sh(wpkh([00000000/49'/0'/0'/xpub..../1/*))\"To get the correct checksum, either use getdescriptorinfo first, or just copy the correct checksum from when it tells you your incorrect checksum doesn't match the expected checksum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "April 09, 2023, 03:41:47 PM",
+      "body": "Quote from: ragnar dannesk gold on April 09, 2023, 12:49:52 PMFurther to that, I was attempting to run the command without rescan, and tried timestamp \"now\", but it gave an error:When using the non-integer value \"now\", you'll have to enclose it with \\\"now\\\" or it'll fail to parse the whole json array.For the range, it's what the message said; if you've previously imported the same descriptor,you'll have to at least increase the range by 1 to include previously imported descriptor's range.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

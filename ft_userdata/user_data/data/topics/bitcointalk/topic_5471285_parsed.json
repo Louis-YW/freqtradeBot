@@ -1,0 +1,93 @@
+{
+  "id": "topic_5471285",
+  "title": "MixMAx123",
+  "author": "MixMAx123",
+  "created_time": "October 23, 2023, 01:46:26 AMLast edit: January 21, 2024, 01:49:22 AM by MixMAx123",
+  "content": "please delete!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471285",
+  "comments": [
+    {
+      "author": "seek3r",
+      "created_time": "October 23, 2023, 08:39:55 AM",
+      "body": "It looks like you already found the way how to scan the outputs for a specific address.Besides that you can also use Code:scantxoutset start '[\"raw(hex_script)\"] if you want to scan specific hex scripts.or Code:scantxoutset start '[\"pkh(pubkey)\"]to scan P2PKH outputs of the public key you are interested in.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 24, 2023, 12:49:47 PM",
+      "body": "Also note that in addition to the descriptor itself, you will usually have to pass the checksum of the descriptor right after it - the hash '#' followed by a bunch of letters and numbers. There are some software that can calculate this for you, but it's much easier to use getdescriptorinfo and pass the descriptor without checksum, in order to fetch it.Example can be found here: https://developer.bitcoin.org/reference/rpc/getdescriptorinfo.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 25, 2023, 04:36:02 AM",
+      "body": "Quote from: NotATether on October 24, 2023, 12:49:47 PMAlso note that in addition to the descriptor itself, you will usually have to pass the checksum of the descriptor right after it - the hash '#' followed by a bunch of letters and numbers.That's only mandatory in importdescriptors command.But scantxoutset will work regardless of the presence or absence of the checksum as of v25.0Anyways, OP was asking for the \"syntax\" so most likely, he knows what arguments to include, just how to put them together which he already did in the edit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "3dmlib",
+      "created_time": "December 22, 2023, 08:06:37 PM",
+      "body": "Hello.I have following RPC code. It runs on local fully synced bitcoin core node.JObject getAddressUtxosResponse = rpcClient.InvokeMethod(\"scantxoutset\", \"start\", new[] { $\"addr({bitcoinAddress})\" });JValue success = (JValue)getAddressUtxosResponse[\"result\"][\"success\"];if ((bool)success == true){    // get total balance by total_amount    JValue total_amount = (JValue)getAddressUtxosResponse[\"result\"][\"total_amount\"];    decimal totalBalance = (decimal)total_amount;}It return incorrect amount. For example for address 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa it returns 22.73242908 BTC, instead of correct 72.74245948 BTC.Why this is can happen?Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 22, 2023, 08:24:45 PM",
+      "body": "Quote from: 3dmlib on December 22, 2023, 08:06:37 PMI have following RPC code. It runs on local fully synced bitcoin core node.You'll have to be a little more explanatory. Where is this code from? Is it yours? What's the library you're using? Judging by the fact that it's C#, may I suppose it's NBitcoin?Quote from: 3dmlib on December 22, 2023, 08:06:37 PMFor example for address 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa it returns 22.73242908 BTC, instead of correct 72.74245948 BTC.That particular address is the exception to the rule, because it was rewarded with the 50 non-spendable bitcoins of the genesis block. The correct amount of spendable coins is 22.73242908. Judging by the code, it gets the total balance by summing the UTXOs. Since the block reward of genesis isn't UTXO, it doesn't count it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "3dmlib",
+      "created_time": "December 22, 2023, 08:38:04 PM",
+      "body": "Quote from: BlackHatCoiner on December 22, 2023, 08:24:45 PMQuote from: 3dmlib on December 22, 2023, 08:06:37 PMI have following RPC code. It runs on local fully synced bitcoin core node.You'll have to be a little more explanatory. Where is this code from? Is it yours? What's the library you're using? Judging by the fact that it's C#, may I suppose it's NBitcoin?Quote from: 3dmlib on December 22, 2023, 08:06:37 PMFor example for address 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa it returns 22.73242908 BTC, instead of correct 72.74245948 BTC.That particular address is the exception to the rule, because it was rewarded with the 50 non-spendable bitcoins of the genesis block. The correct amount of spendable coins is 22.73242908. Judging by the code, it gets the total balance by summing the UTXOs. Since the block reward of genesis isn't UTXO, it doesn't count it. Thanks. Code work ok then. It just a problem with this particular address. A lot needed to know about bitcoin internals. I'm heard first time about '50 non-spendable bitcoins of the genesis block'.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "December 22, 2023, 09:47:41 PM",
+      "body": "I believe the command syntax you're looking for would be this:scantxoutset start \"[\\\"addr(PasteYourAddressHere)\\\"]\"No need to rely on any third party blockchain explorers.  Way better privacy!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "3dmlib",
+      "created_time": "December 25, 2023, 12:38:27 PM",
+      "body": "Quote from: BitcoinCanSaveUsAll on December 22, 2023, 09:47:41 PMNo need to rely on any third party blockchain explorers.  Way better privacy!Yeh. But it very slow to query this rpc call to local bitcoin core. Is any way to improve bitcoin core response time for this type of query? Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "December 26, 2023, 09:57:49 AM",
+      "body": "Quote from: 3dmlib on December 25, 2023, 12:38:27 PMQuote from: BitcoinCanSaveUsAll on December 22, 2023, 09:47:41 PMNo need to rely on any third party blockchain explorers.  Way better privacy!Yeh. But it very slow to query this rpc call to local bitcoin core. Is any way to improve bitcoin core response time for this type of query? Thanks.You either must,1. Add that address to wallet so it'll be indexed by Bitcoin Core. First rescan is slow, but afterwards you only need to use wallet RPC call. 2. Run either self-hosted Electrum server or block-explorer which index all Bitcoin address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "December 26, 2023, 02:44:31 PM",
+      "body": "Quote from: 3dmlib on December 22, 2023, 08:38:04 PMThanks. Code work ok then. It just a problem with this particular address. A lot needed to know about bitcoin internals. I'm heard first time about '50 non-spendable bitcoins of the genesis block'.Oh, yeah. It is mainly encyclopedic knowledge, but it might seem strange to anyone programming Bitcoin. For some reason, Satoshi decided to not include the coinbase transaction to the global transaction database (you can confirm this by getrawtransaction). Maybe he did to not be called a preminer as genesis block was mined before he released the very first Bitcoin client binaries.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

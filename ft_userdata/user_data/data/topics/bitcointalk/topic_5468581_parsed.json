@@ -1,0 +1,165 @@
+{
+  "id": "topic_5468581",
+  "title": "BitcoinCanSaveUsAll",
+  "author": "BitcoinCanSaveUsAll",
+  "created_time": "September 29, 2023, 06:59:20 PM",
+  "content": "I've noticed over the last few weeks that there's been a fairly notable discrepancy between my two nodes that are both running on windows with respect to the size of the mempool. Presently I'm running a version 20 and a 20.1 and note that there is about 195 MB of memory usage for the mempool on the older version versus 158 MB on the newer version. That really seemed odd to me considering that they both booted up on the same date (11 days ago). I've also noticed how fairly frequently the men pool has been exceeding 300 MB which is the default amount of memory that the nodes keep unconfirmed transactions in. Has anybody else out there noticed this discrepancy? Better yet, does anybody out there have an idea about why this might be happening or how?I should probably add that version 20.1 is not operating behind a VPN and is allowing for inbound connections versus the one running version 20 that is behind a VPN and unable to receive inbound connection. That however was never an issue before the last several months. Perhaps it has something to do with the ordinals spamming?Thanks in advance for any feedback.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468581",
+  "comments": [
+    {
+      "author": "Findingnemo",
+      "created_time": "September 29, 2023, 07:31:54 PM",
+      "body": "I don't know the exact reason for this but it may be due to the difference in the configuration setting, so check if there is any difference in mempool related setting using bitcoin.conf.Quote from: BitcoinCanSaveUsAll on September 29, 2023, 06:59:20 PMThat however was never an issue before the last several months. Perhaps it has something to do with the ordinals spamming?Possibly yes, because Stale blocks formed in the main chain but don't belong to the chain now so one of your nodes picked up the spam blocks and the other didn't pick those broadcasted from peers so the difference in numbers maybe the reason as well.Still, let the experts of technical knowledge to find the actual reason.Meanwhile, you can check this out that explains about stale blocksQuoteThe difference in size is due to the number of stale blocks that your node stores. Stale blocks are blocks that once formed the part of the main chain but is not belong to the main chain now.For example, if say two blocks are mined at height 102 at the same time. When the miner relays the block through the gossip network, the network that is closer to miner 1 will receive its block (102a) first as compared to block mined by miner 2 (102b). Bitcoin core adds the first received valid block to the tip of the chain. The blocks received at the same height after that are not deleted but kept in the database just in case a reorganization happens. So, if the next block 103 is mined on top of block 102b then the node that received 102a first will reorganize its chain to one that contains 102b as shown below.101 -->102a     \\     \\            102b --> 103 -->104Bitcoin Core does not delete any valid block that it receives from its peers. It is stored in your database forever in the file blocks/blk****.dat (which is also same for blocks in the main chain). However, the software does not relay stale blocks. In order to receive stale blocks, you need to be online at the time when your peer broadcasted a block to you from different chain view. Peers will only broadcast those blocks that they view form the current active chain from their perspective. So you will only have the stale blocks that you received when you were online. This also mean you will need to be connected to peers that view one the tip of the chain that is different from other peers. Due to this variability, many nodes will have different view of the sizes of the Bitcoin blockchain",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "September 29, 2023, 07:56:30 PM",
+      "body": "Thanks @Findingnemo,I just checked the config file on both nodes and oddly enough the only option that might be related was the dbcache value which was set to 10000 for the one with less transactions in it's mempool vs 5000 for the one with more.  Other than that there didn't appear to be any values in there that should affect the amount of memory for the mempool and I don't' even know if dbcache is even a value that does as it seems the one with the larger amount has less transactions that the other. I did however also note that the one with more transactions (v 20.0) was started ~ 5 hours earlier 11 days ago but I wouldn't imagine that would be an issue this much time into the future as I've never noticed it before the ordinals / incriptions spam and I've run nodes for years. Either way I'm stumped here and hope there's nothing more sinister going on here. Thank you for the reply and hopefully others can chime in on this subject as well as it would be great to understand what's currently going on here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "October 02, 2023, 10:29:14 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on September 29, 2023, 07:56:30 PMEither way I'm stumped here and hope there's nothing more sinister going on here. Thank you for the reply and hopefully others can chime in on this subject as well as it would be great to understand what's currently going on here.  Your 2 nodes might just have very different sets of peers and thus get certain transactions earlier or later.You could try logging the mempool size over the course of a few days and see if one is consistently smaller than the other or just at a certain point in time.Another thing to try would be manually making the 2 machines peers, so they should exchange information between each other fairly frequently.https://bitcoincore.org/en/doc/25.0.0/rpc/network/addnode/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 02, 2023, 11:39:28 AMLast edit: October 02, 2023, 02:34:40 PM by o_e_l_e_o",
+      "body": "This could be more related to your devices rather than the mempools themselves.Use getmempoolinfo on your two nodes and compare the outputs. \"Size\" is the number of transactions in your mempool, and \"bytes\" is the raw size of these transactions. I would expect these numbers to be fairly similar if your nodes are both running with similar mempool settings and similar uptimes.\"Usage\" on the other hand, which is the 158 MB and 195 MB you are referring to, is the amount of RAM those unconfirmed transactions are using after they have been deserialized. This is also what the default 300 MB limit refers to, and not to the raw size of the transactions. The deserialized RAM usage will vary due to a number of factors external to the size of the mempool, such as the version of Core, the hardware of the system, the OS, and so on.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 02, 2023, 11:48:02 AM",
+      "body": "Are both these nodes on the same private internal network?If so can you do an addnode command between the 2 of them?They should at that point talk to each other and although the mempool will never be the same everything else being equal they really should be a lot closer. -Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "October 03, 2023, 04:17:37 PM",
+      "body": "Thanks for all the replies everyone.  @n0nce ,IMO opinion the mempool difference in size isn't due to the two different nodes getting the transactions at slightly different times as they have been having a very similar discrepancy for the last several months and their sizes have been quite different for most (if not all) of that timeframe.  That in contrast to the few years I've been running them this way beforehand with no notable discrepancy in size other than the last two months and I don't recall changing any settings in either.@o_e_l_e_o ,Please note that my I did just upgrade y v 20.0 to 20.2 (the one behind the VPN) two days ago yet I'm still seeing the same discrepancy after over 48 hours of running them. Presently the 20.2 node running behind the VPN not accepting inbound connections has the following getmempoolinfo output:{  \"loaded\": true,  \"size\": 5649,  \"bytes\": 19164914,  \"usage\": 95340400,  \"maxmempool\": 300000000,  \"mempoolminfee\": 0.00001000,  \"minrelaytxfee\": 0.00001000}Vs. my 20.1 which is accepting inbounds:{  \"loaded\": true,  \"size\": 13601,  \"bytes\": 21971612,  \"usage\": 107492160,  \"maxmempool\": 300000000,  \"mempoolminfee\": 0.00001000,  \"minrelaytxfee\": 0.00001000}@DaveF ,Technically they are both on the same LAN but one is behind a VPN connection not accepting inbound connections (the recently updated v20.2) and the other is open with inbound connections.All,I'm starting to wonder if perhaps this may be related to the transactions in the mempool being increased to higher than my nodes default 300 MB size and somehow my nodes picked different transactions to store locally when the levels dropped below that level however wouldn't of imagined this is possible as shouldn't they be prioritizing them the same way?  Either way from what I gather the mempool is below 300 MB now and the deltas between the two nodes continue to persist which would seem to invalidate my theory.Also while I certainly appreciate all of the suggestions to try and correct the issue, the real reason for me bringing up this matter isn't to get my two nodes synched up so that they have the same mempool but to rather it's to understand why there is a discrepancy in the first place as this may somehow be some kind of attack that we aren't aware of presently that needs to be looked at (call me paranoid but we are competing with the most powerful and best funded organizations in the history of the planet, right?).  Thanks all.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 03, 2023, 04:56:33 PM",
+      "body": "Inbound/outbound connections won't make a difference here, provided both nodes have a good number of connections. Your nodes will receive unconfirmed transactions over both types of connection just the same.Note that nodes won't try to fetch any transactions missing from their mempool. Once they drop a transaction, they won't learn about it again unless it is rebroadcast. If they receive a transaction which they do not add to their mempool due to it exceeding the size limit, then again, they won't learn about it unless it is rebroadcast. Given that the mempool has only recently come back down below the 300 MB default limit, if there was a delta between your nodes then this delta will persist until the backlog of transactions is cleared. Transactions which one node knows about but the other doesn't won't propagate between your nodes unless they are manually rebroadcast.If one of your nodes has lost connection, had poor connections, been temporarily offline, hit the default limits before the other one, and so on, then any transactions not added to its mempool during this time will simply not be known about and the deficit will persist.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "October 13, 2023, 05:09:58 PM",
+      "body": "Okay this is seemingly a persistent issue even after I increased the default mempool to 600 MB for both over a week ago. As of this message I am still getting substantial mismatched between nodes whereas my node running version 20.1 is seeing a much larger memory usage then my 20.2 version. The even stranger thing is that the 20.1 which is the node that has inbound connections and was started several hours after the 20.2 behind the VPN yet it has a much larger size than the other (303 MB vs. 280 MB currently). Something really seems off here and I'm hoping that someone here can help me understand why this is happening seemingly since around the time or the ordinals and inscriptions. Prior to this I have never seen a discrepancy before and I have been running the nose for years. Thanks in advance by any support!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 14, 2023, 11:51:25 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on October 13, 2023, 05:09:58 PMOkay this is seemingly a persistent issue even after I increased the default mempool to 600 MB for both over a week ago.There have still been times over the last week where your nodes' mempools will have exceeded 600 MB, and as I explained above the exact point this happens will be different for both your nodes.Quote from: BitcoinCanSaveUsAll on October 13, 2023, 05:09:58 PMThe even stranger thing is that the 20.1 which is the node that has inbound connections and was started several hours after the 20.2 behind the VPN yet it has a much larger size than the other (303 MB vs. 280 MB currently). Use getmempoolinfo again and compare the number of transactions in each mempool (\"size\"). Has this gap closed at all?The next thing I would try would be to delete the mempool for both nodes, start them up simultaneously, let them both run for a couple of days, and then check if the discrepancy is still there. Also, if it is the node behind the VPN which is constantly behind, have you checked it isn't intermittently losing connection, the VPN intermittently disconnecting, or the VPN blocking any traffic?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 14, 2023, 12:05:38 PM",
+      "body": "Quote from: BitcoinCanSaveUsAll on October 03, 2023, 04:17:37 PM....@DaveF ,Technically they are both on the same LAN but one is behind a VPN connection not accepting inbound connections (the recently updated v20.2) and the other is open with inbound connections.All,I'm starting to wonder if perhaps this may be related to the transactions in the mempool being increased to higher than my nodes default 300 MB size and somehow my nodes picked different transactions to store locally when the levels dropped below that level however wouldn't of imagined this is possible as shouldn't they be prioritizing them the same way?  Either way from what I gather the mempool is below 300 MB now and the deltas between the two nodes continue to persist which would seem to invalidate my theory.Also while I certainly appreciate all of the suggestions to try and correct the issue, the real reason for me bringing up this matter isn't to get my two nodes synched up so that they have the same mempool but to rather it's to understand why there is a discrepancy in the first place as this may somehow be some kind of attack that we aren't aware of presently that needs to be looked at (call me paranoid but we are competing with the most powerful and best funded organizations in the history of the planet, right?).  Thanks all.Is there any reason you are on the 20.x instead of 24 or 25?Since they are both on the same LAN you should be able to add the nodes to each others peer list.Most VPNs will only deal with connections going to outside your LAN, otherwise you would not be able to print to a network printer or see network shares and so on when running a VPN.How is the hardware that they are running on? About the same in terms of CPU / RAM / Drive?-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "October 14, 2023, 12:22:41 PM",
+      "body": "Speaking of which, I have wondered something similar regarding the different mempools. As I am writing this, the one on Mempool.space shows 24k unconfirmed transactions. At the same time, Johoe's mempool has over 52k of unconfirmed transactions. It's not a small difference, it's more than the double. Could this really be about not being connected to the same peers, purging transactions of different sat values, or something else?Scratch that. One shows the weight of transactions, the other the total number of them. My bad.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 14, 2023, 12:37:50 PM",
+      "body": "Quote from: Pmalek on October 14, 2023, 12:22:41 PMOne shows the weight of transactions, the other the total number of them. My bad. If you switch Johoe's to \"BTC\" (rather than \"BTC (default mempool)\") and sort by \"count\" rather than \"weight\", you should get a number which is roughly similar to mempool.space.\"BTC (default mempool)\" shows the mempool with the 300 MB memory limit enforced. \"BTC\" shows the mempool with a much higher limit (although I'm not sure exactly how high he sets the limit). Although at the moment on the BTC/count graph, it says ~26k transactions at 1 sat/vbyte or more, but ~30k total transactions. I'm not sure what explains that deficit - transactions paying under 1 sat/vbyte?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "October 14, 2023, 04:38:48 PM",
+      "body": "Quotetransactions paying under 1 sat/vbyte?Of course. We always had them, in some older versions, transactions were free, and some people still try to use them in that way. There are many transactions in range from zero to one satoshi per virtual byte. Some of them are just a result of mining pools, sending their own internal transactions for free, and including them in their own blocks (while also broadcasting them publicly), some of them are used in some off-chain protocols, like decentralized sidechain experiments, mining in LN experiments, or mempool-level-messaging experiments. Because nothing stops you from creating a group of nodes, that will use full-RBF, and increment fees one satoshi at a time, until reaching the final replacement of one satoshi per virtual byte, when all other nodes also try to process that batched result.https://mempool.jhoenicke.de/#BTC,all,weight,0Look at the bottom of the chart. That grey block can show you, what happens in 0-1 satoshis per virtual byte range. And if you have your own full node, even if it is pruned, you can directly receive that kind of traffic, if you change your configuration to allow that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 14, 2023, 04:58:03 PM",
+      "body": "Quote from: vjudeu on October 14, 2023, 04:38:48 PMhttps://mempool.jhoenicke.de/#BTC,all,weight,0Did not know you could append a number like that to have the minimum fee displayed set to that level. That's a neat trick!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "October 14, 2023, 05:18:02 PM",
+      "body": "You don't need to use any tricks in address bar. Just click on that last level of 0-1 range on that web page, and you will be redirected there. In exactly the same way you can click on other ranges, and you will be redirected to fees on that level or above. For example, if you click on 10-12 range, you will be redirected here: https://mempool.jhoenicke.de/#BTC,all,weight,10",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "October 14, 2023, 05:49:36 PM",
+      "body": "Hi all,@ o_e_l_e_o,I’ve just run the Code:getmempoolinfo command on both and while there is still a discrepancy, I see that for some reason even though the maxmempool of 600 is in both option files for both the v.20.1 and the v.20.2 version it seems as though the .2 version is not applying this 600 MB value and is sticking to the default 300.  I then checked what else I had in the two to compare apples to apples and then ensured to have only the same options enabled between the 20.1 and the 20.2 as to mimic the 20.1 that was seemingly applying the 600 MB value correctly.  Unfortunately this did not work as after rerunning the command I see that 20.2 is still stuck on the 300 MB default cap.  @DaveFI should also add that the computer running the .2 version is much more capable in terms of hardware and in fact has more ram than the other PC so there are no hardware limitations that should be coming into play here. I next restarted the computer with the 20.2 version and again it’s still stuck with the 300 MB cap even though the following options are enabled in the options file:Code:maxmempool=600If anyone knows why this could be happening in this 20.2 version I’d love to hear your feedback.  Perhaps this is a bug on this version?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "October 15, 2023, 06:53:04 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on October 14, 2023, 05:49:36 PMIf anyone knows why this could be happening in this 20.2 version I’d love to hear your feedback.  Perhaps this is a bug on this version? Have you considered the easiest possible solution to simple upgrade to a newer version of Bitcoin Core which might fix the issue by itself? The latest release is 25.0, so there is a lot of ground to catch. Is something keeping you from upgrading to a newer version of the software?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 15, 2023, 07:04:18 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on October 14, 2023, 05:49:36 PMIf anyone knows why this could be happening in this 20.2 version I’d love to hear your feedback.  Perhaps this is a bug on this version?Are you sure you've not mistyped anything? It's not commented out, or set only for testnet? And are you sure your bitcoin.conf file is in the right location? Easiest way to check is to click on \"Settings\" -> \"Open Configuration File\" within the Core GUI.Why not update to 25.0 though?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "October 15, 2023, 08:30:57 AM",
+      "body": "QuoteWhy not update to 25.0 though?Good question, because 20.x does not support Taproot at all. Which means, Taproot transactions will not be visible in your mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

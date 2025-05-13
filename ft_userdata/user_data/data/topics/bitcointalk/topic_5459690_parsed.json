@@ -1,0 +1,21 @@
+{
+  "id": "topic_5459690",
+  "title": "leomedina",
+  "author": "leomedina",
+  "created_time": "July 13, 2023, 03:14:49 PMLast edit: July 13, 2023, 05:53:21 PM by leomedina",
+  "content": "Welcome to MoneyPot's provably fair seeding event.Our provably fair system is based on the first seeding event, but instead of salting each hash in the chain with a client seed, a Vx signature will be used. This preserves all provably fair guarantees while allowing third-party auditing.Starting with a server secret, I have generated a chain of 100,000,000 sha256 hashes by recursively hashing the previous hash. The hash of the chain's last element is cd01fbf68ac526970f016e07d7b92e58d49322f02387e4a952037dc5f605f016. This is also our commitment to Vx.The reference code we use to determine game results is as follows:Code:const crypto = require(\"crypto\")// The function that calculates game resultsfunction gameResult(hash, vxSignature, casinoBankroll, playerBetting) {  const X = scaledOutcome(hash, vxSignature)  return (casinoBankroll + 2 * playerBetting) / (-scaledOutcome * casinoBankroll + casinoBankroll + 2 * playerBetting)}// The pure probability of the casino winning, before taking into account any edgefunction scaledOutcome(hash, vxSignature) {  const nBits = 52 // number of most significant bits to use  // 1. HMAC_SHA256(key=vxSignature, message=hash)  const hmac = crypto.createHmac(\"sha256\", vxSignature)  hmac.update(hash)  seed = hmac.digest(\"hex\")  // 2. r = 52 most significant bits  seed = seed.slice(0, nBits/4)  const r = parseInt(seed, 16)  // 3. X = r / 2^52  return r / Math.pow(2, nBits) // uniformly distributed in [0; 1)}To compute the hash chain and verify game results, you can use this open-source tool.The technical details of our game result generation scheme can be found in our maths page.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459690",
+  "comments": [
+    {
+      "author": "leomedina",
+      "created_time": "July 13, 2023, 05:52:27 PM",
+      "body": "Locking this thread as I have decided to mix in an actual client seed to prove that MoneyPot and ProvablyHonest are not collaborating.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

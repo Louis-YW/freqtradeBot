@@ -1,0 +1,133 @@
+{
+  "id": "topic_5403058",
+  "title": "vfCM",
+  "author": "vfCM",
+  "created_time": "June 18, 2022, 06:58:38 AM",
+  "content": "Peer to peer payments are a revolutionary technology. I've contemplated integrating them into a number of different projects of mine---to add an economic dimension to network transactions could greatly reduce or entirely eliminate spam, and could change the economic model from ad-based to direct payment, which could lead to greater variety of viewpoints presented, etc.However, I keep coming up against one obstacle: the operational complexity of actually running a Lightning node. I'm no technical slouch, but as I read through guides on running a server, I come away with the strong impression that the process is not only onerous, but also incredibly accident-prone.For example, the need for watchtower services in addition to the main lightning node; the need to always be online and available or face penalties; the complexity of managing channels; restoring nodes (and funds!) from loss after unexpected shutdowns; etc.The point of the Lightning Network is to fully realize the peer-to-peer cash vision of Bitcoin. Due to the blockchain's limited throughput, transaction fees are too high and transaction latencies far too slow.But de facto the operations risks and difficulties of the Lightning Network serve as a comparable---though not identical---impediment to its use as a peer-to-peer payment network.Of course, many can and do run nodes and make use of what is an amazing technology.But to truly take the place of cash, everybody should be able to use it. Anybody can receive, keep, and pass on a ten dollar bill. But almost nobody can run a Lightning Node, even following step-by-step instructions.So lightning is faster, and per-transaction it will be cheaper. But in many ways it seems even less cash-like than directly transacting on the blockchain. At least with on-chain transactions, I only need to be online when I want to transact.That's why I hesitate to integrate Lightning into services and protocols I'm designing. For example, a peer-to-peer publishing and content distribution platform I'd like to build. Asking people to run _a_ server on their phone or laptop or whatever isn't too big of an ask; but asking them to _also_ run a Lighting Node so that they can be paid for their work and pay to view others' work---that's quite a high bar.I understand there are simplifying upgrades to Bitcoin that could allow a smoother Lightning experience (e.g. the L2 upgrade).But what are the prospects for making Lightning at least as easy to run as Bitcoin Core?And making it easy to integrate directly into other software, such that the Lightning Protocol is largely abstracted away from users?Some things I've been wondering about. Look forward to anything I might learn. Thanks in advance.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5403058",
+  "comments": [
+    {
+      "author": "garlonicon",
+      "created_time": "June 18, 2022, 09:48:25 AM",
+      "body": "If you don't like Lightning Network in its current form, you can try sidechains: https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2022-June/020532.htmlQuoteFor example, the need for watchtower services in addition to the main lightning nodeYou can use two channels working in one direction, instead of a single channel working in both directions. Then you don't need any watchtower, but then you have to rebalance your channels more often. Also, you can try to increase the number of participants in a single channel, from 2 to N. By using Taproot and forming N-of-N multisigs, you can handle that, without increasing needed on-chain space.Edit: Technically, I can imagine a sidechain as a single Taproot output with SIGHASH_SINGLE|SIGHASH_ANYONECANPAY, that will keep moving as a one-input-one-output entry every sometimes, when all peg-ins and peg-outs will be handled by attaching more inputs and outputs to such transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "June 18, 2022, 11:10:27 AM",
+      "body": "Quote from: vfCM on June 18, 2022, 06:58:38 AMFor example, the need for watchtower services in addition to the main lightning node; the need to always be online and available or face penalties; the complexity of managing channels; restoring nodes (and funds!) from loss after unexpected shutdowns; etc.This is more of a client software issue, rather than a protocol issue. It should not be terribly difficult to implement improvements to all of the above. Watchtowers are needed to ensure that your counterparties are not attempting to cheat you. With watchtowers, you do not need to personally be online. One failsafe improvement may be to query the current channel status from the counterparty to improve issues related to restoring from backups.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 18, 2022, 11:45:20 AM",
+      "body": "Guess the question is how many people do not have cable or similar internet services that are online 24/7/365?If you are running your own BTC node that you are doing all your transactions through then not having it up all the time is not a good idea anyway.Think about it you made a purchase last weekend and then shutdown your node. If you don't turn it back on till today you have to catch up on a weeks worth of blocks and that can take a couple of hours depending on your hardware. If you are using a wallet like Electrum anyway that connects to their servers then running lightning through them or blue wallet or any of the other LN wallet providers is just as simple.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HeRetiK",
+      "created_time": "June 18, 2022, 07:03:00 PM",
+      "body": "There's a handful of custodial Lightning Network wallets such as Wallet of Satoshi and Bluewallet that allow sending and receiving payments via Lightning Networks without the need of running your own node. I guess that's what most users will go for and for the smallish payments that LN is aiming for using a custodial wallet should be fine for the most part.If you plan on using LN \"properly\" the complexity of running your own node can be reduced by not running a routing node. If you're just looking for a self-hosted gateway for the LN wallet of your choice opening a channel to the node you're planning to transact with the most (e.g. a merchant or exchange) is sufficient and you won't have to bother with keeping the channels balanced etc. (especially if you keep the channels private). Under that scenario it should also be fine if your node is not online 24/7 as long as it comes online at least once a day or so as to make sure that no shenanigans is happening.Quote from: PrimeNumber7 on June 18, 2022, 11:10:27 AMOne failsafe improvement may be to query the current channel status from the counterparty to improve issues related to restoring from backups.The LND implementation already has had this for quite a while in the form of Static Channel Backups:https://wiki.ion.radar.tech/tutorials/troubleshooting/static-channel-backups",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 19, 2022, 03:54:19 AM",
+      "body": "Lightning Network standards are managed by a group of people different from the ones who write the BIPs for the protocol, and generally these standards are not written in an open manner because both LN clients are sponsored by companies (c-lightning by BlockStream, and lnd by Lightning Labs) unlike Bitcoin Core which is sponsored by no-one.That is why you have these really huge operational complexities because not only is the client underdocumented (because employees are not paid for that), recruitment of developers for each of the different LN subsystems is scarce because the add-ons are so complex to set up (for now I've only been able to set up an LN chnnel and that's about it).It is more of a *political* problem more than a *technical* problem because the clients each define their own standards, and so the problem must be solved by *politics* by going to Lightning conferences and forums and advocating a single Layer 2 Forum that decides on Layer 2 standards (like VESA for computers).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "June 19, 2022, 07:12:25 AM",
+      "body": "Quote from: NotATether on June 19, 2022, 03:54:19 AMLightning Network standards are managed by a group of people different from the ones who write the BIPs for the protocolIt's worth mentioning that the BIP equivalent for lightning is BOLT: https://github.com/lightning/bolts",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 19, 2022, 12:34:37 PM",
+      "body": "Quote from: ETFbitcoin on June 18, 2022, 11:55:15 AMQuote from: vfCM on June 18, 2022, 06:58:38 AMBut what are the prospects for making Lightning at least as easy to run as Bitcoin Core?And making it easy to integrate directly into other software, such that the Lightning Protocol is largely abstracted away from users?Have you tried Electrum, BlueWallet or other LN wallet for regular user?This  I'd add Phoenix Wallet to the list too, and there are many more I haven't even tested. They're very easy to use, without the need to install a full node. Just like most Bitcoin users use a light wallet instead of Bitcoin Core.Quote from: vfCM on June 18, 2022, 06:58:38 AMBut what are the prospects for making Lightning at least as easy to run as Bitcoin Core?I'd argue a mobile LN wallet is in fact easier to use than Bitcoin Core.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "June 19, 2022, 03:14:10 PMLast edit: June 19, 2022, 05:14:07 PM by BlackHatCoiner",
+      "body": "Running a bitcoin node versus running a bitcoin node with a lightning node differs, indeed, in difficulty, because, besides setups, you also have to be aware of re-balancing your channels often, being online at all times, creating new channels etc. However, I think we need to settle down how much willing a \"simple user\" is, and should be, during their involvement with bitcoin. For example, I don't believe a \"simple user\" is willing to devote a part of their disk space and RAM for syncing the chain or for buying extra hardware, let alone to run their own lightning node. But, that's their loss. If they don't like trusting an SPV server, the tutorials, papers, github pages, internet boards are there to help them achieve it, whenever they decide to. You gain financial sovereignty when you have, disciplinedly, taken the time to study the subject. Just knowing what bitcoin is said it offers makes you a potentially financial sovereign. But, you gain this individual consciousness only if you do study it. Now, when it comes to Lightning, a \"simple user\" has two options;Losing custody of their money, but being able to use Lightning in a simple manner. (e.g., BlueWallet, Phoenix etc.)Deciding to study what's the Lightning Network and act accordingly to their benefits.It's obvious that the latter is a difficult thing to do, objectively. But, that's how it goes. Simplicity, custody, efficiency; pick 2. Maybe there's some better network-proposal in the future, but currently that's what we have.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "June 19, 2022, 03:56:02 PM",
+      "body": "QuoteI'd argue a mobile LN wallet is in fact easier to use than Bitcoin Core.I'd argue it is a little bit harder for me, because for example to use Phoenix Wallet, I need a virtual machine with Android, to run that on desktop, the same with any other \"mobile-only\" wallets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PrimeNumber7",
+      "created_time": "June 19, 2022, 08:11:58 PM",
+      "body": "Quote from: HeRetiK on June 18, 2022, 07:03:00 PMQuote from: PrimeNumber7 on June 18, 2022, 11:10:27 AMOne failsafe improvement may be to query the current channel status from the counterparty to improve issues related to restoring from backups.The LND implementation already has had this for quite a while in the form of Static Channel Backups:https://wiki.ion.radar.tech/tutorials/troubleshooting/static-channel-backupsMy reading of the documentation for Static Channel Backups is that you are essentially asking the other party to your channel to broadcast the current channel state to close out the channel.I was thinking something more along the lines of a feature that would have your client ask the counterparty client what they believe the current channel state is, and if both parties agree, a new channel state can be created with those balances. This would remove the need to close out all your channels.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 19, 2022, 09:10:07 PMLast edit: June 19, 2022, 09:20:40 PM by n0nce",
+      "body": "Quote from: vfCM on June 18, 2022, 06:58:38 AMHowever, I keep coming up against one obstacle: the operational complexity of actually running a Lightning node. I'm no technical slouch, but as I read through guides on running a server, I come away with the strong impression that the process is not only onerous, but also incredibly accident-prone.It's not that hard! You can just follow my guide, which appears to me is very easy to follow.Quote from: vfCM on June 18, 2022, 06:58:38 AMFor example, the need for watchtower services in addition to the main lightning node; the need to always be online and available or face penalties; the complexity of managing channels; restoring nodes (and funds!) from loss after unexpected shutdowns; etc.You don't need a watchtower if you run your own node (maybe as a backup kind of deal). But the downsides you list is what is to be expected if you 'are your own bank' and do not delegate such duties to an institution like a bank. Sure, that's going to be less hassle and less work for you, but you'll have no financial independence and financial freedom like you have when 'doing everything yourself'. That's essentially the price we pay for our freedom. A little less convenience and a bit of time and money for set up and maintenance.Quote from: vfCM on June 18, 2022, 06:58:38 AMThe point of the Lightning Network is to fully realize the peer-to-peer cash vision of Bitcoin. Due to the blockchain's limited throughput, transaction fees are too high and transaction latencies far too slow.But de facto the operations risks and difficulties of the Lightning Network serve as a comparable---though not identical---impediment to its use as a peer-to-peer payment network.I don't think they're a big impediment honestly. They definitely impede high-frequency, especially small, transfers much less than when using the blockchain directly. Because these are things that are actually only possible in Lightning. You can actually donate to podcasters minute by minute using Breez, for example. The same could be possible through a browser extension donating to a YouTube creator by the minute or by the second. Or on a new platform, like maybe https://bitcointv.com/, which is part of the federated, distributed network called Fediverse[url=http://. Like you mentioned, this could replace the jungle of ads that pays the internet today.Quote from: vfCM on June 18, 2022, 06:58:38 AMBut to truly take the place of cash, everybody should be able to use it. Anybody can receive, keep, and pass on a ten dollar bill. But almost nobody can run a Lightning Node, even following step-by-step instructions.That's true to a certain point; everyone can download Breez]. Like you mentioned, this could replace the jungle of ads that pays the internet today.Quote from: vfCM on June 18, 2022, 06:58:38 AMBut to truly take the place of cash, everybody should be able to use it. Anybody can receive, keep, and pass on a ten dollar bill. But almost nobody can run a Lightning Node, even following step-by-step instructions.That's true to a certain point; everyone can download Breez or Phoenix and literally hold a Lightning Node in their hands.. For even smoother operation (but with more trust), they could even use a custodial Lightning wallet like the one built into BlueWallet.Quote from: vfCM on June 18, 2022, 06:58:38 AMThat's why I hesitate to integrate Lightning into services and protocols I'm designing. For example, a peer-to-peer publishing and content distribution platform I'd like to build. Asking people to run _a_ server on their phone or laptop or whatever isn't too big of an ask; but asking them to _also_ run a Lighting Node so that they can be paid for their work and pay to view others' work---that's quite a high bar.Why not do both? Offer on-chain if someone thinks it's much harder to install a Lightning wallet than a on-chain Bitcoin wallet; and offer Lightning for the ones who can get it done and want to save some fees and receive their payments quicker. Quote from: vfCM on June 18, 2022, 06:58:38 AMBut what are the prospects for making Lightning at least as easy to run as Bitcoin Core?Honestly, running Lightning is not really any harder than running Bitcoin Core. If you're saying using a SPV on-chain wallet is easier than a comparable Lightning wallet, I may agree. But most people don't run Bitcoin Core; the same way they won't run a real routing, always-online, Lightning node.Quote from: vfCM on June 18, 2022, 06:58:38 AMAnd making it easy to integrate directly into other software, such that the Lightning Protocol is largely abstracted away from users?Abstracted / integrated into software already kind of exists; in BTCPayServer. You can set it up to accept both on-chain and Lightning.Quote from: BlackHatCoiner on June 19, 2022, 03:14:10 PMLosing custody of their money, but being able to use Lightning in a simple manner. (e.g., BlueWallet, Phoenix etc.) [emphasis mine]Small, but important correction!Lightning Network mobile apps:|Custodial|Non-custodial||BlueWallet (the LN portion of it)|Phoenix by Acinq|||Breez.io|",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "June 19, 2022, 09:58:17 PM",
+      "body": "And lets not forget one of my favorite things. Nodes in a box.Umbrel / raspiblitz / mynode / others.Add in autopilot and all you have to do is either re-balance as needed or close and open others depending on your mood.But, I guess the question is why? We are enthusiasts. The same way some people are car enthusiasts and wash and wax their Corvette every weekend, try to get every last HP out of it. Change the oil every 1000 miles and have their own lift to get under the car in their garage so they can be sure everything is perfect. They would be happy with paying their bills using bluewallet. With my car, I put in gas as needed and change the oil when the light on the dashboard tells me and I think the last time I washed it we had a different president. But I have several of my own BTC and lightning nodes......-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 20, 2022, 07:14:51 AM",
+      "body": "Quote from: n0nce on June 19, 2022, 09:10:07 PMQuote from: BlackHatCoiner on June 19, 2022, 03:14:10 PMLosing custody of their money, but being able to use Lightning in a simple manner. (e.g., BlueWallet, Phoenix etc.) [emphasis mine]Small, but important correction!Lightning Network mobile apps:|Custodial|Non-custodial||BlueWallet (the LN portion of it)|Phoenix by Acinq|||Breez.io|While we're doing small corrections: opening a channel in Phoenix Wallet requires trust.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 20, 2022, 11:23:07 AM",
+      "body": "Quote from: tromp on June 19, 2022, 07:12:25 AMIt's worth mentioning that the BIP equivalent for lightning is BOLT: https://github.com/lightning/boltsGood, so that's one problem already solved. Implementors should not expect their vendor additions to be copied by other wallets unless they propose the addition as a BOLT.This really allows for a minimum standards-compliant LN client to be made.BOLT should actually make a reference client to avoid the issue of protocol standards additions that never get implemented (clightning & lnd might not be controlled by the same working group).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "June 20, 2022, 01:22:45 PM",
+      "body": "Quote from: LoyceV on June 20, 2022, 07:14:51 AMQuote from: n0nce on June 19, 2022, 09:10:07 PMQuote from: BlackHatCoiner on June 19, 2022, 03:14:10 PMLosing custody of their money, but being able to use Lightning in a simple manner. (e.g., BlueWallet, Phoenix etc.) [emphasis mine]Small, but important correction!Lightning Network mobile apps:|Custodial|Non-custodial||BlueWallet (the LN portion of it)|Phoenix by Acinq|||Breez.io|While we're doing small corrections: opening a channel in Phoenix Wallet requires trust.Small, but important! I'd add to that: Breez is probably the same. Last I checked, by default it only opens channels to the Breez node; the idea is that they have much less incentive to cheat on you than the other way round, especially since they usually deposit more into the channel you have with them than you do and they have a reputation at stake.What I like about Breez is that it's trivially simple to use raw lnd commands through the 'developer' menu to (force) close all channels and move your balance, for example. I've not yet come across another mobile application that has this feature and in my mind, it massively reduces trust in terms of being able to access your funds at any time on-chain through manual channel closes.Quote from: NotATether on June 20, 2022, 11:23:07 AMQuote from: tromp on June 19, 2022, 07:12:25 AMIt's worth mentioning that the BIP equivalent for lightning is BOLT: https://github.com/lightning/boltsGood, so that's one problem already solved. Implementors should not expect their vendor additions to be copied by other wallets unless they propose the addition as a BOLT.This really allows for a minimum standards-compliant LN client to be made.BOLT should actually make a reference client to avoid the issue of protocol standards additions that never get implemented (clightning & lnd might not be controlled by the same working group).Yes, but BOLT has its issues. For example, BOLT12.org has been a 'lightning-rfc' since 2020 and lnd developers just reject adding it to the standard and implementing it into LND. It can be speculated if they truly believe it's bad / unnecessary / insecure (whatever) or if it's a political decision, but if one company can just put in a 'veto' this easily, it shows me BOLT is worse than BIP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

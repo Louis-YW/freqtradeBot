@@ -1,0 +1,61 @@
+{
+  "id": "topic_5410484",
+  "title": "THLO",
+  "author": "THLO",
+  "created_time": "August 19, 2022, 11:50:57 AM",
+  "content": "Hi everyone!I'm trying to create a transaction programmatically (in Rust) that spends an output associated with a P2WPKH address. This is the relevant code snippet:Code:fn sign_transaction<SignFun>(    own_public_key: &[u8],    own_address: &Address,    own_utxos: &[Utxo],    mut transaction: Transaction,    key_name: String,    derivation_path: Vec<Vec<u8>>,    signer: SignFun,) -> Transactionwhere    SignFun: Fn(String, Vec<Vec<u8>>, Vec<u8>) -> Fut,{    let txclone = transaction.clone();    let mut hash_cache = sighash::SighashCache::new(&txclone);    for (index, input) in transaction.input.iter_mut().enumerate() {        let value = get_value(input, own_utxos);    // Look up the value by finding the corresponding UTXO        let sighash = hash_cache            .segwit_signature_hash(index, &own_address.script_pubkey(), value, SIG_HASH_TYPE)            .expect(\"Creating the segwit signature hash failed.\");        let signature = signer(key_name.clone(), derivation_path.clone(), sighash.to_vec()).await;        // Convert signature to DER.        let der_signature = sec1_to_der(signature);        let mut sig_with_hashtype = der_signature;        sig_with_hashtype.push(SIG_HASH_TYPE.to_u32() as u8);        let witness_bytes = vec![sig_with_hashtype, own_public_key.to_vec()];        input.witness = Witness::from_vec(witness_bytes);    }    transaction}SIG_HASH_TYPE is simply EcdsaSighashType::All.I get the following serialized transaction:Code:010000000001016e97eae878274b6663923994bf7622c72ed41ce71d9d5d4091905378eeb0e5fa0000000000ffffffff0200e1f505000000001976a9148f7918f50cfd908ff82294a12c926f0fc52b0d1d88ac3e160d8f000000001600148be949ae15ee4b5da9af0ce2bf8d3f3c43c582da02483045022100999dd2a10b036d6b599d7d6b205f62b4dd14aca4b4c0d12224c0daa35c34bbea022025702dd922f94bd5b9444f798ab4ad7bcdbdd53568d7a45c6086a3e6f81b20d4012103366e75877b80252ff39e76229fe6d88d14e1150256bfdd27e7726b6b2cb23c0200000000When trying to submit it, I get the following error:Code:error code: -26error message:non-mandatory-script-verify-flag (Signature must be zero for failed CHECK(MULTI)SIG operation)When decoding the transaction (using decoderawtransaction), everything looks okay as far as I can tell but I might be missing something.Note that I adapted the code from the following working example that signs a P2PKH input:Code:...let sighash = txclone.signature_hash(index, &own_address.script_pubkey(), SIG_HASH_TYPE.to_u32());let signature = signer(key_name.clone(), derivation_path.clone(), sighash.to_vec()).await;// Convert signature to DER.let der_signature = sec1_to_der(signature);let mut sig_with_hashtype = der_signature;sig_with_hashtype.push(SIG_HASH_TYPE.to_u32() as u8);input.script_sig = Builder::new()    .push_slice(sig_with_hashtype.as_slice())    .push_slice(own_public_key)     .into_script();input.witness.clear();Can anybody spot a mistake in the code? Am I signing the wrong data?If you need additional information, just let me know.Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5410484",
+  "comments": [
+    {
+      "author": "pooya87",
+      "created_time": "August 19, 2022, 01:07:02 PM",
+      "body": "The input you used (fae5b0ee78539091405d9d1de71cd42ec72276bf94399263664b2778e8ea976e) can not be found on the blockchain.Assuming it exists (RegTest maybe) and it using the key in this transaction (03366e75877b80252ff39e76229fe6d88d14e1150256bfdd27e7726b6b2cb23c02) and is actually P2WPKH, your signature is invalid.If I had to guess, the problem is that you converted the code that is designed to sign P2PKH transactions (method called signer) to sign P2WPKH transaction which won't work since the algorithm is different. Read BIP-143 for more information",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "THLO",
+      "created_time": "August 19, 2022, 02:31:09 PM",
+      "body": "Sorry, I forgot to mention that I'm working in RegTest mode (as you guessed correctly), so the address (bcrt1q3055nts4ae94m2d0pn3tlrfl83putqk6qnjp0d) does exist and has sufficient funds in my local chain.As you can see in my code, I switched to using the segwit_signature_hash function to (hopefully) get the right piece of data that needs to be signed.I read BIP-143 and concluded that only the transaction digestion algorithm changed but not the signing algorithm itself. Did I misunderstand this part?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 19, 2022, 03:31:00 PM",
+      "body": "Quote from: THLO on August 19, 2022, 02:31:09 PMI read BIP-143 and concluded that only the transaction digestion algorithm changed but not the signing algorithm itself. Did I misunderstand this part?The signing algorithm (ECDSA) is the same for both legacy and SegWit version 0 transactions. But the sighash algorithm (to compute the hash to be signed) is different. If your input amount is 2500000000 (25BTC) then your digest should be c7b46808353916389c2aedd3f59a54fca60c439e4ae03dc93d2ec4758eefe0c6 for this transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "THLO",
+      "created_time": "August 19, 2022, 04:19:11 PM",
+      "body": "Thanks for the clarification!As stated above, I'm using the codeCode:let mut hash_cache = sighash::SighashCache::new(&txclone);    for (index, input) in transaction.input.iter_mut().enumerate() {        let value = get_value(input, own_utxos);    // Look up the value by finding the corresponding UTXO        let sighash = hash_cache            .segwit_signature_hash(index, &own_address.script_pubkey(), value, SIG_HASH_TYPE)            .expect(\"Creating the segwit signature hash failed.\");to create the sighash. This is the standard bitcoin::util::sighash function, which should yield the correct sighash if I'm not mistaken.Is this the wrong function? Or is there a problem with the inputs? The index, value, and SIG_HASH_TYPE should be fine, so that would leave the script pubkey (but again, this is a standard bitcoin::Address...).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 20, 2022, 04:52:26 AM",
+      "body": "Quote from: THLO on August 19, 2022, 02:31:09 PMSorry, I forgot to mention that I'm working in RegTest mode (as you guessed correctly), so the address (bcrt1q3055nts4ae94m2d0pn3tlrfl83putqk6qnjp0d) does exist and has sufficient funds in my local chain.As you can see in my code, I switched to using the segwit_signature_hash function to (hopefully) get the right piece of data that needs to be signed.I read BIP-143 and concluded that only the transaction digestion algorithm changed but not the signing algorithm itself. Did I misunderstand this part?Well, if you consider as part of the transaction algorithm SHA256 hashing the inputs and outputs before signing, and placing your signature in the witness area, then yes, P2WPKH addresses still use ECDSA signatures.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "THLO",
+      "created_time": "August 26, 2022, 09:05:30 AM",
+      "body": "I ran the code again with more output:Public key: 0377f5de845ac601f24e7cbf2e4abcc9e1040cd4ae971ecaa00837b1c74684e15bAddress: bcrt1qh3zle7xs34azdyycg8cpf9wx5nxjpcqyqv4eycInput spent with value: 625000000Transaction to sign: 0100000001ceac446d9350730c2a886220bed7ae154ca3f717897819091d5e72dcd0f0895e00000 00000ffffffff0200e1f505000000001600148be949ae15ee4b5da9af0ce2bf8d3f3c43c582da26 dc4a1f00000000160014bc45fcf8d08d7a26909841f01495c6a4cd20e00400000000Sighash: d7e5696f18363b58c84b8d57014d291c9f7ebbac562d219f7e7014b9a5685bbfSEC1 signature: c10c09b210914e49f295c07c9f96352e085df9d2c4272292239445d6f89483bc64c9903bebaba4b bf998d217c80375c36b60b212a824b63435e30205b2ed5a6aDER signature: 3045022100c10c09b210914e49f295c07c9f96352e085df9d2c4272292239445d6f89483bc02206 4c9903bebaba4bbf998d217c80375c36b60b212a824b63435e30205b2ed5a6a DER signature with Sighash type: 3045022100c10c09b210914e49f295c07c9f96352e085df9d2c4272292239445d6f89483bc02206 4c9903bebaba4bbf998d217c80375c36b60b212a824b63435e30205b2ed5a6a01Signed transaction: 01000000000101ceac446d9350730c2a886220bed7ae154ca3f717897819091d5e72dcd0f0895e0 000000000ffffffff0200e1f505000000001600148be949ae15ee4b5da9af0ce2bf8d3f3c43c582 da26dc4a1f00000000160014bc45fcf8d08d7a26909841f01495c6a4cd20e00402483045022100c 10c09b210914e49f295c07c9f96352e085df9d2c4272292239445d6f89483bc022064c9903bebab a4bbf998d217c80375c36b60b212a824b63435e30205b2ed5a6a01210377f5de845ac601f24e7cb f2e4abcc9e1040cd4ae971ecaa00837b1c74684e15b00000000Could anybody please pinpoint where things go wrong?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "topic_5459306",
+  "title": "virginorange",
+  "author": "virginorange",
+  "created_time": "July 10, 2023, 11:21:20 AM",
+  "content": "I would like to take 12 Bitcoin seed words and deterministically derive a PGP private public key pairHow can I do do this? I'd like to have a tool, which I can then use on a Tails OS not connected to the internet.BackgroundI want to use BIP 85 to dervie all my important secrets including wallets and passwords. BIP 85 takes your Bitcoin seed and dervies seeds for child wallets.It is easy to dervie the child wallet seed from the parent wallet seed. However you can't realisticly dervive the parent seed from the child seed.I use the parent seed for my cold storage and the child seed for my mobile wallet.As a result I only have to back up one seed for two wallets.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5459306",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "July 10, 2023, 12:11:43 PM",
+      "body": "Are you planning to encrypt the backup 12 words seed using the PGP tool?Tails OS already has a PGP tool where you can encrypt your backup seed?I would suggest check this video on how to encrypt a message or just paste your backup seed inside to encrypt using the PGP tool.Does it look like you are using a coldcard wallet that supports BIP85?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "July 10, 2023, 12:45:34 PM",
+      "body": "Found this one for reference: https://github.com/jeffreybolle/deterministic-pgp-keys. You can build on your own to be used on Tails. Though, I don't know if it supports BIP 85, since it solely uses BIP39 for the seed generation/recovery.Do note that I just search around about your use case and found that repo. So I did know further about how secure is it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "virginorange",
+      "created_time": "July 10, 2023, 05:39:57 PM",
+      "body": "Quote from: vv181 on July 10, 2023, 12:45:34 PMFound this one for reference: https://github.com/jeffreybolle/deterministic-pgp-keys. You can build on your own to be used on Tails.Thanks a lot, I will take a look at it.Quote from: vv181 on July 10, 2023, 12:45:34 PMThough, I don't know if it supports BIP 85, since it solely uses BIP39 for the seed generation/recovery.I use a hardware wallet do derive the child seeds. I don't need BIP 85 support to go from the child seed to a PGP key pair.Quote from: vv181 on July 10, 2023, 12:45:34 PMDo note that I just search around about your use case and found that repo. So I did know further about how secure is it.Maybe somebody more experienced on Bitcointalk has an answer here?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hatshepsut93",
+      "created_time": "July 11, 2023, 12:03:33 AM",
+      "body": "This is probably not a good idea, because the space of possible seeds is 2^132 if you have 12 word seeds with 2048 possible words, while RSA uses 2048 or 4096-bit keys. You can only map 1 seed to 1 key deterministically, so if your algorithm is known to attacker, their attack against your RSA key will be more optimized than against a truly random key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "virginorange",
+      "created_time": "July 11, 2023, 06:48:40 PM",
+      "body": "Quote from: hatshepsut93 on July 11, 2023, 12:03:33 AMThis is probably not a good idea, because the space of possible seeds is 2^132 if you have 12 word seeds with 2048 possible words, while RSA uses 2048 or 4096-bit keys. You can only map 1 seed to 1 key deterministically, so if your algorithm is known to attacker, their attack against your RSA key will be more optimized than against a truly random key. Good point12 seed words would have 2^128 entropy24 seed words would have 2^256 entropyRSA has 2^2048 entropyRSA would be more secure than Bitcoin seed wordsHowever Bitcoin seed words, which secure vast amount of wealth, are difficult enough to brute force.Shouldn’t 256 bits of entropy (even 128 bits) be enough to derive a secure enough RSA key pair, secure enough for encrypting emails?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hatshepsut93",
+      "created_time": "July 11, 2023, 09:32:58 PM",
+      "body": "Quote from: virginorange on July 11, 2023, 06:48:40 PMHowever Bitcoin seed words, which secure vast amount of wealth, are difficult enough to brute force.Shouldn’t 256 bits of entropy (even 128 bits) be enough to derive a secure enough RSA key pair, secure enough for encrypting emails?RSA Factoring ChallengeRSA works with larger keys, like 2048 bits, because 128 or 256 bits are no longer secure for RSA, while still being secure for elliptic curves. The seed-derived numbers might be 2048 bit long, but the possible space will be only 2^136, so there's a possibility for optimization of the prime factorization algorithm.I think that on practice you'll be relatively safe, because cracking such system would still require knowledge and effort, so if you don't have powerful enemies, your RSA keys probably won't be cracked. But it's better to always practice strong security and never grow overconfident.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "virginorange",
+      "created_time": "July 12, 2023, 02:24:11 AM",
+      "body": "Quote from: hatshepsut93 on July 11, 2023, 09:32:58 PMRSA works with larger keys, like 2048 bits, because 128 or 256 bits are no longer secure for RSA, while still being secure for elliptic curves. The seed-derived numbers might be 2048 bit long, but the possible space will be only 2^136, so there's a possibility for optimization of the prime factorization algorithm.If the possible space is 2^136, wouldn’t 2^256 Bitcoin seed be enough?You would need a sort of mapping. Maybe you could estimate there are X prime numbers lower than the number Y. The Bitcoin seed gives you X. You estimate Y. From Y you search the next prime number, which you can use for RSA.Would this work?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

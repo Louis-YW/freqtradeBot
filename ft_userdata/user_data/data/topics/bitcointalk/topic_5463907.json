@@ -1,0 +1,141 @@
+{
+  "id": "topic_5463907",
+  "title": "tw0.625",
+  "author": "tw0.625",
+  "created_time": "August 20, 2023, 10:49:09 AM",
+  "content": "Just theory:21 million Bitcoin and 100 million Satoshi per Bitcoin  was chosen in order to simplify calculations and involve floating-point arithmetic.1. 64-bit IEEE754 double, all integers up to 9007199254740992 == 2^53 can be exactly represented. In the range 2^51 to 2^52, the only non-integer values .5Below 2^51 we also have .25 and .75, so comparing a number with it's rounded counterpart in order to determine if it may be integer or not starts making some sense.If we want to test whether result may be integer, you must avoid numbers larger than 2^51 == 2251799813685248Simple test:Code:for (uint64_t i = pow(2, 52); i >= 0; i--) {        double d = i;        double sat = 100000000;        double d1 = d / sat;        double d2 = d1 * sat;        uint64_t i2 = round(d2);        if (i != i2) {            std::cout << i << std::endl;        }}for (uint64_t i = pow(2, 51); i >= 0; i--) {        double d = i;        double sat = 100000000;        double d1 = d / sat;        double d2 = d1 * sat;        uint64_t i2 = round(d2);        if (i != i2) {            std::cout << i << std::endl;        }}Sure, Satoshi could choose  2200000000000000, but 22 is not triangular number.2. So, for the purpose of optimizing calculations, he had to choose the triangular number closest to 22 from the sequence: 0, 1, 3, 6, 10, 15, 21, 28,...",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5463907",
+  "comments": [
+    {
+      "author": "Cricktor",
+      "created_time": "August 20, 2023, 11:29:47 AM",
+      "body": "There is no system-dependent floating point arithmetic used to my knowledge. The Bitcoin blockchain doesn't use the concept of floating point math, nor do the Bitcoin clients do that.The Bitcoin blockchain has 1 Satoshi as smallest token. By definition of Satoshi Nakamote 100,000,000 of those tokens are 1BTC. I remember that this division in 108 token has been discussed a lot of times in this forum. Did you try to search for this?The maximum supply of slightly less than 21,000,000BTC, to be accurate max is 2,099,999,997,690,000sat, is directly correlated to the initial block reward of 50BTC and halving this value of 5,000,000,000sat after 210,000 issued blocks by a binary bit-shift. Halving repeats after 210,000 blocks have been mined. There will be times when an odd number of Satoshis as block reward has to be halved and that's no issue with a bit-shift then.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tw0.625",
+      "created_time": "August 20, 2023, 11:36:13 AM",
+      "body": "Quote from: Cricktor on August 20, 2023, 11:29:47 AMThere is no system-dependent floating point arithmetic used to my knowledge. The Bitcoin blockchain doesn't use the concept of floating point math, nor do the Bitcoin clients do that.The Bitcoin blockchain has 1 Satoshi as smallest token. By definition of Satoshi Nakamote 100,000,000 of those tokens are 1BTC. I remember that this division in 108 token has been discussed a lot of times in this forum. Did you try to search for this?The maximum supply of slightly less than 21,000,000BTC, to be accurate max is 2,099,999,997,690,000sat, is directly correlated to the initial block reward of 50BTC and halving this value of 5,000,000,000sat by a binary bit-shift. There will be times when an odd number of Satoshis as block reward has to be halved and that's no issue with a bit-shift then.So, you couldn't even compile a simple C++ test that I provided above. Yet you're discussing how Satoshi might have thought? Well, that's amusing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 20, 2023, 12:01:15 PM",
+      "body": "Quote from: Cricktor on August 20, 2023, 11:29:47 AMThe maximum supply of slightly less than 21,000,000BTC, to be accurate max is 2,099,999,997,690,000sat, is directly correlated to the initial block reward of 50BTC and halving this value of 5,000,000,000sat after 210,000 issued blocks by a binary bit-shift.The real question is: why 210,000 blocks between halvings? That's the choice that lead to a total of 21 million Bitcoins. Why not a round number of blocks? Say 100,000? Or 314,159 blocks? I guess the reason was to get 4 years between halvings. If that's correct, Satoshi chose 10 minutes between blocks, he chose 50 Bitcoin per block, and he choose to have halvings every 4 years. The 210,000 blocks and 21 million Bitcoin just resulted from this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "August 20, 2023, 12:33:05 PM",
+      "body": "From what I remember, sorry a bit of faded memories, the first important metric for Satoshi was the block time target of 10min. It was likely a compromise but mainly focussed on security. To my knowledge a smaller block time, particularly in the beginning of the Bitcoin blockchain, would've had less security and stability (don't press me on that, though). The likelyhood of certain attacks rises with significantly shorter block time. Much larger than 10min isn't nice either, not in terms of security but user experience (nobody wants to wait too long for stable and secure confirmation of their transactions).Initial block reward of 50BTC seemed like a sweet spot for Satoshi, large enough to trigger interest (and maybe some greed ) and attract more distinct miners to increase decentralization and security by more proof of work of more individual miners.And then chosing a halving period in the time frame of about 4 years resulted in the metric of 210,000 blocks (a rounder value than 210,384, taking a leap year into account; otherwise 210,240). It could've been that value of initial block reward and halving intervall are intertwined. But, frankly, I don't know or remember past discussions about that and I'm only mildly interested in those.In my perception the most important metrics for Satoshi were stability and security of the blockchain, a reasonable length of the halving period and not reaching max cap too fast or too far in the future.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tw0.625",
+      "created_time": "August 20, 2023, 01:56:12 PM",
+      "body": "Quote from: LoyceV on August 20, 2023, 12:01:15 PMQuote from: Cricktor on August 20, 2023, 11:29:47 AMThe maximum supply of slightly less than 21,000,000BTC, to be accurate max is 2,099,999,997,690,000sat, is directly correlated to the initial block reward of 50BTC and halving this value of 5,000,000,000sat after 210,000 issued blocks by a binary bit-shift.The real question is: why 210,000 blocks between halvings? That's the choice that lead to a total of 21 million Bitcoins. Why not a round number of blocks? Say 100,000? Or 314,159 blocks? I guess the reason was to get 4 years between halvings. If that's correct, Satoshi chose 10 minutes between blocks, he chose 50 Bitcoin per block, and he choose to have halvings every 4 years. The 210,000 blocks and 21 million Bitcoin just resulted from this.What you are talking about is a specific implementation of approximating the logistic function (Wt[t]). To implement it, you first need to conduct mathematical modeling and define the function you will be approximating. The choice of 21 million is not random. Satoshi could have chosen any parameter W. 4 years is just \"approximation step\" of the function (Wt[t])Code:The generalised logistic function or Richards' curve (1959) was developed for growth modelling (extension of logistic). The model has been modified by Sugden (1981) and Satoshi (2008)Wt[t]=W(1-(1-m)Exp[-k(t-T)/(m^(m/(1 - m)))])^(1/(1- m))W=21000000k=0.00265m=0.3909T=165.6https://twitter.com/TheoryBitcoin/status/1232224207838359553",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HeRetiK",
+      "created_time": "August 20, 2023, 01:59:34 PM",
+      "body": "Quote from: Cricktor on August 20, 2023, 12:33:05 PMFrom what I remember, sorry a bit of faded memories, the first important metric for Satoshi was the block time target of 10min. It was likely a compromise but mainly focussed on security. To my knowledge a smaller block time, particularly in the beginning of the Bitcoin blockchain, would've had less security and stability (don't press me on that, though). The likelyhood of certain attacks rises with significantly shorter block time. Much larger than 10min isn't nice either, not in terms of security but user experience (nobody wants to wait too long for stable and secure confirmation of their transactions).Yes, IIRC 10 minutes were considered the sweet spot between reliability and convenience, though satoshi erred more in favor of reliability. It was only with the first generations of alts that we found out how low block times can be pushed. Litecoin's 2.5 minutes worked fine while other alts that went to blocktimes of less than a minute tended to suffer from high orphan rates and reorgs. While later alts have been able to successfully go to blocktimes below one minute, they arguably could take lessons from earlier failed attempts.The bigger question IMO would indeed be why satoshi then chose 210,000 blocks per halving period, resulting in the 4 years between each halving as pointed out by LoyceV. My pet theory has always been that satoshi had a hunch that 4 years would be the perfect interval for boom and bust hype cycles, ie. enough time for people to forget about Bitcoin and the pain of having bought at the top, but not so long as to completely drop out of the collective consciousness. But in hindsight it's of course always easy to see deliberate choice in what might have just been serendipity.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tw0.625",
+      "created_time": "August 20, 2023, 02:20:29 PMLast edit: August 20, 2023, 02:48:09 PM by tw0.625",
+      "body": "Quote from: HeRetiK on August 20, 2023, 01:59:34 PMYes, IIRC 10 minutes were considered the sweet spot between reliability and convenience, though satoshi erred more in favor of reliability. It was only with the first generations of alts that we found out how low block times can be pushed. Litecoin's 2.5 minutes worked fine while other alts that went to blocktimes of less than a minute tended to suffer from high orphan rates and reorgs. While later alts have been able to successfully go to blocktimes below one minute, they arguably could take lessons from earlier failed attempts.The bigger question IMO would indeed be why satoshi then chose 210,000 blocks per halving period, resulting in the 4 years between each halving as pointed out by LoyceV. My pet theory has always been that satoshi had a hunch that 4 years would be the perfect interval for boom and bust hype cycles, ie. enough time for people to forget about Bitcoin and the pain of having bought at the top, but not so long as to completely drop out of the collective consciousness. But in hindsight it's of course always easy to see deliberate choice in what might have just been serendipity.In reality, he could have chosen a smoother approximation of Wt[t] – reducing the block reward every 10 blocks, or every 100 blocks, or every 1000 blocks. I think he opted for a halving of the block reward every 4 years simply to make it easier for regular people unfamiliar with mathematics to remember and comprehend.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 20, 2023, 03:05:19 PM",
+      "body": "Quote from: LoyceV on August 20, 2023, 12:01:15 PMThe real question is: why 210,000 blocks between halvings? That's the choice that lead to a total of 21 million Bitcoins. Why not a round number of blocks? Say 100,000? Or 314,159 blocks? I guess the reason was to get 4 years between halvings. If that's correct, Satoshi chose 10 minutes between blocks, he chose 50 Bitcoin per block, and he choose to have halvings every 4 years. The 210,000 blocks and 21 million Bitcoin just resulted from this.I get the feeling that most of the numbers are chosen somewhat arbitrarily. It's probably not so easy to find numbers that are factors of psychologically pleasing numbers (i.e. 2, 3, 4, 10 etc), so the scheme was some kind of coin-flip compromise between using simple numbers in places where some rule-of-thumb might be helpful (i.e. the exact number of blocks in 4 years at constant difficulty for halvings), and something \"ugly\" for aspects that are difficult to maintain as whole numbers i.e. the supply cap.the supply cap is actually a good example to take here: 21 million is in fact a simplification, it's some unwieldy and unmemorable amount *very close* to 21 million, but not 21 million exactly.really this is classic bike-shedding material: satoshi had to choose something, and it needed to be: 1. arbitrary 2. not too small.we can even bike shed the question in the OP: the question is wrong, you should be asking why satoshi chose to put the decimal point at 8 positions in either direction. Why was satoshi so obsessed with the number 8?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tw0.625",
+      "created_time": "August 20, 2023, 03:38:41 PM",
+      "body": "Quote from: Carlton Banks on August 20, 2023, 03:05:19 PMQuote from: LoyceV on August 20, 2023, 12:01:15 PMThe real question is: why 210,000 blocks between halvings? That's the choice that lead to a total of 21 million Bitcoins. Why not a round number of blocks? Say 100,000? Or 314,159 blocks? I guess the reason was to get 4 years between halvings. If that's correct, Satoshi chose 10 minutes between blocks, he chose 50 Bitcoin per block, and he choose to have halvings every 4 years. The 210,000 blocks and 21 million Bitcoin just resulted from this.I get the feeling that most of the numbers are chosen somewhat arbitrarily. It's probably not so easy to find numbers that are factors of psychologically pleasing numbers (i.e. 2, 3, 4, 10 etc), so the scheme was some kind of coin-flip compromise between using simple numbers in places where some rule-of-thumb might be helpful (i.e. the exact number of blocks in 4 years at constant difficulty for halvings), and something \"ugly\" for aspects that are difficult to maintain as whole numbers i.e. the supply cap.the supply cap is actually a good example to take here: 21 million is in fact a simplification, it's some unwieldy and unmemorable amount *very close* to 21 million, but not 21 million exactly.really this is classic bike-shedding material: satoshi had to choose something, and it needed to be: 1. arbitrary 2. not too small.we can even bike shed the question in the OP: the question is wrong, you should be asking why satoshi chose to put the decimal point at 8 positions in either direction. Why was satoshi so obsessed with the number 8?  I can't explain why Satoshi chose 8 decimal places. Perhaps this number was indeed chosen randomly. However, when it comes to the total number of 21m * 100m < 2^51 makes sense in terms of processor limitations even today, not to mention the year 2008.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "HeRetiK",
+      "created_time": "August 20, 2023, 03:59:48 PM",
+      "body": "Quote from: tw0.625 on August 20, 2023, 02:20:29 PMIn reality, he could have chosen a smoother approximation of Wt[t] – reducing the block reward every 10 blocks, or every 100 blocks, or every 1000 blocks.Of course! But I also think Bitcoin wouldn't have been quite as successful with a smooth emission curve.Quote from: tw0.625 on August 20, 2023, 02:20:29 PMI think he opted for a halving of the block reward every 4 years simply to make it easier for regular people unfamiliar with mathematics to remember and comprehend.It's a great hook considering how weird and confusing the other mechanics of Bitcoin may seem at a first glance. All things considered the halving is one of the easiest concepts to explain to a newcomer.Apart from that a smooth emission curve wouldn't have resulted in the sudden supply shocks that lead to Bitcoin's notorious bubbles which in turn placed it on everyone's radar. Add to that a cycle of predictable, publicly known, future supply shocks and you get yourself a self-fulling prophecy -- not only because one \"knows\" when to expect the next price increase, but also because price increases are expected by most market participants at roughly the same time.Quote from: Carlton Banks on August 20, 2023, 03:05:19 PMWhy was satoshi so obsessed with the number 8?  The number 21 was just a distraction all along Quote from: tw0.625 on August 20, 2023, 03:38:41 PMnot to mention the year 2008.The plot thickens",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tw0.625",
+      "created_time": "August 20, 2023, 04:05:18 PM",
+      "body": "Quote from: HeRetiK on August 20, 2023, 03:59:48 PMQuote from: tw0.625 on August 20, 2023, 03:38:41 PMnot to mention the year 2008.The plot thickens    Domain Name: bitcoin.orgRegistry Domain ID: 95f8bd6f31564abd9c35804710ed58fe-LRORRegistrar WHOIS Server: whois.namecheap.comRegistrar URL: http://www.namecheap.comUpdated Date: 2021-09-23T09:18:07ZCreation Date: 2008-08-18T13:19:55Z",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 20, 2023, 04:16:02 PM",
+      "body": "Quote from: Carlton Banks on August 20, 2023, 03:05:19 PMWhy was satoshi so obsessed with the number 8?  He just ate Serious answer: As far as I know it has to do with creating small enough units to serve the global population.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 20, 2023, 04:45:39 PM",
+      "body": "This kind of coincidences is exactly why this video was made: Spooky Coincidences?  (Vsauce classics, watch it)There are really just tons of things to take into account about the 21m. It could be that, or the inevitable result of having havlings every once in 4 years, with 10 minute block interval and 50 BTC as first reward. Or if we were to interpret this spiritually, 42 is everything, so all bitcoins are \"half\" of everything.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 20, 2023, 06:29:14 PMLast edit: August 20, 2023, 07:15:05 PM by Carlton Banks",
+      "body": "i think Robert Anton Wilson (fiction author) said that it was possible to ascribe meaning to any random pattern or instance of numbers if:one really applies their imaginationone really wants to believe something irrespective of whether the pattern is meaningfulboth types of people are a danger to themselves, and the first type particularly a danger to others...so I'm gonna say it again: these are arbitrary goldilocks numbers; not too big, not too small, and pulled out of satoshi's... hat",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tw0.625",
+      "created_time": "August 20, 2023, 06:48:16 PM",
+      "body": "Quote from: Carlton Banks on August 20, 2023, 06:29:14 PMi think Robert Anton Wilson (fiction author) said that it was possible to ascribe meaning to any random pattern or instance of numbers if:one really applies their imaginationone really wants to believe something irrespective of whether the pattern is meaningfulboth types of people are a danger to themselves, and the first type particularly a danger to others...so I'm gonna say it again: these are arbitrary goldilocks numbers: not too big, not too small, and pulled out of satoshi's... hatIn your words, there's a sense that you have a humanities education. But programmers tend to think a bit differently.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "August 21, 2023, 09:25:38 AM",
+      "body": "Quote from: tw0.625 on August 20, 2023, 11:36:13 AMQuote from: Cricktor on August 20, 2023, 11:29:47 AMThere is no system-dependent floating point arithmetic used to my knowledge. The Bitcoin blockchain doesn't use the concept of floating point math, nor do the Bitcoin clients do that.The Bitcoin blockchain has 1 Satoshi as smallest token. By definition of Satoshi Nakamote 100,000,000 of those tokens are 1BTC. I remember that this division in 108 token has been discussed a lot of times in this forum. Did you try to search for this?The maximum supply of slightly less than 21,000,000BTC, to be accurate max is 2,099,999,997,690,000sat, is directly correlated to the initial block reward of 50BTC and halving this value of 5,000,000,000sat by a binary bit-shift. There will be times when an odd number of Satoshis as block reward has to be halved and that's no issue with a bit-shift then.So, you couldn't even compile a simple C++ test that I provided above. Yet you're discussing how Satoshi might have thought? Well, that's amusing.For reference, Bitcoin full node client which was initially written by Satoshi (now called Bitcoin Core) use int64_t. So i fail to see what's amusing about @Cricktor statement.Quote from: tw0.625 on August 20, 2023, 06:48:16 PM--snip--But programmers tend to think a bit differently.A bit differently as in a bit different way to choose arbitrary number?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

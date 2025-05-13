@@ -1,0 +1,101 @@
+{
+  "id": "topic_5523772",
+  "title": "ganzocrypt",
+  "author": "ganzocrypt",
+  "created_time": "December 22, 2024, 01:21:45 PM",
+  "content": "Hello,I am trying to \"generate\" bitcoin addresses from 2014 to see if they have some satoshi. It's for a friend who think he has the passphrase and wants to see if the addresses have Bitcoin! I am using AI to create a script to do the following:write a script to create bitcoin P2PKH and P2SH formats valid addresses starting from several passphrase. Print the passphrase for each address indicating the address formats. Check also if the address has bitcoins. The scripts works but I do not know if these addresses are correct. I check on https://www.blockchain.com/explorer/ if these addresses exists and it tells me if they are P2PKH and P2SH format.Any ideas?Code:import hashlibimport base58import requestsdef generate_p2pkh_address(passphrase):    # Generate a public key from the passphrase    private_key = hashlib.sha256(passphrase.encode()).hexdigest()    public_key = hashlib.new('ripemd160', hashlib.sha256(bytes.fromhex(private_key)).digest()).hexdigest()        # Create P2PKH address    p2pkh_prefix = '00'    p2pkh_address = p2pkh_prefix + public_key    p2pkh_address_checksum = hashlib.sha256(hashlib.sha256(bytes.fromhex(p2pkh_address)).digest()).digest()[:4]    p2pkh_address += p2pkh_address_checksum.hex()    p2pkh_address = base58.b58encode(bytes.fromhex(p2pkh_address)).decode()        return p2pkh_addressdef generate_p2sh_address(passphrase):    # Generate a public key from the passphrase    private_key = hashlib.sha256(passphrase.encode()).hexdigest()    public_key = hashlib.new('ripemd160', hashlib.sha256(bytes.fromhex(private_key)).digest()).hexdigest()        # Create P2SH address    p2sh_prefix = '05'    p2sh_address = p2sh_prefix + public_key    p2sh_address_checksum = hashlib.sha256(hashlib.sha256(bytes.fromhex(p2sh_address)).digest()).digest()[:4]    p2sh_address += p2sh_address_checksum.hex()    p2sh_address = base58.b58encode(bytes.fromhex(p2sh_address)).decode()        return p2sh_addressdef check_balance(address):    response = requests.get(f'https://api.blockcypher.com/v1/btc/main/addrs/{address}/balance')    if response.status_code == 200:        return response.json()['final_balance']    return Nonepassphrases = ['passphrase1', 'passphrase2', 'passphrase3']for passphrase in passphrases:    p2pkh_address = generate_p2pkh_address(passphrase)    p2sh_address = generate_p2sh_address(passphrase)        p2pkh_balance = check_balance(p2pkh_address)    p2sh_balance = check_balance(p2sh_address)        print(f'Passphrase: {passphrase}')    print(f'P2PKH Address: {p2pkh_address}, Balance: {p2pkh_balance} satoshis')    print(f'P2SH Address: {p2sh_address}, Balance: {p2sh_balance} satoshis')",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5523772",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "December 22, 2024, 01:28:16 PM",
+      "body": "What passphrase are you talking about? Does your friend know exactly how he generated his addresses? The way that you're generating addresses would be similar to how brainwallet used to generate legacy addresses, which can work only if your friend generated his Bitcoin wallet in this way. Depending on how weak the passphrase is, they should be empty by now.Anyhow, if your friend is sure that he generated his addresses this way, you can easily just query any blockexplorer with the addresses generated. Else, you should probably try to find out how exactly was he generating his addresses.P2SH-P2WPKH is probably the most common method that people would utilize a passphrase for when used in conjunction with P2SH. However, it didn't exist in 2014.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "December 22, 2024, 01:40:58 PM",
+      "body": "If you run Linux or WSL and have access to BASH scripts, you can use my script in BRAIN21 - A simple Brain Wallet generator in BASH which does exactly what you need.The post in the link is very self explanatory, so no need to explain further here, but if you need anything let me know.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ganzocrypt",
+      "created_time": "December 22, 2024, 01:54:59 PM",
+      "body": "Quote from: ranochigo on December 22, 2024, 01:28:16 PMWhat passphrase are you talking about? Does your friend know exactly how he generated his addresses? The way that you're generating addresses would be similar to how brainwallet used to generate legacy addresses, which can work only if your friend generated his Bitcoin wallet in this way. Depending on how weak the passphrase is, they should be empty by now.Anyhow, if your friend is sure that he generated his addresses this way, you can easily just query any blockexplorer with the addresses generated. Else, you should probably try to find out how exactly was he generating his addresses.P2SH-P2WPKH is probably the most common method that people would utilize a passphrase for when used in conjunction with P2SH. However, it didn't exist in 2014.Passphrase or password. In 2014, mining bitcoin was possible on a computer (he did on a mac) and it was all command line. That's what my friend was doing.So we are trying to generate valid bitcoin addresses (not on the blockchain, nor wallets), to check if those addresses contain bitcoins.I am trying to help him by having the script generate valid addresses but since 2014 the hashing to create the private/public keys have been changed so I am trying to figure out if the script above is valid to create bitcoin addresses created at that time.Does it make sense?thx for the comments!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "December 22, 2024, 01:59:23 PM",
+      "body": "Quote from: ganzocrypt on December 22, 2024, 01:54:59 PMPassphrase or password. In 2014, mining bitcoin was possible on a computer (he did on a mac) and it was all command line. That's what my friend was doing.So we are trying to generate valid bitcoin addresses (not on the blockchain, nor wallets), to check if those addresses contain bitcoins.I am trying to help him by having the script generate valid addresses but since 2014 the hashing to create the private/public keys have been changed so I am trying to figure out if the script above is valid to create bitcoin addresses created at that time.Does it make sense?thx for the comments!It depends on how your friend used the passphrase to generate addresses. I'm assuming that you didn't use any wallets like Electrum, Bitcoin-qt (back then), Armory, etc? The hashing hasn't changed and P2SH and P2PKH were the most prominent address types back then. If you cannot remember how it was generated, then it would likely just be like finding a needle in a haystack.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "December 22, 2024, 02:02:28 PM",
+      "body": "Quote from: ranochigo on December 22, 2024, 01:59:23 PMIt depends on how your friend used the passphrase to generate addresses. I'm assuming that you didn't use any wallets like Electrum, Bitcoin-qt (back then), Armory, etc? The hashing hasn't changed and P2SH and P2PKH were the most prominent address types back then. If you cannot remember how it was generated, then it would likely just be like finding a needle in a haystack.Like you mentioned above, I am almost certain OP looks for brainwallets.If not, then perhaps they used Bitcoin-QT, which was already established and used by most people back then. But if so, there is no way to find the coins without a wallet backup.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ganzocrypt",
+      "created_time": "December 22, 2024, 03:03:09 PM",
+      "body": "I do not know and the guy does not remember how passphrase were used on command line. The miner/wallet he used and such!If the script is correct and creates a valid address (for 2014 code) than I guess the passprhase/password he has are not correct since those addresses I generated with the script do not contain any coins!I will continue digging the issue to see if I can trace back to 2014 enviroment.Maybe will go to check the Bitcoin code back than.Thx for the help and if you get any idea pls post here!Happy Holidays!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Saint-loup",
+      "created_time": "December 22, 2024, 03:31:20 PM",
+      "body": "Are you sure the passphrase wasn't the password of his encrypted wallet file instead? What your script is doing, it's to use the passphrases as private keys of adresses hashed with SHA256. So it's a brainwallet basically. But if it was so \"simple\" I guess your friend would have already tried it with one tool or another during those 10 passed years, especially with the exponential increasing price of BTC, don't you think? Anyway I hope you will be able to find more clues. May Santa Claus be generous with you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "SquirrelJulietGarden",
+      "created_time": "December 22, 2024, 04:13:37 PM",
+      "body": "Quote from: ganzocrypt on December 22, 2024, 01:21:45 PMIt's for a friend who think he has the passphrase and wants to see if the addresses have Bitcoin! If your friend mined bitcoin in 2014, but now has a wallet passphrase, he can unlock the wallet file and access his bitcoin.If not, he need an unenrypted wallet file to access his bitcoin.You can not brute force Bitcoin private key from Bitcoin public addresses that has balance, because if you can do it, many other people would have done it before you.Private key > Public Key > Public address, it's always one-way process, not way to do backwards like Public address > Pubic Key > Private key.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ganzocrypt",
+      "created_time": "December 22, 2024, 04:39:38 PMLast edit: December 23, 2024, 12:07:23 PM by Mr. Big",
+      "body": "Quote from: Saint-loup on December 22, 2024, 03:31:20 PMAre you sure the passphrase wasn't the password of his encrypted wallet file instead? What your script is doing, it's to use the passphrases as private keys of adresses hashed with SHA256. So it's a brainwallet basically. But if it was so \"simple\" I guess your friend would have already tried it with one tool or another during those 10 passed years, especially with the exponential increasing price of BTC, don't you think? Anyway I hope you will be able to find more clues. May Santa Claus be generous with you.I do not know how in 2014 mining worked in the sense, wallet and mining to the btc address happened at the same time?It was transparent to the miner? Not sure.From what he told, he used a password or passphrase which then lead to a BTC address and than mined to that address.He does not have a wallet file.Quote from: SquirrelJulietGarden on December 22, 2024, 04:13:37 PMQuote from: ganzocrypt on December 22, 2024, 01:21:45 PMIt's for a friend who think he has the passphrase and wants to see if the addresses have Bitcoin! If your friend mined bitcoin in 2014, but now has a wallet passphrase, he can unlock the wallet file and access his bitcoin.If not, he need an unenrypted wallet file to access his bitcoin.You can not brute force Bitcoin private key from Bitcoin public addresses that has balance, because if you can do it, many other people would have done it before you.Private key > Public Key > Public address, it's always one-way process, not way to do backwards like Public address > Pubic Key > Private key.Ad I mentioned he does not have a wallet file.He thinks he knows the passphrase or password used to create the address at command line for mining. He knows that he mined some coins.I do not know what process was back than. I am guessing, enter a password and than everything else was not so explicit and than started to mine.I am not trying to brute force anything. As I explain we have a \"known\" passphrase / password and want to use the script to create the pkey which leads to an address to see if it exists and contains coins.The script above takes some passphrase or passowrd, creates pkey, than creates a valid address and than it checks if the address has bitcoin.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "December 22, 2024, 06:07:44 PM",
+      "body": "Quote from: ganzocrypt on December 22, 2024, 04:39:38 PMFrom what he told, he used a password or passphrase which then lead to a BTC address and than mined to that address.He does not have a wallet file.Judging from that, it must be a brainwallet. I 'd start looking there. I 'd try with multiple possible passphrase, to see if the addresses that are generated are indeed theirs and have unspent coins there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ganzocrypt",
+      "created_time": "December 22, 2024, 06:12:31 PM",
+      "body": "Quote from: apogio on December 22, 2024, 06:07:44 PMQuote from: ganzocrypt on December 22, 2024, 04:39:38 PMFrom what he told, he used a password or passphrase which then lead to a BTC address and than mined to that address.He does not have a wallet file.Judging from that, it must be a brainwallet. I 'd start looking there. I 'd try with multiple possible passphrase, to see if the addresses that are generated are indeed theirs and have unspent coins there.I agree, that's why I am testing with the script so that I can create several addresses from passphrase.Right now I am looking for a BTC address check service so that I can automate the process.BTW, there will be both BTC and BTH, looks like!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "topic_5452906",
+  "title": "Question:",
+  "author": "s2",
+  "created_time": "May 16, 2023, 08:52:01 AM",
+  "content": "We all know QCs are being worked on but most likely decades away from being a danger to ECDSA used in Bitcoin... that said though, when that day does arrive, either due to QC or some mathmatical genius figures out how to break it, it seems prudent to have another signature system in the wings that people could opt to move their coins to.I'd like to discuss the pros/cons of implementing lattice signatures in bitcoin now such that when ECDSA is broken it's an orderly transition to use a different lock on funds.I'd also like to suggest that we add an optional PoW on a transaction submitted to a node so that when someone submits their transaction they can provide a PoW of that Tx alongside to the node to show they really want the tx to be included.In normal usage like we are today, no PoW for a Tx is required.  But if there is a systemic compromise of existing transactions, this PoW feature could be enabled by miners such that they only repeat a tx with PoW offered along side it.  This way even if the unlikely event of a large QC being made and used to attack the network happens, there is a plan on how people can safely move their bitcoin to an alternative locking mechanism.Thoughts?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5452906",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "May 16, 2023, 09:01:08 AM",
+      "body": "Quote from: s2 on May 16, 2023, 08:52:01 AMI'd like to discuss the pros/cons of implementing lattice signatures in bitcoin now such that when ECDSA is broken it's an orderly transition to use a different lock on funds.If you want, we can discuss this here, or you can email me or the bitcoin-dev mailing list directly with the possibility of starting a discussion about one of these quantum-resistant schemes and the possibility to make a new Bech32 address type that utilizes them.Quote from: s2 on May 16, 2023, 08:52:01 AMI'd also like to suggest that we add an optional PoW on a transaction submitted to a node so that when someone submits their transaction they can provide a PoW of that Tx alongside to the node to show they really want the tx to be included.This will not work, because computers and smartphones are not ASICs and they can't possibly be expected to create a hash for transactions. Besides, this will require a complete rewrite of the bitcoin protocol, which is so used to the methodology: transactions --> blocks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "May 16, 2023, 11:16:57 AM",
+      "body": "Quote from: ETFbitcoin on May 16, 2023, 10:17:44 AMor even QC itself to break PoW requirement easily.While the Hashcash PoW used in bitcoin and most PoW coins is subject to quantum speedup through Grover's algorithm, some non-Hashcash PoW schemes like the memory bound Cuckoo Cycle [1] have no known quantum speedup.[1] https://github.com/tromp/cuckoo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "s2",
+      "created_time": "May 16, 2023, 03:20:38 PM",
+      "body": "Quote from: NotATether on May 16, 2023, 09:01:08 AMQuote from: s2 on May 16, 2023, 08:52:01 AMI'd also like to suggest that we add an optional PoW on a transaction submitted to a node so that when someone submits their transaction they can provide a PoW of that Tx alongside to the node to show they really want the tx to be included.This will not work, because computers and smartphones are not ASICs and they can't possibly be expected to create a hash for transactions. Besides, this will require a complete rewrite of the bitcoin protocol, which is so used to the methodology: transactions --> blocks.So hear me out on this one...The PoW for the tx does not necessarily enter the blockchain (it could be a segwit bit of data but actually is easier just reuse the actual signature and keep resigning such that the signature is the tx PoW nonce)With this change, all bitcoin wallets and nodes continue as they are.  No change need.Doing a SHA256(tx) however gives a normalised value to test for PoW.  Now if we (a node) see a system compromise, we require the SHA256(tx) value to be less than 1/1000000 * 256 bit value, we can be relatively confident the issuing wallet has done a certain amount of pow on that tx for it to be issued. Why?  This is an emergency brake that bitcoin node operators could optionally enable if there was a system wide compromise.  It gives bitcoin owners time to issue their own tx with a local PoW to move their funds to a QC safe or uncompromised signature system.Yes each wallet would need an option to 'create a tx with PoW' but it seems this would distribute the work to the wallets/clients so a system wide attack vector is reduced.If nothing else, it would be interesting to include a PoW check on itself within the script Whilst everything remains as is and no chain split or major technical change is needed, it does give an emergency option to migrate to an uncompromised signature system.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "May 16, 2023, 04:20:09 PM",
+      "body": "QuoteBesides, this will require a complete rewrite of the bitcoin protocol, which is so used to the methodology: transactions --> blocks.No rewrite needed. Including or excluding a particular transaction is a mempool-level decision, so each node can have its own rules for that. It would be harder if you want to distribute newly generated coins, based on that work, but probably also possible.QuoteAverage people would use smartphone or computer CPU to perform PoW, while attacker could just use multiple GPU or even QC itself to break PoW requirement easily.True, it depends what will be broken, and how it will be broken. Because I can imagine a situation, where some attacker does not know the private key, but can produce a valid signature (for example because of public key recovery). Also note that if SHA-256 is broken, then ECDSA in the current form will also be, because you can easily generate a signature with some random hash, and then if SHA-256 is broken on preimage level, then you could just construct a transaction matching that hash.QuoteThe PoW for the tx does not necessarily enter the blockchainIf it is only to include or exclude some transaction, then yes, it could be a commitment, based on some new algorithm, and then it can be processed only on mempool level, and then dropped if some transaction will be deeply confirmed (as long as this new algorithm is not directly supported by consensus rules).Quoteit could be a segwit bit of data but actually is easier just reuse the actual signature and keep resigning such that the signature is the tx PoW nonceYou don't need witness space for that. Using a commitment, that will be processed only by upgraded nodes, is cheaper, and if everything is about mempool rules, then that kind of data can be completely separated from the current consensus. So, all that is needed, is just tweaking R-value of the signature, so it will commit to some new hash function, and a new signature scheme, intended to be used in the future. Then, current nodes will just see some random R-value, but upgraded nodes will also process a commitment from the new version.QuoteIf nothing else, it would be interesting to include a PoW check on itself within the scriptYou don't need that, because there are no consensus rules, that are related to including transactions into blocks. You have to include the coinbase transaction, but everything else is up to the node, and you can touch all of those settings, without touching consensus.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 18, 2023, 10:02:11 AM",
+      "body": "Quote from: s2 on May 16, 2023, 03:20:38 PMNow if we (a node) see a system compromise, we require the SHA256(tx) value to be less than 1/1000000 * 256 bit value, we can be relatively confident the issuing wallet has done a certain amount of pow on that tx for it to be issued. Why?  This is an emergency brake that bitcoin node operators could optionally enable if there was a system wide compromise.  It gives bitcoin owners time to issue their own tx with a local PoW to move their funds to a QC safe or uncompromised signature system.Yes each wallet would need an option to 'create a tx with PoW' but it seems this would distribute the work to the wallets/clients so a system wide attack vector is reduced.Besides the change you mentioned, one more (and non-trivial) change is required - you see, block (header)s have a field for nonce, so the miners just keep increasing it until the SHA256(block) is less than whatever the target is.But in a bitcoin transaction field, no such field exists for a nonce. That means when you SHA256 a (signed) transaction, there will only be one possible value, unless someone adds a new field by using a fork.The current fields of a Bitcoin transaction - as you can see, there are no \"reserved\" fields that can be taken advantage of to implement this procedure.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 18, 2023, 10:10:43 AM",
+      "body": "QuoteBut in a bitcoin transaction field, no such field exists for a nonce.That one is simple, just use the last four bytes (locktime field). If nSequence is set to 0xffffffff, it will be ignored, and then you could put there anything you want.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "May 18, 2023, 10:18:00 AM",
+      "body": "Quote from: garlonicon on May 18, 2023, 10:10:43 AMQuoteBut in a bitcoin transaction field, no such field exists for a nonce.That one is simple, just use the last four bytes (locktime field). If nSequence is set to 0xffffffff, it will be ignored, and then you could put there anything you want.That would work, but it will also break all other use cases that have nSequence set to some other value. That's why I did not consider it as a blank field.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "May 18, 2023, 10:26:32 AM",
+      "body": "Quoteit will also break all other use cases that have nSequence set to some other valueWhy? Even if you want to use locktime in your transaction, then still you have a lot of values to choose from. More than that: with every mined block, and every second, that space is expanding, so in the future, that field will have no effect, when the UNIX time will pass 0xffffffff, and when the block number will pass 500,000,000. At that time, even if locktime will be enabled, any value will be accepted, so that field is just transforming into nonce.Also, you can count, how many values you can put here today:790,314 -> 0x000c0f2a500,000,000 -> 0x1dcd65001,684,405,370 -> 0x6465fc7aThat means, at the moment of writing, you can safely use values from 0x00000000 to 0x000c0f2a, and also from 0x1dcd6500 to 0x6465fc7a. That is more than 30 bits!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

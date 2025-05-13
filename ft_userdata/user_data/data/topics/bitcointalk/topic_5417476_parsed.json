@@ -1,0 +1,53 @@
+{
+  "id": "topic_5417476",
+  "title": "willmorrison",
+  "author": "willmorrison",
+  "created_time": "October 17, 2022, 11:13:03 PM",
+  "content": "Hello, I'm having a problem with Bitcoin RPC's send method. Here is my RPC call:{\"jsonrpc\":\"2.0\",\"method\":\"send\",\"params\":[[{\"3NKnXgAuRZ52uUMgDztyQM1aNsXoyoxM7D\":0.0002462028}],6,\"economical\",null,{\"change_position\":1,\"subtract_fee_from_outputs\":[0],\"inputs\":[{\"txid\":\"69c77704508f14949448a989b2b5662292128f92cad9620961118f767799d1be\",\"vout\":0,\"sequence\":0}]}]}This is the RPC response:{\"result\":null,\"error\":{\"code\":-3,\"message\":\"Invalid amount\"},\"id\":null}I'm aware of the other question on this forum that says -3 is a type error that only appears when amount is negative or zero, but that is not the case as you can see above in the call body.As you can see on a chain explorer, this transaction ID has more than the send amount at that index. As a test, I removed the additional options to see if it would send without them and it results in the same error.I've tried specifying the amount as a string and a number, neither work.Any help would be appreciated. Thanks.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417476",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "October 17, 2022, 11:58:26 PM",
+      "body": "Can you share the whole cURL or code snippet you're using to submit that request?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "October 17, 2022, 11:59:23 PM",
+      "body": "How about using createrawtransaction instead of send call?I search a bit in google there might be issue in your rpc command so try other commands like generating raw transaction and broadcast them manually.Read this https://bitcoin.stackexchange.com/questions/58727/unable-to-create-raw-transaction-with-json-rpc-command",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "willmorrison",
+      "created_time": "October 18, 2022, 12:24:10 AM",
+      "body": "Quote from: n0nce on October 17, 2022, 11:58:26 PMCan you share the whole cURL or code snippet you're using to submit that request?It's hard to get that because I'm using my own RPC library. The JSON body I put in the post is printing from inside the library right before it makes the request. Here's the TypeScript code that's trying to send:Code:const response = await bitcoin.send(    [{ [output]: sending.toString() }],    6, // conf_target    \"economical\",    undefined, // fee_rate    {      \"change_position\": 1,      \"subtract_fee_from_outputs\": [0],      \"inputs\": [input],    },  );Again, I have run it without the options object and have the same result. Additionally, this code works on the testnet but not the mainnet if that helps.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 18, 2022, 04:00:00 AM",
+      "body": "Quote from: willmorrison on October 17, 2022, 11:13:03 PM0.0002462028{\"result\":null,\"error\":{\"code\":-3,\"message\":\"Invalid amount\"},\"id\":null}I'm aware of the other question on this forum that says -3 is a type error that only appears when amount is negative or zero, but that is not the case as you can see above in the call body.The error message is already telling you what the problem is and it is not just about being negative or zero, it is about being an \"invalid\" value for amount which could be for many different reasons like not being a number; in this case the problem is that the value has more decimal places than defined in Bitcoin (10 instead of 8).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "willmorrison",
+      "created_time": "October 18, 2022, 01:10:41 PM",
+      "body": "Quote from: pooya87 on October 18, 2022, 04:00:00 AMQuote from: willmorrison on October 17, 2022, 11:13:03 PM0.0002462028{\"result\":null,\"error\":{\"code\":-3,\"message\":\"Invalid amount\"},\"id\":null}I'm aware of the other question on this forum that says -3 is a type error that only appears when amount is negative or zero, but that is not the case as you can see above in the call body.The error message is already telling you what the problem is and it is not just about being negative or zero, it is about being an \"invalid\" value for amount which could be for many different reasons like not being a number; in this case the problem is that the value has more decimal places than defined in Bitcoin (10 instead of .Thank you, this solved the problem. Here's the new code:Code:const response = await bitcoin.send(    [{ [output]: sending.toFixed(8).toString() }],    6, // conf_target    \"economical\",    undefined, // fee_rate    {      \"change_position\": 1,      \"subtract_fee_from_outputs\": [0],      \"inputs\": [input],    },  );",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

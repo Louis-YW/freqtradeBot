@@ -1,0 +1,61 @@
+{
+  "id": "topic_5398077",
+  "title": "cmdcode",
+  "author": "cmdcode",
+  "created_time": "May 10, 2022, 07:30:08 PM",
+  "content": "Hello. Not sure if this is a bug or standard procedure. I have two regtest nodes, one connected to the other through the \"addnode\" RPC command. Both nodes are using Tor.When reading the debug logs for the connecting node, it will spam repeatedly this line, about twice a second:\"{date string} Selected {onion address} from new\" I have redacted the date and onion address.The debug logs for the node being connected to will show something similar, unless I add \"connect=0\" to the config. I didn't have this experience with Core version 22.0. Is this normal behavior for the node, or is this a bug?Thank you for reading!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5398077",
+  "comments": [
+    {
+      "author": "BitMaxz",
+      "created_time": "May 10, 2022, 11:18:41 PM",
+      "body": "That is misconfiguration if you use only the onion address on \"addnode\" it should be the Ip address: PortYour Bitcoin core is trying to connect on that set up it's rejected which is why it keeps spamming repeatedly.Sample of IP address: PortCode:192.168.1.1:8777Can you read this maybe this guide below will help you to set up your config?- https://github.com/bitcoin/bitcoin/blob/master/doc/tor.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cmdcode",
+      "created_time": "May 10, 2022, 11:47:13 PMLast edit: May 11, 2022, 12:05:00 AM by cmdcode",
+      "body": "Quote from: BitMaxz on May 10, 2022, 11:18:41 PMThat is misconfiguration if you use only the onion address on \"addnode\" it should be the Ip address: PortYour Bitcoin core is trying to connect on that set up it's rejected which is why it keeps spamming repeatedly.Sample of IP address: PortCode:192.168.1.1:8777Can you read this maybe this guide below will help you to set up your config?- https://github.com/bitcoin/bitcoin/blob/master/doc/tor.mdThank you for the reply. I am surprised that it is a misconfiguration, because the status of the peer is connected and I receive transactions / blocks between the nodes.Is it possible for it to be misconfigured yet the nodes still connect over tor?I will try adding the port designation. I did not add it previously because bitcoind is a little weird with regards to how it handles incoming tor connections (moving between 18445-18444 on regtest).Edit: When I add the port designation, the peer connection no longer works.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "May 11, 2022, 12:58:30 AM",
+      "body": "Quote from: BitMaxz on May 10, 2022, 11:18:41 PMThat is misconfiguration if you use only the onion address on \"addnode\" it should be the Ip address: PortCode:192.168.1.1:8777Addnode configuration can be used with its own respective network type(IPv4, CJDNS, onion, etc).Quote from: cmdcode on May 10, 2022, 11:47:13 PMIs it possible for it to be misconfigured yet the nodes still connect over tor?I don't think that is where the problem relies on, though I'm also not sure about the OP problem.  I don't particularly have an experience with regtest, maybe you can wait for someone else or try to set up a more log level might help. You can use debug=net on the bitcoin.conf.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 11, 2022, 06:19:29 AM",
+      "body": "Quote from: cmdcode on May 10, 2022, 07:30:08 PMI have two regtest nodes, one connected to the other through the \"addnode\" RPC command. Both nodes are using Tor.-snip-unless I add \"connect=0\" to the config.I didn't have this experience with Core version 22.0. Is this normal behavior for the node, or is this a bug?Have you enabled debugging?I have tested it and it shows in v23.0 with either -debug or -debug=addrman active but it's not showing in v22.0.So it might be something new that's added in the latest version.Also, by adding \"connect=0\", you have disabled \"automatic connections\" so it might have something to do with it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "cmdcode",
+      "created_time": "May 13, 2022, 04:44:06 AM",
+      "body": "Quote from: nc50lc on May 11, 2022, 06:19:29 AMQuote from: cmdcode on May 10, 2022, 07:30:08 PMI have two regtest nodes, one connected to the other through the \"addnode\" RPC command. Both nodes are using Tor.-snip-unless I add \"connect=0\" to the config.I didn't have this experience with Core version 22.0. Is this normal behavior for the node, or is this a bug?Have you enabled debugging?I have tested it and it shows in v23.0 with either -debug or -debug=addrman active but it's not showing in v22.0.So it might be something new that's added in the latest version.Also, by adding \"connect=0\", you have disabled \"automatic connections\" so it might have something to do with it.Thank you for taking the time to test that! I do have \"debug=addrman\" enabled. The output is not interfering with anything, but it does seem quite spammy so I was wondering if maybe it was a bug.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "May 13, 2022, 05:20:30 AM",
+      "body": "Quote from: cmdcode on May 13, 2022, 04:44:06 AMQuote from: nc50lc on May 11, 2022, 06:19:29 AM-snip-Thank you for taking the time to test that! I do have \"debug=addrman\" enabled. The output is not interfering with anything, but it does seem quite spammy so I was wondering if maybe it was a bug.I've searched for related Pull Requests after v22.0 and found this: https://github.com/bitcoin/bitcoin/pull/22839/filesApparently, it's added as an improvement to \"Address Manager\" logging.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

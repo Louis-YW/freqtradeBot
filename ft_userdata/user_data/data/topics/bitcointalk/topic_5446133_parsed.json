@@ -1,0 +1,85 @@
+{
+  "id": "topic_5446133",
+  "title": "mothepro",
+  "author": "mothepro",
+  "created_time": "March 24, 2023, 09:04:33 AM",
+  "content": "Hey y'all, earlier this year I began working on a proposal for an encryption protocol which only allows decryption after a set amount of time has elapsed.It is powered by layer-1 bitcoin transactions, so I figured users here would be interested in learning more. Now, I'm looking for any feedback or potential vulnerabilities I've missed, before attempting any time of implementation.Use case?A real world use case is for whistleblowers to encrypt and share their documents and findings without the contents/identity being revealed for a set amount of time. The whistleblower will have time to personally prepare before the documents are unlocked to their target, and they can know that no middle man can compromise them by unlocking the documents prematurely.White paperGoogle doc (https://docs.google.com/document/d/e/2PACX-1vQe-OF0Lw9lutf6aBeSlVs0G09sSGX3XmBRQG7rkbxRvJeKZ22hH-O1zXU4Cvj8YXfi4r2N31GUc7cG/pub)PDF (https://drive.google.com/file/d/1ty6XjgzoP5WOjGbl0U3PCwMJOKtRTTDV/view?usp=sharing)This Github gist which generates the `sigScript` for the bitcoin puzzle transaction: https://gist.github.com/mothepro/78da7630fa8004e1fb660101beb5f8ce",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5446133",
+  "comments": [
+    {
+      "author": "larry_vw_1955",
+      "created_time": "March 25, 2023, 02:30:11 AM",
+      "body": "is that the simplest possible way to do trustless time-locked encryption? because it seems a bit too much. also, i'm not sure you gave any compelling argument for why this feature is needed in the real world. maybe give some more examples...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "March 25, 2023, 11:10:15 AM",
+      "body": "Quoteis that the simplest possible way to do trustless time-locked encryption?If you want to make it 100% trustless, then you have to perform some computations. Then, it is not guaranteed that your message will be unlocked after N days. Instead, you can get it unlocked after checking for example N hashes. A good example of such encryption is that famous puzzle transaction: if you have 2^64 private key, then you need to brute force around 2^64 keys to unlock that. Some article about it: https://gwern.net/self-decryptingQuotebecause it seems a bit too muchIf you want to encrypt things by time and nothing else, then you start with regular encryption, and then create conditions to get decryption key after N computations. There seems to be no other way, because if you know that decryption key, or if it is stored by anyone, then the owner of that key is the weakest link. So, the correct way is to create a key known only by the creator, or by using some algorithm that will guarantee than nobody, even the creator, cannot reach that key without sufficient computations (then, using things like range proof from Monero is needed).Quotealso, i'm not sure you gave any compelling argument for why this feature is needed in the real worldFrom quoted article by Gwern:QuoteIt is not so easy to achieve adjustable decryptability over time, a “time-lock crypto”: for some uses (data escrow, leaking, insurance, last-resort Bitcoin backups etc), one wants data which is distributed only after a certain point in time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "March 25, 2023, 11:05:43 PM",
+      "body": "Quote from: garlonicon on March 25, 2023, 11:10:15 AM Some article about it: https://gwern.net/self-decryptingthat's a nice overview of the subject. seems like it all boils down to 2 options. you either require one person to do a bunch of computation that takes the predicted amount of time or you require a network to do that computation. that network could be bitcoin for example. QuoteIt is not so easy to achieve adjustable decryptability over time, a “time-lock crypto”: for some uses (data escrow, leaking, insurance, last-resort Bitcoin backups etc), one wants data which is distributed only after a certain point in time.who needs time-locked data escrow?what is \"leaking\" and why does it need to have a time lock?what does insurance need time locks for?why would someone backup their bitcoin private key so that the entire world could decrypt it after a certain amount of time?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "March 26, 2023, 07:18:22 AM",
+      "body": "Quotewho needs time-locked data escrow?Some example of data escrow with third party, it can be replaced with timelock instead: https://www.escrow-data.com/Quotewhat is \"leaking\" and why does it need to have a time lock?Imagine that you know something now, and you want to release it in the future, for example: https://bitcointalk.org/index.php?topic=5082414.msg48561087#msg48561087Without a timelock, the only option is to set up some trusted third party, or people simply have to trust that you will release it at certain point in time. What if those data would be timelocked instead? Then, it will be released now in encrypted form, and you will no longer have any way to delay or cancel releasing those data in the future, after unlocking that timelock.Quotewhy would someone backup their bitcoin private key so that the entire world could decrypt it after a certain amount of time?This is a good question to the creator of 08389f34c98c606322740c0be6a7125d9860bb8d5cb182c02f98461e5fa6cd15 transaction. Probably, this was done to measure strength of private keys. And now, it is some kind of timelock in practice, because years after years, next addresses are unlocked. However, other uses are possible, for example you can create some offchain transactions, and make sure they will be invalidated when someone will unlock those keys. Of course, in case of Bitcoin, those kind of timelocks can be created easier, by using OP_CHECKLOCKTIMEVERIFY/OP_CHECKSEQUENCEVERIFY or using nLockTime field in transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "March 26, 2023, 12:54:45 PM",
+      "body": "Quote3. Do you think miner/pool would be interested enough to modify their software in order to claim the puzzle?This problem could be solved by Merged Mining. Then, if some chain can accept any header as a valid Proof of Work, it is possible to work on such puzzles and mine coins with the same work.Also, I wonder if by exploring SHA-256, it could be possible to find some equations in the middle, that could be used as a puzzle. For example, all block headers always have 0x00000000 as one of their 32-bit final values. Then, if the challenge would require getting specific internal state, it would be always reached after mining N blocks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "March 26, 2023, 11:44:31 PM",
+      "body": "Quote from: garlonicon on March 26, 2023, 07:18:22 AMOf course, in case of Bitcoin, those kind of timelocks can be created easier, by using OP_CHECKLOCKTIMEVERIFY/OP_CHECKSEQUENCEVERIFY or using nLockTime field in transaction.well isn't there some way to make a transaction that the public key is only revealed once it is spent into a block? if so then it seems like the public key itself could be the secret key to unlocking the data.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sha420hashcollision",
+      "created_time": "March 27, 2023, 03:56:10 AM",
+      "body": "technically all p2pkh type transactions work this way, you use a hash of the key and spend with the full key. The issue is that it assumes you already know said key. Not sure how you would manage to do this without some kind of ongoing state, I think such a thing could be possible with MAST type contracts and Simplicity https://github.com/BlockstreamResearch/simplicity",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vjudeu",
+      "created_time": "March 27, 2023, 02:04:16 PM",
+      "body": "Quotewell isn't there some way to make a transaction that the public key is only revealed once it is spent into a block? if so then it seems like the public key itself could be the secret key to unlocking the data.It is always true in any hash-based address, so P2PKH, P2SH, P2WPKH, P2WSH, and non-standard scripts with any hashing opcodes, applied to public keys. But if you use some public key as your secret, then you have to share your transaction somehow. If you will do that alone, then no timelock is needed, because you can encrypt things normally, and reveal the password at the right time, then using timelock will be pointless if you can fully control the whole process, and if you are the central point that will release the key. And if you pass that transaction to any third party before releasing, then that party will know the password, and can unlock your data, even if your transaction will be timelocked.So, hiding your public key is possible, but if you want to make some data locked by time, then you cannot control it alone, or pass your unlocking key unencrypted to anyone, because then your timelock will not be enforced.Instead, you can look at the simplest timelock: executing hash function multiple times. For example, you can start by using the Genesis Block hash, and hash it multiple times.Code:SHA-256(0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c)=af42031e805ff493a07341e2f74ff58149d22ab9ba19f61343e2c86c71c5d66dSHA-256(af42031e805ff493a07341e2f74ff58149d22ab9ba19f61343e2c86c71c5d66d)=6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000SHA-256(6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000)=0df32bc40af15b76d566c9b50e0eb02fa3ef0913db04b1beb01ad55a3b590d30SHA-256(0df32bc40af15b76d566c9b50e0eb02fa3ef0913db04b1beb01ad55a3b590d30)=b60eed28264507e1289dae289b58e284541e1b5c9c8611c319d0c5719a0c2cf8And then, you can repeat that process, for example 2^32 times. Then, you will get some key, and you can encrypt your data with any symmetric encryption, like AES. Then, you can share some simple program for calculating those hashes, and it will guarantee that your data will be unlocked after calculating 2^32 hashes, what can be done on CPUs in for example 10 minutes. The drawback is that if you want to lock things for a month, then you need to spend a month to compute that. There are better ways with better complexity, also described by Gwern in the article linked above, but that simple concept should be enough to understand, what those timelocks are about.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "larry_vw_1955",
+      "created_time": "March 28, 2023, 12:38:58 AM",
+      "body": "Quote from: vjudeu on March 27, 2023, 02:04:16 PMThe drawback is that if you want to lock things for a month, then you need to spend a month to compute that.apparently not. not if I use chained hashing.   Quote There are better ways with better complexity, also described by Gwern in the article linked above, but that simple concept should be enough to understand, what those timelocks are about.the better the way is it seems like the more complicated it is though to implement. if something requires the entire ethereum virtual machine with smart contracts then that's a pretty big infrastructure just to have trustless time lock captability...you couldn't justify the existence of something like ethereum based on just time locks in other words.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

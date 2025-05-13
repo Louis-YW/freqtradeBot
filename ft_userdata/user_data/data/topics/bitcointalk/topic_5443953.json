@@ -1,0 +1,93 @@
+{
+  "id": "topic_5443953",
+  "title": "dzungmobile",
+  "author": "dzungmobile",
+  "created_time": "March 08, 2023, 05:48:06 AMLast edit: March 28, 2024, 08:46:00 AM by dzungmobile",
+  "content": "Exchanges usually require 1 to 3 confirmations for your deposit transaction to credit your Bitcoin to your account and you can start trading. Usually they require 1 confirmation (big exchanges) and 2 or 3 confirmations (small exchanges).Casinos do have similar confirmation requirement.Have you ever wondered why they have such criteria?By sharing the article How Many Bitcoin Confirmations is Enough? from Jameson Lopp, hopefully it is helpful for you.I sometimes read posts from o_e_l_e_o with his calculations for Bitcoin confirmations and reorg risk but don't know his calculations match with J. Lopp or not but I very enjoyed his posts honestly.Source: https://blog.lopp.net/how-many-bitcoin-confirmations-is-enough/https://jlopp.github.io/bitcoin-confirmation-risk-calculator/https://github.com/jlopp/bitcoin-confirmation-risk-calculatorhttps://howmanyconfs.com/https://github.com/lukechilds/howmanyconfs.comHashrate distribution over time and summary of mined blockshttps://www.blockchain.com/explorer/charts/pools-timeseriesContent is from the articleQuoteHow safe is it to accept a bitcoin transactionafter X confirmations?A deep dive into the math behind quantifying double-spend risk.If you've been paying attention to Bitcoin for more than a few minutes, you're probably aware that it's dangerous to accept unconfirmed (AKA 0-conf) transactions. With zero confirmations, you as a receiver of BTC are vulnerable to the race attack, the Finney attack, as well as the 51% attack.If you are patient enough to wait for at least one confirmation then you are no longer vulnerable to race attacks or Finney attacks. Now your only concern is 51% attacks. What's the rule of thumb for an acceptable number of confirmations?1 confirmation: sufficient for small payments less than $1,000.3 confirmations: for payments $1,000 - $10,000. Most exchanges require 3 confirmations for deposits.6 confirmations: good for large payments between $10,000 - $1,000,000. Six is standard for most transactions to be considered secure.10 confirmations: suggested for large payments greater than $1,000,000.We've Got to Go DeeperNaturally, since this is Bitcoin, it's not quite that simple. The rule of thumb for confirmations is based upon assumptions that we don't really talk about!For example, the broadly suggested confirmation thresholds listed above are actually based on an attacker with 10% of the global hash rate. In such a case, 6 confirmations gives you a 99.99% assurance that the attacker can't rewrite that much history from the blockchain.But these calculations (which can be found in the whitepaper) were performed long before the invention of mining pools and industrial mining operations. At the time it was reasonable to assume that it would be very difficult for someone to have over 10% of the global hashrate. Ever since 2011 there have been plenty of block-producing entities (pools) on the network that have amassed far more than 10% of the global hashrate. At time of writing, there are 5 such pools!Quantifying Realtime RiskPages 6 & 7 of the bitcoin whitepaper outline the method by which you can calculate the risk of an attacker rewriting the blockchain after a given number of confirmations.The race between the honest chain and an attacker chain can be characterized as a Binomial Random Walk. The success event is the honest chain being extended by one block, increasing its lead by 1, and the failure event is the attacker's chain being extended by one block, reducing the gap by 1. The probability of an attacker catching up from a given deficit is analogous to a Gambler's Ruin problem. In layman's terms: the gambler (attacker) is expected to lose most of the time, thus the longer they play this game that has a negative expected value, the less likely they are to emerge as the winner.Given our assumption that the attacker has less than 50% of the network hashrate, the probability of the attacker catching up drops exponentially as the number of blocks they have to catch up with increases. With the odds against him, if he doesn't make a lucky lunge forward early on, his chances become vanishingly small as he falls further behind. The attacker's potential progress itself is a Poisson distribution, since all mining is a Poisson process and thus successful outcomes follow this distribution.To determine the probability that an attacker can rewrite the blockchain from z blocks ago, we multiply the Poisson density for each amount of progress the attacker could have made by the probability he could catch up from that point, where:p = probability an honest miner finds the next blockq = probability the attacker finds the next blockz = how many blocks (confirmations) need to be reorganizedlambda = z * (q / p)k = integer from 0 to zThis is not a fun formula to calculate by hand, so it seemed like a great candidate for an open source project...Introducing the Confirmation Risk CalculatorI've created the following tool that will dynamically calculate the current chain reorganization risk based upon the mining pool with the highest hashrate estimate (from the trailing week of mined blocks.) You can, of course, override this parameter with any other hashrate percentage and desired number of confirmations to get a risk score.https://jlopp.github.io/bitcoin-confirmation-risk-calculator/This calculator will give you a rough quantification of the risk that the current dominant mining pool with the most hashrate could reorganize the blockchain after a given number of transactions and thus make a payment cease to exist. The standard for high value payments is to wait for 6 confirmations, but it's not that simple! You can learn more about the calculation in this article.What percent of global hashrate does the potential attacker have?According to blockchain.info, the current dominant mining pool is Foundry USA which has 33.55% of the global hashrateHashrate percent: 33.55%Confirmations > Reorganization risk: 1> 68.99%; 3>41.73%; 6 > 21.31%This tool is 100% open source codeThe Bitcoin Transaction Size Calculator repository can be found at https://github.com/jlopp/bitcoin-confirmation-risk-calculatorNow it's easy to see that if we want 99.9% certainty that our transaction won't be double-spent, for an attacker with a given % of the network hashrate, the number of confirmations increases drastically as the attacker's hashrate approaches 50%.Why Should You Care?At time of writing, Foundry has 36% of the global hashrate; that means if you're accepting payments after 3 confirmations there's a 49% chance that Foundry could still rewrite the chain to facilitate a double spend.The 6 block confirmation rule of thumb to achieve 99.99% assurance a double spend can't happen (and assumes a 10% hashrate attacker) now requires 60 confirmations to achieve the same level of confidence.As for the practicality of such an attack: pools are certainly disincentivized from performing attacks; they would likely lose a ton of business if they were to do so. And miners in general are long-term holders that are disinclined to harm folk's confidence in the system. However, a pool can still be a single point of failure; someone could exploit a vulnerability to hijack a pool for a short period of time. It's happened before, like this BGP attack that rerouted a bunch of mining pool traffic to mine coins for the attacker.Final ThoughtsBitcoin, for all its robustness and stability in some aspects, is quite volatile and dynamic in other aspects. It's important for folks who are receiving high-value payments on the Bitcoin blockchain to realize that they should adjust their risk assessment based upon the current state of the mining ecosystem.To be clear, the above point about Foundry should not be construed as this being some sort of imminent / systemic threat to the integrity of the Bitcoin network. Over the past decade we have seen levels of miner centralization ebb and flow as a result of a multitude of factors. For example:I remain optimistic that the incentives driving industrial Bitcoin miners are sound. They will continue to seek out sources of cheap / stranded / excess energy, and it is the very nature of energy that it is well-distributed around the world. Over the long term I expect we'll see the hashrate distribution across pools become less concentrated. There are also technology improvements such as Stratum V2 that remove power from pool operators and put it back in the hands of individual hashers.Also: confirmations across networks are not at all comparable! Check out howmanyconfs.com to see how other Proof of Work networks stack up to Bitcoin.In Mastering Bitcoin, Antonopoulos wrote about Bitcoin blockchainQuote from: https://github.com/bitcoinbook/bitcoinbook/blob/develop/ch09.asciidocOne way to think about the blockchain is like layers in a geological formation, or glacier core sample. The surface layers might change with the seasons, or even be blown away before they have time to settle. But once you go a few inches deep, geological layers become more and more stable. By the time you look a few hundred feet down, you are looking at a snapshot of the past that has remained undisturbed for millions of years. In the blockchain, the most recent few blocks might be revised if there is a chain recalculation due to a fork. The top six blocks are like a few inches of topsoil. But once you go more deeply into the blockchain, beyond six blocks, blocks are less and less likely to change. After 100 blocks back, there is so much stability that the coinbase transaction—the transaction containing newly mined bitcoin—can be spent. A few thousand blocks back (a month) and the blockchain is settled history, for all practical purposes. While the protocol always allows a chain to be undone by a longer chain and while the possibility of any block being reversed always exists, the probability of such an event decreases as time passes until it becomes infinitesimal.You can check his explanations by checking with the open source tool from Jameson Lopp, with 100 confirmations and different hashrate percent up to like 49%.Risks are different a lot between 45% to 49% hashrate percent with risks are 10.24% to 80.77%Another toolhttps://web.archive.org/web/20181231045818/https://people.xiph.org/~greg/attack_success.html",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5443953",
+  "comments": [
+    {
+      "author": "Outhue",
+      "created_time": "March 08, 2023, 10:17:33 AM",
+      "body": "Good one, I always release my customers once I see 1 confirmation in my wallet whenever they pay me in Bitcoin at my business sanctuary. The requirement for more than 1 confirmation only happens on centralised exchanges,  oh and few gambling platforms too. Few VPN services also requires for more than 1 confirmation when paying with Bitcoin. Believing that you have received your Bitcoin when the transaction still shows Zero confirmation is where the real threat lies, always make sure that you get at least 1 confirmation before moving on.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "March 08, 2023, 08:00:38 PM",
+      "body": "Quote from: dzungmobile on March 08, 2023, 05:48:06 AMIf you are patient enough to wait for at least one confirmation then you are no longer vulnerable to race attacks or Finney attacks. Now your only concern is 51% attacks. Actually, 51% attack isn't your only concern. I'd say that an attacker who wants to deliberately reverse your transaction is a small concern (of course depending on the amount of money you move). The common concern with 1 confirmation is occasional reorg. It does happen once in a while, inevitable in a decentralized system. And once your transaction suddenly turns to unconfirmed from 1 confirmation, things go nervous.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "March 08, 2023, 09:09:07 PM",
+      "body": "Quote from: dzungmobile on March 08, 2023, 05:48:06 AMAccording to blockchain.info, the current dominant mining pool is Foundry USA which has 33.55% of the global hashrateHashrate percent: 33.55%Confirmations > Reorganization risk: 1> 68.99%; 3>41.73%; 6 > 21.31%His numbers are actually a little off.For 33.55% of the hashrate, the probability an attacker is successful after 1 confirmation is 70.12%, after 3 confirmations is 43.54%, and after 6 confirmations is 23.09%.On closer examination of the code here, it seems the error is that his calculation is not taking in to account fractions of a percent. You can test this yourself by putting in the hashrate box, for example, 30 and 30.999, and seeing they produce the same result.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dzungmobile",
+      "created_time": "March 09, 2023, 03:19:38 AM",
+      "body": "Quote from: o_e_l_e_o on March 08, 2023, 09:09:07 PMHis numbers are actually a little off.it seems the error is that his calculation is not taking in to account fractions of a percent. You can test this yourself by putting in the hashrate box, for example, 30 and 30.999, and seeing they produce the same result.I think he did not do that intentionally and perhaps he made a bug with his code. He got nothing by intentionally code to reduce Reorg risk a little bit like this.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "statoshi",
+      "created_time": "May 15, 2023, 08:50:11 PM",
+      "body": "The rounding error was an unintentional result of me taking the form input and running it through parseInt, which truncates all decimal precision. I've changed that to parseFloat - the discrepancy is now resolved.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dzungmobile",
+      "created_time": "May 16, 2023, 02:44:43 AM",
+      "body": "Quote from: statoshi on May 15, 2023, 08:50:11 PMThe rounding error was an unintentional result of me taking the form input and running it through parseInt, which truncates all decimal precision. I've changed that to parseFloat - the discrepancy is now resolved.It worked after your fixing.I did not expect to see it is quickly fixed like this. I did not know you are J.Lopp on the forum.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Velemir Sava",
+      "created_time": "May 30, 2023, 04:06:32 AM",
+      "body": "I think to make it easier and simpler I'll just assume this way in understanding your statement. For low value or time sensitive transactions, a lower number of confirmations may be considered acceptable. On the other hand, for high value transactions or situations that demand a higher level of security, waiting some confirmation to be wise.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dzungmobile",
+      "created_time": "August 03, 2023, 01:59:49 AMLast edit: August 03, 2023, 02:23:08 AM by dzungmobile",
+      "body": "Quote from: Velemir Sava on May 30, 2023, 04:06:32 AMFor low value or time sensitive transactions, a lower number of confirmations may be considered acceptable. On the other hand, for high value transactions or situations that demand a higher level of security, waiting some confirmation to be wise.It is the general advice but specifically practice, it depends upon each person like their wealth, value of a transaction and is it big or small in value for the person.Generally I belelieve most of us don't need more than three confirmations because we don't make too big value transaction.If you are serious because your transaction is big in value, you should compare it with average value of all transaction in each Bitcoin block and total value of all transactions in 3 or 6 blocks should be bigger than your transaction value.Interesting to note if I move very big fund, I will never do it in one transaction.https://blockchair.com/bitcoin/blocks#f=id,transaction_count,output_total,output_total_usd",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "August 04, 2023, 08:25:39 AM",
+      "body": "Quote from: dzungmobile on August 03, 2023, 01:59:49 AMGenerally I belelieve most of us don't need more than three confirmations because we don't make too big value transaction.Note that someone has to risk three blocks, so your transaction value has to be equal to at least three block rewards (unless the attacker wants to reverse more than that). The majority obviously moves less than 18.75 BTC. Quote from: dzungmobile on August 03, 2023, 01:59:49 AMIf you are serious because your transaction is big in value, you should compare it with average value of all transaction in each Bitcoin block and total value of all transactions in 3 or 6 blocks should be bigger than your transaction value.The coinbase reward is the only amount of money you know the attacker is risking. Comparing with the rest of the transactions is irrelevant, again unless they want to reverse those either.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dzungmobile",
+      "created_time": "August 29, 2024, 07:23:41 AM",
+      "body": "I knew about learnmeabitcoin.com website some years ago from our forum members but that site was redesigned recent months. Perhaps the owner behind it added some new contents recently and today I just discovered one interesting education page from it, that is related to this topic.51% attack, rewriting the blockchainIt has some interesting things.Calculator on probability of 51% attacksAn insightful table: Probability of replacing top X blocks in the blockchain based on percentage mining power.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

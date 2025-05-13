@@ -1,0 +1,165 @@
+{
+  "id": "topic_1790",
+  "title": "appamatto",
+  "author": "appamatto",
+  "created_time": "November 15, 2010, 03:02:31 AM",
+  "content": "This is based on a discussion on 11/14/2010 on the IRC channel.BitDNSAlthough there have been attempts to tackle DNS in a distributed way in the past, I don't think there have been solutions that have fully removed authority from the equation.If there was such a solution, it probably would have been able to implement bitcoin directly on top of it, and we all know that didn't happen.However, it seems possible to create a bitcoin clone (bitDNS) that provides a solution to distributed authority-free name allocation and transfer.Basically, the system is a copy of bitcoin where miners generate 50 new name mappings of their choosing whenever they win a block.  The name mappings change hands in a way similar to btc.This system is separate from btc, and it is likely that escrow services will provide a name market in btc, since any such escrow can leverage the two block chains to verify transactions.  Miners can pick names that are already being bid upon with funds in escrow to make sure they are able to sell generated names quickly.Generalizing Bitcoin: BitXThis is all well and good, but now there are two block chains, and any given miner can only generate for one at a time.  This will be really bad when even more clever applications are developed that require bitcoin-like properties but will be susceptible to attack in their early development.  Enter BitX, designed to support any and every such application on a single block chain.BitX has a block chain like bitcoin's.  However, miners choose to distribute arbitrary application data in the following manner:1) The payload in a block is a mapping from application names to hashes: [\"bitcoin\": <hash>, \"bitDNS\": <hash>, \"bitHaiku\": <hash>, ...]2) Any given block is only allowed to create one new application that does not already appear somewhere in the block chain.  This is to prevent spam.3) Any given block may omit data for any application.  Similarly to the current situation, miners have a choice as to what transactions to include, and this extends to the choice over which applications to choose to send data for.4) Application data is transfered separately, so for instance a bitcoin client will never have to care about haikus or DNS names, as it can simply ask someone for the bitcoin payload and make sure it matches the hash in the appropriate block.5) On the client side, blocks are only ever rejected for an error relating to the previous four points.  In other words, blocks aren't rejected for carrying a faulty bitcoin payload, because this might result in rejecting valid DNS transfers.  Instead, bitcoin clients accept the most recent block but ignore the invalid bitcoin transactions.Miners will engage in activities they feel profitable.  For example, miners may not see a profit motive in haikus, but will want to generate DNS names because they can be sold easily.  I think this system could support a very wide range of useful applications while adding only a minimal overhead to the block chain itself.  Application proliferation is kept in check by the interests of the miners themselves.This also seems to make the block chain more modular, as it separates concerns; the block chain is strictly for creating a universal state of the system for everyone in the world, and application data travels out of band but is verified against the block chain.One effect of the modularity is that applications can ignore illegal or undesirable application data and only download payloads for the applications they care about.As a last thought: BitX poses a significant threat to bitcoin, because money may not be the \"killer app\" for the block chain.  In other words, what happens when bitBeanieBabies becomes bigger than bitcoin?  Suddenly the bitcoin system doesn't seem as secure.  If both were running on top of BitX, they would enhance each other's security, and interfere with one another minimally.Thanks for reading,Appamatto",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=1790",
+  "comments": [
+    {
+      "author": "Cdecker",
+      "created_time": "November 15, 2010, 08:40:32 PM",
+      "body": "Just for reference, the discussion on IRC starts here http://bit.ly/9qjLL5",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Gavin Andresen",
+      "created_time": "November 15, 2010, 11:43:45 PM",
+      "body": "So....I want to register a new domain name \"gavin.bitdns\" in this hypothetical bitdns system.How do I do it?  Run a BitX miner and hope that I generate a block sometime in the next week or three?  Ummm... yuck!Or I want to buy a domain from somebody; what does that look like in the bitdns system?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "appamatto",
+      "created_time": "November 16, 2010, 03:06:26 AM",
+      "body": "Quote from: gavinandresen on November 15, 2010, 11:43:45 PMSo....I want to register a new domain name \"gavin.bitdns\" in this hypothetical bitdns system.How do I do it?  Run a BitX miner and hope that I generate a block sometime in the next week or three?  Ummm... yuck!Or I want to buy a domain from somebody; what does that look like in the bitdns system?It's pretty much the same as starting a separate service.  You have to convince a few people to use your system.But in this case, there are some incentives for a BitX miner to adopt your new BitX app (in this case, bitDNS).For one, it doesn't impact the miner's mining speed.  And he would end up with a possibly valuable resource in the form of a very big head start on bitDNS registrations.Consider the case in which there are 5 big BitX miners that each control large processing pools.  They each generate 20% of bitcoins (which is now running on the BitX protocol) yet the first one to generate bitDNS names would generate 100% of names until the second adopted bitDNS as well, and this would be at no cost to him.In the case of buying a name, you need an escrow that will temporarily hold the btc and the name until they are both confirmed, and then pass them along to the new owners.  I think it's best to keep btc and dns completely separate so that they can succeed or fail independently yet leverage the single block chain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "appamatto",
+      "created_time": "November 16, 2010, 03:39:14 AM",
+      "body": "I thought about the BitX block format more today, and (with the help of ByteCoin on irc) decided that block rejection is an important part of the system.  So, the format would work more or less like the following:<previous block hash><timestamp><hash of app name> <hash of app data> <previous app block offset><hash of app name> ....<nonce>Basically, there is the BitX block chain which is maintained in the first field.  But there are also \"subchains\" for each app.  The \"previous app block offset\" is the number of blocks to travel backwards in the chain to find the last previous block for this app.Omitting some details, a Bitcoin fork would appear as follows, inside a non-forked BitX chain:block 0:<empty, this is the genesis block>(bitcoin) datahash... 0A previous app block offset of zero indicates that this is a genesis block for that app.  Each BitX block is only allowed to specify a genesis block for one app.block 1:<hash of block 0>(bitcoin) datahash... 1This is a continuation of the last BitX block and it also claims to be a successor of the previous block's bitcoin chain.block 2:<hash of block 1><empty>It's perfectly legit for any given application to not appear in a block.block 3:<hash of block 2>(bitcoin) datahash... 3This is a continuation of the BitX chain, but it has rejected the previous bitcoin block.  Clients will now have to accept one bitcoin app block and reject the other, but there is no reason to reject the BitX block.  The rejected bitcoin app block will stay in the BitX block chain, but it will not be part of the longest valid bitcoin block chain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cdecker",
+      "created_time": "November 16, 2010, 06:53:15 AM",
+      "body": "Since more and more of these ideas to uniquely acquire some virtual resource appear, why not abstract away the entire, domain specific, logic and just create a service that does p2p proof of work all day long, on which the services can be implemented? It might help strengthen the main chain, by basing multiple applications on it, and might reduce the repetitive work for each system, since the basis is already there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "appamatto",
+      "created_time": "November 16, 2010, 02:53:05 PM",
+      "body": "Quote from: Cdecker on November 16, 2010, 06:53:15 AMSince more and more of these ideas to uniquely acquire some virtual resource appear, why not abstract away the entire, domain specific, logic and just create a service that does p2p proof of work all day long, on which the services can be implemented? It might help strengthen the main chain, by basing multiple applications on it, and might reduce the repetitive work for each system, since the basis is already there.I think that's exactly what I'm suggesting.  BitX is a block chain service (not sure how this differs from 'p2p proof of work') that supports arbitrary applications, such as bitcoin, bitDNS, ...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cdecker",
+      "created_time": "November 16, 2010, 05:45:11 PM",
+      "body": "So now the question is what kinds of central authorities can be replaced by this type of quorum?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ByteCoin",
+      "created_time": "November 18, 2010, 05:14:20 AM",
+      "body": "I've been thinking about your scheme appamato and as we discussed, rejecting invalid blocks and only working on the longest chain is a critical part of the security of these schemes. Therefore all hashing clients need to have the logic to tell the good from the bad. Ths could be done by distributing the appropriate logic for each app as java bytecode or .NET stuff. All clients would therefore understand all apps.There would have to be some incentive to support an app in this way. Some form of payment.... hmmmByteCoin",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "appamatto",
+      "created_time": "November 18, 2010, 06:28:58 AM",
+      "body": "ByteCoin, I think you can just keep a pointer to the last valid block per app in the big block chain.So, when you mined, you would produce new app data for each app you cared about and stick the hash of that data as well as pointer to the previous vaild app block (per app you care about) into the big block chain.In other words, the big chain has a next pointer to the last valid big block, as well as a next pointer to each last valid app block you care about.  So, if you think there was an invalid app block, you can still add to the longest big block chain and reject the invalid app block by pointing further back in the chain to the last valid (in your view) app block.You don't have to know about every app in this case.  This plan still retains the bonus that miners can mine for as many apps as they want.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "asdf",
+      "created_time": "November 18, 2010, 06:38:26 AM",
+      "body": "I didn't read the thread, but you might be interested in the Netsukuku solution to distributed dns:http://en.wikipedia.org/wiki/Netsukuku#A_Netsukuku_Domain_Name_ArchitectureNetsukuku:http://netsukuku.freaknet.org/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Anonymous",
+      "created_time": "November 30, 2010, 12:54:41 PM",
+      "body": "http://p2pdns.baywords.com/2010/11/30/hello-world/I just found this from Peter Sunde who wants to create a decentralized dns system.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gekko",
+      "created_time": "November 30, 2010, 06:01:02 PM",
+      "body": "A lot of collaboration on a decentralized DNS by the bittorrent community is occurring here: http://dot-p2p.org/index.php?title=Main_PageThe brainstorming session is here. BitDNS/Bitcoin could provide them with a lot of the source code needed:http://dns-p2p.openpad.me/1",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kiba",
+      "created_time": "November 30, 2010, 06:06:37 PM",
+      "body": "Quick! Offer a bounty in bitcoin!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "sandos",
+      "created_time": "December 01, 2010, 08:26:14 AM",
+      "body": "If you just allow any number of applications \"on top\" of bitcoin, isn't that a bit messy? Suddenly some guy says he invented this bitdns2 where all domains are available!Maybe make it a tad bit hard to add applications?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kiba",
+      "created_time": "December 01, 2010, 05:27:05 PM",
+      "body": "Quote from: sandos on December 01, 2010, 08:26:14 AMIf you just allow any number of applications \"on top\" of bitcoin, isn't that a bit messy? Suddenly some guy says he invented this bitdns2 where all domains are available!Maybe make it a tad bit hard to add applications?Hmm? I thought we're going to use a separate blockchain than what bitcoin use.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bober182",
+      "created_time": "December 02, 2010, 12:22:26 AM",
+      "body": "I find tieing in bitcoins to DNS retarded. There are already some other p2p DNS systems that need help lifting off the ground why make a new one.http://dot-p2p.org/index.php?title=Main_Pagehttp://wiki.opennicproject.org/dotP2PTLD",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kiba",
+      "created_time": "December 02, 2010, 12:25:25 AM",
+      "body": "Quote from: bober182 on December 02, 2010, 12:22:26 AMI find tieing in bitcoins to DNS retarded. There are already some other p2p DNS systems that need help lifting off the ground why make a new one.http://dot-p2p.org/index.php?title=Main_Pagehttp://wiki.opennicproject.org/dotP2PTLDCalling something retard and having no substance to back it up is not a good argument.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tyler",
+      "created_time": "December 02, 2010, 12:30:56 AM",
+      "body": "Quote from: kiba on December 02, 2010, 12:25:25 AMQuote from: bober182 on December 02, 2010, 12:22:26 AMI find tieing in bitcoins to DNS retarded. There are already some other p2p DNS systems that need help lifting off the ground why make a new one.http://dot-p2p.org/index.php?title=Main_Pagehttp://wiki.opennicproject.org/dotP2PTLDCalling something retard and having no substance to back it up is not a good argument.retarded means \"slowed\" which ironically is the case here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "kiba",
+      "created_time": "December 02, 2010, 12:41:05 AM",
+      "body": "Quote from: tyler on December 02, 2010, 12:30:56 AMretarded means \"slowed\" which ironically is the case here",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

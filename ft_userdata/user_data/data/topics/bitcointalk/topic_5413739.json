@@ -1,0 +1,109 @@
+{
+  "id": "topic_5413739",
+  "title": "krashfire",
+  "author": "krashfire",
+  "created_time": "September 16, 2022, 04:46:27 AM",
+  "content": "Hi everyone..1) I tried putting in my given public key.. but the output returns as invalid. am i suppose to convert the raw given public key in a bitcoin transaction before using lattice? what shoud i convert it to?2) If all i had is the public key, can the lattice attack program still work?3)if i must give the r,s,kp values besides the public key, which website gives very technical details of a bitcoin transaction? i know 2coins is now defunct. is there any similar website?based on https://github.com/bitlogik/lattice-attacki have read the READ.md but im still not very clear. hence, im here aking you experts. Thank you so much on your advice.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5413739",
+  "comments": [
+    {
+      "author": "stanner.austin",
+      "created_time": "September 16, 2022, 09:09:41 AM",
+      "body": "Hellolattice-attack need public key = coordinates.if public is is compressed(02 or 03 in starting) you have to decompress it and use x/y coordinates of them.You don't need 6000 signatures its depend on leaked bit lowest bit leak is 4 need 100 signatures .ps: i prefer to answer public instead of private unless its too sensitive information.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "September 16, 2022, 12:06:20 PM",
+      "body": "Quote from: krashfire on September 16, 2022, 04:46:27 AM3)if i must give the r,s,kp values besides the public key, which website gives very technical details of a bitcoin transaction? i know 2coins is now defunct. is there any similar website?Not website, but you can use this script https://github.com/iceland2k14/rsz. I tested it for few minutes and it works without any problem.Code:$ git clone https://github.com/iceland2k14/rsz$ cd rsz$ python3 getz_input.py -txid 27d47157ee0557db28e8a28e6295cab69ee409d2eb642172e2a86091c5e173d0Starting Program...====================================================================== [Input Index #: 0]     R: 3d9bc5aec4e53f59b03bc4866453a94b673e99f67bd69d2915a39964d4918a98     S: 28637de6101936def68c0cfd831c7a73227b8ba7ef1c70ddba6e69d2e628775a     Z: f3612c362cf925c4dc902957353454bf04bdcc3e874372800a8e69f6daa7a19fPubKey: 031ca4aa8c1bec706e817e9d74b356bcab13625061c541052ddd9e6352cba6911eBut take note this script doesn't support Witness data, so you can't use it to get R/S/Z value from Bech32 address and SegWit wrapped on P2SH address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "krashfire",
+      "created_time": "September 16, 2022, 12:53:01 PM",
+      "body": "Quote from: ETFbitcoin on September 16, 2022, 12:06:20 PMQuote from: krashfire on September 16, 2022, 04:46:27 AM3)if i must give the r,s,kp values besides the public key, which website gives very technical details of a bitcoin transaction? i know 2coins is now defunct. is there any similar website?Not website, but you can use this script https://github.com/iceland2k14/rsz. I tested it for few minutes and it works without any problem.Code:$ git clone https://github.com/iceland2k14/rsz$ cd rsz$ python3 getz_input.py -txid 27d47157ee0557db28e8a28e6295cab69ee409d2eb642172e2a86091c5e173d0Starting Program...====================================================================== [Input Index #: 0]     R: 3d9bc5aec4e53f59b03bc4866453a94b673e99f67bd69d2915a39964d4918a98     S: 28637de6101936def68c0cfd831c7a73227b8ba7ef1c70ddba6e69d2e628775a     Z: f3612c362cf925c4dc902957353454bf04bdcc3e874372800a8e69f6daa7a19fPubKey: 031ca4aa8c1bec706e817e9d74b356bcab13625061c541052ddd9e6352cba6911eBut take note this script doesn't support Witness data, so you can't use it to get R/S/Z value from Bech32 address and SegWit wrapped on P2SH address.Mine is a P2SH address. yes i have this program. it doesnt work on my P2SH address. is there any other website or script u can recommend specifically for P2SH addresses?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BHWallet",
+      "created_time": "September 16, 2022, 04:29:58 PM",
+      "body": "Can anyone explain in a more simple way how to run this lattice attack? Thanks",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CrunchyF",
+      "created_time": "September 16, 2022, 05:22:30 PM",
+      "body": "Quote from: BHWallet on September 16, 2022, 04:29:58 PMCan anyone explain in a more simple way how to run this lattice attack? ThanksYes if you want i can try to resume the  lattice attack in a simple way but i have to know what sort of leakage in the nonce of the signature  are you attempt in the signatures you want to attack?-a small nonce for ex a nonce between 1 to 2^128  instead of 1 to 2^256 like this :000000000000000000000000000000003fc87113fa3119661528d1ead67fd97c00000000000000000000000000000000c9b514fe70e73b4762e893ad7fa927b900000000000000000000000000000000bccd31a9026c3b39220ab2d185b408000000000000000000000000000000000075c73909c9d056ec09c5394ebd04336400000000000000000000000000000000a86b35d428b45d48be1b4995c8c8b4ad00000000000000000000000000000000b08ad648ce95649a0d893e7d7b596503...-a leakage in the MSB or LSB of signatures (for ex you know the first 8 bits of the nonce value)8798269c708d7cdcf5c8d81a3e6e5f8770dbfaebfd0130e70bd4cf1ecf8adbd108a31e897638a5bf4c3adc3daaaf3d8f1241b30ac46fea3e0f154547b01380df51bf53e79da24d83649ff8396cfb81b6c02d4c6a65776d40217c7b8b66cf6000d279f11b49061bc8c804ceea19327956beaaf16b84383a10df39db88e457f99344159fa36129f20e644542b83c8bd8b5eb22a1bd78bdc2787c0de106b20962c5be46afb29211a3a68149533eaaecd2b817d7fe3584085fbe329ac8751bffe703it assumes that you know the bold value before performing the attack -a weak generation of nonce with fixed bits for ex the 16th bytes of the  nonce have always  the value \"FD\" (you don't have to know what value but only that the bits at a fixed position are always the same).f62a05c0e4fab585df2a0e020e87b62fdbfc6112306de89c2e692ac22c34a412c357830e65c5a66c63152c51911e0a3fdbd4dd208d990a661b3fc0efa951c208884299a0e2f15bb800ac4139bb4892afd22a141456d399d0c2ed8250e26830363cd1ab221edf28805abef9b0a44d05cfdc1d3d43896d062d96ae5a65499d092c5fe0366612732cada1caac8e2d71277fd94f2abd74e0fa0042786c30695a756d6c79fe6d34c51e311c356fec4a290d7fd7fe27c9f776c172a965a9b8e7f0f9dawith a little trick this last attack can be really powerful because you don't have to know where the fixed bits are",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "September 17, 2022, 05:14:31 PM",
+      "body": "Quote from: ETFbitcoin on September 17, 2022, 08:08:47 AMQuote from: krashfire on September 16, 2022, 12:53:01 PMQuote from: ETFbitcoin on September 16, 2022, 12:06:20 PM--snip--But take note this script doesn't support Witness data, so you can't use it to get R/S/Z value from Bech32 address and SegWit wrapped on P2SH address.Mine is a P2SH address. yes i have this program. it doesnt work on my P2SH address. is there any other website or script u can recommend specifically for P2SH addresses?I'm not aware of tool which can parse signature and get R,S,Z automatically from P2SH address. After P2SH address could do LOTS of things such as P2WPKH-in-P2SH, P2WSH-in-P2SH, multi signature or even custom puzzle challenge. I know there's set of Bitcoin cryptography tool https://github.com/demining/CryptoDeepTools, but i never try it myself.His soft work only with his DEMO SIGHNATURES ONLY !!!! WE ARE BUY HIS SOFT AND KNOW WHAT TALK ABOUT !!!!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "COBRAS",
+      "created_time": "September 17, 2022, 05:27:58 PM",
+      "body": "Quote from: CrunchyF on September 16, 2022, 05:22:30 PMQuote from: BHWallet on September 16, 2022, 04:29:58 PMCan anyone explain in a more simple way how to run this lattice attack? ThanksYes if you want i can try to resume the  lattice attack in a simple way but i have to know what sort of leakage in the nonce of the signature  are you attempt in the signatures you want to attack?-a small nonce for ex a nonce between 1 to 2^128  instead of 1 to 2^256 like this :000000000000000000000000000000003fc87113fa3119661528d1ead67fd97c00000000000000000000000000000000c9b514fe70e73b4762e893ad7fa927b900000000000000000000000000000000bccd31a9026c3b39220ab2d185b408000000000000000000000000000000000075c73909c9d056ec09c5394ebd04336400000000000000000000000000000000a86b35d428b45d48be1b4995c8c8b4ad00000000000000000000000000000000b08ad648ce95649a0d893e7d7b596503...-a leakage in the MSB or LSB of signatures (for ex you know the first 8 bits of the nonce value)8798269c708d7cdcf5c8d81a3e6e5f8770dbfaebfd0130e70bd4cf1ecf8adbd108a31e897638a5bf4c3adc3daaaf3d8f1241b30ac46fea3e0f154547b01380df51bf53e79da24d83649ff8396cfb81b6c02d4c6a65776d40217c7b8b66cf6000d279f11b49061bc8c804ceea19327956beaaf16b84383a10df39db88e457f99344159fa36129f20e644542b83c8bd8b5eb22a1bd78bdc2787c0de106b20962c5be46afb29211a3a68149533eaaecd2b817d7fe3584085fbe329ac8751bffe703it assumes that you know the bold value before performing the attack -a weak generation of nonce with fixed bits for ex the 16th bytes of the  nonce have always  the value \"FD\" (you don't have to know what value but only that the bits at a fixed position are always the same).f62a05c0e4fab585df2a0e020e87b62fdbfc6112306de89c2e692ac22c34a412c357830e65c5a66c63152c51911e0a3fdbd4dd208d990a661b3fc0efa951c208884299a0e2f15bb800ac4139bb4892afd22a141456d399d0c2ed8250e26830363cd1ab221edf28805abef9b0a44d05cfdc1d3d43896d062d96ae5a65499d092c5fe0366612732cada1caac8e2d71277fd94f2abd74e0fa0042786c30695a756d6c79fe6d34c51e311c356fec4a290d7fd7fe27c9f776c172a965a9b8e7f0f9dawith a little trick this last attack can be really powerful because you don't have to know where the fixed bits areGood Day. How to detect P2SH transaction then parsing transaction hash?p.s. your answer is good. You first man on phoroom who know something about lattice... regsrd",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "MisterCooper",
+      "created_time": "February 17, 2023, 01:51:37 PM",
+      "body": "Quote from: ETFbitcoin on September 18, 2022, 08:27:54 AMQuote from: COBRAS on September 17, 2022, 05:14:31 PMQuote from: ETFbitcoin on September 17, 2022, 08:08:47 AM--snip--I know there's set of Bitcoin cryptography tool https://github.com/demining/CryptoDeepTools, but i never try it myself.His soft work only with his DEMO SIGHNATURES ONLY !!!! WE ARE BUY HIS SOFT AND KNOW WHAT TALK ABOUT !!!!I don't know about other part of the script, but i can run script to get R,S,Z from arbitrary raw transaction hex. Here are the steps to run the script,Code:$ git clone https://github.com/demining/CryptoDeepTools$ cd CryptoDeepTools/02BreakECDSAcryptography/$ python2 -m pip install -r requirements.txt$ python2 cat breakECDSA.py [RAW TX HEX]Example on raw TX, where all input is P2PKH[1].Code:$ python2 breakECDSA.py 0100000001f65499107b1714a70409c528d4ca2214516dd62005ddac99848cf55350fe75f1000000006b483045022100c27f019f3112e3dbf4f067e057d6b20e9a5bb847f47e65ba7769bf62eb5192a5022070c77e2c0b3570594e5aec0166b3a08b958d0aedde8d07e917ee9831641a3cc801210369e03e2c91f0badec46c9c903d9e9edae67c167b9ef9b550356ee791c9a40896ffffffff0249e36002000000001976a9149f21a07a0c7c3cf65a51f586051395762267cdaf88ace0aa1500000000001976a91421937d90affbc4161261cfc5e70380d79c39434988ac00000000R = 0xc27f019f3112e3dbf4f067e057d6b20e9a5bb847f47e65ba7769bf62eb5192a5S = 0x70c77e2c0b3570594e5aec0166b3a08b958d0aedde8d07e917ee9831641a3cc8Z = 0x761ef44d70339fdccd39673c3a1eec03b9fa0481fb1b30bf43c77dca4de44d2dPUBKEY = 0369e03e2c91f0badec46c9c903d9e9edae67c167b9ef9b550356ee791c9a40896======================================================================But this script doesn't work on P2WPKH[2] or P2WPKH-in-P2SH[3] input, so it's not useful for OP use case though.Code:$ python2 breakECDSA.py 020000000001015a7130573012f88d469fe96fe3feb0df66118bd459a10d1fda7ed08dcaea6bbd0100000000fdffffff02e0604b00000000001600145c9dac79b08e617da2de963a041a464e4c49679a0734124400000000160014f60834ef165253c571b11ce9fa74e46692fc5ec102483045022100914440a21cfff72ad3cfc48927fccd78600046d7c02d4e756f1c44f5cd0be08d022002f03e397c7c5ac6fde1815ddefde2972ec383bbf476d2bfd4721a974b51be290121026e5628506ecd33242e5ceb5fdafe4d3066b5c0f159b3c05a621ef65f177ea28600000000Traceback (most recent call last):  File \"breakECDSA.py\", line 10, in <module>    m = txnUtils.parseTxn(tx)  File \"../CryptoDeepTools/02BreakECDSAcryptography/txnUtils.py\", line 37, in parseTxn    sigLen = int(script[0:2], 16)ValueError: invalid literal for int() with base 16: ''$ python2 breakECDSA.py 010000000001022a366de4b96167e42337790043299ac614e0bc05bf8ba340e927d9f3868889af01000000171600147d452b9add3914b1c5c0f88be47898b64c373c4bffffffff1d775117f15b2a9579528bd3cf2fe8c79fa9f8fa1d52cd110bb6fa3dd6caca650a00000017160014537fe4df8143216b1c21872457091a0c458ccd1cffffffff0240420f000000000017a914d732316b111b38ce6ea70906e3a782513aae6bd4873c0602000000000017a914621aa60b0e81cc8bea3ded10387bf825b9e941f187024730440220305cd635d21b95630249f914c48cbb1a7601e4886fc0fc816a64a228d2cc75d3022021b1852fd4e54d096357f9b1c95c04ce5b08528b7d9a9e02c1b89bf552029e71012103eb738067a660c75f78f10bf96ec3bd406d8b3d9520e107a03282bd7d58c23d5f02473044022001ade616cb553ee09bee7f02deed603ebf4fb29825c77e44d2cd61a10df99881022055c22cd77e2aeff7978f02fb087101eacf036d48018fff3ba84b0e2098e7709f012103cea6d75c21cedabb2795496aaf6d0e522b197666feb601ce08eac71f63ded7e500000000Traceback (most recent call last):  File \"breakECDSA.py\", line 10, in <module>    m = txnUtils.parseTxn(tx)  File \"/home/user/Desktop/CryptoDeepTools/02BreakECDSAcryptography/txnUtils.py\", line 37, in parseTxn    sigLen = int(script[0:2], 16)ValueError: invalid literal for int() with base 16: ''[1] https://mempool.space/tx/4747c73ae788b8c00bb87914abd17ebef5c48572aa4642c84f00a6a40820c1d3[2] https://mempool.space/tx/574df3b2aa53c61701ec3831d72a9e1abcfa8f50dd1c37a98e338c71dc9f80d1[3] https://mempool.space/tx/9bd507520021888e9cb5b3ce5a6e25892e38de4ecab8690e264b3ab41f995547You are getting an error because you have not installed Python 2.7Do the following commands:Code:git clone https://github.com/demining/CryptoDeepTools.gitcd CryptoDeepTools/02BreakECDSAcryptography/sudo apt install python2-minimalwget https://bootstrap.pypa.io/pip/2.7/get-pip.pysudo python2 get-pip.pypip2 install -r requirements.txtRun the script next!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bjpark",
+      "created_time": "February 21, 2023, 06:21:36 AM",
+      "body": "Quote from: COBRAS on September 17, 2022, 05:27:58 PMQuote from: CrunchyF on September 16, 2022, 05:22:30 PMQuote from: BHWallet on September 16, 2022, 04:29:58 PMCan anyone explain in a more simple way how to run this lattice attack? ThanksYes if you want i can try to resume the  lattice attack in a simple way but i have to know what sort of leakage in the nonce of the signature  are you attempt in the signatures you want to attack?-a small nonce for ex a nonce between 1 to 2^128  instead of 1 to 2^256 like this :000000000000000000000000000000003fc87113fa3119661528d1ead67fd97c00000000000000000000000000000000c9b514fe70e73b4762e893ad7fa927b900000000000000000000000000000000bccd31a9026c3b39220ab2d185b408000000000000000000000000000000000075c73909c9d056ec09c5394ebd04336400000000000000000000000000000000a86b35d428b45d48be1b4995c8c8b4ad00000000000000000000000000000000b08ad648ce95649a0d893e7d7b596503...-a leakage in the MSB or LSB of signatures (for ex you know the first 8 bits of the nonce value)8798269c708d7cdcf5c8d81a3e6e5f8770dbfaebfd0130e70bd4cf1ecf8adbd108a31e897638a5bf4c3adc3daaaf3d8f1241b30ac46fea3e0f154547b01380df51bf53e79da24d83649ff8396cfb81b6c02d4c6a65776d40217c7b8b66cf6000d279f11b49061bc8c804ceea19327956beaaf16b84383a10df39db88e457f99344159fa36129f20e644542b83c8bd8b5eb22a1bd78bdc2787c0de106b20962c5be46afb29211a3a68149533eaaecd2b817d7fe3584085fbe329ac8751bffe703it assumes that you know the bold value before performing the attack -a weak generation of nonce with fixed bits for ex the 16th bytes of the  nonce have always  the value \"FD\" (you don't have to know what value but only that the bits at a fixed position are always the same).f62a05c0e4fab585df2a0e020e87b62fdbfc6112306de89c2e692ac22c34a412c357830e65c5a66c63152c51911e0a3fdbd4dd208d990a661b3fc0efa951c208884299a0e2f15bb800ac4139bb4892afd22a141456d399d0c2ed8250e26830363cd1ab221edf28805abef9b0a44d05cfdc1d3d43896d062d96ae5a65499d092c5fe0366612732cada1caac8e2d71277fd94f2abd74e0fa0042786c30695a756d6c79fe6d34c51e311c356fec4a290d7fd7fe27c9f776c172a965a9b8e7f0f9dawith a little trick this last attack can be really powerful because you don't have to know where the fixed bits areGood Day. How to detect P2SH transaction then parsing transaction hash?p.s. your answer is good. You first man on phoroom who know something about lattice... regsrdf62a05c0e4fab585df2a0e020e87b62fdbfc6112306de89c2e692ac22c34a412c357830e65c5a66c63152c51911e0a3fdbd4dd208d990a661b3fc0efa951c208884299a0e2f15bb800ac4139bb4892afd22a141456d399d0c2ed8250e26830363cd1ab221edf28805abef9b0a44d05cfdc1d3d43896d062d96ae5a65499d092c5fe0366612732cada1caac8e2d71277fd94f2abd74e0fa0042786c30695a756d6c79fe6d34c51e311c356fec4a290d7fd7fe27c9f776c172a965a9b8e7f0f9daDoes the value containing the fd character mean the private key value of the R value in the R, S, and Z values?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Kpot87",
+      "created_time": "February 27, 2023, 12:12:46 AM",
+      "body": "No, its k_nonce value from witch you received R",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "GR Sasa",
+      "created_time": "February 27, 2023, 09:51:47 AM",
+      "body": "Hello guys,Lets take Satoshies old mined addresses, they have public key exposed.PubKey: 0405f818748aecbc8c67a4e61a03cee506888f49480cf343363b04908ed51e25b9615f244c38311 983fb0f5b99e3fd52f255c5cc47a03ee2d85e78eaf6fa76bb9dis there a way to perform this trick to attack/try to get the private key of one of Satoshies mined old address using the his public key?if yes, i would like for someone to  give me a example using the public key given above.Thanks.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ymgve2",
+      "created_time": "February 27, 2023, 03:01:50 PM",
+      "body": "If there was a way, Satoshi's coins would have been gone already.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

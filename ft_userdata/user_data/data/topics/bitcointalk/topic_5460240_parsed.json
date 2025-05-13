@@ -1,0 +1,165 @@
+{
+  "id": "topic_5460240",
+  "title": "jaydee3839",
+  "author": "jaydee3839",
+  "created_time": "July 18, 2023, 04:14:52 PM",
+  "content": "I was wondering if there are any measurement techniques (software tools) that can quantify the randomness of a seed phrase.  I've read numerous times that humans picking their own seed phrase is not advisable, because it would not have the level of randomness a (quality) computer-generated seed phrase would produce.  Therefore, their must be some test or method of measuring this.  I'm picturing something like a 0-100 scale, where the first word repeated 12 consecutive times would be 0 or extraordinarily close to 0, and the best entropy sources designed for seed phrase generation would be something close to 100, but there may be other ways to measure.Is there anything like this?  I would think there would be, but I haven't come across is, nor have I heard anyone advertise to \"test the randomness of your phrase\", though I get the skepticism of entering the phrase into such a system introduces a risk (you'd only want to do it on a trusted, air-gapped device).For nothing else, I'm curious as to \"how bad\" a human is at generating seed phrases randomly, versus computer.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5460240",
+  "comments": [
+    {
+      "author": "ranochigo",
+      "created_time": "July 18, 2023, 05:05:57 PM",
+      "body": "No. If there is a method to accurately determine the randomness of strings or cryptographic keys, we wouldn't have so much issues with CSPRNGs. We would be able to just test the entropy using algorithm. The issue is that there is no way of testing if a key is truly random, variance could skew your results to have more x characters than another for example. Even if you introduce a huge sample size, there is no telling if a bias is inherent or it is just a coincidence with variance. There are instances where the lack of CSPRNG is evident; most evidently with Bitcoin signatures but they are attacked in unique ways and are not determined using a fixed algorithm.If you are using a reputable wallet, one of the key things that is heavily scrutinized is the CSPRNG mechanism used during seed generation. That being said, you're probably in safe hands.As to how bad humans are at generating entropy: http://www.loper-os.org/bad-at-entropy/manmach.html.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jaydee3839",
+      "created_time": "July 18, 2023, 05:50:11 PM",
+      "body": "Thank you for the response. It seems to be true that you can definitively say that a seed phrase is \"bad\"/not random (such as 12 repeating words, or sequential forwards or backwards).  If you can measure that some are \"not random\", there ought to be (I would think) some algorithm that captures such combinations and gives them a quantifiable score, which you can then expand towards \"less random\" combinations.  Perhaps you hit a limit at some point, but it seems to me that there should be a mathematical model to represent \"badness\".",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 19, 2023, 02:28:18 AM",
+      "body": "Quote from: jaydee3839 on July 18, 2023, 05:50:11 PMIf you can measure that some are \"not random\", there ought to be (I would think) some algorithm that captures such combinations and gives them a quantifiable score, which you can then expand towards \"less random\" combinations.  Perhaps you hit a limit at some point, but it seems to me that there should be a mathematical model to represent \"badness\".The issue lies when you associated randomness with a uniform distribution. Contrary to popular belief, they are actually not synonymous. For Cryptographically Secure Pseudo-Random Number Generator (CSPRNG), they are subjected to the next-bit test where you cannot predict the next few bits given the first few bits. That requirement is fulfilled by your OS's CSPRNG and thus it qualifies as being sufficiently random.Now, back to the topic. Sure, you can reject a result where you have 12 consecutive '0's in your key, but that is extraordinarily rare and it would prob never be executed in any code that you write. Hence, there is no good reason for anyone to include test-cases which tests for this. Going by that, the definition of having entropy would then be having the results for which each character has the equal probability of being in each space (ie. non-biased). A counter-example is this: Code:524314352124312Against these which are generated with a CSPRNG: Code:524402459535269The former has low entropy, even though each character appears exactly once, which means that by normal standards, you would consider each character as having the equal probability to occur at least once. Yet, that is predictable. The second is generated with a CSPRNG, which is random yet there are repeated characters present. That is unpredictable. Given a large enough set, think infinity, each of the values would possibly be uniformly distributed. The mathematical model doesn't exist, there is no telling of how random something is because it is not designed to be predictable. Analysis with any results are often done with something that can be measured and thereby predictable.There is no need to implement any algorithms to test for this. Your wallet client probably incorporates /dev/random which is a CSPRNG within your OS. random continually collected entropy from the environment and blocks if there isn't any sufficient entropy being collected. In addition, your wallet also seeds using entropy collected from other sources. Hence, trying to evaluate entropy is unnecessary and provides a false sense of security.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 19, 2023, 07:19:35 AM",
+      "body": "Quote from: ranochigo on July 19, 2023, 02:28:18 AMNow, back to the topic. Sure, you can reject a result where you have 12 consecutive '0's in your key, but that is extraordinarily rare and it would prob never be executed in any code that you write.I would just point out that this isn't an accurate statement. 12 consecutive 0s has a 1 in 4,096 chance, which is definitely not \"extraordinarily rare\" to start with. But if you take a 24 word seed phrase with 256 bits, then there is actually around a 1 in 34 chance that you get 12 consecutive 0s somewhere in those 256 bits. And of course you can double that chance if you consider 12 consecutive 1s as well.So for roughly every seventeen completely random 24 word seed phrases you generate, you'll have a string of 12 consecutive 0s or 1s. This is why it is difficult to assess randomness like OP is proposing. Strings which look random may not be at all, and strings which look predictable can indeed be entirely random.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "July 19, 2023, 07:39:55 AM",
+      "body": "Quote from: jaydee3839 on July 18, 2023, 04:14:52 PMI was wondering if there are any measurement techniques (software tools) that can quantify the randomness of a seed phrase.  I've read numerous times that humans picking their own seed phrase is not advisable, because it would not have the level of randomness a (quality) computer-generated seed phrase would produce.  Therefore, their must be some test or method of measuring this.  I'm picturing something like a 0-100 scale, where the first word repeated 12 consecutive times would be 0 or extraordinarily close to 0, and the best entropy sources designed for seed phrase generation would be something close to 100, but there may be other ways to measure.Is there anything like this?  I would think there would be, but I haven't come across is, nor have I heard anyone advertise to \"test the randomness of your phrase\", though I get the skepticism of entering the phrase into such a system introduces a risk (you'd only want to do it on a trusted, air-gapped device).For nothing else, I'm curious as to \"how bad\" a human is at generating seed phrases randomly, versus computer.  The seed phrases are random as much as random  the sequences of bits from which they are generated. The ideal case is that when those the sequences are truly random and unpredictable.To assess the randomness of generated bits one can use NIST Statistical Test Suite which includes 15 specific tests. The output of those tests  are  capable to tell if provided data are the result of pure chance.The relevant guide on how to use NIST Statistical Test Suite is located here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 19, 2023, 08:06:20 AM",
+      "body": "Quote from: o_e_l_e_o on July 19, 2023, 07:19:35 AMI would just point out that this isn't an accurate statement. 12 consecutive 0s has a 1 in 4,096 chance, which is definitely not \"extraordinarily rare\" to start with. But if you take a 24 word seed phrase with 256 bits, then there is actually around a 1 in 34 chance that you get 12 consecutive 0s somewhere in those 256 bits. And of course you can double that chance if you consider 12 consecutive 1s as well.So for roughly every seventeen completely random 24 word seed phrases you generate, you'll have a string of 12 consecutive 0s or 1s. This is why it is difficult to assess randomness like OP is proposing. Strings which look random may not be at all, and strings which look predictable can indeed be entirely random.I stand corrected. I wasn't thinking about the binary representation, just in hex representation. I'll have a go at this combinatorics problem when I have some time but I suspect you're right that it isn't exactly extraordinary case even when considering that.Quote from: satscraper on July 19, 2023, 07:39:55 AMTo assess the randomness of generated bits one can use NIST Statistical Test Suite which includes 15 specific tests. The output of those tests  are  capable to tell if provided data are the result of pure chance.It isn't too useful actually. The suite is used to test for generation of a large set of entropy seeds, and it cannot be used to calculate the entropy of a specific keys, or a bunch of specific keys even. Usually used by people who are directly testing the source of entropy.In addition, the suite is recommended to test for the randomness but not about non-predictability (which is also different). If you are developing your own source of CSPRNG (ie. another implementation of urandom), then you should use that. Otherwise, it is useless to evaluate for individual entropy because the sample size is far far smaller than required to test for that. An interesting article by Random.org discusses this issue better than me: https://www.random.org/analysis/, stumbled upon it while finding sources of RNG previously. They conduct real-time analysis with the test as well, they yield interesting results.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "July 19, 2023, 08:28:15 AM",
+      "body": "Quote from: o_e_l_e_o on July 19, 2023, 07:19:35 AMStrings which look random may not be at allHow about 9428367110839506348425063820855586539232765? Looks random, right? Except that it's part of the first million decimals of pi.The same with seed phrases: you can create one based on a Shakespear book. The seed will look random, but it's created deterministically. You can only tell it's not random once you find the source.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "July 19, 2023, 08:51:12 AM",
+      "body": "Quote from: LoyceV on July 19, 2023, 08:28:15 AMQuote from: o_e_l_e_o on July 19, 2023, 07:19:35 AMStrings which look random may not be at allHow about 9428367110839506348425063820855586539232765? Looks random, right? Except that it's part of the first million decimals of pi.pi is the  mathematical constant with fixed digits, so any part of it can not be viewed as random because it can be calculated and besides  knowing it allow you with near 100% guarantee to point out the next digit/s.AFAIK true random numbers may  be obtained only via digitization of fundamentally unpredictable and  stochastic  physical phenomena like quantum ones, atmospheric, etc..",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 19, 2023, 08:58:48 AM",
+      "body": "Quote from: ranochigo on July 19, 2023, 08:06:20 AMI wasn't thinking about the binary representation, just in hex representation.Ahh ok. In that case 12 zeroes in a row from a set of 16 possible characters would indeed by exponentially more unlikely. My (quick) calculations put it at approximately 1 in 76,569,678,407.Quote from: LoyceV on July 19, 2023, 08:28:15 AMHow about 9428367110839506348425063820855586539232765? Looks random, right? Except that it's part of the first million decimals of pi.That's another problem you've touched on there. Pi, as far as we know, is random, uniform, and normal, although this hasn't been definitively proven. It could potentially be a good source of entropy, except that it is a widely known mathematical constant. And given that pi is infinite, random, and normal, then at some point in it you will find sequences of numbers which appear decidedly non-random. Since we are talking about 12 zeroes in a row, pi contains 12 zeroes in a row at position 1,755,524,129,973.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "apogio",
+      "created_time": "July 19, 2023, 09:28:04 AM",
+      "body": "This looks interesting: http://www.loper-os.org/bad-at-entropy/manmach.htmlI have tried this website here for fun: https://numbergenerator.org/random-256-bit-binary-numberIt produced the following:0000000000001000101110010110010111110110100010101101110111000011110010111100001 0110101000100100011101001000100100100001001110101111000001001110000000000001010 0100110110000001011010101010000010011001001101111001000010101001011100100111000 0111011101001001101 I have played the game above using this input and it \"won\" the machine with a score of 56% approximately.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 19, 2023, 09:38:45 AM",
+      "body": "Quote from: apogio on July 19, 2023, 09:28:04 AMThis looks interesting: http://www.loper-os.org/bad-at-entropy/manmach.htmlI have tried this website here for fun: https://numbergenerator.org/random-256-bit-binary-numberIt produced the following:0000000000001000101110010110010111110110100010101101110111000011110010111100001 0110101000100100011101001000100100100001001110101111000001001110000000000001010 0100110110000001011010101010000010011001001101111001000010101001011100100111000 0111011101001001101 I have played the game above using this input and it \"won\" the machine with a score of 56% approximately.Try 10111000, you'll realize that you can always win the code after a while. Essentially a De Bruijn sequence in combinatoric math, and if you analyze the source code, then you would realize exactly how to outsmart that algorithm.But the point is actually to get 50-50, with neither side winning. Winning/losing would both point to your inputs having a pattern and the code to either always play the wrong moves or the right moves. It's one of the many possible ways to see a pattern in inputs, but it serves as a good demonstration why humans cannot be good at entropy.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "tromp",
+      "created_time": "July 19, 2023, 03:50:42 PMLast edit: July 19, 2023, 05:50:19 PM by tromp",
+      "body": "Quote from: satscraper on July 19, 2023, 08:51:12 AMpi is the  mathematical constant with fixed digits, so any part of it can not be viewed as random because it can be calculatedPi is believed to be normal in base 10 [1], meaning it contains all finite sequences of digits. In which case your statement is obviously false.An occurrence of some sequence of k digits in pi is only a sign of non-randomness if ithe index at which it occurs can be written in much less than k digits...[1] https://en.wikipedia.org/wiki/Normal_number",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "satscraper",
+      "created_time": "July 19, 2023, 05:32:30 PM",
+      "body": "Quote from: tromp on July 19, 2023, 03:50:42 PMQuote from: satscraper on July 19, 2023, 08:51:12 AMpi is the  mathematical constant with fixed digits, so any part of it can not be viewed as random because it can be calculatedPi is believed to be normal in base 10 [1], meaning it contains all finite sequences of digits. In which case your statement is obviously false.A (first) occurrence of some sequence of k digits in pi at index i is only a sign of non-randomness if i can be written in much less than k digits...[1] https://en.wikipedia.org/wiki/Normal_numberIt is still an open question whether pi is  normal or not. Academics continue their discussions on this matter. Read for instance the brief on the results obtained by David H. Bailey from Lawrence Berkeley National Laboratory which emphasizes \"that the new result he and Crandall have obtained does not constitute a proof that pi or log(2) is normal\".So, before taking any conclusion on my statement, DYOR,  and don't rely entirely on Wikipedia. There are plenty research works on this matter. And to conclude - just nice citation supporting my thought:Quote from: https://theconversation.com/pi-might-look-random-but-its-full-of-hidden-patterns-55994",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jaydee3839",
+      "created_time": "July 19, 2023, 08:13:05 PM",
+      "body": "Thanks all.  Interesting discussion.Perhaps my semantics weren't the best, using the word \"randomness\" whereas a better word could have been \"non-patterned\".  If the randomness or \"non-patternedness\" isn't quantifiable/measurable as is the consensus here, then the scientific method can't be fully applied to the effectiveness of seed generators.  We only get to hypothesis based on deductive reasoning.  To judge the quality of outputted seed phrase solely on what generated (such as CSPRNG) it, rather than something intrinsic to the phrase itself that is testable, seems to violate the \"Don't trust, verify\" principle, no?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "July 20, 2023, 01:03:08 AMLast edit: July 20, 2023, 01:16:01 AM by odolvlobo",
+      "body": "Quote from: jaydee3839 on July 19, 2023, 08:13:05 PMPerhaps my semantics weren't the best, using the word \"randomness\" whereas a better word could have been \"non-patterned\".  The issue is not the term you are using, it is what you are measuring. When you measure randomness, you are measuring the process and not the result itself. So, the question should be \"how random is the process that generated this string of bits?\" and not \"how random is this string of bits?\" The reason is simply that in a purely random process, every result is equally likely and thus equally hard to guess.The problem of results with identifiable patterns is not that they aren't random results, it is that they are potentially results from a non-random process, and it is much more effective to attack non-random processes. However, the likelihood of generating such results using a random process is low enough that it is not a problem. For example, a password that happens to be one of the 1 million variations of the most commonly used 8-character passwords would be trivial to guess, but the odds of a random 8-character password using letters and numbers being one of those is 1 in 2 billion.OTOH, there are statistical methods of evaluating the randomness of a process using the results. One example is the Chi-squared test. The accuracies of these tests depend on the amount of data and a single seed is not enough to be useful.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 20, 2023, 12:16:23 PM",
+      "body": "Quote from: LoyceV on July 19, 2023, 08:28:15 AMQuote from: o_e_l_e_o on July 19, 2023, 07:19:35 AMStrings which look random may not be at allHow about 9428367110839506348425063820855586539232765? Looks random, right? Except that it's part of the first million decimals of pi.The same with seed phrases: you can create one based on a Shakespear book. The seed will look random, but it's created deterministically. You can only tell it's not random once you find the source.The issue here is there are potentially trillions of text inputs to analyze, so it becomes largely impractical to test the seed phrase against all of them (that is not mentioning the many different and creative ways the inputs could be transformed into the seed phrase).It becomes more of an issue to analyze what are the more common ways people abuse randomness to make random-looking but statistically speaking, weak sequences, and I don't think you'll get very far with that without machine learning.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "July 20, 2023, 12:24:58 PM",
+      "body": "Quote from: tromp on July 19, 2023, 03:50:42 PMPi is believed to be normal in base 10Indeed in all integer bases greater than or equal to 2.Quote from: jaydee3839 on July 19, 2023, 08:13:05 PMTo judge the quality of outputted seed phrase solely on what generated (such as CSPRNG) it, rather than something intrinsic to the phrase itself that is testable, seems to violate the \"Don't trust, verify\" principle, no?If it were possible to check if the numbers being outputted were indeed completely random and cryptographically secure, then there wouldn't be such a large field of research dedicated to random number generators, or so many cases of weak random number generators leading to wallets bring compromised.  Testing a single output as you are suggesting is meaningless. Let's say I toss a completely fair coin five times and get the following results: HTHHT. Fine, that looks random enough. Now I do it again and get TTTTT. Wait, that doesn't look random at all! Why? Both of those sequences had exactly a 1/32 chance of occurring.Quote from: odolvlobo on July 20, 2023, 01:03:08 AMOne example is the Chi-squared test. The accuracies of these tests depend on the amount of data and a single seed is not enough to be useful.A Chi-squared test simply tests for bias. It cannot tell you whether you are generating actually random numbers. It also requires multiple observations for each expected value, so cannot be applied to 256 bit numbers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ranochigo",
+      "created_time": "July 20, 2023, 01:36:31 PM",
+      "body": "Quote from: NotATether on July 20, 2023, 12:16:23 PMThe issue here is there are potentially trillions of text inputs to analyze, so it becomes largely impractical to test the seed phrase against all of them (that is not mentioning the many different and creative ways the inputs could be transformed into the seed phrase).Depends on implementation. Brainflyer is astonishingly good at cracking V1 Brainwallet phrases. Scrypt with salt would slow the process down a lot but I definitely wouldn't trust my money with it.Quote from: jaydee3839 on July 19, 2023, 08:13:05 PMIf the randomness or \"non-patternedness\" isn't quantifiable/measurable as is the consensus here, then the scientific method can't be fully applied to the effectiveness of seed generators.  We only get to hypothesis based on deductive reasoning.  To judge the quality of outputted seed phrase solely on what generated (such as CSPRNG) it, rather than something intrinsic to the phrase itself that is testable, seems to violate the \"Don't trust, verify\" principle, no?  Unfortunately, that is the best that we can do. As we've said, the predictability of a seed or a random binary string cannot be determined from a single sample and that you need a relatively large sample to be able to ascertain that it is free of bias, and therein lies the question; how big of a sample size is sufficient? The answer is definitely not just a few of them and would possibly just be infinity.The whole concept of \"Don't trust, verify\" comes with the fact that we are able to determine the authenticity of binary files with hash functions, or ability to inspect the code before compiling the code yourself. Entropy is unfortunately, something that you cannot measure and trying to evaluate a random process with certainty would be absurd (because then it won't be considered unpredictable anymore). ** Though note that urandom actually estimates the amount of entropy that is being added to the pool, but that involves a constant stream of data./dev/(u)random provides sufficient entropy for all the cases that we need. You can certainly generate your own entropy, a fair unbiased dice, atmospheric noise or the decay of an uranium ore if you want something random. I'd like to think of the security of Bitcoin as a binary result, \"sufficient\" or \"insufficient\". If you were to use a fair unbiased dice (6 sided), record down 99 rolls and calculate a SHA256 hash of that, I guarantee that the entropy would be sufficient (not perfectly perfect, but I won't have any doubts about it). What is the possibility that someone replicates all of your 99 rolls, with the same numbers, in the same exact sequence?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 20, 2023, 02:17:22 PM",
+      "body": "One thing I never understood is what sets the barrier between looking random and being random. For example, number 888 has the same chances theoretically to be picked between 1 and ~2^256, but it shouldn't, even if the process was completely random, because anyone playing with strange numbers can compromise the key. So you don't want a completely random process, you want one that generates randomly looking numbers, which raises the question of which numbers are looking random, or more importantly, which ones don't?Quote from: o_e_l_e_o on July 19, 2023, 08:58:48 AMPi, as far as we know, is randomWhat proof do we have that Pi is random, even if not definite? Do you mean it is very questionably random?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

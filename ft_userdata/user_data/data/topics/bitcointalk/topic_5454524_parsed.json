@@ -1,0 +1,101 @@
+{
+  "id": "topic_5454524",
+  "title": "Jodmapht",
+  "author": "Jodmapht",
+  "created_time": "May 30, 2023, 02:24:14 PM",
+  "content": "Hi,I am trying to push a 5M sats payment through Lightning and I am having a hard time. Here are the relevant information I get from CLN:From the lightning-cli output:\"code\": 210,   \"message\": \"Ran out of routes to try after 58 attempts: see `paystatus`\",...\"status\": \"failed\",         \"failreason\": \"failed: WIRE_TEMPORARY_CHANNEL_FAILURE (reply from remote)\",From the debug log:Split into 3 sub-payments due to initial size (5000000000msat > 2560000000msat): new partid 2, new partid 3, new partid 4...plugin-pay: cmd 34 partid 11: Fee exceeds our fee budget: 930240msat > 275741msat, discarding route...plugin-pay: cmd 34 partid 41: Cannot split payment any further without exceeding the maximum number of HTLCs allowed by our channels...xxxxx-chan#1: htlc 8 failed from 1th node with code 0x1007 (WIRE_TEMPORARY_CHANNEL_FAILURE)xxxxx-chan#1: htlc 7 failed from 1th node with code 0x1007 (WIRE_TEMPORARY_CHANNEL_FAILURE)plugin-pay: cmd 34 partid 4: failed: WIRE_TEMPORARY_CHANNEL_FAILURE (reply from remote)plugin-pay: id 2 partid 3: failed: WIRE_TEMPORARY_CHANNEL_FAILURE (reply from remote)xxxxx-chan#1: htlc 9 failed from 1th node with code 0x1007 (WIRE_TEMPORARY_CHANNEL_FAILURE)xxxxx-chan#1: htlc 10 failed from 1th node with code 0x1007 (WIRE_TEMPORARY_CHANNEL_FAILURE)xxxxx-chan#1: htlc 11 failed from 1th node with code 0x1007 (WIRE_TEMPORARY_CHANNEL_FAILURE)xxxxx-chan#1: htlc 12 failed from 1th node with code 0x1007 (WIRE_TEMPORARY_CHANNEL_FAILURE)2023-05-30T14:08:18.903Z INFO    plugin-pay: id 2 partid 5: failed: WIRE_TEMPORARY_CHANNEL_FAILURE (reply from remote)2023-05-30T14:08:18.921Z INFO    plugin-pay: id 2 partid 12: failed: WIRE_TEMPORARY_CHANNEL_FAILURE (reply from remote)2023-05-30T14:08:18.954Z INFO    plugin-pay: id 2 partid 19: failed: WIRE_TEMPORARY_CHANNEL_FAILURE (reply from remote)2023-05-30T14:08:18.980Z INFO    plugin-pay: id 2 partid 31: failed: WIRE_TEMPORARY_CHANNEL_FAILURE (reply from remote)From previous experiences it seems that the 2560000000msat threshold is important, but this is difficult to know for sure? The node I am connecting to is well connected and has very large channels.Thanks!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454524",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 30, 2023, 02:35:31 PM",
+      "body": "You're moving about $1300 in one payment. That isn't micro-transaction, given that the average channel channel capacity is a little more than that. May I ask why you're doing this? It's in no one's benefit. You're about to pay 0.01 BTC in fees, as far as I can see. The receiver should neither want that, even if he happens to have such large receiving capacity, as it'll cost him to rebalance afterwards. Briefly, the remote nodes respond with failure, because you both exceed the max number of HTLCs allowed, and because you don't have enough sats to cover the fee.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "May 30, 2023, 02:42:45 PM",
+      "body": "Quote from: BlackHatCoiner on May 30, 2023, 02:35:31 PMYou're moving about $1300 in one payment. That isn't micro-transaction, given that the average channel channel capacity is a little more than that. May I ask why you're doing this? It's in no one's benefit. You're about to pay 0.01 BTC in fees, as far as I can see. The receiver should neither want that, even if he happens to have such large receiving capacity, as it'll cost him to rebalance afterwards. Briefly, the remote nodes respond with failure, because you both exceed the max number of HTLCs allowed, and because you don't have enough sats to cover the fee. I am trying to do an atomic swap to get inbound liquidity for my channel, so I have to pay for an onchain fee and I want to minimize my costs on a relative basis. Why do you say \"You're about to pay 0.01 BTC in fees\"? It is a 0.05 BTC transaction and I set the routing fee limit to 0.1% (which should be more than sufficient based on the channel fees I see and the number of hops required), so routing fees are capped to 0.00005 BTC. Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 30, 2023, 02:53:24 PM",
+      "body": "Quote from: Jodmapht on May 30, 2023, 02:42:45 PMI am trying to do an atomic swap to get inbound liquidity for my channel, so I have to pay for an onchain fee and I want to minimize my costs on a relative basis.Oh, I see. You're setting up a channel, you don't pay a merchant.Quote from: Jodmapht on May 30, 2023, 02:42:45 PMWhy do you say \"You're about to pay 0.01 BTC in fees\"?My bad, just checked the log again. Partner with id 11 says that this transaction cost's exceeds their fee budget:Quoteplugin-pay: cmd 34 partid 11: Fee exceeds our fee budget: 930240msat > 275741msat, discarding routeThat being said, I don't think you share a channel with the node you want to swap coins (you probably knew that already). Routing 0.05 BTC in one transaction is just too much. They wouldn't all reply with the same WIRE_TEMPORARY_CHANNEL_FAILURE error if it wasn't that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "May 30, 2023, 03:00:22 PM",
+      "body": "Quote from: BlackHatCoiner on May 30, 2023, 02:53:24 PMQuote from: Jodmapht on May 30, 2023, 02:42:45 PMI am trying to do an atomic swap to get inbound liquidity for my channel, so I have to pay for an onchain fee and I want to minimize my costs on a relative basis.Oh, I see. You're setting up a channel, you don't pay a merchant.Quote from: Jodmapht on May 30, 2023, 02:42:45 PMWhy do you say \"You're about to pay 0.01 BTC in fees\"?My bad, just checked the log again. Partner with id 11 says that this transaction cost's exceeds their fee budget:Quoteplugin-pay: cmd 34 partid 11: Fee exceeds our fee budget: 930240msat > 275741msat, discarding routeThat being said, I don't think you share a channel with the node you want to swap coins (you probably knew that already). Routing 0.05 BTC in one transaction is just too much. They wouldn't all reply with the same WIRE_TEMPORARY_CHANNEL_FAILURE error if it wasn't that. No I don't share a channel directly with the node I want to swap coins with. I was doing that for privacy reason so that node would not know both my node info and UTXO info. Should I do otherwise? Would that go through if I was connected directly?Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 30, 2023, 03:26:41 PM",
+      "body": "Quote from: Jodmapht on May 30, 2023, 03:00:22 PMNo I don't share a channel directly with the node I want to swap coins with. I was doing that for privacy reason so that node would not know both my node info and UTXO info.If you have a lightning node with lots of channels, then opening up one directly with that one won't harm your privacy. When making a payment in lightning, the receiver doesn't know the node that paid the invoice, they only know the last node which routed the transaction. In other words, their node won't know if you are the one who swaps the coins, you could just be routing that. Quote from: Jodmapht on May 30, 2023, 03:00:22 PMShould I do otherwise? Would that go through if I was connected directly?That would go through, and you'd pay no fees (apart from the on-chain, obviously). In any case, you should absolutely no send a payment of 5 million sats, which requires multiple routes to finalize.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "May 30, 2023, 03:43:13 PM",
+      "body": "Quote from: BlackHatCoiner on May 30, 2023, 03:26:41 PMThat would go through, and you'd pay no fees (apart from the on-chain, obviously). In any case, you should absolutely no send a payment of 5 million sats, which requires multiple routes to finalize. Did you mean in any other case? Only a single route would be required if I had a direct channel with the node offering the swap service, correct?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 30, 2023, 03:47:02 PM",
+      "body": "Quote from: Jodmapht on May 30, 2023, 03:43:13 PMDid you mean in any other case?In any case. You shouldn't be expecting lightning nodes to route you 5 million sats. Quote from: Jodmapht on May 30, 2023, 03:43:13 PMOnly a single route would be required if I had a direct channel with the node offering the swap service, correct?No, zero. Direct channel means no intermediaries, that means no routing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "May 30, 2023, 04:38:48 PM",
+      "body": "Quote from: BlackHatCoiner on May 30, 2023, 03:47:02 PMQuote from: Jodmapht on May 30, 2023, 03:43:13 PMDid you mean in any other case?In any case. You shouldn't be expecting lightning nodes to route you 5 million sats. Quote from: Jodmapht on May 30, 2023, 03:43:13 PMOnly a single route would be required if I had a direct channel with the node offering the swap service, correct?No, zero. Direct channel means no intermediaries, that means no routing. Yes sorry, I used the wrong terminology. What I wanted to confirm is that the peer of a direct channel will allow for my 5M sats transaction to go through this channel, correct? Since there is no routing involved, there is no reason for blocking the transaction?Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "May 30, 2023, 04:49:46 PM",
+      "body": "Quote from: Jodmapht on May 30, 2023, 04:38:48 PMYes sorry, I used the wrong terminology. What I wanted to confirm is that the peer of a direct channel will allow for my 5M sats transaction to go through this channel, correct?Yes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "June 01, 2023, 03:13:29 AM",
+      "body": "Quote from: BlackHatCoiner on May 30, 2023, 04:49:46 PMQuote from: Jodmapht on May 30, 2023, 04:38:48 PMYes sorry, I used the wrong terminology. What I wanted to confirm is that the peer of a direct channel will allow for my 5M sats transaction to go through this channel, correct?Yes. So I am still getting errors even with a direct channel:From lightning-cli:\"code\": 210,   \"message\": \"Ran out of routes to try after 59 attempts: see `paystatus`\",   \"attempts\": [      {         \"status\": \"pending\",         \"partid\": 1,         \"amount_msat\": 5000000000      },       {         \"status\": \"failed\",         \"failreason\": \"failed: WIRE_MPP_TIMEOUT (reply from remote)\",         \"partid\": 2,         \"amount_msat\": 3167117220,            \"parent_partid\": 1      },...      {         \"status\": \"failed\",         \"failreason\": \"No path found\",         \"partid\": 49,         \"amount_msat\": 19365229,         \"parent_partid\": 28      },       {         \"status\": \"failed\",         \"failreason\": \"Cannot split payment any further without exceeding the maximum number of HTLCs allowed by our channels\",         \"partid\": 29,         \"amount_msat\": 31155448,         \"parent_partid\": 20      }, From the log file:INFO    plugin-pay: cmd 34 partid 1: Split into 2 sub-payments due to initial size (5000000000msat > 2560000000msat): new partid 2, new partid 3...INFO    xxxxx-chan#2: htlc 5 failed from 0th node with code 0x0017 (WIRE_MPP_TIMEOUT)INFO    plugin-pay: cmd 34 partid 2: failed: WIRE_MPP_TIMEOUT (reply from remote)INFO    plugin-pay: cmd 34 partid 2: Payment deadline expired, not retrying (partial-)payment xxxxx/2INFO    xxxxx-chan#2: htlc 6 failed from 0th node with code 0x0017 (WIRE_MPP_TIMEOUT)INFO    plugin-pay: id 1 partid 4: failed: WIRE_MPP_TIMEOUT (reply from remote)INFO    plugin-pay: id 1 partid 4: Payment deadline expired, not retrying (partial-)payment xxxxx/4INFO    xxxxx-chan#2: htlc 7 failed from 0th node with code 0x0017 (WIRE_MPP_TIMEOUT)INFO    plugin-pay: id 1 partid 8: failed: WIRE_MPP_TIMEOUT (reply from remote)INFO    plugin-pay: id 1 partid 8: Payment deadline expired, not retrying (partial-)payment xxxxx/8INFO    xxxxx-chan#2: htlc 8 failed from 0th node with code 0x0017 (WIRE_MPP_TIMEOUT)INFO    plugin-pay: id 1 partid 36: failed: WIRE_MPP_TIMEOUT (reply from remote)INFO    plugin-pay: id 1 partid 36: Payment deadline expired, not retrying (partial-)payment xxxxx/36When I look the the channel info, the field maximum_htlc_out_msat is higher than 5000000000msat. So why is it still looking for routes if it does not need any routing?Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "June 01, 2023, 03:37:06 AMLast edit: June 01, 2023, 05:27:39 AM by Jodmapht",
+      "body": "Ok it looks like it is a bug with CLN that is being worked on: https://github.com/ElementsProject/lightning/issues/5417Edit: If I use disable-mpp and large-channels in my config file, I manage to do the transfer.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

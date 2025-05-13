@@ -1,0 +1,93 @@
+{
+  "id": "topic_5458139",
+  "title": "BitcoinCanSaveUsAll",
+  "author": "BitcoinCanSaveUsAll",
+  "created_time": "June 30, 2023, 03:52:25 PM",
+  "content": "Hi everyone, I'm not sure if this is the right sub forum for this however I'm having a bit of an issue with creating Bitcoin PSBT's in Bitcoin Core (V.20.0) and was hoping to get some community feedback if possible.  Specifically what  I'm attempting to do is to use Bitcoin Core to create and send PSBTs via my air gapped Cold Card.  To achieve this I have used the \"importmulti\" command that is created by the Cold Card but unfortunately it seems to only create the command for a WPKH address scheme which I needed to modify to use P2PKH addresses.  To achieve this I had to take the original command which was:Code:importmulti '[{\"range\": [0, 1000], \"timestamp\": \"now\", \"keypool\": true, \"watchonly\": true, \"desc\": \"wpkh([fingerprint/84h/0h/0h]xpub/0/*)#checksum\", \"internal\": false}, {\"range\": [0, 1000], \"timestamp\": \"now\", \"keypool\": true, \"watchonly\": true, \"desc\": \"wpkh([secret fingerprint/84h/0h/0h]secretxpub/1/*)#checksum\", \"internal\": true}]'To the modified as per below:Code:importmulti '[{\"range\": [0, 1000], \"timestamp\": \"now\", \"keypool\": true, \"watchonly\": true, \"desc\": \"pkh([fingerprint/44h/0h/0h]xpub/0/*)#checksum\", \"internal\": false}, {\"range\": [0, 1000], \"timestamp\": \"now\", \"keypool\": true, \"watchonly\": true, \"desc\": \"pkh([fingerprint/44h/1h/0h]xpub/1/*)#checksum\", \"internal\": false}]'Note that I also had to calculate the correct checksum for the modified command using the \"getdescriptorinfo\" command and after uploading it into the console windown and rescanning the blockchain I could see my previous transactions and also create and broadcast PSBTs.   What I'm now trying to figure out is a way that makes bitcoin core automatically create a change address that's associated with my Cold Card's change addresses just as Electrum does when you import the skeleton wallet into electrum.  If anyone knows any way to do this I'd really appreciate the feedback.  I do know there's kind of a work around by using a custom change address that you can manually enter in the core gui but this is sub optimal IMO.  Thanks all in advance for your support!",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5458139",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "June 30, 2023, 05:28:48 PM",
+      "body": "Notice how in your original command one of the descriptors has \"internal\": true. Set that for the descriptor that you want to be used to generate your change addresses (probably the second one).Both descriptors have \"internal\": false which tells the wallet that they should not be used for change addresses.You may need to remake the wallet when you do this as the keys may persist in the keypool.I would suggest that you create a descriptor wallet (which will need a more recent version of Bitcoin Core) and use the importdescriptors command rather than a legacy wallet with importmulti. Descriptor wallets have much better handling of importing descriptors and actually using them to generate addresses.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "June 30, 2023, 05:34:30 PM",
+      "body": "Thank you for your reply!  I'm' still trying to wrap my brain around this command and the structure.  Are you saying that my modified value of \"internal\": false for the second portion of the command should be true?  I'm really trying to understand this better so if there's any way you can break it down it would be very much appreciated.  I'm specifically interested in understanding the second half of the command where in the original command it that has a /1 after the xpub vs. a /0 after the first xpub.  I'm also wondering why it was set to internal: true originally.  Does this second half of the command specify the change addresses?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 30, 2023, 06:23:31 PM",
+      "body": "Quote from: BitcoinCanSaveUsAll on June 30, 2023, 05:34:30 PMAre you saying that my modified value of \"internal\": false for the second portion of the command should be true?YesQuote from: BitcoinCanSaveUsAll on June 30, 2023, 05:34:30 PMI'm specifically interested in understanding the second half of the command where in the original command it that has a /1 after the xpub vs. a /0 after the first xpub.  I'm also wondering why it was set to internal: true originally.  Does this second half of the command specify the change addresses? Yes, the original command contains two descriptors, one for your receiving addresses, and one for your change addresses. The standard practice is to generate receiving addresses with a derivation path of m/44h/0h/0h/0/0/* and change addresses with m/44h/0h/0h/0/1/*.However Bitcoin Core will not try to determine which descriptor is to be used for change just based on the derivation paths themselves. Descriptors are meant to be a generic format that can specify many different address constructions, including those which are not standardized. Thus Bitcoin Core needs to be told whether a descriptor should be used for generating receiving addresses or change addresses. It does this with the internal field, so named because change addresses are generally not shown to the user or given out, and hence internal to the wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "June 30, 2023, 06:54:45 PM",
+      "body": "Hi achow101,Thank you for your feedback on the import multi command.  It was definitely helpful. To be honest though I'm still not entirely sure how I can setup my bitcoin core node to create a PSBT whereas the change address defaults to one that is generated for my Coldcard change address list that I imported with the modified command.  I understand that I have to change the internal: to true from false however I'm not quite sure outside of that what is needed.  If there is a fairly straightforward way that I can have bitcoin core produce the change address based on my imported wallet's P2PNK change address list vs. the ones internal in bitcoin core itself it would be really helpful for me if you could help me there. Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 30, 2023, 07:37:54 PM",
+      "body": "Install Bitcoin Core 0.21+ and follow Coldcard's instructions: https://github.com/Coldcard/firmware/blob/master/docs/bitcoin-core-usage.md",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "June 30, 2023, 08:22:36 PM",
+      "body": "Quote from: BitcoinCanSaveUsAll on June 30, 2023, 03:52:25 PMBitcoin Core (V.20.0)You're really making things hard on yourself.  Install the latest stable release and life will be a lot simpler.  Coupling your ColdCard with core is the simplest thing ever.  Once you're logged in and set the appropriate passphrase, the ColdCard can create a wallet.dat file you can save onto the mSD card.  Open that file core and you're done.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "June 30, 2023, 09:09:20 PM",
+      "body": "Honestly I'm hesitant to upgrade my bitcoin core for a few reasons. Things started seeming strange when the Windows signing certificate was never renewed several versions back and honestly I don't want to add some of the additional features in the most recent versions. In fact I was even considering going back to earlier versions.  That said however when I browse the most recent version history here:  https://bitcoin.org/en/version-history the last version listed is 22.0 which is odd because I could of sworn that release 25 was cut not too long ago.  Regardless I'd like to stick with good ole .20 and .20.1 for the time being.  I'm honestly not sure why there isn't a standard operating procedure at bitcoin core to push all the bug fixes to these earlier versions.  It would seem as though they would be behind this as it seemingly supports the ideology that plebs vote on what version of bitcoin is bitcoin based on the rules in the nodes they run. Unfortunately as it stands now I worry that with enough time people will have to upgrade their nodes less they be stuck running obsolete software rummaging through bugs and forced to upgrade to whatever version is maintained enough.  Either way thank you all for your feedback.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "June 30, 2023, 10:01:26 PM",
+      "body": "Quote from: BitcoinCanSaveUsAll on June 30, 2023, 09:09:20 PMThings started seeming strange when the Windows signing certificate was never renewed several versions backIt's renewed when it expires - I would know since I'm the one who does that. There was an issue a few years ago where the CA revoked it when it was time to renew it, but we've since changed to a different CA.Quote from: BitcoinCanSaveUsAll on June 30, 2023, 09:09:20 PMThat said however when I browse the most recent version history here:  https://bitcoin.org/en/version-history the last version listed is 22.0 which is odd because I could of sworn that release 25 was cut not too long ago.Yes, the most recent version is 25.0. The project's website is bitcoincore.org, bitcoin.org merely mirrors the binaries. No one who works on Bitcoin Core has any control over what goes on at bitcoin.org, and although we've asked them to mirror a more recent version or stop mirroring entirely, they've been unresponsive.Quote from: BitcoinCanSaveUsAll on June 30, 2023, 09:09:20 PMI'm honestly not sure why there isn't a standard operating procedure at bitcoin core to push all the bug fixes to these earlier versions. There is, but 0.20 is now unsupported. It takes a lot of time to backport bug fixes, especially when there are many other things going on in the codebase that make such backports non-trivial which requires additional review. There's also many things that resolve long standing issues that aren't strictly bug fixes. For example, descriptor wallets resolves many issue with watch only wallets, but its primarily a new feature that involves a significant reworking of how the wallet works. This is something that is rather difficult to backport.Many contributors prefer to spend their time reviewing new features that overhaul components of the project which resolve long standing issues. Trying to review backports takes  time away from moving forward on other significant improvements. And being an open source project, contributors are free to work on whatever they want - no one can force anyone to do anything. Ultimately there simply isn't the manpower nor willpower to backport features that also end up fixing bugs.Quote from: BitcoinCanSaveUsAll on June 30, 2023, 09:09:20 PMIt would seem as though they would be behind this as it seemingly supports the ideology that plebs vote on what version of bitcoin is bitcoin based on the rules in the nodes they run. Unfortunately as it stands now I worry that with enough time people will have to upgrade their nodes less they be stuck running obsolete software rummaging through bugs and forced to upgrade to whatever version is maintained enough.There's ongoing work to make the project more modular so that things like wallet and GUI features aren't necessarily tied to the node, but this is a large project and it will take a lot of time.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinCanSaveUsAll",
+      "created_time": "June 30, 2023, 10:46:35 PM",
+      "body": "Thank you for elaborating on my earlier reply. It was quite informative.  I'm certainly looking forward to your last point as well regarding the modularity of Core in the future.  Also thank you for all that you do to help make Bitcoin amazing!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "July 01, 2023, 12:36:53 AM",
+      "body": "Quote from: BitcoinCanSaveUsAll on June 30, 2023, 09:09:20 PMThings started seeming strange when the Windows signing certificate was never renewed several versions backEven when the Windows certificate was expired, we had other ways of trusting the software was authentic.  More practical and direct ways in fact, that don't rely on a third-party certification.First thing to remember is the official website is bitcoincore.org.  Bookmark it, and don't go anywhere else to download the software.  On the downloads page you'll notice that you can download the SHA checksums and their corresponding signature files.  Learn how to verify a file using GPG, I wrote a tutorial focused on verifying Electrum, but the principal is the same to verify Bitcoin Core.  By using GPG to verify the checksum file, and using a tool (like CertUtil) to confirm the checksum of the .exe file, you are getting the assurance of all of the developers that the file is authentic.  No trust in a third-party CA is required.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

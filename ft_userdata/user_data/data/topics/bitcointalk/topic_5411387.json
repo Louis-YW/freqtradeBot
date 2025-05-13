@@ -1,0 +1,165 @@
+{
+  "id": "topic_5411387",
+  "title": "Little Mouse",
+  "author": "Little Mouse",
+  "created_time": "August 27, 2022, 04:00:29 AMLast edit: August 29, 2022, 07:55:56 AM by Little Mouse",
+  "content": "Title- EditedLink- https://bitcointalk.org/index.php?topic=5411387.msg60834138#msg60834138There are a lot of custom scripts here to track/check many stats. But I'm looking for some custom script if available here so that instead of putting a neutral tag NOTE, I can add note for specific user and whenever I interact with that user, I will see that note. This may not help a lot users but it would be beneficial for me.PS- Not for commercial use.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5411387",
+  "comments": [
+    {
+      "author": "LoyceV",
+      "created_time": "August 27, 2022, 06:32:00 AM",
+      "body": "Quote from: Little Mouse on August 27, 2022, 04:00:29 AMThere are a lot of custom scripts here to track/check many stats. But I'm looking for some custom script if available here so that instead of putting a neutral tag NOTE, I can add note for specific user and whenever I interact with that user, I will see that note. This may not help a lot users but it would be beneficial for me.That was requested from BPIP Extension, but wasn't implemented. Then again, similar extensions exist already, but I don't dare to install them.How about good old bookmarks? Create a \"notes on users\" Folder, bookmark the profile and Name it \"This guy asked about keeping notes\". When I visit your profile, there's a star in the address bar, and when I click it, I'm reminded you're the one who asked about keeping notes. You won't see it on posts, but you can easily find it back and it works on any site/browser without increased security risk.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 27, 2022, 01:31:56 PMLast edit: May 14, 2023, 02:17:45 AM by TryNinja",
+      "body": "edit: updated to 0.3, check the new thread for more info.I created something, what do you think?P.S: This is stored locally and only works with TamperMonkey (and GreaseMonkey + forks probably). Maybe I can add an option to list all notes and import/export if it's usefull.Code:// ==UserScript==// @name         BitcoinTalk User Notes// @version      0.3// @description  Adds an note field to each user on BitcoinTalk// @author       TryNinja// @match        https://bitcointalk.org/*// @icon         https://www.google.com/s2/favicons?sz=64&domain=bitcointalk.org// @grant GM.setValue// @grant GM.getValue// @grant GM_setValue// @grant GM_getValue// ==/UserScript==const enableModal = 1;(async function() {    'use strict';    const addStyle = (css) => {        const style = document.getElementById(\"GM_addStyleBy8626\") || (() => {        const style = document.createElement('style');        style.id = \"GM_addStyleBy8626\";        document.head.appendChild(style);        return style;        })();        const sheet = style.sheet;        sheet.insertRule(css, (sheet.rules || sheet.cssRules || []).length);    }    if (enableModal) {        addStyle(`.modal {            position: fixed;            width: 100vw;            height: 100vh;            top: 0;            left: 0;            display: flex;            align-items: center;            justify-content: center;        }`);        addStyle(`.modal-bg {            position: absolute;            width: 100%;            height: 100%;        }`);        addStyle(`.modal-container {            min-width: 30vh;            border-radius: 10px;            background: #fff;            position: relative;            padding: 10px;        }`);        addStyle(`.modal-close {            position: absolute;            right: 15px;            top: 15px;            outline: none;            appearance: none;            color: red;            background: none;            border: 0px;            font-weight: bold;            cursor: pointer;        }`);    };    const getValue = typeof GM_getValue === 'undefined' ? GM.getValue : GM_getValue;    const setValue = typeof GM_setValue === 'undefined' ? GM.setValue : GM_setValue;    const getParentNodeNth = (element, num) => {        let parent = element;        for (let i = 0; i < num; i++) {            if (parent.parentNode) {                parent = parent.parentNode;            }        }        return parent;    };    const getNotes = async () => {        let notes;        try {            notes = JSON.parse(await getValue('notes') ?? '{}');        } catch (error) {            notes = {};        };        return notes;    };    const setNotes = async notes => {        if (typeof notes === 'string') {            try {                JSON.parse(notes);                await setValue('notes', notes);            } catch (error) {                console.error('Notes value is an invalid JSON format')            };        } else if (typeof notes === 'object') {            await setValue('notes', JSON.stringify(notes ?? {}));        };    };    const getUserNote = async user => {        const notes = await getNotes();        if (!notes) {            return null;        }        return notes[user];    };    const setUserNote = async (user, note) => {        const notes = await getNotes();        notes[user] = note;        await setNotes(notes)    };    const texts = {        addNote: '<a style=\"cursor: pointer; font-weight: bold\" href=\"javascript:;\">ðŸ“œ Add Note</a>',        withNote: note => `<a style=\"cursor: pointer; font-weight: bold\" href=\"javascript:;\"><b>ðŸ“œ</b> ${note}</a>`    };    const addNote = async (user, element) => {        const note = prompt('Input the note (empty to remove):');        await setUserNote(user, note);        if (note) {            element.innerHTML = texts.withNote(note);        } else if (note !== null) {            element.innerHTML = texts.addNote;        }    };    const exportNotesToInput = async () => {        const notesInput = document.querySelector('#notesInput');        const notesImportExportDiv = document.querySelector('#notesImportExportDiv');        const doneImportButton = document.querySelector('#doneImportButton');        const notes = await getNotes();        const notesJsonString = JSON.stringify(Object.keys(notes)            .filter(user => notes[user]).reduce((obj, user) => ({...obj, [user]: notes[user]}), {}));        notesInput.value = notesJsonString;        notesImportExportDiv.querySelector('span').innerText = 'Export (copy the code)';        notesImportExportDiv.style.display = 'flex';        doneImportButton.style.display = 'none';    };    const importNotesFromInput = async () => {        const notesInput = document.querySelector('#notesInput');        const notesImportExportDiv = document.querySelector('#notesImportExportDiv');        const doneImportButton = document.querySelector('#doneImportButton');        notesInput.value = '';        notesImportExportDiv.querySelector('span').innerText = 'Import (paste the code)';        notesImportExportDiv.style.display = 'flex';        doneImportButton.style.display = 'inline-block';    };    const importNotesFromInputDone = async () => {        const notesInput = document.querySelector('#notesInput');        const confirmImport = confirm('Are you sure you want to override your local notes?');        if (confirmImport && notesInput.value) {            setNotes(notesInput.value);            loadUserNotesList();        }    };    const insertNotesModal = async () => {        let notesModal = document.querySelector('#userNotesModal');        if (!notesModal) {            const moreMenuBtn = document.querySelector('body');            notesModal = document.createElement('div');            notesModal.innerHTML = `                <div class=\"modal\" id=\"modal-one\">                    <div class=\"modal-bg modal-exit\"></div>                    <div class=\"modal-container\">                        <div style=\"margin-bottom: 5px;\">                            <b style=\"font-size: 2rem;\">User Notes</b>                            <button class=\"modal-close modal-exit\">X</button>                        </div>                        <div style=\"display: flex; align-items: center; margin-bottom: 5px;\">                            <button id=\"exportUserNotes\">Export</button>                            <button id=\"importUserNotes\">Import</button>                        </div>                        <div>                            <div style=\"display: none; flex-direction: column;\" id=\"notesImportExportDiv\">                                <span id=\"notesInputText\"></span>                                <input id=\"notesInput\" />                                <button id=\"doneImportButton\" style=\"display: none;\">Done</button>                            </div>                        </div>                        <div id=\"userNotesList\" />                    </div>                </div>`;            notesModal.classList.add('modal');            notesModal.style.visibility = 'hidden';            notesModal.setAttribute('id', 'userNotesModal');            moreMenuBtn.after(notesModal);            const exportButton = document.querySelector('#exportUserNotes');            const importButton = document.querySelector('#importUserNotes');            const doneImportButton = document.querySelector('#doneImportButton');            exportButton.addEventListener('click', () => exportNotesToInput());            importButton.addEventListener('click', () => importNotesFromInput());            doneImportButton.addEventListener('click', () => importNotesFromInputDone());        };        return notesModal;    };    const loadUserNotesList = async () => {        const userNotesList = document.querySelector('#userNotesList');        const notes = await getNotes();        if (Object.keys(notes).length) {            userNotesList.innerHTML = Object.keys(notes)            .filter(user => notes[user])            .map((user) => `<a href=\"https://bitcointalk.org/index.php?action=profile;u=${user}\" target=\"_blank\">${user}</a>: ${notes[user]}`).join('<br/>');        } else {            userNotesList.innerHTML = 'No notes...';        };    };    const insertUserNotesMenuButton = async () => {        let notesBtn = document.querySelector('#userNotesMenuBtn');        const modal = await insertNotesModal();        const modalExit = modal.querySelectorAll('.modal-exit');        if (!notesBtn) {            const moreMenuBtn = document.querySelector(`a[href='/more.php']`).parentNode;            notesBtn = document.createElement('td');            notesBtn.innerHTML = '<td><a href=\"javascript:;\" id=\"openUserNotes\">User Notes</a></td>';            notesBtn.classList.add('maintab_back');            notesBtn.setAttribute('id', 'userNotesMenuBtn');            moreMenuBtn.after(notesBtn);            const openUserNotes = document.querySelector('#openUserNotes')            const notesImportExportDiv = document.querySelector('#notesImportExportDiv');            const notesInput = document.querySelector('#notesInput');            openUserNotes.addEventListener('click', () => {                modal.style.visibility = 'visible';                modal.style.opacity = 1;                notesImportExportDiv.style.display = 'none';                notesInput.value = '';                loadUserNotesList();            });            modalExit.forEach(el => el.addEventListener('click', () => {                modal.style.visibility = 'hidden';                modal.style.opacity = 0;            }));        }        return notesBtn;    };    if (enableModal) {        insertNotesModal();        insertUserNotesMenuButton();    };    if (window.location.href.match(/topic=\\d+/)) {        const targets = [...document.querySelectorAll('td.poster_info div a:last-child')]        .filter(e => window.getComputedStyle(getParentNodeNth(e, 11)).display !== 'none');        targets.map(async target => {            const [_, userId] = [...target.parentNode.parentNode.childNodes].find(childNode => childNode.innerHTML).innerHTML.match(/u=(\\d+)/);            const noteDiv = document.createElement('div');            const note = await getUserNote(userId);            if (!note) {                noteDiv.innerHTML = texts.addNote;            } else {                noteDiv.innerHTML = texts.withNote(note);            }            target.before(noteDiv);            noteDiv.addEventListener('click', () => addNote(userId, noteDiv), false);        });    } else if (window.location.href.match(/profile;u=\\d+/)) {        const [_, userId] = window.location.href.match(/u=(\\d+)/);        const target = getParentNodeNth(document.querySelector('#bodyarea table tr td tbody tr:nth-child(2) tr:last-child').parentNode, 1);        const noteDiv = document.createElement('div');        const note = await getUserNote(userId);        if (!note) {            noteDiv.innerHTML = texts.addNote;        } else {            noteDiv.innerHTML = texts.withNote(note);        }        target.before(noteDiv);        noteDiv.addEventListener('click', () => addNote(userId, noteDiv), false);    }})();",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "August 27, 2022, 03:18:58 PM",
+      "body": "Quote from: TryNinja on August 27, 2022, 01:31:56 PMP.S: This is stored locally and only works with TamperMonkey (and GreaseMonkey + forks probably). Maybe I can add an option to list all notes and import/export if it's usefull.[...]Nice thing. Do you have a set of instruction to install it. I am not a good guy who tried browser extensions before. Still old school who does things manually LOLQuote from: LoyceV on August 27, 2022, 06:32:00 AMHow about good old bookmarks? Create a \"notes on users\" Folder, bookmark the profile and Name it \"This guy asked about keeping notes\". When I visit your profile, there's a star in the address bar, and when I click it, I'm reminded you're the one who asked about keeping notes. You won't see it on posts, but you can easily find it back and it works on any site/browser without increased security risk.This is a good example of old school LOL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 27, 2022, 03:36:37 PM",
+      "body": "Quote from: BitcoinGirl.Club on August 27, 2022, 03:18:58 PMDo you have a set of instruction to install itInstall the Tampermonkey extension if you are using any Chromium based browser (Chrome, Brave, Opera...) or Greasemonkey if you are using Firefox (untested)Then open the extension's popup/page -> Add new script -> Paste the code and save.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "August 27, 2022, 03:42:59 PM",
+      "body": "Quote from: TryNinja on August 27, 2022, 01:31:56 PMI created something, what do you think?Nice work as usual TryNinja, this is exactly what I was looking for years!Now my 50 BTC question, how complicated would be to import this to BPIP extension?I am not counting potential bribe we could pay to suchmoon for updating extension again  PSOne thing I would like to see is option to backup and import all notes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "August 27, 2022, 03:46:59 PM",
+      "body": "Quote from: TryNinja on August 27, 2022, 03:36:37 PMQuote from: BitcoinGirl.Club on August 27, 2022, 03:18:58 PMDo you have a set of instruction to install itInstall the Tampermonkey extension if you are using any Chromium based browser (Chrome, Brave, Opera...) or Greasemonkey if you are using Firefox (untested)Then open the extension's popup/page -> Add new script -> Paste the code and save.Dammit 😘I am going to ask another stupid question LOLNow how do I add note to users?Laugh as much as you can but I can not see an input box 🤣Edit: I already reloaded my browser but still see nothing.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 27, 2022, 03:49:09 PM",
+      "body": "Quote from: BitcoinGirl.Club on August 27, 2022, 03:46:59 PMNow how do I add note to users?Did you manage to install the script? You should see the \"Add Note\" text on everyone's profile and post (see the image above). Just click on it and a prompt should pop up. You can also click the note (i.e the \"good guy!\" in the image) to edit or remove the note.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "August 27, 2022, 03:54:28 PM",
+      "body": "Quote from: TryNinja on August 27, 2022, 03:49:09 PMQuote from: BitcoinGirl.Club on August 27, 2022, 03:46:59 PMNow how do I add note to users?Did you manage to install the script? You should see the \"Add Note\" text on everyone's profile and post (see the image above). Just click on it and a prompt should pop up. You can also click the note (i.e the \"good guy!\" in the image) to edit or remove the note.Yes I did but as you see there are nothing for me.I am using Firefox with tor connection. Is that a problem? It should not be though.Off- topic:By the way for Liverpool fans.We won finally and it's 9 -0 🤣Bournemouth has been destroyed!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 27, 2022, 05:11:26 PM",
+      "body": "Quote from: BitcoinGirl.Club on August 27, 2022, 03:54:28 PMYes I did but as you see there are nothing for me.I am using Firefox with tor connection. Is that a problem? It should not be though.It seems like Greasymonkey (Firefox version) has some breaking differences from Tampermonkey (Chrome). Update the script (same post) and it should work now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "August 27, 2022, 06:16:01 PM",
+      "body": "Quote from: TryNinja on August 27, 2022, 05:11:26 PM[...]It seems like Greasymonkey (Firefox version) has some breaking differences from Tampermonkey (Chrome). Update the script (same post) and it should work now. It's working now finally 😉Nice work there brother. Little Mouse must have got his answer by now and it helped me too. I was never into these extensions before although seen a lot of you were using them.Guys please rain TryNinja with merit. Once Theirmos will start accepting merit source application, I may consider applying LOL",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Little Mouse",
+      "created_time": "August 28, 2022, 05:07:40 PM",
+      "body": "Quote from: TryNinja on August 27, 2022, 01:31:56 PMI created something, what do you think?This one is cool. I just have checked out it and it works perfectly and is exactly what I was looking for. I would recommend you a few suggestions which I think would add more value to the script.First of all, create a separate ANN thread for this. That would help to reach more users.1. Change the color of \"Add Note\" to blue.2. When I visit the user profile, I can't see the note. Possible to put it there too?3. When we re-write the note, I'm expecting to see the previous text in the input box.4. I would hate to see other people's notes in public. So, consider not importing them and making them public..These are my personal suggestions/recommendations if you are considering further development.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "TryNinja",
+      "created_time": "August 28, 2022, 06:35:37 PM",
+      "body": "Quote from: Little Mouse on August 28, 2022, 05:07:40 PM2. When I visit the user profile, I can't see the note. Possible to put it there too?You should (screenshot number 1 and 2). What's your browser? Any other custom script/extension that modifies the forum page?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fivestar4everMVP",
+      "created_time": "August 28, 2022, 09:01:27 PM",
+      "body": "TryNinja created something really incredible and highly interesting here.I have a noob question by the way, if I follow the installation process on my PC and every thing works as it should, when I visit the forum on my smartphone, do i still get the \"Add Note\" link?Asking because 95 percent of the time, I access the forum via my smartphone, so I wanna be sure it will work on my smartphone after installing the code via my computer,If it's not gonna work, then I shouldnt bother maybe.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "August 28, 2022, 09:32:47 PM",
+      "body": "Quote from: Fivestar4everMVP on August 28, 2022, 09:01:27 PMI have a noob question by the way, if I follow the installation process on my PC and every thing works as it should, when I visit the forum on my smartphone, do i still get the \"Add Note\" link?How about this!I installed it to my PC and now when you are using it from your smartphone, should you see it on there too? 😂No is the answer. 😉Use common sense. Your PC and smartphone are two different devices. Even different browser in the same PC are different app which means if you install the code in Firefox then in the same PC you are not seeing it from Google Chrome. You will need to install it on Google Chrome too to see the notes.I hope it's clear now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Xal0lex",
+      "created_time": "August 28, 2022, 09:35:16 PM",
+      "body": "Quote from: Fivestar4everMVP on August 28, 2022, 09:01:27 PMwhen I visit the forum on my smartphone, do i still get the \"Add Note\" link?I'll answer that, if I may. No, you have to have a browser that supports extensions installed on your smartphone. This is needed to install the Tampermonkey (Chrome) or Greasemonkey (FireFox) extension and then install the script. Of browsers based on Chromium, I know only one - it is Kiwi Browser. I use it myself. And FireFox supports extensions by default, if I'm not mistaken.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Fivestar4everMVP",
+      "created_time": "August 28, 2022, 10:08:45 PM",
+      "body": "Quote from: BitcoinGirl.Club on August 28, 2022, 09:32:47 PM~Snip~Quote from: Xal0lex on August 28, 2022, 09:35:16 PM~Snip~You both are right, I just successfully did the installation on my PC and it worked, but coming back to my smartphone, there is no trace of such a feature.Maybe in the future, theymos will have the feature in-built into bitcointalk or make it possible to add the code directly to bitcointalk to make the feature available across different devices and browsers, just the same way we add signature codes to our profile with one device, and the signature displays across all devices and browsers.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Stalker22",
+      "created_time": "August 28, 2022, 10:58:33 PM",
+      "body": "Quote from: Little Mouse on August 28, 2022, 05:07:40 PM4. I would hate to see other people's notes in public. So, consider not importing them and making them public.All notes are saved locally, in your browser's storage, so this is not possible. No one can see your notes except you (unless TryNinja changes the code). It is good that the code is open source, so we can evaluate it independently.  @TryNinja, I would love to see this integrated into the BPIP extension, as dkbit98 suggested. Is that possible?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Little Mouse",
+      "created_time": "August 29, 2022, 07:32:06 AM",
+      "body": "Quote from: TryNinja on August 28, 2022, 06:35:37 PMQuote from: Little Mouse on August 28, 2022, 05:07:40 PM2. When I visit the user profile, I can't see the note. Possible to put it there too?You should (screenshot number 1 and 2). What's your browser? Any other custom script/extension that modifies the forum page?I'm using Google Chrome and I didn’t have any other script for bitcointalk until yesterday. After I have tested your script, I tried the bpip extension too. But that's after checking with your script. I have tried a few times to check through user profile. Is it something I missed? I was looking for the notes beside the personal text option. Maybe I didn’t notice. I'm not on my pc now. So, I have check it again lol.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "August 29, 2022, 07:53:41 AM",
+      "body": "Quote from: Little Mouse on August 28, 2022, 05:07:40 PMQuote from: TryNinja on August 27, 2022, 01:31:56 PMI created something, what do you think?First of all, create a separate ANN thread for this. That would help to reach more users.@TryNinja: do it please!Until then: @Little Mouse: can you change the topic title to something else than a question? For instance: \"TryNinja's user script to put notes on users\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

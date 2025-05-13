@@ -1,0 +1,93 @@
+{
+  "id": "topic_5456101",
+  "title": "loupiote",
+  "author": "loupiote",
+  "created_time": "June 12, 2023, 07:13:14 AMLast edit: June 12, 2023, 07:32:54 AM by loupiote",
+  "content": "A user contacted me about a weird / abnormal situation that caused them to lose 1.26869 BTC when transferring from Kraken to an wallet address under their control.I can confirm that the situation (as seen on the blockchain) is very abnormal, and I cannot understand what caused it.Basically, one BTC block contains 2 Txs:- one is the transfer from Kraken to the user account address A (it's a native segqwit address in user wallet) which is the Tx that the user initialed by a withdrawal from Kraken,- and in the same BTC block, there is a suspicious Tx from the user account address A to an unrecognized segwit address B that is not under control of the user, for a similar amount.My understanding is that 1) this second (suspicious) Tx that moved the user funds could only have been signed by the user's private key - so likely a case of leaked key - and 2) this suspicious Tx sending the funds to address B could not have been normally initiated because no funds were on address A before the withdrawal from Kraken (which is mined in the same BTC block).Can the BTC network (mempool) accept a Tx that moves funds from an address that has no balance / utxo?This situation seems very abnormal to me, and the only way I think it could happen is with this BTC block 793728 being crafted by a malicious miner (or maybe a bot scanning the mempool?) who had access to the user's private key, in order to include the malicious signed Tx (A -> B) in that same block where the Kraken withdrawal was done, that deposits funds to address A.Here are the info:address A: https://www.blockchain.com/explorer/addresses/btc/bc1q927v5jvzm9pxkdxr0l8q325r3mrz8e9jp56cga (you can see both Txs on this page)address B: https://www.blockchain.com/explorer/addresses/btc/bc1qn3rwwaaayt4ugusftlzac22rmve29mqcg6v5dt (where the BTC are now sitting)BTC block: 793728 Have you guys seen anything like that before? And why is such a hack possible?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5456101",
+  "comments": [
+    {
+      "author": "hosemary",
+      "created_time": "June 12, 2023, 07:39:59 AMLast edit: June 12, 2023, 08:11:57 AM by hosseinimr93",
+      "body": "The private key of address A was probably compromised and the thief stole the fund. That's all. It could be due to the device being compromised or using a fake wallet.  Note that miners can include both parent and child in the same block and there is no problem with that. The thief saw the receiving transaction to the address A and made a transaction to address B while the transaction to address A was still unconfirmed. The fee paid for these transactions was high enough and a miner included both of them in the same block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "loupiote",
+      "created_time": "June 12, 2023, 07:43:32 AM",
+      "body": "> The private key of address A was probably compromised and the thief stole the fund.we all agree on that part.> The thief saw the receiving transaction to the address A and made a transaction to address B while the transaction to address A was still unconfirmed.The fee paid for these transactions was high enough and a miner include both of them in the same block.So the Tx from Kraken (in the mempool) is considered unconfirmed, and because it is in the mempool, it's ok to spend the utxo of this tx in another Tx?This can obviously be only done by some mempool-watching bots.Is it common to see this pattern in the blockchain?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "June 12, 2023, 07:49:44 AMLast edit: June 12, 2023, 08:06:48 AM by hosseinimr93",
+      "body": "Quote from: loupiote on June 12, 2023, 07:43:32 AMSo the Tx from Kraken (in the mempool) is considered unconfirmed, and because it is in the mempool, it's ok to spend the utxo of this tx in another Tx?Yes. You can spend unconfirmed outputs. Just note that you can't get confirmation for the child as long as the parent hasn't been confirmed. If the fee rate used for the child is equal or greater than the parent, both transactions will be included in the same block. Quote from: loupiote on June 12, 2023, 07:43:32 AMIs it common to see this pattern in the blockchain?Yes, you can see many of them in the blockchain.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "loupiote",
+      "created_time": "June 12, 2023, 08:03:16 AM",
+      "body": "thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 12, 2023, 08:06:31 AM",
+      "body": "Quote from: loupiote on June 12, 2023, 07:43:32 AMSo the Tx from Kraken (in the mempool) is considered unconfirmed, and because it is in the mempool, it's ok to spend the utxo of this tx in another Tx?This can obviously be only done by some mempool-watching bots.This is very common for leaked private keys: one or multiple attackers have bots competing against each other to be the fastest to steal any incoming funds.Quote from: loupiote on June 12, 2023, 07:13:14 AMAnd why is such a hack possible?This is how Bitcoin works: anyone with the private key can move funds. The only thing that's left now is find out how the private key was leaked, and make sure it never happens again in the future. Considering the funds involved are quite significant, they should only have been send to a cold wallet. Hot wallets are inherently risky.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 12, 2023, 03:39:18 PM",
+      "body": "The transaction stealing the coins was broadcast less than two seconds after the withdrawal transaction from Kraken. This means that not only was his private key compromised, but it was likely compromised some time ago and is already on the list of more than one bot which is continually watching for transactions which it can steal. The only safe way forward here is for the user in question to assume that everything on that device is compromised - every private key, every seed phrase, every wallet, every log in, every account, etc. The device in question needs to be completely formatted and have a clean install of their OS. They need to move all their coins to brand new wallets generated on a clean device. They need to reset their passwords on all their online accounts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "loupiote",
+      "created_time": "June 13, 2023, 03:59:19 AM",
+      "body": "Quote from: loupiote on June 12, 2023, 07:13:14 AMThis is how Bitcoin works: anyone with the private key can move funds. The only thing that's left now is find out how the private key was leaked, and make sure it never happens again in the future. Considering the funds involved are quite significant, they should only have been send to a cold wallet. Hot wallets are inherently risky.I know, I was just wondering how it was possible to send a Tx that was spending unconfirmed deposits (i.e. with 0 confirmation). I don't think you can do that with ETH, for example. But I guess BTC allows that. Interesting.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "June 13, 2023, 04:33:14 AMLast edit: June 13, 2023, 07:45:31 AM by LoyceV",
+      "body": "Quote from: loupiote on June 13, 2023, 03:59:19 AMI was just wondering how it was possible to send a Tx that was spending unconfirmed deposits (i.e. with 0 confirmation).Why wouldn't it be possible? It would be very inconvenient if you have to wait for your change to confirm before you can send another transaction, and it would be impossible to use CPFP if you couldn't spend unconfirmed inputs.If I remember correctly, I think you can do this up to 24 25 transactions deep. After that, the default mempool will reject your transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitcoinGirl.Club",
+      "created_time": "June 13, 2023, 06:43:25 AM",
+      "body": "Quote from: loupiote on June 13, 2023, 03:59:19 AMQuote from: loupiote on June 12, 2023, 07:13:14 AMThis is how Bitcoin works: anyone with the private key can move funds. The only thing that's left now is find out how the private key was leaked, and make sure it never happens again in the future. Considering the funds involved are quite significant, they should only have been send to a cold wallet. Hot wallets are inherently risky.I know, I was just wondering how it was possible to send a Tx that was spending unconfirmed deposits (i.e. with 0 confirmation).I don't see a problem as long as the first transaction is not changed.A to B, transaction unconfirmed but you can still send coin from B to C.However if the transaction A to B is changed like canceled (double spend and fees increased too I guess) then the 2nd transaction which was from B to C will drop.Risk is someone can easily scam someone else who know how to drop B to C.They will send a transaction from A to B with lower fees, obviously it will take much longer time to confirm. Then they will do the 2nd transaction from B to C.Consider it's a P2P exchange. The buyer (BTC buyer) send the other currency that you two agreed on. His received bitcoin transaction is still unconfirmed but if he send the other coin and you decide to change the first transaction which was A to B then the transaction B to C will disappear and your buyer will never receive the BTC unless you send him the BTC again.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "June 13, 2023, 07:42:36 AM",
+      "body": "Quote from: LoyceV on June 13, 2023, 04:33:14 AMIf I remember correctly, I think you can do this up to 24 transactions deep. After that, the default mempool will reject your transaction.The stipulation is a maximum of 25 unconfirmed parents or 25 unconfirmed descendants, which means you can make a chain of 25 unconfirmed transactions, and it is the 26th transaction which will be rejected.The code is here: https://github.com/bitcoin/bitcoin/blob/e9262ea32a6e1d364fb7974844fadc36f931f8c6/src/policy/policy.h#L58-L65Note that these transactions don't necessarily have to be in a continuous chain. For example, if you tried to spend three inputs in a single transaction, with each of those inputs having 10 unconfirmed parents, then your transaction would be rejected since the total number of unconfirmed parents is 30.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

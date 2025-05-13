@@ -1,0 +1,109 @@
+{
+  "id": "topic_5466576",
+  "title": "l8orre",
+  "author": "l8orre",
+  "created_time": "September 12, 2023, 09:04:57 PMLast edit: September 12, 2023, 09:17:03 PM by l8orre",
+  "content": "I have a TX stuck, and seems the culprit is an INCOMING TX I got to my wallet.I was not aware of this incoming TX and spent an output that depends on that mysterious input. So my TX has 18vByte/Sat which is ok, but this weird 860 Sat TX has a large size and a fee of 6 Sat/ vByte and is unconfirmed.I have no idea where this is from, but here it is:https://blockchair.com/bitcoin/transaction/95e315f00b48201655877d8d86817748fe32b1d7d339c5a334dac28328a4c939so this TX has 79 receivers that all got 860 Sat and 6 Sat per Byte, and has been stuck for 3 days now.Effectively blocking 79 addresses with expenditure of0.00068022BTC (17.62USD) and Transaction fee 0.00018345BTC (4.75USD)...fun fact: I tried https://www.viabtc.com/tools/txaccelerator/ and the free service did not work bcs TX too large, and the paid service.....came up with a price tag of ..... 0.09BTC !!!!! $2100 to accelerate this TX!Can anyone make anything of this? Is this some kind of mapping attack with dust (like cpl years ago),Or is it a sabotage attempt to block as many wallets as possible?Anybody else finding themselves in this trap?This appears rather sinister...Because as a matter of fact, my TX as well as the rest of the funds in my wallet now seem to be effectively frozen...if this is is not the right place for this, please direct me there - I looked around but did not see anything about it",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466576",
+  "comments": [
+    {
+      "author": "Bitcoin_Arena",
+      "created_time": "September 12, 2023, 09:36:46 PM",
+      "body": "This seems to be a dust attack. I don't know the kind of wallet you are using but for wallets like Electrum. You could uncheck the option of spending unconfirmed coins.Sparrow wallet has an option of you selecting the UTXO's you want to spend. This can effectively enable you to spend coins without including the dust sats into your transaction inputs.AFAIK, right now there is nothing you can do, you just have to wait it out until the unconfirmed transaction finally get confirmed if the fee rate drops so which is likely hard to achieve or until the unconfirmed transactions get dropped out of the mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khaled0111",
+      "created_time": "September 12, 2023, 10:42:12 PM",
+      "body": "Not sure if it's a dust attack or not because the sender could have sent less sats than 800 (546 if am not wrong).Anyway, what makes things worse is that even the parent transaction of the one you received is still unconfirmed. So, if you are going to perform rbf you'll have to pay for both of them.I haven't done an accurate calculation but I believe if you are going to use rbf to accelerate the transaction you'll need to add 80-90k sats to the paid fees to get a reasonable effective fee rate (~18 sat/vb)Next time, make sure to use the coin control feature to select which UTXOs you want to spend.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Bitcoin_Arena",
+      "created_time": "September 12, 2023, 11:03:19 PM",
+      "body": "Quote from: khaled0111 on September 12, 2023, 10:42:12 PMNot sure if it's a dust attack or not because the sender could have sent less sats than 800 (546 if am not wrong).Anyway, what makes things worse is that even the parent transaction of the one you received is still unconfirmed. So, if you are going to perform rbf you'll have to pay for both of them.You probably meant CPFP, right?At this point, OP can not perform RBF because the unconfirmed ancestor transactions are in a wallet address he probably does not control. Secondly, the ancestor transactions are not RBF enabled.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "khaled0111",
+      "created_time": "September 12, 2023, 11:37:24 PM",
+      "body": "Quote from: Bitcoin_Arena on September 12, 2023, 11:03:19 PMYou probably meant CPFP, right?At this point, OP can not perform RBF because the unconfirmed ancestor transactions are in a wallet address he probably does not control. Secondly, the ancestor transactions are not RBF enabled.OP can perform rbf as long as the transaction he made is flagged as rbf even if he doesn't have access to wallets which made the parent transactions (someone corrects me if I'm wrong!).When replacing a transaction by fee, you are telling the node to remove it and replace it with a new one which consumes the same (or a single) inputs and pays higher fees. Technically, this doesn't affect or introduce any change to the parent transaction(s).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Bitcoin_Arena",
+      "created_time": "September 12, 2023, 11:58:25 PM",
+      "body": "Quote from: khaled0111 on September 12, 2023, 11:37:24 PMOP can perform rbf as long as the transaction he made is flagged as rbf even if he doesn't have access to wallets which made the parent transactions (someone corrects me if I'm wrong!).When replacing a transaction by fee, you are telling the node to remove it and replace it with a new one which consumes the same (or a single) inputs and pays higher fees. Technically, this doesn't affect or introduce any change to the parent transaction(s). He can't perform RBF. I saw his transaction and the RBF was not enabled as well, but I didn't want to share it here since he didn't post the TX ID initially.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "l8orre",
+      "created_time": "September 13, 2023, 01:24:51 AM",
+      "body": "Thanks for the comments - we will see how it plays out.viabtc offers to 'rectify' the situation for just ~0.09 BTC and I am not quite willing to pay for that.I am using a coin-specific multiwallet that does not have much fee control- but this would have happened with any wallet I guess,because the culprit is the incoming TX.I guess electrum or bitcoin core would have displayed the pending dust TX, but that also can be overlooked.What weird behaviour, I seem to remember that the dust attacks from 2 or 3 years ago were allegedly done as some kind of marketing gimmick. I just hope it gets dropped from the mempool sooner or later...Yes, this is the parent TX to the 79-output-TX and is is also still unconfirmed:https://blockchair.com/bitcoin/transaction/ba3c96897174501fec909952ae590176b9211f2a3ae4d3b844fcc26a474756bcThis parent TX has 60 senders, all of them 3xyz.. multsig addresses, and the TX going to the subsequent address that sent the dust seems to be a change address- could this be some kind of mixer?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "September 13, 2023, 05:05:44 AM",
+      "body": "Quote from: l8orre on September 13, 2023, 01:24:51 AMI am using a coin-specific multiwallet that does not have much fee control- but this would have happened with any wallet I guess,because the culprit is the incoming TX.Using coin control would have prevented it:Quote from: khaled0111 on September 12, 2023, 10:42:12 PMNext time, make sure to use the coin control feature to select which UTXOs you want to spend.If your wallet doesn't allow manual coin control or manual fees: stop using that wallet and switch to a decent one. Take your seed or private key and import it. For now, all you can do is wait until your transaction is dropped. If your current wallet keeps broadcasting it, that may take a very long time.Quote from: l8orre on September 13, 2023, 01:24:51 AMI guess electrum or bitcoin core would have displayed the pending dust TX, but that also can be overlooked.Bitcoin Core doesn't use unconfirmed inputs from third parties.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 13, 2023, 07:03:59 AM",
+      "body": "Quote from: l8orre on September 13, 2023, 01:24:51 AMviabtc offers to 'rectify' the situation for just ~0.09 BTC and I am not quite willing to pay for that.In comparison to CPFP, it'll only need an extra 0.00178900BTC to bump to 20sat/vB. (total vSize is 8945 vB)Since there's still 0.00850354 change, you can still use some of it to CPFP whether the wallet supports CPFP so or not.If you do not have any other available UTXO, you can perform CPFP by simply sending another child transaction with enough absolute fee (fee rate multiplied by virtual size).Quote from: l8orre on September 13, 2023, 01:24:51 AMI just hope it gets dropped from the mempool sooner or later...Your transaction and its parents have an overall transaction fee rate of 7.89sat/vB as bundle.It's nearing the bottom of mempools with default size setting.The question is, if your wallet keeps its own mempool and wallet transactions, rebroadcasts dropped txns or need user intervention to remove dropped transactions.It's impossible to give a suggestion without knowing the wallet's name.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 13, 2023, 01:06:04 PM",
+      "body": "I've rewritten your transaction OP to remove the dust input, keep the payment output the same, and very slightly adjusted the fee so you can replace your currently unconfirmed transaction:Code:0100000001192aabd987ff508dfda0e10448bfcb1b2cc7281d5b4fa8f77208d13543965c62010000001f144a0ee83923483d4aa9a38b2e5f4ad6650728a72600081b889b0600000000fdffffff0280778e060000000017a914e7a88359fe98b9774a2d6cdbecfb81090ff29c6c8743f50c00000000001976a9144a0ee83923483d4aa9a38b2e5f4ad6650728a72688ac00000000If you can sign this and broadcast it to a node which accepts full RBF replacements, then it should replace your other transaction and be confirmed fairly quickly. You can do this easily with Electrum if you are able to import your wallet to Electrum using either your seed phrase or a private key for that address. You should do this on an airgapped device for security reasons.Otherwise, at the effective fee rate of ~7.5 sats/vbyte, you are going to be waiting weeks for a confirmation.Quote from: nc50lc on September 13, 2023, 07:03:59 AMIt's nearing the bottom of mempools with default size setting.The parent transaction with a fee rate of 6 sats/vbyte will already have been dropped by default nodes, meaning OP's transaction will have been dropped as well. There are however an increasing number of nodes using non-default mempool settings, which is why we can still see OP's transaction on most block explorers and he can still see it in his wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "September 13, 2023, 01:47:09 PM",
+      "body": "l8orre, I just created a watch-only wallet with your address in electrum and tried several servers. Some of them still had your transaction (and its parent) in their mempool and some of them had dropped your transaction from their mempool.As mentioned by o_e_l_e_o above, you should be able to broadcast a new transaction using electrum. If you imported your wallet and you saw your transaction, try different servers until you find a one that doesn't have your transaction in its mempool.If your transaction status changed to local, right click on it and select \"Remove\".In the case you connect to a server that doesn't have your transaction, you can broadcast your transaction even if the server's node hasn't enabled full RBF. Due to security reasons, it's better to create a watch-only wallet with your address for finding a server which doesn't have your transaction in its mempool and broadcasting your transaction. As suggested by o_e_l_e_o, import your private key and sign your transaction on an air-gapped device.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "l8orre",
+      "created_time": "September 13, 2023, 02:00:37 PMLast edit: September 14, 2023, 12:31:39 PM by l8orre",
+      "body": "Quote from: hosseinimr93 on September 13, 2023, 01:47:09 PMl8orre, I just created a watch-only wallet with your address in electrum and tried several servers. Some of them still had your transaction (and its parent) in their mempool and some of them had dropped your transaction from their mempool.As mentioned by o_e_l_e_o above, you should be able to broadcast a new transaction using electrum. If you imported your wallet and you saw your transaction, try different servers until you find a one that doesn't have your transaction in its mempool.If your transaction status changed to local, right click on it and select \"Remove\".In the case you connect to a server that doesn't have your transaction, you can broadcast your transaction even if the server's node hasn't enabled full RBF. Due to security reasons, it's better to create a watch-only wallet with your address for finding a server which doesn't have your transaction in its mempool and broadcasting your transaction. As suggested by o_e_l_e_o, import your private key and sign your transaction on an air-gapped device. Thank You so much Sir, this worked!!!I created a view only electrum wallet on another device, found the spurious dust TX, went through the servers, found one that listed this TX as 'local', deleted it from there, and was able to send (from another, secure rig) a small-ish TX with a beefy fee from another address to that my original address.Now my original child TX has disappeared, while the spurious dust TX is still pending, but I can send funds again!Hard to follow how this could work, but it did!Thank You!These two precursor TXs look interesting, they do seem to be some kind of consolidation protocol.The latter one that blocked my TX was someone spreading out a change TX over 79 other addresses (seemingly random),and the precursor to that one received 60 inputs with almost the same amounts, all from 3xy addresses - looks like some consolidation or intermingling going on ..Also, why would someone disperse  0.00086367 BTC - 22.38 USD of change, seemingly just to get rid of it?This is the precursor TX to the offending change dispersal: https://blockchair.com/bitcoin/transaction/ba3c96897174501fec909952ae590176b9211f2a3ae4d3b844fcc26a474756bcI am not that much of a blockchain sleuth, but it sure looks weird...So if the sender does not up the fee a bit it will bounce sooner or later, and to what purpose was it sent then?Was this done specifically to bounce eventually?Or a SPAM attack on BTC with underfunded TXs that are meant to bloat the mempool?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 14, 2023, 07:15:50 AM",
+      "body": "Quote from: l8orre on September 13, 2023, 02:00:37 PMSo if the sender does not up the fee a bit it will bounce sooner or later, and to what purpose was it sent then?Was this done specifically to bounce eventually?Or a SPAM attack on BTC with underfunded TXs that are meant to bloat the mempool?The motivation for all these \"mempool attacks\" don't make any sense to me. You just temporarily hold up the mempool from processing other transactions for shits and giggles. Eventually the mempool clears because you cannot keep creating spam at this rate forever, and all of the transactions get processed, making the whole attack useless.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

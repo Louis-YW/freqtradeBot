@@ -1,0 +1,29 @@
+{
+  "id": "topic_5417503",
+  "title": "pooya87",
+  "author": "pooya87",
+  "created_time": "October 18, 2022, 06:54:30 AM",
+  "content": "Looking at the code, when parsing dersig[1] if r or s length or value is equal to zero, the parser still returns true. Ignoring the strict der encoding enforcement (eg. pre-activation of BIP66) the code eventually ends up here[2] where it would reject the zero r/s values. My question is if there is any scenario where somewhere in the middle of going from [1] to [2] that it would ignore ECDSA verification and returns true?Or a better way of asking this question is why isn't the parser in [1] just reject invalid signatures (eg. rlen=0) and return false right there instead of letting it go to [2]?[1] https://github.com/bitcoin/bitcoin/blob/e7a0e9627196655be5aa6c2738d4b57646a03726/src/pubkey.cpp#L35[2] https://github.com/bitcoin/bitcoin/blob/c06cda3e48e9826043ebc5790a7bb505bfbf368c/src/secp256k1/src/ecdsa_impl.h#L216",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417503",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "October 18, 2022, 11:09:47 AM",
+      "body": "Doesn't this code in [1] close to the function beginning already check for zero r-lengths?Code:    /* Integer length for R */    if (pos == inputlen) {        return 0;    }",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 18, 2022, 12:10:41 PM",
+      "body": "No, that line is checking to see if there is any bytes left in the array/stream (called input) it is reading from, before it reads the \"lenbyte\" value which is the rlen and could have a value of zero itself.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

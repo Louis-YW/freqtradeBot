@@ -1,0 +1,101 @@
+{
+  "id": "topic_5405738",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "July 09, 2022, 05:01:02 PM",
+  "content": "I was playing around with my nodes' RPC calls and I found some interesting peers like a few bcoin and BitcoinJ nodes, a BitcoinUnlimited node, and quite a number of FutureBit Apollo miners like my client.But I found one node that has an empty version string. Completely empty! How is that even possible? Is it allowed by the protocol?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5405738",
+  "comments": [
+    {
+      "author": "jackg",
+      "created_time": "July 09, 2022, 09:08:48 PM",
+      "body": "There's probably a thing of it not being considered too useful as it's just a name used to identify what nodes are connecting to where (they can then check if they share a blockchain and if there are new blocks to be discovered if so).Did you manage to get any additional information out of the client to see where it was at (eg its block height - there might be more information on it in your debug log I'm not too sure)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "n0nce",
+      "created_time": "July 09, 2022, 11:39:48 PM",
+      "body": "I remember to have read about this on the forum in the past, but https://ninjastic.space/search?content=%22version%20string%22 didn't bring up anything. My guess would be that it's indeed optional, as I don't see what it would be needed for. You can put almost anything in it, anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 10, 2022, 03:12:04 AM",
+      "body": "You don't even have include the version string and some other fields in your version message and due to backward compatibility bitcoin core ignores it all. Basically after the processor reads your network address information the message stream could just stop there and it would be fine (meaning it can skip: nonce, subver (version string), height and relay bool).https://github.com/bitcoin/bitcoin/blob/194710d8ff398838e4e5bb87b56e19ebed1d6c52/src/net_processing.cpp#L2786",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 10, 2022, 04:27:36 AM",
+      "body": "Quote from: jackg on July 09, 2022, 09:08:48 PMDid you manage to get any additional information out of the client to see where it was at (eg its block height - there might be more information on it in your debug log I'm not too sure) Yeah, I captured its peer information:Code:  {    \"id\": 449110,    \"addr\": \"REDACTED:42630\",    \"addrbind\": \"REDACTED:8333\",    \"network\": \"ipv4\",    \"services\": \"0000000000000000\",    \"servicesnames\": [    ],    \"relaytxes\": false,    \"lastsend\": 0,    \"lastrecv\": 0,    \"last_transaction\": 0,    \"last_block\": 0,    \"bytessent\": 0,    \"bytesrecv\": 0,    \"conntime\": 1657426886,    \"timeoffset\": 0,    \"version\": 0,    \"subver\": \"\",    \"inbound\": true,    \"startingheight\": -1,    \"synced_headers\": -1,    \"synced_blocks\": -1,    \"inflight\": [    ],    \"permissions\": [    ],    \"minfeefilter\": 0.00000000,    \"bytessent_per_msg\": {    },    \"bytesrecv_per_msg\": {    },    \"connection_type\": \"inbound\"  }It is an inbound peer, which has sent and received exactly zero bytes, and has downloaded no block height at all. It also advertises literally no services (see service bitmask above) and has relaytxes set to false. And it is connecting using a nonstandard port. Could be a zombie node? If so, I'd like to ban such nodes as they are just clogging the network for everyone.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "July 10, 2022, 04:48:59 AM",
+      "body": "Quote from: NotATether on July 10, 2022, 04:27:36 AMYeah, I captured its peer information:Code:  {    \"minfeefilter\": 0.00000000,    \"bytessent_per_msg\": {    },    \"bytesrecv_per_msg\": {    },    \"connection_type\": \"inbound\"  }It is an inbound peer, which has sent and received exactly zero bytes, and has downloaded no block height at all. It also advertises literally no services (see service bitmask above) and has relaytxes set to false. And it is connecting using a nonstandard port. Could be a zombie node? If so, I'd like to ban such nodes as they are just clogging the network for everyone.Not sure if there's much reason to block if it hasn't sent or received anything.The bit I cut off the code tag looks a lot like default values too. Realistically, the version message they give you can be adapted to whatever they want for the information they need so there could be a chance there's a node behind it - or it could just be someone testing out code. Unless your node starts sending data to them (and theirs would have to request if) you're probably fine leaving it to be dumped by your node (it won't be connected to - often and will probably be dropped - because it doesn't have a blockchain/competing height).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 10, 2022, 04:58:59 AM",
+      "body": "You should have captured the data stream itself instead of the modified result that core reports in order to know what that other client is sending you. But this behavior (no service flag, no block height, no relay; and if you request headers they won't reply) is usually common among scripts such as crawlers and spy nodes (basically custom written code) not actual full nodes.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 10, 2022, 05:59:18 AM",
+      "body": "Quote from: pooya87 on July 10, 2022, 04:58:59 AMYou should have captured the data stream itself instead of the modified result that core reports in order to know what that other client is sending you.How? And exactly what data stream are you referring to? When I check my debug.log I only see disconnects and malformed header errors from other peers, nothing from this particular peer ID.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 10, 2022, 06:16:36 AM",
+      "body": "Quote from: NotATether on July 10, 2022, 05:59:18 AMHow? And exactly what data stream are you referring to? When I check my debug.log I only see disconnects and malformed header errors from other peers, nothing from this particular peer ID.There are network monitoring and capturing tools that can capture all your network activity. For example Wireshark. You can set it to only capture HTTP traffic over 8333 port (42630 is your local port not the peer's) and filter the result based on bitcoin messages. Then look for a version message.This way you can clearly see what the problem with that message was, for example if it was shorter as I said in my first comment or broken.Here is an example from Wireshark after connecting to a random TestNet node. The part on top shows the deserialized message while the part at the bottom shows the raw bytes:",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 10, 2022, 07:05:16 AM",
+      "body": "Quote from: pooya87 on July 10, 2022, 06:16:36 AMThere are network monitoring and capturing tools that can capture all your network activity. For example Wireshark. You can set it to only capture HTTP traffic over 8333 port (42630 is your local port not the peer's) and filter the result based on bitcoin messages. Then look for a version message.This way you can clearly see what the problem with that message was, for example if it was shorter as I said in my first comment or broken.It is already getting quite difficult to get a hold of the addresses of the bot nodes. They keep reconnecting very quickly under different IP addresses and ports, sometimes even with TOR. I'd have to script the collection of bot peers and then feed the data through wireshark (there'd be a time delay obviously so I lose the first few messages) or else I have to continually tap my network interface and filter out all the non Bitcoin protocol traffic, since I have no idea how I'd monitor my TOR hidden service [for IPv4 and 6 it should be straightforward], but I imagine there would be massive overhead in collecting and dropping the rest of the noisy packets.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "July 10, 2022, 09:04:45 AM",
+      "body": "Well, if you want to monitor your network, you have two options:1) Use tools like Wireshark to monitor the traffic.2) Build Bitcoin Core from source, and add some monitoring capabilities, for example by writing suspicious messages to some file, and limiting that to the last N megabytes, to prevent flooding.Edit: The second option is of course more dangerous, because it requires some coding skills, and you have to be careful, to not break some features. But I think it is easier, when you want to analyze something. For example, if you want to extract all z-values for all transactions, it is easier to attach to some code, related to signature checking, then you can easily grab those values directly, without going through the whole procedure of making the right message, and hashing that.The same here, if you attach to some code that will parse received message, it will be already decrypted, and will fit the Bitcoin protocol, so there will be no need to go through the whole encryption/decryption stuff, that is related to handling onion nodes, you will get the raw values directly, inside some function, so you can just write it to some file to analyze that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 11, 2022, 06:02:24 AM",
+      "body": "Quote from: garlonicon on July 10, 2022, 09:04:45 AMWell, if you want to monitor your network, you have two options:1) Use tools like Wireshark to monitor the traffic.2) Build Bitcoin Core from source, and add some monitoring capabilities, for example by writing suspicious messages to some file, and limiting that to the last N megabytes, to prevent flooding.Edit: The second option is of course more dangerous, because it requires some coding skills, and you have to be careful, to not break some features. But I think it is easier, when you want to analyze something. For example, if you want to extract all z-values for all transactions, it is easier to attach to some code, related to signature checking, then you can easily grab those values directly, without going through the whole procedure of making the right message, and hashing that.The same here, if you attach to some code that will parse received message, it will be already decrypted, and will fit the Bitcoin protocol, so there will be no need to go through the whole encryption/decryption stuff, that is related to handling onion nodes, you will get the raw values directly, inside some function, so you can just write it to some file to analyze that.I can code C++ so that is not a problem, but I was just hoping that there would be a simpler solution to this as I have so much C++ work to do already.Something like this code scaffold could be used to log the peer ID, the current timestamp, and the message in a single directory organized by peer id, with integer timestamps as the name.Code:#include <iostream>#include <fstream>#include <string>#include <ctime>using namespace std;namespace MessageLogger {    // Someone tell me if this is the correct class for P2P messages    void log(int peer id, const CMessage& message) { char timestamp[128];        strftime(timestamp, 128, \"%Y-%m-%d %H:%M:%S\"); /* ... */    }};",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

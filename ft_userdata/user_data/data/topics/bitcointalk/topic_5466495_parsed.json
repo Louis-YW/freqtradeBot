@@ -1,0 +1,77 @@
+{
+  "id": "topic_5466495",
+  "title": "DifDrama",
+  "author": "DifDrama",
+  "created_time": "September 12, 2023, 08:12:36 AM",
+  "content": "Is there any practical advantage in generating a hardened child key from an unhardened parent key within the framework of BIP32? For instance, are there real-world scenarios or applications where this specific key derivation approach is beneficial or commonly utilized? Apologies in advance if this is a silly question.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5466495",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "September 12, 2023, 09:06:56 AM",
+      "body": "If a child private key is not having hardened derivational path, and if its master public key is known, with that, the master private key can be derived, which can used used to generate all other child private keys belonging to that wallet and its coins can be stolen. With hardened keys, that is not possible.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Findingnemo",
+      "created_time": "September 12, 2023, 09:09:37 AM",
+      "body": "Quote from: DifDrama on September 12, 2023, 08:12:36 AMIs there any practical advantage in generating a hardened child key from an unhardened parent key within the framework of BIP32?Yes, Isolation of funds. In case if attacker has access to the extended public keys and one of the private keys derived from it still the remaining funds from the main source will be secure so this is practically useful when accepting payments online stores so that you can avoid losing all your funds if they are hacked.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Charles-Tim",
+      "created_time": "September 12, 2023, 09:25:49 AM",
+      "body": "Quote from: Findingnemo on September 12, 2023, 09:09:37 AMYes, Isolation of funds. In case if attacker has access to the extended public keys and one of the private keys derived from it still the remaining funds from the main source will be secure so this is practically useful when accepting payments online stores so that you can avoid losing all your funds if they are hacked.I do not think it is useful this way. While paying online, people can only see the bitcoin address. The private key can not be leaked. When problem can occur is if one of the private keys is leaked and the master public key is also known. All other private keys can be derived from unhardened child private key and master public key. Although, no one will want to be careless with his child private keys and master public keys, but the hardened derivational path makes accessing other child private keys and the master private keys impossible if possible something like that would occur.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "September 12, 2023, 09:40:40 AM",
+      "body": "Quote from: Charles-Tim on September 12, 2023, 09:25:49 AMQuote from: Findingnemo on September 12, 2023, 09:09:37 AMYes, Isolation of funds. In case if attacker has access to the extended public keys and one of the private keys derived from it still the remaining funds from the main source will be secure so this is practically useful when accepting payments online stores so that you can avoid losing all your funds if they are hacked.I do not think it is useful this way. While paying online, people can only see the bitcoin address. The private key can not be leaked. When problem can occur is if one of the private keys is leaked and the master public key is also known. All other private keys can be derived from unhardened child private key and master public key. Although, no one will want to be careless with his child private keys and master public keys, but the hardened derivational path makes accessing other child private keys and the master private keys impossible if possible something like that would occur.It may work in a certain scenario when using one seed for different coins. If you derive their child master keys at non-hardened paths and the coin protocol or the implementation of it is broken and leaks your child private key (broken DSA) and master public key (broken/weak communication protocol), then your \"other wallets\" could be at risk too.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 12, 2023, 12:06:49 PM",
+      "body": "Quote from: DifDrama on September 12, 2023, 08:12:36 AMIs there any practical advantage in generating a hardened child key from an unhardened parent key within the framework of BIP32?I can't see any reason to do this. You should be using hardened paths at every level which does not require watch only functionality. The whole point of unhardened paths is to allow the export of an xpub to another wallet or service and the generation of new child public keys without needing any of your private keys.By adding an unhardened path before a hardened one, you don't gain anything. You can't derive the hardened path without using the xprv anyway, and exporting the xpub at the unhardened path doesn't let you create a watch only wallet at the hardened path.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bitmover",
+      "created_time": "September 12, 2023, 01:49:33 PM",
+      "body": "People should always use hardened derivation.Hardened derivation was created because unhardned key derivation has a potential risk. If one of your private keys leaks, all the other ones may be derived from it.Hardened derivation solves that problem.I remember to read it in mastering bitcoin.QuoteHardened child key derivationThe ability to derive a branch of public keys from an extended public key is very useful, but it comes with a potential risk. Access to an extended public key does not give access to child private keys. However, because the extended public key contains the chain code, if a child private key is known, or somehow leaked, it can be used with the chain code to derive all the other child private keys. A single leaked child private key, together with a parent chain code, reveals all the private keys of all the children. Worse, the child private key together with a parent chain code can be used to deduce the parent private key.To counter this risk, HD wallets use an alternative derivation function called hardened derivation, which “breaks” the relationship between parent public key and child chain code. The hardened derivation function uses the parent private key to derive the child chain code, instead of the parent public key. This creates a “firewall” in the parent/child sequence, with a chain code that cannot be used to compromise a parent or sibling private key. https://www.oreilly.com/library/view/mastering-bitcoin/9781491902639/ch04.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 12, 2023, 03:06:15 PM",
+      "body": "Quote from: bitmover on September 12, 2023, 01:49:33 PMHardened derivation was created because unhardned key derivation has a potential risk.Hardened and unhardened derivations were defined simultaneously in BIP32. One wasn't created in response to the other.Quote from: bitmover on September 12, 2023, 01:49:33 PMIf one of your private keys leaks, all the other ones may be derived from it.A private key on its own is insufficient to derive any other key, be that parent, sibling, or child. It is the combination of a private key and the parent public key and parent chain code (as is revealed in the parent extended public key) which reduces the equation for unhardene derivation to a single unknown (the parent private key) and allows it to be calculated.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "September 12, 2023, 04:59:02 PM",
+      "body": "Quote from: bitmover on September 12, 2023, 01:49:33 PMHardened derivation was created because unhardned key derivation has a potential risk. If one of your private keys leaks, all the other ones may be derived from it.I agree that hardened key derivation should be used by the average person, but unhardened derivation was very much purposefully created. It's when you want to share a list of addresses with some third party. For instance, you might have a client who is sending you bitcoin often. Instead of bothering to give them an address, you can just give an extended public key once. You could choose a particular account from the derivation path to be used unhardened just for that particular case, and use hardened everywhere else.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

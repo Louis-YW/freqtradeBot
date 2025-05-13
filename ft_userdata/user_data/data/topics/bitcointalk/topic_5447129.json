@@ -1,0 +1,125 @@
+{
+  "id": "topic_5447129",
+  "title": "Cricktor",
+  "author": "Cricktor",
+  "created_time": "April 01, 2023, 08:42:05 AM",
+  "content": "I've just seen this in the debug.log of my Core bitcoind (v24.0.1):Code:...2023-04-01T07:29:55Z UpdateTip: new best=00000000000000000001244128897a9f32c24ca0e7ee578063f8580deed9ccb7 height=783425 version=0x20800000 log2_work=94.093200 tx=819475866 date='2023-04-01T07:29:18Z' progress=1.000000 cache=5.5MiB(22491txo)2023-04-01T07:29:56Z BlockUntilSyncedToCurrentChain: txindex is catching up on block notifications2023-04-01T07:30:56Z New outbound peer connected: version: 70016, blocks=783425, peer=17965 (outbound-full-relay)2023-04-01T07:31:28Z Socks5() connect to <redacted>.onion:8333 failed: host unreachable2023-04-01T07:33:29Z ERROR: ConnectBlock(): too many sigops2023-04-01T07:33:29Z InvalidChainFound: invalid block=00000000000000000002ec935e245f8ae70fc68cc828f05bf4cfa002668599e4  height=783426  log2_work=94.093214  date=2023-04-01T07:32:51Z2023-04-01T07:33:29Z InvalidChainFound:  current best=00000000000000000001244128897a9f32c24ca0e7ee578063f8580deed9ccb7  height=783425  log2_work=94.093200  date=2023-04-01T07:29:18Z2023-04-01T07:33:29Z ERROR: ConnectTip: ConnectBlock 00000000000000000002ec935e245f8ae70fc68cc828f05bf4cfa002668599e4 failed, bad-blk-sigops2023-04-01T07:33:29Z InvalidChainFound: invalid block=00000000000000000002ec935e245f8ae70fc68cc828f05bf4cfa002668599e4  height=783426  log2_work=94.093214  date=2023-04-01T07:32:51Z2023-04-01T07:33:29Z InvalidChainFound:  current best=00000000000000000001244128897a9f32c24ca0e7ee578063f8580deed9ccb7  height=783425  log2_work=94.093200  date=2023-04-01T07:29:18Z2023-04-01T07:35:20Z UpdateTip: new best=00000000000000000004e0ec4f27bd3347381e8e19ed98d7f918e8c1c292ae97 height=783426 version=0x21386000 log2_work=94.093214 tx=819477925 date='2023-04-01T07:34:57Z' progress=1.000000 cache=4.7MiB(15485txo)...What's the reason, that one of my peers tries to relay a block with \"too many sigops\"? I assume the following InvalidChainFound errors are a result of the first error condition that ConnectBlock() spitted out. Malicious peer node? Bug in Core?I'm curious to hear some explanations, please.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5447129",
+  "comments": [
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "April 01, 2023, 08:52:55 AM",
+      "body": "Quote from: Cricktor on April 01, 2023, 08:42:05 AMI assume the following InvalidChainFound errors are a result of the first error condition that ConnectBlock() spitted out.Yes, Bitcoin Core has a limit on the number of sigops in a block. From consensus.h, it's set to 80,000. That is consensus rule.Quote from: Cricktor on April 01, 2023, 08:42:05 AMWhat's the reason, that one of my peers tries to relay a block with \"too many sigops\"?It's indeed weird. There is either some malicious node out there, or a miner who failed to to validate the block properly. Maybe some Bitcoin Core developer can enlighten us.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 01, 2023, 10:31:11 AM",
+      "body": "In the meantime I learned, not verified though, that a mined block might at the very beginning be propagated by only its block header and then there's also Compact Block Relay. The block header of the too-many-sigops-block seemed to be valid, while its block content wasn't. So block header only relay wouldn't have detected the error at first, only after a valid node had checked the full block and detect the consensus violation, it would've dropped the block as faulty.But take this with a big pinch of salt as I clearly am lacking detail knowledge here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "April 01, 2023, 10:58:15 AM",
+      "body": "Quote from: Cricktor on April 01, 2023, 10:31:11 AMIn the meantime I learned, not verified though, that a mined block might at the very beginning be propagated by only its block header and then there's also Compact Block Relay. The block header of the too-many-sigops-block seemed to be valid, while its block content wasn't. So block header only relay wouldn't have detected the error at first, only after a valid node had checked the full block and detect the consensus violation, it would've dropped the block as faulty.But take this with a big pinch of salt as I clearly am lacking detail knowledge here.That's only for receiving blocks not for relaying them. In other words the nodes must not relay the header alone before fully verifying the block itself. If a node sent you an invalid block that node is either malicious or a broken/buggy implementation.Additionally compact block feature is about reducing your node's traffic consumption. Basically your node already has most of the transactions that are waiting to be confirmed in its mempool and a new block usually contains transactions that you already have in your mempool (verified). So your node can skip re-downloading and re-verifying them and instead download the parts it doesn't already have.P.S. I wish you shared the entire block not just its hash if you had it.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "April 01, 2023, 01:13:21 PMLast edit: April 01, 2023, 01:38:48 PM by garlonicon",
+      "body": "QuoteP.S. I wish you shared the entire block not just its hash if you had it.It seems my full node has it, here you are: https://pastebin.com/ETVD9yf9Edit: I guess the coinbase transaction can be also needed:Code:$ ./bitcoin-cli getrawtransaction eb6e6080a351e20f840741b56b1d92f920d19a1bb1dc10970dfa6e0fdc032dea true 00000000000000000002ec935e245f8ae70fc68cc828f05bf4cfa002668599e4{  \"in_active_chain\": false,  \"txid\": \"eb6e6080a351e20f840741b56b1d92f920d19a1bb1dc10970dfa6e0fdc032dea\",  \"hash\": \"d44c787805d9ec5f06540d89f6945e281bf50f2df4b6664237e0292b7e7f96e7\",  \"version\": 1,  \"size\": 424,  \"vsize\": 397,  \"weight\": 1588,  \"locktime\": 1049682829,  \"vin\": [    {      \"coinbase\": \"0342f40b2cfabe6d6d76eebeccd7ca22e72d1f7c18b9a3ae8c3f93c04072e77b94dfcf0f0dd560be4410000000f09f909f092f4632506f6f6c2f66000000000000000000000000000000000000000000000000000000000000000000000005007c000000\",      \"txinwitness\": [        \"0000000000000000000000000000000000000000000000000000000000000000\"      ],      \"sequence\": 0    }  ],  \"vout\": [    {      \"value\": 6.50925715,      \"n\": 0,      \"scriptPubKey\": {        \"asm\": \"OP_DUP OP_HASH160 c825a1ecf2a6830c4401620c3a16f1995057c2ab OP_EQUALVERIFY OP_CHECKSIG\",        \"desc\": \"addr(1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY)#flw9lhul\",        \"hex\": \"76a914c825a1ecf2a6830c4401620c3a16f1995057c2ab88ac\",        \"address\": \"1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY\",        \"type\": \"pubkeyhash\"      }    },    {      \"value\": 0.00000000,      \"n\": 1,      \"scriptPubKey\": {        \"asm\": \"OP_RETURN aa21a9edf8b71f0213d7b0bc1cefcfe26f15f0faeb470790cdf2fa733e372e2ac86dbd9b\",        \"desc\": \"raw(6a24aa21a9edf8b71f0213d7b0bc1cefcfe26f15f0faeb470790cdf2fa733e372e2ac86dbd9b)#mxdkcvex\",        \"hex\": \"6a24aa21a9edf8b71f0213d7b0bc1cefcfe26f15f0faeb470790cdf2fa733e372e2ac86dbd9b\",        \"type\": \"nulldata\"      }    },    {      \"value\": 0.00000000,      \"n\": 2,      \"scriptPubKey\": {        \"asm\": \"OP_RETURN 434f524501bc0fbef688bca8f9ec86c688cdfbe6e0fe6086e9bdb2a04b4ccf74792cc6753c27c5fd5f1d6458bf\",        \"desc\": \"raw(6a2d434f524501bc0fbef688bca8f9ec86c688cdfbe6e0fe6086e9bdb2a04b4ccf74792cc6753c27c5fd5f1d6458bf)#ckn567kp\",        \"hex\": \"6a2d434f524501bc0fbef688bca8f9ec86c688cdfbe6e0fe6086e9bdb2a04b4ccf74792cc6753c27c5fd5f1d6458bf\",        \"type\": \"nulldata\"      }    },    {      \"value\": 0.00000000,      \"n\": 3,      \"scriptPubKey\": {        \"asm\": \"OP_RETURN 48617468541f47c104f1690e5ff047144796590532263943499eb325769b2b4abe54e4a2\",        \"desc\": \"raw(6a2448617468541f47c104f1690e5ff047144796590532263943499eb325769b2b4abe54e4a2)#9a9g966l\",        \"hex\": \"6a2448617468541f47c104f1690e5ff047144796590532263943499eb325769b2b4abe54e4a2\",        \"type\": \"nulldata\"      }    },    {      \"value\": 0.00000000,      \"n\": 4,      \"scriptPubKey\": {        \"asm\": \"OP_RETURN 52534b424c4f434b3a8faeec671a86c6204caaab8ee63d185f62fa271a6ca971fd84e9851e004f05e5\",        \"desc\": \"raw(6a4c2952534b424c4f434b3a8faeec671a86c6204caaab8ee63d185f62fa271a6ca971fd84e9851e004f05e5)#cy0daxqf\",        \"hex\": \"6a4c2952534b424c4f434b3a8faeec671a86c6204caaab8ee63d185f62fa271a6ca971fd84e9851e004f05e5\",        \"type\": \"nulldata\"      }    }  ],  \"hex\": \"010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff640342f40b2cfabe6d6d76eebeccd7ca22e72d1f7c18b9a3ae8c3f93c04072e77b94dfcf0f0dd560be4410000000f09f909f092f4632506f6f6c2f66000000000000000000000000000000000000000000000000000000000000000000000005007c00000000000000059356cc26000000001976a914c825a1ecf2a6830c4401620c3a16f1995057c2ab88ac0000000000000000266a24aa21a9edf8b71f0213d7b0bc1cefcfe26f15f0faeb470790cdf2fa733e372e2ac86dbd9b00000000000000002f6a2d434f524501bc0fbef688bca8f9ec86c688cdfbe6e0fe6086e9bdb2a04b4ccf74792cc6753c27c5fd5f1d6458bf0000000000000000266a2448617468541f47c104f1690e5ff047144796590532263943499eb325769b2b4abe54e4a200000000000000002c6a4c2952534b424c4f434b3a8faeec671a86c6204caaab8ee63d185f62fa271a6ca971fd84e9851e004f05e5012000000000000000000000000000000000000000000000000000000000000000008de3903e\",  \"blockhash\": \"00000000000000000002ec935e245f8ae70fc68cc828f05bf4cfa002668599e4\",  \"confirmations\": 0}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 01, 2023, 01:40:14 PM",
+      "body": "Quote from: pooya87 on April 01, 2023, 10:58:15 AMP.S. I wish you shared the entire block not just its hash if you had it.I'm eager to learn how to extract that data from my node. I haven't done this before. Any hints or instructions, please?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "garlonicon",
+      "created_time": "April 01, 2023, 01:49:55 PM",
+      "body": "You can use \"bitcoin-cli\" command. It has \"help\" with all available commands. For example, I extracted the whole block, if someone needs that: https://mega.nz/file/FAdXWLaR#UR0BSrx1WxMVqPszITF5FxcElufHJyt3InILB-GZR4ECode:./bitcoin-cli getblock 00000000000000000002ec935e245f8ae70fc68cc828f05bf4cfa002668599e4 0 > block.txtThen, the whole block will be in \"block.txt\" on your node, in a folder where you executed it, probably nearby bitcoin-cli.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "April 01, 2023, 05:17:24 PMLast edit: April 01, 2023, 05:28:02 PM by pooya87",
+      "body": "I don't have a full chainstate to perform a full block verification but by verifying the block with what I have it seems like the block that @garlonicon shared on mega contains a bunch of transactions like [1] and [2] that are using multiple outputs with P2MS scripts. These scripts using OP_CHECKMULTISIG have a very high cost per OP, 20*4 to be exact. For example by my calculations tx [1] has a sigOpCount of 644 and [2] 2084.The record belongs to [3] with 158 outputs and a sigOpCount of 12564[4]!Note that these transactions aren't invalid on their own (as you can see from links below they are already included in another valid block), my guess is that the miner who mined the invalid block (00000000000000000002ec935e245f8ae70fc68cc828f05bf4cfa002668599e4) was running a modified code that didn't check sigOpCounts of blocks they constructed and they ended up including more of these transactions in their candid block as they should have hence creating the invalid block with too many (more than 80k) sigOps.[1] https://blockchair.com/bitcoin/transaction/0b71a358a1f82e66143fb2dfd54b7cc9227dc8c054397f3fae703f474950f2c1[2] https://blockchair.com/bitcoin/transaction/4af11e9067eade98e4210a4f739e3c651734b53164dd82e3821363cb586536c6[3] https://blockchair.com/bitcoin/transaction/87dae4c816c9611038ee35e4662d71089e73f3041863165e56e3dd70d309b274[4] If they had used something like P2WSH the sigOpCount of these 1of3 multi-sigs would have been something like 160 for this transaction instead of 12564.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CohibAA",
+      "created_time": "April 06, 2023, 01:49:03 AM",
+      "body": "I've just found one in my logs as well:Code:2023-04-06T00:47:01Z UpdateTip: new best=00000000000000000004ef043082d84196e3845c9628ee20764c591c1fb29d6c height=784120 version=0x37ffe000 log2_work=94.102717 tx=821173080 date='2023-04-06T00:46:39Z' progress=1.000000 cache=6.9MiB(11094txo)2023-04-06T00:56:58Z ERROR: ConnectBlock(): too many sigops2023-04-06T00:56:58Z InvalidChainFound: invalid block=000000000000000000046a2698233ed93bb5e74ba7d2146a68ddb0c2504c980d  height=784121  log2_work=94.102730  date=2023-04-06T00:56:48Z2023-04-06T00:56:58Z InvalidChainFound:  current best=00000000000000000004ef043082d84196e3845c9628ee20764c591c1fb29d6c  height=784120  log2_work=94.102717  date=2023-04-06T00:46:39Z2023-04-06T00:56:58Z ERROR: ConnectTip: ConnectBlock 000000000000000000046a2698233ed93bb5e74ba7d2146a68ddb0c2504c980d failed, bad-blk-sigops2023-04-06T00:56:58Z InvalidChainFound: invalid block=000000000000000000046a2698233ed93bb5e74ba7d2146a68ddb0c2504c980d  height=784121  log2_work=94.102730  date=2023-04-06T00:56:48Z2023-04-06T00:56:58Z InvalidChainFound:  current best=00000000000000000004ef043082d84196e3845c9628ee20764c591c1fb29d6c  height=784120  log2_work=94.102717  date=2023-04-06T00:46:39Z2023-04-06T01:03:02Z UpdateTip: new best=00000000000000000003f84a139ad4a61a2812ee2633b5d30bb087a3c4480752 height=784121 version=0x3fffe000 log2_work=94.102730 tx=821175327 date='2023-04-06T01:02:19Z' progress=1.000000 cache=8.9MiB(27288txo)This is the result of \"bitcoin-cli getblock 000000000000000000046a2698233ed93bb5e74ba7d2146a68ddb0c2504c980d\":Code:{  \"hash\": \"000000000000000000046a2698233ed93bb5e74ba7d2146a68ddb0c2504c980d\",  \"confirmations\": -1,  \"height\": 784121,  \"version\": 540082176,  \"versionHex\": \"20310000\",  \"merkleroot\": \"3bf92f16ab88b82c8a23f3956075579c3d0fcdff4e8680eeebfdbf6a1eff5b5a\",  \"time\": 1680742608,  \"mediantime\": 1680738952,  \"nonce\": 1525312513,  \"bits\": \"1706023e\",  \"difficulty\": 46843400286276.55,  \"chainwork\": \"000000000000000000000000000000000000000044b9330c4d3c5eb4f1bf358a\",  \"nTx\": 1995,  \"previousblockhash\": \"00000000000000000004ef043082d84196e3845c9628ee20764c591c1fb29d6c\",  \"strippedsize\": 762307,  \"size\": 1711401,  \"weight\": 3998322,The full output with tx data is here: block.txtInteresting, indeed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "April 06, 2023, 03:49:36 AM",
+      "body": "Quote from: CohibAA on April 06, 2023, 01:49:03 AMThe full output with tx data is here: block.txtThis only contains transaction hashes no the full tx data that is needed to verify the block manually and see what the problem is. I checked a couple of transactions in the block, the first being coinbase is obviously not found anywhere else but also the second transaction is not found either.P.S. I noticed something in the previous block's coinbase transaction, the signature script contains the word \"F2Pool\" in it. Could it be the F2Pool that messed up or is it someone else using that name?If we had the full block of this new one we could speculate if this is from the same miner/pool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CohibAA",
+      "created_time": "April 06, 2023, 04:10:27 AM",
+      "body": "Quote from: pooya87 on April 06, 2023, 03:49:36 AMQuote from: CohibAA on April 06, 2023, 01:49:03 AMThe full output with tx data is here: block.txtThis only contains transaction hashes no the full tx data that is needed to verify the block manually and see what the problem is.Is this something I can extract from my node, and if so, can you tell me how, and I'd be happy to post anything that helps?I'm a little high.  Here is the correct one I think: block2.txtQuote from: pooya87 on April 06, 2023, 03:49:36 AMI checked a couple of transactions in the block, the first being coinbase is obviously not found anywhere else but also the second transaction is not found either.Yes, some of the transactions I looked for are missing, but the few I found did come back as being confirmed in the real block 784121, such as these randoms transactions (1) (2) (3) I selected.Quote from: pooya87 on April 06, 2023, 03:49:36 AMP.S. I noticed something in the previous block's coinbase transaction, the signature script contains the word \"F2Pool\" in it. Could it be the F2Pool that messed up or is it someone else using that name?If we had the full block of this new one we could speculate if this is from the same miner/pool.It's curious that it's happened more than once over the previous days.  If indeed this is a configuration error, which seems likely, someone is losing a fair amount of mining rewards I think.  I wonder, would it be possible for a competing miner to capture these blocks and insert their own (valid) transactions in place for broadcast?  Maybe a dumb question, lol.  In my log there were several minutes seperation from valid blocks on either side on the bogus block.What would be the goal or take away from a malicious node broadcasting these intentionally?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "April 06, 2023, 04:42:01 AM",
+      "body": "This seems to be the same problem as above. A block containing transactions like this one [1] that are creating P2MS outputs (1 of 3 which is strange itself) hence inflating their sigopcount (884 in case of [1] which is the highest in that block) and the miner doesn't check the limit ergo produces an invalid block exceeding 80k sigopcount limit.The miner/mining-pool also seems to be the same since coinbase script contains F2Pool string again.[1] https://blockchair.com/bitcoin/transaction/0450a1fc590465796e9a1099328fdc4726b86558b7010704ae04cf2cca9643aeQuote from: CohibAA on April 06, 2023, 04:10:27 AMIt's curious that it's happened more than once over the previous days.  If indeed this is a configuration error, which seems likely, someone is losing a fair amount of mining rewards I think.That's true, specially when it is a pool where miners are trusting to not waste their hard work.Quote from: CohibAA on April 06, 2023, 04:10:27 AMI wonder, would it be possible for a competing miner to capture these blocks and insert their own (valid) transactions in place for broadcast?No because the block has to be changed and if you change even a single bit the final hash will be entirely different meaning it will no longer satisfy the target check so it has to be mined again.Quote from: CohibAA on April 06, 2023, 04:10:27 AMWhat would be the goal or take away from a malicious node broadcasting these intentionally?I don't think this is intentional. To give a better answer we have to know the client the said node is running which may be acquired if your logs stored the IP address of the node that sent the invalid block. In which case we may be able to connect to that node and see if it sends its useragent and that may give us more information like the client name which we could find on GitHub and report this bug.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "CohibAA",
+      "created_time": "April 06, 2023, 04:54:40 AM",
+      "body": "Quote from: pooya87 on April 06, 2023, 04:42:01 AMQuote from: CohibAA on April 06, 2023, 04:10:27 AMI wonder, would it be possible for a competing miner to capture these blocks and insert their own (valid) transactions in place for broadcast?No because the block has to be changed and if you change even a single bit the final hash will be entirely different meaning it will no longer satisfy the target check so it has to be mined again.As I was typing that, I was thinking that was the case, but it's been quite some time since I've dove into the technical details of bitcoin mining.  Thanks for clarifying.Quote from: pooya87 on April 06, 2023, 04:42:01 AMQuote from: CohibAA on April 06, 2023, 04:10:27 AMWhat would be the goal or take away from a malicious node broadcasting these intentionally?I don't think this is intentional. To give a better answer we have to know the client the said node is running which may be acquired if your logs stored the IP address of the node that sent the invalid block. In which case we may be able to connect to that node and see if it sends its useragent and that may give us more information like the client name which we could find on GitHub and report this bug.While I do have logips set to 1, everything I can see in the debug.log is quoted above.  Is there somewhere else I can pull the IP of the invalid broadcaster from?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "April 06, 2023, 06:50:23 PM",
+      "body": "The coinbase target address for both invalid blocks is 1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY and this one is attributed to the F2Pool.It's puzzling that they failed now twice with the same problem within just a few days in between. Lol, maybe some other mining pool exploits F2Pool's buggy candidate block assembly by sending them those sigops costly big P2MS transactions... Just a wild guess, don't take this serious!Having lost almost 13BTC with those two invalid blocks, F2Pool should really fix their mining software.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "April 28, 2023, 09:27:52 AM",
+      "body": "Stumbled across this question on Stack Exchange, so thought I would link it here for everyone's information: https://bitcoin.stackexchange.com/questions/117837/how-many-sigops-are-in-the-invalid-block-783426The invalid block in OP's post was only 3 sigops over the limit, for a total of 80,003.Also Vojtěch Strnad shared a handy script to calculate the number of sigops in a block.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

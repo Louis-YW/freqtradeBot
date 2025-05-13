@@ -1,0 +1,37 @@
+{
+  "id": "topic_5448305",
+  "title": "Sha256explorer",
+  "author": "Sha256explorer",
+  "created_time": "April 10, 2023, 08:48:37 PMLast edit: April 10, 2023, 09:53:56 PM by Sha256explorer",
+  "content": "I wrote a short piece of software to check if I understood correctly how the block hash calculation is done.I started from the python code published here: https://bitcointalk.org/index.php?topic=5439273.0I analyzed a random block, namely block 784697the program generates a wrong hash.please, where am I wrong?Code:import binasciiimport hashlib# block 784697     # decoded_raw_block\":{\"hash\":\"000000000000000000044b32a02685122ddef6a1a54990a7f0883577ae67128e\",\"confirmations\":5,\"height\":784697,\"version\":577257472,\"versionHex\":\"22684000\",\"merkleroot\":\"97cbf0be2eb628cd1548d3b755f0e04b0fe4f06c15b4882ea90b7a2ae93728c0\",\"time\":1681074323,\"mediantime\":1681068560,\"nonce\":3518743859,\"bits\":\"1705e0b2\",\"difficulty\":47887764338536.25,\"chainwork\":\"0000000000000000000000000000000000000000451ad1754406a7d5e02bdd08\",\"nTx\":3932,\"previousblockhash\":\"000000000000000000010550de6754269ccb5adeed388581cfc84f5aea6f45a1\",\"nextblockhash\":\"0000000000000000000271ea86cffc855dc61554ed66b3b824d6e9f7778b5ce9\",\"strippedsize\":797005,\"size\":1601732,\"weight\":3992747,\"tx\":#hash\":\"000000000000000000044b32a02685122ddef6a1a54990a7f0883577ae67128eversion=\"22684000\"prevhash=\"000000000000000000010550de6754269ccb5adeed388581cfc84f5aea6f45a1\"merkle_root=\"97cbf0be2eb628cd1548d3b755f0e04b0fe4f06c15b4882ea90b7a2ae93728c0\"# \"time\":1681074323,\"mediantime\":1681068560,\"nonce\":3518743859,\"bits\":\"1705e0b2\"nbits=\"1705e0b2\"ntime=\"1681074323\"nonce=\"3518743859\"blockheader = version + prevhash + merkle_root + nbits + ntime + nonce +\\            '000000800000000000000000000000000000000000000000000000000000000000000000000000000000000080020000'       # print('blockheader:\\n{}\\n'.format(blockheader))       hash = hashlib.sha256(hashlib.sha256(binascii.unhexlify(blockheader)).digest()).digest()hash = binascii.hexlify(hash).decode()print('hash: {}'.format(hash))Edit:I used this link for the node:https://api.blockchair.com/bitcoin/raw/block/000000000000000000044b32a02685122ddef6a1a54990a7f0883577ae67128e",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5448305",
+  "comments": [
+    {
+      "author": "ymgve2",
+      "created_time": "April 10, 2023, 09:35:52 PMLast edit: April 10, 2023, 09:53:11 PM by ymgve2",
+      "body": "Well, mainly that is absolutely not a valid block header you're building.Time and nonce are in decimal format when they should be hex and you add some garbage on the end after the nonce which is not part of Bitcoin. And every single value has the wrong endianness. Literally every single piece of your block header is wrong. Whoever made that original code you linked have no idea what they're doing.edit: Here's the actual raw data for the block header:00406822a1456fea5a4fc8cf818538edde5acb9c265467de500501000000000000000000c02837e 92a7a0ba92e88b4156cf0e40f4be0f055b7d34815cd28b62ebef0cb9793283364b2e0051733c5bb d1breaking it down (note all are lowest significant byte first (LSB) and might \"seem\" reversed from what you expect): 00406822 - versiona1456fea5a4fc8cf818538edde5acb9c265467de500501000000000000000000 - prevhashc02837e92a7a0ba92e88b4156cf0e40f4be0f055b7d34815cd28b62ebef0cb97 - merkle root93283364 - timestampb2e00517 - nbits33c5bbd1 - nonce",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "odolvlobo",
+      "created_time": "April 10, 2023, 10:11:09 PM",
+      "body": "Another potential problem is that each field has a fixed size. So, when you generate the hex for the values, you need to ensure that leading 0s are included.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "April 11, 2023, 08:22:09 AM",
+      "body": "The key thing to realize here is that all hashes are stored as big-endian hexadecimal numbers, and all numbers (such as version, time, etc.) are in little-endian by default. When you download raw block data, you should convert both the Merkle root hash and the previous block hash back to little-endian and only then use them for calculation. All other decimal values should be converted to hexadecimal representation, but endianness should be preserved. When you calculate the final hash, you need to convert it to hexadecimal and swap the endianness, so that all trailing zeroes become leading. If you are unsure which value should be converted and which do not, it is always a good idea to consult this page: https://en.bitcoin.it/wiki/Block_hashing_algorithm",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

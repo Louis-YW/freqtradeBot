@@ -1,0 +1,53 @@
+{
+  "id": "topic_5465150",
+  "title": "Egii Nna",
+  "author": "Egii Nna",
+  "created_time": "August 31, 2023, 05:50:58 AM",
+  "content": "I'm experimenting with Sparrow-based multisig wallets. I have two Nano Ledger hardware wallets, each configured with a distinct private key for a single signature. I made a 2 of 2 multisig wallet using these. The XPUB and ZPUB for every individual keystore should match those in the single signature wallets for the same device, as I had anticipated. The XPUB and ZPUB, however, were unique.Does the use of a set of private keys to create a single signature wallet or to join a multisig wallet configuration result in a different XPUB and ZPUB?If yes , do the XPUB and ZPUB vary according to the multisig wallet's signature?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5465150",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "August 31, 2023, 06:22:30 AM",
+      "body": "Quote from: Egii Nna on August 31, 2023, 05:50:58 AMDoes the use of a set of private keys to create a single signature wallet or to join a multisig wallet configuration result in a different XPUB and ZPUB?It's the derivation from \"master private key\" to \"extended public key\".The xpub/zpub are different because those are derived with different derivation paths which you can check in the wallet's 'Settings' under 'Keystores'.For example (single-sig Native SegWit): m/84'/0'/0'Each number separated with \"/\" starting from \"m\" (master private key) represents a key derivation index, which different index produce different child key.The xpub is usually the child key at the last number of the derivation path shown.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 31, 2023, 09:43:39 AM",
+      "body": "Most multisig wallets are created from a set of seed phrases, one for each co-signer at least that's how it works in Electrum, so naturally when you go about deriving master public keys and extended public keys, the number of x/zpubs generated is going to be multiplied by the number of co-signers, because each one has a different seed.Then each transaction will have a multisig script containing the public keys at the derived index e.g. 44'/0'/0'/0/0 for each co-signer's seed, for UTXOs of the first address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DifDrama",
+      "created_time": "September 04, 2023, 03:06:25 AMLast edit: September 06, 2023, 03:53:20 AM by DifDrama",
+      "body": "when you're dealing with multisignature wallets, the XPUB and ZPUB values can indeed vary based on the multisig configuration. This is because multisig wallets use a different derivation path and a combination of public keys from the participating wallets to create a unique multisig address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 04, 2023, 03:47:44 AM",
+      "body": "Quote from: DifDrama on September 04, 2023, 03:06:25 AMThe derivation path for multisig wallets typically includes information about the number of signatures required and the public keys involved.No, it's not in the derivation path; the script type (p2wpkh or p2sh-p2wpkh) only if it follows BIP48 standard but not the information about the consignees.The number of required signatures is in the \"redeem script\" and the number of cosigners is based from the number of public keys in it.That wont affect the derivation from the user's master private key to the extended public key that'll be used to derive the public keys in the MultiSig setup.Different m-of-n setup wont produce a different xpub, it's just the difference in derivation path as explained in the previous posts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "September 04, 2023, 06:03:34 AM",
+      "body": "Quote from: DifDrama on September 04, 2023, 03:06:25 AMEach combination of public keys, even from the same hardware wallets, can result in a unique XPUB or ZPUB for that specific multisig setup.The xpub or zpub is simply an encoding of the public key and chain code at that level. The only thing that will make it change is a different derivation path. Indeed, an xpub or a zpub (or any other type of master public key) at the same level encodes the exact same data other than the prefix and checksum.For example, take the following seed phrase:Code:electric rule silver fatal glide deny reduce beef flower captain shed transferAt m/0, the xpub is as follows:Code:xpub68EHu5nWAcFPupRV4LUMuacQHpM2D3n1qxjxQkS4Qk21sYNkgsMSpwW2ZHSTvTUF4EKejymDQm4FKJcbFD2ESjp5jMbmPY3F6649VUJFKf2If we decode that from Base58 to hex (and add in a few spaces for clarity), we get the following:Code:0488b21e 01 2e6e7c8f 00000000 b8a8672f29e366205ec4a809cb608b40c0ef948687821367e99374ccc4d6efd1 02804083e75db2a886af7b176e7a48cab9db9e66231315a9e4a0449b737e3fd8b2 6ae4f545This is broken down as 4 byte version code, 1 byte key depth, 4 byte parent fingerprint, 4 byte child index number, 32 byte chain code, 33 byte public key, 8 byte checksum.Now, let's take the zpub at the same derivation path:Code:zpub6mtpWR8LTyLMcQoij43cKkoQdkdv6Hm1gBnPyYDqAkmmyk1DCBga54pJbhMdvGn5sWZGEvxLL5mM5sqigbrG3DBHU2zcZMgDdYBSGf1zZjGLooks totally different, right? But let's decode that just as we did above:Code:04b24746 01 2e6e7c8f 00000000 b8a8672f29e366205ec4a809cb608b40c0ef948687821367e99374ccc4d6efd1 02804083e75db2a886af7b176e7a48cab9db9e66231315a9e4a0449b737e3fd8b2 b6ceaafbThe only thing that we change is the prefix version code, which is what changes the first four characters from \"xpub\" to \"zpub\". Because this has changed, the checksum changes too. And so the encoded key looks totally different, when in reality it is almost identical.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

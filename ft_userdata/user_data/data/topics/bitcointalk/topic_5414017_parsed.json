@@ -1,0 +1,53 @@
+{
+  "id": "topic_5414017",
+  "title": "uxBLN01",
+  "author": "uxBLN01",
+  "created_time": "September 18, 2022, 06:04:49 PM",
+  "content": "Hi guys,I have to do the following task:1. Compile Bitcoin Core (https://github.com/bitcoin/bitcoin). You can see doc/build-*.md for instructions on building the various elements.2. Run the unit and functional tests. Instructions on how to do that can be found here: (https://github.com/bitcoin/bitcoin/blob/master/test/README.md).3. Look at example_test.py in the functional test directory and try getting node 1 to mine another block, send it to node 2, and check that node 2 received it. In your response to this email, please include a link to a gist or code snippet that you used to complete this step.Cause compiling is a bit difficult for me (I am new, sorry for that), I downloaded the pre compiled version of bitcoin core, including the dmg and tar.gz file. My thinking was that I am able to solve the above mentioned problem via the regtest mode. But how do I access do the regtest mode without bitcoin core starting with the initial blockchain download. I do not want to clutter up my mac with so much data. Just want to solve the problem and then delete all again cause it is not the device for operating a BTC fullnode.Any help for this.Thanks a lot.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5414017",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "September 18, 2022, 09:52:33 PM",
+      "body": "To enable regtest, simply run Bitcoind usingCode:bitcoind -chain=regtestAnd in Bitcoin-cli:Code:bitcoin-cli -chain=regtest <command> <args>You don't need to define special RPC ports and hosts or options. Assuming your configuration file doesn't have them either, the software will automatically create a \"cookie\" file that is used automatically for authentication every time you use Bitcoin-cli.These options are always available, whether you compiled from source or you just used a pre-built binary.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "uxBLN01",
+      "created_time": "September 19, 2022, 06:45:28 AM",
+      "body": "sure but if I unpack the pre compiled version, the blockchain download starts. And I do not want to do this. Just using the regtest mode via the terminal with your stressed commands.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "September 19, 2022, 10:30:25 AM",
+      "body": "Quote from: uxBLN01 on September 19, 2022, 06:45:28 AMsure but if I unpack the pre compiled version, the blockchain download starts. And I do not want to do this. Just using the regtest mode via the terminal with your stressed commands. There should not be an initial block download when you use regtest, because regtest always starts with an empty blockchain. Are you sure you are running the daemon or GUI with -chain=regtest added to the program arguments such as:Code:bitcoin-qt -chain=regtestbitcoind -chain=regtest",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "uxBLN01",
+      "created_time": "September 19, 2022, 02:05:41 PM",
+      "body": "okay, I managed to download bitcoin core from source. I got a bitcoin folder, including all the stuff needed, in my home folder directory. It also works to run the regtest mode via: Code:...~ % bitcoin-cli -regtest ...I created 101 blocks as well.But now I want to connect to another node on the regtest mode so I am able to send him a freshly ''mined'' block. What do I have to do. What kind of new data directory do I have to setup and what files do I need? How do I do then the connection to this node?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 20, 2022, 03:38:14 AM",
+      "body": "Quote from: uxBLN01 on September 19, 2022, 02:05:41 PMBut now I want to connect to another node on the regtest mode so I am able to send him a freshly ''mined'' block. What do I have to do. What kind of new data directory do I have to setup and what files do I need? How do I do then the connection to this node?You received quite a number of replies in your other thread, link: How to add a node in regtest mode via GUI?In my reply specifically, you'll have to start bitcoin-qt with --datadir and other parameters.In the command line, use the same method but start bitcoind with the same parameters but you'll also have to add different -rpcport -rpcuser -rpcpassword per instanceso that you can use bitcoin-cli RPC commands to specific nodes.This is how I start my bitcoind Regtest 3-Nodes setup:Node1:Code:bitcoind -regtest -port=8330 -datadir=E:\\AppData\\Bitcoin-altdir1 -rpcport=18001 -rpcuser=node1 -rpcpassword=node1Node2:Code:bitcoind -regtest -port=8330 -connect=127.0.0.1:8330 -datadir=E:\\AppData\\Bitcoin-altdir2 -rpcport=18002 -rpcuser=node2 -rpcpassword=node2Node3:Code:bitcoind -regtest -port=8330 -connect=127.0.0.1:8330 -datadir=E:\\AppData\\Bitcoin-altdir3 -rpcport=18003 -rpcuser=node3 -rpcpassword=node3So, when using bitcoin-cli to use RPC commands, you'll have to add the specific -rpcport -rpcuser -rpcpassword to tell which node to send the command.Example for Node1:Code:bitcoin-cli -rpcport=18001 -rpcuser=node1 -rpcpassword=node1 getblockchaininfo",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

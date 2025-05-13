@@ -1,0 +1,165 @@
+{
+  "id": "topic_5462674",
+  "title": "gmaxwell",
+  "author": "gmaxwell",
+  "created_time": "August 09, 2023, 05:12:08 PM",
+  "content": "If you used \"bx seed\" you probably already lost your bitcoins, but if you did and you still have them. MOVE THEM NOW.  It turns out that in late 2016 it was changed from using the OS provided secure entropy to using 32-bits of timestamp fed into an insecure generator.  If you used it prior to the introduction of the vulnerability I would still recommend moving any coins you have left.Do not update and continue to use it.  The author insists the insecure behavior was intentional and expressed disinterest in changing it.https://news.ycombinator.com/item?id=37054862",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5462674",
+  "comments": [
+    {
+      "author": "Charles-Tim",
+      "created_time": "August 09, 2023, 05:14:40 PM",
+      "body": "Similar discussion ongoing:[WARNING] Wallets created with Libbitcoin Explorer (bx) are insecure!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 10, 2023, 06:17:45 AM",
+      "body": "Never knew bx seed was so popular to be honest.Fortunately, I'm actively creating my own wallet software which *can* generate seeds and private keys (securely), and now I'm thinking about making a command-line interface which exposes these commands as well.Clearly, there is a shortage of trustworthy bitcoin tools.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "un_rank",
+      "created_time": "August 10, 2023, 01:19:06 PM",
+      "body": "Quote from: NotATether on August 10, 2023, 06:17:45 AMClearly, there is a shortage of trustworthy bitcoin tools.And there should not be an expectation of trustworthy tools. Many tools start of with a good reputation and attracts a ton of users who do not regularly review the code, making it possible for them to turn dubious without notice.We should not trust any tool no matter how long it has been functioning effectively.- Jay -",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 10, 2023, 01:49:37 PM",
+      "body": "Isn't \"bx seed\" supposed to be weak? I mean the docs clearly state that this is generating a \"pseudorandom\" seed and can \"introduce cryptographic weakness\". Why would a wallet use this in first place?https://github.com/libbitcoin/libbitcoin-explorer/wiki/bx-seedOr is the problem somewhere in the code affecting other commands like \"bx hd-new\" because the doc doesn't say anything about being weak there.https://github.com/libbitcoin/libbitcoin-explorer/wiki/bx-hd-new",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 10, 2023, 07:49:44 PMLast edit: August 12, 2023, 01:29:37 PM by Carlton Banks",
+      "body": "Quote from: pooya87 on August 10, 2023, 01:49:37 PMIsn't \"bx seed\" supposed to be weak? I mean the docs clearly state that this is generating a \"pseudorandom\" seed and can \"introduce cryptographic weakness\". Why would a wallet use this in first place?https://github.com/libbitcoin/libbitcoin-explorer/wiki/bx-seed\"pseudorandom\" isn't any kind of meaningful warning, all (typical) RNGs are pseudorandom. Not providing sufficient entropy to seed the RNG is something altogether different. The only alternative is an expensive HRNG (a separate rackmountable entropy generator, in essence), and even then I seem to remember that this only improves the quality of the entropy seeding (i.e. the RNG still produces pseudorandom numbers).stating more plainly what the security properties of the code really is would help, but I'm not sure it would have made a difference in these recent thefts. Anyone who compiles this code themselves (and I'm pretty sure that's necessary, no organization was building + distributing binaries) is taking a leap into the world of trusting their own judgement in any case. <-- edit i was too lazy to check thoroughly, libbbitcoin did distribute pre-built bx-seed binaries, thanks gmaxwellthe quality of the entropy seeding an RNG is so fundamental to secure use of cryptography, and yet truly understanding how and why are immense tasks for any human. so I do sympathize with those who were stolen from, because I'm not happy with my own grasp of the issues. but we may, in the end, have no choice but to do so, i somehow doubt this is the last time that inadequate assessments of cryptography in software will burn people, whether cryptocurrency or otherwise",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 11, 2023, 01:39:35 AMLast edit: August 11, 2023, 02:48:08 PM by gmaxwell",
+      "body": "Quote from: pooya87 on August 10, 2023, 01:49:37 PMIsn't \"bx seed\" supposed to be weak? I mean the docs clearly state that this is generating a \"pseudorandom\" seed and can \"introduce cryptographic weakness\". Why would a wallet use this in first place?https://github.com/libbitcoin/libbitcoin-explorer/wiki/bx-seed\"It's dangerous to go alone! Take this.\"You're reading the \"warning\" the the benefit of unadulterated hindsight, you already know the function is dangerous because it uses an insecure PRNG with a 32-bit seed.  The audience for a warning doesn't know that, so you have to forget what you know and read it from their perspective.QuoteWARNING: Pseudorandom seeding can introduce cryptographic weakness into your keys. This command is provided as a convenience.One completely credible way of reading the \"warning\" is \"It's really easy to get seeding wrong and dangerous if you do, to help you get it right we've provided you with this function for your convenience.\"  That makes sense, right?Otherwise what possibly could convenience mean here?  A function called \"bx seed\" that outputs a minimum of 128 bits while never having more than 32-bits of unpredictability, based on the time... how is that convenient for anyone except thieves?  It doesn't help the user because they'll just get robbed it they use it.  Even if the user is just testing stuff it's no harm to use a plausible secure random seed, and no easier to use an insecure one (it's not like it had an option to let the user give a number between 1 and 4 billion to get a particular result for test reproducibility).If they didn't want to do anything complicated they could have just told users to use \"xxd -p -l 32 /dev/random\" or \"openssl rand -hex 32\": look mah, no code!How could a user distinguish the \"You really should use this\" from a \"you really SHOULDNT use this\"?  Well one way would be for it to explicitly say not to use it, which the warning did not say.  Another way is if the page gave even the slightest hint of what the user should do this instead e.g. \"You should roll dice for your seed, instructions are outside of the scope of this page.\"-- but it didn't do that either.\"There was once a little chick named Kluk\"The \"you really should use this\" understanding isn't the only credible dangerous understanding.  Another way to read it is that the output is not REAL ULTIMATE POWERTRUE RANDOMNESS, but instead is the output of a securely seeded cryptographic pseudorandom generator.  That is what the code actually did (more or less) until late 2016.  The change happened without notice in an unreviewed PR that claimed to make the random number generation \"thread safe and optimal\".  The change could have easily renamed seed to \"insecureseed\" and/or restricted it to 32-bits of output, but it didn't.[Aside: Inside Bitcoin core there are some RNGs used for non-security purposes but they use names like \"insecure_rand()\" to avoid confusion, even though the only users of these internal APIs are developers of the software itself (and, I think these days, they're all an actually secure fast CSPRNG, they're just not intended for security purposes) and are much less likely to get confused than a user at the command-line]People sometimes spread FUD over the use of CSPRNGs in favor of often-dubious true random schemes.   In fact, comments by the libbitcoin author suggest that this may have been the actual intent of the warning-- as he says it was there to warn users that the code depended on the operating system RNG.  The fact that it *didn't* depend on the OS it was just unconditionally insecure and yet the author insists there is no flaw and its working as intended is confusing to say the least (especially since he knew 32-bits could be searched quickly).But in any case use of the OS RNG (which these days is usually a CSPRNG driven by a hardware TRNG among other sources) would be completely reasonable and unlikely to lose your coins (save for some fringe risks)-- which is dramatically different than what was actually delivered: a function guaranteed to lose your coins.So even accepting the author's position the 'warning' there wasn't intended to be a warning that it was actually insecure but a warning that it might not be highly secure against fringe threats like your OS yielding bad random numbers.  We can't say a function that had no security was adequately warned by a notice intended to address the fact that it it may not have the best possible security.\"It was on display in the bottom of a locked filing cabinet stuck in a disused lavatory with a sign on the door saying 'Beware of the Leopard'.\"But all this talk about the \"warning\" is kind of moot--  The warning, which was listed only on a single page of the documentation, was added after the change and after the command was already in use and recommended elsewhere. Other pages of the documentation instruction on the creation of private keys and BIP39 seeds continued to use \"bx seed\" with no warning.  The text advising \"bx seed\" with no warning was submitted to Mastering Bitcoin by the same person who later introduced the vulnerability.  They also listed instructions elsewhere with nary a warning in sight.  Even if you don't agree with the the two distinct arguments I present about about the warning being completely ineffectual there is a great reason to expect most users would never see it.QuoteOr is the problem somewhere in the code affecting other commands like \"bx hd-new\" because the doc doesn't say anything about being weak there.https://github.com/libbitcoin/libbitcoin-explorer/wiki/bx-hd-newAll commands in libbitcoin explorer must have their entropy provided to them, so the documentation for bx-hd-new tells you to use \"bx seed\" to get it (just like the example above for BIP39, or for plain private keys).(... I find myself wondering if the unformatted entropy on stdin is may be responsible for some other insecure key incidents we've found-- it's pretty easy to provide the wrong input into stdin and not notice!)That aside, anyone working on software in this space (or really in general) has to spend a considerable amount of time avoiding serious footguns because otherwise there are too many ways for things to go wrong for any user (even an expert) to have much hope of using the software successfully.  A seed generating command that generates seeds which are practically insecure is just unjustifiable, to do so intentionally (or defend an existing one) requires a phenomenal lapse in judgement.And we've still yet to see an explanation for this the fact that the authors development activity stopped entirely months ago on the very day the first exploitation appear to have happened and how that possibility squares with the denial that there was a problem in libbitcoin explorer at all.Quote from: Carlton Banks on August 10, 2023, 07:49:44 PMAnyone who compiles this code themselves (and I'm pretty sure that's necessary, no organization was building + distributing binaries) is taking a leap into the world of trusting their own judgement in any case.FWIW, there are binaries.  I wouldn't be surprised to learn that they were frequently used, as it's long been the case that this software has been difficult to get to compile, as NotATether recently learned.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "August 11, 2023, 05:35:37 PM",
+      "body": "@gmaxwell,Do you think this vulnerability had anything to do with the hack reported here: https://bitcointalk.org/index.php?topic=5461057.msg62602139#msg62602139Th OP of that post claimed he used Bitpay's libraries, bitcore-mnemonic and bitcore-lib to create mnemonic phrase (which I assume is represented as a WIF master key.)  Do you know if these libraries rely on libbitcoin?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 11, 2023, 06:33:06 PM",
+      "body": "They made a similar post on reddit, I responded with some questions but they haven't responded.If I had to make a bet I would bet they actually used bx to generate their seed and are confused about the history.  I very much would not be surprised if the bitcore software were vulnerable (considering the history) but having the exact same vulnerability seems unlikely.It seems really credible to me that someone could generate their bip39 seed with one tool and think it was another-- they might have even evaluated both.  I think that's more likely that the bitcore code containing the same vulnerability.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 12, 2023, 02:37:01 PMLast edit: August 12, 2023, 03:15:57 PM by Carlton Banks",
+      "body": "Quote from: gmaxwell on August 11, 2023, 01:39:35 AMThe change happened without notice in an unreviewed PR that claimed to make the random number generation \"thread safe and optimal\".  The change could have easily renamed seed to \"insecureseed\" and/or restricted it to 32-bits of output, but it didn't.Quote from: gmaxwell on August 11, 2023, 01:39:35 AMyet the author insists there is no flaw and its working as intended is confusing to say the least (especially since he knew 32-bits could be searched quickly).Quote from: gmaxwell on August 11, 2023, 01:39:35 AMAnd we've still yet to see an explanation for this the fact that the authors development activity stopped entirely months ago on the very day the first exploitation appear to have happened and how that possibility squares with the denial that there was a problem in libbitcoin explorer at all.these statements are rather damning taken altogether. the library author was at best absurdly negligent (that's absurdly), and I say that given that he seems to be otherwise intelligent, as well as just a little arrogant when talking live (which I experienced once). whatever the excuse, it would be difficult to trust someone like that (but i expect he will melt away into the background somewhere/somehow and it will never trouble his reputation as a developer)looking at the diff in the pull request, my (non-expert) opinion is that the original code was also pretty dubious for securely seeding an RNG (src/utility/random.cpp:39-41). depending on the output of std::random_device is clearly implementation/platform specific, wouldn't it have been much more sensible to at least use some cross-platform library function to collect additional entropy? (even simply openssl, surely?). trusting the hardware and the c++ lib implementation on every possible platform (past, present + future...) seems to border on reckless to me, in my (as i say) non-expert opinionand that's without considering the actual (uncommented) change to cast the current system time (!) to an unsigned 32-bit integer as the return type for the function providing the entropy seeding data. I'm 100% confident that you don't need to be an expert to see that this is staggeringly unprofessional, rock-bottom basic tutorials for generating entropy describe exactly this sort of practice as badbadbadin fact, ISTM it's not even necessary to search the entire 32-bit number space?! surely it's possible to feed unix-timestamps since the 2016 date/time when the PR was merged into some common c++ mersenne_twister implementations to find every seed generated with the insecure code. either way, it's very surprising that it's taken 7 years for anyone to notice",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 12, 2023, 03:03:45 PM",
+      "body": "Quote from: Carlton Banks on August 12, 2023, 02:37:01 PMin fact, ISTM it's not even necessary to search the entire 32-bit number space?! surely it's possible to feed unix-timestamps since the 2015 date/time when the PR was merged into some common c++ mersenne_twister implementations to find every seed generated with the insecure code. either way, it's very surprising that it's taken 7 years for anyone to noticeThat gives 220,752,000 possible seeds if we take exactly 7 years, otherwise a little more or less. Either way, it's something that even a Pentium 4 can brute force. To say nothing about GPUs.They clearly did a bad job explaining that this command is not intended for real-world usage.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 12, 2023, 03:18:54 PMLast edit: August 12, 2023, 06:24:52 PM by Carlton Banks",
+      "body": "Quote from: NotATether on August 12, 2023, 03:03:45 PMThey clearly did a bad job explaining that this command is not intended for real-world usage.i defer to gmaxwells point on this: what non-real-world usage is there for a woefully insecure wallet seed utility?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 13, 2023, 04:17:46 AM",
+      "body": "Quote from: Carlton Banks on August 12, 2023, 03:18:54 PMQuote from: NotATether on August 12, 2023, 03:03:45 PMThey clearly did a bad job explaining that this command is not intended for real-world usage.i defer to gmaxwells point on this: what non-real-world usage is there for a woefully insecure wallet seed utility?I don't think there's any. If they wanted to just use it as a unit test for their seed generation algorithm, they should've left it at that and not make it a public API or command.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 13, 2023, 05:15:54 AM",
+      "body": "Quote from: Carlton Banks on August 12, 2023, 02:37:01 PM opinion is that the original code was also pretty dubious for securely seeding an RNG (src/utility/random.cpp:39-41). depending on the output of std::random_device is clearly implementation/platform specificI think there are good odds that for any platform where the code can actually be built that function just read randomness from the OS, but you're right that it isn't guaranteed.Basically it seems they changed from code that had security problems in theory but usually not (and maybe never) in practice to code that was certainly broken all the time for everyone in both theory and practice.Quotein fact, ISTM it's not even necessary to search the entire 32-bit number space?! surely it's possible to feed unix-timestamps since the 2016 date/time when the PR was merged into some common c++ mersenne_twister implementations to find every seed generated with the insecure code. either way, it's very surprising that it's taken 7 years for anyone to noticeThe timer is a high resolution (nanosecond) one and it uses the least significant bits of it, so it loops every 4.2 seconds or so.  But depending on the platform not all the bits will be used, e.g. mac i think only has microsecond resolution.In any case it shouldn't matter because optimized code will make fast work of all 32-bits.Quote from: NotATether on August 13, 2023, 04:17:46 AMI don't think there's any. If they wanted to just use it as a unit test for their seed generation algorithm, they should've left it at that and not make it a public API or command.But there isn't any test it's used for I can find, and its used in all the documentation any place a seed is needed. I also can't find any instructions in their docs on how you *should* generate the seed.  Like if you want to use dice you still need a procedure to de-bias the dice (and to get hex out). I don't buy it, it's just not a credible excuse to me. To be clear, I'm not suggesting that it was intentionally vulnerable, but that it was just mistaken and that a rather non-pragmatic view on what users will or should do caused it to not get as much care as it ought to have.Quote from: Carlton Banks on August 12, 2023, 02:37:01 PMand that's without considering the actual (uncommented) change to cast the current system time (!) to an unsigned 32-bit integer as the return type for the function providing the entropy seeding data. I'm 100% confident that you don't need to be an expert to see that this is staggeringly unprofessional, rock-bottom basic tutorials for generating entropy describe exactly this sort of practice as badbadbadIt's also likely bad for the non-cryptographic usage in libbitcoin. An attacker can observe some of the choices made by the software you can recover the RNG state then use it to predict the random choices that were used and will be used, which likely results in DOS vulnerabilities.On modern computers there is seldom a reason to use very poor randomness.  The only time these days when I use non-cryptographic randomness is for the inner loops of optimization search code where the RNG is very performance critical.  In those cases I'll use xoshiro256++ periodically seeded with rdrand (the hw RNG on modern cpus). But in any ordinary software it's uncommon for the rng performance to matter so much that you can't use a cryptographic one.Maybe in some usage or another using a crappy PRNG with weak seeding wouldn't be harmful, but it's usually not worth the cost of figuring out if its safe or not (and making sure it stays safe as people change code), better to use a safe thing unless and until the performance is an issue and then figure out if something faster can be used safely.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 13, 2023, 12:17:02 PM",
+      "body": "Quote from: gmaxwell on August 13, 2023, 05:15:54 AMI think there are good odds that for any platform where the code can actually be built that function just read randomness from the OS, but you're right that it isn't guaranteed.the bad odds are that people are good at re-inventing bad ideas by dint of hubristic assumption that they're being imaginative/original. you can bet someone will go for security<-->obscurity simply because they have some exotic or old platform that they believe somehow protects them from attacks, and use it to generate seeds and/or sign txs offline etc. I realize this is many layers of (now anachronistic) hypotheticals in the case of bx-seed though, but these things bear repeating every so oftenQuote from: gmaxwell on August 13, 2023, 05:15:54 AMIt's also likely bad for the non-cryptographic usage in libbitcoin. An attacker can observe some of the choices made by the software you can recover the RNG state then use it to predict the random choices that were used and will be used, which likely results in DOS vulnerabilities.hmmm, but wasn't the low-entropy seeding limited to the bx-seed codebase, or has a similar problem been found in the libbitcoin dev toolkit?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 13, 2023, 03:52:40 PM",
+      "body": "Quote from: Carlton Banks on August 13, 2023, 12:17:02 PMhmmm, but wasn't the low-entropy seeding limited to the bx-seed codebase, or has a similar problem been found in the libbitcoin dev toolkit?No. libbitcoin is split into 11 different repositories, the flawed rng was in libbitcoin-system, used all over the place the supposed thread safety bug that motivated the change was observed in P2P networking.  But I believe bx-seed is the one and only generate-your-private-key thing in the whole caboodle.The division of the software into many repositories probably contributes to the lack of review/oversight and wider participation in development there.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Carlton Banks",
+      "created_time": "August 13, 2023, 04:16:09 PM",
+      "body": "Quote from: gmaxwell on August 13, 2023, 03:52:40 PMthe flawed rng was in libbitcoin-system, used all over the place the supposed thread safety bug that motivated the change was observed in P2P networkingdisclaimer: i'm the wrong person to speak about thread safety, not enough experience...but, the pull request doesn't seem to make any changes that should alter threading behavior, if it does it's incredibly subtle (which I appreciate is often the case with thread-safety bugs)..surely (yeah, another \"...surely...\") it's good practice to document the nature of the bug, in the case where it's a subtle thread-safety bug?sounds like I ought to check if Armory's use of libbitcoin could be affected. I didn't create any new Armory wallets since the date (late 2016) of the libbitcoin-system pull request, but possibly others did. Armory previously used Crypto++, which I guess was subject to a little more scrutiny (guessing isn't good enough however, I feel compelled now to check)",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 13, 2023, 05:08:19 PM",
+      "body": "Quote from: Carlton Banks on August 13, 2023, 04:16:09 PM...but, the pull request doesn't seem to make any changes that should alter threading behavior, if it does it's incredibly subtle (which I appreciate is often the case with thread-safety bugs)It does, it makes the random number generator thread specific. See the code after \"// Maintain thread static state space.\".  Of course it could have made the RNG thread local with a much smaller commit which changed nothing except the fact that each thread got its own copy of the RNG.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Cricktor",
+      "created_time": "August 14, 2023, 09:32:33 PM",
+      "body": "Yesterday a new release v.3.7.0 of libbitcoin-explorer has been published on their Github repo, effectively making bx seed  an obsolete command and removing it. I'm not knowledgeable enough to sift through all the commits from previous release(s) to this one to identify if major improvements with entropy handling were done. My gutt feeling: I doubt it.At first glance the removal of bx seed  doesn't look to change anything regarding the questionable PRNG and its seeding issues. But, I'm no code reviewer and I didn't have time for a closer look. For me this raises rather questions than any confidence in this tool or how this project deals with entropy, quality of randomness and so on.When reading \"Mastering Bitcoin\" I remember that I thought how versatile and interesting this bx tool seemed to be. I wanted to play with and explore it, don't remember what kept me from doing it, though. Today I'm glad I didn't use it.This reminds me to look at and assess carefully how tools implement the very basic foundation of cryptography to avoid such fails like MilkSad. Unfortunately that's often kind of expert level playground. It's so much more easy to screw up than the opposite.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "gmaxwell",
+      "created_time": "August 15, 2023, 02:49:09 AM",
+      "body": "Quote from: Cricktor on August 14, 2023, 09:32:33 PMIt's so much more easy to screw up than the opposite.The fact that the author has been resolute in the position that this wasn't an error means that this can't just be understood in terms of how easy it is to screw up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

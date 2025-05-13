@@ -1,0 +1,69 @@
+{
+  "id": "topic_5418910",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "October 31, 2022, 08:26:16 AM",
+  "content": "Hello all,sorry if this question is dumb or contains a thinking error but I am looking for answers. If I understand correctly, the time in the block header is 4 bytes Unix style.  Four bytes corresponding to 32 bits and 2^32 equals 4294967296. This corresponds to the seconds after the date 01 January 1970 and the expiration date would therefore be the year 2106.Would the protocol have to be adapted by this year at the latest? Otherwise the system would collapse when it reaches this limit. Do I have a thinking error?Please enlighten me. Thank you",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5418910",
+  "comments": [
+    {
+      "author": "NeuroticFish",
+      "created_time": "October 31, 2022, 08:41:07 AM",
+      "body": "Quote from: citb0in on October 31, 2022, 08:26:16 AMWould the protocol have to be adapted by this year at the latest? Otherwise the system would collapse when it reaches this limit. Do I have a thinking error?Please enlighten me. Thank youIt doesn't look to me like a thinking error. The wiki also tells that bitcoin will have a problem in 2106 (2038+68), so yes, until then somebody will have to find a fix, not only for bitcoin, but for many other databases and systems using that time format (and most systems will need a fix \"already\" in 2038).However, I am sure it's not an urgent matter  Quote from: https://en.bitcoin.it/wiki/Block_timestampBitcoin uses an unsigned integer for the timestamp, so the year 2038 problem is delayed for another 68 years.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "October 31, 2022, 09:56:49 AMLast edit: October 31, 2022, 10:52:41 AM by o_e_l_e_o",
+      "body": "Yes, since bitcoin uses a 32 bit unsigned integer rather than a 32 bit signed integer, the 2038 problem does not occur until 2106.Options to solve this would either to be increase the size of the field to 64 bits, or simply allow it to overflow and add 232 to the overflowed timestamp.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "October 31, 2022, 10:20:11 AM",
+      "body": "That was helpful, thanks to both of you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "ABCbits",
+      "created_time": "October 31, 2022, 11:59:36 AM",
+      "body": "Quote from: citb0in on October 31, 2022, 08:26:16 AMWould the protocol have to be adapted by this year at the latest? Otherwise the system would collapse when it reaches this limit. FYI, current and older Bitcoin Core use 2^31 (rather than 2^32) which means some node would crash on 2038. The bug was revealed since few years ago[1-2], but only fixed very recently[3]. It's possible other full node implementation might have similar problem.Quote from: o_e_l_e_o on October 31, 2022, 09:56:49 AMOptions to solve this would either to be increase the size of the field to 64 bits, or simply allow it to overflow and add 232 to the overflowed timestamp.I expect there'll be at least 1 hard fork between now and 2106, so first option should be chosen. Second option will need ugly workaround such as if (block_height > X){timestamp += 2^32} .[1] https://github.com/bitcoin/bitcoin/issues/21356[2] https://bitcointalk.org/index.php?topic=5365359.msg58166985#msg58166985[3] https://github.com/bitcoin/bitcoin/pull/26259",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 31, 2022, 12:18:29 PM",
+      "body": "As others have mentioned this was already known and will be fixed long before there will be an issue.What is interesting is that it was done that way in the 1st place. It's not like this was not mentioned in a lot of other places long before BTC was even a thought by Satoshi.I know unlike the Y2K thing this is not getting attention in other places that should because even now 2038 is 15 years away and it will be the next programmers problem.But still....https://www.reddit.com/r/mariadb/comments/lfm4fz/does_mariadb_have_any_plans_to_fix_the_2038/Anybody want to ask theymos what database server we are running on here?-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NeuroticFish",
+      "created_time": "October 31, 2022, 12:28:57 PM",
+      "body": "Quote from: DaveF on October 31, 2022, 12:18:29 PMAnybody want to ask theymos what database server we are running on here?Well, if SMF wiki is not lying, I'd guess that MySQL is the only choice for the current 1.1.x version in use here.Quote from: https://wiki.simplemachines.org/smf/DatabaseForums using SMF 2.0 and up can use MySQL, PostgreSQL, or SQLite database to store all of the data on the forum, while SMF 1.0 and 1.1 forums may use only MySQL.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "October 31, 2022, 01:58:56 PM",
+      "body": "Quote from: NeuroticFish on October 31, 2022, 12:28:57 PMQuote from: https://wiki.simplemachines.org/smf/DatabaseForums using SMF 2.0 and up can use MySQL, PostgreSQL, or SQLite database to store all of the data on the forum, while SMF 1.0 and 1.1 forums may use only MySQL.mariadb is a fork of MySQL so the same issue exists there https://database.guide/what-is-the-year-2038-problem/From the coding PHP coding side it really is a trivial fix, BUT have you found every place where that code might be.Where someone hacked something quickly together and left it because it worked.It's not the glaring issues that are the problem, it the stuff that is embedded or used everywhere that is the problem.If you are in IT, what are you doing tomorrow:  https://www.zdnet.com/article/openssl-warns-of-critical-security-vulnerability-with-upcoming-patch/Probably dealing with that.....-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

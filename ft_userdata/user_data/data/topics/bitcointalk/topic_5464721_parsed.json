@@ -1,0 +1,69 @@
+{
+  "id": "topic_5464721",
+  "title": "Accardo",
+  "author": "Accardo",
+  "created_time": "August 27, 2023, 10:34:09 AM",
+  "content": "Carried out a search on some SQL programs that can query the blockchain, Saw Abe, but it required that I download bitcoin core, which wasn't what I needed. Knew of some RPC commands that people who run full nodes can use to retrieve data on the blockchain. So I checked out bigquery, read it on a PDF, a google product that has some bitcoin datasets, with two tables blocks and transaction, including interval structures stored in columns; TXin & txout of a transaction, stored in the inputs and outputs columns of the transactions respectively. It all looked complex to understand at first glance, but read further to discover that it's mainly to help analysis for various kinds of analytic problems, and not for exploring individual transactions.I queried for the transactions with zero fees, which I also read on the introductory aspect of the program, which explains that miners add their transactions to a block without paying fees. The query retrieved the number of transactions with zero feesCode:SELECT   ROUND((input_value - output_value)/ size, 0) AS fees_per_byte,  COUNT(*) AS txn_cntFROM  `bigquery-public-data.crypto_bitcoin.transactions`WHERE TRUE  AND block_timestamp >= '2023-08-24'   AND is_coinbase IS FALSEGROUP BY 1Did another test run on another query I found on the article written about the bitcoin dataset, the query is to retrieve balances on different addresses. Code:WITH double_entry_book AS (   -- debits   SELECT    array_to_string(inputs.addresses, \",\") as address   , inputs.type   , -inputs.value as value   FROM `bigquery-public-data.crypto_bitcoin.inputs` as inputs   UNION ALL   -- credits   SELECT    array_to_string(outputs.addresses, \",\") as address   , outputs.type   , outputs.value as value   FROM `bigquery-public-data.crypto_bitcoin.outputs` as outputs)SELECT   address,   type   ,   sum(value) as balanceFROM double_entry_bookGROUP BY 1,2ORDER BY balance DESCLIMIT 1000This retrieves different addresses with the amount of bitcoin contained in them, but the numbers didn't look realistic at first, like this 5502219754649, then I copied one address: bc1qjasf9z3h7w3jspkhtgatgpyvvzgpa2wwd2lr0eh5tx44reyn2k7sfc27a4 searched on blockchain explorer and found that the digits doesn't have a decimal point that separates the number, though correct. It looked this way on block explorer 55022.19754649 Tried out different queries, which I may not post because I didn't understand the results, didn't stop loading or too long to share. The bitcoin dataset is 'bigquery-public-data.crypto_bitcoin' other cryptocurrency datasets also exists too, you can read this threadGoogle is still building the model at the moment I notice some limitations, you can also use Legacy or Google SQL to execute query on bigquery.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5464721",
+  "comments": [
+    {
+      "author": "ABCbits",
+      "created_time": "August 27, 2023, 12:13:56 PM",
+      "body": "That's interesting, i didn't know Google had public dataset including Bitcoin blockchain.Quote from: Accardo on August 27, 2023, 10:34:09 AMCarried out a search on some SQL programs that can query the blockchain, Saw Abe, but it required that I download bitcoin core, which wasn't what I needed. Knew of some RPC commands that people who run full nodes can use to retrieve data on the blockchain. So I checked out bigquery, read it on a PDF, a google product that has some bitcoin datasets, with two tables blocks and transaction, including interval structures stored in columns; TXin & txout of a transaction, stored in the inputs and outputs columns of the transactions respectively. There are other platform to do that (such as https://www.dolthub.com/repositories/web3/bitcoin/data/main), but they no longer update their data.Quote from: Accardo on August 27, 2023, 10:34:09 AMThis retrieves different addresses with the amount of bitcoin contained in them, but the numbers didn't look realistic at first, like this 5502219754649, then I copied one address: bc1qjasf9z3h7w3jspkhtgatgpyvvzgpa2wwd2lr0eh5tx44reyn2k7sfc27a4 searched on blockchain explorer and found that the digits doesn't have a decimal point that separates the number, though correct. It looked this way on block explorer 55022.19754649 Tried out different queries, which I may not post because I didn't understand the results, didn't stop loading or too long to share. FYI, Bitcoin full node software which was initially written by Satoshi (now called Bitcoin Core) use int64_t to store amount of satoshi. So it's realistic/not weird to see other platform also store amount of satoshi under the hood.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "UFO Chaos",
+      "created_time": "August 27, 2023, 12:22:23 PM",
+      "body": "Just yesterday I was wondering if this was possible, OP I would drop you several merit if I had any, thank you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "August 27, 2023, 01:48:18 PM",
+      "body": "Just going to make the comment that if you want to do anything 'real' with the data you really should download core and import the data into the DB yourself. Weather deliberate or by accident if you're relying on somebody else's data for financial transactions you are just asking for trouble. Did Google want to censor something? Oops you got the wrong answer to your query.Did some engineer at Google take a shortcut and copy a set of data to save time and forgot to bring in the real data? oops you've got problems. Just picking on Google since it's who you are talking about but any place that you're relying on their data you are relying on them to be trustworthy. Might not even have to be the organization itself. Could just be a rogue engineer who's trying to scam something.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Accardo",
+      "created_time": "August 28, 2023, 06:20:58 PM",
+      "body": "Quote from: DaveF on August 27, 2023, 01:48:18 PMJust going to make the comment that if you want to do anything 'real' with the data you really should download core and import the data into the DB yourself. Weather deliberate or by accident if you're relying on somebody else's data for financial transactions you are just asking for trouble. Did Google want to censor something? Oops you got the wrong answer to your query.Did some engineer at Google take a shortcut and copy a set of data to save time and forgot to bring in the real data? oops you've got problems. Just picking on Google since it's who you are talking about but any place that you're relying on their data you are relying on them to be trustworthy. Might not even have to be the organization itself. Could just be a rogue engineer who's trying to scam something.-DaveThis is correct, I've seen multiple complaints of missing data on the old dataset \"bigquery-public-data.bitcoin_blockchain.blocks\", a case like missing transaction output not correct or shown, but the new dataset `bigquery-public-data.crypto_bitcoin.transactions`seem to have all the blockchain data and updated every 10 minutes or so, not sure, most times people who complain for missing data didn't send out the right query. Google developers also provided a form https://issuetracker.google.com/issues/new?component=187149&template=0 where people who have missing results or any underlying difficulty can send their complaints in details and their dispute may get settled. I'm not trusting them, only that they're trying to solve a problem on their own end, also putting a bitcoin dataset on their bigquery is a good move, despite the certainty people or users will time to time face issues unlike those who download bitcoin core and query directly by themselves. I understand your points, things can get fishy, since it's managed by some developers, aside it, we have explorers to crosscheck our results if unsatisfied.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "August 29, 2023, 04:34:55 AM",
+      "body": "Quote from: Accardo on August 27, 2023, 10:34:09 AMfound that the digits doesn't have a decimal point that separates the numberDecimals are only used in the User Interface to show the value to the user in different ways. Otherwise as far as the protocol and consensus rules are concerned there is no decimal values used anywhere. Every number in Bitcoin is an integer (a whole number) of different size, most are 32 bit (like version and locktime), some are variable size (like script lengths), we have a couple of 256 bit integers (used in difficulty) and the only 64 bit integers we have are the \"amounts\" field in the outputs of each transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 29, 2023, 06:49:33 AM",
+      "body": "Quote from: DaveF on August 27, 2023, 01:48:18 PMJust going to make the comment that if you want to do anything 'real' with the data you really should download core and import the data into the DB yourself. You can't do that because Bitcoin Core is using LevelDB which is not a relational database, but a NoSQL-type. You could still use a script to conver tthe SQL into whatever format is being dumped into the LevelDB but that is way too time-consuming.Quote from: Accardo on August 28, 2023, 06:20:58 PMThis is correct, I've seen multiple complaints of missing data on the old dataset \"bigquery-public-data.bitcoin_blockchain.blocks\", a case like missing transaction output not correct or shown, but the new dataset `bigquery-public-data.crypto_bitcoin.transactions`seem to have all the blockchain data and updated every 10 minutes or so, not sure, most times people who complain for missing data didn't send out the right query. Google developers also provided a form https://issuetracker.google.com/issues/new?component=187149&template=0 where people who have missing results or any underlying difficulty can send their complaints in details and their dispute may get settled. I'm not trusting them, only that they're trying to solve a problem on their own end, also putting a bitcoin dataset on their bigquery is a good move, despite the certainty people or users will time to time face issues unlike those who download bitcoin core and query directly by themselves. I understand your points, things can get fishy, since it's managed by some developers, aside it, we have explorers to crosscheck our results if unsatisfied. Datasets are seldom updated, only a few times per year. It is unlikely that the data contained inside will ever be up-to-date and suitable for real-time use.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 31, 2023, 10:22:40 AM",
+      "body": "Quote from: ETFbitcoin on August 29, 2023, 12:15:12 PMWhat exactly do you mean by time consuming?I meant writing a block parser to database, by hand. But it seems that someone has already done that as your link to Github shows.But it has a problem: It depends on Python 2.7, which has been unsupported for a while, and most distros don't even carry Python2 anymore. It should be straightforward to port it to Python 3 if it's not using Python2 dependencies as well.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

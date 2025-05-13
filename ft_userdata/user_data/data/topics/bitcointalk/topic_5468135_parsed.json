@@ -1,0 +1,37 @@
+{
+  "id": "topic_5468135",
+  "title": "DdmrDdmr",
+  "author": "DdmrDdmr",
+  "created_time": "September 26, 2023, 08:13:07 AM",
+  "content": "Ojeando el artículo abajo referenciado, leí que el subtitular rezaba lo siguiente:QuoteLa red actualmente tiene 393.000 transacciones sin confirmar que se remontan hasta abril. Para algunos, eso es algo bueno.Los mineros, si lo tengo bien concebido, suelen tener parametrizado desechar las TXs con más de 2 semanas de antigüedad, aunque esto no es necesariamente homogéneo para todos los mineros. Uno también habría podido acudir a un servicio de broadcasting para mantener la TX en espera durante más tiempo en la mempool de algún minero, pero aún así, me extraña que hubiesen TXs de abril todavía en la mempool.Q1) ¿Alguien sabe cómo pueden verse estas TXs tan antiguas?He probado parametrizar Blockchair en vano.Q2) ¿La fecha de TX que vemos en los exploradores de las TXs pendientes sería la fecha de primera emisión de la TX o de inclusión de la TX en la mempool?Q3) ¿Se pueden listar todas las TXs pendientes en alguna herramienta, ordenadas por fecha?Ver:https://decrypt.co/es/198642/locura-de-inscripciones-deja-miles-de-transacciones-de-bitcoin-sin-confirmar",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468135",
+  "comments": [
+    {
+      "author": "Shawshank",
+      "created_time": "September 26, 2023, 07:25:15 PM",
+      "body": "Se puede ver cómo ha evolucionado el tamaño de la mempool durante los últimos años, horas y en tiempo real. Por ejemplo, aquí la evolución de la mempool durante el último mes:https://mempool.space/graphs/mempool#1mQuote from: DdmrDdmrQ1) ¿Alguien sabe cómo pueden verse estas TXs tan antiguas?Si tienes un nodo de Bitcoin Core sincronizado, puedes ejecutar el comando: Code:getrawmempoolQuote from: DdmrDdmrQ2) ¿La fecha de TX que vemos en los exploradores de las TXs pendientes sería la fecha de primera emisión de la TX o de inclusión de la TX en la mempool?Hay exploradores que muestran la fecha en la que vieron la transacción por primera vez (cuando entró en su mempool). Evidentemente, esas fechas pueden ser bastante diferentes entre exploradores. Pueden darse casos en los que un explorador ha visto una transacción por primera vez cuando ya está confirmada en un bloque, mientras que en los nodos de otros exploradores, la transacción llevaba ya horas en su mempool.Quote from: DdmrDdmrQ3) ¿Se pueden listar todas las TXs pendientes en alguna herramienta, ordenadas por fecha?No conozco web que tenga disponible ese servicio. Le he preguntado a Bard de Google y me recomienda que un nodo de Bitcoin Core ejecute el siguiente comando (que no he probado porque estoy fuera).Code:bitcoin-cli getrawmempool | jq -s '.[] | select(.txid | startswith(\"0\")) | sort_by(.time) | reverse'Ya utilizo Bard para todo, incluso para contestar en conversaciones informales en grupos de whatsapp.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "albert0bsd",
+      "created_time": "September 27, 2023, 05:23:18 AM",
+      "body": "Quote from: DdmrDdmr on September 26, 2023, 08:13:07 AMQ1) ¿Alguien sabe cómo pueden verse estas TXs tan antiguas?He probado parametrizar Blockchair en vano.La API de mempool.space se me hace muy completa y amigable.Quote from: DdmrDdmr on September 26, 2023, 08:13:07 AMQ2) ¿La fecha de TX que vemos en los exploradores de las TXs pendientes sería la fecha de primera emisión de la TX o de inclusión de la TX en la mempool?Escribi hace unas semanas esa duda TX Broadcast timestampEsta informacion varia mucho dependiendo del explorador, en el caso de mempool.space las transacciones generalmente tienen el tiempo en el que fueron recividas, sin embargo si la transaccion es reemplazada mediante RBF o FullRBF entonces cosas raras pasan con estos tiempos. Despues de un tiempo mempool dropea la transaccion vieja dejando la nueva, pero como no todos los nodos tienen habilitado fullrbf en ocaciones estos vuelven a realizar un broadcast de esa transaccion y esta se reescribe en la base de datos de mempool. (Repito son casos muy puntuales)Quote from: DdmrDdmr on September 26, 2023, 08:13:07 AMQ3) ¿Se pueden listar todas las TXs pendientes en alguna herramienta, ordenadas por fecha?Solamente con script yo tengo algunos hechos nada tan avanzado como descargarlas todas y ordenarlas por fecha, pero no seria dificil hacerlo.Code:import jsonimport mathimport timeimport randomimport requestsdef round_up_to_decimals(number, decimals):    factor = 10 ** decimals    rounded_number = math.ceil(number * factor) / factor    return rounded_numberdef get_tx(txid):    time.sleep(0.01)    tx = None    try:        url = \"\"        if networkname==\"bitcoin\":            url = \"https://mempool.space/api/tx/\" + txid        elif networkname==\"testnet\":            url = \"https://mempool.space/testnet/api/tx/\" + txid        else:            print(\"Unknow network\")            exit()        response = requests.get(url)        if response.status_code == 200:            tx = response.json()            return tx    except Exception as e:        print(f\"An error occurred: {e}\")        return txdef get_mempool_txids():    time.sleep(0.05)    txids = []    try:        url = \"\"        if networkname==\"bitcoin\":            url = \"https://mempool.space/api/mempool/txids\"        elif networkname==\"testnet\":            url = \"https://mempool.space/testnet/api/mempool/txids\"        else:            print(\"Unknow network\")            exit()        response = requests.get(url)        if response.status_code == 200:            txids = response.json()            return txids    except Exception as e:        print(f\"An error occurred: {e}\")        return txids        networkname = \"bitcoin\"txids = get_mempool_txids()#with open(\"txids.txt\", \"w\") as file:#    file.writelines(\"%s\\n\" % txid for txid in txids)for txid in txids:    tx_data = get_tx(txid)    #do somethingLas funciones que te podrian ser utiles son: GET Mempool Transaction IDs GET Mempool Recent GET Transaction La ventaja de esta API es que los datos ya estan formateados en JSON, listos para ser parseados facilmente.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DdmrDdmr",
+      "created_time": "September 27, 2023, 07:12:37 AM",
+      "body": "Ok, gracias por la info a ambos. Efectivamente, parece que no hay manera de verlo usando algún interficie ya existente sin entrar a codificar una solución, habiendo ahora dos maneras de aproximarse al problema con los apuntes arriba citados (via bitcoin core, via api).Mis búsquedas eran un tanto más simplistas, y tenía la esperanza de encontrar algo abierto como sería a través de los filtros de Blockchair, pero el filtro que tiene de fechas parece funcionar mal, y hagas lo que hagas, parece ceñirse a TXs con fecha de los dos últimos días. Por ejemplo, al intentar filtrar los días 20 y 21 de este mes, el resultado es nulo:https://blockchair.com/bitcoin/mempool/transactions?s=time(asc)&q=time(2023-09-20..2023-09-21)#Nota: También miré si Dune tenía algún tipo de BD (cargada) para la Mempool, pero no.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

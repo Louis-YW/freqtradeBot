@@ -1,0 +1,45 @@
+{
+  "id": "topic_5468401",
+  "title": "simpleSliv3r",
+  "author": "simpleSliv3r",
+  "created_time": "September 28, 2023, 09:20:46 AMLast edit: September 28, 2023, 01:21:23 PM by simpleSliv3r",
+  "content": "Hi,I'm trying to connect my LND node to my Core, both on different machines, but my LND is stucked after unlocking the wallet and I cannot make RPC calls as it shows the following error:Code:user@ubuntu:/usr$ lncli getinfo[lncli] rpc error: code = Unknown desc = the RPC server is in the process of starting up, but not yet ready to accept callsError from lnd side:Code:2023-09-28 11:19:26.524 [DBG] RPCS: [/lnrpc.WalletUnlocker/UnlockWallet] requested2023-09-28 11:19:27.087 [INF] LNWL: Opened wallet2023-09-28 11:19:27.132 [INF] CHRE: Primary chain is set to: bitcoin2023-09-28 11:19:32.512 [DBG] RPCS: [/lnrpc.Lightning/GetInfo] requested2023-09-28 11:19:32.512 [ERR] RPCS: [/lnrpc.Lightning/GetInfo]: the RPC server is in the process of starting up, but not yet ready to accept callsWith a quick search on the Internet, I found that this could be because Core is not completely sync but it's:Code:{  \"version\": 220000,  \"blocks\": 809706,  \"headers\": 809706,  \"verificationprogress\": 0.9999983770795251,....Checking mempool.space 809706 is the last block.The bitcoin.conf and lnd.conf are the following ones:[Bitcoin.conf]Code:server=1daemon=1# Allows LND to connect to the Bitcoin node via an RPC user & passrpcuser=*********rpcpassword=**********# Allows LND & Bitcoin Core to communicate via ZeroMQzmqpubrawblock=tcp://127.0.0.1:28332zmqpubrawtx=tcp://127.0.0.1:28333# Allows other machines apart from localhost to connect to rpc serverrpcallowip=x.x.x.x/24rpcbind=127.0.0.1dbcache=20480shrinkdebugfile=0[LND]Code:[Application Options]externalip=x.x.x.x[Bitcoin]bitcoin.active=truebitcoin.mainnet=truebitcoin.node=bitcoind[Bitcoind]bitcoind.rpchost=CoreIP (same network as externalip)bitcoind.rpcuser=*******bitcoind.rpcpass=********bitcoind.zmqpubrawblock=tcp://127.0.0.1:28332bitcoind.zmqpubrawtx=tcp://127.0.0.1:28333Thanks in advance,-SS",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5468401",
+  "comments": [
+    {
+      "author": "ABCbits",
+      "created_time": "September 28, 2023, 10:26:02 AM",
+      "body": "Quote from: simpleSliv3r on September 28, 2023, 09:20:46 AMWith a quick search on the Internet, I found that this could be because Core is not completely sync but it's:Code:{  \"version\": 220000,  \"blocks\": 809706,  \"headers\": 809706,  \"verificationprogress\": 0.9999983770795251,....Checking mempool.space 809706 is the last block.At very least, number on verificationprogress is just estimation and one of Bitcoin Core member said there's no problem if it's slightly below 1.0[1]. It's proven by 0.9999983770795251 doesn't refer to total of verified block since the value equal to 6249989856747 / 6250000000000 [2].[1] https://bitcoin.stackexchange.com/a/85973[2] https://www.calculator.net/fraction-calculator.html?c2d1=0.9999983770795251&ctype=2&x=79&y=24#decimal2fraction",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "September 28, 2023, 10:34:45 AM",
+      "body": "Quote from: ETFbitcoin on September 28, 2023, 10:26:02 AMAt very least, number on verificationprogress is just estimation and one of Bitcoin Core member said there's no problem if it's slightly below 1.0[1]. It's proven by 0.9999983770795251 doesn't refer to total of verified block since the value equal to 6249989856747 / 6250000000000 [2].[1] https://bitcoin.stackexchange.com/a/85973[2] https://www.calculator.net/fraction-calculator.html?c2d1=0.9999983770795251&ctype=2&x=79&y=24#decimal2fractionYes, I absolutely discard that as the issue. I think there's some network config issue on bitcoin.conf and lnd.conf files but I'm unable to see it.I've modified rpcallowip parameter to 0.0.0.0/0 but still not working :/If I just wait I get the following message on LND:Code:2023-09-28 12:37:13.820 [ERR] LTND: unable to create partial chain control: invalid http POST response (nil), method: getblockhash, id: 1, last error=Post \"http://x.x.x.x:8332\": dial tcp x.x.x.x:8332: connect: connection timed out2023-09-28 12:37:13.820 [ERR] LTND: Shutting down because error in main method: error creating wallet config: unable to create partial chain control: invalid http POST response (nil), method: getblockhash, id: 1, last error=Post \"http://x.x.x.x:8332\": dial tcp x.x.x.x:8332: connect: connection timed out2023-09-28 12:37:13.822 [INF] LTND: Shutdown completeerror creating wallet config: unable to create partial chain control: invalid http POST response (nil), method: getblockhash, id: 1, last error=Post \"http://x.x.x.x:8332\": dial tcp x.x.x.x:8332: connect: connection timed out",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "September 28, 2023, 12:05:09 PM",
+      "body": "After changing some config as binding to 0.0.0.0 and listening to 0.0.0.0/0 on bitcoin.conf now I get a different error:Code:2023-09-28 14:06:41.431 [DBG] RPCS: [/lnrpc.WalletUnlocker/UnlockWallet] requested2023-09-28 14:06:41.986 [INF] LNWL: Opened wallet2023-09-28 14:06:42.026 [INF] CHRE: Primary chain is set to: bitcoin2023-09-28 14:06:42.039 [ERR] LTND: unable to create partial chain control: -28: Loading P2P addresses…2023-09-28 14:06:42.039 [ERR] LTND: Shutting down because error in main method: error creating wallet config: unable to create partial chain control: -28: Loading P2P addresses…2023-09-28 14:06:42.040 [INF] LTND: Shutdown completeerror creating wallet config: unable to create partial chain control: -28: Loading P2P addresses…",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "September 28, 2023, 01:23:32 PM",
+      "body": "Finally it's working!There were different issues. First of all the bindings of bitcoind services must be on 0.0.0.0 if not external IP cannot connect.Also, there was a traffic filtering on the bitcoin core firewall and it was blocking LND traffic.- SS",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

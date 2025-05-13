@@ -1,0 +1,29 @@
+{
+  "id": "topic_5410715",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "August 21, 2022, 06:43:09 PM",
+  "content": "As the version number in the title implies, I am running a debug version of Bitcoin Core 23.0, because I am trying to test a small feature I have just added to part of the wallet subsystem.The RPC for creating a wallet in bitcoin-cli, is createwallet, and loadwallet for loading a wallet. Neither of these are present in Regtest, Signet, or Testnet networks. In fact the entire Wallet subsystem calls seem to be missing. Attempting to call any of them returns \"method not found\".I don't want to take my 0.21.1 node offline to run the wallet tests on mainnet, because that will upgrade the file formats irreversibly. So how am I supposed to create a wallet on the other chains?Build options (Ubuntu 20.04 LTS):Code:./autogen.sh && ./configure --enable-debug && make check -j4Runtime options:Code:./bitcoind -nodaemon -chain=xxx <I tried all 3 of them> -debug=walletdb -debug=rpc",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5410715",
+  "comments": [
+    {
+      "author": "achow101",
+      "created_time": "August 21, 2022, 10:26:43 PM",
+      "body": "Quote from: NotATether on August 21, 2022, 06:43:09 PMIn fact the entire Wallet subsystem calls seem to be missing. Attempting to call any of them returns \"method not found\".You're probably missing the wallet dependencies so configure automatically disabled the wallet. Make sure you have at least one of sqlite and bdb installed.Quote from: NotATether on August 21, 2022, 06:43:09 PMI don't want to take my 0.21.1 node offline to run the wallet tests on mainnet, because that will upgrade the file formats irreversibly.No it won't. Any background upgrades are always backwards compatible. Anything that is not backwards compatible requires explicit user action.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "August 22, 2022, 04:18:52 AM",
+      "body": "Quote from: achow101 on August 21, 2022, 10:26:43 PMQuote from: NotATether on August 21, 2022, 06:43:09 PMIn fact the entire Wallet subsystem calls seem to be missing. Attempting to call any of them returns \"method not found\".You're probably missing the wallet dependencies so configure automatically disabled the wallet. Make sure you have at least one of sqlite and bdb installed.Apparently, I did not have libsqlite3-dev installed, and my BDB build path wasn't exported either. I was 100% sure I built BDB before, since that concided with a pevious source compilation. I forgot to export it again, and run configure with that.All chains have wallet support now.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

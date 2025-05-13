@@ -1,0 +1,21 @@
+{
+  "id": "topic_5414212",
+  "title": "BlackHatCoiner",
+  "author": "BlackHatCoiner",
+  "created_time": "September 20, 2022, 08:38:49 AMLast edit: September 21, 2022, 02:06:19 PM by BlackHatCoiner",
+  "content": "I've already opened a github issue, but due to lack of responses, I'll ask it here as well. I don't know if it's a REST related issue, or mine, but probably the latter. Executing GET commands using REST works fine (e.g., getinfo), the problem is with POST commands.For example:Code:curl -X POST \"https://localhost:3001/v1/invoice/genInvoice\" -H  \"accept: application/json\" -H  \"Content-Type: application/json\" -H 'macaroon: Ag[...]l4=' --insecure -d \"msatoshi=1000\"The above returns:Code:SyntaxError: Unexpected token a in JSON at position 0    at JSON.parse (<anonymous>)    at createStrictSyntaxError (/home/bitcoin/c-lightning-REST/node_modules/body-parser/lib/types/json.js:158:10)    at parse (/home/bitcoin/c-lightning-REST/node_modules/body-parser/lib/types/json.js:83:15)    at /home/bitcoin/c-lightning-REST/node_modules/body-parser/lib/read.js:121:18    at invokeCallback (/home/bitcoin/c-lightning-REST/node_modules/raw-body/index.js:224:16)    at done (/home/bitcoin/c-lightning-REST/node_modules/raw-body/index.js:213:7)    at IncomingMessage.onEnd (/home/bitcoin/c-lightning-REST/node_modules/raw-body/index.js:273:7)    at IncomingMessage.emit (events.js:314:20)    at endReadableNT (_stream_readable.js:1241:12)    at processTicksAndRejections (internal/process/task_queues.js:84:21)It needs more parameters (label, description), but the error is the same. And I don't know what it means. (I mean I do know, I just don't know what it has to do with c-lightning-REST)Core Lightning: v0.10.2C-Lightning-REST: I don't know the version. I'm trying to figure out where it is located.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5414212",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "September 20, 2022, 08:39:58 PM",
+      "body": "Quote from: BlackHatCoiner on September 20, 2022, 08:38:49 AMI've already opened a github issue, but due to lack of responses, I'll ask it here as well. I don't know if it's a REST related issue, or mine, but probably the latter. Executing GET commands using REST works fine (e.g., getinfo), the problem is with POST commands.For example:Code:curl -X POST \"https://localhost:3001/v1/invoice/genInvoice\" -H  \"accept: application/json\" -H  \"Content-Type: application/json\" -H 'macaroon: Ag[...]l4=' --insecure -d \"msatoshi=1000\"Your query is a little bit wrong. Should be like follows. The error probably stems from the --data or -d parameter being wrong.Code:curl -X POST 'https://localhost:3001/v1/invoice/genInvoice' --insecure -H 'macaroon:[redacted]' -H 'Content-Type: application/json' -d '{\"amount\":\"1000\", \"label\":\"test\", \"description\":\"a new test\"}'Oh, also you don't need to specify the 'Accept' data type (JSON); the API will return you JSON anyway.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

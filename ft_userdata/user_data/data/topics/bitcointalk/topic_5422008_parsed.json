@@ -1,0 +1,93 @@
+{
+  "id": "topic_5422008",
+  "title": "citb0in",
+  "author": "citb0in",
+  "created_time": "November 17, 2022, 06:04:44 PM",
+  "content": "I have two numbers which I want to do simple addition math with.Dec / HexNumber 1 is:67890123456789012345 / 3AE2A2B962F52DF79Number 2 is:35000000000000 / 1FD512913000If I add decimal values of nr.1 and nr.2 the result is:67890123456789012345 + 35000000000000 = 67890158460000000000When I convert this decimal value to hex I get as result:3AE2A4B6C0147D800Now I try the same thing but only using the hex values. I use 'bc' tool on Linux for this calculation:Code:$ bcQuotebc 1.07.1Copyright 1991-1994, 1997, 1998, 2000, 2004, 2006, 2008, 2012-2017 Free Software Foundation, Inc.This is free software with ABSOLUTELY NO WARRANTY.For details type `warranty'. obase=16;ibase=163AE2A2B962F52DF79+1FD5129130003AE2A4B6B41E40F79As you see the result differs from the 1th method.3AE2A4B6C0147D800 != 3AE2A4B6B41E40F79Then I thought I check online with any of the available hex calculators <https://www.calculators.tech/hex-calculator>I enter HexValueA=3AE2A2B962F52DF79 plus (+) HexValueB=1FD512913000 and theResult = 3AE2A4B6B41E40000[/color]This same result was output by another online hexcalc (https://purecalculators.com/de/hex-calculator)I got three different results. What the #!R(T$F2M?!?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5422008",
+  "comments": [
+    {
+      "author": "hosemary",
+      "created_time": "November 17, 2022, 07:00:29 PM",
+      "body": "You are adding the two decimal numbers together incorrectly. Quote from: citb0in on November 17, 2022, 06:04:44 PM67890123456789012345 + 35000000000000 = 6789015846000000000067890123456789012345 plus 35000000000000 doesn't equal 67890158460000000000. It equals 67890158456789012345. That's 3AE2A4B6B41E40F79 in hexadecimal format and has been calculated correctly by the tool you used on Linux.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 17, 2022, 08:25:21 PM",
+      "body": "There you go    I used the calculator on my Linux desktop and when adding those two numbers, the result was displayed as:6,789015846×10¹⁹so I just adjusted it myself to show the whole number without expression in power of. The thing is: my 'real' numbers were not as clear as this example here. So I just copied and pasted from one tool to another. Conclusion is: some tools are not capable in calculating and displaying very high numbers. I guess the same is true for the mentioned online hex calculators.Lesson learned --> I will stick with 'bc' toll for further calculations.Thanks for pointing out!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 18, 2022, 12:15:23 PM",
+      "body": "That anyway, yes. But the problem in my case was not the missing specification of the base the problem, but the fact that gnome-calculator cannot handle large numbers. I just found after the fact the function where you can set gnome-calculator also in \"programmer mode\". There you can simply add hex values. Also here the error occurs, see the following screenshot which makes this clear.Everything after B4 is just simply omitted and replaced by zeros.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "PowerGlove",
+      "created_time": "November 19, 2022, 02:44:10 AM",
+      "body": "@citb0in: You ran into a pretty interesting situation (3 different answers, in 3 different tools), here's what happened:The first attemptIt looks like you used GNOME Calculator for this attempt, and the reason you got the limited-precision answer that you did is because of the default preferences in that tool:With that level of precision: 67890123456789012345 + 35000000000000 = 67890158460000000000 = 0x3ae2a4b6c0147d800Btw, you can crank the precision all the way up to 100 decimals, which is something not many people seem to be aware of.The second attemptThis time you used bc, which supports arbitrary precision, so it gave you the correct (i.e. fully precise) answer: 67890123456789012345 + 35000000000000 = 67890158456789012345 = 0x3ae2a4b6b41e40f79The third attemptThis time you used an online calculator, which did its job in JavaScript, so the calculation was carried out in double precision: 67890123456789012345 + 35000000000000 = 67890158456789008384 = 0x3ae2a4b6b41e40000I hope that fully solves the mystery for you!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 19, 2022, 07:54:52 AM",
+      "body": "Quote from: PowerGlove on November 19, 2022, 02:44:10 AMBtw, you can crank the precision all the way up to 100 decimals, which is something not many people seem to be aware of.Hi PowerGlove and thanks for your reply. Yes, that's why I wrote on my last post. It was due to precision. Didn't know that I can modify gnome-calculator's precision. Changed it to maximum possible value = 100 and now the result is displayed correct. One can use gnome-calculator in \"programming mode\" to perform arithmetics with hex values.Nice to have, now I don't need to open a terminal shell and use bc for my calculations.Thank you.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "November 19, 2022, 08:55:20 AM",
+      "body": "If you have any fixed point library, it is not hard to create an arbitrary-precision calculator. All you have to do is code an AST (abstract syntax tree) to arrange the operators in a tree form according to their order of precedence, and this supports operators with any operant count, and cool stuff like parentheses and even nested functions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "November 21, 2022, 09:59:43 PM",
+      "body": "use this calchttps://www.calculator.net/big-number-calculator.htmland https://www.calculator.net/hex-calculator.html",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "citb0in",
+      "created_time": "November 22, 2022, 07:53:36 AM",
+      "body": "Thanks for providing the links for those online calculators, however I wanted something to use locally in Python. It's part of an educational process",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "November 22, 2022, 01:42:57 PM",
+      "body": "Quote from: citb0in on November 22, 2022, 07:53:36 AMThanks for providing the links for those online calculators, however I wanted something to use locally in Python. It's part of an educational process use math library",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "brainless",
+      "created_time": "November 22, 2022, 01:46:36 PM",
+      "body": "use gmpy2 lib to large number multiply or divide etc",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

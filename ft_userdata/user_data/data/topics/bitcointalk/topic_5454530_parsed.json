@@ -1,0 +1,69 @@
+{
+  "id": "topic_5454530",
+  "title": "Jodmapht",
+  "author": "Jodmapht",
+  "created_time": "May 30, 2023, 03:48:55 PMLast edit: May 30, 2023, 04:33:08 PM by Jodmapht",
+  "content": "Hi,How can I open a CLN's wallet using another wallet software? The mnemonic phrase is not sufficient, it seems to be using a non-standard derivation path or something?There is an issue with the support for feerate specification when closing a channel and CLN ended up closing a channel with a fee of 20 sats/vByte. I would like to send the UTXO from the stuck transaction to another UTXO using a higher rate than necessary so the average rate for both transactions is sufficient to include my transaction, but lightning-cli is unable to see the stuck transaction.Thanks!Edit:The \"lightning-hsmtool dumponchaindescriptors\" command returns something like this:wpkh(xpub.../0/0/*)#xxxxxxxxsh(wpkh(xpub.../0/0/*))#xxxxxxxxMy CLN wallet has native segwit addresses, so I tried using the first line in Sparrow I entered it has a descriptor. I am not sure what I should use for the Master fingerprint and the Derivation fields? I tried zeroing out the Master fingerprint and use the default m/84'/0'/0' value for the derivation path. I also tried m, m/0/0, m/84;, m/84'/0', m/84'/0'/0 . I am not sure how it would help me figure out the xpriv/zpriv from the mnemonic phrase though. I am not familiar with descriptors.What am I missing?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5454530",
+  "comments": [
+    {
+      "author": "Jodmapht",
+      "created_time": "May 30, 2023, 06:57:18 PM",
+      "body": "Ok so I looked at the hsmtool code and I managed to hack it to extract the seed. They use the following piece of code that does a non-standard transformation to the seed as obtained from the mnemonic words as far as I understand:hkdf_sha256(bip32_seed, sizeof(bip32_seed),                            &salt, sizeof(salt),                            &hsm_secret, sizeof(hsm_secret),                            \"bip32 seed\", strlen(\"bip32 seed\"));So this stores the actual seed used to generate the master keys into bip32_seed. For standard BIP39 wallets, I think hsm_secret would have constituted the actual BIP32 seed.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 30, 2023, 07:03:58 PM",
+      "body": "Quote from: Jodmapht on May 30, 2023, 03:48:55 PM... when closing a channel and CLN ended up closing a channel with a fee of 20 sats/vByte. I would like to send the UTXO from the stuck transaction to another UTXO using a higher rate than necessary so the average rate for both transactions is sufficient to include my transaction, but lightning-cli is unable to see the stuck transaction....You are overthinking it. From the actual bitcoin node do a CPFP transaction with the higher fee to another address. That will get the 1st TX for the closing of the channel confirmed and the channel closed.No need to mess around with the lightning node and risk broadcasting a TX that might cause another issue.And at 20 sats/vByte I think the VIABTC tool will work too. https://www.viabtc.com/tools/txaccelerator-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "May 30, 2023, 07:23:13 PM",
+      "body": "Quote from: DaveF on May 30, 2023, 07:03:58 PMQuote from: Jodmapht on May 30, 2023, 03:48:55 PM... when closing a channel and CLN ended up closing a channel with a fee of 20 sats/vByte. I would like to send the UTXO from the stuck transaction to another UTXO using a higher rate than necessary so the average rate for both transactions is sufficient to include my transaction, but lightning-cli is unable to see the stuck transaction....You are overthinking it. From the actual bitcoin node do a CPFP transaction with the higher fee to another address. That will get the 1st TX for the closing of the channel confirmed and the channel closed.No need to mess around with the lightning node and risk broadcasting a TX that might cause another issue.And at 20 sats/vByte I think the VIABTC tool will work too. https://www.viabtc.com/tools/txaccelerator-DaveIsn't CPFP what I was actually trying to do? I was trying to spend the UTXO from the low fee transaction such that the average fee rate from both transactions be above 50 sats/vByte. The issue is that I have to extract the private key from the CLN's wallet first?For VIABTC I had tried already, but it looks like they raised their threshold from 10 sats/vByte to a level above 20...Thanks!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 30, 2023, 07:29:29 PM",
+      "body": "No the transaction is within the bitcoin core wallet that you have running on the node. If you have the actual TX that you can see on a block explorer it's out of lightning (2nd layer) and into the 1st layer itself.So all you have to do is spend that transaction with the CPFP.How do you have this setup? You should have some access to that wallet to send the funds.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "May 30, 2023, 07:39:15 PMLast edit: May 30, 2023, 08:00:46 PM by Jodmapht",
+      "body": "Quote from: DaveF on May 30, 2023, 07:29:29 PMNo the transaction is within the bitcoin core wallet that you have running on the node. If you have the actual TX that you can see on a block explorer it's out of lightning (2nd layer) and into the 1st layer itself.So all you have to do is spend that transaction with the CPFP.How do you have this setup? You should have some access to that wallet to send the funds.-DaveI might be wrong, but I don't think CLN uses a bitcoin core wallet? bitcoin-cli listwallets returns an empty array for instance. Also CLN does not seem to be aware at all about what is going on in the mempool.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DaveF",
+      "created_time": "May 30, 2023, 08:38:27 PM",
+      "body": "Quote from: Jodmapht on May 30, 2023, 07:39:15 PMQuote from: DaveF on May 30, 2023, 07:29:29 PMNo the transaction is within the bitcoin core wallet that you have running on the node. If you have the actual TX that you can see on a block explorer it's out of lightning (2nd layer) and into the 1st layer itself.So all you have to do is spend that transaction with the CPFP.How do you have this setup? You should have some access to that wallet to send the funds.-DaveI might be wrong, but I don't think CLN uses a bitcoin core wallet? bitcoin-cli listwallets returns an empty array for instance. Also CLN does not seem to be aware at all about what is going on in the mempool.I thought it did, could be wrong I have never tried with CLN but it was in the back of my head that unlike LND it did.For LND people have written tools to get to the keys https://github.com/lightninglabs/chantoolsQuotewalletinfo          Shows info about an lnd wallet.db file and optionally extracts the BIP32 HD root keyNot sure if anything similar exists for CLNSorry I can't help more.-Dave",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Jodmapht",
+      "created_time": "May 30, 2023, 09:00:51 PM",
+      "body": "Quote from: DaveF on May 30, 2023, 08:38:27 PMQuote from: Jodmapht on May 30, 2023, 07:39:15 PMQuote from: DaveF on May 30, 2023, 07:29:29 PMNo the transaction is within the bitcoin core wallet that you have running on the node. If you have the actual TX that you can see on a block explorer it's out of lightning (2nd layer) and into the 1st layer itself.So all you have to do is spend that transaction with the CPFP.How do you have this setup? You should have some access to that wallet to send the funds.-DaveI might be wrong, but I don't think CLN uses a bitcoin core wallet? bitcoin-cli listwallets returns an empty array for instance. Also CLN does not seem to be aware at all about what is going on in the mempool.I thought it did, could be wrong I have never tried with CLN but it was in the back of my head that unlike LND it did.For LND people have written tools to get to the keys https://github.com/lightninglabs/chantoolsQuotewalletinfo          Shows info about an lnd wallet.db file and optionally extracts the BIP32 HD root keyNot sure if anything similar exists for CLNSorry I can't help more.-DaveNo problem, like I mentioned I was able to extract the seed from CLN by hacking their wallet tool a bit. I used it with another tool I have to get the private key for the UXO of the stuck transaction, and I executed the CPFP. The same tool also generates the zpriv, but I would need to do a bit more hacking to obtain the zpub if I wanted to. Having a tool that can generate wallets based on either entropy, mnemonic words, or seed is handy in this kind of situation Cheers",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

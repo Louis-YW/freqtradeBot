@@ -1,0 +1,125 @@
+{
+  "id": "topic_5414023",
+  "title": "darkv0rt3x",
+  "author": "darkv0rt3x",
+  "created_time": "September 18, 2022, 07:12:20 PM",
+  "content": "HiI'm trying to import a bech32 address to my Bitcoin Core wallet and I can't make it happen.These were the steps:Code:$ bitcoin-cli --named --rpcwallet=MyWatchWallet importaddress label=\"incoming-from-xxxxxxxx\" address=\"bc1qxxxxxxxxxxxxxxxxxxx\" rescan=true p2sh=falseerror code: -4error message:This type of wallet does not support this commandThis is the wallet info:Code: bitcoin-cli --rpcwallet=MyWatchWallet getwalletinfo{  \"walletname\": \"MyWatchWallet\",  \"walletversion\": 169900,  \"format\": \"sqlite\",  \"balance\": 0.00000000,  \"unconfirmed_balance\": 0.00000000,  \"immature_balance\": 0.00000000,  \"txcount\": 0,  \"keypoolsize\": 0,  \"keypoolsize_hd_internal\": 0,  \"paytxfee\": 0.00000000,  \"private_keys_enabled\": false,  \"avoid_reuse\": false,  \"scanning\": false,  \"descriptors\": true,  \"external_signer\": false}I'm usingCode:$ bitcoin-cli --versionBitcoin Core RPC client version v23.0.0Copyright (C) 2009-2022 The Bitcoin Core developersPlease contribute if you find Bitcoin Core useful. Visit<https://bitcoincore.org/> for further information about the software.The source code is available from <https://github.com/bitcoin/bitcoin>.This is experimental software.Distributed under the MIT software license, see the accompanying file COPYINGor <https://opensource.org/licenses/MIT>Why cna't I add it?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5414023",
+  "comments": [
+    {
+      "author": "NotATether",
+      "created_time": "September 18, 2022, 10:00:53 PM",
+      "body": "You are getting that error because importaddress (and importprivkey) are not supported on descriptor wallets[1]. Try making a wallet without descriptors and try again.[1]: https://github.com/bitcoin/bitcoin/issues/25363",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 19, 2022, 04:15:26 AM",
+      "body": "Alternatively, you can use importdescriptors to a descriptor wallet.If the address is from Bitcoin Core, use getaddressinfo to get the address' descriptor and import it to your watching only wallet.If from other wallets, construct a descriptor based from the address' pubKey and script type.e.g. (RegTest):getaddressinfo bcrt1q45ylq9spcg0q5aqzjcfu9ndxqawj28trxylq85Code:\"desc\": \"wpkh([057761c1/0'/0'/1019']02b11c7ade3d64dc2a7fbaf43af8a021cc23a834895d3c16fbb276961f40380467)#sdng4gmc\",Import to MyWatchWallet (prvKey disabled):Code:importdescriptors \"[{ \\\"desc\\\": \\\"wpkh([057761c1/0'/0'/1019']02b11c7ade3d64dc2a7fbaf43af8a021cc23a834895d3c16fbb276961f40380467)#sdng4gmc\\\", \\\"timestamp\\\":0,\\\"label\\\": \\\"incoming-from-xxxxxxxx\\\"}]\"",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "September 27, 2022, 08:15:20 PM",
+      "body": "Quote from: nc50lc on September 19, 2022, 04:15:26 AMAlternatively, you can use importdescriptors to a descriptor wallet.If the address is from Bitcoin Core, use getaddressinfo to get the address' descriptor and import it to your watching only wallet.If from other wallets, construct a descriptor based from the address' pubKey and script type.e.g. (RegTest):getaddressinfo bcrt1q45ylq9spcg0q5aqzjcfu9ndxqawj28trxylq85Code:\"desc\": \"wpkh([057761c1/0'/0'/1019']02b11c7ade3d64dc2a7fbaf43af8a021cc23a834895d3c16fbb276961f40380467)#sdng4gmc\",Import to MyWatchWallet (prvKey disabled):Code:importdescriptors \"[{ \\\"desc\\\": \\\"wpkh([057761c1/0'/0'/1019']02b11c7ade3d64dc2a7fbaf43af8a021cc23a834895d3c16fbb276961f40380467)#sdng4gmc\\\", \\\"timestamp\\\":0,\\\"label\\\": \\\"incoming-from-xxxxxxxx\\\"}]\"I tried getaddressinfo in my online node. But the address in question is not from this node and I got no field named \"desc\": like in your case!I tried with 2 wallets I have in this online node.Code:$ bitcoin-cli --rpcwallet=MyWatchWallet getwalletinfo{  \"walletname\": \"MyWatchWallet\",  \"walletversion\": 169900,  \"format\": \"sqlite\",  \"balance\": 0.00000000,  \"unconfirmed_balance\": 0.00000000,  \"immature_balance\": 0.00000000,  \"txcount\": 0,  \"keypoolsize\": 0,  \"keypoolsize_hd_internal\": 0,  \"paytxfee\": 0.00000000,  \"private_keys_enabled\": false,  \"avoid_reuse\": false,  \"scanning\": false,  \"descriptors\": true,  \"external_signer\": false}and:Code:$ bitcoin-cli --rpcwallet=p2tr-wallet getwalletinfo{  \"walletname\": \"p2tr-wallet\",  \"walletversion\": 169900,  \"format\": \"sqlite\",  \"balance\": 0.00000000,  \"unconfirmed_balance\": 0.00000000,  \"immature_balance\": 0.00000000,  \"txcount\": 0,  \"keypoolsize\": 4000,  \"keypoolsize_hd_internal\": 4000,  \"unlocked_until\": 0,  \"paytxfee\": 0.00000000,  \"private_keys_enabled\": true,  \"avoid_reuse\": false,  \"scanning\": false,  \"descriptors\": true,  \"external_signer\": false}Both are descriptor wallets but no field named \"desc\"Code:$ bitcoin-cli --rpcwallet=MyWatchWallet getaddressinfo bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx{  \"address\": \"bc1qxxxxxxxxxxxxxxxxxxxxxxxx\",  \"scriptPubKey\": \"0014xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",  \"ismine\": false,  \"solvable\": false,  \"iswatchonly\": false,  \"isscript\": false,  \"iswitness\": true,  \"witness_version\": 0,  \"witness_program\": \"bbxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",  \"ischange\": false,  \"labels\": [  ]}andCode:$ bitcoin-cli --rpcwallet=p2tr-wallet getaddressinfo bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx{  \"address\": \"bc1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",  \"scriptPubKey\": \"001xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",  \"ismine\": false,  \"solvable\": false,  \"iswatchonly\": false,  \"isscript\": false,  \"iswitness\": true,  \"witness_version\": 0,  \"witness_program\": \"bbxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",  \"ischange\": false,  \"labels\": [  ]}So, I presume I need to do this in the same node as the one where the addresses were created?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 28, 2022, 04:49:19 AM",
+      "body": "Quote from: darkv0rt3x on September 27, 2022, 08:15:20 PMQuote from: nc50lc on September 19, 2022, 04:15:26 AM-snip-So, I presume I need to do this in the same node as the one where the addresses were created?Yes, getaddressinfo should be used to the node and wallet where the address belongs. Otherwise, it wont return with its descriptor.Additionally even if it's not from a descriptor wallet, it will return with a desc.Here's my test (RegTest):[To see the wallet type] getwalletinfo -rpcwallet=miner_wallet getwalletinfoCode:{  \"walletname\": \"miner_wallet\",  \"walletversion\": 10500,  \"format\": \"bdb\",...}[Export an address' descriptor (no private key)] getwalletinfo -rpcwallet=miner_wallet getaddressinfo bcrt1q45ylq9spcg0q5aqzjcfu9ndxqawj28trxylq85Code:{  \"address\": \"bcrt1q45ylq9spcg0q5aqzjcfu9ndxqawj28trxylq85\",  \"scriptPubKey\": \"0014ad09f01601c21e0a74029613c2cda6075d251d63\",  \"ismine\": true,  \"solvable\": true,  \"desc\": \"wpkh([057761c1/0'/0'/1019']02b11c7ade3d64dc2a7fbaf43af8a021cc23a834895d3c16fbb276961f40380467)#sdng4gmc\",  \"iswatchonly\": false,...}",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "September 29, 2022, 06:47:51 PM",
+      "body": "Quote from: nc50lc on September 28, 2022, 04:49:19 AMQuote from: darkv0rt3x on September 27, 2022, 08:15:20 PMQuote from: nc50lc on September 19, 2022, 04:15:26 AM-snip-So, I presume I need to do this in the same node as the one where the addresses were created?Yes, getaddressinfo should be used to the node and wallet where the address belongs. Otherwise, it wont return with its descriptor.Additionally even if it's not from a descriptor wallet, it will return with a desc.Here's my test (RegTest):[To see the wallet type] getwalletinfo -rpcwallet=miner_wallet getwalletinfoCode:{  \"walletname\": \"miner_wallet\",  \"walletversion\": 10500,  \"format\": \"bdb\",...}[Export an address' descriptor (no private key)] getwalletinfo -rpcwallet=miner_wallet getaddressinfo bcrt1q45ylq9spcg0q5aqzjcfu9ndxqawj28trxylq85Code:{  \"address\": \"bcrt1q45ylq9spcg0q5aqzjcfu9ndxqawj28trxylq85\",  \"scriptPubKey\": \"0014ad09f01601c21e0a74029613c2cda6075d251d63\",  \"ismine\": true,  \"solvable\": true,  \"desc\": \"wpkh([057761c1/0'/0'/1019']02b11c7ade3d64dc2a7fbaf43af8a021cc23a834895d3c16fbb276961f40380467)#sdng4gmc\",  \"iswatchonly\": false,...}Ok, but my goal was to be able to import a bech32 address, created in an offline node, in a different online node, so that I didn't need to go to the offline node every time I need something from that address.But I'll try that just to test it out on my own. Then, I'll paste here my results or if I was able to do it or not!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "September 30, 2022, 03:47:03 AM",
+      "body": "Quote from: darkv0rt3x on September 29, 2022, 06:47:51 PMQuote from: nc50lc on September 28, 2022, 04:49:19 AM-snip-Ok, but my goal was to be able to import a bech32 address, created in an offline node, in a different online node, so that I didn't need to go to the offline node every time I need something from that address.Yes, that's the goal.You have to get the address' descriptor from the offline node just one time.You can even make an HD watching-only wallet with this method (but through the parent descriptors instead).Check this topic is you're interested: Bitcoin core create a watch only wallet and sign transactions offline [Tutorial]",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "September 30, 2022, 08:06:34 PM",
+      "body": "Quote from: nc50lc on September 30, 2022, 03:47:03 AMQuote from: darkv0rt3x on September 29, 2022, 06:47:51 PMQuote from: nc50lc on September 28, 2022, 04:49:19 AM-snip-Ok, but my goal was to be able to import a bech32 address, created in an offline node, in a different online node, so that I didn't need to go to the offline node every time I need something from that address.Yes, that's the goal.You have to get the address' descriptor from the offline node just one time.You can even make an HD watching-only wallet with this method (but through the parent descriptors instead).Check this topic is you're interested: Bitcoin core create a watch only wallet and sign transactions offline [Tutorial]Ohh, ok I see...I'll try that as soon as I can and will post if I succeed or not! Thanks a lot!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "October 01, 2022, 05:25:18 PMLast edit: October 01, 2022, 05:38:37 PM by darkv0rt3x",
+      "body": "Quote from: nc50lc on September 30, 2022, 03:47:03 AMQuote from: darkv0rt3x on September 29, 2022, 06:47:51 PMQuote from: nc50lc on September 28, 2022, 04:49:19 AM-snip-Ok, but my goal was to be able to import a bech32 address, created in an offline node, in a different online node, so that I didn't need to go to the offline node every time I need something from that address.Yes, that's the goal.You have to get the address' descriptor from the offline node just one time.You can even make an HD watching-only wallet with this method (but through the parent descriptors instead).Check this topic is you're interested: Bitcoin core create a watch only wallet and sign transactions offline [Tutorial]Ok, so I just tried to import the descriptor and chose to scan the blockchain late 2018. How long will it take approximately? Too many hours?Edited;Well, the thing didn't work but for some other reaasons:Code:$ bitcoin-cli --rpcwallet=MyWatchWallet importdescriptors \"[{\\\"desc\\\": \\\"wpkh([bbcm4cmclite4m8p957cm8347tyowa87rcyam8ao8a3w4cnwclgrhw4o4)#aaaabbbb\\\", \\\"timestamp\\\":1538352000, \\\"label\\\": \\\"imported-from-old-offline-node\\\"}]\"error: timeout on transient error: Could not connect to the server 127.0.0.1:8332 (error code 0 - \"timeout reached\")Make sure the bitcoind server is running and that you are connecting to the correct RPC port.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 02, 2022, 03:32:08 AM",
+      "body": "Quote from: darkv0rt3x on October 01, 2022, 05:25:18 PMEdited;Well, the thing didn't work but for some other reaasons:Code:error: timeout on transient error: Could not connect to the server 127.0.0.1:8332 (error code 0 - \"timeout reached\")Make sure the bitcoind server is running and that you are connecting to the correct RPC port.Yep, the error is totally unrelated to the command used and it's pretty much self-explanatory.For the rescan, it depends on your system's specs. Could be minutes to hours.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "October 02, 2022, 07:25:56 AMLast edit: October 02, 2022, 07:05:10 PM by darkv0rt3x",
+      "body": "Quote from: nc50lc on October 02, 2022, 03:32:08 AMQuote from: darkv0rt3x on October 01, 2022, 05:25:18 PMEdited;Well, the thing didn't work but for some other reaasons:Code:error: timeout on transient error: Could not connect to the server 127.0.0.1:8332 (error code 0 - \"timeout reached\")Make sure the bitcoind server is running and that you are connecting to the correct RPC port.Yep, the error is totally unrelated to the command used and it's pretty much self-explanatory.For the rescan, it depends on your system's specs. Could be minutes to hours.I got this error but I think the rescan is still going in the background, because yesterday, iirc, I tried to run the command again and I got that message saying the rescan was info in or something like that. The above error message makes no sense because everything is running. Both bitcoin node and LN node.Edited;Ok, so I just checked and the address was imported. I assume this is now a watchonly address in this wallet, right?Edited 1;The imported address says it is  \"iswatchonly\": false,, this means it has the PKs available?I thought this would be a WatchOnly address! Can anyone clarify this, please?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 03, 2022, 03:35:38 AM",
+      "body": "Quote from: darkv0rt3x on October 02, 2022, 07:25:56 AMEdited 1;The imported address says it is  \"iswatchonly\": false,, this means it has the PKs available?I thought this would be a WatchOnly address! Can anyone clarify this, please?But the descriptor only contains the pubKey, as you can see in the getaddressinfo's result, it's the same as the pubKey.Also, when you go to the send tab, you won't have any option to \"Send\" but only \"Create Unsigned\".I wonder if showing that it's  \"iswatchonly\": false, is a bug or intended.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "achow101",
+      "created_time": "October 03, 2022, 05:20:44 AM",
+      "body": "Quote from: nc50lc on October 03, 2022, 03:35:38 AMI wonder if showing that it's  \"iswatchonly\": false, is a bug or intended.It is intended insofar as descriptor wallets do not distinguish between watchonly and spendable internally as legacy wallets do. This distinguishing happens at the wallet level now rather than at a script level, so wallets are watchonly, not items contained within a wallet.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 03, 2022, 05:55:36 AM",
+      "body": "Quote from: achow101 on October 03, 2022, 05:20:44 AMIt is intended insofar as descriptor wallets do not distinguish between watchonly and spendable internally as legacy wallets do. This distinguishing happens at the wallet level now rather than at a script level, so wallets are watchonly, not items contained within a wallet.Thanks for the clarification.@darkv0rt3x In addition to only having the public key, (based from the above) Creating a descriptor wallet with \"Disable Private Key\" option will make the wallet watching-only.In my quick test, it wont accept a descriptor with privKey.On the other hand, a descriptor wallet with private keys enabled wont accept the example descriptor in my test since it only has a pubKey.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "darkv0rt3x",
+      "created_time": "October 03, 2022, 08:06:27 PM",
+      "body": "Thank you both @achow101 and @nc50lc for clarifying. I think I can call this one solved.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

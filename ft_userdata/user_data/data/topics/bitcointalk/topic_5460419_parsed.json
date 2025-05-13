@@ -1,0 +1,37 @@
+{
+  "id": "topic_5460419",
+  "title": "NotATether",
+  "author": "NotATether",
+  "created_time": "July 20, 2023, 08:34:39 AM",
+  "content": "I have stumbled upon some code in python-bitcoin-tools github repo that processes a script(pubkey) and turns it into something human readable. But one thing about the processing surprises me. Have a look for yourself:Code:    @staticmethod    def from_raw(scriptraw, has_segwit=False, network=BitcoinMainNet):        \"\"\"        Imports a Script commands list from raw hexadecimal data            Attributes            ----------            txinputraw : string (hex)                The hexadecimal raw string representing the Script commands            has_segwit : boolean                Is the Tx Input segwit or not        \"\"\"        scriptraw = to_bytes(scriptraw)        commands = []        index = 0        while index < len(scriptraw):            byte = scriptraw[index]            if bytes([byte]) in CODE_OPS:                commands.append(CODE_OPS[bytes([byte])])                index = index + 1                #handle the 3 special bytes 0x4c,0x4d,0x4e if the transaction is not segwit type            elif has_segwit == False and bytes([byte]) == b'\\x4c':                bytes_to_read = int.from_bytes(scriptraw[index + 1], \"little\")                index = index + 1                commands.append(scriptraw[index: index + bytes_to_read].hex())                index = index + bytes_to_read            elif has_segwit == False and bytes([byte]) == b'\\x4d':                bytes_to_read = int.from_bytes(scriptraw[index:index + 2], \"little\")                index = index + 2                commands.append(scriptraw[index: index + bytes_to_read].hex())                index = index + bytes_to_read            elif has_segwit == False and bytes([byte]) == b'\\x4e':                bytes_to_read = int.from_bytes(scriptraw[index:index + 4], \"little\")                index = index + 4                commands.append(scriptraw[index: index + bytes_to_read].hex())                index = index + bytes_to_read            else:                data_size, size = parse_varint(scriptraw[index:index + 9])                commands.append(scriptraw[index + size:index + size + data_size].hex())                index = index + data_size + size        return Script(script=commands, network=network)0x4c, 0x4d, and 0x4e are OP_PUSHDATA1, OP_PUSHDATA2, and OP_PUSHDATA4 respectively, and CODE_OPS is a dict of opcode bytes to strings and includes OP_PUSHDATA*. So this must mean these carcs are impossible to reach then?I am aware of this: https://bitcoin.stackexchange.com/a/48539/112589 but I don't see how this has anything to do with Segwit in particular.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5460419",
+  "comments": [
+    {
+      "author": "vjudeu",
+      "created_time": "July 20, 2023, 12:41:31 PM",
+      "body": "Each Segwit address simply has two pushes: the first one is Segwit version (currently zero or one), and then Segwit address (currently 20-byte or 32-byte).Using OP_PUSHDATA1, OP_PUSHDATA2, or OP_PUSHDATA4, would mean that your Segwit address would contain at least 76 bytes. As long as we have only 20-byte and 32-byte standard addresses, you can just consider anything else non-standard.To sum up: this code validates the output script, outside of witness data. Larger pushes are allowed inside witness (which was abused by Ordinals), but are not accepted in non-witness script that is for example decoded into bech32 address.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "July 20, 2023, 12:46:57 PM",
+      "body": "Quote from: vjudeu on July 20, 2023, 12:41:31 PMEach Segwit address simply has two pushes: the first one is Segwit version (currently zero or one), and then Segwit address (currently 20-byte or 32-byte).Using OP_PUSHDATA1, OP_PUSHDATA2, or OP_PUSHDATA4, would mean that your Segwit address would contain at least 76 bytes. As long as we have only 20-byte and 32-byte standard addresses, you can just consider anything else non-standard.To sum up: this code validates the output script, outside of witness data. Larger pushes are allowed inside witness (which was abused by Ordinals), but are not accepted in non-witness script that is for example decoded into bech32 address.OK, that makes sense. It basically means Segwit outputs do not allow these bytes to be used inside the script.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 20, 2023, 01:03:04 PM",
+      "body": "That's not it.I'd say this is a terrible code to have in a library because it is supposed to handle things that are different and are not supposed to be treated or handled the same way.For starters it is handling scripts and witnesses which are entirely different things. Scripts are scripts! They contain OP codes including PUSHDATA and are supposed to be interpreted to \"build\" the stack with the \"operations\" you have to perform. Hence the 4 branches handling 0x4c,0x4d,0x4e.On the other hand witness is already a stack, it is not-supposed to be interpreted and it does not include OP codes including PUSHDATA. It only has count and size. The code also assumes you have read and discarded the count.In simple terms this method handles apples and oranges at the same time which is why it looks weird.In a script you have OP_PUSHDATA1 so the first 4 branches handle those with a condition that it is not-witness so that they know what data to \"push to the stack\" while the last branch (the else part) is handling the witness (not SegWit output or address) so it has to read a var_int (aka compact_int) indicating the size of the item that is already on the stack.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "topic_5439990",
+  "title": "data-retriever",
+  "author": "data-retriever",
+  "created_time": "February 15, 2023, 08:04:42 PM",
+  "content": "This is the first public release of our Bitcoin wallet focused on cold storage.It's open-source, CLI based and written in Rust.The goal is to provide a secure solution to generate private keys that can be stored in digital mediums (e.g cloud storage). It's an alternative to current-gen hardware wallets for some users that don't have physical security and stability.It's beta but should work fine. All feedback is welcome.Please visit our github page for more information: https://github.com/planktonlabs/frozenkrillIf you have any questions please ask.https://raw.githubusercontent.com/planktonlabs/frozenkrill/master/docs/images/generate_single_interactive.gif",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5439990",
+  "comments": [
+    {
+      "author": "dkbit98",
+      "created_time": "February 15, 2023, 09:25:13 PM",
+      "body": "Quote from: data-retriever on February 15, 2023, 08:04:42 PMIf you have any questions please ask.Welcome to bitcointalk forum!Are you developer or contributor for frozenkrill walle, and if you are I was wondering why choosing that name for wallet?This looks like interesting alternative for cold wallet, but whats the difference and advantage compared to using let's say Electrum wallet offline?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "data-retriever",
+      "created_time": "February 15, 2023, 10:35:39 PMLast edit: February 16, 2023, 12:00:17 AM by data-retriever",
+      "body": "Quote from: dkbit98 on February 15, 2023, 09:25:13 PMQuote from: data-retriever on February 15, 2023, 08:04:42 PMIf you have any questions please ask.Welcome to bitcointalk forum!Are you developer or contributor for frozenkrill walle, and if you are I was wondering why choosing that name for wallet?This looks like interesting alternative for cold wallet, but whats the difference and advantage compared to using let's say Electrum wallet offline?Yes, I'm the main author. The name is a natural one for a Rust project because we are talking about a cRUSTcean (also Rust's mascot, Ferris, is a crab) and it's also adequate in the context of Bitcoin where investors are compared to sea animals.Krill is particularly important to whales but it's also the basis of the food chain of other sea animals. Krill lives in cold waters but if you want to hodl them for a long time it's better to store them frozen  Compared to something like electrum being used offline there are perhaps three notable differences:1) When using frozenkrill, the generated seed is encrypted with strong cryptography because the key derivation/key stretching algorithm (argo2id) has been created to withstand brute-force attacks. Any encryption/decryption will take a lot of cpu and memory.On the other hand electrum uses a much weaker algorithm (just a password hash AFAIK for the disk database, other wallets may use something better like scrypt, but probably with a low number of rounds/RAM requirements and still prone to GPU cracking).Most wallets will by default show the BIP39 seed which uses PBKDF2 with just 2048 iterations if the user selected a non empty password. This is also very prone to brute-force attacks.By default frozenkrill will never show/print the seed, never store it with a weak encryption and only let the user access it indirectly for the signing of PSBT filesIn practice these algorithm differences is the difference between an attacker taking one day to crack the wallet or million years.2) frozenkrill allows and encourages the user to use keyfiles as part of the password (see the README for more information). This is something that only exists on advanced encryption systems like TrueCrypt/VeraCrypt that have been designed with a more paranoid threat modelNote: this isn't a flaw of these other wallets. None of them has been designed to let the seed be stored \"online\" after it being generated offline. All of them will strongly recommend the user to store the seed offline, specially in paper/metal plates.3) frozenkrill is a CLI only, so it doesn't need a graphical system (like the X server in Unix systems) which let it run on very lean operating systems. This reduces the attack surface.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "February 16, 2023, 04:01:47 AM",
+      "body": "PBKDF2 in mnemonic algorithms such as BIP39 and Electrum is not meant to provide security, in fact 2048 rounds is an overkill itself. It is as the name suggests a key derivation function, a way to derive more than one key from the same seed phrase.QuoteSafe BIP-39 seed generation with the option for the user to input 12/24 words (complete seed) or 11/23 words (automatically generation of the last word/checksum)Last word is not the checksum, it contains the checksum. For example in case of a 12-word mnemonic only 4 bits out of the 11 bits of the last word is the checksum. With only having first 11 words, you'll end up with multiple possible words that would satisfy the checksum verification. In other words you can't \"automatically\" generate the last word.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "data-retriever",
+      "created_time": "February 16, 2023, 05:15:49 AM",
+      "body": "Quote from: pooya87 on February 16, 2023, 04:01:47 AMPBKDF2 in mnemonic algorithms such as BIP39 and Electrum is not meant to provide security, in fact 2048 rounds is an overkill itself. It is as the name suggests a key derivation function, a way to derive more than one key from the same seed phrase.It's clear that one of the reasons given on BIP39 to allow a password is to make plausible deniability possible:QuoteThe described method also provides plausible deniability, because every passphrase generates a valid seed (and thus a deterministic wallet) but only the correct one will make the desired wallet available.So we are not just talking about a simple account management using different passwords, but an adversarial setting where the password will make some funds inaccessible to an attacker. The greater the number of iterations, the harder the attacker's job.Quote from: pooya87 on February 16, 2023, 04:01:47 AMQuoteSafe BIP-39 seed generation with the option for the user to input 12/24 words (complete seed) or 11/23 words (automatically generation of the last word/checksum)Last word is not the checksum, it contains the checksum. For example in case of a 12-word mnemonic only 4 bits out of the 11 bits of the last word is the checksum. With only having first 11 words, you'll end up with multiple possible words that would satisfy the checksum verification. In other words you can't \"automatically\" generate the last word.You're technically correct, the best kind of correct Yes, some bits will be filled randomly so we can \"pick\" the last word, it's not just a checksum calculation.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "dkbit98",
+      "created_time": "February 16, 2023, 10:05:45 PM",
+      "body": "Quote from: data-retriever on February 15, 2023, 10:35:39 PMKrill is particularly important to whales but it's also the basis of the food chain of other sea animals. Krill lives in cold waters but if you want to hodl them for a long time it's better to store them frozen  I heard about Krill, other than whales, people are also consuming them (maybe even Bitcoin whales) in a form of Omega3 pills, they say it's better quality then Omega3 from fish and it has specific red color.Quote from: data-retriever on February 15, 2023, 10:35:39 PMfrozenkrill is a CLI only, so it doesn't need a graphical system (like the X server in Unix systems) which let it run on very lean operating systems. This reduces the attack surface.Thank you for very detailed explanation.I know this can often be advantage for geeks and linux users, but majority of people are mostly using wallets with graphical interface.It is good to see that you are using stronger encryption for frozenkrill wallet, but I would like to see other security experts testing it for potential bugs.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

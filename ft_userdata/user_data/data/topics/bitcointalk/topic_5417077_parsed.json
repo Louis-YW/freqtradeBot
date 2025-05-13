@@ -1,0 +1,61 @@
+{
+  "id": "topic_5417077",
+  "title": "Exchangman",
+  "author": "Exchangman",
+  "created_time": "October 14, 2022, 08:43:23 AM",
+  "content": "I have a python script inside docker container and a bitcoin node outside of docker in my local machine , this is my bitcoin.conf informationCode:rpcuser=testuserrpcpassword=testpasswordtestnet=1prune=550server=1[test]rpcallowip=0.0.0.0/0rpcport=8332bind=127.0.0.1minconf=1and this is my docker compose conf fileCode:app:build:  context: .restart: alwaysvolumes:  - .:/appextra_hosts:  - \"host.docker.internal:host-gateway\"then in my python script i'm trying to connect to the bitcoin node using this:Code:connection_url=\"http://%s:%s@localhost:8332/wallet/testwallet\" credentials=('testuser','testpassword')rpc_connection = AuthServiceProxy(connection_url % credentials)rpc_connection.getnewaddress()when I make call to this script I get this error in return [Errno 111] Connection refusedPs: when I run the same script outside of docker container it works fine Any solutions?? ++ is it safe to run the node and connect to it using a script like this? locally?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5417077",
+  "comments": [
+    {
+      "author": "vv181",
+      "created_time": "October 14, 2022, 11:21:58 AM",
+      "body": "You should use the internal IP on the Python container, not localhost.Code:connection_url=\"http://%s:%s@host.docker.internal:8332/wallet/testwallet\" credentials=('testuser','testpassword')rpc_connection = AuthServiceProxy(connection_url % credentials)rpc_connection.getnewaddress()If it still not works, try refer to https://www.howtogeek.com/devops/how-to-connect-to-localhost-within-a-docker-container/",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Exchangman",
+      "created_time": "October 14, 2022, 11:33:21 AM",
+      "body": "Quote from: vv181 on October 14, 2022, 11:21:58 AMYou should use the internal IP on the Python container, not localhost.Code:connection_url=\"http://%s:%s@host.docker.internal:8332/wallet/testwallet\" credentials=('testuser','testpassword')rpc_connection = AuthServiceProxy(connection_url % credentials)rpc_connection.getnewaddress()If it still not works, try refer to https://www.howtogeek.com/devops/how-to-connect-to-localhost-within-a-docker-container/internal ip like 127.0.01? but that will connect to docker localhost network not the server localhost?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Exchangman",
+      "created_time": "October 14, 2022, 11:41:58 AM",
+      "body": "Quote from: ETFbitcoin on October 14, 2022, 09:04:06 AMQuote from: Exchangman on October 14, 2022, 08:43:23 AMwhen I make call to this script I get this error in return [Errno 111] Connection refusedPs: when I run the same script outside of docker container it works fine Any solutions??I only use docker to run certain application, but AFAIK you got this error because you didn't perform port forwarding. On terminal, i'd use parameter -p HOST_PORT:CONTAINER_PORT (should be -p 8332:8332 in your case) to perform port forwarding. But i don't know the equivalent for Dockerfile.Quote from: Exchangman on October 14, 2022, 08:43:23 AM++ is it safe to run the node and connect to it using a script like this? locally?Since you're the one who create the script, it should be safe. But if you have very serious security concern or writing script for business/enterprise usage, i'd recommend you to check whether library you use is malicious or not.So running on local and connecting to rpc on local is safe, just i have to check the python library that's all?How do i know that this library \"https://github.com/jgarzik/python-bitcoinrpc\" is safe?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "vv181",
+      "created_time": "October 14, 2022, 12:41:08 PM",
+      "body": "Quote from: Exchangman on October 14, 2022, 11:33:21 AMQuote from: vv181 on October 14, 2022, 11:21:58 AMYou should use the internal IP on the Python container, not localhost.Code:connection_url=\"http://%s:%s@host.docker.internal:8332/wallet/testwallet\" credentials=('testuser','testpassword')rpc_connection = AuthServiceProxy(connection_url % credentials)rpc_connection.getnewaddress()If it still not works, try refer to https://www.howtogeek.com/devops/how-to-connect-to-localhost-within-a-docker-container/internal ip like 127.0.01? but that will connect to docker localhost network not the server localhost?I meant the internal IP of Docker.Since you already set host.docker.internal:host-gateway, you can try to use host.docker.internal as the IP, to access the IP outside Docker container.Try to use the modified code as I quoted above.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "October 27, 2022, 04:53:01 PM",
+      "body": "Another thing could be your server configuration because you need to one the port in the farewal to give access to the RPC calls.Reference: https://stackoverflow.com/questions/11585377/python-socket-error-errno-111-connection-refusedThe way i did to personally fix this kind of issues in my local servers was with the command:Code:firewall-cmd --zone=public --add-port=8332/tpc --permanentAnd to verify your open ports you can use nmap:Code:nmap localhost",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "October 27, 2022, 05:12:40 PM",
+      "body": "host.docker.internal is a domain name not an IP address. You need the IP address of the Docker container because bitcoin-cli doesn't do address resolution when connecting to the RPC server. You can find it using such tools as \"ip addr\" that show all the network interfaces - it will be called \"docker0\" or something like that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

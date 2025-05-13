@@ -1,0 +1,141 @@
+{
+  "id": "topic_5404603",
+  "title": "bydzl",
+  "author": "bydzl",
+  "created_time": "June 30, 2022, 07:55:08 AM",
+  "content": "BTC cannot be transferred out. This will appear：RuntimeError('DataError: Forbidden key path')。。。。。This is the prompt when you want to transfer out BTC. If you can't transfer out, how can you handle it? thank you。Click \"after signing\", that's it. You can't click \"broadcast。",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5404603",
+  "comments": [
+    {
+      "author": "nc50lc",
+      "created_time": "June 30, 2022, 09:36:30 AM",
+      "body": "Quote from: bydzl on June 30, 2022, 07:55:08 AMIf you can't transfer out, how can you handle it? thank you。If it's not a hardware wallet, try to restore the wallet using the seed phrase.Are you using a hardware wallet?If so, you might have to upgrade it to the latest firmware to work.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "June 30, 2022, 12:32:38 PM",
+      "body": "Quote from: bydzl on June 30, 2022, 07:55:08 AMClick \"after signing\", that's it. You can't click \"broadcast._So you can sign the transaction but not broadcast it?If so, you should be able to broadcast it using a 3rd party broadcasting tool such as Blockcypher's.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "June 30, 2022, 12:42:52 PM",
+      "body": "Your transaction is most probably not signed because this error happens when Electrum can not derive the correct key using the information provided in your wallet. It requires your change value in your derivation path be either 0 or 1. Lack of signature is the reason why you can't click the Broadcast button.The line that throws this exception: https://github.com/spesmilo/electrum/blob/574243b897f345208a3b9197c6b0b1e229d61271/electrum/keystore.py#L537-L538",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "DireWolfM14",
+      "created_time": "June 30, 2022, 01:44:50 PM",
+      "body": "I suspect nc50lc is on the right track, i.e. you're using a hardware wallet and Electrum can't get the right signature from the hardware wallet.  This is likely due to having the wrong Bip39 passphrase entered into the hardware wallet, which provides Electrum a completely different set of signing keys.If you're not using a hardware wallet, your wallet file may have been corrupted in which case you'll need to restore it from your seed phrase or a previous back up.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BitMaxz",
+      "created_time": "June 30, 2022, 03:03:41 PM",
+      "body": "There is someone who reported the same issue on the Electrum GitHub page are you the one who reported it there? I think you are?It seems that you are using macOS and installed Electrum 4.1.5 would you mind trying to install the latest one which is 4.2.2 and test and maybe it is just a bug.If it didn't solve the issue like on the reply on the Github page try to enable the debug logging. You can find this feature under tools>preferences>general and then check the write logs to file and reopen the Electrum and make a test transaction again if the error show you can now close the Electrum and check the logs.Let's see if you can find the reason and issue under that logs you can share it here to help us identify the issue.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 01, 2022, 06:53:44 AM",
+      "body": "Quote from: DireWolfM14 on June 30, 2022, 01:44:50 PMI suspect nc50lc is on the right track, i.e. you're using a hardware wallet and Electrum can't get the right signature from the hardware wallet.  This is likely due to having the wrong Bip39 passphrase entered into the hardware wallet, which provides Electrum a completely different set of signing keys.We should just take this as a new suggestion :)since what I suspected in case he's using a hardware wallet is: he might be using an outdated firmware that has a similar bug like this: linkSo I can't take the credit.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Pmalek",
+      "created_time": "July 02, 2022, 09:01:43 AM",
+      "body": "I tried to google the error to see what would come up. I managed to find something not related to Electrum directly but a fork for it for an altcoin. https://githubhot.com/repo/qtumproject/qtum-electrum/issues/115The user experienced the same type of error and the fix was a simple settings change in something the software calls \"Safety Check Level\". Electrum obviously doesn't have anything like that, but it's interesting nonetheless that this error pops up after the alleged signing takes place and the the user is trying to broadcast the transaction.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "BlackHatCoiner",
+      "created_time": "July 02, 2022, 11:46:46 AM",
+      "body": "Quote from: Pmalek on July 02, 2022, 09:01:43 AMI managed to find something not related to Electrum directly but a fork for it for an altcoin.The alt's Electrum wasn't made from scratch, it says it was forked from Electrum. Therefore there's a high chance this error comes from a prior version of Electrum, that was later removed. Electrum developers get used to doing these changes. Quote from: pooya87 on June 30, 2022, 12:42:52 PMYour transaction is most probably not signed because this error happens when Electrum can not derive the correct key using the information provided in your wallet. It requires your change value in your derivation path be either 0 or 1.OP is probably running an old version that was upgraded from an even older? Can't guess of anything else.I'd back up my seed phrase (if I hadn't already) and move onto 4.1.5+.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "July 03, 2022, 04:59:59 AM",
+      "body": "Quote from: BlackHatCoiner on July 02, 2022, 11:46:46 AMOP is probably running an old version that was upgraded from an even older? Can't guess of anything else.OP doesn't seem to be interested in this issue anymore (maybe solved already?) but in order to have any further information we need OP to post the results of the debug log as it was suggested by SomberNight in issue #7873 3 days ago.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "July 03, 2022, 05:14:41 AM",
+      "body": "Quote from: pooya87 on July 03, 2022, 04:59:59 AM-snip- in issue #7873 3 days ago.Based on his screenshot, he's using Trezor hardware wallet since that hardware wallet icon (lower-right) is exclusive to Trezor.It's most likely similar to the old issue (link in my second reply) which should be fixed by upgrading the firmware.Yeah, it's probably solved already after following the first reply and OP didn't bothered replying.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bydzl",
+      "created_time": "November 15, 2022, 03:14:28 AM",
+      "body": "I just continued to log in here today, thank you for your replies, but the problem is still not resolved. After setting the path with the trezor hardware wallet yesterday, I still can't sign. Unable to transfer btc out. Please help me, thank you。",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "November 15, 2022, 03:59:29 AM",
+      "body": "Quote from: bydzl on November 15, 2022, 03:14:28 AMI just continued to log in here today, thank you for your replies, but the problem is still not resolved. After setting the path with the trezor hardware wallet yesterday, I still can't sign.\"Setting the path\", what do you mean?Anyways, have you upgraded your Trezor's firmware to the latest version? No?Here's their official guide on it: https://trezor.io/learn/a/update-trezor-device-firmware",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bydzl",
+      "created_time": "November 15, 2022, 07:17:53 AM",
+      "body": "Quote from: nc50lc on November 15, 2022, 03:59:29 AMQuote from: bydzl on November 15, 2022, 03:14:28 AMI just continued to log in here today, thank you for your replies, but the problem is still not resolved. After setting the path with the trezor hardware wallet yesterday, I still can't sign.\"Setting the path\", what do you mean?Anyways, have you upgraded your Trezor's firmware to the latest version? No?Here's their official guide on it: https://trezor.io/learn/a/update-trezor-device-firmwarehttp://derivation path. Wallets have this functionality. Why can't I upload pictures to this forum? Upgraded to latest version still the same.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "November 15, 2022, 07:33:23 AM",
+      "body": "Quote from: bydzl on November 15, 2022, 07:17:53 AMWhy can't I upload pictures to this forum? This forum doesn't have that option so instead you have to upload your images to one of the image hosting platforms such as https://imgur.com/ and then post the Share link here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "bydzl",
+      "created_time": "November 15, 2022, 08:30:34 AM",
+      "body": "Quote from: pooya87 on November 15, 2022, 07:33:23 AMQuote from: bydzl on November 15, 2022, 07:17:53 AMWhy can't I upload pictures to this forum? This forum doesn't have that option so instead you have to upload your images to one of the image hosting platforms such as https://imgur.com/ and then post the Share link here.https://twitter.com/yearn_dotcom/status/1592433441219702785?s=20thank you",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "o_e_l_e_o",
+      "created_time": "November 15, 2022, 09:16:05 AM",
+      "body": "Open your Electrum wallet. Click on Tools -> Preferences and then check the box named \"Write logs to file\". Close Electrum and then reopen it and open your wallet again.Try to make a transaction so you get shown the error message as before. Close Electrum, then navigate to the newly created logs folder inside the Electrum directory (~/.electrum/logs) and share the contents of the log file with us here.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

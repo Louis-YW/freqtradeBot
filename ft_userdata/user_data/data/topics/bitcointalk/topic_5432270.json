@@ -1,0 +1,117 @@
+{
+  "id": "topic_5432270",
+  "title": "Evgueni Leonov",
+  "author": "Evgueni Leonov",
+  "created_time": "December 29, 2022, 12:33:15 PMLast edit: December 29, 2022, 03:29:51 PM by Evgueni Leonov",
+  "content": "Bitcoin Client Software and Version Number: Bitcoin Core RPC client version v24.0.1Operating System: Raspbian GNU/Linux 9 (stretch)System Hardware Specs: ARMv7 Processor rev 4 (v7l), 1GB RAM and 1 Tb free hard drive space.Description of Problem: My node is up and running but is not reacheable from the internet. I use Code:curl -sL https://bitnodes.earn.com/api/v1/nodes/me-8333/ | jq to test itThis is the output of a nmap scan of my raspberry in my LAN:Code:Nmap scan report for 192.168.1.138Host is up (0.0048s latency).Not shown: 998 filtered portsPORT     STATE SERVICE22/tcp   open  ssh8333/tcp open  bitcoinNmap done: 1 IP address (1 host up) scanned in 5.06 secondsI recently ask to my ISP to get me out from CGNAT and now my public ipv4 in my router config is the same as the one whatsmyip.org shows me. I also added a port forwarding rule in my router config:Code:Protocol: TCPExternal host: 0.0.0.0Internal host: 192.168.1.138External Port: 8333Internal Port: 8333But my node is still not reacheable.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5432270",
+  "comments": [
+    {
+      "author": "n0nce",
+      "created_time": "December 29, 2022, 05:37:29 PM",
+      "body": "Is your node fully synced yet?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Evgueni Leonov",
+      "created_time": "December 29, 2022, 11:41:06 PM",
+      "body": "No, its at 27% yet. I thought it wouldnt accept transactions until is fully synced but it would be reacheable. If thats not the case thanks for your reply! This was driving me crazy :S",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "jackg",
+      "created_time": "December 30, 2022, 12:54:55 AM",
+      "body": "How are you trying to reach it? I think you should be able to reach it from a ping request locally or from a hard coded connection from a device on your network but not over the Internet or externally yet (changing once it syncs).You could test if it's a router issue by trying to connect it over tor.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 30, 2022, 06:53:56 AM",
+      "body": "Quote from: Evgueni Leonov on December 29, 2022, 11:41:06 PMNo, its at 27% yet. I thought it wouldnt accept transactions until is fully synced but it would be reacheable. If thats not the case thanks for your reply! This was driving me crazy :SWhen you're node is in the initial block download stage, it won't accept certain RPC calls until the verification is finished, but I don't think that's the problem. Why is your node listening on 192.168.1.138 only? You need to make it listen to 0.0.0.0.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Evgueni Leonov",
+      "created_time": "December 30, 2022, 09:14:14 AM",
+      "body": "Quote from: jackg on December 30, 2022, 12:54:55 AMHow are you trying to reach it? I think you should be able to reach it from a ping request locally or from a hard coded connection from a device on your network but not over the Internet or externally yet (changing once it syncs).You could test if it's a router issue by trying to connect it over tor. I'm trying to reach it by using this tool https://bitnodes.io/#join-the-network.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Evgueni Leonov",
+      "created_time": "December 30, 2022, 09:29:02 AM",
+      "body": "Quote from: NotATether on December 30, 2022, 06:53:56 AMQuote from: Evgueni Leonov on December 29, 2022, 11:41:06 PMNo, its at 27% yet. I thought it wouldnt accept transactions until is fully synced but it would be reacheable. If thats not the case thanks for your reply! This was driving me crazy :SWhen you're node is in the initial block download stage, it won't accept certain RPC calls until the verification is finished, but I don't think that's the problem. Why is your node listening on 192.168.1.138 only? You need to make it listen to 0.0.0.0.My raspberry LAN IP is 192.168.1.138 and I used nmap to check if bitcoind is listening on 8333 port. I don't understand how to make it listen to 0.0.0.0, what do you mean?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 30, 2022, 12:15:52 PM",
+      "body": "Quote from: Evgueni Leonov on December 30, 2022, 09:29:02 AMQuote from: NotATether on December 30, 2022, 06:53:56 AMQuote from: Evgueni Leonov on December 29, 2022, 11:41:06 PMNo, its at 27% yet. I thought it wouldnt accept transactions until is fully synced but it would be reacheable. If thats not the case thanks for your reply! This was driving me crazy :SWhen you're node is in the initial block download stage, it won't accept certain RPC calls until the verification is finished, but I don't think that's the problem. Why is your node listening on 192.168.1.138 only? You need to make it listen to 0.0.0.0.My raspberry LAN IP is 192.168.1.138 and I used nmap to check if bitcoind is listening on 8333 port. I don't understand how to make it listen to 0.0.0.0, what do you mean?0.0.0.0 is a special network address that causes a program to listen on all the network interfaces in the system.Try running Bitcoin Core again using the options -listen=1 -bind=0.0.0.0 , if that doesn't work, then try testing your SSH port to see if you can connect to it from outside the internet. I see it is listening on the local network (interface), but is it also listening on your internet-connected interface (that is, whatever IP address your ISP gave you).",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "simpleSliv3r",
+      "created_time": "December 30, 2022, 12:17:33 PM",
+      "body": "Quote from: Evgueni Leonov on December 30, 2022, 09:29:02 AMQuote from: NotATether on December 30, 2022, 06:53:56 AMQuote from: Evgueni Leonov on December 29, 2022, 11:41:06 PMNo, its at 27% yet. I thought it wouldnt accept transactions until is fully synced but it would be reacheable. If thats not the case thanks for your reply! This was driving me crazy :SWhen you're node is in the initial block download stage, it won't accept certain RPC calls until the verification is finished, but I don't think that's the problem. Why is your node listening on 192.168.1.138 only? You need to make it listen to 0.0.0.0.My raspberry LAN IP is 192.168.1.138 and I used nmap to check if bitcoind is listening on 8333 port. I don't understand how to make it listen to 0.0.0.0, what do you mean?Use nmap for your public and not private IP and see what happens.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "seoincorporation",
+      "created_time": "December 30, 2022, 12:44:29 PM",
+      "body": "I'm not sure if if this will work for Raspbian, but on my Centos server I had to configure the firewall to fix the same issue that you have right now. The command was the next one:Code:firewall-cmd --zone=public --add-port=8332/tcp --permanentThat way the port will be open to the public. And about your ISP I think you only need to configure your modem in DMZ, that way anyone outside the LAN will be able to connect to the server.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 30, 2022, 01:03:48 PM",
+      "body": "Quote from: seoincorporation on December 30, 2022, 12:44:29 PMI'm not sure if if this will work for Raspbian, but on my Centos server I had to configure the firewall to fix the same issue that you have right now. The command was the next one:Code:firewall-cmd --zone=public --add-port=8332/tcp --permanentThat way the port will be open to the public. And about your ISP I think you only need to configure your modem in DMZ, that way anyone outside the LAN will be able to connect to the server.CentOS doesn't have a firewall enabled on installation, but firewalld blocks all incoming traffic by default - on all distributions. So it is something that OP should look into as well.<while we are at the topic of firewalls, somebody should make a firewall that monitors port 8333 for malicious traffic utilizing patched security vulnerabilities.>",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Evgueni Leonov",
+      "created_time": "December 30, 2022, 01:13:54 PM",
+      "body": "Quote from: simpleSliv3r on December 30, 2022, 12:17:33 PMUse nmap for your public and not private IP and see what happens.The nmap report on my public ip says:Code:All 1000 scanned ports on [my public ip] are filteredBut in my router control panel the firewall is configured this way:https://i.ibb.co/J7nYXTW/image.pngAnd I added this manual rule (UPnP IGd is enabled):https://i.ibb.co/hWsGpNx/image.png",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "NotATether",
+      "created_time": "December 30, 2022, 02:13:45 PM",
+      "body": "Quote from: Evgueni Leonov on December 30, 2022, 01:13:54 PMQuote from: simpleSliv3r on December 30, 2022, 12:17:33 PMUse nmap for your public and not private IP and see what happens.The nmap report on my public ip says:Code:All 1000 scanned ports on [my public ip] are filteredBut in my router control panel the firewall is configured this way:And I added this manual rule (UPnP IGd is enabled):What is the brand and model of your router? It seems as though it is still blocking all of your public ports, considering the SSH port is also filtered from your public IP.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Evgueni Leonov",
+      "created_time": "December 30, 2022, 05:59:41 PM",
+      "body": "Quote from: NotATether on December 30, 2022, 02:13:45 PMWhat is the brand and model of your router? It seems as though it is still blocking all of your public ports, considering the SSH port is also filtered from your public IP.Sagemcom F@st 5657",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

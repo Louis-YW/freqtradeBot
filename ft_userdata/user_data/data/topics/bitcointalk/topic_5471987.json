@@ -1,0 +1,77 @@
+{
+  "id": "topic_5471987",
+  "title": "johnal",
+  "author": "johnal",
+  "created_time": "October 28, 2023, 09:38:20 AM",
+  "content": "getaddressbalance is not accurate:Code:$ ./electrum-4.4.6/run_electrum  getaddressbalance 18jANvQ6AuVGJnea4EhmXiAf6bHR5qKjPB{    \"confirmed\": \"0.00099822\",    \"unconfirmed\": \"0\"}But real balance is 30.99099822 BTCsee https://blockchair.com/bitcoin/address/18jANvQ6AuVGJnea4EhmXiAf6bHR5qKjPBandhttps://blockchain.info/balance?active=18jANvQ6AuVGJnea4EhmXiAf6bHR5qKjPBWhat can be wrong? The servers I'm relying on?",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5471987",
+  "comments": [
+    {
+      "author": "hosemary",
+      "created_time": "October 28, 2023, 09:47:05 AM",
+      "body": "If you check the transaction history of the address, you will see that it has received 50 BTC in 2009. That transaction is not recognized by electrum, because that's a P2PK transaction and the 50 BTC hasn't been paid to that address at all. That transaction has been made to the public key which generates that address. Many block explorers display the fund that has been sent to a public key for the address derived from that, but electrum doesn't do that.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "johnal",
+      "created_time": "October 28, 2023, 10:05:59 AM",
+      "body": "Thanks, to better understand, \"if\" I own the private key associated with this address, then:My balance is 30.99099822 BTC.which includes:- the 30 BTC from the P2PK transaction made in 2009.- The 0.99 BTC that Electrum recognizes as confirmed for that addressBut I can still spend 30.99 btc, right? If yes, I don't understand Electrum decision to exclude P2PK balances from the address balance!",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "hosemary",
+      "created_time": "October 28, 2023, 10:16:19 AMLast edit: October 29, 2023, 08:04:20 AM by hosseinimr93",
+      "body": "Quote from: johnal on October 28, 2023, 10:05:59 AMThanks, to better understand, \"if\" I own the private key associated with this address, then:My balance is 30.99099822 BTC.If you own the private key of that address, you own  30.99 BTC, but you have to use another tool for spending that. Electrum will display only 0.00099822 Edit: It's possible to sweep the private key in electrum. Read nc50lc's reply.Quote from: johnal on October 28, 2023, 10:05:59 AM- the 30 BTC from the P2PK transaction made in 2009.The (public key of) address received 50 BTC in 2009, spent 19.01 BTC of that and received 30.99 BTC as change. Quote from: johnal on October 28, 2023, 10:05:59 AM- The 0.99 BTC that Electrum recognizes as confirmed for that address0.00099822 BTC. That's the total amount the address received through P2PKH transactions.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Findingnemo",
+      "created_time": "October 28, 2023, 05:51:11 PM",
+      "body": "Quote from: johnal on October 28, 2023, 10:05:59 AMI don't understand Electrum decision to exclude P2PK balances from the address balance!No one really uses it anymore so they didn't want to add that feature that no one will ever use it anymore. But if you are someone you can create a script to broadcast P2PK transactions via Electrum too.You can find the relevant discussion about Electrum can't handle \"send to pubkey\" inputs created by LoyceVOr better go with Bitcoin core which supports P2PK and every available kind and it definitely worth it if you want to spend your 30BTC.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 29, 2023, 04:58:17 AM",
+      "body": "Quote from: johnal on October 28, 2023, 10:05:59 AMBut I can still spend 30.99 btc, right? If yes, I don't understand Electrum decision to exclude P2PK balances from the address balance!Electrum is not excluding that balance, the block explorers you check are falsely displaying the P2PK balance as the P2PKH balance. Imagine if you had two checking account in bank A and bank B, you won't see your balance B when you check your A account and vice versa, even though both of them are your bank accounts and you spend from both using the same signature.In Bitcoin you can create a lot of different addresses using the same key pair. 2x P2PK, 2x P2PKH, multiple P2SH with various scripts (eg. 1of1 multisig, locktime, conditionals, wrapped witness), 2x P2WPKH, multiple P2WSH with various scripts, multiple P2TR.But when you create a wallet with that key, the wallet has to know which type of output script (or address) it needs to watch. So when you import your key and select the P2PKH address or import P2PKH address in a watch only wallet it will only watch the P2PKH outputs and report that balance. Which means everything else including P2PK outputs will be ignored.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "nc50lc",
+      "created_time": "October 29, 2023, 05:01:10 AM",
+      "body": "Quote from: johnal on October 28, 2023, 10:05:59 AMBut I can still spend 30.99 btc, right? If yes, I don't understand Electrum decision to exclude P2PK balances from the address balance!With Electrum, your only option is to \"Sweep\" its private key (Wallet->Private key->Sweep) and Electrum will be able to spend that P2PK unspent txn output.When sweeping, do not append any script type before the private key (it wont work in uncompressed WIF) and it'll search for P2PK together with P2PKH outputs.Take note that sweep automatically sends the amount of BTC to the wallet where you've used the menu.Reference PR: https://github.com/spesmilo/electrum/pull/3125",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "LoyceV",
+      "created_time": "October 29, 2023, 12:28:33 PM",
+      "body": "Quote from: pooya87 on October 29, 2023, 04:58:17 AMElectrum is not excluding that balance, the block explorers you check are falsely displaying the P2PK balance as the P2PKH balance.While technically correct, I think it's a good choice to display the information. The block explorer knows for a fact that the same private key can access the funds, so why risk someone overlooking his funds?Quote from: nc50lc on October 29, 2023, 05:01:10 AMWith Electrum, your only option is to \"Sweep\" its private key (Wallet->Private key->Sweep) and Electrum will be able to spend that P2PK unspent txn output.The main drawback: you need a hot wallet, and can't sign offline. I'd always recommend an offline setup with Bitcoin Core for these amounts.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "pooya87",
+      "created_time": "October 30, 2023, 12:54:06 PM",
+      "body": "Quote from: LoyceV on October 29, 2023, 12:28:33 PMQuote from: pooya87 on October 29, 2023, 04:58:17 AMElectrum is not excluding that balance, the block explorers you check are falsely displaying the P2PK balance as the P2PKH balance.While technically correct, I think it's a good choice to display the information. The block explorer knows for a fact that the same private key can access the funds, so why risk someone overlooking his funds?Nah, it's just a weird decision they made for only P2PK outputs. For example if you had funds in P2WPKH address and checked the P2PKH address derived from the same key, the explorer still won't show you the balance in the P2WPKH address.What they do is basically to take P2PK outputs and convert them to P2PKH. That's it!There are a bunch of these types of little bugs in block explorers. For example majority of them count the 50BTC reward of Genesis block as the balance of its \"address\". For those who don't know this reward is not spendable so it should not be included as the balance.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}

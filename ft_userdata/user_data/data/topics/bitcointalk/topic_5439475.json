@@ -1,0 +1,69 @@
+{
+  "id": "topic_5439475",
+  "title": "zasad@",
+  "author": "zasad@",
+  "created_time": "February 11, 2023, 03:46:40 PM",
+  "content": "Нужна только цена монеты с округлением до сотых.Подскажите что нужно написать в гугл таблице на примере BTC?___Можно с любого подобного сайта, Коинмаркеткап и другие.",
+  "score": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "url": "https://bitcointalk.org/index.php?topic=5439475",
+  "comments": [
+    {
+      "author": "andy_pelevin",
+      "created_time": "February 12, 2023, 08:52:08 AM",
+      "body": "У coingecko есть API. Причем, когда они в рекламе пишут что предоставляют самый полный криптовалютный API для трейдеров и разработчиков - это не преувеличение. Для получения данных в таблицу можно установить расширение к таблице или написать скрипт для внешнего АПИ. Я когда то давно пробовал пользовать расширением, но это было не очень удобно и с сильно ограниченным функционалом. АПИ - более гибкий и более универсальный инструмент, но для написания АПИ-запроса, нужно чётко знать, какие данные нужны и где их можно взять.Когда то давно я сделал ветку на БТТ о различных способах автоматизации, но тема не получила поддержки от форумчан и я её забросил.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "zasad@",
+      "created_time": "February 12, 2023, 07:23:17 PM",
+      "body": "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usdЭтот скрипт выводитCode:{\"bitcoin\":{\"usd\":21977}}Как сделать чтобы была только цена?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "andy_pelevin",
+      "created_time": "February 12, 2023, 09:00:22 PMLast edit: February 13, 2023, 07:12:45 AM by andy_pelevin",
+      "body": "Quote from: zasad@ on February 12, 2023, 07:23:17 PMhttps://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usdЭтот скрипт выводитCode:{\"bitcoin\":{\"usd\":21977}}Как сделать чтобы была только цена?Это не скрипт, а АПИ-запрос, который возвращает данные в формате JSON. Для того, чтобы достать значение, собственно, и нужно добавить этот запрос в скрипт, который находится на странице \"Apps Script\". Буквально, в этом ответе написано:  price bitcoin в валюте usd равен 21977. В запросе может быть не одно значение, а несколько, поэтому нужно понимать какие данные в ответе к чему относятся.К сожалению, тот скрипт, который я оставлял в таблице в качестве примера, на прямую не работает с таким форматом ответа, нужно будет порыться в своих старых таблицах... Я сейчас редко работаю с запросами из таблиц, предпочитаю питон+пандас... P.S.  Кстати, в таблицы совсем недавно добавили коннектор данных. Там есть \"бигквэри\", эта штука может очень много, но, увы, она  платная, и какой то \"лукер\". Я с этими фишками ещё не разбирался, завтра, если будет время, посмотрю...",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "witcher_sense",
+      "created_time": "February 13, 2023, 06:23:41 AMLast edit: February 13, 2023, 06:43:04 AM by witcher_sense",
+      "body": "Quote from: zasad@ on February 12, 2023, 07:23:17 PMhttps://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usdЭтот скрипт выводитCode:{\"bitcoin\":{\"usd\":21977}}Как сделать чтобы была только цена?У меня нет опыта работы с API, но думаю что способов извлечь данные существует достаточно много и решение проблемы может зависеть от конкретной поставленной задачи.Если у вас не какой-то серьезный проект, который требует чтобы программа обеспечивала бесперебойный доступ для множества пользователей и всегда выводила правильные данные, то можно воспользоваться чем-то минималистичным. Вот написанный на коленке скрипт для извлечения только цены:Code:import requestsimport timeendpoint = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'while True:    response = requests.get(endpoint)    if response.status_code == 200:        data = response.json()        print(data['bitcoin']['usd'])        time.sleep(5)EDIT: Можно опробовать онлайн тут: https://trinket.io/python3/73277981c9",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "andy_pelevin",
+      "created_time": "February 13, 2023, 07:00:48 AMLast edit: February 13, 2023, 09:45:56 AM by andy_pelevin",
+      "body": "^Скрипт на питоне не годится. Для гугл-таблиц нужен скрипт, написанный в Apps Script. Это диалект языка JS.Я не большой знаток Apps Script, но по идее скрипт функции должен выглядеть примерно так:Code:function get_price(ids) {  var url = 'https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=';  var response = UrlFetchApp.fetch(url+ids);  var response_text = response.getContentText();  return JSON.parse(response_text)[0][0]}в таблице нужно писать =get_price(ids)вместо ids поставить адрес ячейки со значением названия токенаНо скрипт выдаёт ошибку превышения лимита скорости обращений. Видимо, все обращения  к api.coingecko.com из гугл-таблиц суммируюся и их становится очень много. Как это победить, не знаю. Возможно, нужно отправлять авторизованные запросы, т.е., получить свой токен авторизации и добавлять его в запрос.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "imhoneer",
+      "created_time": "February 13, 2023, 04:37:48 PM",
+      "body": "Quote from: zasad@ on February 11, 2023, 03:46:40 PMНужна только цена монеты с округлением до сотых.Подскажите что нужно написать в гугл таблице на примере BTC?Нашел следующее, вроде понятно написано https://mixedanalytics.com/knowledge-base/import-coingecko-data-to-google-sheets/ или Вам надо что-то другое?",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    },
+    {
+      "author": "Woodman",
+      "created_time": "February 14, 2023, 07:14:38 AMLast edit: February 14, 2023, 09:14:28 AM by Woodman",
+      "body": "Расширение можно поискать для Google sheets но надо понимать что очень быстро прилетит ограничение. Сделал по примеру с https://mixedanalytics.com/ и через пару запросов прилетел бан от coingecko- {\"status\":{\"error_code\":429,\"error_message\":\"You've exceeded the Rate Limit. Please visit https://www.coingecko.com/en/api/pricing to subscribe to our API plans for higher rate limits.\"}} и расширения тоже будут накладывать ограничения, неделя - две полета и потом глюки, их делают чтобы бабло рубить с пользователей платных подписок.и там на coingecko почему то нет десятичных.Лучше написать скрипт на google apps script с записью в таблицу и выполнением по расписанию или при обновлении таблицы. Можно еще и телеграм бота прицепить чтобы в телегу свежие данные слал. Будет надежно и бесплатно. Если надо могу подкинуть код, недавно делал для кукоина кое что подобное, можешь посмотреть в канале @feedbtc #1h data и #daily data берутся по описанному способу.p.s. вот нужный для вывода цены btc код, чего кругами ходить, в таблице выбираешь Расширения - Apps Script - вставляешь код, настраиваешь ID таблицы, имя листа, sheet.getRange(3, 3) указываешь куда вставлять данные на листе, в коде указан B3, если надо A1 в скобках ставь (1, 1), если D2 то в скобках (2, 4) и т.д... Такая в apps script система координат.  - Cохраняешь - Выполнить. Чуть не забыл перед первым запуском скрипта надо сделать развертывание, погугли это просто.Code:const btcprice = () => {  try {    const ss = SpreadsheetApp.openById('ID таблицы');    const sheet = ss.getSheetByName('имя листа');    const range = sheet.getRange(3, 3);    //Парсинг цены btc    var url = \"https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT\"    var response = UrlFetchApp.fetch(url, { 'muteHttpExceptions': true });    var json = response.getContentText();    var parsepricebtc = JSON.parse(json);    var pricebtc = parsepricebtc.data.price;    //Добавление данных в таблицу      range.setValue(pricebtc)  }  catch (e) {    Logger.log(`Error: ${e}`);    return [];  }}Чтобы запускалось автоматически надо настроить триггеры.",
+      "score": 0,
+      "upvotes": 0,
+      "downvotes": 0
+    }
+  ]
+}
