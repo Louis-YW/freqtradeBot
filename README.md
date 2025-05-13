@@ -64,16 +64,22 @@ ft_userdata/user_data/data/topic/
 
 2. Generate Sentiment Features
 Run:
+```bash
 python ft_userdata/user_data/scripts/process_sentiment_features.py
+```
 This will produce a structured dataset in:
 ft_userdata/user_data/data/
 
-3. Train Your Own Models
+4. Train Your Own Models
 Run one of the training scripts depending on your desired model:
+```bash
 python ft_userdata/user_data/freqaimodels/lstm_training.py
+```
 
 # or
+```bash
 python ft_userdata/user_data/freqaimodels/lstm_training_with_sentiment.py
+```
 After training, the following directory will contain your models:
 
 ft_userdata/user_data/models/
