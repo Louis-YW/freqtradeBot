@@ -22,6 +22,7 @@ Download these files only:
 3. Download the image with tag: `stable_freqaitorch`
 4. Follow the [official quickstart guide](https://www.freqtrade.io/en/stable/docker_quickstart/) to install Freqtrade inside the container.
 
+```markdown
 ### Run Backtesting
 
 Once inside the Freqtrade container, run the following commands:
